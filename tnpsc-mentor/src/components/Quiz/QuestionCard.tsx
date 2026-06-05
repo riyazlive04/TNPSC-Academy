@@ -1,6 +1,7 @@
 import type { AnswerLetter, Question } from '../../types'
-import { LETTERS, optionText } from '../../types'
+import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
+import { useT } from '../../lib/i18n'
 
 interface QuestionCardProps {
   question: Question
@@ -26,11 +27,12 @@ export default function QuestionCard({
   reveal = false,
   disabled = false,
 }: QuestionCardProps) {
+  const { t, lang } = useT()
   return (
     <div className="animate-fadeIn rounded-3xl bg-white p-5 shadow-card sm:p-7">
       <div className="mb-3 flex items-center justify-between">
-        <span className="font-heading text-sm font-bold uppercase tracking-wide text-secondary">
-          Question {index + 1} of {total}
+        <span className="tamil font-heading text-sm font-bold uppercase tracking-wide text-secondary">
+          {t('question')} {index + 1} {t('of')} {total}
         </span>
         {question.difficulty && (
           <span className="rounded-full bg-primary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-primary">
@@ -39,8 +41,8 @@ export default function QuestionCard({
         )}
       </div>
 
-      <p className="tamil mb-5 text-lg font-semibold leading-relaxed text-navytext sm:text-xl">
-        {question.question_text}
+      <p className="tamil mb-5 whitespace-pre-line text-lg font-semibold leading-relaxed text-navytext sm:text-xl">
+        {displayQuestion(question, lang)}
       </p>
 
       <div className="flex flex-col gap-3">
@@ -52,7 +54,7 @@ export default function QuestionCard({
             <OptionButton
               key={letter}
               letter={letter}
-              text={optionText(question, letter)}
+              text={displayOption(question, letter, lang)}
               selected={!reveal && selected === letter}
               onSelect={() => onSelect(letter)}
               disabled={disabled}
@@ -62,13 +64,13 @@ export default function QuestionCard({
         })}
       </div>
 
-      {reveal && question.explanation && (
+      {reveal && displayExplanation(question, lang) && (
         <div className="mt-5 rounded-2xl border-l-4 border-secondary bg-secondary/5 p-4">
-          <p className="mb-1 font-heading text-sm font-bold uppercase text-secondary">
-            Explanation
+          <p className="tamil mb-1 font-heading text-sm font-bold uppercase text-secondary">
+            {t('explanation')}
           </p>
-          <p className="tamil text-sm leading-relaxed text-navytext/80">
-            {question.explanation}
+          <p className="tamil whitespace-pre-line text-sm leading-relaxed text-navytext/80">
+            {displayExplanation(question, lang)}
           </p>
         </div>
       )}

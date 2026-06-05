@@ -110,7 +110,7 @@ def scrape_section(section, slug, max_pages=8):
                     print(f"    Error parsing a question: {e}")
                     continue
 
-            time.sleep(1)
+            time.sleep(0.4)
         except Exception as e:  # noqa: BLE001
             print(f"  Error fetching {url}: {e}")
             continue

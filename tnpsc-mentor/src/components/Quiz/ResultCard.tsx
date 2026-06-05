@@ -1,6 +1,7 @@
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
-import { LETTERS, optionText } from '../../types'
+import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../../types'
 import { Check, X, MinusCircle } from 'lucide-react'
+import { useT } from '../../lib/i18n'
 
 interface ResultCardProps {
   question: Question
@@ -19,6 +20,7 @@ export default function ResultCard({
   answer,
   showExplanation,
 }: ResultCardProps) {
+  const { lang } = useT()
   const attempted = Boolean(answer?.selected_answer)
   const correct = answer?.is_correct ?? false
 
@@ -38,9 +40,9 @@ export default function ResultCard({
   return (
     <div className={`rounded-2xl border-2 bg-white p-4 ${ring}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
-        <p className="tamil text-sm font-semibold leading-snug text-navytext">
+        <p className="tamil whitespace-pre-line text-sm font-semibold leading-snug text-navytext">
           <span className="mr-1 text-secondary">Q{index + 1}.</span>
-          {question.question_text}
+          {displayQuestion(question, lang)}
         </p>
         <div className="flex flex-shrink-0 items-center gap-1">
           {statusIcon}
@@ -70,20 +72,20 @@ export default function ResultCard({
                   ].join(' ')}
                 >
                   <span className="font-heading font-bold">{letter}.</span>{' '}
-                  {optionText(question, letter)}
+                  {displayOption(question, letter, lang)}
                   {isCorrect && ' ✓'}
                   {isChosenWrong && ' ✗ (your answer)'}
                 </div>
               )
             })}
           </div>
-          {question.explanation && (
+          {displayExplanation(question, lang) && (
             <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-              <p className="tamil text-xs leading-relaxed text-navytext/80">
+              <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
                 <span className="font-heading font-bold text-secondary">
                   Explanation:{' '}
                 </span>
-                {question.explanation}
+                {displayExplanation(question, lang)}
               </p>
             </div>
           )}

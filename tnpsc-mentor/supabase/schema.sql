@@ -50,6 +50,16 @@ create table if not exists questions (
   created_at timestamptz default now()
 );
 
+-- Optional Tamil (bilingual) content — added separately so existing English
+-- rows are untouched. The frontend renders these when the user picks Tamil/Both
+-- and falls back to English when a column is null.
+alter table questions add column if not exists question_text_ta text;
+alter table questions add column if not exists option_a_ta text;
+alter table questions add column if not exists option_b_ta text;
+alter table questions add column if not exists option_c_ta text;
+alter table questions add column if not exists option_d_ta text;
+alter table questions add column if not exists explanation_ta text;
+
 -- Indexes for fast filtering
 create index if not exists idx_questions_category on questions(category);
 create index if not exists idx_questions_group_type on questions(group_type);
