@@ -1,0 +1,67 @@
+Scraping Simplification [numerics]...
+    aptitude/simplification: 20
+  Found 20 questions
+Scraping Profit and Loss [numerics]...
+    aptitude/profit-and-loss: 27
+  Found 27 questions
+Scraping Percentage [numerics]...
+    aptitude/percentage: 20
+  Found 20 questions
+Scraping Ratio and Proportion [numerics]...
+    aptitude/ratio-and-proportion: 20
+  Found 20 questions
+Scraping LCM & HCF [numerics]...
+    aptitude/problems-on-hcf-and-lcm: 35
+  Found 35 questions
+Scraping Area and Volume [numerics]...
+    aptitude/area: 29
+    aptitude/volume-and-surface-area: 26
+  Found 55 questions
+Scraping Simple Interest & Compound Interest [numerics]...
+    aptitude/simple-interest: 24
+    aptitude/compound-interest: 27
+  Found 51 questions
+Scraping Time and Work [numerics]...
+    aptitude/time-and-work: 40
+  Found 40 questions
+Scraping A.P & G.P [numerics]...
+    aptitude/numbers: 78
+  Found 78 questions
+Scraping Square Root & Cube Root [numerics]...
+    aptitude/square-root-and-cube-root: 20
+  Found 20 questions
+Scraping Surds [numerics]...
+    aptitude/surds-and-indices: 20
+  Found 20 questions
+Scraping Logs and Exponents [numerics]...
+    aptitude/logarithm: 20
+  Found 20 questions
+Scraping Logical Number Series [reasoning]...
+    logical-reasoning/number-series: 79
+  Found 79 questions
+Scraping Logical Alphabet Series [reasoning]...
+    logical-reasoning/letter-and-symbol-series: 17
+  Found 17 questions
+Scraping Alpha-Numeric Reasoning [reasoning]...
+    verbal-reasoning/series-completion: 75
+  Found 75 questions
+Scraping Analogy [reasoning]...
+    verbal-reasoning/analogy: 71
+    non-verbal-reasoning/analogy: 73
+  Found 144 questions
+Scraping Dice [reasoning]...
+    non-verbal-reasoning/cubes-and-dice: 73
+  Found 73 questions
+Scraping Puzzles [reasoning]...
+    verbal-reasoning/character-puzzles: 59
+    logical-reasoning/logical-problems: 24
+  Found 83 questions
+Scraping No of Figures [reasoning]...
+    non-verbal-reasoning/classification: 79
+    non-verbal-reasoning/figure-matrix: 40
+  Found 119 questions
+Scraping Mathematical Operators [reasoning]...
+    verbal-reasoning/arithmetic-reasoning: 79
+  Found 79 questions
+
+Total aptitude questions: 1075
