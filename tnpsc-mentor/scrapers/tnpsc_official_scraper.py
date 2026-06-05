@@ -14,23 +14,30 @@ This script does the two reliable, deterministic steps:
      research refuted guessed URL patterns) and download them, and
   2) OCR each page to Tamil text IF an OCR backend is available.
 
-OCR backends (auto-detected, in order):
-  - pytesseract + Tesseract-OCR installed with the Tamil model 'tam'
-    (tessdata: https://github.com/tesseract-ocr/tessdata or indic-ocr/tessdata)
-  - else: download only, and print install instructions.
+OCR backends (choose with --engine; 'auto' is the default):
+  - cloud  : Google Cloud Vision DOCUMENT_TEXT_DETECTION with Tamil hints
+             (~0.79% CER — best for Tamil). Needs GOOGLE_VISION_API_KEY in
+             scrapers/.env. Pages are rendered with PyMuPDF and sent to Vision.
+  - tesseract : local Tesseract-OCR + Tamil model 'tam' (~7.8% CER fallback).
+  - auto   : cloud if GOOGLE_VISION_API_KEY is set, otherwise tesseract.
 
-NOTE ON ACCURACY: zero-shot Tesseract on Tamil is ~7.8% char / ~40% word error,
-so OCR text needs manual review / post-processing before it becomes clean MCQs.
-For production volume, a cloud OCR (Google Document AI / Vision, ~0.8% CER) is
-strongly recommended. Turning OCR'd answer-key text into structured MCQs with
-the correct option is a separate parsing/QA step that should be reviewed by a
-Tamil reader — this script intentionally stops at producing OCR text so nothing
-unverified is auto-loaded into the question bank.
+NOTE ON ACCURACY: even cloud OCR has ~12% word error on Tamil (word/space
+formation), so OCR text needs review / post-processing before it becomes clean
+MCQs. Turning OCR'd answer-key text into structured MCQs with the correct option
+is a separate parsing/QA step that a Tamil reader should review — this script
+intentionally stops at producing OCR text so nothing unverified is auto-loaded
+into the question bank.
+
+Setup for cloud OCR:
+  1. Google Cloud Console → enable "Cloud Vision API"
+  2. Create an API key → put it in scrapers/.env as GOOGLE_VISION_API_KEY
+  3. pip install pymupdf            (page rendering; pillow only for tesseract)
 
 Usage:
-  python tnpsc_official_scraper.py --list            # list PDF links
-  python tnpsc_official_scraper.py --download N       # download first N PDFs
-  python tnpsc_official_scraper.py --ocr              # OCR downloaded PDFs (needs Tesseract+tam)
+  python tnpsc_official_scraper.py --list                     # list PDF links
+  python tnpsc_official_scraper.py --download N                # download first N (0=all)
+  python tnpsc_official_scraper.py --ocr --engine cloud        # cloud OCR (Vision)
+  python tnpsc_official_scraper.py --ocr --engine tesseract    # local OCR
 """
 
 import argparse
@@ -114,65 +121,129 @@ def download(limit=None):
     print(f"Downloaded/cached {ok}/{len(links)} PDFs.")
 
 
-def _ocr_backend():
-    try:
-        import pytesseract  # noqa: F401
-        from PIL import Image  # noqa: F401
-
-        # Confirm the Tamil model is present.
-        langs = pytesseract.get_languages(config="")
-        if "tam" not in langs:
-            print("⚠️  Tesseract found but 'tam' model missing. Install tessdata 'tam'.")
-            return None
-        return "pytesseract"
-    except Exception:
-        return None
-
-
-def ocr_all():
-    backend = _ocr_backend()
-    if not backend:
-        print(
-            "No OCR backend available.\n"
-            "Install:  pip install pytesseract pymupdf pillow\n"
-            "Then install Tesseract-OCR and the Tamil model 'tam':\n"
-            "  - Tesseract: https://github.com/UB-Mannheim/tesseract/wiki (Windows)\n"
-            "  - tam model: https://github.com/tesseract-ocr/tessdata (place tam.traineddata\n"
-            "    in your tessdata dir, or set TESSDATA_PREFIX)\n"
-            "For higher accuracy on Tamil, prefer Google Document AI / Cloud Vision."
-        )
-        return
-
+# ─── Page rendering ─────────────────────────────────────────────────────────
+def _render_pages(pdf_path, dpi=300):
+    """Yield (page_index, png_bytes) for every page of a scanned PDF."""
     import fitz  # PyMuPDF
-    import pytesseract
-    from PIL import Image
+
+    doc = fitz.open(pdf_path)
+    for i, page in enumerate(doc):
+        pix = page.get_pixmap(dpi=dpi)
+        yield i, pix.tobytes("png")
+    doc.close()
+
+
+# ─── Cloud OCR: Google Cloud Vision (DOCUMENT_TEXT_DETECTION) ────────────────
+# Best Tamil accuracy per research (~0.79% CER). Needs a Vision API key in
+# scrapers/.env as GOOGLE_VISION_API_KEY (enable the Cloud Vision API and create
+# an API key in Google Cloud Console). Billed per page (~1k pages free/month).
+VISION_ENDPOINT = "https://vision.googleapis.com/v1/images:annotate"
+
+
+def ocr_cloud_vision(png_bytes, api_key):
+    import base64
+
+    payload = {
+        "requests": [
+            {
+                "image": {"content": base64.b64encode(png_bytes).decode("ascii")},
+                "features": [{"type": "DOCUMENT_TEXT_DETECTION"}],
+                # Tamil + English hints dramatically improve mixed-script pages.
+                "imageContext": {"languageHints": ["ta", "en"]},
+            }
+        ]
+    }
+    r = requests.post(
+        f"{VISION_ENDPOINT}?key={api_key}", json=payload, timeout=90
+    )
+    r.raise_for_status()
+    resp = r.json()["responses"][0]
+    if "error" in resp:
+        raise RuntimeError(resp["error"].get("message", "Vision API error"))
+    return resp.get("fullTextAnnotation", {}).get("text", "")
+
+
+# ─── Local OCR: Tesseract 'tam+eng' (fallback) ──────────────────────────────
+def ocr_tesseract(png_bytes):
     import io
 
+    import pytesseract
+    from PIL import Image
+
+    return pytesseract.image_to_string(Image.open(io.BytesIO(png_bytes)), lang="tam+eng")
+
+
+def _resolve_engine(engine):
+    """Pick the OCR engine. 'auto' = cloud if a Vision key exists, else tesseract."""
+    key = os.getenv("GOOGLE_VISION_API_KEY", "").strip()
+    if engine in ("auto", "cloud") and key:
+        return "cloud", key
+    if engine == "cloud" and not key:
+        return None, "Set GOOGLE_VISION_API_KEY in scrapers/.env to use cloud OCR."
+    # tesseract path
+    try:
+        import pytesseract
+
+        if "tam" not in pytesseract.get_languages(config=""):
+            return None, "Tesseract found but 'tam' model missing (install tessdata 'tam')."
+        return "tesseract", None
+    except Exception:
+        return None, (
+            "No OCR backend. Either set GOOGLE_VISION_API_KEY (recommended for Tamil),\n"
+            "or: pip install pytesseract pymupdf pillow + install Tesseract-OCR with the\n"
+            "'tam' model (https://github.com/tesseract-ocr/tessdata)."
+        )
+
+
+def ocr_all(engine="auto", dpi=300):
+    backend, info = _resolve_engine(engine)
+    if not backend:
+        print(info)
+        print("\nFor highest Tamil accuracy use cloud OCR:")
+        print("  1. Google Cloud Console → enable 'Cloud Vision API'")
+        print("  2. Create an API key, put it in scrapers/.env as GOOGLE_VISION_API_KEY")
+        print("  3. pip install pymupdf  (page rendering)")
+        print("  4. python tnpsc_official_scraper.py --ocr --engine cloud")
+        return
+
+    try:
+        import fitz  # noqa: F401
+    except Exception:
+        print("PyMuPDF is required for page rendering: pip install pymupdf")
+        return
+
     os.makedirs(OCR_DIR, exist_ok=True)
-    pdfs = [f for f in os.listdir(PDF_DIR) if f.lower().endswith(".pdf")] if os.path.isdir(PDF_DIR) else []
-    print(f"OCR-ing {len(pdfs)} PDFs with Tesseract 'tam+eng' ...")
+    pdfs = (
+        [f for f in os.listdir(PDF_DIR) if f.lower().endswith(".pdf")]
+        if os.path.isdir(PDF_DIR)
+        else []
+    )
+    label = "Google Cloud Vision (ta+en)" if backend == "cloud" else "Tesseract tam+eng"
+    print(f"OCR-ing {len(pdfs)} PDFs with {label} ...")
+
+    api_key = info if backend == "cloud" else None
     for name in pdfs:
         out_path = os.path.join(OCR_DIR, name.rsplit(".", 1)[0] + ".txt")
         if os.path.exists(out_path):
             continue
         try:
-            doc = fitz.open(os.path.join(PDF_DIR, name))
             chunks = []
-            for page in doc:
-                pix = page.get_pixmap(dpi=300)
-                img = Image.open(io.BytesIO(pix.tobytes("png")))
-                chunks.append(pytesseract.image_to_string(img, lang="tam+eng"))
+            for _, png in _render_pages(os.path.join(PDF_DIR, name), dpi=dpi):
+                if backend == "cloud":
+                    chunks.append(ocr_cloud_vision(png, api_key))
+                    time.sleep(0.2)  # stay under Vision rate limits
+                else:
+                    chunks.append(ocr_tesseract(png))
             with open(out_path, "w", encoding="utf-8") as f:
-                f.write("\n".join(chunks))
+                f.write("\n\n".join(chunks))
             print(f"  ✓ {name} -> {out_path}")
         except Exception as e:  # noqa: BLE001
             print(f"  ✗ {name}  {e}")
+
     print(
-        "\nOCR text written to "
-        + OCR_DIR
-        + "/. Review & post-process into MCQs (Tamil reader QA recommended) "
-        "before loading — OCR has ~10-40% word error and answer keys must be "
-        "aligned to question text."
+        f"\nOCR text written to {OCR_DIR}/. Next: post-process into MCQs (a Tamil "
+        "reader should QA — even cloud OCR has ~12% word error, and answer-key "
+        "tables must be aligned to question text) before loading into the DB."
     )
 
 
@@ -180,7 +251,14 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", action="store_true", help="list exam PDF links")
     ap.add_argument("--download", type=int, nargs="?", const=0, help="download first N (0=all)")
-    ap.add_argument("--ocr", action="store_true", help="OCR downloaded PDFs (needs Tesseract+tam)")
+    ap.add_argument("--ocr", action="store_true", help="OCR downloaded PDFs")
+    ap.add_argument(
+        "--engine",
+        choices=["auto", "cloud", "tesseract"],
+        default="auto",
+        help="OCR engine: auto (cloud if key set, else tesseract), cloud (Google Vision), tesseract",
+    )
+    ap.add_argument("--dpi", type=int, default=300, help="page render DPI for OCR")
     args = ap.parse_args()
 
     if args.list:
@@ -189,6 +267,6 @@ if __name__ == "__main__":
     elif args.download is not None:
         download(limit=args.download or None)
     elif args.ocr:
-        ocr_all()
+        ocr_all(engine=args.engine, dpi=args.dpi)
     else:
         ap.print_help()
