@@ -54,6 +54,14 @@ ALLOWED_COLUMNS = {
     "explanation",
     "difficulty",
     "source_url",
+    # Bilingual (paired) Tamil columns — populated by tnpsc_paired_extractor.py.
+    # Requires the _ta ALTERs in supabase/schema.sql to have been run.
+    "question_text_ta",
+    "option_a_ta",
+    "option_b_ta",
+    "option_c_ta",
+    "option_d_ta",
+    "explanation_ta",
 }
 
 BATCH_SIZE = 100
@@ -146,6 +154,8 @@ def main():
     total += upload_file("pyq_questions.json", "PYQ")
     total += upload_file("samacheer_questions.json", "Samacheer")
     total += upload_file("tamil_questions.json", "Tamil (HF dataset)")
+    # Paired bilingual rows from official papers (needs _ta columns in DB).
+    total += upload_file("paired_questions.json", "Paired bilingual (official)")
 
     print(f"🎉 All uploads complete! Inserted {total} rows this run.")
     print(f"Rows after upload: {current_count()}")
