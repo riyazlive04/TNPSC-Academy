@@ -3,10 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertTriangle, ArrowLeft, Loader2, Search, ShieldCheck } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
-import { LETTERS, optionText } from '../types'
+import { LETTERS, displayOption, displayQuestion, displayExplanation } from '../types'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { useAuth } from '../hooks/useAuth'
+import { useT } from '../lib/i18n'
 
 /**
  * Admin-only view. Reached via the *same* selection flow as a regular user,
@@ -17,6 +18,7 @@ export default function AdminQuestionsPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isAdmin, loading: authLoading } = useAuth()
+  const { lang } = useT()
   const config = location.state as QuizConfig | null
 
   const [questions, setQuestions] = useState<Question[]>([])
@@ -140,9 +142,9 @@ export default function AdminQuestionsPage() {
           <div className="flex flex-col gap-4">
             {filtered.map((q, i) => (
               <article key={q.id} className="rounded-2xl bg-white p-4 shadow-card sm:p-5">
-                <p className="tamil mb-3 font-heading text-base font-bold leading-snug text-navytext">
+                <p className="tamil mb-3 whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
                   <span className="mr-1 text-secondary">{i + 1}.</span>
-                  {q.question_text}
+                  {displayQuestion(q, lang)}
                 </p>
                 <div className="flex flex-col gap-1.5">
                   {LETTERS.map((letter) => {
@@ -165,19 +167,19 @@ export default function AdminQuestionsPage() {
                         >
                           {letter}
                         </span>
-                        {optionText(q, letter)}
+                        {displayOption(q, letter, lang)}
                         {isCorrect && <span className="ml-auto text-xs font-bold">✓ Correct</span>}
                       </div>
                     )
                   })}
                 </div>
-                {q.explanation && (
+                {displayExplanation(q, lang) && (
                   <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-                    <p className="tamil text-xs leading-relaxed text-navytext/80">
+                    <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
                       <span className="font-heading font-bold text-secondary">
                         Explanation:{' '}
                       </span>
-                      {q.explanation}
+                      {displayExplanation(q, lang)}
                     </p>
                   </div>
                 )}

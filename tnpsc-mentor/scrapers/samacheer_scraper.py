@@ -28,22 +28,38 @@ STANDARDS = [6, 7, 8, 9, 10]
 # Samacheer subject -> IndiaBix general-knowledge section slug(s).
 # Each slug becomes a `topic` (humanised) within the subject.
 SUBJECT_SOURCES = {
-    "History and INM": ["general-knowledge/indian-history"],
+    "History and INM": [
+        "general-knowledge/indian-history",
+        "general-knowledge/days-and-years",
+    ],
     "Polity": ["general-knowledge/indian-politics"],
     "History Culture Heritage of TN": [
         "general-knowledge/indian-culture",
         "general-knowledge/indian-history",
+        "general-knowledge/books-and-authors",
     ],
     "Development Administration of TamilNadu": [
         "general-knowledge/indian-economy",
         "general-knowledge/indian-politics",
+        "general-knowledge/indian-geography",
     ],
     "Biology": ["general-knowledge/biology", "general-knowledge/general-science"],
-    "Physics": ["general-knowledge/physics"],
-    "Chemistry": ["general-knowledge/chemistry"],
-    "Indian Economy": ["general-knowledge/indian-economy"],
-    "Current Affairs": ["general-knowledge/basic-general-knowledge"],
-    "Aptitude": ["aptitude/simplification", "aptitude/percentage"],
+    "Physics": ["general-knowledge/physics", "general-knowledge/general-science"],
+    "Chemistry": ["general-knowledge/chemistry", "general-knowledge/general-science"],
+    "Indian Economy": [
+        "general-knowledge/indian-economy",
+        "general-knowledge/basic-general-knowledge",
+    ],
+    "Current Affairs": [
+        "general-knowledge/basic-general-knowledge",
+        "general-knowledge/honours-and-awards",
+        "general-knowledge/sports",
+    ],
+    "Aptitude": [
+        "aptitude/simplification",
+        "aptitude/percentage",
+        "aptitude/average",
+    ],
 }
 
 
@@ -60,7 +76,7 @@ def scrape_subject(subject):
     for path in sources:
         section, slug = path.split("/", 1)
         topic = humanise(path)
-        fetched = scrape_section(section, slug, max_pages=4)
+        fetched = scrape_section(section, slug, max_pages=14)
         # Round-robin standards within this topic.
         std_i = 0
         for r in fetched:

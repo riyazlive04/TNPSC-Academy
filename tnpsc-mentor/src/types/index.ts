@@ -28,6 +28,14 @@ export interface Question {
   correct_answer: AnswerLetter
   explanation?: string
   difficulty?: Difficulty
+  // Optional Tamil content (bilingual-ready). When present and the user's
+  // language is Tamil/both, the UI renders these instead of/alongside English.
+  question_text_ta?: string | null
+  option_a_ta?: string | null
+  option_b_ta?: string | null
+  option_c_ta?: string | null
+  option_d_ta?: string | null
+  explanation_ta?: string | null
 }
 
 export interface TestSession {
@@ -117,4 +125,48 @@ export function optionText(q: Question, letter: AnswerLetter): string {
     case 'D':
       return q.option_d
   }
+}
+
+function optionTextTa(q: Question, letter: AnswerLetter): string | null | undefined {
+  switch (letter) {
+    case 'A':
+      return q.option_a_ta
+    case 'B':
+      return q.option_b_ta
+    case 'C':
+      return q.option_c_ta
+    case 'D':
+      return q.option_d_ta
+  }
+}
+
+export type DisplayLang = 'en' | 'ta' | 'both'
+
+/**
+ * Returns the question text to render for the given UI language. Falls back to
+ * English when Tamil content isn't available. For 'both' it stacks EN + TA.
+ */
+export function displayQuestion(q: Question, lang: DisplayLang): string {
+  const ta = q.question_text_ta?.trim()
+  if (lang === 'ta' && ta) return ta
+  if (lang === 'both' && ta) return `${q.question_text}\n${ta}`
+  return q.question_text
+}
+
+/** Same fallback logic for an individual option. */
+export function displayOption(q: Question, letter: AnswerLetter, lang: DisplayLang): string {
+  const en = optionText(q, letter)
+  const ta = optionTextTa(q, letter)?.toString().trim()
+  if (lang === 'ta' && ta) return ta
+  if (lang === 'both' && ta) return `${en} / ${ta}`
+  return en
+}
+
+/** Explanation with the same fallback. */
+export function displayExplanation(q: Question, lang: DisplayLang): string {
+  const en = q.explanation ?? ''
+  const ta = q.explanation_ta?.trim()
+  if (lang === 'ta' && ta) return ta
+  if (lang === 'both' && ta) return `${en}\n${ta}`
+  return en
 }

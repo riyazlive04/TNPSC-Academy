@@ -113,7 +113,7 @@ def _discover_page_urls(soup, section, slug):
     return urls
 
 
-def scrape_indiabix_source(section, slug, aptitude_type, topic_name, max_pages=8):
+def scrape_indiabix_source(section, slug, aptitude_type, topic_name, max_pages=16):
     """Scrape one IndiaBix section/slug page (following its pagination)."""
     base_url = f"https://www.indiabix.com/{section}/{slug}/"
     questions = []
@@ -189,7 +189,7 @@ def scrape_indiabix_source(section, slug, aptitude_type, topic_name, max_pages=8
                     print(f"    Error parsing a question: {e}")
                     continue
 
-            time.sleep(1)
+            time.sleep(0.4)
         except Exception as e:  # noqa: BLE001
             print(f"  Error fetching {url}: {e}")
             continue
@@ -206,10 +206,10 @@ def scrape_all_aptitude():
             qs = scrape_indiabix_source(section, slug, apt_type, topic_name)
             print(f"    {section}/{slug}: {len(qs)}")
             topic_questions.extend(qs)
-            time.sleep(1)
+            time.sleep(0.4)
         print(f"  Found {len(topic_questions)} questions")
         all_questions.extend(topic_questions)
-        time.sleep(1)
+        time.sleep(0.4)
 
     with open("aptitude_questions.json", "w", encoding="utf-8") as f:
         json.dump(all_questions, f, ensure_ascii=False, indent=2)

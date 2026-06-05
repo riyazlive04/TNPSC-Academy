@@ -17,26 +17,52 @@ import time
 
 from indiabix_common import scrape_section
 
-# TNPSC subject -> IndiaBix general-knowledge section slug(s).
+# TNPSC subject -> IndiaBix section slug(s). Multiple sources per subject +
+# deep pagination push the per-subject volume up toward the 10k target.
 SUBJECT_SOURCES = {
-    "History and INM": ["general-knowledge/indian-history"],
-    "Polity": ["general-knowledge/indian-politics"],
+    "History and INM": [
+        "general-knowledge/indian-history",
+        "general-knowledge/world-organisations",
+        "general-knowledge/days-and-years",
+    ],
+    "Polity": [
+        "general-knowledge/indian-politics",
+        "general-knowledge/basic-general-knowledge",
+    ],
     # No TN-specific IndiaBix section exists; Indian history + culture are the
     # closest clean sources for TN history/heritage questions.
     "History Culture Heritage of TN": [
         "general-knowledge/indian-culture",
         "general-knowledge/indian-history",
+        "general-knowledge/books-and-authors",
+        "general-knowledge/famous-personalities",
     ],
     "Development Administration of TamilNadu": [
         "general-knowledge/indian-politics",
         "general-knowledge/indian-economy",
+        "general-knowledge/indian-geography",
     ],
-    "Biology": ["general-knowledge/biology"],
-    "Physics": ["general-knowledge/physics"],
-    "Chemistry": ["general-knowledge/chemistry"],
-    "Indian Economy": ["general-knowledge/indian-economy"],
-    "Current Affairs": ["general-knowledge/basic-general-knowledge"],
-    "Aptitude": ["aptitude/simplification", "aptitude/percentage"],
+    "Biology": ["general-knowledge/biology", "general-knowledge/general-science"],
+    "Physics": ["general-knowledge/physics", "general-knowledge/general-science"],
+    "Chemistry": ["general-knowledge/chemistry", "general-knowledge/general-science"],
+    "Indian Economy": [
+        "general-knowledge/indian-economy",
+        "general-knowledge/basic-general-knowledge",
+    ],
+    "Current Affairs": [
+        "general-knowledge/basic-general-knowledge",
+        "general-knowledge/honours-and-awards",
+        "general-knowledge/sports",
+        "general-knowledge/inventions",
+        "general-knowledge/technology",
+    ],
+    "Aptitude": [
+        "aptitude/simplification",
+        "aptitude/percentage",
+        "aptitude/profit-and-loss",
+        "aptitude/average",
+        "aptitude/numbers",
+    ],
 }
 
 GROUP_SUBJECTS = {
@@ -82,8 +108,7 @@ def scrape_subject(group, subject):
     seen = set()
     for path in sources:
         section, slug = path.split("/", 1)
-        # Keep per-source scope modest so 30 subjects don't take forever.
-        rows = scrape_section(section, slug, max_pages=4)
+        rows = scrape_section(section, slug, max_pages=14)
         for r in rows:
             key = r["question_text"][:80]
             if key in seen:
