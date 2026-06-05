@@ -3,3 +3,10 @@ beautifulsoup4==4.12.2
 supabase==2.3.0
 python-dotenv==1.0.0
 lxml==5.1.0
+
+# Official TNPSC PDF OCR pipeline (tnpsc_official_scraper.py)
+PyMuPDF==1.24.9      # render scanned PDF pages to images
+Pillow==10.4.0       # image handling for the Tesseract fallback
+pytesseract==0.3.13  # optional local OCR fallback (needs Tesseract + 'tam')
+# Cloud OCR (recommended for Tamil) uses Google Cloud Vision over REST via
+# `requests` + a GOOGLE_VISION_API_KEY — no extra SDK required.
