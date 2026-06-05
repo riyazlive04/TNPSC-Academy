@@ -145,6 +145,7 @@ def main():
     total += upload_file("current_affairs_questions.json", "Current Affairs")
     total += upload_file("pyq_questions.json", "PYQ")
     total += upload_file("samacheer_questions.json", "Samacheer")
+    total += upload_file("tamil_questions.json", "Tamil (HF dataset)")
 
     print(f"🎉 All uploads complete! Inserted {total} rows this run.")
     print(f"Rows after upload: {current_count()}")
