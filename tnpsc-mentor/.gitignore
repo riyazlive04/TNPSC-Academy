@@ -12,8 +12,11 @@ dist-ssr
 .env
 scrapers/.env
 
-# Scraper output
+# Scraper output / working dirs
 scrapers/*.json
+scrapers/_log_*.txt
+scrapers/tnpsc_official_pdfs/
+scrapers/tnpsc_official_ocr/
 
 # Python
 __pycache__/
