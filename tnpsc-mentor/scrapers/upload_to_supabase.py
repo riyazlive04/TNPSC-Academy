@@ -95,6 +95,7 @@ def main():
     upload_file(supabase, "aptitude_questions.json", "Aptitude")
     upload_file(supabase, "current_affairs_questions.json", "Current Affairs")
     upload_file(supabase, "pyq_questions.json", "PYQ")
+    upload_file(supabase, "samacheer_questions.json", "Samacheer")
     print("🎉 All uploads complete!")
 
 

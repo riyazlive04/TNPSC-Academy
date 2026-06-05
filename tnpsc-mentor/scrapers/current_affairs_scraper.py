@@ -1,13 +1,15 @@
 """
-Scrapes monthly current affairs MCQs from GKToday.
+Scrapes current affairs MCQs from GKToday's quizbase.
 
-Months: August 2025 -> June 2026
-URL pattern: https://www.gktoday.in/current-affairs-mcq/{month-slug}/
+GKToday exposes quizzes at:
+  - Month wise:  https://www.gktoday.in/quizbase/current-affairs-quiz-{month}-{year}
+  - Topic wise:  https://www.gktoday.in/quizbase/{topic}-current-affairs
 
-Each MCQ on GKToday lives inside a `.wp-block-group` (or article) and contains:
-  - a question paragraph
-  - an <ol>/<ul> of options (<li>)
-  - an "Answer:" / "Correct Answer:" marker followed by the option letter or text
+Each quiz page renders 10 MCQs. Per question:
+  - `.wp_quiz_question`          -> "1. <question>" (+ inline options)
+  - `.wp_quiz_question_options`  -> "[A] .. [B] .. [C] .. [D] .."
+  - `.wp_basic_quiz_answer`      -> "Correct Answer: C [text] Notes: <explanation>"
+  - `.answer_hint`               -> "Notes: <explanation>"
 
 Output: current_affairs_questions.json
 """
@@ -21,6 +23,9 @@ from bs4 import BeautifulSoup
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
+BASE = "https://www.gktoday.in/quizbase"
+
+# (url-slug, label, year) — slug appended to current-affairs-quiz-
 MONTHS = [
     ("august-2025", "August 2025", 2025),
     ("september-2025", "September 2025", 2025),
@@ -35,119 +40,154 @@ MONTHS = [
     ("june-2026", "June 2026", 2026),
 ]
 
-# Curated topic categories (also surfaced in the frontend as defaults).
-TOPIC_CATEGORIES = [
-    "Science & Technology",
-    "Sports",
-    "Economy & Finance",
-    "Government Schemes",
-    "International Affairs",
-    "Awards & Honours",
-    "Appointments",
-    "Environment",
-    "Defence",
-    "Tamil Nadu",
-]
+# GKToday topic quizbase slug -> TNPSC-facing topic label.
+TOPIC_SOURCES = {
+    "science-technology-current-affairs": "Science & Technology",
+    "sports-current-affairs": "Sports",
+    "business-economy-banking-current-affairs": "Economy & Finance",
+    "government-schemes-current-affairs": "Government Schemes",
+    "international-current-affairs": "International Affairs",
+    "awards-honours-persons-in-news-current-affairs": "Awards & Honours",
+    "environment-biodiversity-current-affairs": "Environment",
+    "defence-current-affairs": "Defence",
+    "india-government-politics-current-affairs": "Polity & Governance",
+    "places-in-news-current-affairs": "Places in News",
+}
+
+OPT_RE = re.compile(r"\[\s*([ABCD])\s*\]\s*(.*?)(?=\[\s*[ABCD]\s*\]|$)", re.S)
+ANS_RE = re.compile(r"Correct Answer\s*[:\-]?\s*\[?\s*([ABCD])", re.I)
 
 
 def _clean(text: str) -> str:
     return " ".join((text or "").split())
 
 
-def _answer_letter_from(text: str, option_texts):
-    """Resolve the correct answer to an A/B/C/D letter."""
-    text = text or ""
-    # Direct letter, e.g. "Answer: B"
-    m = re.search(r"answer[:\s]*\[?([ABCD])\b", text, re.I)
-    if m:
-        return m.group(1).upper()
-    # Otherwise try to match the answer text to one of the options.
-    m = re.search(r"answer[:\s]*(.+)", text, re.I)
-    if m:
-        ans_text = _clean(m.group(1)).lower()
-        for idx, opt in enumerate(option_texts):
-            if ans_text and (ans_text in opt.lower() or opt.lower() in ans_text):
-                return ["A", "B", "C", "D"][idx]
-    return "A"
-
-
-def scrape_gktoday_mcq(month_slug, ca_month, ca_year):
-    url = f"https://www.gktoday.in/current-affairs-mcq/{month_slug}/"
+def parse_quiz_page(soup, common):
+    """Parse the 10 MCQs on a GKToday quizbase page into question dicts."""
     questions = []
+    blocks = soup.select(".sques_quiz, .wp_quiz_question")
+    # `.sques_quiz` wraps a full question (Q + options + answer); fall back to
+    # iterating question text nodes if the wrapper class is absent.
+    if soup.select(".sques_quiz"):
+        wrappers = soup.select(".sques_quiz")
+    else:
+        wrappers = blocks
 
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=20)
-        if resp.status_code != 200:
-            print(f"  HTTP {resp.status_code} for {url}")
-            return questions
-        soup = BeautifulSoup(resp.content, "lxml")
-
-        # Question containers: GKToday wraps each MCQ in a group/article block.
-        containers = soup.select(".wp-block-group, article .entry-content > div")
-        for q_div in containers:
-            try:
-                # Question text — first paragraph with reasonable length.
-                q_text = ""
-                for p in q_div.find_all("p"):
-                    candidate = _clean(p.get_text(" ", strip=True))
-                    if len(candidate) >= 10:
-                        q_text = candidate
-                        break
-                if not q_text:
-                    continue
-
-                option_els = q_div.find_all("li")
-                if len(option_els) < 4:
-                    continue
-                option_texts = [_clean(o.get_text(" ", strip=True)) for o in option_els[:4]]
-                if any(not o for o in option_texts):
-                    continue
-
-                # Answer marker — search the block text.
-                block_text = q_div.get_text(" ", strip=True)
-                answer = _answer_letter_from(block_text, option_texts)
-
-                # Explanation — often after "Notes:" or "Explanation:".
-                explanation = ""
-                em = re.search(r"(notes?|explanation)[:\s]+(.+)", block_text, re.I)
-                if em:
-                    explanation = _clean(em.group(2))[:1000]
-
-                questions.append(
-                    {
-                        "category": "current_affairs",
-                        "ca_month": ca_month,
-                        "ca_year": ca_year,
-                        "ca_type": "month_wise",
-                        "subject": "Current Affairs",
-                        "question_text": q_text,
-                        "option_a": option_texts[0],
-                        "option_b": option_texts[1],
-                        "option_c": option_texts[2],
-                        "option_d": option_texts[3],
-                        "correct_answer": answer,
-                        "explanation": explanation,
-                        "difficulty": "medium",
-                        "source_url": url,
-                    }
-                )
-            except Exception as e:  # noqa: BLE001
-                print(f"    Error parsing a question: {e}")
+    for w in wrappers:
+        try:
+            q_el = w.select_one(".wp_quiz_question")
+            opt_el = w.select_one(".wp_quiz_question_options")
+            ans_el = w.select_one(".wp_basic_quiz_answer")
+            hint_el = w.select_one(".answer_hint")
+            if not q_el or not opt_el:
                 continue
-    except Exception as e:  # noqa: BLE001
-        print(f"  Error scraping {month_slug}: {e}")
+
+            # Question text — strip the leading "N." and any trailing options.
+            q_raw = q_el.get_text(" ", strip=True)
+            opt_raw = opt_el.get_text(" ", strip=True)
+            q_text = q_raw.replace(opt_raw, "").strip()
+            q_text = re.sub(r"^\s*\d+\.\s*", "", q_text)
+            q_text = _clean(q_text)
+            if len(q_text) < 8:
+                continue
+
+            # Options — parse the "[A] .. [B] .. [C] .. [D] .." string.
+            opts = {m.group(1).upper(): _clean(m.group(2)) for m in OPT_RE.finditer(opt_raw)}
+            option_texts = [opts.get(k, "") for k in ["A", "B", "C", "D"]]
+            if any(not o for o in option_texts):
+                continue
+
+            # Answer letter.
+            ans_text = ans_el.get_text(" ", strip=True) if ans_el else ""
+            m = ANS_RE.search(ans_text)
+            answer = m.group(1).upper() if m else "A"
+
+            # Explanation — prefer the answer_hint "Notes:" content.
+            explanation = ""
+            if hint_el:
+                explanation = _clean(hint_el.get_text(" ", strip=True))
+            elif ans_text:
+                em = re.search(r"Notes?\s*[:\-]\s*(.+)", ans_text, re.I)
+                if em:
+                    explanation = _clean(em.group(1))
+            explanation = re.sub(r"^Notes?\s*[:\-]\s*", "", explanation)[:1500]
+
+            row = {
+                "question_text": q_text,
+                "option_a": option_texts[0],
+                "option_b": option_texts[1],
+                "option_c": option_texts[2],
+                "option_d": option_texts[3],
+                "correct_answer": answer,
+                "explanation": explanation,
+                "difficulty": "medium",
+            }
+            row.update(common)
+            questions.append(row)
+        except Exception as e:  # noqa: BLE001
+            print(f"    Error parsing a question: {e}")
+            continue
 
     return questions
 
 
+def _fetch(url):
+    resp = requests.get(url, headers=HEADERS, timeout=20)
+    if resp.status_code != 200:
+        print(f"  HTTP {resp.status_code} for {url}")
+        return None
+    return BeautifulSoup(resp.content, "lxml")
+
+
+def scrape_month(slug, label, year):
+    url = f"{BASE}/current-affairs-quiz-{slug}"
+    soup = _fetch(url)
+    if soup is None:
+        return []
+    common = {
+        "category": "current_affairs",
+        "ca_month": label,
+        "ca_year": year,
+        "ca_type": "month_wise",
+        "subject": "Current Affairs",
+        "source_url": url,
+    }
+    return parse_quiz_page(soup, common)
+
+
+def scrape_topic(slug, label):
+    url = f"{BASE}/{slug}"
+    soup = _fetch(url)
+    if soup is None:
+        return []
+    common = {
+        "category": "current_affairs",
+        "ca_type": "topic_wise",
+        "ca_topic": label,
+        "subject": "Current Affairs",
+        "source_url": url,
+    }
+    return parse_quiz_page(soup, common)
+
+
 def scrape_all_current_affairs():
     all_questions = []
-    for slug, month_label, year in MONTHS:
-        print(f"Scraping {month_label}...")
-        questions = scrape_gktoday_mcq(slug, month_label, year)
-        print(f"  Found {len(questions)} questions")
-        all_questions.extend(questions)
-        time.sleep(2)
+
+    print("=== MONTH WISE ===")
+    for slug, label, year in MONTHS:
+        print(f"Scraping {label}...")
+        qs = scrape_month(slug, label, year)
+        print(f"  Found {len(qs)} questions")
+        all_questions.extend(qs)
+        time.sleep(1.5)
+
+    print("\n=== TOPIC WISE ===")
+    for slug, label in TOPIC_SOURCES.items():
+        print(f"Scraping {label}...")
+        qs = scrape_topic(slug, label)
+        print(f"  Found {len(qs)} questions")
+        all_questions.extend(qs)
+        time.sleep(1.5)
 
     with open("current_affairs_questions.json", "w", encoding="utf-8") as f:
         json.dump(all_questions, f, ensure_ascii=False, indent=2)
