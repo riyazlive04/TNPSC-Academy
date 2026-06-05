@@ -14,9 +14,12 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const from =
-    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ??
-    '/test-arena'
+  // After login we always route through the language screen (it pre-selects
+  // any saved choice, so returning users just click Continue). Deep links to
+  // a specific protected page are still honoured.
+  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from
+    ?.pathname
+  const from = fromPath && fromPath !== '/test-arena' ? fromPath : '/language'
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
