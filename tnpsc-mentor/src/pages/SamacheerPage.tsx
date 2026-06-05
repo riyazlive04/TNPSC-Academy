@@ -7,10 +7,12 @@ import PillButton from '../components/UI/PillButton'
 import { SUBJECTS, STANDARDS, standardLabel } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useStartTest } from '../hooks/useStartTest'
+import { useT } from '../lib/i18n'
 
 export default function SamacheerPage() {
   const navigate = useNavigate()
   const startTest = useStartTest()
+  const { t } = useT()
 
   const [subject, setSubject] = useState<string | null>(null)
   const [standard, setStandard] = useState<number | null>(null)
@@ -70,17 +72,17 @@ export default function SamacheerPage() {
           onClick={() => navigate('/test-arena')}
           className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
         >
-          <ArrowLeft size={16} /> Test Arena
+          <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
         <div className="mb-8 text-center">
-          <YellowBadge>Samacheer Based</YellowBadge>
+          <YellowBadge>{t('samacheerBadge')}</YellowBadge>
         </div>
 
         {/* Row 1 — subject */}
         <section className="mb-8">
-          <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-            Step 1 — Select Subject
+          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+            {t('step1Subject')}
           </h3>
           <div className="flex flex-wrap justify-center gap-3">
             {SUBJECTS.map((s) => (
@@ -103,8 +105,8 @@ export default function SamacheerPage() {
         {/* Row 2 — standard */}
         {subject && (
           <section className="mb-8 animate-fadeIn">
-            <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-              Step 2 — Select Standard
+            <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+              {t('step2Standard')}
             </h3>
             <div className="flex flex-wrap justify-center gap-3">
               {STANDARDS.map((n) => (
@@ -123,8 +125,8 @@ export default function SamacheerPage() {
         {/* Row 3 — topics from DB */}
         {subject && standard !== null && (
           <section className="animate-fadeIn">
-            <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-              Step 3 — Select Topic ({subject} · {standardLabel(standard)})
+            <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+              {t('step3Topic')} ({subject} · {standardLabel(standard)})
             </h3>
 
             {loading && (

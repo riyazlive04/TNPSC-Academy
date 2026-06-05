@@ -7,10 +7,12 @@ import PillButton from '../components/UI/PillButton'
 import { GROUPS, GROUP_SUBJECTS, groupLabel } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useStartTest } from '../hooks/useStartTest'
+import { useT } from '../lib/i18n'
 
 export default function PreviousYearPage() {
   const navigate = useNavigate()
   const startTest = useStartTest()
+  const { t } = useT()
   const [selectedGroup, setSelectedGroup] = useState<GroupType | null>(null)
 
   const subjects = selectedGroup ? GROUP_SUBJECTS[selectedGroup] : []
@@ -32,17 +34,17 @@ export default function PreviousYearPage() {
           onClick={() => navigate('/test-arena')}
           className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
         >
-          <ArrowLeft size={16} /> Test Arena
+          <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
         <div className="mb-8 text-center">
-          <YellowBadge>Previous Year Question Paper</YellowBadge>
+          <YellowBadge>{t('pyqBadge')}</YellowBadge>
         </div>
 
         {/* Row 1 — group selection */}
         <section className="mb-8">
-          <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-            Step 1 — Select Group
+          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+            {t('step1Group')}
           </h3>
           <div className="flex flex-wrap justify-center gap-3">
             {GROUPS.map((g) => (
@@ -60,8 +62,8 @@ export default function PreviousYearPage() {
         {/* Row 2 — subjects (only when a group is selected) */}
         {selectedGroup && (
           <section className="animate-fadeIn">
-            <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-              Step 2 — Select Subject ({groupLabel(selectedGroup)})
+            <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+              {t('step2Subject')} ({groupLabel(selectedGroup)})
             </h3>
             <div className="flex flex-wrap justify-center gap-3">
               {subjects.map((subject) => (

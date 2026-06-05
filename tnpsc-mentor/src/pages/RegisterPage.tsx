@@ -62,7 +62,7 @@ export default function RegisterPage() {
 
     // If email confirmation is enabled there may be no active session yet.
     if (useAuthStore.getState().user) {
-      navigate('/test-arena', { replace: true })
+      navigate('/language', { replace: true })
     } else {
       setInfo('Account created! Please check your email to confirm, then sign in.')
     }

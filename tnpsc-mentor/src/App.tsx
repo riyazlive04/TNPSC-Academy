@@ -6,6 +6,7 @@ import ProtectedRoute from './components/Layout/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import LanguageScreen from './pages/LanguageScreen'
 import TestArenaPage from './pages/TestArenaPage'
 import PreviousYearPage from './pages/PreviousYearPage'
 import SamacheerPage from './pages/SamacheerPage'
@@ -32,6 +33,14 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Protected */}
+      <Route
+        path="/language"
+        element={
+          <ProtectedRoute>
+            <LanguageScreen />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/test-arena"
         element={

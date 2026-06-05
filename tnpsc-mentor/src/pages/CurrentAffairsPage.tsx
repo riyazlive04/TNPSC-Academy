@@ -7,12 +7,14 @@ import PillButton from '../components/UI/PillButton'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 import { useStartTest } from '../hooks/useStartTest'
+import { useT } from '../lib/i18n'
 
 type CAView = 'month_wise' | 'topic_wise'
 
 export default function CurrentAffairsPage() {
   const navigate = useNavigate()
   const startTest = useStartTest()
+  const { t } = useT()
   const [view, setView] = useState<CAView>('month_wise')
 
   // Topic-wise: distinct ca_topic values from the DB.
@@ -81,27 +83,27 @@ export default function CurrentAffairsPage() {
           onClick={() => navigate('/test-arena')}
           className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
         >
-          <ArrowLeft size={16} /> Test Arena
+          <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
         <div className="mb-8 text-center">
-          <YellowBadge>Current Affairs</YellowBadge>
+          <YellowBadge>{t('currentAffairsBadge')}</YellowBadge>
         </div>
 
         {/* Sub-category pills */}
         <div className="mb-8 flex justify-center gap-3">
           <PillButton active={view === 'topic_wise'} onClick={() => setView('topic_wise')}>
-            TOPIC WISE
+            {t('topicWise').toUpperCase()}
           </PillButton>
           <PillButton active={view === 'month_wise'} onClick={() => setView('month_wise')}>
-            MONTH WISE
+            {t('monthWise').toUpperCase()}
           </PillButton>
         </div>
 
         {view === 'month_wise' && (
           <section className="animate-fadeIn">
-            <h3 className="mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
-              Select Month (August 2025 → June 2026)
+            <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-white/60">
+              {t('selectMonth')} (August 2025 → June 2026)
             </h3>
             <div className="flex flex-wrap justify-center gap-3">
               {CA_MONTHS.map((m) => (
