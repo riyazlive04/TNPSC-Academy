@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Environment — never commit secrets
+.env
+scrapers/.env
+
+# Scraper output
+scrapers/*.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv
+venv/
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

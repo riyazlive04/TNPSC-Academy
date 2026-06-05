@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0d47a1;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-heading {
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Tamil text helper class */
+.tamil {
+  font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0d47a1;
+}
+::-webkit-scrollbar-thumb {
+  background: #1565c0;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1976d2;
+}
+
+@layer components {
+  /* White pill button — the core nav element */
+  .pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3
+      font-heading font-semibold text-navytext shadow-pill transition-all duration-200
+      hover:-translate-y-0.5 hover:shadow-card active:translate-y-0 focus:outline-none
+      focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Yellow active/selected pill */
+  .pill-active {
+    @apply bg-accent text-navytext;
+  }
+
+  /* Yellow category header badge */
+  .badge-yellow {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-7 py-2.5
+      font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill;
+  }
+
+  /* Input pill */
+  .input-pill {
+    @apply w-full rounded-full border-2 border-transparent bg-white px-5 py-3 font-body text-navytext
+      placeholder:text-slate-400 focus:border-accent focus:outline-none;
+  }
+}
