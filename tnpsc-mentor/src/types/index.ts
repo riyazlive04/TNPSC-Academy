@@ -27,6 +27,9 @@ export interface Question {
   option_d: string
   correct_answer: AnswerLetter
   explanation?: string
+  // Per-option rationale: for each WRONG option letter, why it is incorrect.
+  // Powers the targeted "your answer is wrong because…" feedback.
+  why_wrong?: Partial<Record<AnswerLetter, string>> | null
   difficulty?: Difficulty
   // Optional Tamil content (bilingual-ready). When present and the user's
   // language is Tamil/both, the UI renders these instead of/alongside English.
@@ -179,4 +182,10 @@ export function displayExplanation(q: Question, lang: DisplayLang): string {
   if (lang === 'ta' && ta) return ta
   if (lang === 'both' && ta) return `${en}\n${ta}`
   return en
+}
+
+/** Why a specific (wrong) option is incorrect, if we have it. */
+export function whyWrongFor(q: Question, letter: AnswerLetter): string {
+  const reason = q.why_wrong?.[letter]
+  return reason ? reason.trim() : ''
 }

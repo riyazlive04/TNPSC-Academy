@@ -1,5 +1,5 @@
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
-import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../../types'
+import { LETTERS, displayQuestion, displayOption, displayExplanation, whyWrongFor } from '../../types'
 import { Check, X, MinusCircle } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 
@@ -23,6 +23,10 @@ export default function ResultCard({
   const { lang } = useT()
   const attempted = Boolean(answer?.selected_answer)
   const correct = answer?.is_correct ?? false
+  const chosen = answer?.selected_answer as AnswerLetter | undefined
+  // Targeted feedback: why the user's specific wrong choice is incorrect.
+  const wrongReason =
+    attempted && !correct && chosen ? whyWrongFor(question, chosen) : ''
 
   let statusIcon = <MinusCircle size={20} className="text-slate-400" />
   let statusLabel = 'Skipped'
@@ -79,6 +83,16 @@ export default function ResultCard({
               )
             })}
           </div>
+          {wrongReason && (
+            <div className="mt-3 rounded-lg border-l-4 border-red-400 bg-red-50 p-3">
+              <p className="tamil whitespace-pre-line text-xs leading-relaxed text-red-700">
+                <span className="font-heading font-bold">
+                  Why your answer ({chosen}) is wrong:{' '}
+                </span>
+                {wrongReason}
+              </p>
+            </div>
+          )}
           {displayExplanation(question, lang) && (
             <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
               <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
