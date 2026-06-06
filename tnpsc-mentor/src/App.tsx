@@ -15,6 +15,9 @@ import AptitudePage from './pages/AptitudePage'
 import QuizPage from './pages/QuizPage'
 import AdminQuestionsPage from './pages/AdminQuestionsPage'
 import ResultPage from './pages/ResultPage'
+import InsightsPage from './pages/InsightsPage'
+import RevisionPage from './pages/RevisionPage'
+import MockTestPage from './pages/MockTestPage'
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -102,6 +105,30 @@ export default function App() {
         element={
           <ProtectedRoute>
             <ResultPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/insights"
+        element={
+          <ProtectedRoute>
+            <InsightsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/revision"
+        element={
+          <ProtectedRoute>
+            <RevisionPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mock"
+        element={
+          <ProtectedRoute>
+            <MockTestPage />
           </ProtectedRoute>
         }
       />

@@ -106,6 +106,48 @@ const STRINGS = {
     en: 'No questions are available for this selection yet.',
     ta: 'இந்தத் தேர்வுக்கு இன்னும் வினாக்கள் இல்லை.',
   },
+
+  // Insights / analytics
+  insights: { en: 'My Insights', ta: 'என் பகுப்பாய்வு' },
+  insightsTitle: { en: 'Performance Insights', ta: 'செயல்திறன் பகுப்பாய்வு' },
+  testsTaken: { en: 'Tests Taken', ta: 'எடுத்த தேர்வுகள்' },
+  avgAccuracy: { en: 'Avg Accuracy', ta: 'சராசரி துல்லியம்' },
+  bestScore: { en: 'Best Score', ta: 'சிறந்த மதிப்பெண்' },
+  studyTime: { en: 'Study Time', ta: 'படிப்பு நேரம்' },
+  focusAreas: { en: 'Focus Areas', ta: 'கவனம் தேவைப்படும் பகுதிகள்' },
+  focusHint: {
+    en: 'These topics need work — revise and re-attempt them next.',
+    ta: 'இந்தத் தலைப்புகளில் கவனம் தேவை — மீள்பார்வை செய்து மீண்டும் முயற்சிக்கவும்.',
+  },
+  strengths: { en: 'Your Strengths', ta: 'உங்கள் பலங்கள்' },
+  bySubject: { en: 'By Subject', ta: 'பாடம் வாரியாக' },
+  accuracyTrend: { en: 'Accuracy Trend', ta: 'துல்லிய போக்கு' },
+  noData: {
+    en: 'Take a few tests and your insights will appear here.',
+    ta: 'சில தேர்வுகளை எடுத்தால் உங்கள் பகுப்பாய்வு இங்கே தோன்றும்.',
+  },
+  learnThis: { en: 'Learn this', ta: 'இதைக் கற்க' },
+  studyTip: { en: 'Study Tip', ta: 'படிப்புக் குறிப்பு' },
+  resources: { en: 'Free resources', ta: 'இலவச வளங்கள்' },
+
+  // Revision
+  revision: { en: 'Revision', ta: 'மீள்பார்வை' },
+  revisionTitle: { en: 'Smart Revision', ta: 'திறன்மிகு மீள்பார்வை' },
+  dueToday: { en: 'Due today', ta: 'இன்று செய்ய வேண்டியவை' },
+  startRevision: { en: 'Start Revision', ta: 'மீள்பார்வையைத் தொடங்கு' },
+  practiceMistakes: { en: 'Practice your mistakes', ta: 'தவறுகளைப் பயிற்சி செய்' },
+  revisionEmpty: {
+    en: 'Nothing due. Finish a test — wrong & flagged questions come here for spaced revision.',
+    ta: 'எதுவும் இல்லை. ஒரு தேர்வை முடியுங்கள் — தவறான & குறித்த வினாக்கள் மீள்பார்வைக்கு இங்கே வரும்.',
+  },
+  allCaughtUp: { en: 'All caught up! 🎉', ta: 'அனைத்தும் முடிந்தது! 🎉' },
+
+  // Mock tests
+  mockTest: { en: 'Mock Test', ta: 'மாதிரித் தேர்வு' },
+  mockTests: { en: 'Mock Tests', ta: 'மாதிரித் தேர்வுகள்' },
+  fullLength: { en: 'Full-length exam simulation', ta: 'முழு நீள தேர்வு உருவகப்படுத்துதல்' },
+  negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
+  startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
 } as const
 
 export type StringKey = keyof typeof STRINGS

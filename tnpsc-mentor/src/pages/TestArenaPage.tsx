@@ -1,6 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen, GraduationCap, Newspaper, Calculator, ShieldCheck } from 'lucide-react'
+import {
+  BookOpen,
+  GraduationCap,
+  Newspaper,
+  Calculator,
+  ShieldCheck,
+  TrendingUp,
+  RefreshCw,
+  FileText,
+} from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { useAuth } from '../hooks/useAuth'
@@ -113,7 +122,46 @@ export default function TestArenaPage() {
             </div>
           ))}
         </div>
+
+        {/* Quick access — study loop */}
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <QuickLink
+            icon={<TrendingUp size={18} />}
+            label={t('insights')}
+            onClick={() => navigate('/insights')}
+          />
+          <QuickLink
+            icon={<RefreshCw size={18} />}
+            label={t('revision')}
+            onClick={() => navigate('/revision')}
+          />
+          <QuickLink
+            icon={<FileText size={18} />}
+            label={t('mockTests')}
+            onClick={() => navigate('/mock')}
+          />
+        </div>
       </div>
     </AppLayout>
+  )
+}
+
+function QuickLink({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 font-heading text-sm font-bold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-white/10"
+    >
+      <span className="text-accent">{icon}</span>
+      <span className="tamil">{label}</span>
+    </button>
   )
 }

@@ -62,7 +62,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   ...initialState,
 
   initSession: (config, questions) => {
-    const limit = Math.max(questions.length, 1) * SECONDS_PER_QUESTION
+    const limit =
+      config.mock && config.mockDurationSeconds
+        ? config.mockDurationSeconds
+        : Math.max(questions.length, 1) * SECONDS_PER_QUESTION
     set({
       config,
       questions,

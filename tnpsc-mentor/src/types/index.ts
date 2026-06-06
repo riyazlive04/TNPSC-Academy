@@ -83,6 +83,12 @@ export interface QuizConfig {
   aptitude_topic?: string
   /** Human-friendly label shown in the quiz header & result page. */
   label?: string
+  /** Mock-test mode: mixed questions, fixed duration, optional negative marking. */
+  mock?: boolean
+  mockQuestionCount?: number
+  mockDurationSeconds?: number
+  /** Negative mark per wrong answer (e.g. 0.33 for -1/3). 0 = none. */
+  negativeMark?: number
 }
 
 export interface Profile {

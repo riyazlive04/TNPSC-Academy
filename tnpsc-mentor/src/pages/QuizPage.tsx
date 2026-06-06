@@ -13,6 +13,7 @@ import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import { describeConfig, fetchQuestionsForConfig, shuffle } from '../lib/fetchQuestions'
+import { enqueueReviewItems } from '../lib/srs'
 import type { AnswerLetter, QuizConfig, ResultPayload } from '../types'
 
 export default function QuizPage() {
@@ -239,6 +240,23 @@ export default function QuizPage() {
         timeTakenSeconds: timeTaken,
         sessionId,
       }
+      // Smart revision: enqueue wrong + flagged questions for spaced review.
+      try {
+        const user = useAuthStore.getState().user
+        if (user) {
+          const toReview = qs
+            .filter((q) => {
+              const a = ans[q.id]
+              const wrong = a ? !a.is_correct : true // unattempted counts as needing review
+              return wrong || s.flags[q.id]
+            })
+            .map((q) => q.id)
+          if (toReview.length) await enqueueReviewItems(user.id, toReview)
+        }
+      } catch {
+        /* non-fatal */
+      }
+
       s.setSubmitting(false)
       void auto
       navigate('/result', { state: payload, replace: true })

@@ -120,6 +120,22 @@ create table if not exists test_answers (
 
 create index if not exists idx_answers_session on test_answers(session_id);
 
+-- ─── Smart Revision (spaced repetition) ─────────────────────────────────────
+-- Wrong / flagged questions land here and resurface on an SM-2-lite schedule.
+create table if not exists review_items (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  question_id uuid references questions(id) on delete cascade,
+  due_at timestamptz default now(),
+  interval_days integer default 0,
+  reps integer default 0,
+  last_result text check (last_result in ('correct', 'wrong')),
+  created_at timestamptz default now(),
+  unique (user_id, question_id)
+);
+
+create index if not exists idx_review_user_due on review_items(user_id, due_at);
+
 -- ─── User Profiles ──────────────────────────────────────────────────────────
 create table if not exists profiles (
   id uuid references auth.users(id) primary key,
@@ -137,6 +153,12 @@ alter table questions enable row level security;
 alter table test_sessions enable row level security;
 alter table test_answers enable row level security;
 alter table profiles enable row level security;
+alter table review_items enable row level security;
+
+drop policy if exists "Users can manage own review items" on review_items;
+create policy "Users can manage own review items"
+  on review_items for all to authenticated
+  using (auth.uid() = user_id);
 
 -- Helper: is the current user an admin?
 create or replace function public.is_admin()
