@@ -14,3 +14,7 @@ pytesseract==0.3.13  # optional local OCR fallback (needs Tesseract + 'tam')
 # Bilingual pairing: machine-translate EN questions -> Tamil _ta columns
 # (translate_to_tamil.py). Free Google MT endpoint, no key needed.
 deep-translator==1.11.4
+
+# AI explanation generation (generate_explanations.py) — fills missing/
+# placeholder explanations using Claude, anchored on the verified answer.
+anthropic>=0.49.0
