@@ -1,0 +1,33 @@
+name: Monthly Current Affairs Update
+
+# Runs in production on a schedule (GitHub-hosted cron — no server needed) and
+# can also be triggered manually. Scrapes the current month's TNPSC current
+# affairs, de-duplicates against Supabase, and inserts only new questions.
+
+on:
+  schedule:
+    # 03:00 UTC on the 5th of every month (gives sources time to publish).
+    - cron: '0 3 5 * *'
+  workflow_dispatch: {}
+
+jobs:
+  update-current-affairs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install minimal deps
+        run: pip install requests beautifulsoup4 lxml python-dotenv
+
+      - name: Run monthly current-affairs updater
+        working-directory: tnpsc-mentor/scrapers
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: python monthly_ca_update.py
