@@ -14,6 +14,8 @@ scrapers/.env
 
 # Scraper output / working dirs
 scrapers/*.json
+scrapers/*.jsonl
+scrapers/paraphrase_backup.jsonl
 scrapers/_log_*.txt
 scrapers/tnpsc_official_pdfs/
 scrapers/tnpsc_official_ocr/
