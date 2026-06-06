@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BookOpen,
@@ -9,10 +9,15 @@ import {
   TrendingUp,
   RefreshCw,
   FileText,
+  Flame,
+  CalendarClock,
+  Target,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
+import ProgressBar from '../components/UI/ProgressBar'
 import { useAuth } from '../hooks/useAuth'
+import { fetchHabit, type HabitState } from '../lib/habit'
 import { useT, type StringKey } from '../lib/i18n'
 
 interface ArenaCard {
@@ -52,9 +57,23 @@ const CARDS: ArenaCard[] = [
 
 export default function TestArenaPage() {
   const navigate = useNavigate()
-  const { profile, isAdmin } = useAuth()
+  const { user, profile, isAdmin } = useAuth()
   const { t } = useT()
   const [hovered, setHovered] = useState<string | null>(null)
+  const [habit, setHabit] = useState<HabitState | null>(null)
+
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    fetchHabit(user.id, profile?.daily_goal ?? 20, profile?.exam_date ?? null)
+      .then((h) => !cancelled && setHabit(h))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [user, profile?.daily_goal, profile?.exam_date])
+
+  const needsSetup = profile && !profile.exam_date
 
   return (
     <AppLayout>
@@ -71,6 +90,67 @@ export default function TestArenaPage() {
           <div className="mx-auto mb-6 mt-4 flex max-w-xl items-center justify-center gap-2 rounded-2xl border border-accent/40 bg-accent/10 px-4 py-3 text-center">
             <ShieldCheck size={18} className="flex-shrink-0 text-accent" />
             <p className="tamil font-body text-sm text-white/80">{t('adminModeNote')}</p>
+          </div>
+        )}
+
+        {/* Habit strip: streak · daily goal · exam countdown */}
+        {habit && (
+          <div className="mx-auto mt-5 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="flex items-center gap-3 rounded-2xl bg-white/8 px-4 py-3">
+              <Flame size={22} className="flex-shrink-0 text-orange-400" />
+              <div>
+                <div className="font-heading text-xl font-bold text-white">{habit.currentStreak}</div>
+                <div className="tamil font-body text-[11px] uppercase tracking-wide text-white/50">
+                  {t('dayStreak')}
+                </div>
+              </div>
+            </div>
+            <div className="rounded-2xl bg-white/8 px-4 py-3">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="tamil flex items-center gap-1.5 font-heading text-[11px] uppercase tracking-wide text-white/60">
+                  <Target size={13} /> {t('dailyGoal')}
+                </span>
+                <span className="font-heading text-xs font-bold text-white">
+                  {habit.questionsToday}/{habit.dailyGoal}
+                </span>
+              </div>
+              <ProgressBar
+                percent={Math.min(100, (habit.questionsToday / Math.max(1, habit.dailyGoal)) * 100)}
+                color={habit.goalMetToday ? '#16a34a' : '#FFC107'}
+                height={6}
+              />
+            </div>
+            {habit.daysToExam != null ? (
+              <div className="flex items-center gap-3 rounded-2xl bg-white/8 px-4 py-3">
+                <CalendarClock size={22} className="flex-shrink-0 text-accent" />
+                <div>
+                  <div className="font-heading text-xl font-bold text-white">
+                    {Math.max(0, habit.daysToExam)}
+                  </div>
+                  <div className="tamil font-body text-[11px] uppercase tracking-wide text-white/50">
+                    {t('daysToExam')}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/setup')}
+                className="flex items-center justify-center gap-2 rounded-2xl border border-accent/40 bg-accent/10 px-4 py-3 font-heading text-xs font-bold uppercase tracking-wide text-accent transition hover:bg-accent/20"
+              >
+                <CalendarClock size={16} /> {t('setExamDate')}
+              </button>
+            )}
+          </div>
+        )}
+
+        {needsSetup && (
+          <div className="mx-auto mt-3 max-w-2xl text-center">
+            <button
+              onClick={() => navigate('/setup')}
+              className="tamil font-heading text-sm font-semibold uppercase tracking-wide text-accent transition hover:text-white"
+            >
+              {t('setExamDate')} →
+            </button>
           </div>
         )}
 
@@ -124,7 +204,12 @@ export default function TestArenaPage() {
         </div>
 
         {/* Quick access — study loop */}
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <QuickLink
+            icon={<Newspaper size={18} />}
+            label={t('daily')}
+            onClick={() => navigate('/daily')}
+          />
           <QuickLink
             icon={<TrendingUp size={18} />}
             label={t('insights')}

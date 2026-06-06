@@ -89,6 +89,8 @@ export interface QuizConfig {
   mockDurationSeconds?: number
   /** Negative mark per wrong answer (e.g. 0.33 for -1/3). 0 = none. */
   negativeMark?: number
+  /** For mock mode: restrict the random pool to `category` (e.g. daily CA). */
+  scopeToCategory?: boolean
 }
 
 export interface Profile {
@@ -98,6 +100,8 @@ export interface Profile {
   phone?: string
   target_group?: string
   role?: UserRole
+  exam_date?: string | null
+  daily_goal?: number | null
 }
 
 // ─── Result payload passed via router state to /result ──────────────────────

@@ -18,6 +18,8 @@ import ResultPage from './pages/ResultPage'
 import InsightsPage from './pages/InsightsPage'
 import RevisionPage from './pages/RevisionPage'
 import MockTestPage from './pages/MockTestPage'
+import SetupPage from './pages/SetupPage'
+import DailyPage from './pages/DailyPage'
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -129,6 +131,22 @@ export default function App() {
         element={
           <ProtectedRoute>
             <MockTestPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/setup"
+        element={
+          <ProtectedRoute>
+            <SetupPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/daily"
+        element={
+          <ProtectedRoute>
+            <DailyPage />
           </ProtectedRoute>
         }
       />

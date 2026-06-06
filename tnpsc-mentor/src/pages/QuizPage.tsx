@@ -14,6 +14,7 @@ import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import { describeConfig, fetchQuestionsForConfig, shuffle } from '../lib/fetchQuestions'
 import { enqueueReviewItems } from '../lib/srs'
+import { recordActivity } from '../lib/habit'
 import type { AnswerLetter, QuizConfig, ResultPayload } from '../types'
 
 export default function QuizPage() {
@@ -252,6 +253,8 @@ export default function QuizPage() {
             })
             .map((q) => q.id)
           if (toReview.length) await enqueueReviewItems(user.id, toReview)
+          // Habit layer: log today's activity for streak + daily-goal progress.
+          await recordActivity(user.id, attemptedCount, 1)
         }
       } catch {
         /* non-fatal */
