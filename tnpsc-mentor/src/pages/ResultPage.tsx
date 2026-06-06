@@ -14,11 +14,15 @@ import ResultCard from '../components/Quiz/ResultCard'
 import { formatTime } from '../components/UI/Timer'
 import { generateExplanationPdf } from '../lib/pdfGenerator'
 import { describeConfig } from '../lib/fetchQuestions'
+import { scoreByTopic, weakAreas } from '../lib/analytics'
+import { assetsFor } from '../lib/assets'
+import { useT } from '../lib/i18n'
 import type { ResultPayload } from '../types'
 
 export default function ResultPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t, lang } = useT()
   const payload = location.state as ResultPayload | null
 
   const [generating, setGenerating] = useState(false)
@@ -45,6 +49,12 @@ export default function ResultPage() {
   const label = describeConfig(config)
   const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
   const attendancePct = totalQuestions > 0 ? Math.round((attempted / totalQuestions) * 100) : 0
+
+  // Post-test focus areas (weak topics in THIS test) + negative-marking net score.
+  const focus = weakAreas(scoreByTopic(questions, answers), 60).slice(0, 5)
+  const wrong = attempted - correct
+  const negMark = config.negativeMark ?? 0
+  const netMarks = negMark > 0 ? Math.max(0, +(correct - wrong * negMark).toFixed(2)) : null
 
   const scoreColor =
     scorePercentage >= 80 ? '#16a34a' : scorePercentage >= 50 ? '#FFC107' : '#FF5722'
@@ -147,9 +157,70 @@ export default function ResultPage() {
           )}
         </div>
 
+        {/* Net marks (mock tests with negative marking) */}
+        {netMarks !== null && (
+          <div className="mb-6 rounded-2xl bg-white/8 p-4 text-center">
+            <span className="font-body text-sm text-white/60">
+              {t('negMarking')} ({negMark}/wrong):{' '}
+            </span>
+            <span className="font-heading text-xl font-bold text-accent">
+              {netMarks} {t('of')} {totalQuestions}
+            </span>
+          </div>
+        )}
+
+        {/* Focus areas from this test + learn links */}
+        {focus.length > 0 && (
+          <section className="mb-6">
+            <h3 className="tamil mb-1 font-heading text-lg font-bold uppercase tracking-wide text-white">
+              {t('focusAreas')}
+            </h3>
+            <p className="tamil mb-3 font-body text-sm text-white/55">{t('focusHint')}</p>
+            <div className="flex flex-col gap-2.5">
+              {focus.map((f) => {
+                const asset = assetsFor(f.key)
+                return (
+                  <div key={f.key} className="rounded-2xl bg-white p-3.5 shadow-card">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="tamil font-heading text-sm font-bold text-navytext">
+                        {f.key}
+                      </span>
+                      <span className="font-heading text-sm font-bold text-warn">
+                        {f.accuracy}% ({f.correct}/{f.attempted})
+                      </span>
+                    </div>
+                    <p className="tamil mt-1.5 font-body text-xs leading-relaxed text-navytext/70">
+                      {lang === 'ta' ? asset.tipTa : asset.tip}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {asset.links.slice(0, 2).map((l) => (
+                        <a
+                          key={l.url}
+                          href={l.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-full bg-primary/10 px-3 py-1 font-heading text-[11px] font-semibold text-primary transition hover:bg-primary/20"
+                        >
+                          {t('learnThis')}: {l.label} ↗
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => navigate('/revision')}
+              className="mt-3 w-full rounded-full bg-white/10 px-5 py-2.5 font-heading text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white/20"
+            >
+              {t('practiceMistakes')} →
+            </button>
+          </section>
+        )}
+
         {/* Per-question breakdown */}
         <h3 className="mb-3 font-heading text-lg font-bold uppercase tracking-wide text-white">
-          Question Breakdown
+          {t('questionBreakdown')}
         </h3>
         <div className="mb-8 flex flex-col gap-3">
           {questions.map((q, i) => (

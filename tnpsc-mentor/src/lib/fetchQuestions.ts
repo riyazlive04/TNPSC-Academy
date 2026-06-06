@@ -21,6 +21,19 @@ export function shuffle<T>(arr: T[]): T[] {
 export async function fetchQuestionsForConfig(
   config: QuizConfig
 ): Promise<Question[]> {
+  // Mock mode: pull a broad, mixed pool and randomly sample the requested count.
+  if (config.mock) {
+    const want = config.mockQuestionCount ?? 50
+    // Fetch a generous window (offset varied so repeat mocks differ) then shuffle.
+    const windowSize = Math.min(Math.max(want * 6, 300), 1000)
+    const { data, error } = await supabase
+      .from('questions')
+      .select('*')
+      .limit(windowSize)
+    if (error) throw error
+    return shuffle((data ?? []) as Question[]).slice(0, want)
+  }
+
   let query = supabase.from('questions').select('*').eq('category', config.category)
 
   switch (config.category) {
