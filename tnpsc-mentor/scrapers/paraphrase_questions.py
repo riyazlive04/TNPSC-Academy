@@ -50,7 +50,11 @@ HAIKU = "claude-haiku-4-5"
 OPUS = "claude-opus-4-8"
 
 BACKUP = os.path.join(os.path.dirname(__file__), "paraphrase_backup.jsonl")
-PARAPHRASE_SOURCES = ("indiabix.com", "gktoday.in")
+# Third-party sources whose verbatim wording we rewrite into original expression.
+PARAPHRASE_SOURCES = (
+    "indiabix.com", "gktoday.in", "tnpscmaster.in", "tnpscguru.in",
+    "tnpscthervupettagam.com",
+)
 LETTERS = ["A", "B", "C", "D"]
 
 SCHEMA = {
