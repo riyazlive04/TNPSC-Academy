@@ -37,7 +37,9 @@ export async function fetchQuestionsForConfig(
 
   switch (config.category) {
     case 'pyq':
-      if (config.group_type) query = query.eq('group_type', config.group_type)
+      // Subject-membership model: a question is shown under any group whose
+      // syllabus includes its subject, so we filter by subject only (the UI
+      // already restricts subject choices per group via GROUP_SUBJECTS).
       if (config.subject) query = query.eq('subject', config.subject)
       break
     case 'samacheer':

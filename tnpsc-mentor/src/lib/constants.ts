@@ -13,12 +13,16 @@ export const GROUPS: GroupDef[] = [
   { id: 'Group4_VAO', label: 'GROUP 4 & VAO' },
 ]
 
-// The 10 shared subjects (PYQ + Samacheer use the same canonical list).
+// General-Studies subjects (the full TNPSC GS syllabus, shared by all groups).
+// Questions are tagged by subject; a question shows under any group whose
+// syllabus includes its subject (subject-membership, not a stored group_type).
 export const SUBJECTS: string[] = [
   'History and INM',
   'Polity',
+  'Geography',
   'History Culture Heritage of TN',
   'Development Administration of TamilNadu',
+  'General Science',
   'Biology',
   'Physics',
   'Chemistry',
@@ -27,30 +31,15 @@ export const SUBJECTS: string[] = [
   'Aptitude',
 ]
 
-// Per-group subject availability (matches scrapers/pyq_scraper.py).
+// Language papers (qualifying papers for Group 2/2A and Group 4 & VAO).
+export const LANGUAGE_SUBJECTS: string[] = ['General Tamil', 'General English']
+
+// Per-group subject availability. Group 1 = full GS; Group 2/4 add the
+// General Tamil / General English qualifying papers.
 export const GROUP_SUBJECTS: Record<GroupType, string[]> = {
   Group1: [...SUBJECTS],
-  Group2_2A: [
-    'History and INM',
-    'Polity',
-    'History Culture Heritage of TN',
-    'Biology',
-    'Physics',
-    'Chemistry',
-    'Indian Economy',
-    'Current Affairs',
-    'Aptitude',
-  ],
-  Group4_VAO: [
-    'History and INM',
-    'Polity',
-    'Biology',
-    'Physics',
-    'Chemistry',
-    'Indian Economy',
-    'Current Affairs',
-    'Aptitude',
-  ],
+  Group2_2A: [...SUBJECTS, ...LANGUAGE_SUBJECTS],
+  Group4_VAO: [...SUBJECTS, ...LANGUAGE_SUBJECTS],
 }
 
 // ─── Samacheer standards ────────────────────────────────────────────────────
