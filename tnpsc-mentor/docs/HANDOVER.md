@@ -213,14 +213,53 @@ Current affairs refresh **automatically every month** with no manual work — a
 scheduled job collects the latest questions and adds only new ones. This keeps
 the current-affairs section relevant throughout the exam cycle.
 
-## B6. One thing to be aware of (sources & usage)
+## B6. Copyright & compliance (please read)
 
-The GK/aptitude/current-affairs questions are gathered from reputable **public**
-practice websites for educational preparation. Before commercialising the app at
-scale, it's worth either obtaining permission from those publishers or gradually
-replacing that content with your own originally-authored questions. The provenance
-link on every question makes this easy to review and manage. This is a normal,
-expected step — flagged here for transparency.
+The GK/aptitude/current-affairs questions are gathered from **public** practice
+websites for educational preparation. Here is an honest, plain-English summary of
+the copyright position. *This is general information, not legal advice — get an
+Indian IP lawyer's sign-off before charging users at scale.*
+
+**What is NOT protected by copyright**
+- **Facts and ideas.** "When did World War I begin?" → "1914" is a fact. Facts
+  and the correct answers themselves cannot be copyrighted.
+- So a question that tests a fact can be re-asked in your **own words** freely.
+
+**What CAN be protected**
+- **The exact wording** of a question/option as written by another site
+  (their original expression).
+- **Original explanations** written by the source site.
+- **The compilation** — a large, curated collection can have "database"/
+  compilation rights in its selection and arrangement.
+
+**Where our app stands today**
+- ✅ **Explanations are now our own** — every explanation was re-written by AI
+  anchored to the verified answer, so we are **not** republishing source
+  explanations. This removes the biggest piece of copied expression.
+- ⚠️ **Question stems/options are still largely verbatim** from the sources.
+  Bulk verbatim copying (thousands of items) into a **commercial** product is the
+  main exposure — both under copyright and under each site's terms of use.
+
+**Realistic risk**
+- This is a real but **manageable** risk, not a criminal matter. The usual first
+  step from a publisher is a takedown notice / cease-and-desist, then a claim for
+  damages if ignored. Exposure rises with (a) commercial/paid use, (b) volume of
+  verbatim copying, and (c) publicly crediting the competitor as the source.
+
+**Recommended steps before monetising**
+1. **Paraphrase** the question stems and options (keep the fact, change the
+   wording). This converts most items into original expression. Could be done in
+   bulk with the same AI pipeline already built.
+2. Keep using **our own explanations** (already done).
+3. Gradually **replace** the highest-risk verbatim items with originally-authored
+   or licensed questions; the `source_url` on every row makes this auditable.
+4. Consider **not displaying** competitor source links to end-users in the
+   product (keep them internally for provenance). Public attribution does **not**
+   cure infringement and can highlight the copying.
+5. Where practical, **license** content or use clearly free/government sources.
+
+*(The per-question `source_url` we store makes all of the above straightforward
+to manage and prioritise.)*
 
 ---
 
