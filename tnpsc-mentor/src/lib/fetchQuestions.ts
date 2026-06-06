@@ -26,10 +26,9 @@ export async function fetchQuestionsForConfig(
     const want = config.mockQuestionCount ?? 50
     // Fetch a generous window (offset varied so repeat mocks differ) then shuffle.
     const windowSize = Math.min(Math.max(want * 6, 300), 1000)
-    const { data, error } = await supabase
-      .from('questions')
-      .select('*')
-      .limit(windowSize)
+    let mq = supabase.from('questions').select('*')
+    if (config.scopeToCategory) mq = mq.eq('category', config.category)
+    const { data, error } = await mq.limit(windowSize)
     if (error) throw error
     return shuffle((data ?? []) as Question[]).slice(0, want)
   }

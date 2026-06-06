@@ -13,28 +13,45 @@ import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import ProgressBar from '../components/UI/ProgressBar'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
+import { fetchPercentile } from '../lib/habit'
 import { assetsFor } from '../lib/assets'
+import { GROUP_SUBJECTS } from '../lib/constants'
+import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
 
 export default function InsightsPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { t, lang } = useT()
   const [data, setData] = useState<UserAnalytics | null>(null)
+  const [percentile, setPercentile] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!user) return
     let cancelled = false
-    fetchUserAnalytics(user.id)
-      .then((d) => !cancelled && setData(d))
+    Promise.all([fetchUserAnalytics(user.id), fetchPercentile(user.id)])
+      .then(([d, p]) => {
+        if (cancelled) return
+        setData(d)
+        setPercentile(p)
+      })
       .catch(() => !cancelled && setData(null))
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
   }, [user])
+
+  // Syllabus coverage: subjects practised vs the target group's subject list.
+  const group = (profile?.target_group as GroupType) || 'Group1'
+  const syllabusSubjects = GROUP_SUBJECTS[group] ?? []
+  const practised = new Set((data?.bySubject ?? []).map((s) => s.key))
+  const coveredCount = syllabusSubjects.filter((s) => practised.has(s)).length
+  const coveragePct = syllabusSubjects.length
+    ? Math.round((coveredCount / syllabusSubjects.length) * 100)
+    : 0
 
   const weak = data ? weakAreas(data.byTopic, 60).slice(0, 6) : []
   const strong = data ? [...data.byTopic].filter((s) => s.accuracy >= 75).slice(0, 5) : []
@@ -73,6 +90,52 @@ export default function InsightsPage() {
               <StatCard icon={<Award size={18} />} label={t('bestScore')} value={`${data.overview.bestScore}%`} />
               <StatCard icon={<Clock size={18} />} label={t('studyTime')} value={`${data.overview.totalTimeMinutes}m`} />
             </div>
+
+            {/* Percentile / peer rank */}
+            {percentile != null && (
+              <div className="mb-6 rounded-2xl bg-gradient-to-r from-secondary/40 to-primary/40 p-4 text-center">
+                <div className="tamil font-heading text-xs font-bold uppercase tracking-widest text-white/60">
+                  {t('yourRank')}
+                </div>
+                <div className="tamil mt-1 font-body text-white">
+                  {t('aheadOf')}{' '}
+                  <span className="font-heading text-2xl font-bold text-accent">{percentile}%</span>{' '}
+                  {t('ofAspirants')}
+                </div>
+              </div>
+            )}
+
+            {/* Syllabus coverage */}
+            {syllabusSubjects.length > 0 && (
+              <section className="mb-8">
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="tamil font-heading text-lg font-bold uppercase tracking-wide text-white">
+                    {t('syllabusCoverage')}
+                  </h3>
+                  <span className="font-heading text-sm font-bold text-accent">
+                    {coveredCount}/{syllabusSubjects.length} · {coveragePct}%
+                  </span>
+                </div>
+                <ProgressBar percent={coveragePct} height={8} />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {syllabusSubjects.map((s) => {
+                    const done = practised.has(s)
+                    return (
+                      <span
+                        key={s}
+                        className={[
+                          'tamil rounded-full px-3 py-1 font-heading text-[11px] font-semibold',
+                          done ? 'bg-green-500/20 text-green-300' : 'bg-white/8 text-white/45',
+                        ].join(' ')}
+                      >
+                        {done ? '✓ ' : ''}
+                        {s}
+                      </span>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* Focus areas (weak) with learn links */}
             {weak.length > 0 && (

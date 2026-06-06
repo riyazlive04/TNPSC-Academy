@@ -148,6 +148,32 @@ const STRINGS = {
   fullLength: { en: 'Full-length exam simulation', ta: 'முழு நீள தேர்வு உருவகப்படுத்துதல்' },
   negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
   startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
+
+  // Habit layer
+  dayStreak: { en: 'Day Streak', ta: 'நாள் தொடர்ச்சி' },
+  dailyGoal: { en: 'Daily Goal', ta: 'தினசரி இலக்கு' },
+  goalDone: { en: "Today's goal complete! 🎉", ta: 'இன்றைய இலக்கு முடிந்தது! 🎉' },
+  questionsToday: { en: 'questions today', ta: 'இன்று வினாக்கள்' },
+  daysToExam: { en: 'days to exam', ta: 'தேர்வுக்கு நாட்கள்' },
+  setExamDate: { en: 'Set your exam date & goal', ta: 'உங்கள் தேர்வு தேதி & இலக்கை அமைக்கவும்' },
+  daily: { en: 'Daily Current Affairs', ta: 'தினசரி நடப்பு நிகழ்வுகள்' },
+  dailyCta: { en: "Today's 10-question current-affairs drill", ta: 'இன்றைய 10-வினா நடப்பு நிகழ்வுப் பயிற்சி' },
+
+  // Setup / onboarding
+  setupTitle: { en: 'Set Your Target', ta: 'உங்கள் இலக்கை அமைக்கவும்' },
+  targetGroup: { en: 'Target Group', ta: 'இலக்கு குழு' },
+  examDate: { en: 'Exam Date', ta: 'தேர்வு தேதி' },
+  dailyGoalQ: { en: 'Daily question goal', ta: 'தினசரி வினா இலக்கு' },
+  saveContinue: { en: 'Save & Continue', ta: 'சேமித்துத் தொடரவும்' },
+  skip: { en: 'Skip', ta: 'தவிர்' },
+
+  // Percentile + syllabus
+  yourRank: { en: 'Your Standing', ta: 'உங்கள் நிலை' },
+  aheadOf: { en: 'ahead of', ta: 'முந்தியுள்ளீர்கள்' },
+  ofAspirants: { en: 'of aspirants', ta: 'விண்ணப்பதாரர்களில்' },
+  syllabusCoverage: { en: 'Syllabus Coverage', ta: 'பாடத்திட்ட பரப்பளவு' },
+  covered: { en: 'covered', ta: 'முடிந்தது' },
+  notStarted: { en: 'Not started', ta: 'தொடங்கவில்லை' },
 } as const
 
 export type StringKey = keyof typeof STRINGS

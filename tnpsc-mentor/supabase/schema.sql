@@ -120,6 +120,47 @@ create table if not exists test_answers (
 
 create index if not exists idx_answers_session on test_answers(session_id);
 
+-- ─── Habit layer: goals, streaks, exam countdown ────────────────────────────
+-- Extra profile fields for onboarding / countdown / daily goal.
+alter table profiles add column if not exists exam_date date;
+alter table profiles add column if not exists daily_goal integer default 20;
+
+-- One row per user per active day — powers streaks + daily-goal progress.
+create table if not exists daily_activity (
+  user_id uuid references auth.users(id) on delete cascade,
+  activity_date date not null default current_date,
+  questions integer default 0,
+  tests integer default 0,
+  primary key (user_id, activity_date)
+);
+
+alter table daily_activity enable row level security;
+drop policy if exists "Users can manage own activity" on daily_activity;
+create policy "Users can manage own activity"
+  on daily_activity for all to authenticated
+  using (auth.uid() = user_id);
+
+-- Percentile / peer rank: avg score vs all aspirants. SECURITY DEFINER so it
+-- can read across users (aggregate only — no row leakage).
+create or replace function public.user_percentile(p_user uuid)
+returns numeric as $$
+  with per_user as (
+    select user_id, avg(score_percentage) as avg_score
+    from public.test_sessions
+    where status = 'completed'
+    group by user_id
+  ), me as (
+    select avg_score from per_user where user_id = p_user
+  )
+  select case
+    when (select count(*) from per_user) <= 1 then 100
+    else round(
+      100.0 * (select count(*) from per_user, me where per_user.avg_score <= me.avg_score)
+      / (select count(*) from per_user)
+    )
+  end;
+$$ language sql security definer stable;
+
 -- ─── Smart Revision (spaced repetition) ─────────────────────────────────────
 -- Wrong / flagged questions land here and resurface on an SM-2-lite schedule.
 create table if not exists review_items (
