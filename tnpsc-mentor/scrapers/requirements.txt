@@ -10,3 +10,7 @@ Pillow==10.4.0       # image handling for the Tesseract fallback
 pytesseract==0.3.13  # optional local OCR fallback (needs Tesseract + 'tam')
 # Cloud OCR (recommended for Tamil) uses Google Cloud Vision over REST via
 # `requests` + a GOOGLE_VISION_API_KEY — no extra SDK required.
+
+# Bilingual pairing: machine-translate EN questions -> Tamil _ta columns
+# (translate_to_tamil.py). Free Google MT endpoint, no key needed.
+deep-translator==1.11.4
