@@ -86,6 +86,30 @@ def _h(extra=None):
     return h
 
 
+def _retry(fn, what, tries=6):
+    """Call fn() with exponential backoff on transient Anthropic/network errors.
+
+    The Batches API occasionally returns transient edge errors (520/529/500) or
+    drops a connection; these are retryable. A whole batch is expensive to lose,
+    so we back off and retry rather than crash the run.
+    """
+    delay = 30
+    for attempt in range(1, tries + 1):
+        try:
+            return fn()
+        except (anthropic.APIStatusError, anthropic.APIConnectionError) as e:  # noqa: PERF203
+            status = getattr(e, "status_code", None)
+            transient = isinstance(e, anthropic.APIConnectionError) or status in (
+                500, 502, 503, 504, 520, 521, 522, 524, 529,
+            )
+            if not transient or attempt == tries:
+                raise
+            print(f"    {what}: transient error ({status or type(e).__name__}); "
+                  f"retry {attempt}/{tries} in {delay}s")
+            time.sleep(delay)
+            delay = min(delay * 2, 300)
+
+
 def needs_explanation(expl) -> bool:
     s = (expl or "").strip()
     if len(s) < MIN_LEN:
@@ -175,19 +199,22 @@ def run(limit=None, chunk=1000):
         group = candidates[i : i + chunk]
         requests_payload = [make_request(q) for q in group]
         print(f"\nSubmitting batch of {len(requests_payload)} (chunk {i//chunk + 1})...")
-        batch = client.messages.batches.create(requests=requests_payload)
+        batch = _retry(
+            lambda: client.messages.batches.create(requests=requests_payload),
+            "batch create",
+        )
         print(f"  batch {batch.id} — polling...")
 
         # Poll until the batch finishes.
         while True:
-            b = client.messages.batches.retrieve(batch.id)
+            b = _retry(lambda: client.messages.batches.retrieve(batch.id), "poll")
             if b.processing_status == "ended":
                 break
             time.sleep(30)
 
         # Apply results.
         ok = 0
-        for result in client.messages.batches.results(batch.id):
+        for result in _retry(lambda: client.messages.batches.results(batch.id), "results"):
             if result.result.type != "succeeded":
                 continue
             try:
