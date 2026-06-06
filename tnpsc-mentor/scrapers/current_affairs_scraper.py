@@ -139,11 +139,33 @@ def _fetch(url):
     return BeautifulSoup(resp.content, "lxml")
 
 
+def scrape_quiz(url, common, max_pages=30):
+    """Scrape ALL questions in a GKToday quiz, following its pagination.
+
+    GKToday paginates with ?pageno=2..N (10 MCQs per page). We walk pages until
+    one returns no NEW questions (an out-of-range page is empty), deduping by
+    question text so we never stop short of the full set (e.g. 50, not 10).
+    """
+    seen = set()
+    out = []
+    for pg in range(1, max_pages + 1):
+        page_url = url if pg == 1 else f"{url}?pageno={pg}"
+        soup = _fetch(page_url)
+        if soup is None:
+            break
+        rows = parse_quiz_page(soup, common)
+        fresh = [r for r in rows if r["question_text"] not in seen]
+        if not fresh:
+            break  # empty page (or repeat) -> end of quiz
+        for r in fresh:
+            seen.add(r["question_text"])
+        out.extend(fresh)
+        time.sleep(1.0)
+    return out
+
+
 def scrape_month(slug, label, year):
     url = f"{BASE}/current-affairs-quiz-{slug}"
-    soup = _fetch(url)
-    if soup is None:
-        return []
     common = {
         "category": "current_affairs",
         "ca_month": label,
@@ -152,14 +174,11 @@ def scrape_month(slug, label, year):
         "subject": "Current Affairs",
         "source_url": url,
     }
-    return parse_quiz_page(soup, common)
+    return scrape_quiz(url, common)
 
 
 def scrape_topic(slug, label):
     url = f"{BASE}/{slug}"
-    soup = _fetch(url)
-    if soup is None:
-        return []
     common = {
         "category": "current_affairs",
         "ca_type": "topic_wise",
@@ -167,7 +186,7 @@ def scrape_topic(slug, label):
         "subject": "Current Affairs",
         "source_url": url,
     }
-    return parse_quiz_page(soup, common)
+    return scrape_quiz(url, common)
 
 
 def scrape_all_current_affairs():
