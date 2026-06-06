@@ -60,6 +60,10 @@ alter table questions add column if not exists option_c_ta text;
 alter table questions add column if not exists option_d_ta text;
 alter table questions add column if not exists explanation_ta text;
 
+-- Per-option rationale: { "<wrong letter>": "why it's wrong", ... }. Powers the
+-- targeted "Why your answer (X) is wrong" feedback on the Result page.
+alter table questions add column if not exists why_wrong jsonb;
+
 -- Indexes for fast filtering
 create index if not exists idx_questions_category on questions(category);
 create index if not exists idx_questions_group_type on questions(group_type);
