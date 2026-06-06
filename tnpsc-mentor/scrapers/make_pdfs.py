@@ -32,7 +32,8 @@ DOCS = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "docs"))
 QBANK = os.path.join(DOCS, "question-bank")
 
 TARGETS = [
-    (os.path.join(DOCS, "HANDOVER.md"), os.path.join(DOCS, "HANDOVER.pdf")),
+    (os.path.join(DOCS, "HANDOVER-DEVELOPER.md"), os.path.join(DOCS, "HANDOVER-DEVELOPER.pdf")),
+    (os.path.join(DOCS, "HANDOVER-CLIENT.md"), os.path.join(DOCS, "HANDOVER-CLIENT.pdf")),
     (os.path.join(QBANK, "README.md"), os.path.join(QBANK, "README.pdf")),
     (os.path.join(QBANK, "current_affairs.md"), os.path.join(QBANK, "current_affairs.pdf")),
     (os.path.join(QBANK, "aptitude.md"), os.path.join(QBANK, "aptitude.pdf")),
