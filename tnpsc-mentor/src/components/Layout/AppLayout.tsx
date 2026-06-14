@@ -25,12 +25,21 @@ interface AppLayoutProps {
 const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
 const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
 
-const NAV = [
+// Learner navigation — the personal study tabs (daily drill, spaced revision,
+// progress insights, achievements) shown to regular users.
+const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
   { to: '/daily', icon: Newspaper, key: 'daily' as const, short: 'navDaily' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
   { to: '/achievements', icon: Trophy, key: 'achievements' as const, short: 'achievements' as const },
+]
+
+// Admin/superadmin navigation — content managers don't use the personal
+// learner-progress tabs, so the nav is just the Test Arena (their gateway to
+// the question banks via the same picker, which routes them to the admin bank).
+const ADMIN_NAV = [
+  { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
 ]
 
 /**
@@ -45,6 +54,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
+
+  // Admins/superadmins manage content; learners get the study tabs.
+  const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
 
   const cycleLang = () => {
     const idx = LANG_CYCLE.indexOf(lang)
@@ -80,7 +92,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
 
             {/* Desktop primary nav — replaces the bottom tab bar on large screens. */}
             <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-              {NAV.map(({ to, icon: Icon, key }) => {
+              {nav.map(({ to, icon: Icon, key }) => {
                 const active = isActive(to)
                 return (
                   <button
@@ -176,7 +188,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
             className="mx-auto flex max-w-md items-stretch justify-between gap-0.5 px-2 py-1.5"
             style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
           >
-            {NAV.map(({ to, icon: Icon, short }) => {
+            {nav.map(({ to, icon: Icon, short }) => {
               const active = isActive(to)
               return (
                 <button

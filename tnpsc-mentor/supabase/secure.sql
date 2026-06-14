@@ -345,8 +345,30 @@ begin
 end;
 $$;
 
+-- ─── 3f. Subject Practice subjects (grouped counts) ─────────────────────────
+-- The picker needs distinct subjects + a per-subject active count. Doing this
+-- with a plain table select hits PostgREST's 1000-row cap (the subject bank has
+-- thousands of rows), so only the first one or two subjects ever came back.
+-- Grouping server-side returns one row per subject regardless of bank size.
+create or replace function public.subject_practice_subjects()
+returns table(subject text, total bigint)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.subject, count(*) as total
+  from public.questions q
+  where q.category = 'subject'
+    and q.active
+    and q.subject is not null
+  group by q.subject
+  order by q.subject;
+$$;
+
 -- ─── 4. Execute grants ──────────────────────────────────────────────────────
 grant execute on function public.get_quiz_questions(jsonb)   to authenticated;
+grant execute on function public.subject_practice_subjects() to authenticated;
 grant execute on function public.submit_test(jsonb, jsonb)   to authenticated;
 grant execute on function public.get_due_reviews(int)        to authenticated;
 grant execute on function public.grade_review(uuid, text)    to authenticated;

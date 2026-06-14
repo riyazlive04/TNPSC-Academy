@@ -106,24 +106,22 @@ router.post(
 // ─── POST /api/questions/subjects ────────────────────────────────────────────
 // Subject Practice: the list of academic subjects (category='subject') with a
 // total active-question count each. Powers the Subject step of the picker.
+//
+// Counts are grouped server-side via the subject_practice_subjects() RPC — a
+// plain table select would hit PostgREST's 1000-row cap and only ever surface
+// the first one or two subjects in the bank.
+//
+// Subjects in HIDDEN_SUBJECTS are kept in the DB but not offered in the picker.
+const HIDDEN_SUBJECTS = new Set(['English', 'Tamil'])
 router.post(
   '/subjects',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { data, error } = await req.db!
-      .from('questions')
-      .select('subject')
-      .eq('category', 'subject')
-      .eq('active', true)
-      .not('subject', 'is', null)
+    const { data, error } = await req.db!.rpc('subject_practice_subjects')
     if (error) return sendDbError(res, error)
-    const counts = new Map<string, number>()
-    for (const r of (data ?? []) as { subject: string | null }[]) {
-      if (!r.subject) continue
-      counts.set(r.subject, (counts.get(r.subject) ?? 0) + 1)
-    }
-    const subjects = Array.from(counts.entries())
-      .map(([subject, total]) => ({ subject, total }))
+    const subjects = ((data ?? []) as { subject: string; total: number }[])
+      .filter((r) => r.subject && !HIDDEN_SUBJECTS.has(r.subject))
+      .map((r) => ({ subject: r.subject, total: Number(r.total) }))
       .sort((a, b) => a.subject.localeCompare(b.subject))
     res.json({ subjects })
   })
