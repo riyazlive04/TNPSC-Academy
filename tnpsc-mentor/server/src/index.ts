@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
-import { config } from './config.js'
+import { config, isAllowedOrigin } from './config.js'
 
 import authRoutes from './routes/auth.js'
 import questionRoutes from './routes/questions.js'
@@ -26,7 +26,10 @@ app.set('trust proxy', 1)
 app.use(helmet())
 app.use(
   cors({
-    origin: config.corsOrigins,
+    // Supports exact origins and `*` wildcards (Vercel preview URLs change every
+    // deploy). An origin that isn't allowed simply gets no CORS headers → the
+    // browser blocks it, which is the intended behaviour.
+    origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
     credentials: true,
   })
 )
