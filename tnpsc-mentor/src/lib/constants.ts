@@ -42,6 +42,26 @@ export const GROUP_SUBJECTS: Record<GroupType, string[]> = {
   Group4_VAO: [...SUBJECTS, ...LANGUAGE_SUBJECTS],
 }
 
+// ─── Outer question bank (subject-wise, Type=outer) ─────────────────────────
+// `subject` labels exactly as stored in the DB for category='outer' rows. Drive
+// the per-subject chips on the admin Outer-questions view.
+export const OUTER_SUBJECTS: string[] = [
+  'History',
+  'Indian National Movement',
+  'Polity',
+  'Geography',
+  'Economy',
+  'History, Culture, Heritage',
+  'Tamil Nadu Administration',
+  'Botany',
+  'Zoology',
+  'Physics',
+  'Chemistry',
+  'Current Affairs',
+  'English',
+  'தமிழ்',
+]
+
 // ─── Samacheer standards ────────────────────────────────────────────────────
 
 export const STANDARDS = [6, 7, 8, 9, 10]
@@ -84,6 +104,7 @@ export interface MonthDef {
 }
 
 export const CA_MONTHS: MonthDef[] = [
+  { slug: 'july-2025', label: 'July 2025', year: 2025 },
   { slug: 'august-2025', label: 'August 2025', year: 2025 },
   { slug: 'september-2025', label: 'September 2025', year: 2025 },
   { slug: 'october-2025', label: 'October 2025', year: 2025 },

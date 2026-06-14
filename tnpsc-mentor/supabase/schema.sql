@@ -1,5 +1,8 @@
 -- ============================================================================
 -- TNPSC Mentor — Supabase schema
+-- ----------------------------------------------------------------------------
+-- IMPORTANT: after running this, also run `supabase/secure.sql`. It hides the
+-- answer columns from the client and adds the grading/fetch RPCs the app calls.
 -- ============================================================================
 
 -- Enable UUID extension
@@ -63,6 +66,13 @@ alter table questions add column if not exists explanation_ta text;
 -- Per-option rationale: { "<wrong letter>": "why it's wrong", ... }. Powers the
 -- targeted "Why your answer (X) is wrong" feedback on the Result page.
 alter table questions add column if not exists why_wrong jsonb;
+
+-- Question style tag — e.g. 'statement_correct', 'factual', 'assertion_reason'.
+alter table questions add column if not exists question_type text;
+
+-- External reference ID from the source dataset (e.g. 'ca-2025-09-0001').
+-- Useful for deduplication and cross-referencing against source files.
+alter table questions add column if not exists external_id text;
 
 -- Indexes for fast filtering
 create index if not exists idx_questions_category on questions(category);

@@ -30,15 +30,22 @@ export default function QuestionCard({
   const { t, lang } = useT()
   return (
     <div className="animate-fadeIn rounded-3xl bg-white p-5 shadow-card sm:p-7">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <span className="tamil font-heading text-sm font-bold uppercase tracking-wide text-secondary">
           {t('question')} {index + 1} {t('of')} {total}
         </span>
-        {question.difficulty && (
-          <span className="rounded-full bg-primary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-primary">
-            {question.difficulty}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {question.category === 'current_affairs' && question.ca_month && (
+            <span className="rounded-full bg-secondary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-secondary">
+              {question.ca_month}
+            </span>
+          )}
+          {question.difficulty && (
+            <span className="rounded-full bg-primary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-primary">
+              {question.difficulty}
+            </span>
+          )}
+        </div>
       </div>
 
       <p className="tamil mb-5 whitespace-pre-line text-lg font-semibold leading-relaxed text-navytext sm:text-xl">

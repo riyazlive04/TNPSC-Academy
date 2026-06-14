@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { api } from './api'
 import type { Question, TestAnswer } from '../types'
 
 // ─── Per-test (post-result) analysis ────────────────────────────────────────
@@ -96,26 +96,11 @@ const EMPTY: UserAnalytics = {
  * All read via RLS-guarded queries with the user's own session.
  */
 export async function fetchUserAnalytics(userId: string): Promise<UserAnalytics> {
-  // 1) Completed sessions.
-  const { data: sessions, error: sErr } = await supabase
-    .from('test_sessions')
-    .select(
-      'id,category,subject,score_percentage,total_questions,correct,attempted,completed_at,time_taken_seconds'
-    )
-    .eq('user_id', userId)
-    .eq('status', 'completed')
-    .order('completed_at', { ascending: true })
-
-  if (sErr || !sessions || sessions.length === 0) return EMPTY
+  // Sessions + per-answer subject/topic in one call (server-side, RLS-guarded).
+  const { sessions, answers } = await api.analytics()
+  if (!sessions || sessions.length === 0) return EMPTY
 
   const rows = sessions as SessionRow[]
-  const sessionIds = rows.map((r) => r.id)
-
-  // 2) Answers for those sessions, with question subject/topic embedded.
-  const { data: answers } = await supabase
-    .from('test_answers')
-    .select('is_correct,question:questions(subject,topic,category,aptitude_topic,ca_topic)')
-    .in('session_id', sessionIds)
 
   // Aggregate subject + topic accuracy from answers.
   const subjMap = new Map<string, TopicScore>()

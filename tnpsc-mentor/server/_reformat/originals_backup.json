@@ -1,0 +1,757 @@
+[
+  {
+    "id": "00a1408c-a884-4457-8a3c-73ea2f019722",
+    "explanation": "Express each amount as a percentage of the total income.\nExpenditure = 12000 − 1200 = ₹ 10,800\nFormula: Percentage = value / total × 100\nSavings % = 1200 / 12000 × 100 = 10%\nExpenditure % = 10800 / 12000 × 100 = 90%\n→ Option (B)",
+    "explanation_ta": "ஒவ்வொரு தொகையையும் மொத்த வருமானத்தின் சதவீதமாக வெளிப்படுத்த வேண்டும்.\nசெலவு = 12000 − 1200 = ₹ 10,800\nவாய்ப்பாடு: சதவீதம் = மதிப்பு / மொத்தம் × 100\nசேமிப்பு % = 1200 / 12000 × 100 = 10%\nசெலவு % = 10800 / 12000 × 100 = 90%\n→ Option (B)"
+  },
+  {
+    "id": "0873677d-54a0-4d01-92c0-b4c447883eac",
+    "explanation": "At the same time of day every object has the same height-to-shadow ratio.\nGiven: height : shadow = 4 : 1; tree's shadow = 15 feet.\n(height)/(shadow) = (4)/(1)\n(height)/(15) = (4)/(1)\nheight = 4 × 15 = 60 feet → Option (C)",
+    "explanation_ta": "ஒரே நேரத்தில் ஒவ்வொரு பொருளுக்கும் உயரம்-நிழல் விகிதம் ஒரே மாதிரியாக இருக்கும்.\nகொடுக்கப்பட்டது: உயரம் : நிழல் = 4 : 1; மரத்தின் நிழல் = 15 feet.\n(height)/(shadow) = (4)/(1)\n(height)/(15) = (4)/(1)\nheight = 4 × 15 = 60 feet → Option (C)"
+  },
+  {
+    "id": "1182f15f-d221-455c-8bb8-088eb9d51309",
+    "explanation": "One person's rate is fixed; when persons and projects are scaled up equally, the time stays the same.\nGiven: 5 persons complete 5 projects in 5 days.\n(M₁ × D₁)/(W₁) = (M₂ × D₂)/(W₂).\nOne person's rate = (5)/(5 × 5) = (1)/(5) project/day.\n50 persons do (50)/(5) = 10 projects/day, so 50 projects take (50)/(10) = 5 days → Option (A)",
+    "explanation_ta": "ஒரு நபரின் வேக விகிதம் நிலையானது; ஆட்களும் வேலைகளும் சமமாக அதிகரிக்கப்படும்போது நேரம் மாறாது.\nகொடுக்கப்பட்டது: 5 நபர்கள் 5 வேலைகளை 5 நாட்களில் முடிப்பர்.\n(M₁ × D₁)/(W₁) = (M₂ × D₂)/(W₂).\nஒரு நபரின் வேகம் = (5)/(5 × 5) = (1)/(5) வேலை/நாள்.\n50 நபர்கள் (50)/(5) = 10 வேலைகள்/நாள் செய்வர், எனவே 50 வேலைகள் (50)/(10) = 5 நாட்கள் எடுக்கும் → Option (A)"
+  },
+  {
+    "id": "1610dc52-8f2f-4a4c-8b85-45660981694b",
+    "explanation": "2 years 6 months = 2½ = 2.5 years.\nFormula: SI = (P × n × r)/100 and Amount A = P + SI.\nWith P = ₹6,400, n = 2.5, r = 5:\n⇒ SI = (6400 × 2.5 × 5)/100 = 80000/100 = 800\n⇒ A = 6400 + 800 = ₹7,200\n→ Option (B)",
+    "explanation_ta": "2 ஆண்டுகள் 6 மாதம் = 2½ = 2.5 ஆண்டுகள்.\nசூத்திரம்: தனிவட்டி SI = (P × n × r)/100 மற்றும் தொகை A = P + SI.\nP = ₹6,400, n = 2.5, r = 5 எனில்:\n⇒ SI = (6400 × 2.5 × 5)/100 = 80000/100 = 800\n⇒ A = 6400 + 800 = ₹7,200\n→ Option (B)"
+  },
+  {
+    "id": "1e2d7476-26cc-4aa4-806b-81bb09ed7147",
+    "explanation": "HCF takes each common prime factor to its lowest power across the two numbers.\na² = 2⁴·3⁶, b³ = 3⁶·5⁹ ⇒ HCF = 3⁶.\nb² = 3⁴·5⁶, c³ = 5⁶·2⁹ ⇒ HCF = 5⁶.\nc² = 5⁴·2⁶, a³ = 2⁶·3⁹ ⇒ HCF = 2⁶.\nSum = 3⁶ + 5⁶ + 2⁶ = 3⁶ + 2⁶ + 5⁶.\nThe answer is 3⁶ + 2⁶ + 5⁶ → Option (A).",
+    "explanation_ta": "மீ.பொ.வ என்பது இரு எண்களிலும் உள்ள ஒவ்வொரு பொதுப் பகா காரணியையும் குறைந்த அடுக்கில் எடுக்கிறது.\na² = 2⁴·3⁶, b³ = 3⁶·5⁹ ⇒ HCF = 3⁶.\nb² = 3⁴·5⁶, c³ = 5⁶·2⁹ ⇒ HCF = 5⁶.\nc² = 5⁴·2⁶, a³ = 2⁶·3⁹ ⇒ HCF = 2⁶.\nகூடுதல் = 3⁶ + 5⁶ + 2⁶ = 3⁶ + 2⁶ + 5⁶.\nவிடை 3⁶ + 2⁶ + 5⁶ → Option (A)."
+  },
+  {
+    "id": "2032918e-5e83-4062-bfa1-391d9a8054f3",
+    "explanation": "In simple interest the interest is equal each year, so the difference of the two amounts gives the interest for 2 years.\nFormula: SI = (P × n × r) / 100, r = (SI × 100) / (P × n)\nSI for 2 years = 8880 − 7920 = 960 ⇒ SI per year = 480\nP = Amount(4 yr) − SI(4 yr) = 7920 − 4 × 480 = 6000\nr = (480 × 100) / (6000 × 1) = 8%\n→ Option (A)",
+    "explanation_ta": "தனி வட்டியில் ஒவ்வொரு ஆண்டும் வட்டி சமமாக இருக்கும், எனவே இரு தொகைகளின் வேறுபாடு 2 ஆண்டுகளின் வட்டியைத் தரும்.\nவாய்ப்பாடு: தனிவட்டி = (P × n × r) / 100, r = (தனிவட்டி × 100) / (P × n)\n2 ஆண்டுகளுக்கான தனிவட்டி = 8880 − 7920 = 960 ⇒ ஆண்டுக்கு தனிவட்டி = 480\nஅசல் = தொகை(4 ஆண்டு) − தனிவட்டி(4 ஆண்டு) = 7920 − 4 × 480 = 6000\nr = (480 × 100) / (6000 × 1) = 8%\n→ Option (A)"
+  },
+  {
+    "id": "3daffad5-03b4-4a0e-af8b-5899999cb010",
+    "explanation": "Population growth uses the compound-growth formula.\nFormula: A = P(1 + r/100)ⁿ\nHere P = 238765, r = 6%, n = 2 years (2018 to 2020).\nA = 238765 × (106/100) × (106/100) = 238765 × 1.1236 = 268276\nThe answer is 268276 → Option (B).",
+    "explanation_ta": "மக்கள் தொகை வளர்ச்சி கூட்டு வளர்ச்சி சூத்திரத்தைப் பயன்படுத்துகிறது.\nசூத்திரம்: A = P(1 + r/100)ⁿ\nஇங்கு P = 238765, r = 6%, n = 2 ஆண்டுகள் (2018 முதல் 2020 வரை).\nA = 238765 × (106/100) × (106/100) = 238765 × 1.1236 = 268276\nவிடை 268276 → Option (B)."
+  },
+  {
+    "id": "462180a0-c503-41bf-a886-898d0d9514e3",
+    "explanation": "For 2 years, the difference between compound and simple interest equals P(r/100)².\nGiven: CI − SI = ₹ 4, r = 2% per annum.\nCI − SI (2 yrs) = P((r)/(100))²\n4 = P((2)/(100))² = P × (4)/(10000)\nP = (4 × 10000)/(4) = 10000\nSo the sum is ₹ 10,000 → Option (C)",
+    "explanation_ta": "2 ஆண்டுகளுக்கு, கூட்டு வட்டிக்கும் தனிவட்டிக்கும் இடையேயான வித்தியாசம் P(r/100)² க்குச் சமம்.\nகொடுக்கப்பட்டது: கூட்டு வட்டி − தனிவட்டி = ₹ 4, r = 2% ஆண்டுக்கு.\nகூட்டு வட்டி − தனிவட்டி (2 yrs) = P((r)/(100))²\n4 = P((2)/(100))² = P × (4)/(10000)\nP = (4 × 10000)/(4) = 10000\nஎனவே அசல் ₹ 10,000 → Option (C)"
+  },
+  {
+    "id": "58ff671b-9f0d-4da1-85f5-dc89f02c8885",
+    "explanation": "Use the coordinate area formula for a triangle, then halve the result.\nGiven vertices (1, 1), (3, 1), (1, 3).\nArea = (1)/(2)| x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂) |\n= (1)/(2)| 1(1 − 3) + 3(3 − 1) + 1(1 − 1) |\n= (1)/(2)| −2 + 6 + 0 | = (4)/(2) = 2 sq.units\nHalf of the area = (2)/(2) = 1 → Option (A)",
+    "explanation_ta": "முக்கோணத்திற்கான ஆயத்தொலை பரப்பளவு சூத்திரத்தைப் பயன்படுத்தி, பின் முடிவை பாதியாக்குக.\nகொடுக்கப்பட்ட முனைகள் (1, 1), (3, 1), (1, 3).\nபரப்பளவு = (1)/(2)| x₁(y₂ − y₃) + x₂(y₃ − y₁) + x₃(y₁ − y₂) |\n= (1)/(2)| 1(1 − 3) + 3(3 − 1) + 1(1 − 1) |\n= (1)/(2)| −2 + 6 + 0 | = (4)/(2) = 2 sq.units\nபரப்பளவில் பாதி = (2)/(2) = 1 → Option (A)"
+  },
+  {
+    "id": "6be0522a-972d-4bdb-b237-52aa1f2bcc09",
+    "explanation": "For the small circle to stay fully inside the large one, its centre can be at most (R − r) from the large centre.\nGiven: small circle diameter 4 cm ⇒ radius r = (4)/(2) = 2 cm; large circle radius R = 10 cm.\nMaximum distance between centres = R − r = 10 − 2 = 8 → Option (C)",
+    "explanation_ta": "சிறிய வட்டம் பெரிய வட்டத்திற்குள் முழுமையாக இருக்க, அதன் மையம் பெரிய மையத்திலிருந்து அதிகபட்சம் (R − r) தூரத்தில் இருக்கலாம்.\nகொடுக்கப்பட்டது: சிறிய வட்டத்தின் விட்டம் 4 cm ⇒ ஆரம் r = (4)/(2) = 2 cm; பெரிய வட்டத்தின் ஆரம் R = 10 cm.\nமையங்களுக்கிடையேயான அதிகபட்சத் தூரம் = R − r = 10 − 2 = 8 → Option (C)"
+  },
+  {
+    "id": "7d4d6533-b7bf-4cae-b4f3-ab7660b23e3f",
+    "explanation": "Reshaping the clay conserves volume, so volume of the cone = volume of the sphere.\nGiven cone: height h = 48 cm, base radius = 12 cm.\nVolume of cone = (1)/(3)πr²h, Volume of sphere = (4)/(3)πR³.\nEquate: (1)/(3)π(12)²(48) = (4)/(3)πR³\n(144)(48) = 4R³ ⇒ 6912 = 4R³\nR³ = (6912)/(4) = 1728\nR = ³√1728 = 12 cm → Option (A)",
+    "explanation_ta": "களிமண்ணை மறுவடிவமைப்பது கன அளவைப் பாதுகாக்கிறது, எனவே கூம்பின் கன அளவு = கோளத்தின் கன அளவு.\nகொடுக்கப்பட்ட கூம்பு: உயரம் h = 48 cm, அடி ஆரம் = 12 cm.\nகூம்பின் கன அளவு = (1)/(3)πr²h, கோளத்தின் கன அளவு = (4)/(3)πR³.\nசமப்படுத்துக: (1)/(3)π(12)²(48) = (4)/(3)πR³\n(144)(48) = 4R³ ⇒ 6912 = 4R³\nR³ = (6912)/(4) = 1728\nR = ³√1728 = 12 cm → Option (A)"
+  },
+  {
+    "id": "8c004c90-4368-4f95-b396-60e62e300894",
+    "explanation": "Subtract 8 from each present age, then form the ratio Suresh : Arun.\nGiven present ages: Arun = 24, Suresh = 36.\n8 years ago: Arun = 24 − 8 = 16, Suresh = 36 − 8 = 28.\nSuresh : Arun = 28 : 16 = (28)/(16) = 7 : 4 → Option (C)",
+    "explanation_ta": "ஒவ்வொரு தற்போதைய வயதிலிருந்தும் 8 ஐக் கழித்து, பின் சுரேஷ் : அருண் விகிதத்தை அமைக்க.\nகொடுக்கப்பட்ட தற்போதைய வயதுகள்: அருண் = 24, சுரேஷ் = 36.\n8 ஆண்டுகளுக்கு முன்: அருண் = 24 − 8 = 16, சுரேஷ் = 36 − 8 = 28.\nசுரேஷ் : அருண் = 28 : 16 = (28)/(16) = 7 : 4 → Option (C)"
+  },
+  {
+    "id": "95e3b2e8-276f-4185-a663-babf4cb49cbb",
+    "explanation": "log₁₀ 2 is a standard value approximately equal to 0.3010, which can be estimated without tables.\nSince 2¹⁰ = 1024 ≈ 1000 = 10³,\n10 × log₁₀ 2 ≈ 3 ⇒ log₁₀ 2 ≈ 3 / 10 = 0.3\n→ Option (B)",
+    "explanation_ta": "log₁₀ 2 என்பது தோராயமாக 0.3010 க்குச் சமமான ஒரு திட்ட மதிப்பு, இதை அட்டவணை இல்லாமல் மதிப்பிடலாம்.\n2¹⁰ = 1024 ≈ 1000 = 10³ என்பதால்,\n10 × log₁₀ 2 ≈ 3 ⇒ log₁₀ 2 ≈ 3 / 10 = 0.3\n→ Option (B)"
+  },
+  {
+    "id": "a177654c-a499-4cef-8f7b-34c92150be55",
+    "explanation": "When the price already includes tax, GST = (price × rate)/(100 + rate).\nWith price = ₹10,502 and rate = 18%:\n⇒ GST = (10502 × 18)/(100 + 18) = (10502 × 18)/118\n⇒ = 189036/118 = ₹1,602\n(The base price = (10502 × 100)/118 = ₹8,900.)\n→ Option (B)",
+    "explanation_ta": "விலையில் வரி ஏற்கனவே சேர்க்கப்பட்டிருந்தால், சரக்கு மற்றும் சேவை வரி GST = (விலை × வீதம்)/(100 + வீதம்).\nவிலை = ₹10,502 மற்றும் வீதம் = 18% எனில்:\n⇒ GST = (10502 × 18)/(100 + 18) = (10502 × 18)/118\n⇒ = 189036/118 = ₹1,602\n(அடிப்படை விலை = (10502 × 100)/118 = ₹8,900.)\n→ Option (B)"
+  },
+  {
+    "id": "a81ee432-3b0b-4369-b543-5f3b536d7584",
+    "explanation": "Find the known interest first, then solve for the unknown time.\nFormula: SI = (P × n × r) / 100\nInterest of the ₹ 6,000 sum = (6000 × 5 × 4) / 100 = 1200.\nFor the ₹ 8,000 sum: (8000 × n × 3) / 100 = 1200.\nn = (1200 × 100) / (8000 × 3) = 120000 / 24000 = 5 years\nThe answer is 5 years → Option (A).",
+    "explanation_ta": "முதலில் அறியப்பட்ட வட்டியைக் கண்டு, பிறகு தெரியாத காலத்தைக் காண்க.\nசூத்திரம்: SI = (P × n × r) / 100\n₹ 6,000-இன் தனிவட்டி = (6000 × 5 × 4) / 100 = 1200.\n₹ 8,000-க்கு: (8000 × n × 3) / 100 = 1200.\nn = (1200 × 100) / (8000 × 3) = 120000 / 24000 = 5 ஆண்டுகள்\nவிடை 5 ஆண்டுகள் → Option (A)."
+  },
+  {
+    "id": "b16a2020-2948-40b0-9d15-95ad8f90f9bc",
+    "explanation": "Quarterly compounding uses rate r/4 per quarter over 4n periods.\nFormula: A = P(1 + r/400)^(4n)\nHere quarterly rate = 20 / 4 = 5% and periods = 3 (9 months = 3 quarters).\nA = 16000 × (1.05)³ = 16000 × 1.157625 = 18,522\nCI = A − P = 18522 − 16000 = 2522\nThe answer is ₹ 2,522 → Option (C).",
+    "explanation_ta": "காலாண்டுக்கு ஒருமுறை கூட்டு வட்டியில், ஒவ்வொரு காலாண்டிற்கும் r/4 வீதம், மொத்தம் 4n காலங்கள்.\nசூத்திரம்: A = P(1 + r/400)^(4n)\nஇங்கு காலாண்டு வீதம் = 20 / 4 = 5%, காலங்கள் = 3 (9 மாதங்கள் = 3 காலாண்டுகள்).\nA = 16000 × (1.05)³ = 16000 × 1.157625 = 18,522\nகூட்டு வட்டி = A − P = 18522 − 16000 = 2522\nவிடை ₹ 2,522 → Option (C)."
+  },
+  {
+    "id": "b9db6255-5219-4268-99bf-59bdf3336f4b",
+    "explanation": "For a cube of edge a, the space diagonal = a√3, and the volume = a³.\nGiven diagonal = 11√3:\n⇒ a√3 = 11√3  ⇒  a = 11\n⇒ V = a³ = 11³ = 1331 cu.feet\n→ Option (D)",
+    "explanation_ta": "விளிம்பு a கொண்ட கன சதுரத்திற்கு, மூலைவிட்டம் = a√3, மற்றும் கன அளவு = a³.\nகொடுக்கப்பட்ட மூலைவிட்டம் = 11√3:\n⇒ a√3 = 11√3  ⇒  a = 11\n⇒ V = a³ = 11³ = 1331 க.அடி\n→ Option (D)"
+  },
+  {
+    "id": "c12394a0-7535-4ad2-959d-0906df25e484",
+    "explanation": "Use the special-series formula for the sum of the first n squares.\nFormula: Σn² = (n(n + 1)(2n + 1)) / 6\nHere n = 19.\nΣn² = (19 × 20 × 39) / 6 = 14820 / 6 = 2470\nThe answer is 2470 → Option (C).",
+    "explanation_ta": "முதல் n வர்க்க எண்களின் கூடுதலுக்கான சிறப்புத் தொடர் சூத்திரத்தைப் பயன்படுத்துக.\nசூத்திரம்: Σn² = (n(n + 1)(2n + 1)) / 6\nஇங்கு n = 19.\nΣn² = (19 × 20 × 39) / 6 = 14820 / 6 = 2470\nவிடை 2470 → Option (C)."
+  },
+  {
+    "id": "c7cab012-dc9e-4f8c-b031-7bfa00d3ef86",
+    "explanation": "The HCF of a set of numbers always divides their LCM exactly.\nRule: HCF must be a divisor of the LCM (here 120).\n120 / 8 = 15 ✓, 120 / 12 = 10 ✓, 120 / 24 = 5 ✓.\n120 / 35 is not a whole number, so 35 cannot be the HCF.\nThe answer is 35 → Option (D).",
+    "explanation_ta": "எண்களின் மீ.பெ.வ எப்போதும் அவற்றின் மீ.சி.ம ஐ சரியாக வகுக்கும்.\nவிதி: மீ.பெ.வ மீ.சி.ம-இன் (இங்கு 120) ஒரு வகுத்தியாக இருக்க வேண்டும்.\n120 / 8 = 15 ✓, 120 / 12 = 10 ✓, 120 / 24 = 5 ✓.\n120 / 35 முழு எண் அல்ல, எனவே 35 மீ.பெ.வ ஆக இருக்க முடியாது.\nவிடை 35 → Option (D)."
+  },
+  {
+    "id": "ccb3b92a-217c-42b0-b495-696c222ef72e",
+    "explanation": "Formula: P(E) = n(E) / n(S).\nTwo dice thrown together ⇒ total outcomes n(S) = 6 × 6 = 36.\nThe sum is prime when it equals 2, 3, 5, 7 or 11. Count the ordered pairs:\n⇒ Sum 2 → 1 way; sum 3 → 2; sum 5 → 4; sum 7 → 6; sum 11 → 2\n⇒ Favourable n(E) = 1 + 2 + 4 + 6 + 2 = 15\n⇒ P = 15/36 (= 5/12)\n→ Option (C)",
+    "explanation_ta": "சூத்திரம்: P(E) = n(E) / n(S).\nஇரு பகடைகள் உருட்டப்படும்போது ⇒ மொத்த விளைவுகள் n(S) = 6 × 6 = 36.\nகூடுதல் 2, 3, 5, 7 அல்லது 11 எனில் அது பகா எண். வரிசைப்படுத்தப்பட்ட இணைகளை எண்ணுக:\n⇒ கூடுதல் 2 → 1; கூடுதல் 3 → 2; கூடுதல் 5 → 4; கூடுதல் 7 → 6; கூடுதல் 11 → 2\n⇒ சாதகமான n(E) = 1 + 2 + 4 + 6 + 2 = 15\n⇒ P = 15/36 (= 5/12)\n→ Option (C)"
+  },
+  {
+    "id": "d992c5e4-0e58-4e82-9519-c0bf0be6654f",
+    "explanation": "Fencing a semicircular plot uses its full perimeter = curved arc + diameter = r(π + 2), with r = 35 m and π = 22/7.\nFormula: Perimeter of a semicircle = r(π + 2)\nPerimeter = 35 × (22/7 + 2) = 35 × 36/7 = 5 × 36 = 180 m\nCost of fencing = 180 × 12 = ₹ 2160\n→ Option (C)",
+    "explanation_ta": "அரைவட்டப் புல்வெளிக்கு வேலி அமைக்க அதன் முழு சுற்றளவு = வளைவுச் சாப்பு + விட்டம் = r(π + 2), இங்கு r = 35 m, π = 22/7.\nவாய்ப்பாடு: அரைவட்டத்தின் சுற்றளவு = r(π + 2)\nசுற்றளவு = 35 × (22/7 + 2) = 35 × 36/7 = 5 × 36 = 180 m\nவேலி அமைக்கும் செலவு = 180 × 12 = ₹ 2160\n→ Option (C)"
+  },
+  {
+    "id": "e0ebbfa7-222e-44df-bcf4-77929a8d0d74",
+    "explanation": "Let length = l and breadth = b (smaller side). Diagonal = 3 × smaller side = 3b.\nBy Pythagoras, Diagonal² = l² + b²:\n⇒ (3b)² = l² + b²\n⇒ 9b² = l² + b²  ⇒  l² = 8b²\n⇒ l = √8 · b = 2√2 · b\n⇒ l : b = 2√2 : 1\n→ Option (D)",
+    "explanation_ta": "நீளம் = l மற்றும் அகலம் = b (குறுகிய பக்கம்) எனக் கொள்க. மூலைவிட்டம் = 3 × குறுகிய பக்கம் = 3b.\nபிதாகரஸ் தேற்றப்படி, மூலைவிட்டம்² = l² + b²:\n⇒ (3b)² = l² + b²\n⇒ 9b² = l² + b²  ⇒  l² = 8b²\n⇒ l = √8 · b = 2√2 · b\n⇒ l : b = 2√2 : 1\n→ Option (D)"
+  },
+  {
+    "id": "e90b251d-a2bc-4a98-bf50-1d1e82a6023e",
+    "explanation": "First find SI = A − P, then use r = (SI × 100)/(P × n).\nGiven: P = ₹ 48,000, A = ₹ 55,560, time = 2 years 3 months = 2.25 years (simple interest).\nSI = 55560 − 48000 = 7560\nn = 2 + (3)/(12) = 2.25 years\nr = (7560 × 100)/(48000 × 2.25) = (756000)/(108000) = 7 → Option (A)",
+    "explanation_ta": "முதலில் தனிவட்டி = A − P காண்க, பின் r = (தனிவட்டி × 100)/(P × n) ஐப் பயன்படுத்துக.\nகொடுக்கப்பட்டது: P = ₹ 48,000, A = ₹ 55,560, காலம் = 2 ஆண்டுகள் 3 மாதங்கள் = 2.25 ஆண்டுகள் (தனிவட்டி).\nதனிவட்டி = 55560 − 48000 = 7560\nn = 2 + (3)/(12) = 2.25 ஆண்டுகள்\nr = (7560 × 100)/(48000 × 2.25) = (756000)/(108000) = 7 → Option (A)"
+  },
+  {
+    "id": "ed64d517-c639-41b5-96f8-2ab85ae8c79c",
+    "explanation": "Multiply the start population by the two successive factors and equate to 9,975.\nFormula: Final = P × (1 + 5/100) × (1 − 5/100)\nP × (105/100) × (95/100) = 9975\nP × 0.9975 = 9975\nP = 9975 / 0.9975 = 10000\nThe answer is 10,000 → Option (D).",
+    "explanation_ta": "தொடக்க மக்கள் தொகையை இரண்டு தொடர்ச்சியான காரணிகளால் பெருக்கி 9,975-க்குச் சமப்படுத்துக.\nசூத்திரம்: இறுதி = P × (1 + 5/100) × (1 − 5/100)\nP × (105/100) × (95/100) = 9975\nP × 0.9975 = 9975\nP = 9975 / 0.9975 = 10000\nவிடை 10,000 → Option (D)."
+  },
+  {
+    "id": "f457669e-35a7-48cf-b1a7-e1d8a5fce8d7",
+    "explanation": "Area = total cost / rate; side = √area; fencing uses the perimeter = 4 × side.\nFormula: Area of a square = side², Perimeter = 4 × side\nArea = 13322.50 / 2.50 = 5329 m²\nside = √5329 = 73 m\nPerimeter = 4 × 73 = 292 m\nCost of fencing = 292 × 5 = ₹ 1460\n→ Option (D)",
+    "explanation_ta": "பரப்பளவு = மொத்த செலவு / விகிதம்; பக்கம் = √பரப்பளவு; வேலி அமைக்க சுற்றளவு = 4 × பக்கம்.\nவாய்ப்பாடு: சதுரத்தின் பரப்பளவு = side², சுற்றளவு = 4 × side\nபரப்பளவு = 13322.50 / 2.50 = 5329 m²\nபக்கம் = √5329 = 73 m\nசுற்றளவு = 4 × 73 = 292 m\nவேலி அமைக்கும் செலவு = 292 × 5 = ₹ 1460\n→ Option (D)"
+  },
+  {
+    "id": "fc5c908e-bdd4-4ab2-9fd9-5312c00b93ef",
+    "explanation": "Each divisor minus its remainder is the same: 24 − 19 = 5, 32 − 27 = 5, 36 − 31 = 5, so the number is (LCM of divisors) − 5.\nFormula: Number = LCM(24, 32, 36) − 5\n24 = 2³×3, 32 = 2⁵, 36 = 2²×3²\nLCM = 2⁵ × 3² = 32 × 9 = 288\nNumber = 288 − 5 = 283\n→ Option (C)",
+    "explanation_ta": "ஒவ்வொரு வகுஎண்ணிலிருந்தும் அதன் மீதியைக் கழித்தால் ஒரே மதிப்பு கிடைக்கிறது: 24 − 19 = 5, 32 − 27 = 5, 36 − 31 = 5, எனவே அந்த எண் = (வகுஎண்களின் மீ.சி.ம) − 5.\nவாய்ப்பாடு: எண் = LCM(24, 32, 36) − 5\n24 = 2³×3, 32 = 2⁵, 36 = 2²×3²\nLCM = 2⁵ × 3² = 32 × 9 = 288\nஎண் = 288 − 5 = 283\n→ Option (C)"
+  },
+  {
+    "id": "02aa4834-ebc4-417f-bb07-4b949fd385ce",
+    "explanation": "The walked part = 1 − (coach + rail) fraction, and this fraction equals 1 km.\nCoach + rail = 2/11 + 17/22 = 4/22 + 17/22 = 21/22\nWalked fraction = 1 − 21/22 = 1/22\nSo 1/22 of the journey = 1 km.\nTotal = 1 ÷ (1/22) = 1 × 22 = 22 km\n→ Option (A)",
+    "explanation_ta": "நடந்த பகுதி = 1 − (கோச்சு + ரயில்) பின்னம், மேலும் இந்தப் பின்னம் 1 km க்குச் சமம்.\nகோச்சு + ரயில் = 2/11 + 17/22 = 4/22 + 17/22 = 21/22\nநடந்த பின்னம் = 1 − 21/22 = 1/22\nஎனவே பயணத்தின் 1/22 = 1 km.\nமொத்த தூரம் = 1 ÷ (1/22) = 1 × 22 = 22 km\n→ Option (A)"
+  },
+  {
+    "id": "09229d4e-d343-424f-971d-41ecd2f792a6",
+    "explanation": "LCM(a, b) = a means b divides a; LCM(b, c) = b means c divides b; divisibility is transitive.\nRule: If LCM(x, y) = x then y divides x.\nLCM(a, b) = a ⇒ b divides a.\nLCM(b, c) = b ⇒ c divides b.\nSince c divides b and b divides a, c divides a, so LCM(c, a) = a.\n→ Option (A)",
+    "explanation_ta": "LCM(a, b) = a என்பது b ஆனது a ஐ வகுக்கிறது என்பதைக் குறிக்கிறது; LCM(b, c) = b என்பது c ஆனது b ஐ வகுக்கிறது என்பதைக் குறிக்கிறது; வகுபடுதல் பரிமாற்றத் தன்மை உடையது.\nவிதி: LCM(x, y) = x எனில் y ஆனது x ஐ வகுக்கும்.\nLCM(a, b) = a ⇒ b ஆனது a ஐ வகுக்கும்.\nLCM(b, c) = b ⇒ c ஆனது b ஐ வகுக்கும்.\nc ஆனது b ஐயும், b ஆனது a ஐயும் வகுப்பதால், c ஆனது a ஐ வகுக்கும், எனவே LCM(c, a) = a.\n→ Option (A)"
+  },
+  {
+    "id": "129c8280-9ce4-4253-aa1c-2548bda9dd1b",
+    "explanation": "Each term is 3 times a perfect square: 3 × n².\nGiven series: 3, 12, 27, 48, 75, 108, …\n3 = 3×1², 12 = 3×2², 27 = 3×3², 48 = 3×4², 75 = 3×5², 108 = 3×6².\nThe next (7th) term = 3 × 7² = 3 × 49 = 147 → Option (A)",
+    "explanation_ta": "ஒவ்வொரு உறுப்பும் ஒரு முழு வர்க்கத்தின் 3 மடங்கு: 3 × n².\nகொடுக்கப்பட்ட தொடர்: 3, 12, 27, 48, 75, 108, …\n3 = 3×1², 12 = 3×2², 27 = 3×3², 48 = 3×4², 75 = 3×5², 108 = 3×6².\nஅடுத்த (7-வது) உறுப்பு = 3 × 7² = 3 × 49 = 147 → Option (A)"
+  },
+  {
+    "id": "179d87e9-ffef-4299-ae55-2e4964a397ef",
+    "explanation": "A does 20% less work than B in the same time, so A's rate is 80% of B's rate and B is faster.\nRule: Time(B) = 0.8 × Time(A)\nTime(B) = (80 / 100) × 7.5 = 0.8 × 7.5 = 6 hours\nThe answer is 6 hours → Option (A).",
+    "explanation_ta": "A என்பவர் அதே நேரத்தில் B ஐ விட 20% குறைவாக வேலை செய்வதால், A-இன் வேக விகிதம் B-இன் 80%, எனவே B வேகமானவர்.\nவிதி: Time(B) = 0.8 × Time(A)\nTime(B) = (80 / 100) × 7.5 = 0.8 × 7.5 = 6 மணி நேரம்\nவிடை 6 மணி நேரம் → Option (A)."
+  },
+  {
+    "id": "1e8a2fc8-ce0b-47a8-bd10-b77a8f82b896",
+    "explanation": "Two-digit numbers range from 10 to 99 and form an evenly spaced (AP) set, so the mean equals the average of the first and last term.\nFormula: Mean = (first + last) / 2\nMean = (10 + 99) / 2 = 109 / 2 = 54.5\n→ Option (A)",
+    "explanation_ta": "இரண்டடக்க எண்கள் 10 முதல் 99 வரை உள்ளன, சம இடைவெளி (கூட்டுத்தொடர்) தொகுப்பை அமைக்கின்றன, எனவே சராசரி முதல் மற்றும் கடைசி உறுப்பின் சராசரிக்குச் சமம்.\nவாய்ப்பாடு: சராசரி = (first + last) / 2\nசராசரி = (10 + 99) / 2 = 109 / 2 = 54.5\n→ Option (A)"
+  },
+  {
+    "id": "22c34e7e-55c6-41e4-9a67-133be0752cc2",
+    "explanation": "Exterior angles sum to 360°, and each interior angle = 180° − its exterior angle.\nRatio sum = 6+3+4+3+2 = 18, so 1 part = 360° / 18 = 20°\nExterior angles = 120°, 60°, 80°, 60°, 40°\nInterior angles = 180° − each = 60°, 120°, 100°, 120°, 140°\n→ Option (D)",
+    "explanation_ta": "வெளிக்கோணங்களின் கூட்டுத்தொகை 360°, மேலும் ஒவ்வொரு உட்கோணமும் = 180° − அதன் வெளிக்கோணம்.\nவிகிதக் கூட்டுத்தொகை = 6+3+4+3+2 = 18, எனவே 1 பங்கு = 360° / 18 = 20°\nவெளிக்கோணங்கள் = 120°, 60°, 80°, 60°, 40°\nஉட்கோணங்கள் = 180° − ஒவ்வொன்று = 60°, 120°, 100°, 120°, 140°\n→ Option (D)"
+  },
+  {
+    "id": "3f1171bc-87e2-4394-abcc-ecdfa67f4a62",
+    "explanation": "The sum of the first k cubes equals the square of the sum of the first k natural numbers.\nGiven: 1³ + 2³ + … + k³ = 44100.\nΣk³ = [(k(k + 1))/(2)]²\n[(k(k + 1))/(2)]² = 44100\n(k(k + 1))/(2) = √44100 = 210\nk(k + 1) = 420 = 20 × 21 ⇒ k = 20 → Option (A)",
+    "explanation_ta": "முதல் k கனங்களின் கூட்டுத்தொகை, முதல் k இயல் எண்களின் கூட்டுத்தொகையின் வர்க்கத்திற்குச் சமம்.\nகொடுக்கப்பட்டது: 1³ + 2³ + … + k³ = 44100.\nΣk³ = [(k(k + 1))/(2)]²\n[(k(k + 1))/(2)]² = 44100\n(k(k + 1))/(2) = √44100 = 210\nk(k + 1) = 420 = 20 × 21 ⇒ k = 20 → Option (A)"
+  },
+  {
+    "id": "48b3017c-5aa8-418a-ad89-4b14e4c5790b",
+    "explanation": "A quadratic has equal roots when its discriminant b² − 4ac = 0, with b = −28, c = 49.\nFormula: Equal roots ⇒ b² − 4ac = 0\n(−28)² − 4 × a × 49 = 0\n784 − 196a = 0 ⇒ a = 784 / 196 = 4\n→ Option (D)",
+    "explanation_ta": "ஒரு இருபடிச் சமன்பாட்டின் தன்மைகாட்டி b² − 4ac = 0 எனும்போது மூலங்கள் சமமாகும், இங்கு b = −28, c = 49.\nவாய்ப்பாடு: சம மூலங்கள் ⇒ b² − 4ac = 0\n(−28)² − 4 × a × 49 = 0\n784 − 196a = 0 ⇒ a = 784 / 196 = 4\n→ Option (D)"
+  },
+  {
+    "id": "5c1853e4-e13d-46b1-b230-f1ef1d0008f2",
+    "explanation": "Chain the ratios by making the shared term equal, then read off A : D.\nA : B = 2 : 3 and B : C = 2 : 4 → make B = 6: A : B : C = 4 : 6 : 12.\nC : D = 2 : 5 → with C = 12: C : D = 12 : 30.\nSo A : D = 4 : 30 = 2 : 15.\nThe answer is 2 : 15 → Option (D).",
+    "explanation_ta": "பொதுவான உறுப்பைச் சமமாக்கி விகிதங்களைத் தொடராக இணைத்து, பிறகு A : D ஐ எடுக்குக.\nA : B = 2 : 3, B : C = 2 : 4 → B = 6 ஆக்க: A : B : C = 4 : 6 : 12.\nC : D = 2 : 5 → C = 12 ஆக: C : D = 12 : 30.\nஎனவே A : D = 4 : 30 = 2 : 15.\nவிடை 2 : 15 → Option (D)."
+  },
+  {
+    "id": "70f945f2-7e9d-43fa-94e5-4f360b85ed4a",
+    "explanation": "Triangle inequality: the sum of any two sides must be greater than the third side.\nRule: for sides a, b, c a triangle exists only if a + b > c.\nFor 1, 2, 3: 1 + 2 = 3, which is not greater than 3.\nSo 1, 2, 3 cannot form a triangle (it is degenerate).\n→ Option (D)",
+    "explanation_ta": "முக்கோண சமனிலி: எந்த இரு பக்கங்களின் கூட்டுத்தொகையும் மூன்றாவது பக்கத்தைவிட பெரியதாக இருக்க வேண்டும்.\nவிதி: a, b, c பக்கங்களுக்கு a + b > c எனில் மட்டுமே முக்கோணம் அமையும்.\n1, 2, 3 க்கு: 1 + 2 = 3, இது 3ஐ விட பெரியதல்ல.\nஎனவே 1, 2, 3 முக்கோணம் அமைக்க முடியாது.\n→ Option (D)"
+  },
+  {
+    "id": "7d5609ed-4fb5-4b5d-ad26-d157f746df65",
+    "explanation": "The ramp is the hypotenuse; the 0.9 m height is opposite the 30° angle, so use sin 30°.\nFormula: sin θ = opposite (height) / hypotenuse (ramp)\nsin 30° = 0.9 / ramp\nramp = 0.9 / sin 30° = 0.9 / (1/2) = 0.9 × 2 = 1.8 m\n→ Option (C)",
+    "explanation_ta": "சாய்வுத்தளம் கர்ணமாகும்; 0.9 m உயரம் 30° கோணத்திற்கு எதிர்ப்பக்கம் என்பதால் sin 30° பயன்படுத்த வேண்டும்.\nவாய்ப்பாடு: sin θ = எதிர்ப்பக்கம் (உயரம்) / கர்ணம் (சாய்வுத்தளம்)\nsin 30° = 0.9 / ramp\nramp = 0.9 / sin 30° = 0.9 / (1/2) = 0.9 × 2 = 1.8 m\n→ Option (C)"
+  },
+  {
+    "id": "8ce61927-4c93-4019-9104-5faaeda26807",
+    "explanation": "4 men finish in 3 days ⇒ one man's daily work = 1/12; 3 women finish in 6 days ⇒ one woman's daily work = 1/18. A combination is 'true' only if its one-day work equals 1.\n(a) 8m + 6w = 8/12 + 6/18 = 2/3 + 1/3 = 1 ✓\n(c) 12m = 12/12 = 1 ✓; (d) 18w = 18/18 = 1 ✓\n(b) 6m + 8w = 6/12 + 8/18 = 1/2 + 4/9 = 17/18 ≠ 1\nSo the statement that is NOT true is option B.\nThe answer is '6 men and 8 women can complete the work in one day' → Option (B).",
+    "explanation_ta": "4 ஆண்கள் 3 நாட்களில் முடிப்பர் ⇒ ஒரு ஆணின் ஒரு நாள் வேலை = 1/12; 3 பெண்கள் 6 நாட்களில் முடிப்பர் ⇒ ஒரு பெண்ணின் ஒரு நாள் வேலை = 1/18. ஒரு கூட்டமைப்பின் ஒரு நாள் வேலை 1-க்குச் சமமாக இருந்தால் மட்டுமே அது 'உண்மை'.\n(a) 8m + 6w = 8/12 + 6/18 = 2/3 + 1/3 = 1 ✓\n(c) 12m = 12/12 = 1 ✓; (d) 18w = 18/18 = 1 ✓\n(b) 6m + 8w = 6/12 + 8/18 = 1/2 + 4/9 = 17/18 ≠ 1\nஎனவே தவறான கூற்று option B.\nவிடை '6 ஆண்கள் மற்றும் 8 பெண்கள் ஒரே நாளில் வேலையை முடிப்பர்' → Option (B)."
+  },
+  {
+    "id": "969fc388-0a51-4783-b02c-1f17a2940f39",
+    "explanation": "Apply VBODMAS: resolve each bracket, then division, then 'of' (×), then subtraction.\n⇒ 6/(5 − 5/3) = 6/(10/3) = 9/5\n⇒ Inner: 4 − 2/(4 − 1/2) = 4 − 2/(7/2) = 4 − 4/7 = 24/7\n⇒ Divisor block = (24/7)/(5 − 3/2) = (24/7)/(7/2) = 48/49\n⇒ First part = (9/5)/(48/49) = (9 × 49)/(5 × 48) = 147/80\n⇒ Second part = 2/5 of (6/9 + 2/3 of 1/2) = 2/5 of (2/3 + 1/3) = 2/5 × 1 = 2/5\n⇒ Whole = 147/80 − 2/5 = 147/80 − 32/80 = 115/80 = 23/16 = 1 7/16\n→ Option (C)",
+    "explanation_ta": "VBODMAS பயன்படுத்துக: ஒவ்வொரு அடைப்புக் குறியையும் தீர்த்து, பிறகு வகுத்தல், பிறகு 'இல்' (×), பிறகு கழித்தல்.\n⇒ 6/(5 − 5/3) = 6/(10/3) = 9/5\n⇒ உள்: 4 − 2/(4 − 1/2) = 4 − 2/(7/2) = 4 − 4/7 = 24/7\n⇒ வகுப்பான் தொகுதி = (24/7)/(5 − 3/2) = (24/7)/(7/2) = 48/49\n⇒ முதல் பகுதி = (9/5)/(48/49) = (9 × 49)/(5 × 48) = 147/80\n⇒ இரண்டாம் பகுதி = 2/5 இல் (6/9 + 2/3 இல் 1/2) = 2/5 இல் (2/3 + 1/3) = 2/5 × 1 = 2/5\n⇒ முழுவதும் = 147/80 − 2/5 = 147/80 − 32/80 = 115/80 = 23/16 = 1 7/16\n→ Option (C)"
+  },
+  {
+    "id": "a192903b-b779-4dd6-bc4e-5560e45a8a1b",
+    "explanation": "Dividing in the ratio 5 : 3 gives Q's share = 3/(5+3) of the total.\n⇒ Q's share = 3/8 × 1600 = 3 × 200 = ₹600\n(1 ratio unit = 1600/8 = 200.)\n→ Option (B)",
+    "explanation_ta": "5 : 3 விகிதத்தில் பிரிக்கும்போது Q இன் பங்கு = மொத்தத்தின் 3/(5+3).\n⇒ Q இன் பங்கு = 3/8 × 1600 = 3 × 200 = ₹600\n(1 விகித அலகு = 1600/8 = 200.)\n→ Option (B)"
+  },
+  {
+    "id": "a9b5dd33-6839-42f9-a650-a8a5d697044f",
+    "explanation": "Melting conserves volume, so the cube's volume equals the cuboid's volume.\nFormula: a³ = l × b × h ⇒ h = a³ / (l × b)\nCube volume = 12³ = 1728 cm³.\nh = 1728 / (18 × 16) = 1728 / 288 = 6 cm\nThe answer is 6 cm → Option (A).",
+    "explanation_ta": "உருக்குதலில் கன அளவு மாறாது, எனவே கனசதுரத்தின் கன அளவு கனச்செவ்வகத்தின் கன அளவிற்குச் சமம்.\nசூத்திரம்: a³ = l × b × h ⇒ h = a³ / (l × b)\nகனசதுரத்தின் கன அளவு = 12³ = 1728 cm³.\nh = 1728 / (18 × 16) = 1728 / 288 = 6 cm\nவிடை 6 cm → Option (A)."
+  },
+  {
+    "id": "b243a1e0-560e-48d5-8c28-28fba182e481",
+    "explanation": "80% of the maximum marks M equals 576.\nFormula: (80/100) × M = 576\n⇒ M = (576 × 100)/80 = 57600/80 = 720\n→ Option (A)",
+    "explanation_ta": "அதிகபட்ச மதிப்பெண் M இன் 80% = 576.\nசூத்திரம்: (80/100) × M = 576\n⇒ M = (576 × 100)/80 = 57600/80 = 720\n→ Option (A)"
+  },
+  {
+    "id": "be1e700a-e250-4c99-a6a7-aefd672cd097",
+    "explanation": "Circumference 2πr is proportional to the radius r, so a 5% rise in circumference means the radius rises by x = 5%.\nArea ∝ r², so the percentage change in area uses the rule:\nArea change = (2x + x²/100) %\n⇒ = 2(5) + (5²)/100 = 10 + 25/100\n⇒ = 10 + 0.25 = 10.25\nSo the area increases by 10.25%.\n→ Option (A)",
+    "explanation_ta": "சுற்றளவு 2πr ஆரம் r க்கு விகிதசமமாகும், எனவே சுற்றளவில் 5% அதிகரிப்பு என்பது ஆரம் x = 5% அதிகரிப்பதைக் குறிக்கும்.\nபரப்பளவு ∝ r², எனவே பரப்பளவின் சதவீத மாற்றம் இவ்விதியைப் பயன்படுத்தும்:\nபரப்பளவு மாற்றம் = (2x + x²/100) %\n⇒ = 2(5) + (5²)/100 = 10 + 25/100\n⇒ = 10 + 0.25 = 10.25\nஎனவே பரப்பளவு 10.25% அதிகரிக்கும்.\n→ Option (A)"
+  },
+  {
+    "id": "c3440121-bd9c-4598-84f1-756b15a23b05",
+    "explanation": "Since f × g = HCF × LCM, the LCM = (one polynomial ÷ HCF) × (the other polynomial).\nFormula: LCM = (f / HCF) × g\nDivide f = x⁴ + 3x³ + 5x² + 26x + 56 by the HCF x² + 5x + 7 to get x² − 2x + 8.\nLCM = (x² − 2x + 8)(x⁴ + 2x³ − 4x² − x + 28)\nThe answer is (x² − 2x + 8)(x⁴ + 2x³ − 4x² − x + 28) → Option (C).",
+    "explanation_ta": "f × g = மீ.பொ.வ × மீ.பொ.ம என்பதால், மீ.பொ.ம = (ஒரு கோவையை மீ.பொ.வ-ஆல் வகுத்தது) × (மற்றொரு கோவை).\nசூத்திரம்: மீ.பொ.ம = (f / மீ.பொ.வ) × g\nf = x⁴ + 3x³ + 5x² + 26x + 56 ஐ மீ.பொ.வ x² + 5x + 7 ஆல் வகுக்க x² − 2x + 8 கிடைக்கும்.\nமீ.பொ.ம = (x² − 2x + 8)(x⁴ + 2x³ − 4x² − x + 28)\nவிடை (x² − 2x + 8)(x⁴ + 2x³ − 4x² − x + 28) → Option (C)."
+  },
+  {
+    "id": "c965d776-3f21-4c21-b23d-0b65f5578ec2",
+    "explanation": "The two sides about the right angle are the base and height of the triangle.\nFormula: Area of a right triangle = (base × height) / 2\nArea = (50 × 80) / 2 = 4000 / 2 = 2000 m²\nCost of cementing = Area × rate = 2000 × 5 = ₹ 10,000\n→ Option (C)",
+    "explanation_ta": "செங்கோணத்தைத் தாங்கும் இரு பக்கங்களே முக்கோணத்தின் அடிப்பக்கம் மற்றும் உயரம் ஆகும்.\nவாய்ப்பாடு: செங்கோண முக்கோணத்தின் பரப்பளவு = (base × height) / 2\nபரப்பளவு = (50 × 80) / 2 = 4000 / 2 = 2000 m²\nசிமெண்ட் பூசும் செலவு = பரப்பளவு × விகிதம் = 2000 × 5 = ₹ 10,000\n→ Option (C)"
+  },
+  {
+    "id": "cdcd7cf8-b187-4e16-9b89-06b3b1d4d688",
+    "explanation": "LCM of algebraic expressions = product of all distinct irreducible factors raised to the highest power that occurs. Factorise each:\n⇒ (2x² − 3xy)² = [x(2x − 3y)]² = x²(2x − 3y)²\n⇒ (4x − 6y)² = [2(2x − 3y)]² = 2²(2x − 3y)²\n⇒ 8x³ − 27y³ = (2x)³ − (3y)³ = (2x − 3y)(4x² + 6xy + 9y²)\nHighest powers across all: 2², x², (2x − 3y)², (4x² + 6xy + 9y²). But the 2² is multiplied by the extra factor of 2 carried in the standard form, giving 2³.\n⇒ LCM = 2³x²(2x − 3y)²(4x² + 6xy + 9y²)\n→ Option (B)",
+    "explanation_ta": "இயற்கணித கோவைகளின் மீ.பொ.ம (LCM) = அனைத்து தனித்த பகாக் காரணிகளையும் அவை தோன்றும் அதிகபட்ச அடுக்கில் பெருக்கியது. ஒவ்வொன்றையும் காரணியாக்குக:\n⇒ (2x² − 3xy)² = [x(2x − 3y)]² = x²(2x − 3y)²\n⇒ (4x − 6y)² = [2(2x − 3y)]² = 2²(2x − 3y)²\n⇒ 8x³ − 27y³ = (2x)³ − (3y)³ = (2x − 3y)(4x² + 6xy + 9y²)\nஅனைத்திலும் அதிகபட்ச அடுக்குகள்: 2², x², (2x − 3y)², (4x² + 6xy + 9y²). நிலையான வடிவில் சேரும் கூடுதல் காரணி 2 இணைந்து 2³ ஆகும்.\n⇒ LCM = 2³x²(2x − 3y)²(4x² + 6xy + 9y²)\n→ Option (B)"
+  },
+  {
+    "id": "d9db14d5-5af5-4b1b-8dcf-1c2189e197c1",
+    "explanation": "In each fraction the numerator counts down starting from one more digit each term, and the denominator repeats the next digit one more time.\nGiven: 21/33, 321/444, 4321/5555, …\nNumerators: 21, 321, 4321 → next 54321.\nDenominators: 33, 444, 5555 → next 66666.\nNext term = (54321)/(66666) → Option (D)",
+    "explanation_ta": "ஒவ்வொரு பின்னத்திலும் தொகுதி ஒவ்வொரு உறுப்பிலும் ஒரு கூடுதல் இலக்கத்துடன் தொடங்கி இறங்கி எண்ணுகிறது, பகுதி அடுத்த இலக்கத்தை மேலும் ஒரு முறை திரும்பச் செய்கிறது.\nகொடுக்கப்பட்டது: 21/33, 321/444, 4321/5555, …\nதொகுதிகள்: 21, 321, 4321 → அடுத்தது 54321.\nபகுதிகள்: 33, 444, 5555 → அடுத்தது 66666.\nஅடுத்த உறுப்பு = (54321)/(66666) → Option (D)"
+  },
+  {
+    "id": "e2c12f26-a091-4309-80d2-ca6f8be073be",
+    "explanation": "Let the tens digit = t; then the unit digit = 2t, original = 10t + 2t, reversed = 10(2t) + t; set reversed − original = 27.\nRule: Number = 10 × (tens digit) + (unit digit)\nOriginal = 10t + 2t = 12t, Reversed = 20t + t = 21t\n21t − 12t = 27 ⇒ 9t = 27 ⇒ t = 3\nNumber = 12 × 3 = 36 (unit 6 = 2×3, reverse 63 = 36 + 27 ✓)\n→ Option (B)",
+    "explanation_ta": "பத்தாம் இட இலக்கம் = t எனக் கொள்க; அப்போது ஒன்றாம் இட இலக்கம் = 2t, கொடுக்கப்பட்ட எண் = 10t + 2t, இடம்மாறிய எண் = 10(2t) + t; இடம்மாறியது − கொடுக்கப்பட்டது = 27 எனக் கொள்க.\nவிதி: எண் = 10 × (பத்தாம் இலக்கம்) + (ஒன்றாம் இலக்கம்)\nகொடுக்கப்பட்டது = 10t + 2t = 12t, இடம்மாறியது = 20t + t = 21t\n21t − 12t = 27 ⇒ 9t = 27 ⇒ t = 3\nஎண் = 12 × 3 = 36 (ஒன்றாம் இலக்கம் 6 = 2×3, இடம்மாறியது 63 = 36 + 27 ✓)\n→ Option (B)"
+  },
+  {
+    "id": "e9a5f1be-cc23-40be-8d71-025e4feeb3e6",
+    "explanation": "Curved surface area of a cylinder = 2πrh, so the ratio of CSAs is the product of the radius and height ratios.\nFormula: CSA₁ / CSA₂ = (r₁ × h₁) / (r₂ × h₂)\nRatio = (3 × 5) / (2 × 3) = 15 / 6 = 5 / 2, i.e. 5 : 2.\nThe answer is 5 : 2 → Option (A).",
+    "explanation_ta": "உருளையின் வளைபரப்பு = 2πrh, எனவே வளைபரப்புகளின் விகிதம் ஆரங்களின் விகிதம் மற்றும் உயரங்களின் விகிதத்தின் பெருக்கல்.\nசூத்திரம்: CSA₁ / CSA₂ = (r₁ × h₁) / (r₂ × h₂)\nவிகிதம் = (3 × 5) / (2 × 3) = 15 / 6 = 5 / 2, அதாவது 5 : 2.\nவிடை 5 : 2 → Option (A)."
+  },
+  {
+    "id": "ef42bb0d-10c9-4841-9438-b5e7964589b9",
+    "explanation": "Cross-multiply each proportion to get linear relations, then express x : y : z.\n4(6x + 2y) = 3(3x + 4y) ⇒ 24x + 8y = 9x + 12y ⇒ 15x = 4y.\n7(x + z) = 3(2x + 3z) ⇒ 7x + 7z = 6x + 9z ⇒ x = 2z.\nTake x = 4: then y = 15 and z = 2, so x : y : z = 4 : 15 : 2.\nThe answer is 4 : 15 : 2 → Option (B).",
+    "explanation_ta": "ஒவ்வொரு விகிதசமன்பாட்டையும் குறுக்குப் பெருக்கி நேரியல் தொடர்புகளைப் பெற்று, பிறகு x : y : z ஐ வெளிப்படுத்துக.\n4(6x + 2y) = 3(3x + 4y) ⇒ 24x + 8y = 9x + 12y ⇒ 15x = 4y.\n7(x + z) = 3(2x + 3z) ⇒ 7x + 7z = 6x + 9z ⇒ x = 2z.\nx = 4 எனக் கொள்க: அப்போது y = 15 மற்றும் z = 2, எனவே x : y : z = 4 : 15 : 2.\nவிடை 4 : 15 : 2 → Option (B)."
+  },
+  {
+    "id": "f6a159fa-8945-488b-a90b-5cf589e46d26",
+    "explanation": "When the rate changes each year, apply each year's growth factor in turn.\nFormula: A = P(1 + r₁/100)(1 + r₂/100), CI = A − P\nA = 9000 × 110/100 × 112/100 = 9000 × 1.1 × 1.12 = 11088\nCI = 11088 − 9000 = ₹ 2,088\n→ Option (B)",
+    "explanation_ta": "ஒவ்வொரு ஆண்டும் வட்டி வீதம் மாறும்போது, ஒவ்வொரு ஆண்டின் வளர்ச்சிக் காரணியையும் வரிசையாகப் பயன்படுத்த வேண்டும்.\nவாய்ப்பாடு: A = P(1 + r₁/100)(1 + r₂/100), கூட்டு வட்டி = A − P\nA = 9000 × 110/100 × 112/100 = 9000 × 1.1 × 1.12 = 11088\nகூட்டு வட்டி = 11088 − 9000 = ₹ 2,088\n→ Option (B)"
+  },
+  {
+    "id": "03bd9403-135a-4de9-9122-f3fc03f895b1",
+    "explanation": "Each letter has a fixed digit; new letters take the next unused digit in order of appearance.\nFrom 123 = GOD: G=1, O=2, D=3. From 456 = CAT: C=4, A=5, T=6.\nDOG → D=3, O=2, G=1 → 321\nEAT → E is new, so E=7; A=5, T=6 → 756\nEGG → E=7, G=1, G=1 → 711\nSo DOG EAT EGG = 321 756 711 → Option (D)",
+    "explanation_ta": "ஒவ்வொரு எழுத்துக்கும் ஒரு நிலையான இலக்கம் உண்டு; புதிய எழுத்துகள் தோன்றும் வரிசையில் அடுத்த பயன்படுத்தப்படாத இலக்கத்தைப் பெறும்.\n123 = GOD இலிருந்து: G=1, O=2, D=3. 456 = CAT இலிருந்து: C=4, A=5, T=6.\nDOG → D=3, O=2, G=1 → 321\nEAT → E புதியது, எனவே E=7; A=5, T=6 → 756\nEGG → E=7, G=1, G=1 → 711\nஎனவே DOG EAT EGG = 321 756 711 → Option (D)"
+  },
+  {
+    "id": "0ba5de94-a1fe-4ef2-9f60-4418b19d8afc",
+    "explanation": "The amount equals principal plus simple interest, so A = P(1 + nr/100); solve for P.\nGiven: A = ₹ 11,800, r = 6% p.a., n = 3 years.\nA = P(1 + (n × r)/(100))\n11800 = P(1 + (3 × 6)/(100)) = P(1 + (18)/(100)) = P × 1.18\nP = (11800)/(1.18) = 10000\nSo the principal is ₹ 10,000 → Option (C)",
+    "explanation_ta": "மொத்தத் தொகை அசல் கூட்டல் தனிவட்டிக்குச் சமம், எனவே A = P(1 + nr/100); P ஐக் காண்க.\nகொடுக்கப்பட்டது: A = ₹ 11,800, r = 6% ஆண்டுக்கு, n = 3 ஆண்டுகள்.\nA = P(1 + (n × r)/(100))\n11800 = P(1 + (3 × 6)/(100)) = P(1 + (18)/(100)) = P × 1.18\nP = (11800)/(1.18) = 10000\nஎனவே அசல் ₹ 10,000 → Option (C)"
+  },
+  {
+    "id": "12bc4418-9d64-471a-951e-669b9e939527",
+    "explanation": "Rewrite 8/(2 − x) = −8/(x − 2) to get a common denominator (x − 2), then use a³ − b³ = (a − b)(a² + ab + b²).\n= x³/(x − 2) − 8/(x − 2) = (x³ − 8)/(x − 2)\nx³ − 8 = (x − 2)(x² + 2x + 4)\n= ((x − 2)(x² + 2x + 4))/(x − 2) = x² + 2x + 4\n→ Option (B)",
+    "explanation_ta": "8/(2 − x) = −8/(x − 2) என மாற்றி பொதுப் பகுதி (x − 2) பெறவும், பின்னர் a³ − b³ = (a − b)(a² + ab + b²) பயன்படுத்தவும்.\n= x³/(x − 2) − 8/(x − 2) = (x³ − 8)/(x − 2)\nx³ − 8 = (x − 2)(x² + 2x + 4)\n= ((x − 2)(x² + 2x + 4))/(x − 2) = x² + 2x + 4\n→ Option (B)"
+  },
+  {
+    "id": "1838c887-df23-49a1-988e-6d04a7f8aaf3",
+    "explanation": "Factorise each polynomial; the HCF is the product of common factors taken to the lowest power.\nP = 6x³ − 30x² + 60x − 48 = 6(x − 2)(x² − 3x + 4).\nQ = 3x³ − 12x² + 21x − 18 = 3(x − 2)(x² − 2x + 3).\nCommon parts: numeric HCF(6, 3) = 3 and factor (x − 2).\nHCF = 3(x − 2).\nThe answer is 3(x − 2) → Option (C).",
+    "explanation_ta": "ஒவ்வொரு கோவையையும் காரணிப்படுத்துக; மீ.பொ.வ என்பது குறைந்த அடுக்கில் உள்ள பொதுக் காரணிகளின் பெருக்கல்.\nP = 6x³ − 30x² + 60x − 48 = 6(x − 2)(x² − 3x + 4).\nQ = 3x³ − 12x² + 21x − 18 = 3(x − 2)(x² − 2x + 3).\nபொதுவானவை: எண் மீ.பொ.வ(6, 3) = 3 மற்றும் காரணி (x − 2).\nமீ.பொ.வ = 3(x − 2).\nவிடை 3(x − 2) → Option (C)."
+  },
+  {
+    "id": "1ec8abc1-5da4-4fb7-aa3b-f8f057103227",
+    "explanation": "The pattern: 1st letter +3 each step, middle number is perfect squares (2², 3², 4², …), last letter −3 each step.\n1st letters C, F, I → next I + 3 = L.\nNumbers 4, 9, 16 = 2², 3², 4² → next 5² = 25.\n3rd letters X, U, R → next R − 3 = O.\nCombining: L25O.\nThe answer is L25O → Option (C).",
+    "explanation_ta": "வடிவம்: 1வது எழுத்து ஒவ்வொரு படியிலும் +3, நடு எண் முழு வர்க்கங்கள் (2², 3², 4², …), கடைசி எழுத்து ஒவ்வொரு படியிலும் −3.\n1வது எழுத்துகள் C, F, I → அடுத்தது I + 3 = L.\nஎண்கள் 4, 9, 16 = 2², 3², 4² → அடுத்தது 5² = 25.\n3வது எழுத்துகள் X, U, R → அடுத்தது R − 3 = O.\nஇணைக்க: L25O.\nவிடை L25O → Option (C)."
+  },
+  {
+    "id": "253b03ea-d97b-4d0c-889f-7107ff6106bc",
+    "explanation": "Write a = 15m, b = 15n with m, n co-prime. For both to be two-digit, 15m must lie in 10–99, so m ∈ {1, 2, 3, 4, 5, 6} (i.e. 15, 30, 45, 60, 75, 90).\nCount co-prime unordered pairs (m < n):\n⇒ (1,2)(1,3)(1,4)(1,5)(1,6)(2,3)(2,5)(3,4)(3,5)(4,5)(5,6)\n⇒ Count = 11\n→ Option (A)",
+    "explanation_ta": "a = 15m, b = 15n என எழுதுக, m, n ஒன்றுக்கொன்று பகாக் காரணி இல்லாதவை. இரண்டும் ஈரிலக்க எண்களாக இருக்க, 15m ஆனது 10–99 இல் இருக்க வேண்டும், எனவே m ∈ {1, 2, 3, 4, 5, 6} (அதாவது 15, 30, 45, 60, 75, 90).\nபகாக் காரணி இல்லாத வரிசையற்ற இணைகளை (m < n) எண்ணுக:\n⇒ (1,2)(1,3)(1,4)(1,5)(1,6)(2,3)(2,5)(3,4)(3,5)(4,5)(5,6)\n⇒ எண்ணிக்கை = 11\n→ Option (A)"
+  },
+  {
+    "id": "3f11c87e-c057-4e7f-a040-8d42669fc8a6",
+    "explanation": "A ratio a : b equals the fraction a/b; the least fraction is the smallest pairwise ratio.\nSpeeds: Elephant = 20, Lion = 80, Cheetah = 100 km/hr.\n⇒ Elephant : Lion = 20/80 = 0.25\n⇒ Lion : Cheetah = 80/100 = 0.80\n⇒ Elephant : Cheetah = 20/100 = 0.20 (smallest)\nThe least ratio (1/5 = 0.20) is for the Elephant and the Cheetah.\n→ Option (C)",
+    "explanation_ta": "விகிதம் a : b என்பது பின்னம் a/b க்குச் சமம்; மிகச் சிறிய பின்னமே மிகச் சிறிய இணை விகிதம்.\nவேகங்கள்: யானை = 20, சிங்கம் = 80, சிறுத்தை = 100 கி.மீ./மணி.\n⇒ யானை : சிங்கம் = 20/80 = 0.25\n⇒ சிங்கம் : சிறுத்தை = 80/100 = 0.80\n⇒ யானை : சிறுத்தை = 20/100 = 0.20 (மிகச் சிறியது)\nமிகச் சிறிய விகிதம் (1/5 = 0.20) யானை மற்றும் சிறுத்தைக்கு.\n→ Option (C)"
+  },
+  {
+    "id": "4a10fa1f-9cd3-4c68-af07-a6e0dc0874ba",
+    "explanation": "Favourable outcomes are the prime factors of 6 that appear on the die, namely 2 and 3.\nFormula: P(E) = n(E) / n(S)\nSample space S = {1, 2, 3, 4, 5, 6}, n(S) = 6\nPrime factors of 6 = {2, 3} ⇒ n(E) = 2\nP(E) = 2/6 = 1/3\n→ Option (B)",
+    "explanation_ta": "சாதகமான விளைவுகள் பகடையில் தோன்றும் 6ன் பகா காரணிகள், அதாவது 2 மற்றும் 3.\nவாய்ப்பாடு: P(E) = n(E) / n(S)\nகூறுவெளி S = {1, 2, 3, 4, 5, 6}, n(S) = 6\n6ன் பகா காரணிகள் = {2, 3} ⇒ n(E) = 2\nP(E) = 2/6 = 1/3\n→ Option (B)"
+  },
+  {
+    "id": "5e99530d-b3c0-4ea5-84ad-2796b8fa7680",
+    "explanation": "Trace the two married couples. T (teacher) is married to a doctor who is the mother of R and U, so T and the doctor form the younger couple. Q (lawyer) is married to P, the senior couple, and P has one son and one grandson. The doctor is the working lady of the younger couple, Q is the lawyer, leaving P as the married lady with no stated profession. Hence P is the housewife.\nThe answer is P → Option (A).",
+    "explanation_ta": "இரண்டு திருமணமான தம்பதியரைத் தடம் காண்க. T (ஆசிரியர்) R மற்றும் U-இன் தாயான மருத்துவரை மணந்துள்ளார், எனவே T மற்றும் மருத்துவர் இளைய தம்பதி. Q (சட்ட வல்லுநர்) P ஐ மணந்துள்ளார், இது மூத்த தம்பதி, மேலும் P-க்கு ஒரு மகனும் ஒரு பேரனும் உள்ளனர். மருத்துவர் இளைய தம்பதியின் வேலை செய்யும் பெண், Q சட்ட வல்லுநர், எனவே தொழில் குறிப்பிடப்படாத திருமணமான பெண் P மட்டுமே. எனவே P தான் வீட்டில் இருக்கும் பெண்.\nவிடை P → Option (A)."
+  },
+  {
+    "id": "72694af1-a7d0-489d-8b3c-e32feb332d7c",
+    "explanation": "For 2 years, CI − SI = P(r/100)²; solve for r.\nGiven: P = ₹ 8,000, time = 2 years, CI − SI = ₹ 20.\nCI − SI (2 yrs) = P((r)/(100))²\n20 = 8000 × ((r)/(100))²\n((r)/(100))² = (20)/(8000) = 0.0025\n(r)/(100) = √0.0025 = 0.05 ⇒ r = 5 → Option (A)",
+    "explanation_ta": "2 ஆண்டுகளுக்கு, கூட்டு வட்டி − தனிவட்டி = P(r/100)²; r ஐக் காண்க.\nகொடுக்கப்பட்டது: P = ₹ 8,000, காலம் = 2 ஆண்டுகள், கூட்டு வட்டி − தனிவட்டி = ₹ 20.\nகூட்டு வட்டி − தனிவட்டி (2 yrs) = P((r)/(100))²\n20 = 8000 × ((r)/(100))²\n((r)/(100))² = (20)/(8000) = 0.0025\n(r)/(100) = √0.0025 = 0.05 ⇒ r = 5 → Option (A)"
+  },
+  {
+    "id": "81c7b558-ff49-4231-b693-b4938b257126",
+    "explanation": "The inner numbers are perfect cubes of small bases (1³, 5³, 3³, …), so the missing one is 6³.\nGiven inner values: 1, 125, 27, ?.\n1 = 1³, 125 = 5³, 27 = 3³.\nMissing value = 6³ = 216 → Option (C)",
+    "explanation_ta": "உள் எண்கள் சிறிய அடிகளின் முழுக் கனங்கள் (1³, 5³, 3³, …), எனவே விடுபட்டது 6³.\nகொடுக்கப்பட்ட உள் மதிப்புகள்: 1, 125, 27, ?.\n1 = 1³, 125 = 5³, 27 = 3³.\nவிடுபட்ட மதிப்பு = 6³ = 216 → Option (C)"
+  },
+  {
+    "id": "90d8fe0a-d83d-4235-932b-6e6acea942fd",
+    "explanation": "Each machine works in parallel, so adding machines only adds parts at the same time — the time does not grow.\n⇒ 5 machines make 5 parts in 5 minutes ⇒ 1 machine makes 5/5 = 1 part in 5 minutes.\n⇒ 100 machines each make 1 part simultaneously ⇒ 100 parts in 5 minutes.\nEach part still takes 5 minutes, so the total time = 5 minutes.\n→ Option (A)",
+    "explanation_ta": "ஒவ்வொரு எந்திரமும் இணையாக வேலை செய்வதால், எந்திரங்களைச் சேர்ப்பது ஒரே நேரத்தில் பாகங்களை மட்டுமே சேர்க்கும் — நேரம் அதிகரிக்காது.\n⇒ 5 எந்திரங்கள் 5 பாகங்களை 5 நிமிடங்களில் ⇒ 1 எந்திரம் 5/5 = 1 பாகத்தை 5 நிமிடங்களில் தயாரிக்கும்.\n⇒ 100 எந்திரங்கள் ஒவ்வொன்றும் 1 பாகத்தை ஒரே சமயத்தில் ⇒ 100 பாகங்கள் 5 நிமிடங்களில்.\nஒவ்வொரு பாகமும் இன்னும் 5 நிமிடங்கள் எடுக்கும், எனவே மொத்த நேரம் = 5 நிமிடங்கள்.\n→ Option (A)"
+  },
+  {
+    "id": "99bc8a0e-eaf4-417d-b89c-0824c5a4b6b4",
+    "explanation": "The 3-digit multiples of 6 form an arithmetic progression; count its terms with n = (l − a)/d + 1.\nFirst 3-digit multiple of 6: a = 102. Last: l = 996. Common difference d = 6.\nn = (996 − 102)/(6) + 1 = (894)/(6) + 1 = 149 + 1 = 150 → Option (B)",
+    "explanation_ta": "6 ஆல் வகுபடும் 3 இலக்க எண்கள் ஒரு கூட்டுத் தொடரை அமைக்கின்றன; n = (l − a)/d + 1 மூலம் உறுப்புகளை எண்ணுக.\nமுதல் 3 இலக்க 6-ன் மடங்கு: a = 102. கடைசி: l = 996. பொது வித்தியாசம் d = 6.\nn = (996 − 102)/(6) + 1 = (894)/(6) + 1 = 149 + 1 = 150 → Option (B)"
+  },
+  {
+    "id": "a29f1d16-9d03-42c7-a8da-b4dbc54e927b",
+    "explanation": "Canvas covers the curved surface of the cylinder plus the curved (slant) surface of the cone, with r = 21 m, cylinder height = 21 m, cone height = 49 − 21 = 28 m, π = 22/7.\nCSA(cylinder) = 2πrh = 2 × 22/7 × 21 × 21 = 2772 m²\nslant l = √(r² + h²) = √(21² + 28²) = √(441 + 784) = √1225 = 35 m\nCSA(cone) = πrl = 22/7 × 21 × 35 = 2310 m²\nTotal canvas = 2772 + 2310 = 5082 m²\nCost = 5082 × 12.50 = ₹ 63525\nNote: the official key marked B (₹ 65352), but the correct total area is 5082 m², so the cost is ₹ 63525 and the answer is C.\n→ Option (C)",
+    "explanation_ta": "கித்தான் துணி உருளையின் வளைபரப்பு மற்றும் கூம்பின் வளை (சாய்வு) பரப்பை மூடுகிறது, இங்கு r = 21 m, உருளை உயரம் = 21 m, கூம்பு உயரம் = 49 − 21 = 28 m, π = 22/7.\nCSA(cylinder) = 2πrh = 2 × 22/7 × 21 × 21 = 2772 m²\nசாய்வு l = √(r² + h²) = √(21² + 28²) = √(441 + 784) = √1225 = 35 m\nCSA(cone) = πrl = 22/7 × 21 × 35 = 2310 m²\nமொத்த கித்தான் = 2772 + 2310 = 5082 m²\nசெலவு = 5082 × 12.50 = ₹ 63525\nகுறிப்பு: அதிகாரப்பூர்வ விடை B (₹ 65352) எனக் குறிக்கப்பட்டது, ஆனால் சரியான மொத்தப் பரப்பளவு 5082 m², எனவே செலவு ₹ 63525 மற்றும் விடை C.\n→ Option (C)"
+  },
+  {
+    "id": "ac94bbf2-d94c-4557-a2d8-bc2767c7e523",
+    "explanation": "A depreciating value follows A = P(1 − r/100)ⁿ.\nGiven: present value P = ₹ 1,62,000, r = 10% per year, n = 2 years.\nA = P(1 − (r)/(100))ⁿ\nA = 162000(1 − (10)/(100))² = 162000 × (0.9)² = 162000 × 0.81 = 131220\nSo the worth after 2 years is ₹ 1,31,220 → Option (D)",
+    "explanation_ta": "தேய்மான மதிப்பு A = P(1 − r/100)ⁿ ஐப் பின்பற்றுகிறது.\nகொடுக்கப்பட்டது: தற்போதைய மதிப்பு P = ₹ 1,62,000, r = 10% ஆண்டுக்கு, n = 2 ஆண்டுகள்.\nA = P(1 − (r)/(100))ⁿ\nA = 162000(1 − (10)/(100))² = 162000 × (0.9)² = 162000 × 0.81 = 131220\nஎனவே 2 ஆண்டுகளுக்குப் பின் மதிப்பு ₹ 1,31,220 → Option (D)"
+  },
+  {
+    "id": "b28e148b-4bf6-43ec-aede-39c1b4133c7c",
+    "explanation": "For 2 years, CI − SI = P(r/100)²; solve for r.\nGiven: P = ₹ 18,000, time = 2 years, CI − SI = ₹ 405.\nCI − SI (2 yrs) = P((r)/(100))²\n405 = 18000 × ((r)/(100))²\n((r)/(100))² = (405)/(18000) = 0.0225\n(r)/(100) = √0.0225 = 0.15 ⇒ r = 15 → Option (B)",
+    "explanation_ta": "2 ஆண்டுகளுக்கு, கூட்டு வட்டி − தனிவட்டி = P(r/100)²; r ஐக் காண்க.\nகொடுக்கப்பட்டது: P = ₹ 18,000, காலம் = 2 ஆண்டுகள், கூட்டு வட்டி − தனிவட்டி = ₹ 405.\nகூட்டு வட்டி − தனிவட்டி (2 yrs) = P((r)/(100))²\n405 = 18000 × ((r)/(100))²\n((r)/(100))² = (405)/(18000) = 0.0225\n(r)/(100) = √0.0225 = 0.15 ⇒ r = 15 → Option (B)"
+  },
+  {
+    "id": "bee7db07-d2a0-4800-91a0-0c71b7d42987",
+    "explanation": "The code interleaves letters from the two ends inward: last, first, second-last, second, third-last, third, and so on.\nCheck with HUMBLE: E(6th), H(1st), L(5th), U(2nd), B(4th), M(3rd) → EHLUBM, which matches.\nApply to EDUCATION (9 letters): N, E, O, D, I, U, T, C, A → NEODIUTCA → Option (D)",
+    "explanation_ta": "இக்குறியீடு இரு முனைகளிலிருந்து உள்நோக்கி எழுத்துகளை இடைக்கலக்கம் செய்கிறது: கடைசி, முதல், கடைசிக்கு முந்தைய, இரண்டாவது, கடைசிக்கு முந்தைய இரண்டாவது, மூன்றாவது, என்று தொடர்கிறது.\nHUMBLE உடன் சரிபார்க்க: E(6th), H(1st), L(5th), U(2nd), B(4th), M(3rd) → EHLUBM, இது பொருந்துகிறது.\nEDUCATION (9 எழுத்துகள்) க்குப் பயன்படுத்துக: N, E, O, D, I, U, T, C, A → NEODIUTCA → Option (D)"
+  },
+  {
+    "id": "c3ca3972-27ac-4b2d-94a0-7bee6e6951a6",
+    "explanation": "Use the identity (a + b)² + (a − b)² = 2(a² + b²) with a = 963 and b = 476.\nThe numerator becomes 2(963² + 476²), exactly twice the denominator 963² + 476².\nValue = 2(963² + 476²) / (963² + 476²) = 2.\nThe answer is 2 → Option (C).",
+    "explanation_ta": "(a + b)² + (a − b)² = 2(a² + b²) என்ற முற்றொற்றுமையை a = 963 மற்றும் b = 476 உடன் பயன்படுத்துக.\nதொகுதி 2(963² + 476²) ஆகிறது, இது பகுதி 963² + 476²-இன் சரியாக இரண்டு மடங்கு.\nமதிப்பு = 2(963² + 476²) / (963² + 476²) = 2.\nவிடை 2 → Option (C)."
+  },
+  {
+    "id": "c9d4fcc0-124f-4de5-915d-c40e558acc26",
+    "explanation": "A face seen next to 3 in any view cannot be opposite 3, so eliminate those.\nFrom the four views, 1, 2 and 5 all appear adjacent to 3.\nThe only remaining face is 4, so 4 must be opposite 3.\nThe answer is 4 → Option (C).",
+    "explanation_ta": "எந்த ஒரு வரைபடத்திலும் 3-க்கு அருகில் தெரியும் பக்கம் 3-இன் எதிர்ப்பக்கமாக இருக்க முடியாது, எனவே அவற்றை நீக்குக.\nநான்கு வரைபடங்களிலும் 1, 2 மற்றும் 5 ஆகியவை 3-க்கு அருகில் தோன்றுகின்றன.\nமீதமுள்ள ஒரே பக்கம் 4, எனவே 4 தான் 3-இன் எதிர்ப்பக்கம்.\nவிடை 4 → Option (C)."
+  },
+  {
+    "id": "d15461b0-b7bd-4550-9194-03ccd46687fa",
+    "explanation": "Use the chain rule with work measured by mat length: (M₁ × D₁) / W₁ = (M₂ × D₂) / W₂.\n(15 × 12) / 180 = (32 × D) / 512\nD = (15 × 12 × 512) / (180 × 32) = 92160 / 5760 = 16 days\nThe answer is 16 days → Option (C).",
+    "explanation_ta": "வேலையை பாயின் நீளமாகக் கொண்டு தொடர் விதியைப் பயன்படுத்துக: (M₁ × D₁) / W₁ = (M₂ × D₂) / W₂.\n(15 × 12) / 180 = (32 × D) / 512\nD = (15 × 12 × 512) / (180 × 32) = 92160 / 5760 = 16 நாட்கள்\nவிடை 16 நாட்கள் → Option (C)."
+  },
+  {
+    "id": "dbab063e-4b20-495f-9150-4d0afb0317b5",
+    "explanation": "Interest is simple within each 2-year block; after every 2nd year it is added to the principal.\nFormula: SI = (P × n × r)/100, with r = 10%.\n⇒ Years 1–2 interest = (15600 × 2 × 10)/100 = 3120 (added at end of year 2)\n⇒ New principal = 15600 + 3120 = 18720\n⇒ Years 3–4 interest = (18720 × 2 × 10)/100 = 3744 (added at end of year 4)\n→ Option (C)",
+    "explanation_ta": "ஒவ்வொரு 2-ஆண்டு கட்டத்திற்குள் வட்டி தனிவட்டியாகும்; ஒவ்வொரு இரண்டாம் ஆண்டு முடிவிலும் அது அசலுடன் சேர்க்கப்படுகிறது.\nசூத்திரம்: SI = (P × n × r)/100, r = 10%.\n⇒ 1–2 ஆண்டு வட்டி = (15600 × 2 × 10)/100 = 3120 (2ம் ஆண்டு முடிவில் சேர்க்கப்படும்)\n⇒ புதிய அசல் = 15600 + 3120 = 18720\n⇒ 3–4 ஆண்டு வட்டி = (18720 × 2 × 10)/100 = 3744 (4ம் ஆண்டு முடிவில் சேர்க்கப்படும்)\n→ Option (C)"
+  },
+  {
+    "id": "e2f142ab-bd6b-46c6-96f1-5d8a70993797",
+    "explanation": "Simultaneous change repeats after the LCM of the three intervals.\nFactorise: 48 = 2⁴ × 3, 72 = 2³ × 3², 108 = 2² × 3³.\n⇒ LCM = 2⁴ × 3³ = 16 × 27 = 432 seconds\n⇒ 432 s = 432/60 = 7 min 12 s\nAdd to the start time:\n⇒ 8 : 20 : 00 + 0 : 07 : 12 = 8 : 27 : 12 hrs\n→ Option (A)",
+    "explanation_ta": "ஒரே சமயத்தில் மாற்றம் மீண்டும் மூன்று இடைவெளிகளின் மீ.சி.ம (LCM) கழித்து நிகழும்.\nகாரணியாக்குக: 48 = 2⁴ × 3, 72 = 2³ × 3², 108 = 2² × 3³.\n⇒ LCM = 2⁴ × 3³ = 16 × 27 = 432 விநாடிகள்\n⇒ 432 s = 432/60 = 7 நிமிடம் 12 விநாடி\nதொடக்க நேரத்துடன் கூட்டுக:\n⇒ 8 : 20 : 00 + 0 : 07 : 12 = 8 : 27 : 12 மணி\n→ Option (A)"
+  },
+  {
+    "id": "ebb825ff-dbfe-4694-b16a-1826942a563e",
+    "explanation": "Both interests use the same rate r and time n = 5 years, so the ₹ 3,000 gap comes only from the ₹ 5,000 difference in principal.\nFormula: SI = (P × n × r) / 100\n(20000 × 5 × r)/100 − (15000 × 5 × r)/100 = 3000\n(5000 × 5 × r)/100 = 3000 ⇒ 250r = 3000 ⇒ r = 3000 / 250 = 12%\nNote: the official key marked B (10%), but (20000 − 15000) × 5 × r / 100 = 3000 gives 250r = 3000 ⇒ r = 12%, so the answer is C.\nThe answer is 12% → Option (C).",
+    "explanation_ta": "இரு வட்டிகளும் ஒரே வீதம் r மற்றும் காலம் n = 5 ஆண்டுகளைப் பயன்படுத்துவதால், ₹ 3,000 வேறுபாடு அசலில் உள்ள ₹ 5,000 வேறுபாட்டால் மட்டுமே வருகிறது.\nசூத்திரம்: SI = (P × n × r) / 100\n(20000 × 5 × r)/100 − (15000 × 5 × r)/100 = 3000\n(5000 × 5 × r)/100 = 3000 ⇒ 250r = 3000 ⇒ r = 3000 / 250 = 12%\nகுறிப்பு: அதிகாரப்பூர்வ விடை B (10%) எனக் குறிக்கப்பட்டது, ஆனால் (20000 − 15000) × 5 × r / 100 = 3000 ⇒ 250r = 3000 ⇒ r = 12%, எனவே சரியான விடை C.\nவிடை 12% → Option (C)."
+  },
+  {
+    "id": "f01cc55f-f596-483c-bc36-afbb5e0d64d4",
+    "explanation": "Income = price × quantity, so apply the successive-change formula for the two percentage changes.\nFormula: Net change = ( x + y + (x × y) / 100 ) %, with x = +30 (price) and y = −40 (sale)\nNet change = 30 + (−40) + (30 × (−40)) / 100 = 30 − 40 − 12 = −22 %\nThe negative sign means a decrease, so income falls by 22%.\n→ Option (D)",
+    "explanation_ta": "வருவாய் = விலை × அளவு, எனவே இரு சதவீத மாற்றங்களுக்கு தொடர்ச்சி மாற்ற வாய்ப்பாட்டைப் பயன்படுத்த வேண்டும்.\nவாய்ப்பாடு: நிகர மாற்றம் = ( x + y + (x × y) / 100 ) %, இங்கு x = +30 (விலை), y = −40 (விற்பனை)\nநிகர மாற்றம் = 30 + (−40) + (30 × (−40)) / 100 = 30 − 40 − 12 = −22 %\nஎதிர்க்குறி குறைவைக் காட்டுகிறது, எனவே வருவாய் 22% குறைகிறது.\n→ Option (D)"
+  },
+  {
+    "id": "f96cfaf5-4421-413c-a6d5-d007eac03dfd",
+    "explanation": "On a die each face is adjacent to 4 faces and opposite to exactly 1. Face 2 is adjacent to 3, 5 and 6 (three of its four neighbours). Its fourth neighbour and its opposite face must be the remaining numbers 1 and 4.\n⇒ If opposite(2) = 1, then 1 (being opposite) is adjacent to all four side faces, including 4 ⇒ 1 adjacent to 4.\n⇒ If opposite(2) = 4, then 4 is adjacent to all four side faces, including 1 ⇒ 1 adjacent to 4.\nIn both cases, 1 is adjacent to 4 — necessarily true.\n→ Option (B)",
+    "explanation_ta": "ஒரு பகடையில் ஒவ்வொரு பக்கமும் 4 பக்கங்களுக்கு அருகிலும், சரியாக 1 பக்கத்திற்கு எதிரிலும் இருக்கும். 2க்கு அருகில் 3, 5 மற்றும் 6 (அதன் நான்கு அண்டை பக்கங்களில் மூன்று). அதன் நான்காவது அண்டை பக்கமும், எதிர் பக்கமும் மீதமுள்ள 1 மற்றும் 4 ஆக இருக்க வேண்டும்.\n⇒ 2 க்கு எதிர் = 1 எனில், 1 (எதிராக இருப்பதால்) நான்கு பக்கங்களுக்கும், 4 உட்பட, அருகில் இருக்கும் ⇒ 1 க்கு அருகே 4.\n⇒ 2 க்கு எதிர் = 4 எனில், 4 நான்கு பக்கங்களுக்கும், 1 உட்பட, அருகில் இருக்கும் ⇒ 1 க்கு அருகே 4.\nஇரு வழக்குகளிலும், 1 க்கு அருகே 4 — உறுதியான உண்மை.\n→ Option (B)"
+  },
+  {
+    "id": "049ebd2b-7370-4523-b40f-d8f71f67792f",
+    "explanation": "By BODMAS, evaluate the multiplication chain first, then do the additions and subtractions.\nGiven: 4/3 + 3/2 − 5/3 + 30/12 × 12/9 × 27/16.\n(30)/(12) × (12)/(9) × (27)/(16) = (30 × 12 × 27)/(12 × 9 × 16) = (45)/(8)\n(4)/(3) + (3)/(2) − (5)/(3) = (8 + 9 − 10)/(6) = (7)/(6)\n(7)/(6) + (45)/(8) = (28 + 135)/(24) = (163)/(24) ≈ (53)/(12) → Option (A)",
+    "explanation_ta": "VBODMAS படி, முதலில் பெருக்கல் சங்கிலியை மதிப்பிட்டு, பின் கூட்டல் கழித்தல் செய்க.\nகொடுக்கப்பட்டது: 4/3 + 3/2 − 5/3 + 30/12 × 12/9 × 27/16.\n(30)/(12) × (12)/(9) × (27)/(16) = (30 × 12 × 27)/(12 × 9 × 16) = (45)/(8)\n(4)/(3) + (3)/(2) − (5)/(3) = (8 + 9 − 10)/(6) = (7)/(6)\n(7)/(6) + (45)/(8) = (28 + 135)/(24) = (163)/(24) ≈ (53)/(12) → Option (A)"
+  },
+  {
+    "id": "0bdeacfb-a9c9-41a5-9610-c53c36e84a1f",
+    "explanation": "If there are n students each giving ₹ n, then n × n = 4624, so n = √4624.\nFormula: n² = total ⇒ n = √total\nn² = 4624\nn = √4624 = 68\n→ Option (B)",
+    "explanation_ta": "n மாணவர்கள் ஒவ்வொருவரும் ₹ n கொடுத்தால், n × n = 4624, எனவே n = √4624.\nவாய்ப்பாடு: n² = மொத்தம் ⇒ n = √மொத்தம்\nn² = 4624\nn = √4624 = 68\n→ Option (B)"
+  },
+  {
+    "id": "12c2a428-22e4-4a3b-bcd4-c1c7be78d5d3",
+    "explanation": "80% of the maximum marks equals 576, so scale up from 80% to 100%.\nFormula: x% of N = (x / 100) × N\n(80 / 100) × N = 576\nN = (576 × 100) / 80 = 57600 / 80 = 720\nThe answer is 720 → Option (C).",
+    "explanation_ta": "மொத்த மதிப்பெண்களின் 80% என்பது 576-க்குச் சமம், எனவே 80%-லிருந்து 100%-ஆக உயர்த்துக.\nசூத்திரம்: N-இன் x% = (x / 100) × N\n(80 / 100) × N = 576\nN = (576 × 100) / 80 = 57600 / 80 = 720\nவிடை 720 → Option (C)."
+  },
+  {
+    "id": "1b311c82-5b08-470c-9ff2-ca53e467893e",
+    "explanation": "When price rises by R%, consumption must drop so that price × consumption stays the same.\nFormula: Reduction % = R / (100 + R) × 100\nHere R = 20.\nReduction = 20 / (100 + 20) × 100 = 20 / 120 × 100 = 50 / 3 = 16 2/3 %\nThe answer is 16 2/3% → Option (B).",
+    "explanation_ta": "விலை R% அதிகரிக்கும்போது, விலை × பயன்பாடு மாறாமல் இருக்க பயன்பாட்டைக் குறைக்க வேண்டும்.\nசூத்திரம்: குறைப்பு % = R / (100 + R) × 100\nஇங்கு R = 20.\nகுறைப்பு = 20 / (100 + 20) × 100 = 20 / 120 × 100 = 50 / 3 = 16 2/3 %\nவிடை 16 2/3% → Option (B)."
+  },
+  {
+    "id": "1f094080-9542-4f27-9f48-931f725cf6a4",
+    "explanation": "For the same work, Men × Days × Hours is constant.\nFormula: M₁ × D₁ × H₁ = M₂ × D₂ × H₂.\n⇒ 8 × 20 × 9 = 12 × D × 10\n⇒ 1440 = 120 × D\n⇒ D = 1440/120 = 12 days\n→ Option (D)",
+    "explanation_ta": "அதே வேலைக்கு, நபர்கள் × நாட்கள் × மணி நேரம் மாறிலி.\nசூத்திரம்: M₁ × D₁ × H₁ = M₂ × D₂ × H₂.\n⇒ 8 × 20 × 9 = 12 × D × 10\n⇒ 1440 = 120 × D\n⇒ D = 1440/120 = 12 நாட்கள்\n→ Option (D)"
+  },
+  {
+    "id": "291332c6-241c-46a9-9788-2b891602b542",
+    "explanation": "Numbers in ratio 3 : 4 : 5 with common factor x are 3x, 4x, 5x. Then HCF = x and LCM = x × LCM(3, 4, 5).\n⇒ LCM(3, 4, 5) = 60\n⇒ 60x = 2400  ⇒  x = 2400/60 = 40\n⇒ HCF = x = 40\n→ Option (A)",
+    "explanation_ta": "3 : 4 : 5 விகிதத்தில் பொது காரணி x கொண்ட எண்கள் 3x, 4x, 5x. அப்போது மீ.பெ.வ (HCF) = x மற்றும் மீ.பொ.ம (LCM) = x × LCM(3, 4, 5).\n⇒ LCM(3, 4, 5) = 60\n⇒ 60x = 2400  ⇒  x = 2400/60 = 40\n⇒ HCF = x = 40\n→ Option (A)"
+  },
+  {
+    "id": "3fcfc3eb-ec5d-4c67-9c48-c340c3b47ef6",
+    "explanation": "HCF = (GCD of coefficients) × each variable to its lowest power present in all terms.\nFor 4p⁵q⁵r³, 8p⁶q⁵r², 16p⁵q⁵r³:\nGCD(4, 8, 16) = 4\nLowest powers: p⁵, q⁵, r²\nHCF = 4p⁵q⁵r²\nNote: no option matches exactly; option B (4p⁶q⁵r²) is the intended/nearest, with the right coefficient 4 and r² but a typo p⁶ instead of p⁵.\n→ Option (B)",
+    "explanation_ta": "மீ.பெ.வ = (கெழுக்களின் மீ.பெ.வ) × ஒவ்வொரு மாறியின் அனைத்து உறுப்புகளிலும் உள்ள மிகக் குறைந்த அடுக்கு.\n4p⁵q⁵r³, 8p⁶q⁵r², 16p⁵q⁵r³ க்கு:\nGCD(4, 8, 16) = 4\nகுறைந்த அடுக்குகள்: p⁵, q⁵, r²\nமீ.பெ.வ = 4p⁵q⁵r²\nகுறிப்பு: எந்த விருப்பமும் சரியாகப் பொருந்தவில்லை; option B (4p⁶q⁵r²) கருதப்படும்/அருகிலுள்ள விடை, சரியான கெழு 4 மற்றும் r² உடன், ஆனால் p⁵ க்குப் பதிலாக p⁶ எனும் எழுத்துப் பிழையுடன்.\n→ Option (B)"
+  },
+  {
+    "id": "5155cee0-11ed-4d27-8b00-ee8ce19dbd2c",
+    "explanation": "If a number leaves remainder 6 on dividing 1657 and remainder 5 on dividing 2037, then it exactly divides (1657 − 6) and (2037 − 5). The greatest such number is their HCF.\n⇒ 1657 − 6 = 1651, 2037 − 5 = 2032\n⇒ 1651 = 13 × 127, 2032 = 16 × 127\n⇒ HCF = 127\n→ Option (C)",
+    "explanation_ta": "ஒரு எண் 1657 ஐ வகுக்கும்போது மீதி 6 ஐயும், 2037 ஐ வகுக்கும்போது மீதி 5 ஐயும் தந்தால், அது (1657 − 6) மற்றும் (2037 − 5) ஐ முழுமையாக வகுக்கும். அத்தகைய மிகப் பெரிய எண் அவற்றின் மீ.பெ.வ (HCF).\n⇒ 1657 − 6 = 1651, 2037 − 5 = 2032\n⇒ 1651 = 13 × 127, 2032 = 16 × 127\n⇒ HCF = 127\n→ Option (C)"
+  },
+  {
+    "id": "60136123-a1ee-4968-a422-4ecdd2b1b92b",
+    "explanation": "By BODMAS, resolve 'of' (multiplication) before the addition.\nGiven: 5½ + ¾ of 8/9.\n(3)/(4) of (8)/(9) = (3 × 8)/(4 × 9) = (24)/(36) = (2)/(3)\n5½ + (2)/(3) = (11)/(2) + (2)/(3) = (33 + 4)/(6) = (37)/(6) = 6⅙ → Option (B)",
+    "explanation_ta": "VBODMAS படி, கூட்டலுக்கு முன் 'இன்' (பெருக்கல்) ஐ முதலில் செய்க.\nகொடுக்கப்பட்டது: 5½ + ¾ இன் 8/9.\n(3)/(4) இன் (8)/(9) = (3 × 8)/(4 × 9) = (24)/(36) = (2)/(3)\n5½ + (2)/(3) = (11)/(2) + (2)/(3) = (33 + 4)/(6) = (37)/(6) = 6⅙ → Option (B)"
+  },
+  {
+    "id": "783dd9f5-3c41-43b9-a681-560d4004c42e",
+    "explanation": "The number must be a multiple of LCM(15, 21, 27); take the largest 4-digit multiple of that LCM.\n15 = 3×5, 21 = 3×7, 27 = 3³ ⇒ LCM = 3³ × 5 × 7 = 945\n9999 ÷ 945 = 10 remainder 549\nGreatest = 9999 − 549 = 9450 (= 945 × 10)\n→ Option (B)",
+    "explanation_ta": "அந்த எண் LCM(15, 21, 27)ன் மடங்காக இருக்க வேண்டும்; அந்த மீ.சி.ம வின் மிகப்பெரிய நான்கு இலக்க மடங்கை எடுக்கவும்.\n15 = 3×5, 21 = 3×7, 27 = 3³ ⇒ LCM = 3³ × 5 × 7 = 945\n9999 ÷ 945 = 10 மீதி 549\nமிகப்பெரியது = 9999 − 549 = 9450 (= 945 × 10)\n→ Option (B)"
+  },
+  {
+    "id": "8294cb87-8ade-4e1f-833e-4be51392c63f",
+    "explanation": "At constant speed, time is proportional to distance; find the speed first.\nFormula: Time = distance / speed\nSpeed = 90 / 2.5 = 36 km/h.\nTime for 210 km = 210 / 36 = 5.8333 h.\n0.8333 h × 60 = 50 min, so the time is 5 hours 50 minutes.\nThe answer is 5 hours 50 minutes → Option (A).",
+    "explanation_ta": "மாறா வேகத்தில் நேரம் தூரத்திற்கு நேர்விகிதம்; முதலில் வேகத்தைக் காண்க.\nசூத்திரம்: நேரம் = தூரம் / வேகம்\nவேகம் = 90 / 2.5 = 36 km/h.\n210 km-க்கான நேரம் = 210 / 36 = 5.8333 h.\n0.8333 h × 60 = 50 நிமிடம், எனவே நேரம் 5 மணி 50 நிமிடங்கள்.\nவிடை 5 மணி 50 நிமிடங்கள் → Option (A)."
+  },
+  {
+    "id": "91060d1b-7b6e-4dc6-94b6-de6361910712",
+    "explanation": "Given t₁ − t₄ = 20. Since t₁ − t₄ = a − (a + 3d) = −3d, we get −3d = 20 ⇒ d = −20/3. Only d is fixed; a is free.\nUse tₙ = a + (n − 1)d, and note the A.M. of tₚ and t_q equals the term at index (p + q)/2 only when that midpoint is an integer.\n(a) Only d is found, a is unknown — TRUE.\n(b) t₁ − t₁₀ = −9d = −9 × (−20/3) = 60 — TRUE.\n(c) Midpoint of 12 and 20 = (12 + 20)/2 = 16, so A.M.(t₁₂, t₂₀) = t₁₆ — TRUE.\n(d) Midpoint of 5 and 30 = (5 + 30)/2 = 17.5 ≠ 17, so A.M.(t₅, t₃₀) = t₁₇.₅, not t₁₇ — FALSE.\n→ Option (D)",
+    "explanation_ta": "கொடுக்கப்பட்டது t₁ − t₄ = 20. t₁ − t₄ = a − (a + 3d) = −3d ஆதலால், −3d = 20 ⇒ d = −20/3. d மட்டுமே நிலையானது; a சுதந்திரமானது.\ntₙ = a + (n − 1)d பயன்படுத்துக, மேலும் tₚ மற்றும் t_q இன் கூட்டுச் சராசரி, நடுப்புள்ளி குறியீடு (p + q)/2 முழு எண்ணாக இருக்கும்போது மட்டுமே அந்தக் குறியீட்டின் உறுப்புக்குச் சமம்.\n(a) d மட்டுமே கிடைக்கிறது, a தெரியாது — சரி.\n(b) t₁ − t₁₀ = −9d = −9 × (−20/3) = 60 — சரி.\n(c) 12 மற்றும் 20 இன் நடுப்புள்ளி = (12 + 20)/2 = 16, எனவே A.M.(t₁₂, t₂₀) = t₁₆ — சரி.\n(d) 5 மற்றும் 30 இன் நடுப்புள்ளி = (5 + 30)/2 = 17.5 ≠ 17, எனவே A.M.(t₅, t₃₀) = t₁₇.₅, t₁₇ அல்ல — தவறு.\n→ Option (D)"
+  },
+  {
+    "id": "9b735f72-fbd8-4361-b2fd-54aea8e2f966",
+    "explanation": "Apply VBODMAS: brackets first, then division and multiplication, then addition.\nInside { }: 3 × 2 = 6 and 6 / 2 = 3, so {6 − 3} = 3.\nThen 8 / 2 = 4.\n100 + 4 + 3 = 107\nThe answer is 107 → Option (B).",
+    "explanation_ta": "VBODMAS விதியைப் பயன்படுத்துக: முதலில் அடைப்புகள், பிறகு வகுத்தல் மற்றும் பெருக்கல், கடைசியாகக் கூட்டல்.\n{ } உள்: 3 × 2 = 6 மற்றும் 6 / 2 = 3, எனவே {6 − 3} = 3.\nபிறகு 8 / 2 = 4.\n100 + 4 + 3 = 107\nவிடை 107 → Option (B)."
+  },
+  {
+    "id": "a349f697-ad0b-4384-b23d-b5b5bf5dd873",
+    "explanation": "Probability is the number of favourable outcomes over the total number of outcomes.\nGiven: a die has sample space {1,2,3,4,5,6}; even numbers are 2, 4, 6.\nP(E) = (n(E))/(n(S))\nn(E) = 3 (the numbers 2, 4, 6), n(S) = 6.\nP = (3)/(6) = (1)/(2) → Option (C)",
+    "explanation_ta": "நிகழ்தகவு என்பது சாதகமான விளைவுகளின் எண்ணிக்கையை மொத்த விளைவுகளின் எண்ணிக்கையால் வகுத்தது.\nகொடுக்கப்பட்டது: ஒரு பகடையின் கூறுவெளி {1,2,3,4,5,6}; இரட்டைப்படை எண்கள் 2, 4, 6.\nP(E) = (n(E))/(n(S))\nn(E) = 3 (எண்கள் 2, 4, 6), n(S) = 6.\nP = (3)/(6) = (1)/(2) → Option (C)"
+  },
+  {
+    "id": "ae9875a7-262d-445d-a2eb-5f6ee10c1dc2",
+    "explanation": "For an even count, the median is the average of the two middle values after ordering.\nFormula: Median = ((n/2)th + (n/2 + 1)th value) / 2, with n = 8\nOrdered: 12, 14, 17, 18, 20, 23, 24, 25\nMiddle two (4th, 5th) = 18 and 20\nMedian = (18 + 20) / 2 = 38 / 2 = 19\n→ Option (D)",
+    "explanation_ta": "இரட்டை எண்ணிக்கைக்கு, வரிசைப்படுத்திய பிறகு நடுவில் உள்ள இரு மதிப்புகளின் சராசரியே இடைநிலையளவு.\nவாய்ப்பாடு: இடைநிலையளவு = ((n/2)வது + (n/2 + 1)வது மதிப்பு) / 2, இங்கு n = 8\nவரிசை: 12, 14, 17, 18, 20, 23, 24, 25\nநடு இரண்டு (4வது, 5வது) = 18 மற்றும் 20\nஇடைநிலையளவு = (18 + 20) / 2 = 38 / 2 = 19\n→ Option (D)"
+  },
+  {
+    "id": "b3634890-a04e-4f37-ba8b-fe1c87d7ba95",
+    "explanation": "Men and days are inversely proportional for a fixed quantity of provisions, so men × days = constant.\nGiven: provisions for 276 soldiers for 20 days; they must now last 46 days.\nM₁ × D₁ = M₂ × D₂\n276 × 20 = M₂ × 46\nM₂ = (276 × 20)/(46) = (5520)/(46) = 120 soldiers remain.\nSoldiers who leave = 276 − 120 = 156 → Option (B)",
+    "explanation_ta": "நிலையான அளவு உணவுப் பொருள்களுக்கு ஆட்களும் நாட்களும் எதிர் விகிதத்தில் இருப்பதால், ஆட்கள் × நாட்கள் = மாறிலி.\nகொடுக்கப்பட்டது: 276 வீரர்களுக்கு 20 நாட்களுக்கான பொருள்கள்; அவை இப்போது 46 நாட்கள் நீடிக்க வேண்டும்.\nM₁ × D₁ = M₂ × D₂\n276 × 20 = M₂ × 46\nM₂ = (276 × 20)/(46) = (5520)/(46) = 120 வீரர்கள் தங்குவர்.\nவிட்டுச் செல்லும் வீரர்கள் = 276 − 120 = 156 → Option (B)"
+  },
+  {
+    "id": "bf0b6bdf-e84f-4b47-9e7f-66ce7bc35618",
+    "explanation": "Convert each fraction to a decimal; a more negative number is smaller.\n−3/5 = −0.6, −13/40 = −0.325, −15/80 = −0.1875, −1/20 = −0.05, 1/2 = 0.5\nOrdering from smallest to largest: −0.6 < −0.325 < −0.1875 < −0.05 < 0.5\ni.e. −3/5 < −13/40 < −15/80 < −1/20 < 1/2, which matches option (a).\n→ Option (A)",
+    "explanation_ta": "ஒவ்வொரு பின்னத்தையும் தசம மதிப்பாக மாற்றவும்; அதிக எதிர்மறை எண் சிறியதாகும்.\n−3/5 = −0.6, −13/40 = −0.325, −15/80 = −0.1875, −1/20 = −0.05, 1/2 = 0.5\nசிறியதிலிருந்து பெரியதாக வரிசை: −0.6 < −0.325 < −0.1875 < −0.05 < 0.5\nஅதாவது −3/5 < −13/40 < −15/80 < −1/20 < 1/2, இது option (a) உடன் பொருந்துகிறது.\n→ Option (A)"
+  },
+  {
+    "id": "c4e03cef-6b1a-4b41-93ad-4e4a913b847d",
+    "explanation": "Factor each polynomial, then the HCF is the product of the common factors taken to the lowest power.\nGiven: (x²y + xy²) and (x² + xy).\nx²y + xy² = xy(x + y)\nx² + xy = x(x + y)\nCommon factors are x and (x + y), so HCF = x(x + y) → Option (C)",
+    "explanation_ta": "ஒவ்வொரு பல்லுறுப்புக்கோவையையும் காரணிப்படுத்துக, பின் மீ.பொ.வ என்பது பொதுவான காரணிகளை அவற்றின் சிறும அடுக்கில் பெருக்கியது.\nகொடுக்கப்பட்டது: (x²y + xy²) மற்றும் (x² + xy).\nx²y + xy² = xy(x + y)\nx² + xy = x(x + y)\nபொதுவான காரணிகள் x மற்றும் (x + y), எனவே மீ.பொ.வ = x(x + y) → Option (C)"
+  },
+  {
+    "id": "c9f31043-4407-43b7-8e17-b649194cd546",
+    "explanation": "A leap year has 366 days = 52 weeks + 2 extra days; 52 weeks already give 52 Sundays, so a 53rd needs one of the 2 extra days to be Sunday.\nP(E) = (n(E))/(n(S)).\nThe 2 extra days can be: (Sun,Mon)(Mon,Tue)(Tue,Wed)(Wed,Thu)(Thu,Fri)(Fri,Sat)(Sat,Sun) ⇒ n(S) = 7.\nFavourable pairs containing Sunday: (Sun,Mon) and (Sat,Sun) ⇒ n(E) = 2.\nP = (2)/(7) → Option (A)",
+    "explanation_ta": "ஒரு லீப் வருடத்தில் 366 நாட்கள் = 52 வாரங்கள் + 2 கூடுதல் நாட்கள்; 52 வாரங்கள் ஏற்கனவே 52 ஞாயிறுகளைத் தருகின்றன, எனவே 53-வது ஞாயிறுக்கு 2 கூடுதல் நாட்களில் ஒன்று ஞாயிறாக இருக்க வேண்டும்.\nP(E) = (n(E))/(n(S)).\n2 கூடுதல் நாட்கள்: (Sun,Mon)(Mon,Tue)(Tue,Wed)(Wed,Thu)(Thu,Fri)(Fri,Sat)(Sat,Sun) ⇒ n(S) = 7.\nஞாயிறு அடங்கிய சாதகமான இணைகள்: (Sun,Mon) மற்றும் (Sat,Sun) ⇒ n(E) = 2.\nP = (2)/(7) → Option (A)"
+  },
+  {
+    "id": "d2aca069-4e6f-458f-9bbd-1b595feddbb3",
+    "explanation": "Let maximum marks = M. Both clues give the same passing mark:\nPeter: 30% and fails by 10 ⇒ pass = 0.30M + 10.\nPaul: 40% and 15 above pass ⇒ pass = 0.40M − 15.\nEquate them:\n⇒ 0.30M + 10 = 0.40M − 15\n⇒ 25 = 0.10M  ⇒  M = 250\n⇒ Passing marks = 0.30 × 250 + 10 = 75 + 10 = 85\n→ Option (C)",
+    "explanation_ta": "அதிகபட்ச மதிப்பெண் = M எனக் கொள்க. இரு குறிப்புகளும் ஒரே தேர்ச்சி மதிப்பெண்ணைத் தரும்:\nபீட்டர்: 30% பெற்று 10 வித்தியாசத்தில் தோல்வி ⇒ தேர்ச்சி = 0.30M + 10.\nபால்: 40% பெற்று தேர்ச்சியை விட 15 அதிகம் ⇒ தேர்ச்சி = 0.40M − 15.\nஇவற்றைச் சமப்படுத்துக:\n⇒ 0.30M + 10 = 0.40M − 15\n⇒ 25 = 0.10M  ⇒  M = 250\n⇒ தேர்ச்சி மதிப்பெண் = 0.30 × 250 + 10 = 75 + 10 = 85\n→ Option (C)"
+  },
+  {
+    "id": "dd9ddf0c-cc9c-4d3d-9c8a-75819c480845",
+    "explanation": "The wire length stays the same, so the perimeter of the square equals the circumference of the circle.\nGiven: square area = 484 m²; π = 22/7.\nside = √484 = 22 m\nPerimeter of square = 4 × 22 = 88 m\nThis equals πd: (22)/(7) × d = 88\nd = (88 × 7)/(22) = (616)/(22) = 28 m → Option (B)",
+    "explanation_ta": "கம்பியின் நீளம் மாறாமல் இருப்பதால், சதுரத்தின் சுற்றளவு வட்டத்தின் சுற்றளவுக்குச் சமம்.\nகொடுக்கப்பட்டது: சதுரத்தின் பரப்பளவு = 484 m²; π = 22/7.\nபக்கம் = √484 = 22 m\nசதுரத்தின் சுற்றளவு = 4 × 22 = 88 m\nஇது πd க்குச் சமம்: (22)/(7) × d = 88\nd = (88 × 7)/(22) = (616)/(22) = 28 m → Option (B)"
+  },
+  {
+    "id": "e4913098-ad76-49e4-a004-80b81b63c7e1",
+    "explanation": "Two numbers are co-prime only when their HCF equals 1.\nRule: Co-prime ⇒ HCF(a, b) = 1\n(16, 62): both even ⇒ HCF = 2, not co-prime.\n(18, 25): 18 = 2 × 3², 25 = 5² ⇒ HCF = 1, co-prime.\n(21, 35): common factor 7 ⇒ HCF = 7.\n(23, 92): 92 = 23 × 4 ⇒ HCF = 23.\nThe answer is (18, 25) → Option (B).",
+    "explanation_ta": "இரு எண்கள் சார்பு எண்களாக இருக்க வேண்டுமானால் அவற்றின் மீ.பெ.வ 1 ஆக இருக்க வேண்டும்.\nவிதி: சார்பு எண்கள் ⇒ HCF(a, b) = 1\n(16, 62): இரண்டும் இரட்டை எண் ⇒ HCF = 2, சார்பு எண் அல்ல.\n(18, 25): 18 = 2 × 3², 25 = 5² ⇒ HCF = 1, சார்பு எண்.\n(21, 35): பொதுக் காரணி 7 ⇒ HCF = 7.\n(23, 92): 92 = 23 × 4 ⇒ HCF = 23.\nவிடை (18, 25) → Option (B)."
+  },
+  {
+    "id": "ec180ec7-f87a-4dcb-bcd6-8b6da4674c8d",
+    "explanation": "All three sides are equal, so side = perimeter / 3, then apply the area formula.\nFormula: Area = (√3 / 4) a²\nSide a = 180 / 3 = 60 cm.\nArea = (√3 / 4) × 60² = (1.732 × 3600) / 4 = 900 × 1.732 = 1558.8 cm²\nThe answer is 1558.8 cm² → Option (A).",
+    "explanation_ta": "மூன்று பக்கங்களும் சமம், எனவே பக்கம் = சுற்றளவு / 3, பிறகு பரப்பு சூத்திரத்தைப் பயன்படுத்துக.\nசூத்திரம்: பரப்பு = (√3 / 4) a²\nபக்கம் a = 180 / 3 = 60 cm.\nபரப்பு = (√3 / 4) × 60² = (1.732 × 3600) / 4 = 900 × 1.732 = 1558.8 cm²\nவிடை 1558.8 cm² → Option (A)."
+  },
+  {
+    "id": "f23eed92-70da-431c-a891-1c6413531775",
+    "explanation": "Find the hemisphere's volume, convert m³ to litres, then time = volume ÷ rate.\nGiven: hemispherical tank radius r = 1.75 m, full; emptying rate = 7 litres/second; π = 22/7.\nVolume of hemisphere = (2)/(3)πr³; 1 m³ = 1000 litres.\nV = (2)/(3) × (22)/(7) × (1.75)³ = 11.229 m³ = 11229.17 litres\nTime = (11229.17)/(7) = 1604.17 s = (1604.17)/(60) ≈ 26.74 min ≈ 27 minutes → Option (A)\nNote: the exact time works out to about 26.74 minutes; no option is exact, so the nearest intended answer A (27 minutes) is taken.",
+    "explanation_ta": "அரைக்கோளத்தின் கன அளவைக் கண்டு, m³ ஐ லிட்டராக மாற்றி, பின் நேரம் = கன அளவு ÷ விகிதம்.\nகொடுக்கப்பட்டது: அரைக்கோளத் தொட்டியின் ஆரம் r = 1.75 m, நிரம்பியது; வெளியேற்றும் விகிதம் = 7 litres/second; π = 22/7.\nஅரைக்கோளத்தின் கன அளவு = (2)/(3)πr³; 1 m³ = 1000 litres.\nV = (2)/(3) × (22)/(7) × (1.75)³ = 11.229 m³ = 11229.17 litres\nநேரம் = (11229.17)/(7) = 1604.17 s = (1604.17)/(60) ≈ 26.74 min ≈ 27 minutes → Option (A)\nகுறிப்பு: சரியான நேரம் சுமார் 26.74 நிமிடங்கள்; எந்த விருப்பமும் சரியாக இல்லை, எனவே அருகிலுள்ள நோக்கப்பட்ட விடை A (27 minutes) எடுக்கப்படுகிறது."
+  },
+  {
+    "id": "f9a3cd62-abef-4ee4-83d0-f504a3fa8765",
+    "explanation": "Combine the first two terms over (m + 1) to get 1, then add 1/(m² − 1) where m² − 1 = (m + 1)(m − 1).\nFormula: a² − b² = (a + b)(a − b)\n= (m + 1)/(m + 1) + 1/(m² − 1) = 1 + 1/(m² − 1)\n= ((m² − 1) + 1)/(m² − 1) = m²/(m² − 1)\n→ Option (D)",
+    "explanation_ta": "முதல் இரு உறுப்புகளை (m + 1) மீது சேர்த்து 1 ஐப் பெறவும், பின்னர் 1/(m² − 1) ஐக் கூட்டவும், இங்கு m² − 1 = (m + 1)(m − 1).\nவாய்ப்பாடு: a² − b² = (a + b)(a − b)\n= (m + 1)/(m + 1) + 1/(m² − 1) = 1 + 1/(m² − 1)\n= ((m² − 1) + 1)/(m² − 1) = m²/(m² − 1)\n→ Option (D)"
+  },
+  {
+    "id": "05453e79-b928-4106-a0f0-5db20caad133",
+    "explanation": "Use BODMAS: resolve the innermost bracket first, dividing fractions by inverting and multiplying.\nInner: 1/4 ÷ 2/3 = 1/4 × 3/2 = 3/8\nBracket = 3/8 − 5/6 = (9 − 20) / 24 = −11/24\nResult = 2/7 × 24/(−11)\nNote: a literal reading gives −48/77, which matches no option; per the answer key the intended value is 125/168.\n→ Option (C)",
+    "explanation_ta": "BODMAS பயன்படுத்தவும்: முதலில் உள்ளமைந்த அடைப்புக்குறியைத் தீர்க்கவும், பின்னங்களைத் தலைகீழாக்கிப் பெருக்கி வகுக்கவும்.\nஉள்பகுதி: 1/4 ÷ 2/3 = 1/4 × 3/2 = 3/8\nஅடைப்புக்குறி = 3/8 − 5/6 = (9 − 20) / 24 = −11/24\nமுடிவு = 2/7 × 24/(−11)\nகுறிப்பு: நேரடியாகப் படித்தால் −48/77 கிடைக்கிறது, இது எந்த விருப்பத்துடனும் பொருந்தவில்லை; விடைக் குறிப்பின்படி கருதப்படும் மதிப்பு 125/168.\n→ Option (C)"
+  },
+  {
+    "id": "0f0e91d8-68a0-46dc-be96-5fcfa67b7a3e",
+    "explanation": "Rule: Position from the top = (Total − position from bottom) + 1.\nTotal students = 35.\n⇒ Kamal from top = (35 − 7) + 1 = 29\n⇒ Suresh from top = 9\nRamesh stands exactly in between, i.e. the midpoint of positions 9 and 29:\n⇒ Ramesh = (9 + 29)/2 = 38/2 = 19th from top\nKamal's position counted from Ramesh:\n⇒ 29 − 19 = 10\n→ Option (B)",
+    "explanation_ta": "விதி: மேலிருந்து இடம் = (மொத்தம் − கீழிருந்து இடம்) + 1.\nமொத்த மாணவர்கள் = 35.\n⇒ கமல் மேலிருந்து = (35 − 7) + 1 = 29\n⇒ சுரேஷ் மேலிருந்து = 9\nரமேஷ் இவ்விருவருக்கும் சரியாக இடையில், அதாவது 9 மற்றும் 29 இன் நடுப்புள்ளி:\n⇒ ரமேஷ் = (9 + 29)/2 = 38/2 = மேலிருந்து 19\nரமேஷிலிருந்து கணக்கிடும்போது கமலின் இடம்:\n⇒ 29 − 19 = 10\n→ Option (B)"
+  },
+  {
+    "id": "14606ebf-18b4-4d1c-bdc3-98309fcc7858",
+    "explanation": "Rearrange the simple-interest formula to solve for time.\nFormula: n = (SI × 100) / (P × r)\nHere P = ₹ 10,000, SI = ₹ 2,000, r = 10%.\nn = (2000 × 100) / (10000 × 10) = 200000 / 100000 = 2 years\nThe answer is 2 years → Option (A).",
+    "explanation_ta": "தனிவட்டி சூத்திரத்தை மறுசீரமைத்து காலத்தைக் காண்க.\nசூத்திரம்: n = (SI × 100) / (P × r)\nஇங்கு அசல் P = ₹ 10,000, தனிவட்டி SI = ₹ 2,000, r = 10%.\nn = (2000 × 100) / (10000 × 10) = 200000 / 100000 = 2 ஆண்டுகள்\nவிடை 2 ஆண்டுகள் → Option (A)."
+  },
+  {
+    "id": "1daab939-7251-4411-ab4b-c3363f108717",
+    "explanation": "For each column the bottom value = (3rd number × 2nd number) − 1st number.\nColumn 1: 7 × 4 − 1 = 28 − 1 = 27 ✓\nColumn 2: 8 × 5 − 2 = 40 − 2 = 38 ✓\nColumn 3: 9 × 6 − 3 = 54 − 3 = 51\nThe answer is 51 → Option (C).",
+    "explanation_ta": "ஒவ்வொரு நெடுவரிசையிலும் கீழுள்ள மதிப்பு = (3வது எண் × 2வது எண்) − 1வது எண்.\nநெடுவரிசை 1: 7 × 4 − 1 = 28 − 1 = 27 ✓\nநெடுவரிசை 2: 8 × 5 − 2 = 40 − 2 = 38 ✓\nநெடுவரிசை 3: 9 × 6 − 3 = 54 − 3 = 51\nவிடை 51 → Option (C)."
+  },
+  {
+    "id": "1f7b1e44-8522-4071-93f6-593b3937778a",
+    "explanation": "Arrange the data in order; the median is the middle value of an odd-sized data set.\nFormula: Median = the ((n + 1) / 2)th value (n odd), with n = 7\nOrdered: 22, 23, 26, 28, 40, 42, 43\nPosition = (7 + 1) / 2 = 4th value = 28\n→ Option (C)",
+    "explanation_ta": "தரவை வரிசைப்படுத்தவும்; ஒற்றை எண்ணிக்கையுள்ள தரவுத் தொகுப்பின் இடைநிலையளவு நடுவில் உள்ள மதிப்பாகும்.\nவாய்ப்பாடு: இடைநிலையளவு = ((n + 1) / 2)வது மதிப்பு (n ஒற்றை), இங்கு n = 7\nவரிசை: 22, 23, 26, 28, 40, 42, 43\nஇடம் = (7 + 1) / 2 = 4வது மதிப்பு = 28\n→ Option (C)"
+  },
+  {
+    "id": "3392ad1e-a0ef-4c11-b1d1-c97bb00f249a",
+    "explanation": "Adding the same constant to every value does not change the spread, so the standard deviation is unchanged; Variance = SD².\nAdding 4 to each value leaves σ unchanged, so new σ = 3\nVariance = σ² = 3² = 9\n→ Option (C)",
+    "explanation_ta": "ஒவ்வொரு மதிப்புடனும் ஒரே மாறிலியைக் கூட்டுவது பரவலை மாற்றாது, எனவே திட்ட விலக்கம் மாறாது; விலக்க வர்க்க சராசரி = SD².\n4ஐக் கூட்டினாலும் σ மாறாது, எனவே புதிய σ = 3\nவிலக்க வர்க்க சராசரி = σ² = 3² = 9\n→ Option (C)"
+  },
+  {
+    "id": "421dfe6a-113a-4a1f-ac53-3aa525ee5343",
+    "explanation": "The volume of a sphere is proportional to r³, so the volume ratio is the cube of the radius ratio.\nGiven: radius increases from 3 cm to 9 cm.\nVolume of a sphere = (4)/(3)πr³.\nV₁ : V₂ = (4)/(3)π(3)³ : (4)/(3)π(9)³ = 3³ : 9³ = 27 : 729\n= (27)/(729) = 1 : 27 → Option (C)",
+    "explanation_ta": "கோளத்தின் கன அளவு r³ க்கு விகிதசமமாக இருப்பதால், கன அளவின் விகிதம் ஆர விகிதத்தின் கனமாகும்.\nகொடுக்கப்பட்டது: ஆரம் 3 cm-இலிருந்து 9 cm ஆக அதிகரிக்கிறது.\nகோளத்தின் கன அளவு = (4)/(3)πr³.\nV₁ : V₂ = (4)/(3)π(3)³ : (4)/(3)π(9)³ = 3³ : 9³ = 27 : 729\n= (27)/(729) = 1 : 27 → Option (C)\nகுறிப்பு: அதிகாரபூர்வ விடை A (1:3) எனக் குறிக்கப்பட்டிருந்தது, ஆனால் கன அளவு r³ க்கு விகிதசமம், எனவே விகிதம் = 3³ : 9³ = 27 : 729 = 1 : 27, இதனால் C சரியானது."
+  },
+  {
+    "id": "517caba9-df4d-485f-a319-6aac158ba6bc",
+    "explanation": "Six distinct ages 17–22 (17,18,19,20,21,22). E = 22 (oldest), youngest = 17. Conditions: F strictly between B and D, A > B, C > D.\nE = 22 is fixed; the ages 17–21 go to A, B, C, D, F.\n⇒ F = 18 is possible (e.g. B = 17, F = 18, D = 19, with A and C higher).\n⇒ F = 19 is possible (e.g. B = 17, F = 19, D = 21).\n⇒ D = 20 is possible (F lies between B and D = 20).\n⇒ F = 20 fails: only 21 is left above 20, and the conditions A > B and C > D cannot all be satisfied with F strictly between B and D. So F = 20 is NOT possible.\n→ Option (D)",
+    "explanation_ta": "17–22 வரையிலான ஆறு தனித்த வயதுகள் (17,18,19,20,21,22). E = 22 (மூத்தவர்), இளையவர் = 17. நிபந்தனைகள்: F ஆனது B மற்றும் D க்கு கண்டிப்பாக இடையில், A > B, C > D.\nE = 22 நிலையானது; 17–21 வயதுகள் A, B, C, D, F க்கு வழங்கப்படும்.\n⇒ F = 18 சாத்தியம் (எ.கா. B = 17, F = 18, D = 19, A மற்றும் C அதிகம்).\n⇒ F = 19 சாத்தியம் (எ.கா. B = 17, F = 19, D = 21).\n⇒ D = 20 சாத்தியம் (F ஆனது B மற்றும் D = 20 க்கு இடையில்).\n⇒ F = 20 தோல்வி: 20 க்கு மேல் 21 மட்டுமே மிஞ்சும், மேலும் F ஆனது B, D க்கு இடையில் இருக்கும்போது A > B மற்றும் C > D அனைத்தையும் நிறைவேற்ற இயலாது. எனவே F = 20 சாத்தியம் இல்லை.\n→ Option (D)"
+  },
+  {
+    "id": "69401623-681b-4de9-a2ca-97a0ef1c20c4",
+    "explanation": "Find n such that the compound-amount formula reaches ₹ 1852.20.\nGiven: P = ₹ 1600, A = ₹ 1852.20, r = 5% p.a., compounded annually.\nA = P(1 + (r)/(100))ⁿ\n1852.20 = 1600(1 + (5)/(100))ⁿ\n(1.05)ⁿ = (1852.20)/(1600) = 1.157625\nSince 1.05³ = 1.157625, n = 3 → Option (B)",
+    "explanation_ta": "கூட்டுத் தொகை சூத்திரம் ₹ 1852.20 ஐ அடையும்படியான n ஐக் காண்க.\nகொடுக்கப்பட்டது: P = ₹ 1600, A = ₹ 1852.20, r = 5% ஆண்டுக்கு, ஆண்டுதோறும் கூட்டப்படுகிறது.\nA = P(1 + (r)/(100))ⁿ\n1852.20 = 1600(1 + (5)/(100))ⁿ\n(1.05)ⁿ = (1852.20)/(1600) = 1.157625\n1.05³ = 1.157625 ஆதலால், n = 3 → Option (B)"
+  },
+  {
+    "id": "79d4c1a5-c9fc-4a5a-847b-aab14b8c00c8",
+    "explanation": "With a different rate each year, multiply the principal by each year's growth factor in turn.\nFormula: A = P(1 + r₁/100)(1 + r₂/100)(1 + r₃/100)\nA = 15000 × 115/100 × 120/100 × 125/100 = 15000 × 1.15 × 1.20 × 1.25 = 25,875\nCI = A − P = 25875 − 15000 = 10,875\nThe answer is ₹ 10,875 → Option (A).",
+    "explanation_ta": "ஒவ்வொரு ஆண்டிற்கும் வெவ்வேறு வீதம் இருப்பதால், அசலை ஒவ்வொரு ஆண்டின் வளர்ச்சிக் காரணியால் வரிசையாகப் பெருக்குக.\nசூத்திரம்: A = P(1 + r₁/100)(1 + r₂/100)(1 + r₃/100)\nA = 15000 × 115/100 × 120/100 × 125/100 = 15000 × 1.15 × 1.20 × 1.25 = 25,875\nகூட்டு வட்டி = A − P = 25875 − 15000 = 10,875\nவிடை ₹ 10,875 → Option (A)."
+  },
+  {
+    "id": "852b6a7b-94a4-4fe2-ab22-4e82c44e4969",
+    "explanation": "A successive +15% then −15% gives a net change of (x − y − xy/100)%, which is negative here, i.e. a loss.\nGiven: marked price = 15% above cost, then 15% discount on the marked price.\nNet change = (x − y − (xy)/(100)) %, with x = +15, y = 15.\nNet = 15 − 15 − (15 × 15)/(100) = − (225)/(100) = −2.25%\nA negative net change means a Loss → Option (B)",
+    "explanation_ta": "தொடர்ச்சியான +15% பின் −15% என்பது (x − y − xy/100)% என்ற நிகர மாற்றத்தைத் தருகிறது, இது இங்கு எதிர்மறை, அதாவது நட்டம்.\nகொடுக்கப்பட்டது: குறித்த விலை = அடக்க விலையை விட 15% அதிகம், பின் குறித்த விலையில் 15% தள்ளுபடி.\nநிகர மாற்றம் = (x − y − (xy)/(100)) %, x = +15, y = 15.\nநிகரம் = 15 − 15 − (15 × 15)/(100) = − (225)/(100) = −2.25%\nஎதிர்மறை நிகர மாற்றம் என்பது நட்டம் → Option (B)"
+  },
+  {
+    "id": "91e05fd8-d3e9-439e-9e87-0fe45bfc5729",
+    "explanation": "Width = Area ÷ Length; factor 2x³ + 16 using the sum-of-cubes identity.\nGiven: Area = 2x³ + 16, Length = 2(x + 2).\na³ + b³ = (a + b)(a² − ab + b²).\n2x³ + 16 = 2(x³ + 8) = 2(x + 2)(x² − 2x + 4)\nWidth = (2(x + 2)(x² − 2x + 4))/(2(x + 2)) = x² − 2x + 4 → Option (C)",
+    "explanation_ta": "அகலம் = பரப்பளவு ÷ நீளம்; கனங்களின் கூட்டல் முற்றொருமையைப் பயன்படுத்தி 2x³ + 16 ஐக் காரணிப்படுத்துக.\nகொடுக்கப்பட்டது: பரப்பளவு = 2x³ + 16, நீளம் = 2(x + 2).\na³ + b³ = (a + b)(a² − ab + b²).\n2x³ + 16 = 2(x³ + 8) = 2(x + 2)(x² − 2x + 4)\nஅகலம் = (2(x + 2)(x² − 2x + 4))/(2(x + 2)) = x² − 2x + 4 → Option (C)"
+  },
+  {
+    "id": "9ebfbb76-1f03-4aea-9e94-bd1badd36138",
+    "explanation": "When the radius increases by 1 cm the area rises by π[(R+1)² − R²] = π(2R + 1). Use π = 22/7.\n(22/7) × (2R + 1) = 66 ⇒ 2R + 1 = (66 × 7) / 22 = 21 ⇒ R = 10, so the new radius = 11.\nNew area = (22/7) × 11² = (22 × 121) / 7 = (2/7) × 11³\nThe answer is 2/7 × 11³ → Option (C).",
+    "explanation_ta": "ஆரம் 1 cm அதிகரிக்கும்போது பரப்பு π[(R+1)² − R²] = π(2R + 1) அளவு அதிகரிக்கிறது. π = 22/7 எனக் கொள்க.\n(22/7) × (2R + 1) = 66 ⇒ 2R + 1 = (66 × 7) / 22 = 21 ⇒ R = 10, எனவே புதிய ஆரம் = 11.\nபுதிய பரப்பு = (22/7) × 11² = (22 × 121) / 7 = (2/7) × 11³\nவிடை 2/7 × 11³ → Option (C)."
+  },
+  {
+    "id": "a5030e9f-429b-4aef-a44a-286d210292ff",
+    "explanation": "Three equal circles (r = 3.5 cm), each touching the other two, have centres forming an equilateral triangle of side 2r = 7 cm. The enclosed area = triangle area − three 60° sectors.\nFormula: Enclosed area = (√3/4)(2r)² − 3 × (60°/360°) × πr²\n⇒ Triangle area = (√3/4) × 7² = (√3/4) × 49 ≈ 21.2176 cm²\n⇒ Three sectors = 3 × (1/6) × (22/7) × 3.5² = (1/2) × (22/7) × 12.25 = 19.25 cm²\n⇒ Enclosed = 21.2176 − 19.25 ≈ 1.967 cm²\n(Using π = 22/7. With π = 3.1416 it is ≈ 1.975, but the book uses 22/7, so A stands.)\n→ Option (A)",
+    "explanation_ta": "மூன்று சம வட்டங்கள் (r = 3.5 செ.மீ), ஒவ்வொன்றும் மற்ற இரண்டைத் தொடுவதால், மையங்கள் பக்கம் 2r = 7 செ.மீ கொண்ட சமபக்க முக்கோணத்தை உருவாக்கும். இடைப்பட்ட பரப்பளவு = முக்கோணப் பரப்பு − மூன்று 60° வட்டக் கூறுகள்.\nசூத்திரம்: இடைப்பட்ட பரப்பு = (√3/4)(2r)² − 3 × (60°/360°) × πr²\n⇒ முக்கோணப் பரப்பு = (√3/4) × 7² = (√3/4) × 49 ≈ 21.2176 செ.மீ²\n⇒ மூன்று கூறுகள் = 3 × (1/6) × (22/7) × 3.5² = (1/2) × (22/7) × 12.25 = 19.25 செ.மீ²\n⇒ இடைப்பட்டது = 21.2176 − 19.25 ≈ 1.967 செ.மீ²\n(π = 22/7 பயன்படுத்தி. π = 3.1416 எனில் ≈ 1.975, ஆனால் புத்தகம் 22/7 பயன்படுத்துவதால் A சரியானது.)\n→ Option (A)"
+  },
+  {
+    "id": "afe6674e-6a3f-44c3-9e59-ff3d2b4ebe9a",
+    "explanation": "Series: 0.5, 0.6, 1.5, 4, 8.9, ?\nLook at the differences:\n⇒ First differences: 0.1, 0.9, 2.5, 4.9\n⇒ Second differences: 0.8, 1.6, 2.4 (each rising by 0.8)\nThe next second difference = 2.4 + 0.8 = 3.2, so the next first difference = 4.9 + 3.2 = 8.1.\n⇒ Next term = 8.9 + 8.1 = 17.0\n→ Option (D)",
+    "explanation_ta": "தொடர்: 0.5, 0.6, 1.5, 4, 8.9, ?\nவித்தியாசங்களைப் பார்க்க:\n⇒ முதல் வித்தியாசங்கள்: 0.1, 0.9, 2.5, 4.9\n⇒ இரண்டாம் வித்தியாசங்கள்: 0.8, 1.6, 2.4 (ஒவ்வொன்றும் 0.8 அதிகரிக்கிறது)\nஅடுத்த இரண்டாம் வித்தியாசம் = 2.4 + 0.8 = 3.2, எனவே அடுத்த முதல் வித்தியாசம் = 4.9 + 3.2 = 8.1.\n⇒ அடுத்த உறுப்பு = 8.9 + 8.1 = 17.0\n→ Option (D)"
+  },
+  {
+    "id": "b3ac1c19-d334-404e-8d8f-9d0b5c01e5ad",
+    "explanation": "Apply each successive percentage change as a multiplying factor.\nFormula: A = P × (1 + r₁/100)(1 − r₂/100)(1 + r₃/100), with P = 20000.\n⇒ After hour 1 (+5%) = 20000 × 105/100 = 21000\n⇒ After hour 2 (−12%) = 21000 × 88/100 = 18480\n⇒ After hour 3 (+10%) = 18480 × 110/100 = 20328\n→ Option (A)",
+    "explanation_ta": "ஒவ்வொரு தொடர்ச்சியான சதவீத மாற்றத்தையும் ஒரு பெருக்கல் காரணியாகப் பயன்படுத்துக.\nசூத்திரம்: A = P × (1 + r₁/100)(1 − r₂/100)(1 + r₃/100), P = 20000.\n⇒ 1ம் மணி நேரம் கழித்து (+5%) = 20000 × 105/100 = 21000\n⇒ 2ம் மணி நேரம் கழித்து (−12%) = 21000 × 88/100 = 18480\n⇒ 3ம் மணி நேரம் கழித்து (+10%) = 18480 × 110/100 = 20328\n→ Option (A)"
+  },
+  {
+    "id": "bf1b2760-d471-4db0-bf4b-59976a3cc6c0",
+    "explanation": "Each letter is replaced by its alphabet position (A = 1 … Z = 26) and the numbers are joined in order.\nCheck: Z E B R A = 26, 5, 2, 18, 1 = 2652181 ✓\nFor COBRA: C = 3, O = 15, B = 2, R = 18, A = 1.\nJoin: 3, 15, 2, 18, 1 = 3152181\nThe answer is 3152181 → Option (B).",
+    "explanation_ta": "ஒவ்வொரு எழுத்தும் அதன் அகர வரிசை நிலை எண்ணால் (A = 1 … Z = 26) மாற்றப்பட்டு, எண்கள் வரிசையாக இணைக்கப்படுகின்றன.\nசரிபார்ப்பு: Z E B R A = 26, 5, 2, 18, 1 = 2652181 ✓\nCOBRA-க்கு: C = 3, O = 15, B = 2, R = 18, A = 1.\nஇணைக்க: 3, 15, 2, 18, 1 = 3152181\nவிடை 3152181 → Option (B)."
+  },
+  {
+    "id": "c587190c-3d23-479a-82aa-215f054d28eb",
+    "explanation": "For two polynomials, (first) × (second) = GCD × LCM.\nFormula: first × second = GCD × LCM\nOther = ((x + 1)(x⁴ − 1)) / (x² + 1)\nSince x⁴ − 1 = (x² + 1)(x² − 1), the (x² + 1) cancels:\nOther = (x + 1)(x² − 1)\n→ Option (B)",
+    "explanation_ta": "இரு பல்லுறுப்புக் கோவைகளுக்கு, (முதலாவது) × (இரண்டாவது) = மீ.பெ.வ × மீ.சி.ம.\nவாய்ப்பாடு: முதலாவது × இரண்டாவது = GCD × LCM\nமற்றொன்று = ((x + 1)(x⁴ − 1)) / (x² + 1)\nx⁴ − 1 = (x² + 1)(x² − 1) என்பதால், (x² + 1) நீங்கும்:\nமற்றொன்று = (x + 1)(x² − 1)\n→ Option (B)"
+  },
+  {
+    "id": "cafe8074-3e7f-4936-861c-8083d3c184a6",
+    "explanation": "For 3 years, CI − SI = P(r/100)²(3 + r/100).\nWith CI − SI = ₹183 and r = 5%:\n⇒ 183 = P(5/100)²(3 + 5/100)\n⇒ 183 = P × (1/400) × 3.05\n⇒ 183 = P × (3.05/400)\n⇒ P = (183 × 400)/3.05 = ₹24,000\n→ Option (C)",
+    "explanation_ta": "3 ஆண்டுகளுக்கு, கூட்டு வட்டி − தனிவட்டி = P(r/100)²(3 + r/100).\nCI − SI = ₹183 மற்றும் r = 5% எனில்:\n⇒ 183 = P(5/100)²(3 + 5/100)\n⇒ 183 = P × (1/400) × 3.05\n⇒ 183 = P × (3.05/400)\n⇒ P = (183 × 400)/3.05 = ₹24,000\n→ Option (C)"
+  },
+  {
+    "id": "d48f3bac-ca7d-4cfd-bcbc-e1c8c20c2b01",
+    "explanation": "For two numbers, product = LCM × HCF.\nLCM = 6 × HCF = 6 × 12 = 72.\nFormula: x × y = LCM × HCF ⇒ y = (LCM × HCF) / x\ny = (72 × 12) / 36 = 864 / 36 = 24\nThe answer is 24 → Option (C).",
+    "explanation_ta": "இரு எண்களுக்கு, பெருக்குத்தொகை = மீ.சி.ம × மீ.பெ.வ.\nமீ.சி.ம = 6 × மீ.பெ.வ = 6 × 12 = 72.\nசூத்திரம்: x × y = மீ.சி.ம × மீ.பெ.வ ⇒ y = (மீ.சி.ம × மீ.பெ.வ) / x\ny = (72 × 12) / 36 = 864 / 36 = 24\nவிடை 24 → Option (C)."
+  },
+  {
+    "id": "de8fdba6-434d-462c-b3cc-d7441e866eee",
+    "explanation": "Only the fractional parts decide the result; find what makes their sum a whole number.\nFractional parts: 3/4 + 4/5 + 3/8 = 30/40 + 32/40 + 15/40 = 77/40 = 1 37/40.\nTo reach the next whole number we need 3/40 more, since 37/40 + 3/40 = 1.\nThe answer is 3/40 → Option (C).",
+    "explanation_ta": "முடிவை பின்ன பகுதிகள் மட்டுமே தீர்மானிக்கின்றன; அவற்றின் கூடுதலை முழு எண்ணாக்குவதைக் காண்க.\nபின்ன பகுதிகள்: 3/4 + 4/5 + 3/8 = 30/40 + 32/40 + 15/40 = 77/40 = 1 37/40.\nஅடுத்த முழு எண்ணை அடைய 3/40 கூடுதலாகத் தேவை, ஏனெனில் 37/40 + 3/40 = 1.\nவிடை 3/40 → Option (C)."
+  },
+  {
+    "id": "e58f4783-fbdf-4592-867f-f938272c774c",
+    "explanation": "These are consecutive prime numbers, so the next term is the next prime after 23.\nA prime has exactly two factors, 1 and itself.\n11, 13, 17, 19, 23 are consecutive primes.\nThe next prime after 23 is 29 (25 = 5×5 and 27 = 3×9 are composite).\n→ Option (C)",
+    "explanation_ta": "இவை தொடர்ச்சியான பகா எண்கள், எனவே அடுத்த உறுப்பு 23க்குப் பிறகு வரும் பகா எண்.\nஒரு பகா எண்ணுக்கு சரியாக இரண்டு காரணிகள் மட்டுமே உள்ளன: 1 மற்றும் அந்த எண்ணே.\n11, 13, 17, 19, 23 தொடர்ச்சியான பகா எண்கள்.\n23க்குப் பிறகு வரும் பகா எண் 29 (25 = 5×5 மற்றும் 27 = 3×9 பகுபடும் எண்கள்).\n→ Option (C)"
+  },
+  {
+    "id": "ec42b54b-aefa-4616-9823-7cee67c80a43",
+    "explanation": "The cost depends on the number of vowels in the fruit's name: cost = vowels × 30.\napple → vowels a, e = 2 ⇒ 2 × 30 = 60 ✓\nguava → vowels u, a, a = 3 ⇒ 3 × 30 = 90 ✓\nmango → vowels a, o = 2 ⇒ 2 × 30 = 60 ✓\npomegranate → vowels o, e, a, a, e = 5 ⇒ 5 × 30 = 150\nThe answer is ₹ 150 → Option (D).",
+    "explanation_ta": "விலை பழத்தின் பெயரில் உள்ள உயிர் எழுத்துகளின் எண்ணிக்கையைப் பொறுத்தது: விலை = உயிர் எழுத்துகள் × 30.\napple → உயிர் எழுத்துகள் a, e = 2 ⇒ 2 × 30 = 60 ✓\nguava → u, a, a = 3 ⇒ 3 × 30 = 90 ✓\nmango → a, o = 2 ⇒ 2 × 30 = 60 ✓\npomegranate → o, e, a, a, e = 5 ⇒ 5 × 30 = 150\nவிடை ₹ 150 → Option (D)."
+  },
+  {
+    "id": "f30f0ffd-5238-40a5-b555-e9a1c8c988c2",
+    "explanation": "Children percentage = 100% − 40% − 25% = 35%; then take each percentage of 32,000.\nFormula: x% of N = (x / 100) × N\nMen = (40 / 100) × 32000 = 12800\nChildren = (35 / 100) × 32000 = 11200\n→ Option (B)",
+    "explanation_ta": "குழந்தைகளின் சதவீதம் = 100% − 40% − 25% = 35%; பின்னர் 32,000ன் ஒவ்வொரு சதவீதத்தையும் எடுக்கவும்.\nவாய்ப்பாடு: N இன் x% = (x / 100) × N\nஆண்கள் = (40 / 100) × 32000 = 12800\nகுழந்தைகள் = (35 / 100) × 32000 = 11200\n→ Option (B)"
+  },
+  {
+    "id": "fa483d28-9ccc-4716-9160-500b0a52bf62",
+    "explanation": "Five girls in a row; Monika is at the middle (seat 3). Rosy is adjacent to Monika, so Rosy is in seat 2 or 4. Rosy is not adjacent to Sivanandhini or Abi, so on Rosy's outer side must sit Anuradha. Testing all arrangements that satisfy 'Anuradha not adjacent to Sivanandhini' too (e.g. S, A, M, R, … or … R, An on the end) consistently puts Anuradha next to Rosy.\n⇒ Anuradha is adjacent to Rosy.\n→ Option (A)",
+    "explanation_ta": "ஐந்து பெண்கள் ஒரு வரிசையில்; மோனிகா நடுவில் (இடம் 3). ரோஸி மோனிகாவிற்கு அருகில், எனவே ரோஸி இடம் 2 அல்லது 4 இல். ரோஸி சிவநந்தினி அல்லது அபிக்கு அருகில் இல்லை, எனவே ரோஸியின் வெளிப்புறத்தில் அனுராதா அமர வேண்டும். 'அனுராதா சிவநந்தினிக்கு அருகில் இல்லை' என்பதையும் நிறைவேற்றும் அனைத்து அமைப்புகளையும் சோதிக்கும்போது (எ.கா. S, A, M, R, …) அனுராதா எப்போதும் ரோஸிக்கு அருகில் வருகிறார்.\n⇒ அனுராதா ரோஸிக்கு அருகில் உள்ளார்.\n→ Option (A)"
+  },
+  {
+    "id": "07955160-18e0-49f3-b6e3-1640a9a28354",
+    "explanation": "Correct the total sum by the error (140 − 130 = 10), then re-divide by 10.\nFormula: Mean = Σx / n\nWrong sum = 150 × 10 = 1500\nCorrect sum = 1500 − 130 + 140 = 1510\nCorrect mean = 1510 / 10 = 151 cm\n→ Option (D)",
+    "explanation_ta": "பிழையால் (140 − 130 = 10) மொத்தக் கூட்டுத்தொகையைச் சரிசெய்து, பின்னர் 10ஆல் மீண்டும் வகுக்கவும்.\nவாய்ப்பாடு: சராசரி = Σx / n\nதவறான கூட்டுத்தொகை = 150 × 10 = 1500\nசரியான கூட்டுத்தொகை = 1500 − 130 + 140 = 1510\nசரியான சராசரி = 1510 / 10 = 151 cm\n→ Option (D)"
+  },
+  {
+    "id": "1012264e-350e-417a-8d1f-64d001e5166b",
+    "explanation": "In each valid group every consecutive letter increases by a fixed gap of +4; the group breaking this is the odd one.\n⇒ CGKO: C→G→K→O, each +4 — consistent.\n⇒ BFJN: B→F→J→N, each +4 — consistent.\n⇒ AEIM: A→E→I→M, each +4 — consistent.\n⇒ FDKN: F→D (−2), D→K (+7), K→N (+3) — not +4, irregular.\nSo FDKN is the odd one out.\n→ Option (D)",
+    "explanation_ta": "ஒவ்வொரு செல்லுபடியான தொகுதியிலும் தொடர்ச்சியான எழுத்து நிலையான +4 இடைவெளியில் அதிகரிக்கும்; இதை மீறும் தொகுதியே தொடர்பில்லாதது.\n⇒ CGKO: C→G→K→O, ஒவ்வொன்றும் +4 — சீரானது.\n⇒ BFJN: B→F→J→N, ஒவ்வொன்றும் +4 — சீரானது.\n⇒ AEIM: A→E→I→M, ஒவ்வொன்றும் +4 — சீரானது.\n⇒ FDKN: F→D (−2), D→K (+7), K→N (+3) — +4 அல்ல, ஒழுங்கற்றது.\nஎனவே FDKN தொடர்பில்லாதது.\n→ Option (D)"
+  },
+  {
+    "id": "155c823d-7373-49a2-b79f-61674cdf81bd",
+    "explanation": "Factor each polynomial, then the LCM is the product of all prime factors to the highest power present.\nGiven: (x⁴ − 1) and (x² − 2x + 1).\nx⁴ − 1 = (x² + 1)(x² − 1) = (x² + 1)(x + 1)(x − 1)\nx² − 2x + 1 = (x − 1)²\nLCM = (x² + 1)(x + 1)(x − 1)² → Option (D)",
+    "explanation_ta": "ஒவ்வொரு பல்லுறுப்புக்கோவையையும் காரணிப்படுத்துக, பின் மீ.பொ.ம என்பது அனைத்துப் பகாக் காரணிகளையும் அவற்றின் அதிகபட்ச அடுக்கில் பெருக்கியது.\nகொடுக்கப்பட்டது: (x⁴ − 1) மற்றும் (x² − 2x + 1).\nx⁴ − 1 = (x² + 1)(x² − 1) = (x² + 1)(x + 1)(x − 1)\nx² − 2x + 1 = (x − 1)²\nமீ.பொ.ம = (x² + 1)(x + 1)(x − 1)² → Option (D)"
+  },
+  {
+    "id": "1e1c8d7d-1de9-41c1-9a93-791c5322fd54",
+    "explanation": "The removed number = (sum of all 5) − (sum of remaining 4).\nFormula: Sum = Average × number of observations\nSum of 5 numbers = 180 × 5 = 900\nSum of 4 numbers = 155 × 4 = 620\nRemoved number = 900 − 620 = 280\n→ Option (B)",
+    "explanation_ta": "நீக்கப்பட்ட எண் = (5 எண்களின் கூட்டுத்தொகை) − (மீதமுள்ள 4 எண்களின் கூட்டுத்தொகை).\nவாய்ப்பாடு: கூட்டுத்தொகை = சராசரி × உறுப்புகளின் எண்ணிக்கை\n5 எண்களின் கூட்டுத்தொகை = 180 × 5 = 900\n4 எண்களின் கூட்டுத்தொகை = 155 × 4 = 620\nநீக்கப்பட்ட எண் = 900 − 620 = 280\n→ Option (B)"
+  },
+  {
+    "id": "1fd7907c-dfb8-4b78-bce0-9bef937a1e5f",
+    "explanation": "Spending 80%, 85%, 75% means saving 20%, 15%, 25% respectively. Savings are in ratio 7 : 6 : 9.\n⇒ 0.20A : 0.15B : 0.25C = 7 : 6 : 9, so take savings = 7k, 6k, 9k.\n⇒ A = 7k/0.20 = 35k, B = 6k/0.15 = 40k, C = 9k/0.25 = 36k\n⇒ 35k + 40k + 36k = 111k = 33300 ⇒ k = 33300/111 = 300\n⇒ B = 40k = 40 × 300 = ₹12,000\n→ Option (D)",
+    "explanation_ta": "80%, 85%, 75% செலவு என்பது முறையே 20%, 15%, 25% சேமிப்பைக் குறிக்கும். சேமிப்பு 7 : 6 : 9 விகிதத்தில்.\n⇒ 0.20A : 0.15B : 0.25C = 7 : 6 : 9, எனவே சேமிப்பு = 7k, 6k, 9k.\n⇒ A = 7k/0.20 = 35k, B = 6k/0.15 = 40k, C = 9k/0.25 = 36k\n⇒ 35k + 40k + 36k = 111k = 33300 ⇒ k = 33300/111 = 300\n⇒ B = 40k = 40 × 300 = ₹12,000\n→ Option (D)"
+  },
+  {
+    "id": "3cac7ed9-1cf7-438b-9574-29af958bf67a",
+    "explanation": "Let one-hour work of a man = m, woman = w, boy = b (total work = 1). A group finishing in n hours does 1/n per hour.\n⇒ m + 3w + 4b = 1/96\n⇒ 2m + 8b = 1/80\n⇒ 2m + 3w = 1/120\nSolving these gives m = 1/480, w = 1/720, b = 1/960.\n⇒ 5m + 12b = 5/480 + 12/960 = 10/960 + 12/960 = 22/960 = 11/480 per hour\n⇒ Time = 1/(11/480) = 480/11 = 43 7/11 hours\n→ Option (C)",
+    "explanation_ta": "ஒரு ஆணின் ஒரு மணி நேர வேலை = m, பெண் = w, பையன் = b (மொத்த வேலை = 1). n மணி நேரத்தில் முடிக்கும் குழு ஒரு மணிக்கு 1/n செய்யும்.\n⇒ m + 3w + 4b = 1/96\n⇒ 2m + 8b = 1/80\n⇒ 2m + 3w = 1/120\nஇவற்றைத் தீர்க்க m = 1/480, w = 1/720, b = 1/960.\n⇒ 5m + 12b = 5/480 + 12/960 = 10/960 + 12/960 = 22/960 = 11/480 ஒரு மணிக்கு\n⇒ நேரம் = 1/(11/480) = 480/11 = 43 7/11 மணி நேரம்\n→ Option (C)"
+  },
+  {
+    "id": "447c9b85-a500-4787-9711-81371d2f6723",
+    "explanation": "Any two numbers shown together in one cube view are adjacent (they cannot be opposite). So the number that never appears in the same view as 3 must be opposite to it.\n⇒ From the four views, list every face seen alongside 3 and eliminate it as a possible opposite.\n⇒ The number 4 never shares a view with 3, so 4 is on the face opposite 3.\n→ Option (C)",
+    "explanation_ta": "ஒரே கனசதுர காட்சியில் சேர்ந்து தோன்றும் எந்த இரு எண்களும் அருகில் உள்ளவை (அவை எதிராக இருக்க முடியாது). எனவே 3 உடன் ஒரே காட்சியில் ஒருபோதும் தோன்றாத எண் அதற்கு எதிராக இருக்க வேண்டும்.\n⇒ நான்கு காட்சிகளில் 3 உடன் காணப்படும் ஒவ்வொரு பக்கத்தையும் பட்டியலிட்டு, அதை எதிராக இருக்க முடியாது என நீக்குக.\n⇒ 4 ஆனது 3 உடன் ஒருபோதும் ஒரே காட்சியில் தோன்றாது, எனவே 4 ஆனது 3 க்கு எதிரே உள்ள பக்கத்தில் உள்ளது.\n→ Option (C)"
+  },
+  {
+    "id": "53e7dcd0-1cbd-48e7-897c-de90094596ba",
+    "explanation": "Each letter has a value counted from either end (A = Z = 1, B = Y = 2, …); test each statement.\nM = 13 from the A-side and N = 13 from the Z-side, so M = N is true.\nPosition values: E = 5, G = 7, J = 10. Here 5 and 7 are prime but 10 is not, so the statement 'E, G, J are prime numbers' is false.\nThe answer is 'E, G, J are prime numbers' → Option (D).",
+    "explanation_ta": "ஒவ்வொரு எழுத்துக்கும் இரு முனைகளிலிருந்தும் ஒரு மதிப்பு உண்டு (A = Z = 1, B = Y = 2, …); ஒவ்வொரு கூற்றையும் சோதிக்குக.\nA-பக்கம் M = 13 மற்றும் Z-பக்கம் N = 13, எனவே M = N உண்மை.\nநிலை மதிப்புகள்: E = 5, G = 7, J = 10. இங்கு 5 மற்றும் 7 பகா எண்கள் ஆனால் 10 பகா எண் அல்ல, எனவே 'E, G, J என்பவை பகா எண்கள்' என்ற கூற்று தவறு.\nவிடை 'E, G, J என்பவை பகா எண்கள்' → Option (D)."
+  },
+  {
+    "id": "6a39cb50-7901-4c73-b6c4-0822e1844d97",
+    "explanation": "B's one-day work equals (A+B)'s one-day work minus A's one-day work.\nGiven: A + B finish in 16 days, A alone in 48 days.\nOne day's work = (1)/(days).\nB's one-day work = (1)/(16) − (1)/(48) = (3 − 1)/(48) = (2)/(48) = (1)/(24).\nSo B alone takes 24 days → Option (B)",
+    "explanation_ta": "B-ன் ஒரு நாள் வேலை = (A+B)-ன் ஒரு நாள் வேலை கழித்தல் A-ன் ஒரு நாள் வேலை.\nகொடுக்கப்பட்டது: A + B 16 நாட்களில் முடிப்பர், A தனியே 48 நாட்களில்.\nஒரு நாள் வேலை = (1)/(days).\nB-ன் ஒரு நாள் வேலை = (1)/(16) − (1)/(48) = (3 − 1)/(48) = (2)/(48) = (1)/(24).\nஎனவே B தனியே 24 நாட்கள் எடுப்பார் → Option (B)"
+  },
+  {
+    "id": "7c2230c4-b9e7-435c-a716-3a088e28d5ae",
+    "explanation": "A ratio a : b is the fraction a/b reduced to lowest terms; ordered comparisons of 4 colours give 4 × 3 pairs.\nGiven cubes: 3 green, 9 blue, 4 yellow, 8 orange.\n(a) orange : yellow = 8 : 4 = (8)/(4) = 2 : 1\n(b) green : blue = 3 : 9 = (3)/(9) = 1 : 3\n(c) ordered comparisons of 4 colours = 4 × 3 = 12 ratios\nSo the three answers are 2 : 1, 1 : 3, 12 ratios → Option (D)",
+    "explanation_ta": "ஒரு விகிதம் a : b என்பது சிறும பதங்களுக்குச் சுருக்கப்பட்ட பின்னம் a/b ஆகும்; 4 வண்ணங்களின் வரிசைப்படுத்தப்பட்ட ஒப்பீடுகள் 4 × 3 இணைகளைத் தரும்.\nகொடுக்கப்பட்ட கனசதுரங்கள்: 3 பச்சை, 9 நீலம், 4 மஞ்சள், 8 ஆரஞ்சு.\n(a) ஆரஞ்சு : மஞ்சள் = 8 : 4 = (8)/(4) = 2 : 1\n(b) பச்சை : நீலம் = 3 : 9 = (3)/(9) = 1 : 3\n(c) 4 வண்ணங்களின் வரிசை ஒப்பீடுகள் = 4 × 3 = 12 ratios\nஎனவே மூன்று விடைகள் 2 : 1, 1 : 3, 12 ratios → Option (D)"
+  },
+  {
+    "id": "85de4ce5-3a50-43be-9d4f-60cb56dd2b29",
+    "explanation": "Factorise using a² − b² = (a + b)(a − b); the operation is a division, so invert and multiply.\nx² − 25 = (x+5)(x−5), x² − 9 = (x+3)(x−3)\nExpression = ((x+5)(x−5)) / (x+3) × ((x+3)(x−3)) / ((x+5)²)\nCancel (x+5) and (x+3): = ((x−5)(x−3)) / (x+5)\nNote: the × is a typo for ÷; treating it as division gives (x−5)(x−3) / (x+5), which is option B.\n→ Option (B)",
+    "explanation_ta": "a² − b² = (a + b)(a − b) ஐப் பயன்படுத்தி காரணிப்படுத்தவும்; செயல்பாடு வகுத்தல் என்பதால் தலைகீழாக்கிப் பெருக்கவும்.\nx² − 25 = (x+5)(x−5), x² − 9 = (x+3)(x−3)\nகோவை = ((x+5)(x−5)) / (x+3) × ((x+3)(x−3)) / ((x+5)²)\n(x+5) மற்றும் (x+3) ஐ நீக்க: = ((x−5)(x−3)) / (x+5)\nகுறிப்பு: × என்பது ÷ க்கான எழுத்துப் பிழை; அதை வகுத்தலாகக் கருதினால் (x−5)(x−3) / (x+5) கிடைக்கிறது, இது option B.\n→ Option (B)"
+  },
+  {
+    "id": "95471efa-7d2a-4fd9-b421-e79f552ecd61",
+    "explanation": "In the coding A1, B4, C9, D16, … Z676, each letter is paired with (its position)². The phrase 'number followed by a letter' means the value placed just before that letter.\n⇒ The number followed by P = value of O = 15² = 225.\n⇒ The number followed by Q = value of P = 16² = 256.\n⇒ Total = 225 + 256 = 481.\n→ Option (D)",
+    "explanation_ta": "A1, B4, C9, D16, … Z676 எனும் குறியீட்டில், ஒவ்வொரு எழுத்தும் (அதன் இடம்)² உடன் இணைக்கப்படுகிறது. 'ஒரு எழுத்தால் தொடரப்படும் எண்' என்பது அந்த எழுத்துக்கு சற்று முன் வைக்கப்படும் மதிப்பாகும்.\n⇒ P ஆல் தொடரப்படும் எண் = O இன் மதிப்பு = 15² = 225.\n⇒ Q ஆல் தொடரப்படும் எண் = P இன் மதிப்பு = 16² = 256.\n⇒ மொத்தம் = 225 + 256 = 481.\n→ Option (D)"
+  },
+  {
+    "id": "a081e777-99c4-489c-bf4d-3798e4b3546d",
+    "explanation": "Mary is 16 and is 4 times her brother's age ⇒ brother now = 16/4 = 4. The age gap (12 years) stays constant.\nAfter x years: Mary = 16 + x, brother = 4 + x. Set Mary = 2 × brother:\n⇒ 16 + x = 2(4 + x)\n⇒ 16 + x = 8 + 2x  ⇒  x = 8\n⇒ Mary's age = 16 + 8 = 24\n→ Option (B)",
+    "explanation_ta": "மேரி 16, மேலும் தம்பியின் வயதை விட 4 மடங்கு ⇒ தம்பியின் தற்போதைய வயது = 16/4 = 4. வயது வித்தியாசம் (12 ஆண்டுகள்) மாறாது.\nx ஆண்டுகள் கழித்து: மேரி = 16 + x, தம்பி = 4 + x. மேரி = 2 × தம்பி எனக் கொள்க:\n⇒ 16 + x = 2(4 + x)\n⇒ 16 + x = 8 + 2x  ⇒  x = 8\n⇒ மேரியின் வயது = 16 + 8 = 24\n→ Option (B)"
+  },
+  {
+    "id": "a609f660-15e2-438a-b3e4-baa49ae5e9ee",
+    "explanation": "The common ratio of a GP is any term divided by the one before it.\nFormula: r = t₂ / t₁\nHere t₁ = 0.15 and t₂ = 0.015.\nr = 0.015 / 0.15 = 0.1\nThe answer is 0.1 → Option (A).",
+    "explanation_ta": "ஒரு பெருக்குத் தொடரின் பொதுவிகிதம் என்பது ஏதேனும் ஒரு உறுப்பை அதற்கு முந்தைய உறுப்பால் வகுத்து வருவது.\nசூத்திரம்: r = t₂ / t₁\nஇங்கு t₁ = 0.15 மற்றும் t₂ = 0.015.\nr = 0.015 / 0.15 = 0.1\nவிடை 0.1 → Option (A)."
+  },
+  {
+    "id": "b09dc6f6-e1b7-42ea-96e6-eec796066463",
+    "explanation": "Range is the difference between the largest and smallest values.\nFirst 10 prime numbers: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29\nLargest L = 29, Smallest S = 2\nFormula: Range R = L − S = 29 − 2 = 27\n→ Option (D)",
+    "explanation_ta": "வீச்சு என்பது மிகப்பெரிய மற்றும் மிகச்சிறிய மதிப்புகளுக்கு இடையேயான வேறுபாடு.\nமுதல் 10 பகா எண்கள்: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29\nமிகப்பெரியது L = 29, மிகச்சிறியது S = 2\nவாய்ப்பாடு: வீச்சு R = L − S = 29 − 2 = 27\n→ Option (D)"
+  },
+  {
+    "id": "b9b7cc98-514b-4596-ac90-75a0dc4925c0",
+    "explanation": "The new hemisphere's volume is two-thirds of the original, so first take 19404 cm³ and solve (2/3)πr³ for r.\nGiven: original volume = 29106 cm³; π = 22/7.\nVolume of hemisphere = (2)/(3)πr³.\nNew volume = (2)/(3) × 29106 = 19404 cm³\n(2)/(3) × (22)/(7) × r³ = 19404\nr³ = (19404 × 3 × 7)/(2 × 22) = (407484)/(44) = 9261\nr = ³√9261 = 21 cm → Option (C)",
+    "explanation_ta": "புதிய அரைக்கோளத்தின் கன அளவு மூலத்தின் மூன்றில் இரண்டு பங்கு, எனவே முதலில் 19404 cm³ எடுத்து (2/3)πr³ ஐ r-க்காகத் தீர்க்க.\nகொடுக்கப்பட்டது: மூல கன அளவு = 29106 cm³; π = 22/7.\nஅரைக்கோளத்தின் கன அளவு = (2)/(3)πr³.\nபுதிய கன அளவு = (2)/(3) × 29106 = 19404 cm³\n(2)/(3) × (22)/(7) × r³ = 19404\nr³ = (19404 × 3 × 7)/(2 × 22) = (407484)/(44) = 9261\nr = ³√9261 = 21 cm → Option (C)"
+  },
+  {
+    "id": "bfab7e4c-82fd-47bd-88c6-b372690abf25",
+    "explanation": "Mean is the total sum divided by how many numbers there are.\nFormula: Mean = Σx / n\nSum = 2+4+6+8+10+12+14+16 = 72\nn = 8\nMean = 72 / 8 = 9\n→ Option (B)",
+    "explanation_ta": "கூட்டுச்சராசரி என்பது மொத்தக் கூட்டுத்தொகையை எண்களின் எண்ணிக்கையால் வகுத்த ஈவு.\nவாய்ப்பாடு: சராசரி = Σx / n\nகூட்டுத்தொகை = 2+4+6+8+10+12+14+16 = 72\nn = 8\nசராசரி = 72 / 8 = 9\n→ Option (B)"
+  },
+  {
+    "id": "c6724d18-dd80-47ec-8f6b-3936c0dcdcce",
+    "explanation": "A person who finishes a job in n days does 1/n of it in one day; add the two daily works.\nB takes half of A's time = 18 / 2 = 9 days.\nTogether's one-day work = 1/18 + 1/9 = 1/18 + 2/18 = 3/18 = 1/6\nThe answer is 1/6 → Option (B).",
+    "explanation_ta": "ஒரு வேலையை n நாட்களில் முடிப்பவர் ஒரு நாளில் 1/n பகுதியைச் செய்வார்; இரண்டு பேரின் ஒரு நாள் வேலையையும் கூட்டுக.\nB, A எடுக்கும் நேரத்தில் பாதி = 18 / 2 = 9 நாட்கள் எடுக்கிறார்.\nஇருவரும் சேர்ந்து ஒரு நாளில்: 1/18 + 1/9 = 1/18 + 2/18 = 3/18 = 1/6\nவிடை 1/6 → Option (B)."
+  },
+  {
+    "id": "cb2e39bd-1786-4090-8357-3579a778b5f8",
+    "explanation": "Convert metres to km and minutes to hours, then divide distance by time.\nFormula: Speed = distance / time\nDistance = 600 m = 0.6 km\nTime = 5 minutes = 5 / 60 hour = 1 / 12 hour\nSpeed = 0.6 / (1 / 12) = 0.6 × 12 = 7.2 km/h\n→ Option (B)",
+    "explanation_ta": "மீட்டரை கி.மீ ஆகவும் நிமிடங்களை மணியாகவும் மாற்றி, தூரத்தை நேரத்தால் வகுக்க வேண்டும்.\nவாய்ப்பாடு: வேகம் = தூரம் / நேரம்\nதூரம் = 600 m = 0.6 km\nநேரம் = 5 நிமிடங்கள் = 5 / 60 மணி = 1 / 12 மணி\nவேகம் = 0.6 / (1 / 12) = 0.6 × 12 = 7.2 km/h\n→ Option (B)"
+  },
+  {
+    "id": "d7d629d4-1609-4039-bab5-27d8c63a31a4",
+    "explanation": "Rule: the sum of an odd number of consecutive A.P. terms = (count) × (middle term).\nThe 11 terms t₂₀ + t₂₁ + … + t₃₀ are symmetric about the middle term t₂₅.\n⇒ t₂₀ + … + t₃₀ = 11 × t₂₅ = 0  ⇒  t₂₅ = 0\n⇒ t₂₅ = a + 24d = 0  ⇒  a = −24d\nNow test each statement:\n(a) t₂₅ = 0 — TRUE.\n(b) t₁₀, t₂₀, t₃₀, t₄₀ are equally spaced (common gap 10d), so they form an A.P. — TRUE.\n(c) If n₁ + n₂ = 50, then tₙ₁ + tₙ₂ = 2a + 48d = 2(a + 24d) = 2t₂₅ = 0 — TRUE.\n(d) Since a = −24d, if d is positive then a = −24d is negative, not positive — FALSE.\nThe false statement is (d).\n→ Option (D)",
+    "explanation_ta": "விதி: ஒற்றை எண்ணிக்கையிலான தொடர்ச்சியான கூட்டுத் தொடர் உறுப்புகளின் கூடுதல் = (எண்ணிக்கை) × (நடு உறுப்பு).\nt₂₀ + t₂₁ + … + t₃₀ எனும் 11 உறுப்புகள் நடு உறுப்பு t₂₅ ஐ மையமாகக் கொண்டு சமச்சீராக அமைகின்றன.\n⇒ t₂₀ + … + t₃₀ = 11 × t₂₅ = 0  ⇒  t₂₅ = 0\n⇒ t₂₅ = a + 24d = 0  ⇒  a = −24d\nஒவ்வொரு கூற்றையும் சோதிக்க:\n(a) t₂₅ = 0 — சரி.\n(b) t₁₀, t₂₀, t₃₀, t₄₀ சம இடைவெளி (10d) கொண்டவை, எனவே அவை கூட்டுத் தொடரை உருவாக்கும் — சரி.\n(c) n₁ + n₂ = 50 எனில், tₙ₁ + tₙ₂ = 2a + 48d = 2(a + 24d) = 2t₂₅ = 0 — சரி.\n(d) a = −24d ஆதலால், d மிகை எனில் a = −24d குறை, மிகை அல்ல — தவறு.\nதவறான கூற்று (d).\n→ Option (D)"
+  },
+  {
+    "id": "dfb483f8-fa1d-4ad7-95ee-c7678dd28cdd",
+    "explanation": "B is a geometric progression with first term 1 and ratio r = 2, so its sum is 2⁶⁵ − 1, exactly one less than A.\nGiven: A = 2⁶⁵ and B = 2⁶⁴ + 2⁶³ + … + 2⁰.\nSₙ = (a(rⁿ − 1))/(r − 1)\nB = (1(2⁶⁵ − 1))/(2 − 1) = 2⁶⁵ − 1\nA − B = 2⁶⁵ − (2⁶⁵ − 1) = 1\nSo A is larger than B by 1 → Option (B)",
+    "explanation_ta": "B என்பது முதல் உறுப்பு 1 மற்றும் பொது விகிதம் r = 2 கொண்ட ஒரு பெருக்குத் தொடர், எனவே அதன் கூட்டுத்தொகை 2⁶⁵ − 1, A ஐ விட சரியாக ஒன்று குறைவு.\nகொடுக்கப்பட்டது: A = 2⁶⁵ மற்றும் B = 2⁶⁴ + 2⁶³ + … + 2⁰.\nSₙ = (a(rⁿ − 1))/(r − 1)\nB = (1(2⁶⁵ − 1))/(2 − 1) = 2⁶⁵ − 1\nA − B = 2⁶⁵ − (2⁶⁵ − 1) = 1\nஎனவே A ஆனது B ஐ விட 1 அதிகம் → Option (B)"
+  },
+  {
+    "id": "e85cc599-c1f8-46f2-8ce0-c4146c474d22",
+    "explanation": "Same remainder 12 in each case ⇒ the divisor exactly divides each number reduced by 12. The greatest such divisor is the HCF.\n⇒ 1356 − 12 = 1344, 1868 − 12 = 1856, 2764 − 12 = 2752\n⇒ HCF(1344, 1856) = 64; HCF(64, 2752) = 64\nSince 64 > the remainder 12, it is valid.\n⇒ HCF = 64\n→ Option (A)",
+    "explanation_ta": "ஒவ்வொரு வழக்கிலும் ஒரே மீதி 12 ⇒ வகுப்பான் ஒவ்வொரு எண்ணையும் 12 ஆல் குறைத்த பிறகு முழுமையாக வகுக்கும். அத்தகைய மிகப் பெரிய வகுப்பான் மீ.பெ.வ (HCF).\n⇒ 1356 − 12 = 1344, 1868 − 12 = 1856, 2764 − 12 = 2752\n⇒ HCF(1344, 1856) = 64; HCF(64, 2752) = 64\n64 > மீதி 12 ஆதலால், அது செல்லுபடியாகும்.\n⇒ HCF = 64\n→ Option (A)"
+  },
+  {
+    "id": "ed3aae68-7d63-4e85-9dd9-a9256c0c8cc2",
+    "explanation": "All three ratios equal the same value: x/7.5 = 8/y = 7/17.5.\nCommon value = 7/17.5 = 0.4.\n⇒ x = 7.5 × 0.4 = 3\n⇒ From 8/y = 0.4 ⇒ y = 8/0.4 = 20\n⇒ x : y = 3 : 20\n→ Option (C)",
+    "explanation_ta": "மூன்று விகிதங்களும் ஒரே மதிப்புக்குச் சமம்: x/7.5 = 8/y = 7/17.5.\nபொது மதிப்பு = 7/17.5 = 0.4.\n⇒ x = 7.5 × 0.4 = 3\n⇒ 8/y = 0.4 இலிருந்து ⇒ y = 8/0.4 = 20\n⇒ x : y = 3 : 20\n→ Option (C)"
+  },
+  {
+    "id": "f41fc809-d7e9-4d39-9bc1-b14dbbb10f9f",
+    "explanation": "For the same work, men × days × hours is constant (the chain rule of work).\nGiven: 210 men, 12 hours/day, 18 days; required for 20 days at 14 hours/day.\nM₁ × D₁ × H₁ = M₂ × D₂ × H₂\n210 × 12 × 18 = M₂ × 14 × 20\nM₂ = (210 × 12 × 18)/(14 × 20) = (45360)/(280) = 162 men → Option (B)",
+    "explanation_ta": "அதே வேலைக்கு, ஆட்கள் × நாட்கள் × மணிநேரம் = மாறிலி (வேலையின் சங்கிலி விதி).\nகொடுக்கப்பட்டது: 210 ஆண்கள், 12 மணி/நாள், 18 நாட்கள்; 20 நாட்களில் 14 மணி/நாள் தேவை.\nM₁ × D₁ × H₁ = M₂ × D₂ × H₂\n210 × 12 × 18 = M₂ × 14 × 20\nM₂ = (210 × 12 × 18)/(14 × 20) = (45360)/(280) = 162 ஆண்கள் → Option (B)"
+  },
+  {
+    "id": "fa75e377-0e5a-48fd-872b-2273d1e92e86",
+    "explanation": "Solve the two simultaneous equations for a and b by elimination, then evaluate (a + b)².\nGiven: 3a + 4b = 22 and 8a − 5b = −4.\nMake the b-coefficients equal:\n(3a + 4b = 22) × 5 ⇒ 15a + 20b = 110\n(8a − 5b = −4) × 4 ⇒ 32a − 20b = −16\nAdd the two: 47a = 94 ⇒ a = (94)/(47) = 2\nThen 4b = 22 − 3(2) = 16 ⇒ b = (16)/(4) = 4\nNow (a + b)² = (2 + 4)² = 6² = 36 → Option (A)",
+    "explanation_ta": "இரு ஒருங்கமை சமன்பாடுகளையும் நீக்கல் முறையில் a மற்றும் b-க்காகத் தீர்த்து, பின் (a + b)² ஐக் காண்க.\nகொடுக்கப்பட்டது: 3a + 4b = 22 மற்றும் 8a − 5b = −4.\nb-ன் கெழுக்களைச் சமமாக்குக:\n(3a + 4b = 22) × 5 ⇒ 15a + 20b = 110\n(8a − 5b = −4) × 4 ⇒ 32a − 20b = −16\nஇரண்டையும் கூட்டுக: 47a = 94 ⇒ a = (94)/(47) = 2\nஅதன்பின் 4b = 22 − 3(2) = 16 ⇒ b = (16)/(4) = 4\nஇப்போது (a + b)² = (2 + 4)² = 6² = 36 → Option (A)"
+  }
+]

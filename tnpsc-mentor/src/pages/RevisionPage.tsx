@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Loader2, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Loader2, RefreshCw, Check } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
-import { fetchDueItems, gradeItem, type ReviewItem } from '../lib/srs'
+import { fetchDueItems, gradeReview, type ReviewItem } from '../lib/srs'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
-import type { AnswerLetter } from '../types'
+import type { AnswerLetter, Question } from '../types'
 
 export default function RevisionPage() {
   const navigate = useNavigate()
@@ -19,6 +19,9 @@ export default function RevisionPage() {
   const [loading, setLoading] = useState(true)
   const [idx, setIdx] = useState(0)
   const [selected, setSelected] = useState<AnswerLetter | null>(null)
+  // The graded question (with correct_answer + explanation merged in) revealed
+  // after the user answers. The deck itself never carries the answer key.
+  const [revealed, setRevealed] = useState<Question | null>(null)
   const [correctCount, setCorrectCount] = useState(0)
   const [done, setDone] = useState(false)
 
@@ -39,15 +42,26 @@ export default function RevisionPage() {
   const handleSelect = async (letter: AnswerLetter) => {
     if (selected !== null || !item || !q) return
     setSelected(letter)
-    const correct = letter === q.correct_answer
-    if (correct) setCorrectCount((c) => c + 1)
-    await gradeItem(item, correct)
+    const grade = await gradeReview(item.id, letter)
+    if (grade) {
+      if (grade.is_correct) setCorrectCount((c) => c + 1)
+      setRevealed({
+        ...q,
+        correct_answer: grade.correct_answer ?? undefined,
+        explanation: grade.explanation ?? undefined,
+        explanation_ta: grade.explanation_ta ?? undefined,
+      })
+    } else {
+      // Grading unavailable (offline) — reveal without the answer highlight.
+      setRevealed(q)
+    }
   }
 
   const next = () => {
+    setSelected(null)
+    setRevealed(null)
     if (idx + 1 < items.length) {
       setIdx(idx + 1)
-      setSelected(null)
     } else {
       setDone(true)
     }
@@ -58,7 +72,7 @@ export default function RevisionPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
+          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
@@ -69,28 +83,28 @@ export default function RevisionPage() {
 
         {loading && (
           <div className="flex justify-center py-16">
-            <Loader2 size={32} className="animate-spin text-accent" />
+            <Loader2 size={32} className="animate-spin text-brand" />
           </div>
         )}
 
         {!loading && items.length === 0 && (
-          <p className="tamil py-12 text-center font-body text-white/60">{t('revisionEmpty')}</p>
+          <p className="tamil py-12 text-center font-body text-ink2">{t('revisionEmpty')}</p>
         )}
 
         {!loading && items.length > 0 && !done && q && (
           <>
             <div className="mb-4">
-              <div className="mb-1 flex justify-between font-body text-xs text-white/50">
+              <div className="mb-1 flex justify-between font-body text-xs font-medium text-ink2">
                 <span>
                   {t('dueToday')}: {idx + 1}/{items.length}
                 </span>
-                <span>{correctCount} ✓</span>
+                <span className="text-mint">{correctCount} ✓</span>
               </div>
               <ProgressBar percent={((idx + 1) / items.length) * 100} />
             </div>
 
             <QuestionCard
-              question={q}
+              question={revealed ?? q}
               index={idx}
               total={items.length}
               selected={selected}
@@ -100,10 +114,7 @@ export default function RevisionPage() {
             />
 
             {selected !== null && (
-              <button
-                onClick={next}
-                className="mt-4 w-full rounded-full bg-accent px-6 py-3 font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5"
-              >
+              <button onClick={next} className="btn-brand mt-4 w-full px-6 py-3.5 text-base">
                 {idx + 1 < items.length ? t('next') : t('allCaughtUp')}
               </button>
             )}
@@ -112,9 +123,13 @@ export default function RevisionPage() {
 
         {!loading && done && (
           <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <CheckCircle2 size={56} className="text-green-400" />
-            <p className="font-heading text-2xl font-bold text-white">{t('allCaughtUp')}</p>
-            <p className="font-body text-white/70">
+            <span className="grid h-14 w-14 place-items-center rounded-2xl bg-tint text-ink">
+              <Check size={28} />
+            </span>
+            <p className="font-heading text-2xl font-semibold tracking-tight text-ink">
+              {t('allCaughtUp')}
+            </p>
+            <p className="font-body text-ink2">
               {correctCount}/{items.length} correct
             </p>
             <div className="mt-2 flex gap-3">
@@ -122,6 +137,7 @@ export default function RevisionPage() {
                 onClick={() => {
                   setIdx(0)
                   setSelected(null)
+                  setRevealed(null)
                   setCorrectCount(0)
                   setDone(false)
                   setLoading(true)
@@ -130,14 +146,11 @@ export default function RevisionPage() {
                       .then((d) => setItems(d.filter((i) => i.question)))
                       .finally(() => setLoading(false))
                 }}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-heading font-bold uppercase text-navytext"
+                className="btn-ghost px-5 py-2.5"
               >
                 <RefreshCw size={16} /> {t('revision')}
               </button>
-              <button
-                onClick={() => navigate('/insights')}
-                className="rounded-full bg-accent px-5 py-2.5 font-heading font-bold uppercase text-navytext"
-              >
+              <button onClick={() => navigate('/insights')} className="btn-brand px-5 py-2.5">
                 {t('insights')}
               </button>
             </div>

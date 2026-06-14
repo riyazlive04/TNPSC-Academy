@@ -34,7 +34,7 @@ export default function SetupPage() {
       exam_date: examDate || null,
       daily_goal: Number(goal) || 20,
     })
-    await fetchProfile(user.id)
+    await fetchProfile()
     setSaving(false)
     navigate('/test-arena', { replace: true })
   }
@@ -46,18 +46,18 @@ export default function SetupPage() {
           <YellowBadge>{t('setupTitle')}</YellowBadge>
         </div>
 
-        <form onSubmit={submit} className="rounded-3xl bg-secondary/30 p-6 shadow-card backdrop-blur">
-          <div className="mb-5 flex justify-center text-accent">
-            <Target size={36} />
+        <form onSubmit={submit} className="card p-6">
+          <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-3xl bg-brand-soft text-brand">
+            <Target size={30} />
           </div>
 
-          <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
+          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
             {t('targetGroup')}
           </label>
           <select
             value={group}
             onChange={(e) => setGroup(e.target.value)}
-            className="input-pill mb-4 appearance-none"
+            className="input-soft mb-4 appearance-none"
           >
             {GROUPS.map((g) => (
               <option key={g.value} value={g.value}>
@@ -66,17 +66,17 @@ export default function SetupPage() {
             ))}
           </select>
 
-          <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
+          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
             {t('examDate')}
           </label>
           <input
             type="date"
             value={examDate ?? ''}
             onChange={(e) => setExamDate(e.target.value)}
-            className="input-pill mb-4"
+            className="input-soft mb-4"
           />
 
-          <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
+          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
             {t('dailyGoalQ')}
           </label>
           <input
@@ -85,20 +85,16 @@ export default function SetupPage() {
             max={200}
             value={goal}
             onChange={(e) => setGoal(Number(e.target.value))}
-            className="input-pill mb-6"
+            className="input-soft mb-6"
           />
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full rounded-full bg-accent px-6 py-3 font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5 disabled:opacity-60"
-          >
+          <button type="submit" disabled={saving} className="btn-brand w-full px-6 py-3.5 text-base">
             {saving ? '…' : t('saveContinue')}
           </button>
           <button
             type="button"
             onClick={() => navigate('/test-arena')}
-            className="mt-3 w-full font-heading text-sm font-semibold uppercase tracking-wide text-white/60 transition hover:text-accent"
+            className="mt-3 w-full font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
           >
             {t('skip')}
           </button>

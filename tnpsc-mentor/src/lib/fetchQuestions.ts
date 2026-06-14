@@ -1,5 +1,5 @@
-import { supabase } from './supabase'
-import type { Question, QuizConfig } from '../types'
+import { api } from './api'
+import type { AnswerLetter, Question, QuizConfig } from '../types'
 
 export const MAX_QUESTIONS = 100
 
@@ -14,53 +14,55 @@ export function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Builds and runs the Supabase query for a given quiz config. Returns up to
- * MAX_QUESTIONS questions. The caller decides whether to randomise order
- * (quiz) or keep stable order (admin list).
+ * Fetches questions for a quiz via the `get_quiz_questions` RPC. The RPC runs
+ * SECURITY DEFINER and returns ONLY the safe columns (no correct_answer /
+ * explanation) in random order, so answers never reach the browser during a
+ * test. Random ordering also fixes the old "always the oldest N" sampling bug.
  */
 export async function fetchQuestionsForConfig(
   config: QuizConfig
 ): Promise<Question[]> {
-  // Mock mode: pull a broad, mixed pool and randomly sample the requested count.
-  if (config.mock) {
-    const want = config.mockQuestionCount ?? 50
-    // Fetch a generous window (offset varied so repeat mocks differ) then shuffle.
-    const windowSize = Math.min(Math.max(want * 6, 300), 1000)
-    let mq = supabase.from('questions').select('*')
-    if (config.scopeToCategory) mq = mq.eq('category', config.category)
-    const { data, error } = await mq.limit(windowSize)
-    if (error) throw error
-    return shuffle((data ?? []) as Question[]).slice(0, want)
-  }
+  const limit = config.mock ? (config.mockQuestionCount ?? 50) : MAX_QUESTIONS
+  return api.quizQuestions({ ...config, limit } as QuizConfig)
+}
 
-  let query = supabase.from('questions').select('*').eq('category', config.category)
+/**
+ * Admin question bank fetch — full rows (answers + explanations) via the
+ * `admin_list_questions` RPC, which is gated server-side by is_admin(). A
+ * non-admin calling it simply gets an empty list.
+ */
+export async function fetchAdminQuestions(config: QuizConfig): Promise<Question[]> {
+  return api.adminListQuestions(config)
+}
 
-  switch (config.category) {
-    case 'pyq':
-      // Subject-membership model: a question is shown under any group whose
-      // syllabus includes its subject, so we filter by subject only (the UI
-      // already restricts subject choices per group via GROUP_SUBJECTS).
-      if (config.subject) query = query.eq('subject', config.subject)
-      break
-    case 'samacheer':
-      if (config.subject) query = query.eq('subject', config.subject)
-      if (config.standard != null) query = query.eq('standard', config.standard)
-      if (config.topic) query = query.eq('topic', config.topic)
-      break
-    case 'current_affairs':
-      if (config.ca_type) query = query.eq('ca_type', config.ca_type)
-      if (config.ca_month) query = query.eq('ca_month', config.ca_month)
-      if (config.ca_topic) query = query.eq('ca_topic', config.ca_topic)
-      break
-    case 'aptitude':
-      if (config.aptitude_type) query = query.eq('aptitude_type', config.aptitude_type)
-      if (config.aptitude_topic) query = query.eq('aptitude_topic', config.aptitude_topic)
-      break
-  }
+/**
+ * Payload for the admin question editor. A blank/absent `id` creates a new
+ * question; a present `id` updates that row. The five content fields and a
+ * `correct_answer` are always required.
+ */
+export type QuestionDraft = Partial<Question> & {
+  id?: string
+  category: Question['category']
+  question_text: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  correct_answer: AnswerLetter
+}
 
-  const { data, error } = await query.limit(MAX_QUESTIONS)
-  if (error) throw error
-  return (data ?? []) as Question[]
+/**
+ * Create or update a question via the `admin_upsert_question` RPC (SECURITY
+ * DEFINER, is_admin() gated server-side). Returns the saved row, including the
+ * answer columns, so the caller can refresh its local list.
+ */
+export async function upsertAdminQuestion(draft: QuestionDraft): Promise<Question> {
+  return api.adminUpsertQuestion(draft as Record<string, unknown>)
+}
+
+/** Delete a question via the is_admin()-gated `admin_delete_question` RPC. */
+export async function deleteAdminQuestion(id: string): Promise<void> {
+  await api.adminDeleteQuestion(id)
 }
 
 /** Build a readable label from a config when none was supplied. */

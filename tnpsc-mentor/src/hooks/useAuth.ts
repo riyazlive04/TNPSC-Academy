@@ -1,4 +1,9 @@
-import { useAuthStore, selectIsAdmin, selectIsAuthenticated } from '../store/authStore'
+import {
+  useAuthStore,
+  selectIsAdmin,
+  selectIsSuperAdmin,
+  selectIsAuthenticated,
+} from '../store/authStore'
 
 /**
  * Convenience hook exposing the slice of auth state most pages need.
@@ -9,6 +14,7 @@ export function useAuth() {
   const loading = useAuthStore((s) => s.loading)
   const isAuthenticated = useAuthStore(selectIsAuthenticated)
   const isAdmin = useAuthStore(selectIsAdmin)
+  const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
 
   const signIn = useAuthStore((s) => s.signIn)
   const signUp = useAuthStore((s) => s.signUp)
@@ -21,6 +27,7 @@ export function useAuth() {
     loading,
     isAuthenticated,
     isAdmin,
+    isSuperAdmin,
     signIn,
     signUp,
     signOut,

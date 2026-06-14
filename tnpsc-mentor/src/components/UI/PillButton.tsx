@@ -34,18 +34,20 @@ export default function PillButton({
     <button
       {...rest}
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-full font-heading font-semibold',
-        'shadow-pill transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card',
-        'active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+        'inline-flex max-w-full items-center justify-center gap-2 rounded-2xl font-heading font-semibold',
+        'shadow-pill transition-all duration-200 hover:-translate-y-0.5',
+        'active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-ring',
         'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0',
-        active ? 'bg-accent text-navytext' : 'bg-white text-navytext',
+        active
+          ? 'bg-brand-gradient text-white'
+          : 'border border-line bg-card text-ink hover:border-brand-ring',
         fullWidth ? 'w-full' : '',
         sizeCls,
         className,
       ].join(' ')}
     >
       {icon}
-      <span className="leading-tight">{children}</span>
+      <span className="min-w-0 break-words leading-tight">{children}</span>
     </button>
   )
 }

@@ -1,7 +1,9 @@
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
 import { LETTERS, displayQuestion, displayOption, displayExplanation, whyWrongFor } from '../../types'
-import { Check, X, MinusCircle } from 'lucide-react'
+import { Bookmark, Check, X, MinusCircle, Clock } from 'lucide-react'
 import { useT } from '../../lib/i18n'
+import { formatDuration } from '../UI/Timer'
+import WorkedSolution from './WorkedSolution'
 
 interface ResultCardProps {
   question: Question
@@ -9,6 +11,9 @@ interface ResultCardProps {
   answer?: TestAnswer
   /** When true, show option text + explanation (only after PDF gate passes). */
   showExplanation: boolean
+  /** Whether this question is bookmarked (omit to hide the bookmark button). */
+  bookmarked?: boolean
+  onToggleBookmark?: () => void
 }
 
 /**
@@ -19,11 +24,19 @@ export default function ResultCard({
   index,
   answer,
   showExplanation,
+  bookmarked,
+  onToggleBookmark,
 }: ResultCardProps) {
-  const { lang } = useT()
+  const { t, lang } = useT()
+  // Aptitude questions get the stepwise "worked solution" treatment; the bank
+  // tags them with aptitude_type (and subject 'Aptitude' under PYQ).
+  const isAptitude =
+    !!question.aptitude_type || question.subject === 'Aptitude' || question.category === 'aptitude'
   const attempted = Boolean(answer?.selected_answer)
   const correct = answer?.is_correct ?? false
   const chosen = answer?.selected_answer as AnswerLetter | undefined
+  // Time the user spent on this question (recorded on the first selection).
+  const timeSpent = attempted ? Math.round(answer?.time_spent_seconds ?? 0) : 0
   // Targeted feedback: why the user's specific wrong choice is incorrect.
   const wrongReason =
     attempted && !correct && chosen ? whyWrongFor(question, chosen) : ''
@@ -44,17 +57,46 @@ export default function ResultCard({
   return (
     <div className={`rounded-2xl border-2 bg-white p-4 ${ring}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
-        <p className="tamil whitespace-pre-line text-sm font-semibold leading-snug text-navytext">
+        <p className="tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm font-semibold leading-snug text-navytext">
           <span className="mr-1 text-secondary">Q{index + 1}.</span>
           {displayQuestion(question, lang)}
         </p>
-        <div className="flex flex-shrink-0 items-center gap-1">
+        <div className="flex flex-shrink-0 items-center gap-1.5">
+          {attempted && (
+            <span
+              className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-0.5 font-heading text-[11px] font-semibold text-navytext/55"
+              title={`${t('timeTaken')}: ${formatDuration(timeSpent)}`}
+            >
+              <Clock size={12} /> {formatDuration(timeSpent)}
+            </span>
+          )}
+          {onToggleBookmark && (
+            <button
+              onClick={onToggleBookmark}
+              aria-label={bookmarked ? 'Remove bookmark' : 'Save question'}
+              title={bookmarked ? 'Saved — tap to remove' : 'Save for later'}
+              className={[
+                'rounded-lg p-1 transition',
+                bookmarked ? 'text-gold' : 'text-navytext/30 hover:text-gold',
+              ].join(' ')}
+            >
+              <Bookmark size={18} fill={bookmarked ? 'currentColor' : 'none'} />
+            </button>
+          )}
           {statusIcon}
           <span className="font-heading text-xs font-bold uppercase text-navytext/60">
             {statusLabel}
           </span>
         </div>
       </div>
+
+      {isAptitude && (question.aptitude_type || question.topic) && (
+        <p className="mb-2 font-heading text-[11px] font-semibold uppercase tracking-wide text-secondary/80">
+          {[question.topic, question.aptitude_type && `Aptitude – ${question.aptitude_type}`]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
+      )}
 
       {showExplanation ? (
         <>
@@ -93,15 +135,19 @@ export default function ResultCard({
               </p>
             </div>
           )}
-          {displayExplanation(question, lang) && (
-            <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-              <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
-                <span className="font-heading font-bold text-secondary">
-                  Explanation:{' '}
-                </span>
-                {displayExplanation(question, lang)}
-              </p>
-            </div>
+          {isAptitude ? (
+            <WorkedSolution question={question} lang={lang} />
+          ) : (
+            displayExplanation(question, lang) && (
+              <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
+                <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
+                  <span className="font-heading font-bold text-secondary">
+                    Explanation:{' '}
+                  </span>
+                  {displayExplanation(question, lang)}
+                </p>
+              </div>
+            )
           )}
         </>
       ) : (

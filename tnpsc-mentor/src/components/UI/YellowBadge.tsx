@@ -15,11 +15,12 @@ export default function YellowBadge({
   className = '',
   size = 'lg',
 }: YellowBadgeProps) {
-  const sizeCls = size === 'lg' ? 'px-7 py-2.5 text-lg sm:text-xl' : 'px-5 py-2 text-base'
+  // Premium minimal: a clean section title rather than a coloured pill.
+  const sizeCls = size === 'lg' ? 'text-2xl sm:text-3xl' : 'text-xl'
   return (
     <span
       className={[
-        'inline-flex items-center justify-center rounded-full bg-accent font-heading font-bold uppercase tracking-wide text-navytext shadow-pill',
+        'inline-block font-heading font-semibold tracking-tight text-ink',
         sizeCls,
         className,
       ].join(' ')}

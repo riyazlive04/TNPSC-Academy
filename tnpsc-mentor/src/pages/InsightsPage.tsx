@@ -62,7 +62,7 @@ export default function InsightsPage() {
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
+          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
@@ -73,12 +73,12 @@ export default function InsightsPage() {
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-16">
-            <Loader2 size={32} className="animate-spin text-accent" />
+            <Loader2 size={32} className="animate-spin text-brand" />
           </div>
         )}
 
         {!loading && !hasData && (
-          <p className="tamil py-12 text-center font-body text-white/60">{t('noData')}</p>
+          <p className="tamil py-12 text-center font-body text-ink2">{t('noData')}</p>
         )}
 
         {!loading && hasData && data && (
@@ -93,13 +93,13 @@ export default function InsightsPage() {
 
             {/* Percentile / peer rank */}
             {percentile != null && (
-              <div className="mb-6 rounded-2xl bg-gradient-to-r from-secondary/40 to-primary/40 p-4 text-center">
-                <div className="tamil font-heading text-xs font-bold uppercase tracking-widest text-white/60">
+              <div className="mb-6 overflow-hidden rounded-3xl bg-brand-gradient p-5 text-center">
+                <div className="tamil font-heading text-xs font-semibold uppercase tracking-widest text-white/50">
                   {t('yourRank')}
                 </div>
-                <div className="tamil mt-1 font-body text-white">
+                <div className="tamil mt-1 font-body text-white/80">
                   {t('aheadOf')}{' '}
-                  <span className="font-heading text-2xl font-bold text-accent">{percentile}%</span>{' '}
+                  <span className="font-heading text-2xl font-semibold text-white">{percentile}%</span>{' '}
                   {t('ofAspirants')}
                 </div>
               </div>
@@ -109,10 +109,10 @@ export default function InsightsPage() {
             {syllabusSubjects.length > 0 && (
               <section className="mb-8">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="tamil font-heading text-lg font-bold uppercase tracking-wide text-white">
+                  <h3 className="tamil font-heading text-lg font-extrabold tracking-tight text-ink">
                     {t('syllabusCoverage')}
                   </h3>
-                  <span className="font-heading text-sm font-bold text-accent">
+                  <span className="font-heading text-sm font-bold text-brand">
                     {coveredCount}/{syllabusSubjects.length} · {coveragePct}%
                   </span>
                 </div>
@@ -125,7 +125,7 @@ export default function InsightsPage() {
                         key={s}
                         className={[
                           'tamil rounded-full px-3 py-1 font-heading text-[11px] font-semibold',
-                          done ? 'bg-green-500/20 text-green-300' : 'bg-white/8 text-white/45',
+                          done ? 'bg-mintsoft text-mint' : 'bg-canvas text-ink2',
                         ].join(' ')}
                       >
                         {done ? '✓ ' : ''}
@@ -140,22 +140,22 @@ export default function InsightsPage() {
             {/* Focus areas (weak) with learn links */}
             {weak.length > 0 && (
               <section className="mb-8">
-                <h3 className="tamil mb-1 font-heading text-lg font-bold uppercase tracking-wide text-white">
+                <h3 className="tamil mb-1 font-heading text-lg font-extrabold tracking-tight text-ink">
                   {t('focusAreas')}
                 </h3>
-                <p className="tamil mb-4 font-body text-sm text-white/55">{t('focusHint')}</p>
+                <p className="tamil mb-4 font-body text-sm text-ink2">{t('focusHint')}</p>
                 <div className="flex flex-col gap-3">
                   {weak.map((w) => {
                     const asset = assetsFor(w.key)
                     return (
-                      <div key={w.key} className="rounded-2xl bg-white p-4 shadow-card">
+                      <div key={w.key} className="card p-4">
                         <div className="mb-2 flex items-center justify-between gap-3">
-                          <span className="tamil font-heading font-bold text-navytext">{w.key}</span>
-                          <span className="font-heading text-sm font-bold text-warn">{w.accuracy}%</span>
+                          <span className="tamil min-w-0 break-words font-heading font-bold text-ink">{w.key}</span>
+                          <span className="flex-shrink-0 font-heading text-sm font-bold text-coral">{w.accuracy}%</span>
                         </div>
-                        <ProgressBar percent={w.accuracy} color="#FF5722" height={6} />
-                        <p className="tamil mt-3 font-body text-xs leading-relaxed text-navytext/70">
-                          <span className="font-bold text-secondary">{t('studyTip')}: </span>
+                        <ProgressBar percent={w.accuracy} color="#E5484D" height={6} />
+                        <p className="tamil mt-3 font-body text-xs leading-relaxed text-ink2">
+                          <span className="font-bold text-brand">{t('studyTip')}: </span>
                           {lang === 'ta' ? asset.tipTa : asset.tip}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -165,7 +165,7 @@ export default function InsightsPage() {
                               href={l.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="rounded-full bg-primary/10 px-3 py-1 font-heading text-[11px] font-semibold text-primary transition hover:bg-primary/20"
+                              className="rounded-full bg-brand-soft px-3 py-1 font-heading text-[11px] font-semibold text-brand transition hover:bg-brand-ring/40"
                             >
                               {l.label} ↗
                             </a>
@@ -181,22 +181,22 @@ export default function InsightsPage() {
             {/* By subject */}
             {data.bySubject.length > 0 && (
               <section className="mb-8">
-                <h3 className="tamil mb-4 font-heading text-lg font-bold uppercase tracking-wide text-white">
+                <h3 className="tamil mb-4 font-heading text-lg font-extrabold tracking-tight text-ink">
                   {t('bySubject')}
                 </h3>
                 <div className="flex flex-col gap-2.5">
                   {data.bySubject.map((s) => (
-                    <div key={s.key} className="rounded-xl bg-white/5 p-3">
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <span className="tamil font-body text-sm text-white/85">{s.key}</span>
-                        <span className="font-heading text-sm font-bold text-white">
+                    <div key={s.key} className="card p-3">
+                      <div className="mb-1.5 flex items-center justify-between gap-3">
+                        <span className="tamil min-w-0 break-words font-body text-sm font-medium text-ink">{s.key}</span>
+                        <span className="flex-shrink-0 font-heading text-sm font-bold text-ink">
                           {s.accuracy}%{' '}
-                          <span className="text-white/40">({s.correct}/{s.attempted})</span>
+                          <span className="text-ink2/50">({s.correct}/{s.attempted})</span>
                         </span>
                       </div>
                       <ProgressBar
                         percent={s.accuracy}
-                        color={s.accuracy >= 75 ? '#16a34a' : s.accuracy >= 50 ? '#FFC107' : '#FF5722'}
+                        color={s.accuracy >= 75 ? '#16A34A' : s.accuracy >= 50 ? '#B7791F' : '#E5484D'}
                         height={6}
                       />
                     </div>
@@ -208,14 +208,14 @@ export default function InsightsPage() {
             {/* Strengths */}
             {strong.length > 0 && (
               <section className="mb-8">
-                <h3 className="tamil mb-3 flex items-center gap-2 font-heading text-lg font-bold uppercase tracking-wide text-white">
-                  <TrendingUp size={18} className="text-green-400" /> {t('strengths')}
+                <h3 className="tamil mb-3 flex items-center gap-2 font-heading text-lg font-extrabold tracking-tight text-ink">
+                  <TrendingUp size={18} className="text-mint" /> {t('strengths')}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {strong.map((s) => (
                     <span
                       key={s.key}
-                      className="tamil rounded-full bg-green-500/20 px-3 py-1.5 font-heading text-sm font-semibold text-green-300"
+                      className="tamil rounded-full bg-mintsoft px-3 py-1.5 font-heading text-sm font-semibold text-mint"
                     >
                       {s.key} · {s.accuracy}%
                     </span>
@@ -240,10 +240,12 @@ function StatCard({
   value: string
 }) {
   return (
-    <div className="rounded-2xl bg-white/8 p-4 text-center">
-      <div className="mb-1 flex items-center justify-center text-accent">{icon}</div>
-      <div className="font-heading text-xl font-bold text-white">{value}</div>
-      <div className="tamil font-body text-[11px] uppercase tracking-wide text-white/50">{label}</div>
+    <div className="card p-4 text-center">
+      <div className="mx-auto mb-1.5 grid h-8 w-8 place-items-center rounded-lg bg-tint text-ink2">
+        {icon}
+      </div>
+      <div className="font-heading text-xl font-semibold text-ink">{value}</div>
+      <div className="tamil font-body text-[11px] uppercase tracking-wide text-ink2">{label}</div>
     </div>
   )
 }

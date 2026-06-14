@@ -1,18 +1,20 @@
 import { create } from 'zustand'
-import type { Session, User } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { api, tokens, isApiConfigured } from '../lib/api'
 import type { Profile, UserRole } from '../types'
 
-interface AuthState {
-  user: User | null
-  session: Session | null
+/** Minimal user identity (the browser no longer holds a Supabase session). */
+export interface AuthUser {
+  id: string
+}
+
+export interface AuthState {
+  user: AuthUser | null
   profile: Profile | null
   loading: boolean // initial session bootstrap
   initialized: boolean
 
   init: () => Promise<void>
-  setSession: (session: Session | null) => void
-  fetchProfile: (userId: string) => Promise<void>
+  fetchProfile: () => Promise<void>
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
@@ -29,109 +31,72 @@ export interface SignUpParams {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  session: null,
   profile: null,
   loading: true,
   initialized: false,
 
+  // Re-hydrate from a stored access token on app boot (token refresh is handled
+  // transparently inside the API client).
   init: async () => {
     if (get().initialized) return
     set({ initialized: true })
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      set({ session, user: session?.user ?? null, loading: false })
-      if (session?.user) {
-        await get().fetchProfile(session.user.id)
-      }
-
-      // Keep store in sync with auth lifecycle events.
-      supabase.auth.onAuthStateChange((_event, newSession) => {
-        set({ session: newSession, user: newSession?.user ?? null })
-        if (newSession?.user) {
-          get().fetchProfile(newSession.user.id)
-        } else {
-          set({ profile: null })
-        }
-      })
-    } catch (e) {
-      // Even if Supabase is unreachable, stop the loading spinner.
+    if (!isApiConfigured || !tokens.access) {
       set({ loading: false })
+      return
+    }
+    try {
+      const { user, profile } = await api.auth.me()
+      set({ user, profile, loading: false })
+    } catch {
+      tokens.clear()
+      set({ user: null, profile: null, loading: false })
     }
   },
 
-  setSession: (session) => set({ session, user: session?.user ?? null }),
-
-  fetchProfile: async (userId) => {
+  fetchProfile: async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-      if (!error && data) {
-        set({ profile: data as Profile })
-      }
+      const profile = await api.getProfile()
+      set({ profile })
     } catch {
       /* non-fatal — profile may not exist yet */
     }
   },
 
   signIn: async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    })
-    if (error) return { error: error.message }
-    set({ session: data.session, user: data.user })
-    if (data.user) await get().fetchProfile(data.user.id)
-    return { error: null }
+    try {
+      const { user, profile } = await api.auth.login(email.trim(), password)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Sign in failed' }
+    }
   },
 
-  signUp: async ({ fullName, email, phone, password, targetGroup }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    })
-    if (error) return { error: error.message }
-
-    // Upsert the profile row (the DB trigger also creates a base row; we
-    // enrich it here with phone + target group). Best-effort — if RLS or the
-    // session isn't ready yet we still let signup succeed.
-    if (data.user) {
-      try {
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name: fullName,
-          email: email.trim(),
-          phone,
-          target_group: targetGroup,
-        })
-      } catch {
-        /* non-fatal */
+  signUp: async (params) => {
+    try {
+      const res = await api.auth.register({ ...params, email: params.email.trim() })
+      if ('requiresConfirmation' in res) {
+        return { error: 'Check your email to confirm your account, then sign in.' }
       }
-      set({ session: data.session, user: data.user })
-      await get().fetchProfile(data.user.id)
+      set({ user: res.user, profile: res.profile })
+      return { error: null }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Sign up failed' }
     }
-    return { error: null }
   },
 
   resetPassword: async (email) => {
-    const redirectTo = `${window.location.origin}/login`
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo,
-    })
-    if (error) return { error: error.message }
-    return { error: null }
+    try {
+      await api.auth.forgotPassword(email.trim(), `${window.location.origin}/login`)
+      return { error: null }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Could not send reset email' }
+    }
   },
 
   signOut: async () => {
-    await supabase.auth.signOut()
-    set({ user: null, session: null, profile: null })
+    api.auth.logout()
+    set({ user: null, profile: null })
   },
 }))
 
@@ -145,6 +110,12 @@ export function selectRole(s: AuthState): UserRole {
   return (s.profile?.role as UserRole) ?? 'user'
 }
 
+// Superadmins inherit all admin abilities, so admin-gated UI treats them as
+// admins too. Use `selectIsSuperAdmin` for the superadmin-only console.
 export function selectIsAdmin(s: AuthState): boolean {
-  return s.profile?.role === 'admin'
+  return s.profile?.role === 'admin' || s.profile?.role === 'superadmin'
+}
+
+export function selectIsSuperAdmin(s: AuthState): boolean {
+  return s.profile?.role === 'superadmin'
 }

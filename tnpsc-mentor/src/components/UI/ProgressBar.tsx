@@ -10,13 +10,13 @@ interface ProgressBarProps {
 export default function ProgressBar({
   percent,
   className = '',
-  color = '#FFC107',
+  color = '#6C5CE7',
   height = 8,
 }: ProgressBarProps) {
   const pct = Math.max(0, Math.min(100, percent))
   return (
     <div
-      className={['w-full overflow-hidden rounded-full bg-white/20', className].join(' ')}
+      className={['w-full overflow-hidden rounded-full bg-line', className].join(' ')}
       style={{ height }}
       role="progressbar"
       aria-valuenow={Math.round(pct)}

@@ -1,10 +1,10 @@
-import { supabase } from './supabase'
-import type { Question } from '../types'
+import { api } from './api'
+import type { AnswerLetter, Question } from '../types'
 
 // Spaced-repetition (SM-2-lite). Wrong/flagged questions are enqueued and
-// resurface on a growing interval as the user gets them right.
-
-const INTERVALS = [1, 3, 7, 16, 35, 75] // days by reps index
+// resurface on a growing interval as the user gets them right. Enqueueing,
+// grading and rescheduling all happen server-side (see secure.sql) so the
+// answer key is never shipped to the browser — this module is the thin client.
 
 export interface ReviewItem {
   id: string
@@ -19,79 +19,121 @@ export interface ReviewItem {
 /** Add wrong/flagged question ids to the user's review deck (no schedule reset). */
 export async function enqueueReviewItems(userId: string, questionIds: string[]) {
   if (!userId || questionIds.length === 0) return
-  const rows = questionIds.map((qid) => ({
-    user_id: userId,
-    question_id: qid,
-    due_at: new Date().toISOString(),
-    interval_days: 0,
-    reps: 0,
-  }))
   try {
-    await supabase
-      .from('review_items')
-      .upsert(rows, { onConflict: 'user_id,question_id', ignoreDuplicates: true })
+    await api.enqueueReviews(questionIds)
   } catch {
     /* non-fatal — table may not exist until ALTERs are run */
   }
 }
 
-/** Items due now (with their question), oldest-due first. */
-export async function fetchDueItems(userId: string, limit = 30): Promise<ReviewItem[]> {
+// Flat row shape returned by the get_due_reviews RPC (review meta + safe
+// question columns, NO answer key).
+interface DueRow {
+  item_id: string
+  reps: number
+  interval_days: number
+  due_at: string
+  last_result: 'correct' | 'wrong' | null
+  id: string
+  category: Question['category']
+  group_type?: Question['group_type']
+  year?: number
+  standard?: number
+  ca_month?: string
+  ca_year?: number
+  ca_type?: Question['ca_type']
+  ca_topic?: string
+  aptitude_type?: Question['aptitude_type']
+  aptitude_topic?: string
+  subject?: string
+  topic?: string
+  question_text: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  difficulty?: Question['difficulty']
+  question_text_ta?: string | null
+  option_a_ta?: string | null
+  option_b_ta?: string | null
+  option_c_ta?: string | null
+  option_d_ta?: string | null
+}
+
+/** Items due now (with their question — no answers), oldest-due first. */
+export async function fetchDueItems(_userId: string, limit = 30): Promise<ReviewItem[]> {
   try {
-    const { data, error } = await supabase
-      .from('review_items')
-      .select(
-        'id,question_id,due_at,interval_days,reps,last_result,question:questions(*)'
-      )
-      .eq('user_id', userId)
-      .lte('due_at', new Date().toISOString())
-      .order('due_at', { ascending: true })
-      .limit(limit)
-    if (error) return []
-    return (data ?? []) as unknown as ReviewItem[]
+    const data = await api.dueReviews(limit)
+    if (!data) return []
+    return (data as DueRow[]).map((r) => ({
+      id: r.item_id,
+      question_id: r.id,
+      due_at: r.due_at,
+      interval_days: r.interval_days,
+      reps: r.reps,
+      last_result: r.last_result,
+      question: {
+        id: r.id,
+        category: r.category,
+        group_type: r.group_type,
+        year: r.year,
+        standard: r.standard,
+        ca_month: r.ca_month,
+        ca_year: r.ca_year,
+        ca_type: r.ca_type,
+        ca_topic: r.ca_topic,
+        aptitude_type: r.aptitude_type,
+        aptitude_topic: r.aptitude_topic,
+        subject: r.subject,
+        topic: r.topic,
+        question_text: r.question_text,
+        option_a: r.option_a,
+        option_b: r.option_b,
+        option_c: r.option_c,
+        option_d: r.option_d,
+        difficulty: r.difficulty,
+        question_text_ta: r.question_text_ta,
+        option_a_ta: r.option_a_ta,
+        option_b_ta: r.option_b_ta,
+        option_c_ta: r.option_c_ta,
+        option_d_ta: r.option_d_ta,
+      },
+    }))
   } catch {
     return []
   }
 }
 
+// Reveal payload returned after grading a review item.
+export interface ReviewGrade {
+  is_correct: boolean
+  correct_answer: AnswerLetter | null
+  explanation: string | null
+  explanation_ta: string | null
+}
+
 /** Total due count (for the dashboard badge). */
-export async function dueCount(userId: string): Promise<number> {
+export async function dueCount(_userId: string): Promise<number> {
   try {
-    const { count } = await supabase
-      .from('review_items')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .lte('due_at', new Date().toISOString())
-    return count ?? 0
+    return await api.reviewCount()
   } catch {
     return 0
   }
 }
 
-/** Grade a review item and reschedule it. */
-export async function gradeItem(item: ReviewItem, correct: boolean) {
-  let reps = item.reps
-  let intervalDays: number
-  if (correct) {
-    intervalDays = INTERVALS[Math.min(reps, INTERVALS.length - 1)]
-    reps = reps + 1
-  } else {
-    reps = 0
-    intervalDays = 0 // stays due (today) until answered correctly
-  }
-  const due = new Date()
-  due.setDate(due.getDate() + intervalDays)
+/**
+ * Grade a review item server-side (the client has no answer key) and return the
+ * reveal payload. The RPC also reschedules the item on the SM-2-lite curve.
+ */
+export async function gradeReview(
+  itemId: string,
+  selected: AnswerLetter
+): Promise<ReviewGrade | null> {
   try {
-    await supabase
-      .from('review_items')
-      .update({
-        reps,
-        interval_days: intervalDays,
-        last_result: correct ? 'correct' : 'wrong',
-        due_at: due.toISOString(),
-      })
-      .eq('id', item.id)
+    const data = await api.gradeReview(itemId, selected)
+    if (!data) return null
+    return data as ReviewGrade
   } catch {
-    /* non-fatal */
+    return null
   }
 }

@@ -1,111 +1,108 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Loader2, MailCheck } from 'lucide-react'
+import { ArrowLeft, MailCheck } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { isSupabaseConfigured } from '../lib/supabase'
+import AuthShell from '../components/Auth/AuthShell'
+import Spinner from '../components/UI/Spinner'
+import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
+import { useT } from '../lib/i18n'
 
 export default function ForgotPasswordPage() {
   const { resetPassword } = useAuth()
+  const { t } = useT()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
+  const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
 
+  const emailInvalid = touched && !isValidEmail(email)
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    setTouched(true)
     setError('')
-    if (!email.trim()) return setError('Please enter your email address.')
-    if (!isSupabaseConfigured)
-      return setError('Supabase is not configured. Set the VITE_SUPABASE_* env vars.')
+    if (!email.trim()) return setError(t('errEmailRequired'))
+    if (!isValidEmail(email)) return setError(t('errEmailInvalid'))
 
     setLoading(true)
     const { error: err } = await resetPassword(email)
     setLoading(false)
     if (err) {
-      setError(err)
+      const f = friendlyAuthError(err)
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
     setSent(true)
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-10">
-      <div className="w-full max-w-md animate-fadeIn">
-        <div className="mb-6 text-center">
-          <h1 className="font-heading text-3xl font-bold tracking-wide text-white">
-            <span className="text-warn">✳</span> TNPSC{' '}
-            <span className="text-accent">MENTOR</span>
-          </h1>
-        </div>
+    <AuthShell>
+      <div className="rounded-3xl border border-line bg-card p-6 shadow-card sm:p-8">
+        <h2 className="mb-1 text-center font-heading text-xl font-semibold tracking-tight text-ink">
+          {t('resetPasswordTitle')}
+        </h2>
+        <p className="mb-6 text-center font-body text-sm text-ink2">{t('resetPasswordHint')}</p>
 
-        <div className="rounded-3xl bg-secondary/40 p-6 shadow-card backdrop-blur sm:p-8">
-          <h2 className="mb-2 text-center font-heading text-2xl font-bold uppercase tracking-wide text-white">
-            Reset Credentials
-          </h2>
-          <p className="mb-6 text-center font-body text-sm text-white/60">
-            Enter your email and we'll send a reset link.
-          </p>
+        {sent ? (
+          <div className="flex animate-scaleIn flex-col items-center gap-4 py-4 text-center">
+            <div className="grid h-16 w-16 animate-popStar place-items-center rounded-3xl bg-mintsoft">
+              <MailCheck size={32} className="text-mint" />
+            </div>
+            <p className="font-body text-ink2">
+              {t('resetLinkSent')}{' '}
+              <span className="font-semibold text-brand">{email}</span>
+            </p>
+            <Link to="/login" className="btn-brand press mt-2 inline-flex px-6 py-3">
+              <ArrowLeft size={16} /> {t('backToSignIn')}
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+            <div>
+              <label
+                htmlFor="forgot-email"
+                className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+              >
+                {t('email')}
+              </label>
+              <input
+                id="forgot-email"
+                type="email"
+                autoComplete="email"
+                className={`input-soft ${emailInvalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
+                placeholder="aspirant@email.com"
+                value={email}
+                aria-invalid={emailInvalid || undefined}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-          {sent ? (
-            <div className="flex flex-col items-center gap-4 py-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
-                <MailCheck size={32} className="text-green-400" />
+            {error && (
+              <div
+                role="alert"
+                className="animate-slideDown rounded-2xl bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+              >
+                {error}
               </div>
-              <p className="font-body text-white">
-                If an account exists for{' '}
-                <span className="font-semibold text-accent">{email}</span>, a
-                password reset link is on its way. Check your inbox.
-              </p>
+            )}
+
+            <button type="submit" disabled={loading} className="btn-brand press mt-2 px-6 py-3.5 text-base">
+              {loading && <Spinner size={18} />}
+              {loading ? t('sending') : t('sendResetLink')}
+            </button>
+
+            <div className="text-center text-sm">
               <Link
                 to="/login"
-                className="mt-2 rounded-full bg-accent px-6 py-2.5 font-heading font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5"
+                className="focus-ring inline-flex items-center gap-1 rounded font-heading font-semibold text-brand transition hover:text-brand-dark"
               >
-                Back to Sign In
+                <ArrowLeft size={15} /> {t('backToSignIn')}
               </Link>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-              <div>
-                <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  autoComplete="email"
-                  className="input-pill"
-                  placeholder="aspirant@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-
-              {error && (
-                <div className="rounded-xl bg-warn/20 px-4 py-3 text-center font-body text-sm text-white">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5 disabled:opacity-60"
-              >
-                {loading && <Loader2 size={18} className="animate-spin" />}
-                {loading ? 'Sending…' : 'Send Reset Link'}
-              </button>
-
-              <div className="text-center text-sm">
-                <Link
-                  to="/login"
-                  className="font-heading font-semibold uppercase tracking-wide text-white transition hover:text-accent"
-                >
-                  Back to Sign In
-                </Link>
-              </div>
-            </form>
-          )}
-        </div>
+          </form>
+        )}
       </div>
-    </div>
+    </AuthShell>
   )
 }

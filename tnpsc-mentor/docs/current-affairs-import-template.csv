@@ -1,0 +1,3 @@
+category,ca_type,ca_month,ca_year,ca_topic,question_text,option_a,option_b,option_c,option_d,correct_answer,explanation,why_wrong_a,why_wrong_b,why_wrong_c,why_wrong_d,question_text_ta,option_a_ta,option_b_ta,option_c_ta,option_d_ta,explanation_ta
+current_affairs,month_wise,August 2025,2025,,"Which country hosted the 2025 event mentioned in the news?",Option A,Option B,Option C,Option D,B,"Explanation of why B is correct.","Why A is wrong.",,"Why C is wrong.","Why D is wrong.",,,,,,
+current_affairs,topic_wise,,2025,Science & Technology,"ISRO's 2025 mission referenced in the news was named?",Option A,Option B,Option C,Option D,C,"Explanation of why C is correct.","Why A is wrong.","Why B is wrong.",,"Why D is wrong.",,,,,,

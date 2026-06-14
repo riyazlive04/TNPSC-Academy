@@ -29,15 +29,31 @@ npm run preview  # preview the production build
 
 ## Database
 
-Run [`supabase/schema.sql`](supabase/schema.sql) in the Supabase SQL editor. It
-creates `questions`, `test_sessions`, `test_answers`, `profiles`, RLS policies,
-the `handle_new_user` trigger, and a `role` column (`user` | `admin`).
+Run these in the Supabase SQL editor, **in order**:
+
+1. [`supabase/schema.sql`](supabase/schema.sql) — creates `questions`,
+   `test_sessions`, `test_answers`, `profiles`, `review_items`,
+   `daily_activity`, RLS policies, the `handle_new_user` trigger, and the
+   `role` column (`user` | `admin`).
+2. [`supabase/secure.sql`](supabase/secure.sql) — **required.** Hides the answer
+   columns from the client (column-level grants) and adds the SECURITY DEFINER
+   RPCs that are the only way to fetch quiz questions, grade a submission, run
+   spaced revision, and read the admin bank. **Until this runs, the app's
+   quiz/submit/revision flows will not work** (they call these RPCs), and answers
+   would otherwise be readable in the browser.
 
 Promote an admin:
 
 ```sql
 update public.profiles set role = 'admin' where email = 'admin@tnpsc.app';
 ```
+
+### Security model
+
+Grading is server-side: the browser never receives `correct_answer` /
+`explanation` during a test, and scores are computed by `submit_test` (they
+can't be forged from the client). Explanations are returned only once the 80%
+attendance gate is met.
 
 ## Roles
 
