@@ -5,6 +5,13 @@
 -- (active=false) rows, so PYQ · Group 1 · Aptitude returned 500 (capped) old
 -- rows instead of the 151 live ones. Add both filters so the admin bank matches
 -- what students actually get. Hidden rows remain in the DB (un-hide via SQL).
+--
+-- 2026-06-14: PYQ now follows the subject-membership model — rows carry NO
+-- group_type and a subject (e.g. 'History and INM') appears under every group
+-- whose syllabus includes it, exactly as get_quiz_questions pools them. So the
+-- group_type filter is skipped for category='pyq'; otherwise the admin bank
+-- would show zero PYQ rows (every group_type IS NULL). Other categories are
+-- unaffected — only the PYQ picker ever sends a group_type.
 -- Idempotent.
 -- ============================================================================
 
@@ -23,7 +30,8 @@ begin
   select * from public.questions q
   where q.active
     and (p_config->>'category'       is null or q.category       = p_config->>'category')
-    and (p_config->>'group_type'     is null or q.group_type     = p_config->>'group_type')
+    -- group_type is skipped for PYQ (pooled by subject; rows have no group_type)
+    and (p_config->>'group_type'     is null or q.category = 'pyq' or q.group_type = p_config->>'group_type')
     and (p_config->>'subject'        is null or q.subject        = p_config->>'subject')
     and ((p_config->>'standard')     is null or q.standard       = (p_config->>'standard')::int)
     and (p_config->>'topic'          is null or q.topic          = p_config->>'topic')
