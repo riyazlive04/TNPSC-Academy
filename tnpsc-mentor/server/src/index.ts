@@ -17,6 +17,12 @@ import feedbackRoutes from './routes/feedback.js'
 
 const app = express()
 
+// Render/Vercel/most PaaS terminate TLS at a proxy that sets X-Forwarded-For.
+// Trust the first proxy hop so req.ip is the real client IP and express-rate-limit
+// stops throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR (which was 500-ing every
+// request, including sign-in). '1' = trust exactly one proxy (Render's edge).
+app.set('trust proxy', 1)
+
 app.use(helmet())
 app.use(
   cors({
