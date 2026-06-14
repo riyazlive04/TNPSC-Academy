@@ -11,12 +11,33 @@ function required(name: string): string {
   return v
 }
 
+const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+
+/**
+ * Whether a browser Origin is allowed. Entries in CORS_ORIGIN may be exact
+ * (`https://app.vercel.app`) or contain `*` wildcards
+ * (`https://*-samad-webs-projects.vercel.app` to cover Vercel's per-deploy
+ * preview URLs, or `https://*.vercel.app`). Requests with no Origin (curl,
+ * health checks, same-origin) are always allowed.
+ */
+export function isAllowedOrigin(origin?: string): boolean {
+  if (!origin) return true
+  return corsOrigins.some((pattern) => {
+    if (pattern === origin) return true
+    if (!pattern.includes('*')) return false
+    const re = new RegExp(
+      '^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*') + '$'
+    )
+    return re.test(origin)
+  })
+}
+
 export const config = {
   port: Number(process.env.PORT ?? 4000),
-  corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean),
+  corsOrigins,
   supabaseUrl: required('SUPABASE_URL'),
   supabaseAnonKey: required('SUPABASE_ANON_KEY'),
   supabaseServiceKey: required('SUPABASE_SERVICE_ROLE_KEY'),
