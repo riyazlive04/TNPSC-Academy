@@ -31,22 +31,26 @@ export default function LanguageScreen() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-brand-gradient px-4 py-10">
       <div className="w-full max-w-md animate-fadeIn">
-        <div className="mb-8 text-center">
-          <h1 className="font-heading text-3xl font-bold tracking-wide text-white">
-            <span className="text-warn">✳</span> TNPSC{' '}
-            <span className="text-accent">MENTOR</span>
+        <div className="mb-6 flex flex-col items-center text-center">
+          <span className="mb-3 grid h-12 w-12 place-items-center rounded-xl bg-white/10 text-xl font-semibold text-white ring-1 ring-white/15">
+            த
+          </span>
+          <h1 className="font-heading text-2xl font-semibold tracking-tight text-white">
+            TNPSC Mentor
           </h1>
         </div>
 
-        <div className="rounded-3xl bg-secondary/40 p-6 shadow-card backdrop-blur sm:p-8">
+        <div className="rounded-2xl border border-line bg-card p-6 shadow-card sm:p-8">
           <div className="mb-6 flex flex-col items-center gap-2 text-center">
-            <Globe size={32} className="text-accent" />
-            <h2 className="font-heading text-2xl font-bold uppercase tracking-wide text-white">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-tint text-ink">
+              <Globe size={22} />
+            </span>
+            <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
               {t('chooseLanguage')}
             </h2>
-            <p className="font-body text-sm text-white/60">{t('languageHint')}</p>
+            <p className="tamil font-body text-sm text-ink2">{t('languageHint')}</p>
           </div>
 
           <div className="mb-6 flex flex-col gap-3">
@@ -57,25 +61,23 @@ export default function LanguageScreen() {
                   key={o.id}
                   onClick={() => setSelected(o.id)}
                   className={[
-                    'flex items-center gap-4 rounded-2xl border-2 px-4 py-4 text-left transition-all',
+                    'flex items-center gap-4 rounded-xl border px-4 py-4 text-left transition-all',
                     active
-                      ? 'border-accent bg-accent/20'
-                      : 'border-white/10 bg-white/5 hover:border-white/30',
+                      ? 'border-ink bg-tint'
+                      : 'border-line bg-card hover:border-brand/40',
                   ].join(' ')}
                 >
                   <span className="text-3xl">{o.flag}</span>
-                  <div className="flex-1">
-                    <div className="tamil font-heading text-lg font-bold text-white">
+                  <div className="min-w-0 flex-1">
+                    <div className="tamil font-heading text-lg font-bold text-ink">
                       {t(o.titleKey)}
                     </div>
-                    <div className="tamil font-body text-xs text-white/55">
-                      {t(o.descKey)}
-                    </div>
+                    <div className="tamil font-body text-xs text-ink2">{t(o.descKey)}</div>
                   </div>
                   <span
                     className={[
-                      'flex h-6 w-6 items-center justify-center rounded-full border-2',
-                      active ? 'border-accent bg-accent text-navytext' : 'border-white/30',
+                      'grid h-6 w-6 place-items-center rounded-full border',
+                      active ? 'border-brand bg-brand text-white' : 'border-line',
                     ].join(' ')}
                   >
                     {active && <Check size={14} />}
@@ -85,11 +87,7 @@ export default function LanguageScreen() {
             })}
           </div>
 
-          <button
-            onClick={proceed}
-            disabled={!selected}
-            className="w-full rounded-full bg-accent px-6 py-3 font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <button onClick={proceed} disabled={!selected} className="btn-brand w-full px-6 py-3.5 text-base">
             {t('continueBtn')} →
           </button>
         </div>

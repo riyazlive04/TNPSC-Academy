@@ -1,0 +1,29 @@
+# Render Blueprint for the TNPSC Mentor API (Express + Supabase).
+# Deploy: Render Dashboard → New → Blueprint → pick this repo. Render reads this
+# file, creates the web service, and then prompts for the secret env vars below
+# (the ones marked `sync: false`). PORT is injected by Render automatically — the
+# server already reads process.env.PORT, so do NOT set it yourself.
+services:
+  - type: web
+    name: tnpsc-mentor-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.1
+      # Comma-separated allowed browser origins. Set to your Vercel URL(s), e.g.
+      #   https://tnpsc-mentor.vercel.app
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      # Service-role key — full DB access, SERVER ONLY. Never expose to the browser.
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

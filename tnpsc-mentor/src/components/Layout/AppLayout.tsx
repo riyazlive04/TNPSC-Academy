@@ -1,27 +1,48 @@
-import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { LogOut, Home, ShieldCheck } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import {
+  LogOut,
+  Home,
+  ShieldCheck,
+  Newspaper,
+  RefreshCw,
+  Trophy,
+  BarChart3,
+  Bookmark,
+  MessageSquarePlus,
+} from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useT } from '../../lib/i18n'
+import FeedbackModal from '../Feedback/FeedbackModal'
 
 interface AppLayoutProps {
   children: ReactNode
-  /** Hide the top brand bar (e.g. inside the immersive quiz screen). */
+  /** Hide the chrome (top bar + bottom nav) for the immersive quiz screen. */
   bare?: boolean
 }
 
-/**
- * Shared shell: dark navy background + the "✳ TNPSC MENTOR" brand bar with a
- * Home button, an admin indicator, and Sign Out.
- */
 const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
 const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
 
+const NAV = [
+  { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
+  { to: '/daily', icon: Newspaper, key: 'daily' as const, short: 'navDaily' as const },
+  { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
+  { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
+  { to: '/achievements', icon: Trophy, key: 'achievements' as const, short: 'achievements' as const },
+]
+
+/**
+ * Shared app shell — soft light canvas, a clean top brand bar, and a responsive
+ * bottom tab bar (the primary navigation on phones; centred on larger screens).
+ */
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
-  const { signOut, profile, isAdmin } = useAuth()
+  const location = useLocation()
+  const { signOut, profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
 
@@ -35,50 +56,110 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
     navigate('/login', { replace: true })
   }
 
+  const isActive = (to: string) =>
+    to === '/test-arena'
+      ? location.pathname === '/test-arena'
+      : location.pathname.startsWith(to)
+
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen overflow-x-hidden bg-canvas bg-brand-radial">
       {!bare && (
-        <header className="sticky top-0 z-30 border-b border-white/10 bg-primary/95 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <header className="sticky top-0 z-30 border-b border-line bg-card">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
             <button
               onClick={() => navigate('/test-arena')}
-              className="flex items-center gap-2 font-heading text-xl font-bold tracking-wide text-white transition hover:opacity-90"
+              className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80"
             >
-              <span className="text-warn">✳</span>
-              <span>
-                TNPSC <span className="text-accent">MENTOR</span>
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white">
+                த
+              </span>
+              <span className="font-heading text-base font-semibold tracking-tight text-ink">
+                TNPSC <span className="text-brand">Mentor</span>
               </span>
             </button>
 
-            <div className="flex items-center gap-2">
+            {/* Desktop primary nav — replaces the bottom tab bar on large screens. */}
+            <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+              {NAV.map(({ to, icon: Icon, key }) => {
+                const active = isActive(to)
+                return (
+                  <button
+                    key={to}
+                    onClick={() => navigate(to)}
+                    aria-current={active}
+                    className={[
+                      'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
+                      active
+                        ? 'bg-brand-soft text-brand-dark'
+                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark',
+                    ].join(' ')}
+                  >
+                    <Icon size={17} />
+                    <span className="tamil">{t(key)}</span>
+                  </button>
+                )
+              })}
+            </nav>
+
+            <div className="flex flex-shrink-0 items-center gap-2">
               <button
                 onClick={cycleLang}
-                title="Change language"
-                className="tamil rounded-full bg-white/10 px-3 py-1.5 font-heading text-xs font-bold text-white transition hover:bg-white/20"
+                title={t('chooseLanguage')}
+                aria-label={`${t('chooseLanguage')} (${LANG_LABEL[lang]})`}
+                className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
               >
                 {LANG_LABEL[lang]}
               </button>
-              {isAdmin && (
-                <span className="hidden items-center gap-1 rounded-full bg-accent px-3 py-1.5 font-heading text-xs font-bold uppercase text-navytext sm:inline-flex">
-                  <ShieldCheck size={14} /> {t('admin')}
-                </span>
+              <button
+                onClick={() => setFeedbackOpen(true)}
+                title={t('sendFeedback')}
+                aria-label={t('sendFeedback')}
+                className="icon-btn h-9 w-9"
+              >
+                <MessageSquarePlus size={18} />
+              </button>
+              <button
+                onClick={() => navigate('/bookmarks')}
+                title={t('questionBank')}
+                aria-label={t('questionBank')}
+                className={[
+                  'grid h-9 w-9 place-items-center rounded-lg transition focus-ring active:scale-90',
+                  location.pathname.startsWith('/bookmarks')
+                    ? 'bg-brand text-white'
+                    : 'text-ink2 hover:bg-brand-soft hover:text-brand-dark',
+                ].join(' ')}
+              >
+                <Bookmark size={18} />
+              </button>
+              {isSuperAdmin ? (
+                <button
+                  onClick={() => navigate('/superadmin')}
+                  title={t('superadminConsole')}
+                  aria-label={t('superadminConsole')}
+                  className="press hidden items-center gap-1 rounded-lg bg-brand-gradient px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-white shadow-brand focus-ring sm:inline-flex"
+                >
+                  <ShieldCheck size={13} /> {t('superadmin')}
+                </button>
+              ) : (
+                isAdmin && (
+                  <span className="hidden items-center gap-1 rounded-lg bg-goldsoft px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-gold sm:inline-flex">
+                    <ShieldCheck size={13} /> {t('admin')}
+                  </span>
+                )
               )}
               {profile?.full_name && (
-                <span className="hidden max-w-[140px] truncate font-body text-sm text-white/70 sm:inline">
+                <span
+                  title={profile.full_name}
+                  className="hidden max-w-[140px] truncate font-body text-sm text-ink2 sm:inline"
+                >
                   {profile.full_name}
                 </span>
               )}
               <button
-                onClick={() => navigate('/test-arena')}
-                title="Home"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-              >
-                <Home size={18} />
-              </button>
-              <button
                 onClick={handleSignOut}
-                title="Sign out"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-warn"
+                title={t('signOut')}
+                aria-label={t('signOut')}
+                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral focus-ring active:scale-90"
               >
                 <LogOut size={18} />
               </button>
@@ -86,7 +167,51 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
           </div>
         </header>
       )}
-      <main>{children}</main>
+
+      <main className={bare ? '' : 'pb-24 lg:pb-10'}>{children}</main>
+
+      {!bare && (
+        <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card lg:hidden">
+          <div
+            className="mx-auto flex max-w-md items-stretch justify-between gap-0.5 px-2 py-1.5"
+            style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
+          >
+            {NAV.map(({ to, icon: Icon, short }) => {
+              const active = isActive(to)
+              return (
+                <button
+                  key={to}
+                  onClick={() => navigate(to)}
+                  aria-label={t(short)}
+                  aria-current={active}
+                  className="group focus-ring relative flex min-h-[3rem] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 py-1"
+                >
+                  <span
+                    className={[
+                      'grid h-9 w-9 place-items-center rounded-xl transition-all duration-200 group-active:scale-90',
+                      active
+                        ? 'bg-brand-gradient text-white'
+                        : 'text-ink2 group-hover:bg-brand-soft group-hover:text-brand-dark',
+                    ].join(' ')}
+                  >
+                    <Icon size={19} />
+                  </span>
+                  <span
+                    className={[
+                      'tamil w-full truncate text-center text-[10px] font-heading font-medium leading-none transition-colors',
+                      active ? 'text-brand-dark' : 'text-ink2',
+                    ].join(' ')}
+                  >
+                    {t(short)}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </nav>
+      )}
+
+      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </div>
   )
 }

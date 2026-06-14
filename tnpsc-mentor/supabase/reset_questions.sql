@@ -1,0 +1,40 @@
+-- ============================================================================
+-- TNPSC Mentor — Purge the old (mock/scraped) question bank
+-- ----------------------------------------------------------------------------
+-- Run this in the Supabase SQL Editor AFTER you have imported the real question
+-- batch and verified it looks correct. Pick ONE strategy below.
+--
+-- ⚠️  Deleting a question also removes any test_answers / review_items that
+--    reference it (foreign keys). Pre-launch this is fine; if real users have
+--    already taken tests, prefer the tag strategy and keep it surgical.
+--
+-- ALWAYS run the SELECT (count) first and sanity-check the number before the
+-- DELETE. There is no undo.
+-- ============================================================================
+
+-- ─── Strategy A — by tag (recommended) ──────────────────────────────────────
+-- The in-app bulk importer stamps every real row's source_url with the sentinel
+-- 'tnpsc-official'. This deletes everything that is NOT part of that batch.
+--
+--   SELECT count(*) FROM public.questions
+--   WHERE source_url IS DISTINCT FROM 'tnpsc-official';
+--
+--   DELETE FROM public.questions
+--   WHERE source_url IS DISTINCT FROM 'tnpsc-official';
+
+-- ─── Strategy B — by time cutoff ────────────────────────────────────────────
+-- If you imported the real batch at a known time, delete everything created
+-- before it. Replace the timestamp with a moment just before your import.
+--
+--   SELECT count(*) FROM public.questions
+--   WHERE created_at < TIMESTAMPTZ '2026-06-11 00:00:00+05:30';
+--
+--   DELETE FROM public.questions
+--   WHERE created_at < TIMESTAMPTZ '2026-06-11 00:00:00+05:30';
+
+-- ─── Strategy C — wipe everything (only if importing real data AFTER) ────────
+-- Nuclear option: clear the whole bank, then import the real questions fresh.
+-- TRUNCATE is faster than DELETE and resets cleanly. CASCADE also clears
+-- dependent test_answers / review_items.
+--
+--   TRUNCATE public.questions CASCADE;

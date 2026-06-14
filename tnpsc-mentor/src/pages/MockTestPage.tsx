@@ -42,7 +42,7 @@ export default function MockTestPage() {
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold uppercase tracking-wide text-white/70 transition hover:text-accent"
+          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
@@ -50,20 +50,20 @@ export default function MockTestPage() {
         <div className="mb-3 text-center">
           <YellowBadge>{t('mockTests')}</YellowBadge>
         </div>
-        <p className="tamil mb-8 text-center font-body text-sm text-white/55">{t('fullLength')}</p>
+        <p className="tamil mb-8 text-center font-body text-sm text-ink2">{t('fullLength')}</p>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {PRESETS.map((p) => (
             <button
               key={p.id}
               onClick={() => start(p)}
-              className="rounded-3xl bg-white p-5 text-left shadow-pill transition hover:-translate-y-1 hover:shadow-card"
+              className="card interactive p-5 text-left"
             >
               <div className="mb-3 flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <FileText size={22} />
+                <span className="grid h-10 w-10 place-items-center rounded-lg bg-tint text-ink">
+                  <FileText size={20} />
                 </span>
-                <span className="font-heading text-lg font-bold text-navytext">{p.title}</span>
+                <span className="font-heading text-base font-semibold text-ink">{p.title}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Tag>
@@ -88,7 +88,7 @@ export default function MockTestPage() {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-primary">
+    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-[11px] font-medium uppercase tracking-wide text-ink2">
       {children}
     </span>
   )

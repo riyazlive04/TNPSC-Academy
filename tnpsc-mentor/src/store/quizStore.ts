@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { AnswerLetter, Question, QuizConfig, TestAnswer } from '../types'
 
 export const SECONDS_PER_QUESTION = 45
@@ -34,6 +35,9 @@ interface QuizState {
   // timing
   tick: () => void
   markQuestionStart: () => void
+  // Recompute the remaining time from `startedAt` (used to resume after a page
+  // refresh, where wall-clock kept moving while the tab was closed).
+  resumeTimer: () => void
 
   // session id + submitting
   setSessionId: (id: string) => void
@@ -58,7 +62,9 @@ const initialState = {
   startedAt: 0,
 }
 
-export const useQuizStore = create<QuizState>((set, get) => ({
+export const useQuizStore = create<QuizState>()(
+  persist(
+    (set, get) => ({
   ...initialState,
 
   initSession: (config, questions) => {
@@ -112,7 +118,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const answer: TestAnswer = {
       question_id: questionId,
       selected_answer: letter,
-      is_correct: letter === q.correct_answer,
+      // is_correct is intentionally NOT set here — the client has no answer key.
+      // Grading happens server-side in submit_test().
       // Keep the time recorded on the first selection for this question.
       time_spent_seconds: prior ? prior.time_spent_seconds : elapsed,
       flagged: get().flags[questionId] ?? false,
@@ -132,6 +139,13 @@ export const useQuizStore = create<QuizState>((set, get) => ({
 
   markQuestionStart: () => set({ questionStartTime: nowSafe() }),
 
+  resumeTimer: () => {
+    const { startedAt, timeLimitSeconds } = get()
+    if (!startedAt || !timeLimitSeconds) return
+    const elapsed = Math.floor((nowSafe() - startedAt) / 1000)
+    set({ totalTimeLeft: Math.max(0, timeLimitSeconds - elapsed) })
+  },
+
   setSessionId: (id) => set({ sessionId: id }),
   setSubmitting: (v) => set({ isSubmitting: v }),
 
@@ -139,7 +153,26 @@ export const useQuizStore = create<QuizState>((set, get) => ({
 
   correctCount: () =>
     Object.values(get().answers).filter((a) => a.is_correct).length,
-}))
+    }),
+    {
+      name: 'tnpsc-mentor-quiz',
+      // Persist enough to resume an in-progress test across a refresh. The
+      // remaining time is recomputed from `startedAt` (not persisted) so a
+      // closed tab doesn't "pause" the clock.
+      partialize: (s) => ({
+        config: s.config,
+        questions: s.questions,
+        currentIndex: s.currentIndex,
+        answers: s.answers,
+        flags: s.flags,
+        timeLimitSeconds: s.timeLimitSeconds,
+        questionStartTime: s.questionStartTime,
+        startedAt: s.startedAt,
+        sessionId: s.sessionId,
+      }),
+    }
+  )
+)
 
 // `Date.now()` is fine in the browser runtime; wrapped for clarity / testability.
 function nowSafe(): number {

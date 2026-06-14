@@ -26,25 +26,25 @@ export default function OptionButton({
   reveal,
   disabled = false,
 }: OptionButtonProps) {
-  let stateCls = 'bg-white text-navytext border-2 border-transparent'
-  let badgeCls = 'bg-primary text-white'
+  let stateCls = 'bg-card text-ink border-2 border-line'
+  let badgeCls = 'bg-brand-soft text-brand'
   let icon: React.ReactNode = null
 
   if (reveal) {
     if (reveal.isCorrect) {
-      stateCls = 'bg-green-50 text-navytext border-2 border-green-500'
-      badgeCls = 'bg-green-500 text-white'
-      icon = <Check size={18} className="text-green-600" />
+      stateCls = 'bg-mintsoft text-ink border-2 border-mint'
+      badgeCls = 'bg-mint text-white'
+      icon = <Check size={18} className="animate-checkPop text-mint" />
     } else if (reveal.isChosenWrong) {
-      stateCls = 'bg-red-50 text-navytext border-2 border-red-500'
-      badgeCls = 'bg-red-500 text-white'
-      icon = <X size={18} className="text-red-600" />
+      stateCls = 'bg-coralsoft text-ink border-2 border-coral'
+      badgeCls = 'bg-coral text-white'
+      icon = <X size={18} className="animate-checkPop text-coral" />
     } else {
-      stateCls = 'bg-white text-navytext border-2 border-transparent'
+      stateCls = 'bg-card text-ink border-2 border-line'
     }
   } else if (selected) {
-    stateCls = 'bg-accent text-navytext border-2 border-accent'
-    badgeCls = 'bg-navytext text-accent'
+    stateCls = 'bg-brand-soft text-brand border-2 border-brand'
+    badgeCls = 'bg-brand text-white'
   }
 
   return (
@@ -55,7 +55,8 @@ export default function OptionButton({
       aria-pressed={selected}
       className={[
         'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left font-body transition-all duration-150',
-        'shadow-pill hover:-translate-y-0.5 disabled:cursor-default disabled:hover:translate-y-0',
+        'shadow-pill hover:-translate-y-0.5 active:scale-[0.99] disabled:cursor-default disabled:hover:translate-y-0 disabled:active:scale-100',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35',
         stateCls,
       ].join(' ')}
     >
@@ -67,7 +68,7 @@ export default function OptionButton({
       >
         {letter}
       </span>
-      <span className="tamil flex-1 text-[15px] leading-snug">{text}</span>
+      <span className="tamil min-w-0 flex-1 break-words text-[15px] leading-snug">{text}</span>
       {icon}
     </button>
   )

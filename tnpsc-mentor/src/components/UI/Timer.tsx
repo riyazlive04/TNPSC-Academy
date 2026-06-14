@@ -14,6 +14,18 @@ export function formatTime(totalSeconds: number): string {
 }
 
 /**
+ * Compact human duration for per-question timing — e.g. "12s" or "1m 05s".
+ * Reads better than a zero-padded clock for the short spans on a result card.
+ */
+export function formatDuration(totalSeconds: number): string {
+  const s = Math.max(0, Math.round(totalSeconds))
+  if (s < 60) return `${s}s`
+  const m = Math.floor(s / 60)
+  const sec = s % 60
+  return `${m}m ${String(sec).padStart(2, '0')}s`
+}
+
+/**
  * Large countdown timer for the quiz. Turns red (#FF5722) when under 60s.
  */
 export default function Timer({ secondsLeft, className = '' }: TimerProps) {
@@ -26,7 +38,9 @@ export default function Timer({ secondsLeft, className = '' }: TimerProps) {
         className,
       ].join(' ')}
       role="timer"
-      aria-live="polite"
+      // Don't announce every second (screen-reader spam); QuizPage announces
+      // milestones (1 min / 30s / 10s) via a dedicated live region instead.
+      aria-live="off"
     >
       <Clock size={18} />
       <span className="text-lg sm:text-xl">{formatTime(secondsLeft)}</span>

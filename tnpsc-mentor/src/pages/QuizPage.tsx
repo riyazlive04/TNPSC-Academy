@@ -5,22 +5,35 @@ import Timer from '../components/UI/Timer'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
 import {
+  AttendanceGateModal,
+  CenteredMessage,
+  SubmitErrorModal,
+} from '../components/Quiz/QuizDialogs'
+import {
   ATTENDANCE_GATE,
   MIN_SECONDS_PER_QUESTION,
   useQuizStore,
 } from '../store/quizStore'
 import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
-import { supabase } from '../lib/supabase'
-import { describeConfig, fetchQuestionsForConfig, shuffle } from '../lib/fetchQuestions'
-import { enqueueReviewItems } from '../lib/srs'
-import { recordActivity } from '../lib/habit'
-import type { AnswerLetter, QuizConfig, ResultPayload } from '../types'
+import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
+import { submitTest } from '../lib/submitTest'
+import type { AnswerLetter, QuizConfig } from '../types'
+
+/** Loose structural match so resuming a refreshed test reuses the same pool. */
+function sameConfig(a: QuizConfig, b: QuizConfig): boolean {
+  return describeConfig(a) === describeConfig(b) && Boolean(a.mock) === Boolean(b.mock)
+}
 
 export default function QuizPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const config = location.state as QuizConfig | null
+  // On a hard refresh, router `location.state` is lost — fall back to the
+  // persisted in-progress session's config so the test can resume.
+  const navConfig = location.state as QuizConfig | null
+  const config = navConfig ?? useQuizStore.getState().config
+
+  const [submitError, setSubmitError] = useState('')
 
   const store = useQuizStore()
   const {
@@ -54,10 +67,23 @@ export default function QuizPage() {
     }
   }, [config, navigate])
 
-  // ── Load questions once ──
+  // ── Load questions once (or resume an in-progress one after a refresh) ──
   useEffect(() => {
     if (!config) return
     let cancelled = false
+
+    // Resume: the persisted store already holds a matching, unfinished test.
+    const persisted = useQuizStore.getState()
+    const canResume =
+      persisted.questions.length > 0 &&
+      persisted.config != null &&
+      sameConfig(persisted.config, config)
+    if (canResume) {
+      persisted.resumeTimer() // recompute remaining time from startedAt
+      setLoading(false)
+      return
+    }
+
     const load = async () => {
       setLoading(true)
       setLoadError('')
@@ -70,7 +96,8 @@ export default function QuizPage() {
           setLoading(false)
           return
         }
-        store.initSession(config, shuffle(fetched))
+        // Server already returns a randomised pool; no client shuffle needed.
+        store.initSession(config, fetched)
         setLoading(false)
       } catch (e) {
         if (!cancelled) {
@@ -96,7 +123,7 @@ export default function QuizPage() {
       if (left <= 1) {
         clearInterval(id)
         useQuizStore.getState().tick()
-        handleSubmit(true)
+        handleSubmit()
       } else {
         useQuizStore.getState().tick()
       }
@@ -109,6 +136,9 @@ export default function QuizPage() {
   useEffect(() => {
     setSecondsOnQuestion(0)
     setMinWarning(false)
+    // Long questions can leave the next one scrolled past its top — reset to the
+    // top of the question on every navigation so it always starts in view.
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     const id = setInterval(() => setSecondsOnQuestion((s) => s + 1), 1000)
     return () => clearInterval(id)
   }, [currentIndex])
@@ -151,121 +181,63 @@ export default function QuizPage() {
       setShowGateModal(true)
       return
     }
-    handleSubmit(false)
+    handleSubmit()
   }
 
-  const handleSubmit = useCallback(
-    async (auto: boolean) => {
-      if (submittedRef.current) return
-      submittedRef.current = true
+  // The final "Submit" button must also honour the 15s-per-question minimum
+  // (previously it bypassed the check that Next enforced).
+  const requestSubmit = () => {
+    if (!canAdvance) {
+      setMinWarning(true)
+      return
+    }
+    attemptSubmit()
+  }
 
-      const s = useQuizStore.getState()
-      const qs = s.questions
-      const ans = s.answers
-      const cfg = s.config
-      if (!cfg || qs.length === 0) {
-        navigate('/test-arena', { replace: true })
-        return
-      }
+  const handleSubmit = useCallback(async () => {
+    if (submittedRef.current) return
+    submittedRef.current = true
 
-      const attemptedCount = Object.keys(ans).length
-      const correctCount = Object.values(ans).filter((a) => a.is_correct).length
-      const totalQ = qs.length
-      const scorePct = totalQ > 0 ? Math.round((correctCount / totalQ) * 100) : 0
-      const passed80 = attemptedCount / totalQ >= ATTENDANCE_GATE
-      const timeTaken = s.timeLimitSeconds - s.totalTimeLeft
+    const s = useQuizStore.getState()
+    if (!s.config || s.questions.length === 0) {
+      navigate('/test-arena', { replace: true })
+      return
+    }
 
-      s.setSubmitting(true)
+    s.setSubmitting(true)
+    setSubmitError('')
 
-      // Persist session + answers (best-effort — UI still proceeds on error).
-      let sessionId: string | undefined
-      try {
-        const user = useAuthStore.getState().user
-        if (user) {
-          const { data: sessionRow, error: sErr } = await supabase
-            .from('test_sessions')
-            .insert({
-              user_id: user.id,
-              category: cfg.category,
-              group_type: cfg.group_type ?? null,
-              subject: cfg.subject ?? null,
-              standard: cfg.standard ?? null,
-              ca_month: cfg.ca_month ?? null,
-              ca_type: cfg.ca_type ?? null,
-              aptitude_type: cfg.aptitude_type ?? null,
-              aptitude_topic: cfg.aptitude_topic ?? null,
-              total_questions: totalQ,
-              attempted: attemptedCount,
-              correct: correctCount,
-              score_percentage: scorePct,
-              pdf_unlocked: passed80,
-              passed_80_percent: passed80,
-              time_limit_seconds: s.timeLimitSeconds,
-              time_taken_seconds: timeTaken,
-              completed_at: new Date().toISOString(),
-              status: 'completed',
-            })
-            .select('id')
-            .single()
-
-          if (!sErr && sessionRow) {
-            sessionId = (sessionRow as { id: string }).id
-            const rows = Object.values(ans).map((a) => ({
-              session_id: sessionId,
-              question_id: a.question_id,
-              selected_answer: a.selected_answer,
-              is_correct: a.is_correct,
-              time_spent_seconds: a.time_spent_seconds,
-              flagged: s.flags[a.question_id] ?? false,
-            }))
-            if (rows.length) {
-              await supabase.from('test_answers').insert(rows)
-            }
-          }
-        }
-      } catch {
-        /* non-fatal — proceed to result either way */
-      }
-
-      const payload: ResultPayload = {
-        config: cfg,
-        questions: qs,
-        answers: ans,
-        totalQuestions: totalQ,
-        attempted: attemptedCount,
-        correct: correctCount,
-        scorePercentage: scorePct,
-        pdfUnlocked: passed80,
-        passed80,
-        timeLimitSeconds: s.timeLimitSeconds,
-        timeTakenSeconds: timeTaken,
-        sessionId,
-      }
-      // Smart revision: enqueue wrong + flagged questions for spaced review.
-      try {
-        const user = useAuthStore.getState().user
-        if (user) {
-          const toReview = qs
-            .filter((q) => {
-              const a = ans[q.id]
-              const wrong = a ? !a.is_correct : true // unattempted counts as needing review
-              return wrong || s.flags[q.id]
-            })
-            .map((q) => q.id)
-          if (toReview.length) await enqueueReviewItems(user.id, toReview)
-          // Habit layer: log today's activity for streak + daily-goal progress.
-          await recordActivity(user.id, attemptedCount, 1)
-        }
-      } catch {
-        /* non-fatal */
-      }
-
+    const user = useAuthStore.getState().user
+    if (!user) {
       s.setSubmitting(false)
-      void auto
-      navigate('/result', { state: payload, replace: true })
-    },
-    [navigate]
-  )
+      submittedRef.current = false
+      setSubmitError('Your session expired. Please sign in again to submit.')
+      return
+    }
+
+    let payload
+    try {
+      payload = await submitTest({
+        config: s.config,
+        questions: s.questions,
+        answers: s.answers,
+        flags: s.flags,
+        timeLimitSeconds: s.timeLimitSeconds,
+        startedAt: s.startedAt,
+      })
+    } catch {
+      s.setSubmitting(false)
+      submittedRef.current = false
+      setSubmitError(
+        'Could not submit your test — grading happens on the server. Check your connection and retry.'
+      )
+      return
+    }
+
+    s.setSubmitting(false)
+    s.reset() // clear the persisted in-progress session
+    navigate('/result', { state: payload, replace: true })
+  }, [navigate])
 
   // ── Render states ──
   if (!config) return null
@@ -273,8 +245,8 @@ export default function QuizPage() {
   if (loading) {
     return (
       <CenteredMessage>
-        <Loader2 size={36} className="animate-spin text-accent" />
-        <p className="font-heading uppercase tracking-widest text-white/70">
+        <Loader2 size={36} className="animate-spin text-brand" />
+        <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
           Preparing your test…
         </p>
       </CenteredMessage>
@@ -284,12 +256,9 @@ export default function QuizPage() {
   if (loadError) {
     return (
       <CenteredMessage>
-        <AlertTriangle size={36} className="text-warn" />
-        <p className="max-w-sm text-center font-body text-white/80">{loadError}</p>
-        <button
-          onClick={() => navigate('/test-arena')}
-          className="rounded-full bg-accent px-6 py-2.5 font-heading font-bold uppercase text-navytext"
-        >
+        <AlertTriangle size={36} className="text-coral" />
+        <p className="max-w-sm text-center font-body text-ink2">{loadError}</p>
+        <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
           Back to Test Arena
         </button>
       </CenteredMessage>
@@ -299,15 +268,12 @@ export default function QuizPage() {
   if (empty) {
     return (
       <CenteredMessage>
-        <AlertTriangle size={36} className="text-accent" />
-        <p className="max-w-sm text-center font-body text-white/80">
+        <AlertTriangle size={36} className="text-brand" />
+        <p className="max-w-sm text-center font-body text-ink2">
           No questions are available for this selection yet. Please run the content
           upload, or choose another topic.
         </p>
-        <button
-          onClick={() => navigate('/test-arena')}
-          className="rounded-full bg-accent px-6 py-2.5 font-heading font-bold uppercase text-navytext"
-        >
+        <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
           Back to Test Arena
         </button>
       </CenteredMessage>
@@ -320,22 +286,35 @@ export default function QuizPage() {
   const isLast = currentIndex + 1 >= total
   const flaggedCount = Object.values(flags).filter(Boolean).length
 
+  // Announce time milestones to screen readers instead of ticking every second.
+  const timeAnnouncement =
+    totalTimeLeft === 60
+      ? '1 minute remaining'
+      : totalTimeLeft === 30
+        ? '30 seconds remaining'
+        : totalTimeLeft === 10
+          ? '10 seconds remaining'
+          : ''
+
   return (
-    <div className="min-h-screen bg-primary pb-28">
+    <div className="min-h-screen bg-canvas pb-28">
+      <div className="sr-only" role="status" aria-live="assertive">
+        {timeAnnouncement}
+      </div>
       {/* Top bar */}
-      <div className="sticky top-0 z-20 border-b border-white/10 bg-primary/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-20 border-b border-line bg-canvas px-4 py-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          <span className="font-heading text-lg font-bold text-white">
-            Q {currentIndex + 1} / {total}
+          <span className="font-heading text-lg font-extrabold text-ink">
+            Q {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
           </span>
-          <span className="hidden max-w-[40%] truncate font-body text-xs text-white/60 sm:block">
+          <span className="hidden max-w-[40%] truncate font-body text-xs text-ink2 sm:block">
             {describeConfig(config)}
           </span>
           <Timer secondsLeft={totalTimeLeft} />
         </div>
         <div className="mx-auto mt-2 max-w-2xl">
           <ProgressBar percent={total > 0 ? ((currentIndex + 1) / total) * 100 : 0} />
-          <div className="mt-1 flex justify-between font-body text-[11px] text-white/50">
+          <div className="mt-1 flex justify-between font-body text-[11px] font-medium text-ink2">
             <span>Attempted: {attempted}/{total}</span>
             <span>Flagged: {flaggedCount}</span>
           </div>
@@ -353,8 +332,8 @@ export default function QuizPage() {
         />
 
         {minWarning && !canAdvance && (
-          <div className="mt-3 flex items-center gap-2 rounded-2xl bg-warn/20 px-4 py-3 font-body text-sm text-white">
-            <AlertTriangle size={18} className="flex-shrink-0 text-warn" />
+          <div className="mt-3 flex items-center gap-2 rounded-2xl bg-coralsoft px-4 py-3 font-body text-sm font-medium text-coral">
+            <AlertTriangle size={18} className="flex-shrink-0" />
             Please spend at least {MIN_SECONDS_PER_QUESTION} seconds on this question.
             ({Math.max(0, MIN_SECONDS_PER_QUESTION - secondsOnQuestion)}s left)
           </div>
@@ -362,38 +341,36 @@ export default function QuizPage() {
       </div>
 
       {/* Bottom nav bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-white/10 bg-primary/95 px-4 py-3 backdrop-blur">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-4 py-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-2">
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="inline-flex items-center gap-1 rounded-full bg-white/10 px-4 py-2.5 font-heading text-sm font-semibold uppercase text-white transition hover:bg-white/20 disabled:opacity-40"
+            className="inline-flex items-center gap-1 rounded-2xl border border-line bg-card px-4 py-2.5 font-heading text-sm font-semibold text-ink shadow-pill transition hover:border-brand-ring disabled:opacity-40"
           >
             <ChevronLeft size={18} /> Prev
           </button>
 
           <button
             onClick={toggleFlag}
+            aria-pressed={isFlagged}
+            aria-label={isFlagged ? 'Unflag this question' : 'Flag this question for review'}
             className={[
-              'inline-flex items-center gap-1 rounded-full px-4 py-2.5 font-heading text-sm font-semibold uppercase transition',
-              isFlagged ? 'bg-warn text-white' : 'bg-white/10 text-white hover:bg-white/20',
+              'press inline-flex items-center gap-1 rounded-2xl px-4 py-2.5 font-heading text-sm font-semibold transition',
+              isFlagged
+                ? 'bg-coral text-white shadow-pill'
+                : 'border border-line bg-card text-ink2 shadow-pill hover:text-coral',
             ].join(' ')}
           >
-            <Flag size={16} /> {isFlagged ? 'Flagged' : 'Flag'}
+            <Flag size={16} className={isFlagged ? 'animate-popStar' : ''} /> {isFlagged ? 'Flagged' : 'Flag'}
           </button>
 
           {isLast ? (
-            <button
-              onClick={attemptSubmit}
-              className="inline-flex items-center gap-1 rounded-full bg-accent px-5 py-2.5 font-heading text-sm font-bold uppercase text-navytext transition hover:-translate-y-0.5"
-            >
+            <button onClick={requestSubmit} className="btn-brand px-6 py-2.5 text-sm">
               Submit Test
             </button>
           ) : (
-            <button
-              onClick={goNext}
-              className="inline-flex items-center gap-1 rounded-full bg-accent px-5 py-2.5 font-heading text-sm font-bold uppercase text-navytext transition hover:-translate-y-0.5"
-            >
+            <button onClick={goNext} className="btn-brand px-6 py-2.5 text-sm">
               Next <ChevronRight size={18} />
             </button>
           )}
@@ -402,51 +379,28 @@ export default function QuizPage() {
 
       {/* 80% gate modal */}
       {showGateModal && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4">
-          <div className="animate-pop w-full max-w-md rounded-3xl bg-white p-6 shadow-card">
-            <div className="mb-3 flex items-center gap-2 text-warn">
-              <AlertTriangle size={24} />
-              <h3 className="font-heading text-xl font-bold uppercase text-navytext">
-                Attendance below 80%
-              </h3>
-            </div>
-            <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">
-              You have attempted{' '}
-              <span className="font-bold">
-                {attempted}/{total}
-              </span>{' '}
-              ({Math.round((attempted / total) * 100)}%). You must attempt at least{' '}
-              <span className="font-bold">80%</span> of the questions to unlock the
-              explanation PDF. You can still submit now to see your score only.
-            </p>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                onClick={() => {
-                  setShowGateModal(false)
-                  handleSubmit(false)
-                }}
-                className="flex-1 rounded-full bg-navytext px-5 py-3 font-heading text-sm font-bold uppercase text-white transition hover:opacity-90"
-              >
-                Submit Anyway (Score Only)
-              </button>
-              <button
-                onClick={() => setShowGateModal(false)}
-                className="flex-1 rounded-full bg-accent px-5 py-3 font-heading text-sm font-bold uppercase text-navytext transition hover:-translate-y-0.5"
-              >
-                Continue Test
-              </button>
-            </div>
-          </div>
-        </div>
+        <AttendanceGateModal
+          attempted={attempted}
+          total={total}
+          onSubmitAnyway={() => {
+            setShowGateModal(false)
+            handleSubmit()
+          }}
+          onContinue={() => setShowGateModal(false)}
+        />
       )}
-    </div>
-  )
-}
 
-function CenteredMessage({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-primary px-4">
-      {children}
+      {/* Submit error (grading is server-side; allow a retry) */}
+      {submitError && (
+        <SubmitErrorModal
+          message={submitError}
+          onRetry={() => {
+            setSubmitError('')
+            handleSubmit()
+          }}
+          onSignIn={() => navigate('/login')}
+        />
+      )}
     </div>
   )
 }

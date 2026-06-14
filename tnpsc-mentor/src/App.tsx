@@ -1,8 +1,12 @@
 import { useEffect } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import type { ReactElement } from 'react'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
+import ScrollToTop from './components/ScrollToTop'
+import Toaster from './components/UI/Toaster'
 
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
@@ -10,16 +14,44 @@ import LanguageScreen from './pages/LanguageScreen'
 import TestArenaPage from './pages/TestArenaPage'
 import PreviousYearPage from './pages/PreviousYearPage'
 import SamacheerPage from './pages/SamacheerPage'
+import SubjectPracticePage from './pages/SubjectPracticePage'
 import CurrentAffairsPage from './pages/CurrentAffairsPage'
 import AptitudePage from './pages/AptitudePage'
 import QuizPage from './pages/QuizPage'
 import AdminQuestionsPage from './pages/AdminQuestionsPage'
 import ResultPage from './pages/ResultPage'
 import InsightsPage from './pages/InsightsPage'
+import AchievementsPage from './pages/AchievementsPage'
 import RevisionPage from './pages/RevisionPage'
 import MockTestPage from './pages/MockTestPage'
 import SetupPage from './pages/SetupPage'
 import DailyPage from './pages/DailyPage'
+import BookmarksPage from './pages/BookmarksPage'
+import SuperAdminPage from './pages/SuperAdminPage'
+
+/** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
+const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
+  { path: '/language', element: <LanguageScreen /> },
+  { path: '/test-arena', element: <TestArenaPage /> },
+  { path: '/test-arena/pyq', element: <PreviousYearPage /> },
+  { path: '/test-arena/subjects', element: <SubjectPracticePage /> },
+  // Samacheer is hidden from the dashboard but its route is kept for direct/admin
+  // access (its data currently lives in questions_backup).
+  { path: '/test-arena/samacheer', element: <SamacheerPage /> },
+  { path: '/test-arena/current-affairs', element: <CurrentAffairsPage /> },
+  { path: '/test-arena/aptitude', element: <AptitudePage /> },
+  { path: '/quiz', element: <QuizPage /> },
+  { path: '/admin/questions', element: <AdminQuestionsPage /> },
+  { path: '/result', element: <ResultPage /> },
+  { path: '/insights', element: <InsightsPage /> },
+  { path: '/achievements', element: <AchievementsPage /> },
+  { path: '/revision', element: <RevisionPage /> },
+  { path: '/mock', element: <MockTestPage /> },
+  { path: '/setup', element: <SetupPage /> },
+  { path: '/daily', element: <DailyPage /> },
+  { path: '/bookmarks', element: <BookmarksPage /> },
+  { path: '/superadmin', element: <SuperAdminPage />, role: 'superadmin' },
+]
 
 export default function App() {
   const init = useAuthStore((s) => s.init)
@@ -30,130 +62,29 @@ export default function App() {
   }, [init])
 
   return (
+    <>
+    <ScrollToTop />
     <Routes>
-      {/* Public */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      {/* Public landing page — explains the product to logged-out visitors. */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Protected */}
-      <Route
-        path="/language"
-        element={
-          <ProtectedRoute>
-            <LanguageScreen />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test-arena"
-        element={
-          <ProtectedRoute>
-            <TestArenaPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test-arena/pyq"
-        element={
-          <ProtectedRoute>
-            <PreviousYearPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test-arena/samacheer"
-        element={
-          <ProtectedRoute>
-            <SamacheerPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test-arena/current-affairs"
-        element={
-          <ProtectedRoute>
-            <CurrentAffairsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/test-arena/aptitude"
-        element={
-          <ProtectedRoute>
-            <AptitudePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/quiz"
-        element={
-          <ProtectedRoute>
-            <QuizPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/questions"
-        element={
-          <ProtectedRoute>
-            <AdminQuestionsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/result"
-        element={
-          <ProtectedRoute>
-            <ResultPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/insights"
-        element={
-          <ProtectedRoute>
-            <InsightsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/revision"
-        element={
-          <ProtectedRoute>
-            <RevisionPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mock"
-        element={
-          <ProtectedRoute>
-            <MockTestPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/setup"
-        element={
-          <ProtectedRoute>
-            <SetupPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/daily"
-        element={
-          <ProtectedRoute>
-            <DailyPage />
-          </ProtectedRoute>
-        }
-      />
+      {PROTECTED_ROUTES.map(({ path, element, role }) => (
+        <Route
+          key={path}
+          path={path}
+          element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
+        />
+      ))}
 
       {/* Fallback */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    <Toaster />
+    </>
   )
 }
 

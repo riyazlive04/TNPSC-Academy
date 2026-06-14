@@ -1,9 +1,13 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Loader2 } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
-import { isSupabaseConfigured } from '../lib/supabase'
+import AuthShell from '../components/Auth/AuthShell'
+import PasswordInput from '../components/UI/PasswordInput'
+import Spinner from '../components/UI/Spinner'
+import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
+import { useT, type StringKey } from '../lib/i18n'
 
 const TARGET_GROUPS = [
   { value: 'Group1', label: 'Group 1' },
@@ -11,9 +15,18 @@ const TARGET_GROUPS = [
   { value: 'Group4_VAO', label: 'Group 4 & VAO' },
 ]
 
+const STRENGTH_META: { key: StringKey; color: string }[] = [
+  { key: 'pwStrengthWeak', color: 'bg-coral' },
+  { key: 'pwStrengthWeak', color: 'bg-coral' },
+  { key: 'pwStrengthFair', color: 'bg-gold' },
+  { key: 'pwStrengthGood', color: 'bg-brand' },
+  { key: 'pwStrengthStrong', color: 'bg-mint' },
+]
+
 export default function RegisterPage() {
   const navigate = useNavigate()
   const { signUp } = useAuth()
+  const { t } = useT()
 
   const [form, setForm] = useState({
     fullName: '',
@@ -25,25 +38,27 @@ export default function RegisterPage() {
   })
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const update = (key: keyof typeof form, value: string) =>
     setForm((f) => ({ ...f, [key]: value }))
 
+  const strength = useMemo(() => passwordStrength(form.password), [form.password])
+  const confirmMismatch = touched && form.confirm.length > 0 && form.password !== form.confirm
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    setTouched(true)
     setError('')
     setInfo('')
 
-    if (!form.fullName.trim()) return setError('Please enter your full name.')
-    if (!form.email.trim()) return setError('Please enter your email.')
-    if (!form.phone.trim()) return setError('Please enter your phone number.')
-    if (form.password.length < 6)
-      return setError('Password must be at least 6 characters.')
-    if (form.password !== form.confirm)
-      return setError('Passwords do not match.')
-    if (!isSupabaseConfigured)
-      return setError('Supabase is not configured. Set the VITE_SUPABASE_* env vars.')
+    if (!form.fullName.trim()) return setError(t('errNameRequired'))
+    if (!form.email.trim()) return setError(t('errEmailRequired'))
+    if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
+    if (!form.phone.trim()) return setError(t('errPhoneRequired'))
+    if (form.password.length < 6) return setError(t('errPasswordShort'))
+    if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
 
     setLoading(true)
     const { error: err } = await signUp({
@@ -56,155 +71,210 @@ export default function RegisterPage() {
     setLoading(false)
 
     if (err) {
-      setError(err)
+      const f = friendlyAuthError(err)
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
 
-    // If email confirmation is enabled there may be no active session yet.
     if (useAuthStore.getState().user) {
       navigate('/language', { replace: true })
     } else {
-      setInfo('Account created! Please check your email to confirm, then sign in.')
+      setInfo(t('confirmEmailSent'))
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary px-4 py-10">
-      <div className="w-full max-w-md animate-fadeIn">
-        <div className="mb-6 text-center">
-          <h1 className="font-heading text-3xl font-bold tracking-wide text-white">
-            <span className="text-warn">✳</span> TNPSC{' '}
-            <span className="text-accent">MENTOR</span>
-          </h1>
-        </div>
+    <AuthShell>
+      <div className="rounded-3xl border border-line bg-card p-6 shadow-card sm:p-8">
+        <h2 className="mb-1 text-center font-heading text-xl font-semibold tracking-tight text-ink">
+          {t('createYourAccount')}
+        </h2>
+        <p className="mb-6 text-center font-body text-sm text-ink2">{t('startPreparing')}</p>
 
-        <div className="rounded-3xl bg-secondary/40 p-6 shadow-card backdrop-blur sm:p-8">
-          <h2 className="mb-6 text-center font-heading text-2xl font-bold uppercase tracking-wide text-white">
-            Register as Aspirant
-          </h2>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
+          <Field
+            id="reg-name"
+            label={t('fullName')}
+            value={form.fullName}
+            onChange={(v) => update('fullName', v)}
+            placeholder="Your name"
+            autoComplete="name"
+            invalid={touched && !form.fullName.trim()}
+          />
+          <Field
+            id="reg-email"
+            label={t('email')}
+            type="email"
+            value={form.email}
+            onChange={(v) => update('email', v)}
+            placeholder="aspirant@email.com"
+            autoComplete="email"
+            invalid={touched && !!form.email && !isValidEmail(form.email)}
+          />
+          <Field
+            id="reg-phone"
+            label={t('phone')}
+            type="tel"
+            value={form.phone}
+            onChange={(v) => update('phone', v)}
+            placeholder="10-digit mobile"
+            autoComplete="tel"
+            invalid={touched && !form.phone.trim()}
+          />
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
-            <Field
-              label="Full Name"
-              value={form.fullName}
-              onChange={(v) => update('fullName', v)}
-              placeholder="Your name"
-              autoComplete="name"
-            />
-            <Field
-              label="Email"
-              type="email"
-              value={form.email}
-              onChange={(v) => update('email', v)}
-              placeholder="aspirant@email.com"
-              autoComplete="email"
-            />
-            <Field
-              label="Phone"
-              type="tel"
-              value={form.phone}
-              onChange={(v) => update('phone', v)}
-              placeholder="10-digit mobile"
-              autoComplete="tel"
-            />
-            <Field
-              label="Password"
-              type="password"
+          <div>
+            <label
+              htmlFor="reg-password"
+              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+            >
+              {t('password')}
+            </label>
+            <PasswordInput
+              id="reg-password"
               value={form.password}
               onChange={(v) => update('password', v)}
               placeholder="At least 6 characters"
               autoComplete="new-password"
+              invalid={touched && form.password.length > 0 && form.password.length < 6}
             />
-            <Field
-              label="Confirm Password"
-              type="password"
+            {/* Password strength meter — animates as the user types. */}
+            {form.password.length > 0 && (
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex h-1.5 flex-1 gap-1">
+                  {[0, 1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      className={`h-full flex-1 rounded-full transition-colors duration-300 ${
+                        i < strength ? STRENGTH_META[strength].color : 'bg-line'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="font-heading text-[11px] font-semibold text-ink2">
+                  {t(STRENGTH_META[strength].key)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="reg-confirm"
+              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+            >
+              {t('confirmPassword')}
+            </label>
+            <PasswordInput
+              id="reg-confirm"
               value={form.confirm}
               onChange={(v) => update('confirm', v)}
               placeholder="Re-enter password"
               autoComplete="new-password"
+              invalid={confirmMismatch}
             />
-
-            <div>
-              <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
-                Target Group
-              </label>
-              <select
-                className="input-pill appearance-none"
-                value={form.targetGroup}
-                onChange={(e) => update('targetGroup', e.target.value)}
-              >
-                {TARGET_GROUPS.map((g) => (
-                  <option key={g.value} value={g.value}>
-                    {g.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {error && (
-              <div className="rounded-xl bg-warn/20 px-4 py-3 text-center font-body text-sm text-white">
-                {error}
-              </div>
+            {confirmMismatch && (
+              <p className="mt-1.5 animate-slideDown font-body text-xs font-medium text-coral">
+                {t('errPasswordMismatch')}
+              </p>
             )}
-            {info && (
-              <div className="rounded-xl bg-green-500/20 px-4 py-3 text-center font-body text-sm text-white">
-                {info}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 font-heading text-lg font-bold uppercase tracking-wide text-navytext shadow-pill transition hover:-translate-y-0.5 disabled:opacity-60"
-            >
-              {loading && <Loader2 size={18} className="animate-spin" />}
-              {loading ? 'Creating account…' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm">
-            <span className="text-white/60">Already registered? </span>
-            <Link
-              to="/login"
-              className="font-heading font-semibold uppercase tracking-wide text-accent transition hover:text-white"
-            >
-              Sign In
-            </Link>
           </div>
+
+          <div>
+            <label
+              htmlFor="reg-group"
+              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+            >
+              {t('targetGroup')}
+            </label>
+            <select
+              id="reg-group"
+              className="input-soft appearance-none"
+              value={form.targetGroup}
+              onChange={(e) => update('targetGroup', e.target.value)}
+            >
+              {TARGET_GROUPS.map((g) => (
+                <option key={g.value} value={g.value}>
+                  {g.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="animate-slideDown rounded-2xl bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+            >
+              {error}
+            </div>
+          )}
+          {info && (
+            <div
+              role="status"
+              className="flex animate-slideDown items-center gap-2 rounded-2xl bg-mintsoft px-4 py-3 text-center font-body text-sm font-medium text-mint"
+            >
+              <CheckCircle2 size={16} className="flex-shrink-0" />
+              {info}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} className="btn-brand press mt-2 px-6 py-3.5 text-base">
+            {loading && <Spinner size={18} />}
+            {loading ? t('creatingAccount') : t('createAccount')}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm">
+          <span className="text-ink2">{t('alreadyRegistered')} </span>
+          <Link
+            to="/login"
+            className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
+          >
+            {t('signIn')}
+          </Link>
         </div>
       </div>
-    </div>
+    </AuthShell>
   )
 }
 
 interface FieldProps {
+  id: string
   label: string
   value: string
   onChange: (v: string) => void
   type?: string
   placeholder?: string
   autoComplete?: string
+  invalid?: boolean
 }
 
 function Field({
+  id,
   label,
   value,
   onChange,
   type = 'text',
   placeholder,
   autoComplete,
+  invalid = false,
 }: FieldProps) {
   return (
     <div>
-      <label className="mb-1.5 block font-heading text-xs font-semibold uppercase tracking-wide text-white/70">
+      <label
+        htmlFor={id}
+        className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+      >
         {label}
       </label>
       <input
+        id={id}
         type={type}
-        className="input-pill"
+        className={`input-soft ${invalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
         placeholder={placeholder}
         autoComplete={autoComplete}
         value={value}
+        aria-invalid={invalid || undefined}
         onChange={(e) => onChange(e.target.value)}
       />
     </div>

@@ -1,10 +1,15 @@
 // ─── Core domain types ──────────────────────────────────────────────────────
 
-export type Category = 'pyq' | 'samacheer' | 'current_affairs' | 'aptitude'
+export type Category = 'pyq' | 'samacheer' | 'current_affairs' | 'aptitude' | 'outer' | 'subject'
+// The five question styles testable in the Subject Practice flow.
+export type SubjectQType = 'chronological' | 'match' | 'assertion_reason' | 'statements' | 'direct'
 export type GroupType = 'Group1' | 'Group2_2A' | 'Group4_VAO'
 export type AnswerLetter = 'A' | 'B' | 'C' | 'D'
 export type Difficulty = 'easy' | 'medium' | 'hard'
-export type UserRole = 'user' | 'admin'
+// Role hierarchy: superadmin ⊃ admin ⊃ user. A superadmin inherits every admin
+// ability (the DB `is_admin()` check is widened to include it) and additionally
+// owns the platform console (metrics, user management, feedback inbox).
+export type UserRole = 'user' | 'admin' | 'superadmin'
 
 export interface Question {
   id: string
@@ -19,18 +24,32 @@ export interface Question {
   aptitude_type?: 'numerics' | 'reasoning'
   aptitude_topic?: string
   subject?: string
+  // Broad unit/section grouping above topic. Used by the "Outer" subject banks
+  // (e.g. unit 'Polity', topic 'Fundamental Rights').
+  unit?: string
   topic?: string
+  // Subject Practice style tag (chronological / match / assertion_reason / …).
+  question_type?: string
+  // Short provenance marker (e.g. 'TU') — rendered as a small badge when set.
+  source_tag?: string | null
   question_text: string
   option_a: string
   option_b: string
   option_c: string
   option_d: string
-  correct_answer: AnswerLetter
+  // Answer/explanation columns are NOT delivered to the client during a quiz
+  // (they're stripped server-side). They're only populated for the admin bank
+  // and merged in after a result is graded — hence optional.
+  correct_answer?: AnswerLetter
   explanation?: string
   // Per-option rationale: for each WRONG option letter, why it is incorrect.
   // Powers the targeted "your answer is wrong because…" feedback.
   why_wrong?: Partial<Record<AnswerLetter, string>> | null
+  // Tamil counterpart of why_wrong (per wrong option), when available.
+  why_wrong_ta?: Partial<Record<AnswerLetter, string>> | null
   difficulty?: Difficulty
+  // Provenance of a scraped/imported question (admin-only; never shown to users).
+  source_url?: string | null
   // Optional Tamil content (bilingual-ready). When present and the user's
   // language is Tamil/both, the UI renders these instead of/alongside English.
   question_text_ta?: string | null
@@ -68,9 +87,34 @@ export interface TestSession {
 export interface TestAnswer {
   question_id: string
   selected_answer: AnswerLetter
-  is_correct: boolean
+  // Unknown until the server grades the submission (the client has no answer key).
+  is_correct?: boolean
   time_spent_seconds: number
   flagged?: boolean
+}
+
+// Per-question result returned by the `submit_test` RPC. correct_answer /
+// explanation fields are only present when the 80% gate unlocked them.
+export interface GradedResult {
+  question_id: string
+  selected_answer: AnswerLetter | null
+  is_correct: boolean
+  correct_answer?: AnswerLetter | null
+  explanation?: string | null
+  explanation_ta?: string | null
+  why_wrong?: Partial<Record<AnswerLetter, string>> | null
+}
+
+// Shape of the whole `submit_test` RPC response.
+export interface SubmitResult {
+  session_id: string
+  total: number
+  attempted: number
+  correct: number
+  score_percentage: number
+  passed_80: boolean
+  unlocked: boolean
+  results: GradedResult[]
 }
 
 export interface QuizConfig {
@@ -79,6 +123,8 @@ export interface QuizConfig {
   subject?: string
   standard?: number
   topic?: string
+  /** Subject Practice: restrict to one question style (omit for "Mixed"). */
+  question_type?: SubjectQType
   ca_month?: string
   ca_type?: string
   ca_topic?: string
@@ -94,6 +140,10 @@ export interface QuizConfig {
   negativeMark?: number
   /** For mock mode: restrict the random pool to `category` (e.g. daily CA). */
   scopeToCategory?: boolean
+  /** Daily Current-Affairs challenge — completing it grants the daily reward. */
+  daily?: boolean
+  /** Weekly Current-Affairs consolidation drill. */
+  weekly?: boolean
 }
 
 export interface Profile {
