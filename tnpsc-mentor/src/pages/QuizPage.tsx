@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2 } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2, X } from 'lucide-react'
 import Timer from '../components/UI/Timer'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
 import {
   AttendanceGateModal,
   CenteredMessage,
+  ExitTestModal,
   SubmitErrorModal,
 } from '../components/Quiz/QuizDialogs'
 import {
@@ -18,6 +19,7 @@ import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { submitTest } from '../lib/submitTest'
+import { abandonTest } from '../lib/abandonTest'
 import type { AnswerLetter, QuizConfig } from '../types'
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
@@ -57,6 +59,9 @@ export default function QuizPage() {
 
   // 80% attendance gate modal before submit
   const [showGateModal, setShowGateModal] = useState(false)
+
+  // Exit confirmation modal (practice tests only)
+  const [showExitModal, setShowExitModal] = useState(false)
 
   const submittedRef = useRef(false)
 
@@ -172,6 +177,31 @@ export default function QuizPage() {
 
   const toggleFlag = () => {
     if (currentQuestion) store.toggleFlag(currentQuestion.id)
+  }
+
+  // ── Exit flow (practice tests only) ──
+  const handleExitEvaluate = () => {
+    setShowExitModal(false)
+    handleSubmit()
+  }
+
+  const handleExitDiscard = async () => {
+    const s = useQuizStore.getState()
+    if (s.config && s.questions.length > 0) {
+      try {
+        await abandonTest({
+          config: s.config,
+          questions: s.questions,
+          answers: s.answers,
+          timeLimitSeconds: s.timeLimitSeconds ?? 0,
+          startedAt: s.startedAt ?? Date.now(),
+        })
+      } catch {
+        // best-effort; don't block navigation if recording fails
+      }
+    }
+    s.reset()
+    navigate('/test-arena', { replace: true })
   }
 
   // ── Submit flow ──
@@ -310,7 +340,18 @@ export default function QuizPage() {
           <span className="hidden max-w-[40%] truncate font-body text-xs text-ink2 sm:block">
             {describeConfig(config)}
           </span>
-          <Timer secondsLeft={totalTimeLeft} />
+          <div className="flex items-center gap-2">
+            <Timer secondsLeft={totalTimeLeft} />
+            {!config.mock && (
+              <button
+                onClick={() => setShowExitModal(true)}
+                aria-label="Exit test"
+                className="rounded-full p-1.5 text-ink2 transition hover:bg-coralsoft hover:text-coral"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
         </div>
         <div className="mx-auto mt-2 max-w-2xl">
           <ProgressBar percent={total > 0 ? ((currentIndex + 1) / total) * 100 : 0} />
@@ -376,6 +417,15 @@ export default function QuizPage() {
           )}
         </div>
       </div>
+
+      {/* Exit confirmation (practice tests only) */}
+      {showExitModal && (
+        <ExitTestModal
+          onEvaluate={handleExitEvaluate}
+          onDiscard={handleExitDiscard}
+          onCancel={() => setShowExitModal(false)}
+        />
+      )}
 
       {/* 80% gate modal */}
       {showGateModal && (

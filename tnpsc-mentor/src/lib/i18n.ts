@@ -87,6 +87,21 @@ const STRINGS = {
   typeStatements: { en: 'Statements', ta: 'கூற்றுகள்' },
   typeDirect: { en: 'Direct', ta: 'நேரடி' },
 
+  // History period selector (PYQ History → Ancient / Medieval / Modern)
+  historyPeriodBadge: { en: 'History — Previous Year Questions', ta: 'வரலாறு — முந்தைய ஆண்டு வினாக்கள்' },
+  historyPickPeriod: { en: 'Select a Period', ta: 'காலகட்டத்தைத் தேர்ந்தெடுக்கவும்' },
+  historyPickPeriodSub: {
+    en: 'Pick a period to begin a History test (Group 1 Prelims, 2019–2025).',
+    ta: 'வரலாறு தேர்வைத் தொடங்க ஒரு காலகட்டத்தைத் தேர்ந்தெடுக்கவும் (குரூப் 1 முதனிலை, 2019–2025).',
+  },
+  periodAncient: { en: 'Ancient History', ta: 'பண்டைய வரலாறு' },
+  periodMedieval: { en: 'Medieval History', ta: 'இடைக்கால வரலாறு' },
+  periodModern: { en: 'Modern History & INM', ta: 'நவீன வரலாறு மற்றும் இந்திய தேசிய இயக்கம்' },
+  periodAncientSub: { en: 'Prehistory · Indus Valley · Sangam · Mauryas · Guptas', ta: 'தொல்பழங்காலம் · சிந்து சமவெளி · சங்கம் · மௌரியர் · குப்தர்' },
+  periodMedievalSub: { en: 'Delhi Sultanate · Mughals · Vijayanagara · Bhakti', ta: 'டெல்லி சுல்தானியம் · முகலாயர் · விஜயநகரம் · பக்தி' },
+  periodModernSub: { en: 'Europeans · British Raj · Freedom Struggle', ta: 'ஐரோப்பியர் · பிரிட்டிஷ் ஆட்சி · சுதந்திரப் போராட்டம்' },
+  questionsCount: { en: 'questions', ta: 'வினாக்கள்' },
+
   // Steps / selectors
   step1Group: { en: 'Step 1 — Select Group', ta: 'படி 1 — குழுவைத் தேர்ந்தெடுக்கவும்' },
   step2Subject: { en: 'Step 2 — Select Subject', ta: 'படி 2 — பாடத்தைத் தேர்ந்தெடுக்கவும்' },
@@ -184,6 +199,68 @@ const STRINGS = {
   fullLength: { en: 'Full-length exam simulation', ta: 'முழு நீள தேர்வு உருவகப்படுத்துதல்' },
   negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
   startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
+
+  // Mock test — group exam vs subject/topic
+  mockGroupExam: { en: 'Group Exam', ta: 'குரூப் தேர்வு' },
+  mockSubjectExam: { en: 'Subject / Topic', ta: 'பாடம் / தலைப்பு' },
+  mockGroupSub: {
+    en: 'Full-length exam following the 2024/2025 TNPSC pattern',
+    ta: '2024/2025 TNPSC முறையைப் பின்பற்றும் முழு நீளத் தேர்வு',
+  },
+  mockSubjectSub: {
+    en: 'Practice a single subject or topic at your chosen difficulty',
+    ta: 'நீங்கள் தேர்ந்தெடுத்த சிரமத்தில் ஒரு பாடம் அல்லது தலைப்பைப் பயிற்சி செய்யுங்கள்',
+  },
+  diffLevel: { en: 'Difficulty', ta: 'சிரமம்' },
+  diffEasy: { en: 'Easy', ta: 'எளிது' },
+  diffMedium: { en: 'Medium', ta: 'நடுத்தரம்' },
+  diffHard: { en: 'Hard', ta: 'கடினம்' },
+  diffMixed: { en: 'Mixed', ta: 'கலந்தது' },
+  questionDistribution: { en: 'Question distribution', ta: 'வினா பகிர்வு' },
+  startExam: { en: 'Start Exam', ta: 'தேர்வைத் தொடங்கு' },
+
+  // Mock instructions
+  examInstructions: { en: 'Exam Instructions', ta: 'தேர்வு வழிமுறைகள்' },
+  instrFullscreen: {
+    en: 'The test runs in full-screen. Exiting full-screen or switching tabs is recorded as a violation.',
+    ta: 'தேர்வு முழுத் திரையில் இயங்கும். முழுத் திரையிலிருந்து வெளியேறுவது அல்லது தாவல்களை மாற்றுவது மீறலாகப் பதிவு செய்யப்படும்.',
+  },
+  instrTimer: {
+    en: 'A fixed countdown timer runs throughout. The test auto-submits when time expires.',
+    ta: 'நிலையான எண்ணிக்கை நேரம் இயங்கும். நேரம் முடிந்ததும் தேர்வு தானாகச் சமர்ப்பிக்கப்படும்.',
+  },
+  instrPalette: {
+    en: 'Use the question palette to navigate, mark questions for review, and track your progress.',
+    ta: 'வழிசெலுத்த, மதிப்பாய்வுக்காக வினாக்களைக் குறிக்க, முன்னேற்றத்தைக் கண்காணிக்க வினாப் பலகத்தைப் பயன்படுத்தவும்.',
+  },
+  instrNoCopy: {
+    en: 'Copy, paste, and right-click are disabled during the test.',
+    ta: 'தேர்வின் போது நகலெடுத்தல், ஒட்டுதல் மற்றும் வலது-கிளிக் முடக்கப்படும்.',
+  },
+  instrConfirm: {
+    en: 'I have read the instructions and agree to take this test under exam conditions.',
+    ta: 'வழிமுறைகளைப் படித்து, தேர்வு நிலைமைகளின் கீழ் இந்தத் தேர்வை எடுக்க ஒப்புக்கொள்கிறேன்.',
+  },
+  beginTest: { en: 'Begin Test', ta: 'தேர்வைத் தொடங்கு' },
+  enterFullscreen: { en: 'Enter full-screen & begin', ta: 'முழுத் திரைக்குச் சென்று தொடங்கு' },
+
+  // OMR interface
+  notVisited: { en: 'Not Visited', ta: 'பார்க்கப்படவில்லை' },
+  visited: { en: 'Visited', ta: 'பார்க்கப்பட்டது' },
+  answered: { en: 'Answered', ta: 'பதிலளிக்கப்பட்டது' },
+  markedReview: { en: 'Marked for Review', ta: 'மதிப்பாய்வுக்குக் குறிக்கப்பட்டது' },
+  answeredMarked: { en: 'Answered & Marked', ta: 'பதிலளித்து குறிக்கப்பட்டது' },
+  saveNext: { en: 'Save & Next', ta: 'சேமித்து அடுத்து' },
+  clearResponse: { en: 'Clear Response', ta: 'பதிலை அழி' },
+  markReviewNext: { en: 'Mark for Review & Next', ta: 'மதிப்பாய்வுக்குக் குறித்து அடுத்து' },
+  questionPalette: { en: 'Question Palette', ta: 'வினாப் பலகம்' },
+  violationWarning: {
+    en: 'Warning: leaving the test screen is recorded. Repeated violations auto-submit your test.',
+    ta: 'எச்சரிக்கை: தேர்வுத் திரையை விட்டு வெளியேறுவது பதிவு செய்யப்படுகிறது. மீண்டும் மீண்டும் மீறல்கள் தேர்வைத் தானாகச் சமர்ப்பிக்கும்.',
+  },
+  timeWarning30: { en: '30 minutes remaining', ta: '30 நிமிடங்கள் மீதம்' },
+  timeWarning10: { en: '10 minutes remaining', ta: '10 நிமிடங்கள் மீதம்' },
+  timeWarning5: { en: '5 minutes remaining', ta: '5 நிமிடங்கள் மீதம்' },
 
   // Habit layer
   dayStreak: { en: 'Day Streak', ta: 'நாள் தொடர்ச்சி' },
@@ -328,6 +405,7 @@ const STRINGS = {
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },
   testsCompleted: { en: 'Tests Completed', ta: 'முடிக்கப்பட்ட தேர்வுகள்' },
+  testsAbandoned: { en: 'Tests Abandoned', ta: 'விட்டுச்சென்ற தேர்வுகள்' },
   totalQuestions: { en: 'Total Questions', ta: 'மொத்த வினாக்கள்' },
   avgRating: { en: 'Avg Rating', ta: 'சராசரி மதிப்பீடு' },
   totalFeedback: { en: 'Feedback Received', ta: 'பெறப்பட்ட கருத்துகள்' },

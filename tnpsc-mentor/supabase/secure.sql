@@ -31,7 +31,7 @@ grant select (
   aptitude_type, aptitude_topic, subject, topic,
   question_type, external_id,
   question_text, option_a, option_b, option_c, option_d,
-  difficulty, source_url, created_at,
+  difficulty, source_url, created_at, images,
   question_text_ta, option_a_ta, option_b_ta, option_c_ta, option_d_ta
 ) on public.questions to authenticated;
 
@@ -52,7 +52,7 @@ returns table (
   aptitude_type text, aptitude_topic text, subject text, topic text,
   question_type text, external_id text,
   question_text text, option_a text, option_b text, option_c text, option_d text,
-  difficulty text,
+  difficulty text, images jsonb,
   question_text_ta text, option_a_ta text, option_b_ta text,
   option_c_ta text, option_d_ta text
 )
@@ -81,7 +81,7 @@ as $$
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
          q.question_type, q.external_id,
          q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-         q.difficulty,
+         q.difficulty, q.images,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q, cfg
@@ -228,6 +228,48 @@ begin
 end;
 $$;
 
+-- ─── 3b. Record an abandoned (exited mid-way) test session ─────────────────
+create or replace function public.record_abandoned_test(p_session jsonb)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user       uuid := auth.uid();
+  v_session_id uuid;
+begin
+  if v_user is null then
+    raise exception 'not authenticated';
+  end if;
+
+  insert into public.test_sessions (
+    user_id, category, group_type, subject, standard, ca_month, ca_type,
+    aptitude_type, aptitude_topic, total_questions, attempted,
+    time_limit_seconds, time_taken_seconds, status
+  ) values (
+    v_user,
+    p_session->>'category',
+    p_session->>'group_type',
+    p_session->>'subject',
+    (p_session->>'standard')::int,
+    p_session->>'ca_month',
+    p_session->>'ca_type',
+    p_session->>'aptitude_type',
+    p_session->>'aptitude_topic',
+    coalesce((p_session->>'total_questions')::int, 0),
+    coalesce((p_session->>'attempted')::int, 0),
+    coalesce((p_session->>'time_limit_seconds')::int, 0),
+    coalesce((p_session->>'time_taken_seconds')::int, 0),
+    'abandoned'
+  ) returning id into v_session_id;
+
+  return v_session_id;
+end;
+$$;
+
+grant execute on function public.record_abandoned_test(jsonb) to authenticated;
+
 -- ─── 3c. Spaced revision: due items (NO answers) ────────────────────────────
 create or replace function public.get_due_reviews(p_limit int default 30)
 returns table (
@@ -237,7 +279,7 @@ returns table (
   aptitude_type text, aptitude_topic text, subject text, topic text,
   question_type text, external_id text,
   question_text text, option_a text, option_b text, option_c text, option_d text,
-  difficulty text,
+  difficulty text, images jsonb,
   question_text_ta text, option_a_ta text, option_b_ta text,
   option_c_ta text, option_d_ta text
 )
@@ -252,7 +294,7 @@ as $$
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
          q.question_type, q.external_id,
          q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-         q.difficulty,
+         q.difficulty, q.images,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.review_items r

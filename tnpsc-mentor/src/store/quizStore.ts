@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import type { AnswerLetter, Question, QuizConfig, TestAnswer } from '../types'
 
 export const SECONDS_PER_QUESTION = 45
-export const MIN_SECONDS_PER_QUESTION = 15
+export const MIN_SECONDS_PER_QUESTION = 7
 export const ATTENDANCE_GATE = 0.8 // 80%
 
 interface QuizState {

@@ -88,6 +88,7 @@ begin
     'active30d',        (select count(distinct user_id) from public.daily_activity
                           where activity_date >= current_date - 29),
     'testsCompleted',   (select count(*) from public.test_sessions where status = 'completed'),
+    'testsAbandoned',   (select count(*) from public.test_sessions where status = 'abandoned'),
     'totalQuestions',   (select count(*) from public.questions),
     'feedbackCount',    (select count(*) from public.app_feedback),
     'avgRating',        (select round(coalesce(avg(rating), 0)::numeric, 2) from public.app_feedback),

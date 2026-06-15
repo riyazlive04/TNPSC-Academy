@@ -31,7 +31,10 @@ const TYPE = {
 }
 // folder -> display subject name (academic subjects only; current_affairs excluded)
 const SUBJECT = {
-  botany: 'Botany',
+  // Botany + Zoology are merged into a single 'Biology' subject (the TNPSC GS
+  // Life-Science unit is taught as one biology paper). Their source folders stay
+  // separate; both load under subject='Biology'.
+  botany: 'Biology',
   chemistry: 'Chemistry',
   economy: 'Economy',
   english: 'English',
@@ -43,7 +46,7 @@ const SUBJECT = {
   polity: 'Polity',
   tamil: 'Tamil',
   tamil_nadu_administration: 'Tamil Nadu Administration',
-  zoology: 'Zoology',
+  zoology: 'Biology',
 }
 const DIFF = { low: 'easy', medium: 'medium', high: 'hard' }
 const clean = (v) => (v == null ? null : String(v).trim() || null)

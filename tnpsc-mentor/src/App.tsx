@@ -13,6 +13,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import LanguageScreen from './pages/LanguageScreen'
 import TestArenaPage from './pages/TestArenaPage'
 import PreviousYearPage from './pages/PreviousYearPage'
+import HistoryPeriodsPage from './pages/HistoryPeriodsPage'
 import SamacheerPage from './pages/SamacheerPage'
 import SubjectPracticePage from './pages/SubjectPracticePage'
 import CurrentAffairsPage from './pages/CurrentAffairsPage'
@@ -24,6 +25,8 @@ import InsightsPage from './pages/InsightsPage'
 import AchievementsPage from './pages/AchievementsPage'
 import RevisionPage from './pages/RevisionPage'
 import MockTestPage from './pages/MockTestPage'
+import MockInstructionsPage from './pages/MockInstructionsPage'
+import MockQuizPage from './pages/MockQuizPage'
 import SetupPage from './pages/SetupPage'
 import DailyPage from './pages/DailyPage'
 import BookmarksPage from './pages/BookmarksPage'
@@ -34,6 +37,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/language', element: <LanguageScreen /> },
   { path: '/test-arena', element: <TestArenaPage /> },
   { path: '/test-arena/pyq', element: <PreviousYearPage /> },
+  { path: '/test-arena/pyq/history', element: <HistoryPeriodsPage /> },
   { path: '/test-arena/subjects', element: <SubjectPracticePage /> },
   // Samacheer is hidden from the dashboard but its route is kept for direct/admin
   // access (its data currently lives in questions_backup).
@@ -47,6 +51,8 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/achievements', element: <AchievementsPage /> },
   { path: '/revision', element: <RevisionPage /> },
   { path: '/mock', element: <MockTestPage /> },
+  { path: '/mock/instructions', element: <MockInstructionsPage /> },
+  { path: '/mock/quiz', element: <MockQuizPage /> },
   { path: '/setup', element: <SetupPage /> },
   { path: '/daily', element: <DailyPage /> },
   { path: '/bookmarks', element: <BookmarksPage /> },
