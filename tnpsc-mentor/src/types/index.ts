@@ -33,6 +33,10 @@ export interface Question {
   // Short provenance marker (e.g. 'TU') — rendered as a small badge when set.
   source_tag?: string | null
   question_text: string
+  // Ordered public URLs of figures that belong to the question stem (diagrams
+  // for dice/seating/figure-counting items). Hosted in the Supabase Storage
+  // `question-images` bucket; rendered with the question, never gated.
+  images?: string[] | null
   option_a: string
   option_b: string
   option_c: string
@@ -123,8 +127,16 @@ export interface QuizConfig {
   subject?: string
   standard?: number
   topic?: string
+  /**
+   * Broad unit/section filter (the `questions.unit` column). Used by the PYQ
+   * History selector to scope a test to one period — 'ancient' | 'medieval' |
+   * 'modern' (the 214 History PYQs are tagged this way).
+   */
+  unit?: string
   /** Subject Practice: restrict to one question style (omit for "Mixed"). */
   question_type?: SubjectQType
+  /** Difficulty filter (easy/medium/hard) — used by subject/topic mock tests. */
+  difficulty?: Difficulty
   ca_month?: string
   ca_type?: string
   ca_topic?: string
@@ -144,6 +156,34 @@ export interface QuizConfig {
   daily?: boolean
   /** Weekly Current-Affairs consolidation drill. */
   weekly?: boolean
+  /**
+   * Proctored mock-test mode. When set, the quiz runs through the dedicated
+   * OMR-style engine (fullscreen, question palette, violation tracking) instead
+   * of the regular timed quiz. `mockKind` distinguishes a full group-pattern
+   * exam from a single subject/topic drill.
+   */
+  proctored?: boolean
+  mockKind?: 'group' | 'subject'
+  /** Which TNPSC group blueprint a group mock follows (2024/2025 pattern). */
+  mockGroup?: GroupType
+}
+
+// ─── Mock-test blueprint (group-exam patterns) ──────────────────────────────
+
+/** One subject slot in a group-exam blueprint (label + how many questions). */
+export interface MockSlot {
+  label: string
+  count: number
+}
+
+/** A full group-exam template following the TNPSC 2024/2025 pattern. */
+export interface MockBlueprint {
+  id: GroupType
+  title: string
+  totalQuestions: number
+  durationMinutes: number
+  negativeMark: number
+  slots: MockSlot[]
 }
 
 export interface Profile {

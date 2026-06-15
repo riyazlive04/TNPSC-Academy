@@ -177,6 +177,9 @@ export const api = {
       body: { session, answers },
     })
   },
+  async abandonTest(session: Record<string, unknown>): Promise<void> {
+    await request('/api/tests/abandon', { method: 'POST', body: { session } })
+  },
   async distinctTopics(params: {
     category: string
     subject?: string
@@ -203,6 +206,37 @@ export const api = {
       body: params,
     })
     return data.counts
+  },
+  /** PYQ History bank counts per period ('ancient' | 'medieval' | 'modern'). */
+  async historyPeriods(): Promise<Record<string, number>> {
+    const data = await request<{ counts: Record<string, number> }>(
+      '/api/questions/history-periods',
+      { method: 'POST', body: {} }
+    )
+    return data.counts
+  },
+
+  // ─── Mock tests ─────────────────────────────────────────────────────────────
+  /** Full group-exam mock (2024/2025 pattern): questions pooled per subject slot. */
+  async mockGroupQuestions(groupType: string): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/mock-group', {
+      method: 'POST',
+      body: { group_type: groupType },
+    })
+    return data.questions
+  },
+  /** Subject/topic mock with optional difficulty (easy/medium/hard). */
+  async subjectMockQuestions(params: {
+    subject?: string
+    topic?: string
+    difficulty?: string
+    count?: number
+  }): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/subject-mock', {
+      method: 'POST',
+      body: params,
+    })
+    return data.questions
   },
 
   // ─── Analytics ─────────────────────────────────────────────────────────────
@@ -329,6 +363,7 @@ export interface PlatformMetrics {
   active7d: number
   active30d: number
   testsCompleted: number
+  testsAbandoned: number
   totalQuestions: number
   feedbackCount: number
   avgRating: number

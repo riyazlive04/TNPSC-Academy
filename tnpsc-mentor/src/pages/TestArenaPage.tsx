@@ -39,6 +39,13 @@ interface ArenaCard {
 
 const CARDS: ArenaCard[] = [
   {
+    to: '/mock',
+    titleKey: 'mockTests',
+    subtitle: 'Group exam · subject · timed',
+    icon: <ShieldCheck size={20} />,
+    tile: 'bg-accentwarmsoft text-accentwarm',
+  },
+  {
     to: '/test-arena/subjects',
     titleKey: 'subjectPracticeTitle',
     subtitle: 'Subject · topic · question type',
@@ -67,6 +74,10 @@ const CARDS: ArenaCard[] = [
     tile: 'bg-brand-soft text-brand',
   },
 ]
+
+// The admin "Manage Question Bank" grid lists only the actual question-bank
+// categories — the Mock Test card (a student exam mode, not a bank) is excluded.
+const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 
 export default function TestArenaPage() {
   const navigate = useNavigate()
@@ -383,7 +394,7 @@ function AdminDashboard({
         </h2>
         <p className="mb-3 font-body text-sm text-ink2">{t('pickCategoryAdmin')}</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {CARDS.map((card, i) => (
+          {BANK_CARDS.map((card, i) => (
             <button
               key={card.to}
               onClick={() => onNavigate(card.to)}
@@ -408,7 +419,7 @@ function AdminDashboard({
           {/* Outer subject bank (admin-only content) */}
           <button
             onClick={() => onNavigate('/admin/questions', { state: { category: 'outer', label: 'Outer Questions' } })}
-            style={{ '--i': CARDS.length } as React.CSSProperties}
+            style={{ '--i': BANK_CARDS.length } as React.CSSProperties}
             className="card interactive stagger-item group flex items-center gap-4 p-4 text-left"
           >
             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-gold/15 text-gold">

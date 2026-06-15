@@ -1,6 +1,7 @@
 import type { AnswerLetter, Question } from '../../types'
 import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
+import QuestionFigures from './QuestionFigures'
 import { useT } from '../../lib/i18n'
 
 interface QuestionCardProps {
@@ -48,9 +49,11 @@ export default function QuestionCard({
         </div>
       </div>
 
-      <p className="tamil mb-5 whitespace-pre-line text-lg font-semibold leading-relaxed text-navytext sm:text-xl">
+      <p className="tamil mb-3 whitespace-pre-line text-lg font-semibold leading-relaxed text-navytext sm:text-xl">
         {displayQuestion(question, lang)}
       </p>
+
+      <QuestionFigures images={question.images} className="mb-5" />
 
       <div className="flex flex-col gap-3">
         {LETTERS.map((letter) => {

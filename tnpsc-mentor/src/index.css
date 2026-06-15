@@ -99,27 +99,41 @@ h4,
   }
 
   /* ─── Buttons ────────────────────────────────────────────────────────── */
+  /* Base carries a sensible DEFAULT size (padding + text), so a bare `btn-*`
+   * renders correctly. Buttons that need a different size still override with
+   * their own px/py/text utilities (utility layer wins over this component
+   * layer), so existing call-sites are unaffected. Tactile press + focus ring
+   * are built in — no need to add `press`/`focus-ring` alongside. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl font-heading font-semibold
-      transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30
-      disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl
+      px-5 py-2.5 text-sm font-heading font-semibold leading-none
+      transition-all duration-200 ease-out active:scale-[0.97]
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas
+      disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
   }
-  /* Primary — royal blue, the signature action (flat, no glow). */
+  /* Compact / spacious size modifiers (compose with any variant). */
+  .btn-sm {
+    @apply px-3.5 py-2 text-xs;
+  }
+  .btn-lg {
+    @apply px-7 py-3.5 text-base;
+  }
+  /* Primary — royal blue, the signature action. Lifts on hover. */
   .btn-brand {
-    @apply btn bg-brand text-white hover:bg-brand-dark active:bg-brand-deep;
+    @apply btn bg-brand text-white shadow-sm hover:bg-brand-dark hover:shadow-brand active:bg-brand-deep;
   }
   /* Warm CTA — the orange accent, used sparingly for the key conversion action. */
   .btn-gold {
-    @apply btn bg-accentwarm text-white hover:brightness-105 active:brightness-95;
+    @apply btn bg-accentwarm text-white shadow-sm hover:brightness-105 hover:shadow-warm active:brightness-95;
   }
   .btn-accent {
-    @apply btn bg-accentwarm text-white hover:brightness-105 active:brightness-95;
+    @apply btn bg-accentwarm text-white shadow-sm hover:brightness-105 hover:shadow-warm active:brightness-95;
   }
   .btn-soft {
     @apply btn bg-brand-soft text-brand-dark hover:bg-tint;
   }
   .btn-ghost {
-    @apply btn border border-line bg-card text-ink hover:border-brand/40 hover:text-brand-dark;
+    @apply btn border border-line bg-card text-ink hover:border-brand/40 hover:bg-tint/40 hover:text-brand-dark;
   }
 
   /* ─── Segmented tabs ─────────────────────────────────────────────────── */

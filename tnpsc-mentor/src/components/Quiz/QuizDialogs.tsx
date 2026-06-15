@@ -63,6 +63,43 @@ export function AttendanceGateModal({
   )
 }
 
+interface ExitTestModalProps {
+  onEvaluate: () => void
+  onDiscard: () => void
+  onCancel: () => void
+}
+
+/** Shown when a student tries to exit a practice test mid-way. */
+export function ExitTestModal({ onEvaluate, onDiscard, onCancel }: ExitTestModalProps) {
+  return (
+    <ModalShell title="Exit Test?">
+      <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">
+        What would you like to do with your progress so far?
+      </p>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={onEvaluate}
+          className="btn-brand w-full px-5 py-3 text-sm"
+        >
+          Submit &amp; See Results
+        </button>
+        <button
+          onClick={onDiscard}
+          className="w-full rounded-full bg-coral px-5 py-3 font-heading text-sm font-bold uppercase text-white transition hover:opacity-90"
+        >
+          Exit Without Saving
+        </button>
+        <button
+          onClick={onCancel}
+          className="w-full rounded-full border border-line px-5 py-3 font-heading text-sm font-semibold text-ink2 transition hover:border-brand-ring"
+        >
+          Keep Going
+        </button>
+      </div>
+    </ModalShell>
+  )
+}
+
 interface SubmitErrorModalProps {
   message: string
   onRetry: () => void

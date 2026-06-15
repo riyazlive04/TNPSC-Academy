@@ -4,6 +4,153 @@ import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 
 const router = Router()
 
+// Columns safe to return to the client (answers stripped at column-grant level,
+// but we also list them explicitly to be unambiguous).
+const QUIZ_COLS = [
+  'id', 'category', 'group_type', 'year', 'standard',
+  'ca_month', 'ca_year', 'ca_type', 'ca_topic',
+  'aptitude_type', 'aptitude_topic', 'subject', 'topic',
+  'question_type', 'external_id', 'difficulty',
+  'question_text', 'option_a', 'option_b', 'option_c', 'option_d',
+  'question_text_ta', 'option_a_ta', 'option_b_ta', 'option_c_ta', 'option_d_ta',
+].join(', ')
+
+// Fisher-Yates shuffle (mutates a copy).
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+// Per-group subject-slot definitions for the group exam mock (2024/2025 pattern).
+// Each slot pulls from one or more {category, subjects?} pairs, pools the results,
+// shuffles, and takes the first `count` questions.
+interface MockQueryDef { category: string; subjects?: string[] }
+interface MockSlotDef { label: string; count: number; queries: MockQueryDef[] }
+
+const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
+  Group4_VAO: [
+    { label: 'General Tamil', count: 20,
+      queries: [{ category: 'subject', subjects: ['தமிழ்'] }] },
+    { label: 'History & INM', count: 15,
+      queries: [
+        { category: 'subject', subjects: ['History', 'Indian National Movement'] },
+        { category: 'pyq', subjects: ['History and INM'] },
+      ] },
+    { label: 'Geography', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['Geography'] },
+        { category: 'pyq', subjects: ['Geography'] },
+      ] },
+    { label: 'Polity', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['Polity'] },
+        { category: 'pyq', subjects: ['Polity'] },
+      ] },
+    { label: 'General Science', count: 20,
+      queries: [
+        { category: 'subject', subjects: ['Physics', 'Chemistry', 'Biology'] },
+        { category: 'pyq', subjects: ['Physics', 'Chemistry', 'Biology'] },
+      ] },
+    { label: 'Economy', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['Economy'] },
+        { category: 'pyq', subjects: ['Indian Economy'] },
+      ] },
+    { label: 'Current Affairs', count: 10,
+      queries: [{ category: 'current_affairs' }] },
+    { label: 'Aptitude', count: 5,
+      queries: [{ category: 'aptitude' }] },
+  ],
+  Group2_2A: [
+    { label: 'History & INM', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['History', 'Indian National Movement'] },
+        { category: 'pyq', subjects: ['History and INM'] },
+      ] },
+    { label: 'Polity', count: 8,
+      queries: [
+        { category: 'subject', subjects: ['Polity'] },
+        { category: 'pyq', subjects: ['Polity'] },
+      ] },
+    { label: 'Geography', count: 8,
+      queries: [
+        { category: 'subject', subjects: ['Geography'] },
+        { category: 'pyq', subjects: ['Geography'] },
+      ] },
+    { label: 'General Science', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['Physics', 'Chemistry', 'Biology'] },
+        { category: 'pyq', subjects: ['Physics', 'Chemistry', 'Biology'] },
+      ] },
+    { label: 'Economy', count: 4,
+      queries: [
+        { category: 'subject', subjects: ['Economy'] },
+        { category: 'pyq', subjects: ['Indian Economy'] },
+      ] },
+    { label: 'TN History & Culture', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['History, Culture, Heritage'] },
+        { category: 'pyq', subjects: ['History Culture Heritage of TN'] },
+      ] },
+    { label: 'TN Administration', count: 5,
+      queries: [
+        { category: 'subject', subjects: ['Tamil Nadu Administration'] },
+        { category: 'pyq', subjects: ['Development Administration of TamilNadu'] },
+      ] },
+    { label: 'General Tamil', count: 15,
+      queries: [{ category: 'subject', subjects: ['தமிழ்'] }] },
+    { label: 'Current Affairs', count: 15,
+      queries: [{ category: 'current_affairs' }] },
+    { label: 'Aptitude', count: 15,
+      queries: [{ category: 'aptitude' }] },
+  ],
+  Group1: [
+    { label: 'History & INM', count: 15,
+      queries: [
+        { category: 'subject', subjects: ['History', 'Indian National Movement'] },
+        { category: 'pyq', subjects: ['History and INM'] },
+      ] },
+    { label: 'Polity', count: 12,
+      queries: [
+        { category: 'subject', subjects: ['Polity'] },
+        { category: 'pyq', subjects: ['Polity'] },
+      ] },
+    { label: 'Geography', count: 12,
+      queries: [
+        { category: 'subject', subjects: ['Geography'] },
+        { category: 'pyq', subjects: ['Geography'] },
+      ] },
+    { label: 'General Science', count: 15,
+      queries: [
+        { category: 'subject', subjects: ['Physics', 'Chemistry', 'Biology'] },
+        { category: 'pyq', subjects: ['Physics', 'Chemistry', 'Biology'] },
+      ] },
+    { label: 'Economy', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['Economy'] },
+        { category: 'pyq', subjects: ['Indian Economy'] },
+      ] },
+    { label: 'TN History & Culture', count: 10,
+      queries: [
+        { category: 'subject', subjects: ['History, Culture, Heritage'] },
+        { category: 'pyq', subjects: ['History Culture Heritage of TN'] },
+      ] },
+    { label: 'TN Administration', count: 6,
+      queries: [
+        { category: 'subject', subjects: ['Tamil Nadu Administration'] },
+        { category: 'pyq', subjects: ['Development Administration of TamilNadu'] },
+      ] },
+    { label: 'Current Affairs', count: 10,
+      queries: [{ category: 'current_affairs' }] },
+    { label: 'Aptitude', count: 10,
+      queries: [{ category: 'aptitude' }] },
+  ],
+}
+
 // ─── POST /api/questions/quiz ────────────────────────────────────────────────
 // Safe quiz questions for a config (no answers — get_quiz_questions strips them
 // server-side and returns a random sample).
@@ -103,6 +250,32 @@ router.post(
   })
 )
 
+// ─── POST /api/questions/history-periods ─────────────────────────────────────
+// Counts the PYQ History bank (category='pyq', subject='History and INM') by
+// historical period — the `unit` column holds 'ancient' | 'medieval' | 'modern'.
+// Powers the three-criteria History selector (counts + disable empty periods).
+const HISTORY_PYQ_SUBJECT = 'History and INM'
+router.post(
+  '/history-periods',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!
+      .from('questions')
+      .select('unit')
+      .eq('category', 'pyq')
+      .eq('subject', HISTORY_PYQ_SUBJECT)
+      .eq('active', true)
+      .not('unit', 'is', null)
+    if (error) return sendDbError(res, error)
+    const counts: Record<string, number> = {}
+    for (const r of (data ?? []) as { unit: string | null }[]) {
+      if (!r.unit) continue
+      counts[r.unit] = (counts[r.unit] ?? 0) + 1
+    }
+    res.json({ counts })
+  })
+)
+
 // ─── POST /api/questions/subjects ────────────────────────────────────────────
 // Subject Practice: the list of academic subjects (category='subject') with a
 // total active-question count each. Powers the Subject step of the picker.
@@ -151,6 +324,74 @@ router.post(
       counts[r.question_type] = (counts[r.question_type] ?? 0) + 1
     }
     res.json({ counts })
+  })
+)
+
+// ─── POST /api/questions/mock-group ─────────────────────────────────────────
+// Group-exam mock questions following the 2024/2025 TNPSC pattern. Fetches
+// questions slot-by-slot (one slot per subject), pools each slot, shuffles, and
+// returns a flat merged array. Answer columns never appear (column-level grants).
+router.post(
+  '/mock-group',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { group_type } = req.body ?? {}
+    const slots = GROUP_SLOTS[group_type as string]
+    if (!slots) return res.status(400).json({ error: `Unknown group_type: ${group_type}` })
+
+    const result: Record<string, unknown>[] = []
+
+    for (const slot of slots) {
+      const pool: Record<string, unknown>[] = []
+      const seen = new Set<string>()
+
+      for (const qdef of slot.queries) {
+        let q = req.db!
+          .from('questions')
+          .select(QUIZ_COLS)
+          .eq('category', qdef.category)
+          .eq('active', true)
+        if (qdef.subjects?.length) q = q.in('subject', qdef.subjects)
+        const { data, error } = await q
+        if (error) return sendDbError(res, error)
+        for (const row of (data ?? []) as unknown as Record<string, unknown>[]) {
+          const id = row.id as string
+          if (!seen.has(id)) { seen.add(id); pool.push(row) }
+        }
+      }
+
+      const picked = shuffle(pool).slice(0, slot.count)
+      result.push(...picked)
+    }
+
+    res.json({ questions: shuffle(result) })
+  })
+)
+
+// ─── POST /api/questions/subject-mock ───────────────────────────────────────
+// Subject/topic mock with optional difficulty filter. Returns up to `count`
+// random questions from the subject bank for the selected subject/topic/difficulty.
+router.post(
+  '/subject-mock',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { subject, topic, difficulty, count = 50 } = req.body ?? {}
+
+    let q = req.db!
+      .from('questions')
+      .select(QUIZ_COLS)
+      .eq('category', 'subject')
+      .eq('active', true)
+    if (subject) q = q.eq('subject', subject)
+    if (topic) q = q.eq('topic', topic)
+    if (difficulty) q = q.eq('difficulty', difficulty)
+
+    const { data, error } = await q
+    if (error) return sendDbError(res, error)
+
+    const rows = (data ?? []) as unknown as Record<string, unknown>[]
+    const questions = shuffle(rows).slice(0, Number(count))
+    res.json({ questions })
   })
 )
 

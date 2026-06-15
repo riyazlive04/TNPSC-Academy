@@ -4,6 +4,7 @@ import { Bookmark, Check, X, MinusCircle, Clock } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { formatDuration } from '../UI/Timer'
 import WorkedSolution from './WorkedSolution'
+import QuestionFigures from './QuestionFigures'
 
 interface ResultCardProps {
   question: Question
@@ -97,6 +98,8 @@ export default function ResultCard({
             .join(' · ')}
         </p>
       )}
+
+      <QuestionFigures images={question.images} className="mb-3" />
 
       {showExplanation ? (
         <>

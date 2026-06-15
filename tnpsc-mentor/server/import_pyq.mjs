@@ -23,20 +23,22 @@ import { readFileSync, existsSync } from 'node:fs'
  */
 
 const ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/pyq_all'
+const Q_ROOT = `${ROOT}/Questions`
 const APPLY = process.env.APPLY === '1'
 
-// JSON filename -> { subject: exact frontend label, slug: external_id namespace }
+// JSON filename -> { subject: exact frontend label, slug: external_id namespace, explFile: explanation lookup }
 const FILES = {
-  'TNPSC_AllYears_History.json': { subject: 'History and INM', slug: 'history' },
-  'TNPSC_AllYears_Polity.json': { subject: 'Polity', slug: 'polity' },
-  'TNPSC_AllYears_Geography.json': { subject: 'Geography', slug: 'geography' },
-  'TNPSC_AllYears_Culture.json': { subject: 'History Culture Heritage of TN', slug: 'culture' },
-  'TNPSC_AllYears_Development_Administration.json': { subject: 'Development Administration of TamilNadu', slug: 'devadmin' },
-  'TNPSC_AllYears_Biology.json': { subject: 'Biology', slug: 'biology' },
-  'TNPSC_AllYears_Physics.json': { subject: 'Physics', slug: 'physics' },
-  'TNPSC_AllYears_Chemistry.json': { subject: 'Chemistry', slug: 'chemistry' },
-  'TNPSC_AllYears_Economics.json': { subject: 'Indian Economy', slug: 'economics' },
-  'TNPSC_AllYears_Aptitude.json': { subject: 'Aptitude', slug: 'aptitude' },
+  'TNPSC_AllYears_History.json': { subject: 'History and INM', slug: 'history', explFile: 'History_explanations.json' },
+  'TNPSC_AllYears_Polity.json': { subject: 'Polity', slug: 'polity', explFile: 'Polity_explanations.json' },
+  'TNPSC_AllYears_Geography.json': { subject: 'Geography', slug: 'geography', explFile: 'Geography_explanations.json' },
+  'TNPSC_AllYears_Culture.json': { subject: 'History Culture Heritage of TN', slug: 'culture', explFile: 'Culture_explanations.json' },
+  'TNPSC_AllYears_Development_Administration.json': { subject: 'Development Administration of TamilNadu', slug: 'devadmin', explFile: 'Development_Administration_explanations.json' },
+  'TNPSC_AllYears_Biology.json': { subject: 'Biology', slug: 'biology', explFile: 'Biology_explanations.json' },
+  'TNPSC_AllYears_Physics.json': { subject: 'Physics', slug: 'physics', explFile: 'Physics_explanations.json' },
+  'TNPSC_AllYears_Chemistry.json': { subject: 'Chemistry', slug: 'chemistry', explFile: 'Chemistry_explanations.json' },
+  'TNPSC_AllYears_Economics.json': { subject: 'Indian Economy', slug: 'economics', explFile: 'Economics_explanations.json' },
+  // Aptitude lives in AllYears/ (already has inline explanations)
+  'TNPSC_AllYears_Aptitude.json': { subject: 'Aptitude', slug: 'aptitude', explFile: null, qDir: 'c:/Users/mas20/Desktop/work/TNPSC/AllYears' },
 }
 
 const clean = (v) => (v == null ? null : String(v).trim() || null)
@@ -71,14 +73,16 @@ const summary = {}
 let skippedNoAnswer = 0
 const skippedSamples = []
 
-for (const [file, { subject, slug }] of Object.entries(FILES)) {
-  const path = `${ROOT}/${file}`
-  if (!existsSync(path)) {
+for (const [file, { subject, slug, explFile, qDir }] of Object.entries(FILES)) {
+  const qPath = `${qDir ?? Q_ROOT}/${file}`
+  const ePath = explFile ? `${ROOT}/${explFile}` : null
+  if (!existsSync(qPath)) {
     console.error(`  ! missing file: ${file}`)
     summary[subject] = 0
     continue
   }
-  const arr = JSON.parse(readFileSync(path, 'utf8'))
+  const arr = JSON.parse(readFileSync(qPath, 'utf8'))
+  const explMap = (ePath && existsSync(ePath)) ? JSON.parse(readFileSync(ePath, 'utf8')) : {}
   let kept = 0
   arr.forEach((q) => {
     const ans = String(q.marked_answer ?? '').trim().toUpperCase()
@@ -89,6 +93,23 @@ for (const [file, { subject, slug }] of Object.entries(FILES)) {
     }
     const opts = q.options || {}
     const optsTa = q.options_ta || {}
+    // Explanation: two formats in the file —
+    //   { opts: { a: {en,ta}, … } }  → per-option (use correct option)
+    //   { type, expl: {en,ta} }       → question-level (single explanation)
+    // Fallback to inline q.explanation if neither is present.
+    const eEntry = explMap[q.qid]
+    let explanation, explanation_ta
+    if (eEntry?.opts) {
+      const opt = eEntry.opts[ans.toLowerCase()]
+      explanation = clean(opt?.en ?? q.explanation)
+      explanation_ta = clean(opt?.ta ?? null)
+    } else if (eEntry?.expl) {
+      explanation = clean(eEntry.expl.en ?? q.explanation)
+      explanation_ta = clean(eEntry.expl.ta ?? null)
+    } else {
+      explanation = clean(q.explanation)
+      explanation_ta = null
+    }
     rows.push({
       category: 'pyq',
       subject,
@@ -102,7 +123,8 @@ for (const [file, { subject, slug }] of Object.entries(FILES)) {
       option_c: clean(opts.c),
       option_d: clean(opts.d),
       correct_answer: ans,
-      explanation: clean(q.explanation),
+      explanation,
+      explanation_ta,
       question_text_ta: stripEmbeddedOptions(clean(q.question_text_ta), optsTa),
       option_a_ta: clean(optsTa.a),
       option_b_ta: clean(optsTa.b),
@@ -146,7 +168,7 @@ console.log('Connected.')
 const COLS = [
   'category', 'subject', 'year', 'topic', 'external_id', 'difficulty',
   'question_text', 'option_a', 'option_b', 'option_c', 'option_d',
-  'correct_answer', 'explanation',
+  'correct_answer', 'explanation', 'explanation_ta',
   'question_text_ta', 'option_a_ta', 'option_b_ta', 'option_c_ta', 'option_d_ta',
   'source_url', 'active',
 ]

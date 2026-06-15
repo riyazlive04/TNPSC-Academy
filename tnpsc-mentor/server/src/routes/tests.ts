@@ -24,4 +24,22 @@ router.post(
   })
 )
 
+// ─── POST /api/tests/abandon ─────────────────────────────────────────────────
+// Records a test that was exited mid-way (status = 'abandoned').
+router.post(
+  '/abandon',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { session } = req.body ?? {}
+    if (!session) {
+      return res.status(400).json({ error: 'session is required' })
+    }
+    const { data, error } = await req.db!.rpc('record_abandoned_test', {
+      p_session: session,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ sessionId: data })
+  })
+)
+
 export default router

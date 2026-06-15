@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore, selectIsSuperAdmin } from '../store/authStore'
+import { useLanguageStore } from '../store/languageStore'
 import AuthShell from '../components/Auth/AuthShell'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
@@ -48,11 +49,14 @@ export default function LoginPage() {
 
     // Resolve destination from the freshly-loaded profile.
     const isSuper = selectIsSuperAdmin(useAuthStore.getState())
+    const langAlreadySet = useLanguageStore.getState().lang !== null
     const dest = isSuper
       ? '/superadmin'
       : fromPath && fromPath !== '/test-arena'
         ? fromPath
-        : '/language'
+        : langAlreadySet
+          ? '/test-arena'
+          : '/language'
     navigate(dest, { replace: true })
   }
 
