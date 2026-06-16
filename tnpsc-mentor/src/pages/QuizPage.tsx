@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2, X } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2, Maximize2, X } from 'lucide-react'
 import Timer from '../components/UI/Timer'
+import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
 import {
@@ -20,6 +21,9 @@ import { useAuthStore } from '../store/authStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
+import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
+import { exitFullscreen } from '../lib/proctor'
+import { useT } from '../lib/i18n'
 import type { AnswerLetter, QuizConfig } from '../types'
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
@@ -29,6 +33,7 @@ function sameConfig(a: QuizConfig, b: QuizConfig): boolean {
 
 export default function QuizPage() {
   const navigate = useNavigate()
+  const { t } = useT()
   const location = useLocation()
   // On a hard refresh, router `location.state` is lost — fall back to the
   // persisted in-progress session's config so the test can resume.
@@ -64,6 +69,9 @@ export default function QuizPage() {
   const [showExitModal, setShowExitModal] = useState(false)
 
   const submittedRef = useRef(false)
+  // Latest proctoring violations, read at submit time (kept in a ref so the
+  // memoised submit handler doesn't need them as a dependency).
+  const violationsRef = useRef<Violation[]>([])
 
   // ── Guard: must have config ──
   useEffect(() => {
@@ -128,7 +136,7 @@ export default function QuizPage() {
       if (left <= 1) {
         clearInterval(id)
         useQuizStore.getState().tick()
-        handleSubmit()
+        handleSubmit(true)
       } else {
         useQuizStore.getState().tick()
       }
@@ -224,7 +232,7 @@ export default function QuizPage() {
     attemptSubmit()
   }
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async (auto = false) => {
     if (submittedRef.current) return
     submittedRef.current = true
 
@@ -266,8 +274,26 @@ export default function QuizPage() {
 
     s.setSubmitting(false)
     s.reset() // clear the persisted in-progress session
-    navigate('/result', { state: payload, replace: true })
+    // Leave full-screen before showing results (no-op for non-proctored quizzes).
+    await exitFullscreen()
+    navigate('/result', {
+      state: { ...payload, violations: violationsRef.current, autoSubmitted: auto },
+      replace: true,
+    })
   }, [navigate])
+
+  // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
+  const proctored = !!config?.proctored
+  const proctorActive = proctored && !loading && !empty && !loadError && total > 0
+  const { violations, violationToast, notFullscreen, fsSupported, reEnterFullscreen } =
+    useProctoring({
+      active: proctorActive,
+      questionIndex: currentIndex,
+      onAutoSubmit: () => {
+        void handleSubmit(true)
+      },
+    })
+  violationsRef.current = violations
 
   // ── Render states ──
   if (!config) return null
@@ -341,6 +367,11 @@ export default function QuizPage() {
             {describeConfig(config)}
           </span>
           <div className="flex items-center gap-2">
+            {proctored && violations.length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-coral/10 px-2 py-1 font-heading text-xs font-semibold text-coral">
+                <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
+              </span>
+            )}
             <Timer secondsLeft={totalTimeLeft} />
             {!config.mock && (
               <button
@@ -451,6 +482,25 @@ export default function QuizPage() {
           onSignIn={() => navigate('/login')}
         />
       )}
+
+      {/* ── Proctoring overlays ── */}
+      {proctored && violationToast && (
+        <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-xl bg-coral px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
+          {violationToast}
+        </div>
+      )}
+      {proctored && fsSupported && notFullscreen && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-ink/80 px-6 text-center backdrop-blur-sm">
+          <Maximize2 size={40} className="text-white" />
+          <p className="max-w-md font-heading text-lg font-semibold text-white">
+            {t('instrFullscreen')}
+          </p>
+          <button onClick={reEnterFullscreen} className="btn-brand">
+            {t('enterFullscreen')}
+          </button>
+        </div>
+      )}
+      {proctored && <ScreenGuard message={t('screenProtected')} />}
     </div>
   )
 }

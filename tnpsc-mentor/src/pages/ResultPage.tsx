@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
+  BookOpen,
   CheckCircle2,
-  Download,
   Home,
   Lock,
   RefreshCw,
@@ -13,13 +13,13 @@ import AppLayout from '../components/Layout/AppLayout'
 import RewardOverlay, { type DailyReward } from '../components/RewardOverlay'
 import ResultCard from '../components/Quiz/ResultCard'
 import { formatTime } from '../components/UI/Timer'
-import { generateExplanationPdf } from '../lib/pdfGenerator'
 import { describeConfig } from '../lib/fetchQuestions'
 import { addBookmark, fetchBookmarkIds, removeBookmark } from '../lib/bookmarks'
 import { scoreByTopic, weakAreas, fetchUserAnalytics } from '../lib/analytics'
 import { fetchHabit } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
 import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
+import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
 import { useAuth } from '../hooks/useAuth'
@@ -27,7 +27,7 @@ import { useProgressStore } from '../store/progressStore'
 import { useT } from '../lib/i18n'
 import type { GroupType, Question, ResultPayload, TestAnswer } from '../types'
 
-type ReviewFilter = 'all' | 'wrong' | 'skipped' | 'correct' | 'flagged'
+type ReviewFilter = 'all' | 'wrong' | 'correct' | 'flagged'
 
 /** Bucket a question by how the user answered it (for the review filter). */
 function classifyAnswer(answer?: TestAnswer): 'correct' | 'wrong' | 'skipped' {
@@ -44,7 +44,6 @@ export default function ResultPage() {
   const claimDaily = useProgressStore((s) => s.claimDaily)
   const payload = location.state as ResultPayload | null
 
-  const [generating, setGenerating] = useState(false)
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())
   const [rewards, setRewards] = useState<{
@@ -85,7 +84,9 @@ export default function ResultPage() {
         totalSubjects: (GROUP_SUBJECTS[group] ?? []).length,
       }
       const all = computeBadges(stats)
-      const unlockedIds = all.filter((b) => b.unlocked).map((b) => b.id)
+      const unlockedIds = all
+        .filter((b) => b.unlocked && !isHiddenBadge(b.id))
+        .map((b) => b.id)
       const level = levelInfo(
         computeXp({ totalCorrect: stats.correct, totalQuestions: stats.questions, testsTaken: stats.tests })
       ).level
@@ -149,9 +150,12 @@ export default function ResultPage() {
   const netMarks = negMark > 0 ? Math.max(0, +(correct - wrong * negMark).toFixed(2)) : null
 
   // Review filter: keep original question numbers while showing a subset.
-  const flaggedCount = questions.filter((q) => answers[q.id]?.flagged).length
+  // Unattended (skipped) questions are never shown — only ones the user answered.
+  const isAttended = (q: Question) => classifyAnswer(answers[q.id]) !== 'skipped'
+  const flaggedCount = questions.filter((q) => isAttended(q) && answers[q.id]?.flagged).length
   const reviewItems: { q: Question; index: number }[] = questions
     .map((q, index) => ({ q, index }))
+    .filter(({ q }) => isAttended(q))
     .filter(({ q }) => {
       if (reviewFilter === 'all') return true
       if (reviewFilter === 'flagged') return Boolean(answers[q.id]?.flagged)
@@ -160,25 +164,6 @@ export default function ResultPage() {
 
   const scoreColor =
     scorePercentage >= 80 ? '#16A34A' : scorePercentage >= 50 ? '#B7791F' : '#E5484D'
-
-  const handleDownload = async () => {
-    if (!pdfUnlocked) return
-    setGenerating(true)
-    try {
-      await generateExplanationPdf({
-        config,
-        questions,
-        answers,
-        scorePercentage,
-        correct,
-        total: totalQuestions,
-        label,
-        lang,
-      })
-    } finally {
-      setGenerating(false)
-    }
-  }
 
   const handleRetry = () => {
     navigate('/quiz', { state: config, replace: true })
@@ -245,35 +230,24 @@ export default function ResultPage() {
           </div>
         </div>
 
-        {/* PDF section */}
+        {/* Explanation unlock status — explanations are shown inline in the
+            review below; there is no downloadable document. */}
         <div className="card mb-5 p-5">
           {pdfUnlocked ? (
-            <div className="flex flex-col items-center gap-3 text-center">
+            <div className="flex items-center justify-center gap-2 text-center">
+              <BookOpen size={18} className="text-brand" />
               <p className="font-body text-sm text-ink2">
-                You attended {attendancePct}% — explanations unlocked.
+                You attended {attendancePct}% — explanations are unlocked in the
+                review below.
               </p>
-              <button
-                onClick={handleDownload}
-                disabled={generating}
-                className="btn-gold w-full px-7 py-3.5 text-base sm:w-auto"
-              >
-                <Download size={20} />
-                {generating ? 'Generating…' : 'Download Explanation PDF'}
-              </button>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 text-center">
               <div className="grid h-12 w-12 place-items-center rounded-2xl bg-coralsoft">
                 <Lock size={24} className="text-coral" />
               </div>
-              <button
-                disabled
-                className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-line px-7 py-3 font-heading text-base font-bold text-ink2/50"
-              >
-                <Lock size={18} /> Download Explanation PDF
-              </button>
               <p className="font-body text-sm font-medium text-coral">
-                Attempt at least 80% of questions to unlock explanations. You
+                Attempt at least 25% of questions to unlock explanations. You
                 attended {attendancePct}%.
               </p>
             </div>
@@ -343,13 +317,12 @@ export default function ResultPage() {
           {t('questionBreakdown')}
         </h3>
 
-        {/* Review filter — jump straight to wrong / skipped / flagged questions */}
+        {/* Review filter — attended questions only (correct / wrong / flagged) */}
         <div className="mb-3 flex flex-wrap gap-2">
           {(
             [
-              ['all', 'All', totalQuestions],
+              ['all', 'All', attempted],
               ['wrong', 'Wrong', wrong],
-              ['skipped', 'Skipped', totalQuestions - attempted],
               ['correct', 'Correct', correct],
               ['flagged', 'Flagged', flaggedCount],
             ] as [ReviewFilter, string, number][]

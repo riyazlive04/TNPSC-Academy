@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, Copy, FileText, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { mockBlueprint } from '../lib/constants'
+import { enterFullscreen } from '../lib/proctor'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
 
@@ -33,13 +34,10 @@ export default function MockInstructionsPage() {
 
   const begin = async () => {
     if (!agreed) return
-    // Request full-screen before handing off; the quiz engine enforces it.
-    try {
-      await document.documentElement.requestFullscreen?.()
-    } catch {
-      // Some browsers/devices block programmatic fullscreen — the quiz page
-      // will prompt the user to re-enter it. Proceed regardless.
-    }
+    // Request full-screen before handing off; the quiz engine enforces it where
+    // supported. On phones (no Fullscreen API) this is a no-op and the quiz
+    // falls back to visibility/blur proctoring — see lib/proctor.ts.
+    await enterFullscreen()
     navigate('/mock/quiz', { state: config })
   }
 

@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import { api } from '../lib/api'
+import {
+  SUBJECT_PRACTICE_ORDER,
+  SUBJECT_TOPIC_ORDER,
+  SUBJECT_TOPIC_GROUPS,
+  bySyllabusOrder,
+  groupTopics,
+} from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
 import type { SubjectQType } from '../types'
@@ -28,6 +35,9 @@ export default function SubjectPracticePage() {
   const [subjects, setSubjects] = useState<{ subject: string; total: number }[]>([])
   const [subject, setSubject] = useState<string | null>(null)
   const [topic, setTopic] = useState<string | null>(null) // null = none picked; ALL_TOPICS = all
+  // For subjects split into sub-groups (e.g. Geography → Physical / Human), the
+  // chosen group heading. Topics are only revealed once a group is picked.
+  const [subgroup, setSubgroup] = useState<string | null>(null)
 
   const [topics, setTopics] = useState<string[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
@@ -41,7 +51,15 @@ export default function SubjectPracticePage() {
     let cancelled = false
     api
       .subjects()
-      .then((s) => !cancelled && setSubjects(s))
+      .then((s) => {
+        if (cancelled) return
+        // Re-order subjects into TNPSC syllabus sequence (unmapped sink to end).
+        const order = bySyllabusOrder(
+          s.map((r) => r.subject),
+          SUBJECT_PRACTICE_ORDER
+        )
+        setSubjects([...s].sort((a, b) => order.indexOf(a.subject) - order.indexOf(b.subject)))
+      })
       .catch(() => !cancelled && setError('Could not load subjects. Please try again.'))
       .finally(() => !cancelled && setLoadingSubjects(false))
     return () => {
@@ -58,7 +76,7 @@ export default function SubjectPracticePage() {
     setTopics([])
     api
       .distinctTopics({ category: 'subject', subject })
-      .then((tp) => !cancelled && setTopics(tp))
+      .then((tp) => !cancelled && setTopics(bySyllabusOrder(tp, SUBJECT_TOPIC_ORDER[subject])))
       .catch(() => !cancelled && setError('Could not load topics. Please try again.'))
       .finally(() => !cancelled && setLoadingTopics(false))
     return () => {
@@ -97,6 +115,14 @@ export default function SubjectPracticePage() {
     return Object.values(counts).reduce((s, n) => s + n, 0) // Mixed = sum of all
   }
 
+  // Topics split into syllabus sub-groups (e.g. Geography → Physical / Human).
+  // Subjects without a grouping config yield a single null-headed group.
+  const topicGroups = useMemo(
+    () => groupTopics(topics, subject ? SUBJECT_TOPIC_GROUPS[subject] : undefined),
+    [topics, subject]
+  )
+  const grouped = topicGroups.length > 1 || topicGroups[0]?.heading != null
+
   return (
     <PickerPage badge={t('subjectPracticeBadge')}>
       {/* Step 1 — subject */}
@@ -115,6 +141,7 @@ export default function SubjectPracticePage() {
                 onClick={() => {
                   setSubject(s.subject)
                   setTopic(null)
+                  setSubgroup(null)
                   setCounts({})
                 }}
               >
@@ -136,7 +163,7 @@ export default function SubjectPracticePage() {
           {!loadingTopics && error && (
             <p className="text-center font-body text-sm text-coral">{error}</p>
           )}
-          {!loadingTopics && !error && (
+          {!loadingTopics && !error && !grouped && (
             <div className="flex flex-wrap justify-center gap-3">
               <PillButton
                 size="sm"
@@ -150,6 +177,53 @@ export default function SubjectPracticePage() {
                   {tp}
                 </PillButton>
               ))}
+            </div>
+          )}
+          {!loadingTopics && !error && grouped && (
+            <div className="space-y-6">
+              {/* Pick a sub-group first (e.g. Physical / Human Geography). The
+                  group's topics are only revealed once a group is chosen. */}
+              <div className="flex flex-wrap justify-center gap-3">
+                <PillButton
+                  size="sm"
+                  active={topic === ALL_TOPICS}
+                  onClick={() => {
+                    setSubgroup(null)
+                    setTopic(ALL_TOPICS)
+                  }}
+                >
+                  {t('allTopics')}
+                </PillButton>
+                {topicGroups.map((g) => (
+                  <PillButton
+                    key={g.heading ?? 'more'}
+                    size="sm"
+                    active={subgroup === g.heading}
+                    onClick={() => {
+                      setSubgroup(g.heading)
+                      setTopic(null)
+                    }}
+                  >
+                    {g.heading}
+                  </PillButton>
+                ))}
+              </div>
+
+              {/* Topics within the chosen sub-group */}
+              {subgroup && (
+                <div className="flex flex-wrap justify-center gap-3 animate-fadeIn">
+                  {(topicGroups.find((g) => g.heading === subgroup)?.topics ?? []).map((tp) => (
+                    <PillButton
+                      key={tp}
+                      size="sm"
+                      active={topic === tp}
+                      onClick={() => setTopic(tp)}
+                    >
+                      {tp}
+                    </PillButton>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </PillSection>

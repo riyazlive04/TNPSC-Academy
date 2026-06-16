@@ -1,10 +1,11 @@
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
-import { LETTERS, displayQuestion, displayOption, displayExplanation, whyWrongFor } from '../../types'
+import { LETTERS, displayOption, displayExplanation, whyWrongFor } from '../../types'
 import { Bookmark, Check, X, MinusCircle, Clock } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { formatDuration } from '../UI/Timer'
 import WorkedSolution from './WorkedSolution'
 import QuestionFigures from './QuestionFigures'
+import QuestionStem from './QuestionStem'
 
 interface ResultCardProps {
   question: Question
@@ -58,10 +59,14 @@ export default function ResultCard({
   return (
     <div className={`rounded-2xl border-2 bg-white p-4 ${ring}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
-        <p className="tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm font-semibold leading-snug text-navytext">
-          <span className="mr-1 text-secondary">Q{index + 1}.</span>
-          {displayQuestion(question, lang)}
-        </p>
+        <div className="min-w-0 flex-1">
+          <QuestionStem
+            question={question}
+            lang={lang}
+            textClassName="break-words text-sm font-semibold leading-snug text-navytext"
+            prefix={<span className="mr-1 text-secondary">Q{index + 1}.</span>}
+          />
+        </div>
         <div className="flex flex-shrink-0 items-center gap-1.5">
           {attempted && (
             <span

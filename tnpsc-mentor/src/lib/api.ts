@@ -185,6 +185,7 @@ export const api = {
     subject?: string
     standard?: number | null
     ca_type?: string
+    aptitude_type?: string
   }): Promise<string[]> {
     const data = await request<{ topics: string[] }>('/api/questions/topics', {
       method: 'POST',

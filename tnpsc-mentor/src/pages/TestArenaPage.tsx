@@ -21,6 +21,7 @@ import ProgressBar from '../components/UI/ProgressBar'
 import StreakCalendar from '../components/StreakCalendar'
 import { useAuth } from '../hooks/useAuth'
 import { fetchHabit, type HabitState } from '../lib/habit'
+import { SHOW_STREAK, SHOW_GOALS } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { computeXp, levelInfo } from '../lib/game'
 import { unlockedBadgeIds, type GameStats } from '../lib/achievements'
@@ -55,7 +56,7 @@ const CARDS: ArenaCard[] = [
   {
     to: '/test-arena/pyq',
     titleKey: 'pyqTitle',
-    subtitle: 'Group 1 · 2/2A · 4 & VAO',
+    subtitle: 'Group 1',
     icon: <BookOpen size={20} />,
     tile: 'bg-brand-soft text-brand',
   },
@@ -107,6 +108,9 @@ export default function TestArenaPage() {
   }, [user, isAdmin, profile?.daily_goal, profile?.exam_date])
 
   const firstName = profile?.full_name?.split(' ')[0]
+  // Streak / daily-goal / exam-countdown surfaces are hidden for now (the habit
+  // data is still fetched so they light up instantly when re-enabled).
+  const showRail = SHOW_STREAK || SHOW_GOALS
   const goalPct = habit
     ? Math.min(100, (habit.questionsToday / Math.max(1, habit.dailyGoal)) * 100)
     : 0
@@ -152,57 +156,40 @@ export default function TestArenaPage() {
     )
   }
 
+  const [featured, ...restCards] = CARDS
+
   return (
     <AppLayout>
-      <div className="mx-auto max-w-6xl px-4 py-6 lg:py-8">
-        {/* Level hero — royal-blue panel */}
-        <button
-          onClick={() => navigate('/achievements')}
-          className="hero-panel mb-5 flex w-full items-center justify-between gap-4 p-6 text-left transition hover:brightness-[1.04]"
-        >
-          <div className="min-w-0 flex-1">
-            <p className="font-body text-sm text-white/55">{t('welcome')}</p>
-            <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-white">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:py-8">
+        {/* Greeting — compact royal-blue strip (no gamification) */}
+        <div className="hero-panel relative flex items-center justify-between gap-4 p-5 animate-slideDown lg:p-6">
+          <div
+            className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+            style={{ backgroundSize: '18px 18px' }}
+          />
+          <div className="relative min-w-0">
+            <p className="font-body text-sm text-white/60">{t('welcomeBack')}</p>
+            <h1 className="truncate font-heading text-2xl font-semibold tracking-tight text-white">
               {firstName || 'Aspirant'}
             </h1>
-            <div className="mt-3 flex items-center gap-2 font-body text-sm text-white/65">
-              <span className="font-heading font-medium text-white">
-                {t('level')} {lvl.level}
-              </span>
-              <span className="text-white/30">·</span>
-              <span>{lvl.title}</span>
-            </div>
-            <div className="mt-2.5 max-w-[260px]">
-              <div className="h-1 w-full overflow-hidden rounded-full bg-white/15">
-                <div
-                  className="h-full rounded-full bg-white/90 transition-all duration-500"
-                  style={{ width: `${lvl.pct}%` }}
-                />
-              </div>
-            </div>
+            <p className="tamil mt-1 font-body text-sm text-white/70">{t('dashboardSub')}</p>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            {habit && habit.currentStreak > 0 && (
-              <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 font-heading text-sm font-medium text-white">
-                <Flame size={14} className="text-accentwarm" /> {habit.currentStreak}
-              </span>
-            )}
-            <ChevronRight size={18} className="text-white/40" />
-          </div>
-        </button>
+          <Sparkles size={40} className="relative hidden flex-shrink-0 text-white/20 sm:block" />
+        </div>
 
-        {/* Responsive body — stacked on phones, two columns from tablet up. */}
-        <div className="grid items-start gap-5 md:grid-cols-3 md:gap-6">
-          {/* Right rail: progress at a glance (first on mobile, right on tablet+) */}
-          <aside className="min-w-0 space-y-5 md:order-2 md:col-span-1">
-            {habit && (
-              <div className="grid grid-cols-2 gap-3">
+        {/* Progress rail — feature-flagged; rendered as a row when re-enabled */}
+        {showRail && habit && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {SHOW_STREAK && (
                 <StatTile
                   icon={<Flame size={18} />}
                   value={String(habit.currentStreak)}
                   label={t('dayStreak')}
                 />
-                {habit.daysToExam != null ? (
+              )}
+              {SHOW_GOALS &&
+                (habit.daysToExam != null ? (
                   <StatTile
                     icon={<CalendarClock size={18} />}
                     value={String(Math.max(0, habit.daysToExam))}
@@ -220,9 +207,8 @@ export default function TestArenaPage() {
                       {t('setExamDate')}
                     </span>
                   </button>
-                )}
-
-                {/* Daily goal */}
+                ))}
+              {SHOW_GOALS && (
                 <div className="card col-span-2 flex flex-col justify-center gap-2 p-3.5">
                   <div className="flex items-center justify-between">
                     <span className="tamil flex items-center gap-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
@@ -238,97 +224,84 @@ export default function TestArenaPage() {
                     height={6}
                   />
                 </div>
-              </div>
-            )}
-
-            {habit && (
+              )}
+            </div>
+            {SHOW_STREAK && (
               <StreakCalendar last30={habit.last30} currentStreak={habit.currentStreak} />
             )}
-          </aside>
+          </div>
+        )}
 
-          {/* Main column: the things to do */}
-          <div className="min-w-0 space-y-6 md:order-1 md:col-span-2">
-            {/* Daily drill — the primary suggestion, a single restrained accent */}
+        {/* Practice categories — bento tiles */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+          {restCards.map((card, i) => (
             <button
-              onClick={() => navigate('/daily')}
-              className="group interactive flex w-full items-center gap-4 rounded-2xl border border-brand/15 bg-brand-soft p-4 text-left lg:p-5"
+              key={card.to}
+              onClick={() => navigate(card.to)}
+              style={{ '--i': i } as React.CSSProperties}
+              className="card interactive stagger-item group flex min-h-[120px] flex-col justify-between gap-3 p-5 text-left"
             >
-              <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand text-white">
-                <Sparkles size={20} />
+              <span
+                className={`grid h-11 w-11 place-items-center rounded-xl transition-transform group-hover:scale-105 ${card.tile}`}
+              >
+                {card.icon}
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="tamil block font-heading text-[15px] font-semibold text-ink">
-                  {t('daily')}
+              <span className="min-w-0">
+                <span className="tamil block font-heading text-sm font-semibold leading-snug text-ink">
+                  {t(card.titleKey)}
                 </span>
-                <span className="tamil block truncate font-body text-sm text-ink2">
-                  {t('dailyCta')}
-                </span>
+                <span className="mt-1 block font-body text-xs text-ink2">{card.subtitle}</span>
               </span>
-              <ChevronRight
-                size={20}
-                className="flex-shrink-0 text-brand/40 transition group-hover:text-brand"
-              />
             </button>
+          ))}
+        </div>
 
-            {/* Practice categories */}
-            <div>
-              <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
-                Practice
-              </h2>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {CARDS.map((card) => (
-                  <button
-                    key={card.to}
-                    onClick={() => navigate(card.to)}
-                    className="card interactive group flex items-center gap-4 p-4 text-left"
-                  >
-                    <span
-                      className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg ${card.tile}`}
-                    >
-                      {card.icon}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="tamil block font-heading text-sm font-semibold leading-tight text-ink">
-                        {t(card.titleKey)}
-                      </span>
-                      <span className="mt-0.5 block truncate font-body text-xs text-ink2">
-                        {card.subtitle}
-                      </span>
-                    </span>
-                    <ChevronRight
-                      size={18}
-                      className="flex-shrink-0 text-ink2/30 transition group-hover:text-ink2"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick links — study loop */}
-            <div>
-              <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
-                Keep going
-              </h2>
-              <div className="grid grid-cols-3 gap-3">
-                <QuickLink
-                  icon={<RefreshCw size={18} />}
-                  label={t('revision')}
-                  onClick={() => navigate('/revision')}
-                />
-                <QuickLink
-                  icon={<FileText size={18} />}
-                  label={t('mockTests')}
-                  onClick={() => navigate('/mock')}
-                />
-                <QuickLink
-                  icon={<TrendingUp size={18} />}
-                  label={t('insights')}
-                  onClick={() => navigate('/insights')}
-                />
-              </div>
-            </div>
+        {/* Keep going — study-loop quick links */}
+        <div>
+          <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
+            Keep going
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <QuickLink
+              icon={<RefreshCw size={18} />}
+              label={t('revision')}
+              onClick={() => navigate('/revision')}
+            />
+            <QuickLink
+              icon={<FileText size={18} />}
+              label={t('mockTests')}
+              onClick={() => navigate('/mock')}
+            />
+            <QuickLink
+              icon={<TrendingUp size={18} />}
+              label={t('insights')}
+              onClick={() => navigate('/insights')}
+            />
           </div>
         </div>
+
+        {/* Mock Tests — full-width gradient CTA at the bottom */}
+        <button
+          onClick={() => navigate(featured.to)}
+          className="hero-panel interactive group relative flex w-full items-center gap-4 p-6 text-left"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
+            style={{ backgroundSize: '18px 18px' }}
+          />
+          <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20">
+            {featured.icon}
+          </span>
+          <span className="relative min-w-0 flex-1">
+            <span className="tamil block font-heading text-lg font-semibold tracking-tight text-white">
+              {t(featured.titleKey)}
+            </span>
+            <span className="block font-body text-sm text-white/70">{featured.subtitle}</span>
+          </span>
+          <span className="relative hidden flex-shrink-0 items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 font-heading text-sm font-semibold text-brand-dark transition-all group-hover:gap-2.5 sm:inline-flex">
+            {t('start')} <ChevronRight size={16} />
+          </span>
+        </button>
       </div>
     </AppLayout>
   )

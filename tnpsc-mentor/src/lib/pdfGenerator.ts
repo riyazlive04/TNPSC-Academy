@@ -1,23 +1,10 @@
 import { jsPDF } from 'jspdf'
-import type { DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
+import type { DisplayLang, Question } from '../types'
 import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../types'
-
-interface GeneratePdfParams {
-  config: QuizConfig
-  questions: Question[]
-  answers: Record<string, TestAnswer>
-  scorePercentage: number
-  correct: number
-  total: number
-  label: string
-  /** UI language — drives which language the PDF content is rendered in. */
-  lang?: DisplayLang
-}
 
 const NAVY: [number, number, number] = [13, 27, 42] // #0D1B2A
 const BLUE: [number, number, number] = [13, 71, 161] // #0D47A1
 const GREEN: [number, number, number] = [22, 163, 74]
-const RED: [number, number, number] = [220, 38, 38]
 const GREY: [number, number, number] = [90, 90, 90]
 
 // Tamil glyphs can't be drawn with jsPDF's built-in Helvetica. We lazily fetch a
@@ -47,145 +34,6 @@ async function loadTamilFontB64(): Promise<string | null> {
     tamilFontB64 = null
   }
   return tamilFontB64
-}
-
-/**
- * Generates and auto-downloads the explanation report PDF in the user's
- * language. The caller MUST only invoke this once the 80% PDF-unlock gate has
- * been satisfied (and the questions therefore carry answers/explanations).
- */
-export async function generateExplanationPdf({
-  config,
-  questions,
-  answers,
-  scorePercentage,
-  correct,
-  total,
-  label,
-  lang = 'en',
-}: GeneratePdfParams): Promise<void> {
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-  const pageW = doc.internal.pageSize.getWidth()
-  const pageH = doc.internal.pageSize.getHeight()
-  const margin = 40
-  const contentW = pageW - margin * 2
-  let y = margin
-
-  // Embed a Tamil-capable font when the content isn't English-only. If the
-  // font can't be fetched, fall back to English text so generation never fails.
-  let bodyFont = 'helvetica'
-  let effLang: DisplayLang = lang
-  if (lang !== 'en') {
-    const b64 = await loadTamilFontB64()
-    if (b64) {
-      doc.addFileToVFS('NotoSansTamil.ttf', b64)
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'normal')
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'bold')
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'italic')
-      bodyFont = 'NotoSansTamil'
-    } else {
-      effLang = 'en'
-    }
-  }
-
-  const ensureSpace = (needed: number) => {
-    if (y + needed > pageH - margin - 24) {
-      addFooter(doc, pageW, pageH, margin)
-      doc.addPage()
-      y = margin
-    }
-  }
-
-  // ── Header band ──
-  doc.setFillColor(...BLUE)
-  doc.rect(0, 0, pageW, 70, 'F')
-  doc.setTextColor(255, 255, 255)
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(20)
-  doc.text('TNPSC Mentor — Explanation Report', margin, 44)
-  y = 92
-
-  // ── Test details ──
-  doc.setTextColor(...NAVY)
-  doc.setFont(bodyFont, 'bold')
-  doc.setFontSize(13)
-  doc.text(label, margin, y)
-  y += 18
-
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(10)
-  doc.setTextColor(...GREY)
-  const date = new Date().toLocaleString()
-  doc.text(
-    `Category: ${config.category}   |   Date: ${date}   |   Score: ${correct}/${total} (${scorePercentage}%)`,
-    margin,
-    y
-  )
-  y += 22
-  doc.setDrawColor(220, 220, 220)
-  doc.line(margin, y, pageW - margin, y)
-  y += 18
-
-  // ── Questions ──
-  questions.forEach((q, idx) => {
-    const ans = answers[q.id]
-    const qLines = doc.splitTextToSize(
-      `${idx + 1}. ${displayQuestion(q, effLang)}`,
-      contentW
-    )
-    ensureSpace(qLines.length * 14 + 90)
-
-    doc.setTextColor(...NAVY)
-    doc.setFont(bodyFont, 'bold')
-    doc.setFontSize(11)
-    doc.text(qLines, margin, y)
-    y += qLines.length * 14 + 4
-
-    // options
-    doc.setFont(bodyFont, 'normal')
-    doc.setFontSize(10)
-    LETTERS.forEach((letter) => {
-      const isCorrect = q.correct_answer === letter
-      const isChosenWrong = ans?.selected_answer === letter && !ans.is_correct
-      if (isCorrect) doc.setTextColor(...GREEN)
-      else if (isChosenWrong) doc.setTextColor(...RED)
-      else doc.setTextColor(...NAVY)
-
-      let suffix = ''
-      if (isCorrect) suffix = '   [Correct]'
-      else if (isChosenWrong) suffix = '   [Your answer]'
-
-      const optLines = doc.splitTextToSize(
-        `${letter}. ${displayOption(q, letter, effLang)}${suffix}`,
-        contentW - 12
-      )
-      ensureSpace(optLines.length * 12 + 4)
-      doc.text(optLines, margin + 12, y)
-      y += optLines.length * 12 + 2
-    })
-
-    // explanation
-    const explanation = displayExplanation(q, effLang)
-    if (explanation) {
-      y += 4
-      doc.setFont(bodyFont, 'italic')
-      doc.setFontSize(9.5)
-      doc.setTextColor(...GREY)
-      const expLines = doc.splitTextToSize(`Explanation: ${explanation}`, contentW - 8)
-      ensureSpace(expLines.length * 12 + 8)
-      doc.text(expLines, margin + 4, y)
-      y += expLines.length * 12
-    }
-
-    y += 14
-    doc.setDrawColor(235, 235, 235)
-    doc.line(margin, y - 6, pageW - margin, y - 6)
-  })
-
-  addFooter(doc, pageW, pageH, margin)
-
-  const safe = label.replace(/[^a-z0-9]+/gi, '_').slice(0, 50)
-  doc.save(`TNPSC_Mentor_${safe || 'Report'}.pdf`)
 }
 
 interface QuestionBankPdfParams {

@@ -75,6 +75,261 @@ export const OUTER_SUBJECTS: string[] = [
   'தமிழ்',
 ]
 
+// ─── Subject Practice syllabus order ────────────────────────────────────────
+// The Subject Practice picker (category='subject') shows subjects then topics.
+// By default the API returns them alphabetically; these structures re-order them
+// to follow the official TNPSC syllabus split-up (Unit I → VI) instead. Strings
+// must match the DB `subject` / `topic` values exactly. Anything not listed here
+// falls to the end alphabetically, so unmapped topics are never hidden.
+
+// Subjects in syllabus sequence: Gen. Science (Phy/Chem/Bio) → Geography →
+// History → INM → Polity → Economy → TN Admin → TN History & Culture.
+export const SUBJECT_PRACTICE_ORDER: string[] = [
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'Geography',
+  'History',
+  'Indian National Movement',
+  'Polity',
+  'Economy',
+  'Tamil Nadu Administration',
+  'History, Culture & Heritage of TN',
+]
+
+// Per-subject topic order, following each unit's syllabus listing (History &
+// INM are chronological; others follow the PDF's sub-point sequence).
+export const SUBJECT_TOPIC_ORDER: Record<string, string[]> = {
+  Physics: [
+    'Nature of Universe',
+    'General Scientific Laws',
+    'Mechanics and Properties of Matter',
+    'Force, Motion and Energy',
+    'Everyday application of the basic principles of Mechanics',
+    'Electricity and Magnetism',
+    'Light, Sound and Heat',
+    'Nuclear Physics and Laser',
+    'Electronics and Communications',
+  ],
+  Chemistry: [
+    'Elements and Compounds',
+    'Acids, Base and Salts',
+    'Petroleum Products',
+    'Fertilizers and Pesticides',
+  ],
+  Biology: [
+    'Main Concepts of Life Science',
+    'Classification of Living Organism',
+    'Evolution',
+    'Genetics',
+    'Physiology',
+    'Nutrition',
+    'Health and Hygiene',
+    'Human Diseases',
+    'Environment and Ecology',
+  ],
+  Geography: [
+    'Location',
+    'Physical Features',
+    'Monsoon, Rainfall, Weather and Climate',
+    'Water Resources',
+    'Rivers in India',
+    'Soil, Minerals and Natural Resources',
+    'Forest and Wildlife',
+    'Agricultural Pattern',
+    'Transport and Communication',
+    'Population Density and Distribution',
+    'Social Geography',
+    'Natural Calamity',
+    'Other Topics',
+  ],
+  History: [
+    'The Pre-Historic Period',
+    'Indus Valley Civilization (2500 - 1800 BC)',
+    'The Vedic Period- the Aryans',
+    'Growth of Jainism and Buddhism',
+    'The Mauryan Empire (321 - 289 BC)',
+    'Post - Mauryan Period',
+    'The Gupta Dynasty (AD 320 - 550)',
+    'The Vardhanas (AD 550 - 647)',
+    'The Southern Dynasties',
+    'The Coming of Islam',
+    'Regional Powers during Mughal Period',
+    'The Mughal Dynasty (1526 - 1540 and 1555 - 1857)',
+    'The Coming of The Europeans',
+    'British East India Company And The British Rule',
+    'Social And Religious Movements In The Nineteenth Century',
+    'Viceroys of India',
+    'Indian Freedom Struggle',
+    'Other Topics',
+  ],
+  'Indian National Movement': [
+    'Revolution of 1857',
+    'Political Institution Established before Congress',
+    'Indian National Congress',
+    'Social and Religious Movement',
+    'Development of Press in Modern India',
+    'Gandhi & Early Movements',
+    'Revolutionary Movement in India',
+    'Quit India Movement',
+    'Evolution of Indian Constitution',
+    'Partition of India and Independence',
+  ],
+  Polity: [
+    'Constitution of India',
+    'Preamble to the Constitution',
+    'Union, State and Union Territory',
+    'Citizenship',
+    'Fundamental Rights',
+    'Directive Principles of State Policy',
+    'Union Legislature',
+    'Union Executive',
+    'State Legislature',
+    'State Executive',
+    'Local Governments',
+    'Election',
+    'Judiciary in India',
+    'Rule of Law',
+    'Human rights charter',
+    'Other Topics',
+  ],
+  Economy: [
+    'Nature of Indian Economy',
+    'Five Year Plan Models-An Assessment',
+    'Planning Commission and Niti Ayog',
+    'Sources of revenue',
+    'Reserve Bank of India',
+    'Fiscal Policy and Monetary Policy',
+    'Finance Commission',
+    'Structure of Indian Economy and Employment Generation',
+    'Land reforms and Agriculture',
+    'Industrial growth',
+    'Rural welfare oriented programmes',
+    'Social problems',
+    'Budget',
+    'Public Finance',
+    'Economic Reforms',
+    'Economic Committees',
+    'Government Schemes',
+    'Other Topics',
+  ],
+  'Tamil Nadu Administration': [
+    'Human Development Indicators',
+    'Political Parties & Welfare Schemes',
+    'Social Justice & Harmony',
+    'Education & Health Systems',
+    'Geography of TN & its Impact on Economic Growth',
+    'e-Governance in TN',
+  ],
+  'History, Culture & Heritage of TN': [
+    'Pre Historic Tamilagam & Archaeological',
+    'History of Tamil society',
+    'Tamil Literature Sangam Age to Contemporary Times',
+    'Thirukkural',
+    'Role of Tamilnadu in freedom struggle',
+    'Socio Political movements in Tamil Nadu',
+  ],
+}
+
+// Optional sub-grouping for the topic step. Subjects listed here render their
+// topics under labelled sub-headings (the syllabus splits Geography into Physical
+// and Human Geography); subjects not listed stay a flat syllabus-ordered list.
+export interface TopicGroup {
+  heading: string
+  topics: string[]
+}
+
+export const SUBJECT_TOPIC_GROUPS: Record<string, TopicGroup[]> = {
+  Economy: [
+    {
+      heading: 'Core Economics',
+      topics: [
+        'Nature of Indian Economy',
+        'Five Year Plan Models-An Assessment',
+        'Planning Commission and Niti Ayog',
+        'Sources of revenue',
+        'Reserve Bank of India',
+        'Fiscal Policy and Monetary Policy',
+        'Finance Commission',
+        'Budget',
+        'Public Finance',
+        'Economic Reforms',
+        'Economic Committees',
+      ],
+    },
+    {
+      heading: 'Economic Development',
+      topics: [
+        'Structure of Indian Economy and Employment Generation',
+        'Land reforms and Agriculture',
+        'Industrial growth',
+        'Rural welfare oriented programmes',
+        'Social problems',
+        'Government Schemes',
+      ],
+    },
+  ],
+  Geography: [
+    {
+      heading: 'Physical Geography',
+      topics: [
+        'Location',
+        'Physical Features',
+        'Monsoon, Rainfall, Weather and Climate',
+        'Water Resources',
+        'Rivers in India',
+        'Soil, Minerals and Natural Resources',
+        'Forest and Wildlife',
+        'Agricultural Pattern',
+      ],
+    },
+    {
+      heading: 'Human Geography',
+      topics: [
+        'Transport and Communication',
+        'Social Geography',
+        'Population Density and Distribution',
+        'Natural Calamity',
+        'Other Topics',
+      ],
+    },
+  ],
+}
+
+// Split `topics` into the configured sub-groups (preserving the incoming order
+// within each group). Topics not in any group are collected under a trailing
+// "More" heading so nothing is ever dropped. Returns a single null-headed group
+// when `groups` is undefined (the flat, ungrouped case).
+export function groupTopics(
+  topics: string[],
+  groups: TopicGroup[] | undefined
+): { heading: string | null; topics: string[] }[] {
+  if (!groups || groups.length === 0) return [{ heading: null, topics }]
+  const present = new Set(topics)
+  const used = new Set<string>()
+  const out: { heading: string | null; topics: string[] }[] = []
+  for (const g of groups) {
+    const ts = g.topics.filter((t) => present.has(t))
+    ts.forEach((t) => used.add(t))
+    if (ts.length) out.push({ heading: g.heading, topics: ts })
+  }
+  const leftover = topics.filter((t) => !used.has(t))
+  if (leftover.length) out.push({ heading: 'More', topics: leftover })
+  return out
+}
+
+// Sort `items` by their position in `order`; entries not in `order` sink to the
+// end and are sorted alphabetically among themselves. Pure (returns a new array).
+export function bySyllabusOrder(items: string[], order: string[] | undefined): string[] {
+  if (!order || order.length === 0) return [...items].sort((a, b) => a.localeCompare(b))
+  const rank = new Map(order.map((s, i) => [s, i]))
+  return [...items].sort((a, b) => {
+    const ra = rank.has(a) ? (rank.get(a) as number) : Number.MAX_SAFE_INTEGER
+    const rb = rank.has(b) ? (rank.get(b) as number) : Number.MAX_SAFE_INTEGER
+    return ra !== rb ? ra - rb : a.localeCompare(b)
+  })
+}
+
 // ─── Samacheer standards ────────────────────────────────────────────────────
 
 export const STANDARDS = [6, 7, 8, 9, 10]
@@ -156,42 +411,6 @@ export function groupLabel(id?: string): string {
 // renders these for the pre-test breakdown; the server pulls the real questions.
 
 export const MOCK_BLUEPRINTS: MockBlueprint[] = [
-  {
-    id: 'Group4_VAO',
-    title: 'Group 4 & VAO',
-    totalQuestions: 100,
-    durationMinutes: 90,
-    negativeMark: 0,
-    slots: [
-      { label: 'General Tamil', count: 20 },
-      { label: 'History & INM', count: 15 },
-      { label: 'Geography', count: 10 },
-      { label: 'Polity', count: 10 },
-      { label: 'General Science', count: 20 },
-      { label: 'Economy', count: 10 },
-      { label: 'Current Affairs', count: 10 },
-      { label: 'Aptitude', count: 5 },
-    ],
-  },
-  {
-    id: 'Group2_2A',
-    title: 'Group 2 / 2A',
-    totalQuestions: 100,
-    durationMinutes: 90,
-    negativeMark: 0,
-    slots: [
-      { label: 'History & INM', count: 10 },
-      { label: 'Polity', count: 8 },
-      { label: 'Geography', count: 8 },
-      { label: 'General Science', count: 10 },
-      { label: 'Economy', count: 4 },
-      { label: 'TN History & Culture', count: 10 },
-      { label: 'TN Administration', count: 5 },
-      { label: 'General Tamil', count: 15 },
-      { label: 'Current Affairs', count: 15 },
-      { label: 'Aptitude', count: 15 },
-    ],
-  },
   {
     id: 'Group1',
     title: 'Group 1 Prelims',

@@ -1,12 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LogOut,
   Home,
   ShieldCheck,
-  Newspaper,
   RefreshCw,
-  Trophy,
+  User,
   BarChart3,
   Bookmark,
   MessageSquarePlus,
@@ -25,14 +24,13 @@ interface AppLayoutProps {
 const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
 const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
 
-// Learner navigation — the personal study tabs (daily drill, spaced revision,
-// progress insights, achievements) shown to regular users.
+// Learner navigation — the personal study tabs (spaced revision, progress
+// insights, profile) shown to regular users.
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
-  { to: '/daily', icon: Newspaper, key: 'daily' as const, short: 'navDaily' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
-  { to: '/achievements', icon: Trophy, key: 'achievements' as const, short: 'achievements' as const },
+  { to: '/profile', icon: User, key: 'profile' as const, short: 'profile' as const },
 ]
 
 // Admin/superadmin navigation — content managers don't use the personal
@@ -49,14 +47,30 @@ const ADMIN_NAV = [
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signOut, profile, isAdmin, isSuperAdmin } = useAuth()
+  const { signOut, profile, isAdmin, isSuperAdmin, user } = useAuth()
   const { t } = useT()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
+  // Once a user has rated the app we hide the feedback entry point so we don't
+  // keep nudging them. Persisted per-user in localStorage (no extra request).
+  const feedbackKey = user?.id ? `tnpsc:feedbackGiven:${user.id}` : null
+  const [feedbackGiven, setFeedbackGiven] = useState(
+    () => !!feedbackKey && localStorage.getItem(feedbackKey) === '1'
+  )
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
 
   // Admins/superadmins manage content; learners get the study tabs.
   const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
+
+  // Re-read once the auth bootstrap resolves the user id (key starts out null).
+  useEffect(() => {
+    setFeedbackGiven(!!feedbackKey && localStorage.getItem(feedbackKey) === '1')
+  }, [feedbackKey])
+
+  const markFeedbackGiven = () => {
+    if (feedbackKey) localStorage.setItem(feedbackKey, '1')
+    setFeedbackGiven(true)
+  }
 
   const cycleLang = () => {
     const idx = LANG_CYCLE.indexOf(lang)
@@ -122,14 +136,16 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               >
                 {LANG_LABEL[lang]}
               </button>
-              <button
-                onClick={() => setFeedbackOpen(true)}
-                title={t('sendFeedback')}
-                aria-label={t('sendFeedback')}
-                className="icon-btn h-9 w-9"
-              >
-                <MessageSquarePlus size={18} />
-              </button>
+              {!feedbackGiven && (
+                <button
+                  onClick={() => setFeedbackOpen(true)}
+                  title={t('sendFeedback')}
+                  aria-label={t('sendFeedback')}
+                  className="icon-btn h-9 w-9"
+                >
+                  <MessageSquarePlus size={18} />
+                </button>
+              )}
               <button
                 onClick={() => navigate('/bookmarks')}
                 title={t('questionBank')}
@@ -223,7 +239,11 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
         </nav>
       )}
 
-      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        onSubmitted={markFeedbackGiven}
+      />
     </div>
   )
 }
