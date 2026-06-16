@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactElement } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
@@ -10,7 +10,6 @@ import Spinner from './components/UI/Spinner'
 // Route-based code splitting: each page ships as its own chunk and is fetched
 // only when the user navigates to it, instead of bundling all ~30 pages into
 // the initial download. This is the main lever on first-load weight.
-const LandingPage = lazy(() => import('./pages/LandingPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
@@ -78,8 +77,9 @@ export default function App() {
     <ScrollToTop />
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* Public landing page — explains the product to logged-out visitors. */}
-        <Route path="/" element={<LandingPage />} />
+        {/* Root is auth-aware: logged-in users go to the app, everyone else to
+            login. The marketing landing page is no longer in the flow. */}
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -100,6 +100,16 @@ export default function App() {
     <Toaster />
     </>
   )
+}
+
+/** Root path "/": send authenticated users into the app, others to login.
+ * Waits for the initial session bootstrap so a logged-in user isn't flashed the
+ * login screen on a hard refresh. */
+function RootRedirect() {
+  const user = useAuthStore((s) => s.user)
+  const loading = useAuthStore((s) => s.loading)
+  if (loading) return <PageLoader />
+  return <Navigate to={user ? '/test-arena' : '/login'} replace />
 }
 
 /** Full-screen fallback shown while a route's lazy chunk is being fetched. */
