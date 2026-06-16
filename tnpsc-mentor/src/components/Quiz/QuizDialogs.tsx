@@ -32,7 +32,7 @@ interface AttendanceGateModalProps {
   onContinue: () => void
 }
 
-/** Warns when attendance is below the 80% gate before letting the user submit. */
+/** Warns when attendance is below the 25% gate before letting the user submit. */
 export function AttendanceGateModal({
   attempted,
   total,
@@ -41,11 +41,11 @@ export function AttendanceGateModal({
 }: AttendanceGateModalProps) {
   const pct = total > 0 ? Math.round((attempted / total) * 100) : 0
   return (
-    <ModalShell title="Attendance below 80%">
+    <ModalShell title="Attendance below 25%">
       <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">
         You have attempted <span className="font-bold">{attempted}/{total}</span> ({pct}
-        %). You must attempt at least <span className="font-bold">80%</span> of the
-        questions to unlock the explanation PDF. You can still submit now to see your
+        %). You must attempt at least <span className="font-bold">25%</span> of the
+        questions to unlock the explanations. You can still submit now to see your
         score only.
       </p>
       <div className="flex flex-col gap-2 sm:flex-row">

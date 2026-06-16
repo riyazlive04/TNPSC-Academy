@@ -22,7 +22,9 @@ export function shuffle<T>(arr: T[]): T[] {
 export async function fetchQuestionsForConfig(
   config: QuizConfig
 ): Promise<Question[]> {
-  const limit = config.mock ? (config.mockQuestionCount ?? 50) : MAX_QUESTIONS
+  const limit = config.mock
+    ? (config.mockQuestionCount ?? 50)
+    : Math.min(config.questionCount ?? MAX_QUESTIONS, MAX_QUESTIONS)
   return api.quizQuestions({ ...config, limit } as QuizConfig)
 }
 

@@ -6,6 +6,7 @@ import YellowBadge from '../components/UI/YellowBadge'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { saveGoals } from '../lib/habit'
+import { SHOW_GOALS } from '../lib/features'
 import { useT } from '../lib/i18n'
 
 const GROUPS = [
@@ -66,27 +67,31 @@ export default function SetupPage() {
             ))}
           </select>
 
-          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
-            {t('examDate')}
-          </label>
-          <input
-            type="date"
-            value={examDate ?? ''}
-            onChange={(e) => setExamDate(e.target.value)}
-            className="input-soft mb-4"
-          />
+          {SHOW_GOALS && (
+            <>
+              <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
+                {t('examDate')}
+              </label>
+              <input
+                type="date"
+                value={examDate ?? ''}
+                onChange={(e) => setExamDate(e.target.value)}
+                className="input-soft mb-4"
+              />
 
-          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
-            {t('dailyGoalQ')}
-          </label>
-          <input
-            type="number"
-            min={5}
-            max={200}
-            value={goal}
-            onChange={(e) => setGoal(Number(e.target.value))}
-            className="input-soft mb-6"
-          />
+              <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
+                {t('dailyGoalQ')}
+              </label>
+              <input
+                type="number"
+                min={5}
+                max={200}
+                value={goal}
+                onChange={(e) => setGoal(Number(e.target.value))}
+                className="input-soft mb-6"
+              />
+            </>
+          )}
 
           <button type="submit" disabled={saving} className="btn-brand w-full px-6 py-3.5 text-base">
             {saving ? '…' : t('saveContinue')}

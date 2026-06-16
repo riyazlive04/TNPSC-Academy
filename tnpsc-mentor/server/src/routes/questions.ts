@@ -171,7 +171,27 @@ router.post(
   '/topics',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { category, subject, standard } = req.body ?? {}
+    const { category, subject, standard, aptitude_type } = req.body ?? {}
+
+    if (category === 'aptitude') {
+      // Aptitude bank: distinct topics for a chosen sub-category (numerics /
+      // reasoning), active rows only so empty/hidden topics don't surface.
+      let q = req.db!
+        .from('questions')
+        .select('aptitude_topic')
+        .eq('category', 'aptitude')
+        .eq('active', true)
+        .not('aptitude_topic', 'is', null)
+      if (aptitude_type) q = q.eq('aptitude_type', aptitude_type)
+      const { data, error } = await q
+      if (error) return sendDbError(res, error)
+      const topics = Array.from(
+        new Set(
+          (data ?? []).map((r: { aptitude_topic: string | null }) => r.aptitude_topic).filter(Boolean)
+        )
+      ).sort()
+      return res.json({ topics })
+    }
 
     if (category === 'samacheer') {
       let q = req.db!

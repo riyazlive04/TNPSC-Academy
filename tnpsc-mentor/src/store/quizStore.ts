@@ -4,7 +4,7 @@ import type { AnswerLetter, Question, QuizConfig, TestAnswer } from '../types'
 
 export const SECONDS_PER_QUESTION = 45
 export const MIN_SECONDS_PER_QUESTION = 7
-export const ATTENDANCE_GATE = 0.8 // 80%
+export const ATTENDANCE_GATE = 0.25 // 25% — explanations unlock at this attendance
 
 interface QuizState {
   config: QuizConfig | null
@@ -71,7 +71,9 @@ export const useQuizStore = create<QuizState>()(
     const limit =
       config.mock && config.mockDurationSeconds
         ? config.mockDurationSeconds
-        : Math.max(questions.length, 1) * SECONDS_PER_QUESTION
+        : config.durationSeconds
+          ? config.durationSeconds
+          : Math.max(questions.length, 1) * SECONDS_PER_QUESTION
     set({
       config,
       questions,

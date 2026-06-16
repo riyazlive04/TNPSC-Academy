@@ -148,8 +148,8 @@ const STRINGS = {
   retryTest: { en: 'Retry Test', ta: 'மீண்டும் முயற்சி' },
   downloadPdf: { en: 'Download Explanation PDF', ta: 'விளக்க PDF பதிவிறக்கம்' },
   pdfLockedMsg: {
-    en: 'Attempt at least 80% of questions to unlock explanations.',
-    ta: 'விளக்கங்களைத் திறக்க குறைந்தது 80% வினாக்களை முயற்சிக்கவும்.',
+    en: 'Attempt at least 25% of questions to unlock explanations.',
+    ta: 'விளக்கங்களைத் திறக்க குறைந்தது 25% வினாக்களை முயற்சிக்கவும்.',
   },
 
   // Empty / errors
@@ -159,8 +159,8 @@ const STRINGS = {
   },
 
   // Insights / analytics
-  insights: { en: 'My Insights', ta: 'என் பகுப்பாய்வு' },
-  insightsTitle: { en: 'Performance Insights', ta: 'செயல்திறன் பகுப்பாய்வு' },
+  insights: { en: 'Mentor Insights', ta: 'வழிகாட்டி பகுப்பாய்வு' },
+  insightsTitle: { en: 'Mentor Insights', ta: 'செயல்திறன் பகுப்பாய்வு' },
   testsTaken: { en: 'Tests Taken', ta: 'எடுத்த தேர்வுகள்' },
   avgAccuracy: { en: 'Avg Accuracy', ta: 'சராசரி துல்லியம்' },
   bestScore: { en: 'Best Score', ta: 'சிறந்த மதிப்பெண்' },
@@ -180,6 +180,16 @@ const STRINGS = {
   learnThis: { en: 'Learn this', ta: 'இதைக் கற்க' },
   studyTip: { en: 'Study Tip', ta: 'படிப்புக் குறிப்பு' },
   resources: { en: 'Free resources', ta: 'இலவச வளங்கள்' },
+  overallAccuracy: { en: 'Overall Accuracy', ta: 'ஒட்டுமொத்த துல்லியம்' },
+  performanceTrend: { en: 'Performance Trend', ta: 'செயல்திறன் போக்கு' },
+  recentTests: { en: 'Recent tests', ta: 'சமீபத்திய தேர்வுகள்' },
+  questionsAnswered: { en: 'Questions', ta: 'வினாக்கள்' },
+  avgScoreLabel: { en: 'Avg Score', ta: 'சராசரி மதிப்பெண்' },
+  takeATest: { en: 'Take a test', ta: 'ஒரு தேர்வு எடுக்கவும்' },
+  sortAccuracy: { en: 'Accuracy', ta: 'துல்லியம்' },
+  sortVolume: { en: 'Most practised', ta: 'அதிகம் பயிற்சி' },
+  correctLabel: { en: 'correct', ta: 'சரி' },
+  notAttemptedYet: { en: 'Not attempted', ta: 'முயற்சிக்கப்படவில்லை' },
 
   // Revision
   revision: { en: 'Revision', ta: 'மீள்பார்வை' },
@@ -218,6 +228,9 @@ const STRINGS = {
   diffMixed: { en: 'Mixed', ta: 'கலந்தது' },
   questionDistribution: { en: 'Question distribution', ta: 'வினா பகிர்வு' },
   startExam: { en: 'Start Exam', ta: 'தேர்வைத் தொடங்கு' },
+  examSetup: { en: 'Questions & time', ta: 'வினாக்கள் & நேரம்' },
+  timeLimit: { en: 'Time limit', ta: 'நேர வரம்பு' },
+  minutesUnit: { en: 'min', ta: 'நிமி' },
 
   // Mock instructions
   examInstructions: { en: 'Exam Instructions', ta: 'தேர்வு வழிமுறைகள்' },
@@ -243,6 +256,17 @@ const STRINGS = {
   },
   beginTest: { en: 'Begin Test', ta: 'தேர்வைத் தொடங்கு' },
   enterFullscreen: { en: 'Enter full-screen & begin', ta: 'முழுத் திரைக்குச் சென்று தொடங்கு' },
+  instrQuizNav: {
+    en: 'Use Prev / Next to move between questions, and Flag to mark one for review.',
+    ta: 'வினாக்களுக்கு இடையே நகர முந்தைய / அடுத்து பொத்தான்களையும், மதிப்பாய்வுக்காகக் குறிக்க Flag-ஐயும் பயன்படுத்தவும்.',
+  },
+  instrViolations: {
+    en: 'Leaving the test screen is recorded. Repeated violations auto-submit your test.',
+    ta: 'தேர்வுத் திரையை விட்டு வெளியேறுவது பதிவு செய்யப்படுகிறது. மீண்டும் மீண்டும் மீறல்கள் தேர்வைத் தானாகச் சமர்ப்பிக்கும்.',
+  },
+  // Pre-quiz setup (practice quizzes)
+  numQuestions: { en: 'Number of Questions', ta: 'வினாக்களின் எண்ணிக்கை' },
+  timeLimitMin: { en: 'Time Limit (minutes)', ta: 'கால அளவு (நிமிடங்கள்)' },
 
   // OMR interface
   notVisited: { en: 'Not Visited', ta: 'பார்க்கப்படவில்லை' },
@@ -258,6 +282,12 @@ const STRINGS = {
     en: 'Warning: leaving the test screen is recorded. Repeated violations auto-submit your test.',
     ta: 'எச்சரிக்கை: தேர்வுத் திரையை விட்டு வெளியேறுவது பதிவு செய்யப்படுகிறது. மீண்டும் மீண்டும் மீறல்கள் தேர்வைத் தானாகச் சமர்ப்பிக்கும்.',
   },
+  screenProtected: {
+    en: 'Screen protected — capture is blocked during the test.',
+    ta: 'திரை பாதுகாக்கப்பட்டது — தேர்வின் போது ஸ்கிரீன்ஷாட் தடுக்கப்படுகிறது.',
+  },
+  openPalette: { en: 'Question palette', ta: 'வினாப் பலகம்' },
+  done: { en: 'Done', ta: 'முடிந்தது' },
   timeWarning30: { en: '30 minutes remaining', ta: '30 நிமிடங்கள் மீதம்' },
   timeWarning10: { en: '10 minutes remaining', ta: '10 நிமிடங்கள் மீதம்' },
   timeWarning5: { en: '5 minutes remaining', ta: '5 நிமிடங்கள் மீதம்' },
@@ -306,6 +336,11 @@ const STRINGS = {
 
   // Gamification — level, XP, achievements
   achievements: { en: 'Awards', ta: 'விருதுகள்' },
+  profile: { en: 'Profile', ta: 'சுயவிவரம்' },
+  accountDetails: { en: 'Account Details', ta: 'கணக்கு விவரங்கள்' },
+  statsOverview: { en: 'Your Stats', ta: 'உங்கள் புள்ளிவிவரம்' },
+  notSet: { en: 'Not set', ta: 'அமைக்கப்படவில்லை' },
+  timeSpent: { en: 'Time Spent', ta: 'செலவழித்த நேரம்' },
   achievementsTitle: { en: 'Achievements', ta: 'சாதனைகள்' },
   level: { en: 'Level', ta: 'நிலை' },
   xp: { en: 'XP', ta: 'புள்ளிகள்' },
@@ -321,6 +356,13 @@ const STRINGS = {
   syllabusCoverage: { en: 'Syllabus Coverage', ta: 'பாடத்திட்ட பரப்பளவு' },
   covered: { en: 'covered', ta: 'முடிந்தது' },
   notStarted: { en: 'Not started', ta: 'தொடங்கவில்லை' },
+
+  // ─── Dashboard ─────────────────────────────────────────────────────────────
+  dashboardSub: {
+    en: 'Pick a bank and start practising.',
+    ta: 'ஒரு தொகுப்பைத் தேர்ந்தெடுத்துப் பயிற்சியைத் தொடங்குங்கள்.',
+  },
+  start: { en: 'Start', ta: 'தொடங்கு' },
 
   // ─── Auth (login / register / forgot) ─────────────────────────────────────
   welcomeBack: { en: 'Welcome back', ta: 'மீண்டும் வரவேற்கிறோம்' },

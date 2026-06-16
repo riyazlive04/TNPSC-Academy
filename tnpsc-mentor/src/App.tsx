@@ -1,36 +1,41 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import Toaster from './components/UI/Toaster'
+import Spinner from './components/UI/Spinner'
 
-import LandingPage from './pages/LandingPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import LanguageScreen from './pages/LanguageScreen'
-import TestArenaPage from './pages/TestArenaPage'
-import PreviousYearPage from './pages/PreviousYearPage'
-import HistoryPeriodsPage from './pages/HistoryPeriodsPage'
-import SamacheerPage from './pages/SamacheerPage'
-import SubjectPracticePage from './pages/SubjectPracticePage'
-import CurrentAffairsPage from './pages/CurrentAffairsPage'
-import AptitudePage from './pages/AptitudePage'
-import QuizPage from './pages/QuizPage'
-import AdminQuestionsPage from './pages/AdminQuestionsPage'
-import ResultPage from './pages/ResultPage'
-import InsightsPage from './pages/InsightsPage'
-import AchievementsPage from './pages/AchievementsPage'
-import RevisionPage from './pages/RevisionPage'
-import MockTestPage from './pages/MockTestPage'
-import MockInstructionsPage from './pages/MockInstructionsPage'
-import MockQuizPage from './pages/MockQuizPage'
-import SetupPage from './pages/SetupPage'
-import DailyPage from './pages/DailyPage'
-import BookmarksPage from './pages/BookmarksPage'
-import SuperAdminPage from './pages/SuperAdminPage'
+// Route-based code splitting: each page ships as its own chunk and is fetched
+// only when the user navigates to it, instead of bundling all ~30 pages into
+// the initial download. This is the main lever on first-load weight.
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
+const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
+const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
+const HistoryPeriodsPage = lazy(() => import('./pages/HistoryPeriodsPage'))
+const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
+const SubjectPracticePage = lazy(() => import('./pages/SubjectPracticePage'))
+const CurrentAffairsPage = lazy(() => import('./pages/CurrentAffairsPage'))
+const AptitudePage = lazy(() => import('./pages/AptitudePage'))
+const QuizInstructionsPage = lazy(() => import('./pages/QuizInstructionsPage'))
+const QuizPage = lazy(() => import('./pages/QuizPage'))
+const AdminQuestionsPage = lazy(() => import('./pages/AdminQuestionsPage'))
+const ResultPage = lazy(() => import('./pages/ResultPage'))
+const InsightsPage = lazy(() => import('./pages/InsightsPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const RevisionPage = lazy(() => import('./pages/RevisionPage'))
+const MockTestPage = lazy(() => import('./pages/MockTestPage'))
+const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
+const MockQuizPage = lazy(() => import('./pages/MockQuizPage'))
+const SetupPage = lazy(() => import('./pages/SetupPage'))
+const DailyPage = lazy(() => import('./pages/DailyPage'))
+const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
+const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 
 /** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
 const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
@@ -44,11 +49,12 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/test-arena/samacheer', element: <SamacheerPage /> },
   { path: '/test-arena/current-affairs', element: <CurrentAffairsPage /> },
   { path: '/test-arena/aptitude', element: <AptitudePage /> },
+  { path: '/quiz/instructions', element: <QuizInstructionsPage /> },
   { path: '/quiz', element: <QuizPage /> },
   { path: '/admin/questions', element: <AdminQuestionsPage /> },
   { path: '/result', element: <ResultPage /> },
   { path: '/insights', element: <InsightsPage /> },
-  { path: '/achievements', element: <AchievementsPage /> },
+  { path: '/profile', element: <ProfilePage /> },
   { path: '/revision', element: <RevisionPage /> },
   { path: '/mock', element: <MockTestPage /> },
   { path: '/mock/instructions', element: <MockInstructionsPage /> },
@@ -70,27 +76,38 @@ export default function App() {
   return (
     <>
     <ScrollToTop />
-    <Routes>
-      {/* Public landing page — explains the product to logged-out visitors. */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* Public landing page — explains the product to logged-out visitors. */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* Protected */}
-      {PROTECTED_ROUTES.map(({ path, element, role }) => (
-        <Route
-          key={path}
-          path={path}
-          element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
-        />
-      ))}
+        {/* Protected */}
+        {PROTECTED_ROUTES.map(({ path, element, role }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
+          />
+        ))}
 
-      {/* Fallback */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
     <Toaster />
     </>
+  )
+}
+
+/** Full-screen fallback shown while a route's lazy chunk is being fetched. */
+function PageLoader() {
+  return (
+    <div className="grid min-h-screen place-items-center bg-canvas">
+      <Spinner size={28} />
+    </div>
   )
 }
 

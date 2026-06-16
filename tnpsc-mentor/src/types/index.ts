@@ -148,6 +148,10 @@ export interface QuizConfig {
   mock?: boolean
   mockQuestionCount?: number
   mockDurationSeconds?: number
+  /** Practice quiz: user-chosen number of questions (caps the random pool). */
+  questionCount?: number
+  /** Practice quiz: user-chosen time limit in seconds (overrides the per-question default). */
+  durationSeconds?: number
   /** Negative mark per wrong answer (e.g. 0.33 for -1/3). 0 = none. */
   negativeMark?: number
   /** For mock mode: restrict the random pool to `category` (e.g. daily CA). */
@@ -254,6 +258,175 @@ export function displayQuestion(q: Question, lang: DisplayLang): string {
   if (lang === 'ta' && ta) return ta
   if (lang === 'both' && ta) return `${q.question_text}\n${ta}`
   return q.question_text
+}
+
+// ─── Match (List I / List II) parsing ───────────────────────────────────────
+// "Match the following" questions store both lists inline in question_text as
+// newline-separated lines, e.g.
+//   <preamble>
+//   List I (Extremity)
+//   (a) Eastern extremity        ← subject style: (a)-(d)
+//   ...
+//   List II (Place)
+//   1. Hills of Anaimalai        ← 1.-4.
+//   ...
+//   Select the correct match.    ← optional trailing prompt
+// (current-affairs style uses "List I:" with A.-D. labels.) Rendering this as a
+// single pre-wrapped blob stacks the two lists vertically; parsing it lets the
+// UI lay List I and List II out side-by-side like the printed exam paper.
+
+export interface MatchItem {
+  /** Raw label token, e.g. 'a' or 'A' or '1'. */
+  label: string
+  text: string
+}
+export interface MatchList {
+  /** Full header line as authored, e.g. 'List I (Extremity)'. */
+  header: string
+  items: MatchItem[]
+}
+export interface ParsedMatch {
+  preamble: string
+  listI: MatchList
+  listII: MatchList
+  /** Trailing prompt after List II, e.g. 'Select the correct match.'. */
+  trailing: string
+}
+
+// An item line: optional "(", a short label, a closing ")" or ".", then the
+// item text. The label tells us which list it belongs to — letters → List I,
+// numbers → List II. Roman numerals (i, ii, iii, iv…) are allowed up to 4 chars
+// so List I items labelled (i)-(iv) aren't truncated.
+const MATCH_ITEM = /^\(?\s*([ivxlcdm]{1,4}|[IVXLCDM]{1,4}|[A-Za-z]{1,2}|\d{1,2}|[அ-ஔ])\s*[).]\s*(.+)$/
+
+// A single line that pairs a List I item with a List II item side-by-side,
+// separated by a pipe or a run of spaces, e.g. "(a) Corn    1. Cotyledon" or
+// "A. s subshell | 1. 6". Captures: I-label, I-text, II-label, II-text.
+const MATCH_COMBINED =
+  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,})\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
+
+/** A line that is a prompt/instruction ("Match the following…"), not a header. */
+const isMatchPrompt = (s: string): boolean =>
+  /\b(match|following|select|correct|codes|given below|use:|பொருத்த|தேர்ந்தெடு)\b/i.test(s)
+
+interface ClassifiedLine {
+  label: string
+  text: string
+  kind: 'alpha' | 'num'
+}
+function classifyMatchLine(line: string): ClassifiedLine | null {
+  const m = line.match(MATCH_ITEM)
+  if (!m) return null
+  const label = m[1]
+  return { label, text: m[2].trim(), kind: /^\d+$/.test(label) ? 'num' : 'alpha' }
+}
+
+/**
+ * Parse the side-by-side layout where each line carries one List I item and its
+ * List II counterpart (split by a pipe or 2+ spaces). Returns null when fewer
+ * than two such rows are present or the List II labels aren't distinct.
+ */
+function parseCombinedMatch(lines: string[]): ParsedMatch | null {
+  const rowIdx: number[] = []
+  const listI: MatchItem[] = []
+  const listII: MatchItem[] = []
+  for (let idx = 0; idx < lines.length; idx++) {
+    const m = lines[idx].match(MATCH_COMBINED)
+    if (!m) continue
+    rowIdx.push(idx)
+    listI.push({ label: m[1], text: m[2].trim() })
+    listII.push({ label: m[3], text: m[4].trim() })
+  }
+  if (listI.length < 2) return null
+  // List II labels must be distinct — guards against matching stray punctuation.
+  const nums = listII.map((i) => i.label)
+  if (new Set(nums).size !== nums.length) return null
+
+  const first = rowIdx[0]
+  const last = rowIdx[rowIdx.length - 1]
+  // A header is the line directly above the first row, when it isn't a row or a
+  // prompt sentence. Split it into the two column headers.
+  let headerLine = -1
+  if (first > 0 && !lines[first - 1].match(MATCH_COMBINED) && !isMatchPrompt(lines[first - 1])) {
+    headerLine = first - 1
+  }
+  let hI = '',
+    hII = ''
+  if (headerLine >= 0) {
+    const parts = lines[headerLine].split(/\s*\|\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean)
+    hI = parts[0] ?? lines[headerLine]
+    hII = parts[1] ?? ''
+  }
+  const preEnd = headerLine >= 0 ? headerLine : first
+  return {
+    preamble: lines.slice(0, preEnd).join(' ').trim(),
+    listI: { header: hI, items: listI },
+    listII: { header: hII, items: listII },
+    trailing: lines.slice(last + 1).join(' ').trim(),
+  }
+}
+
+/**
+ * Parse a "Match the following" question body into its two lists. List I is the
+ * first run of letter-labelled items ((a)-(d) or A-D); List II is the following
+ * run of number-labelled items (1-4). Each list's header is the plain line just
+ * above it — works for "List I/List II", "Schedule/Subject", "Extremity/Place",
+ * etc. Returns null when the text isn't a recognisable two-list match (callers
+ * then fall back to plain text). Operates on a single language's raw text — for
+ * bilingual display, call once per language string.
+ */
+export function parseMatchQuestion(text: string | null | undefined): ParsedMatch | null {
+  if (!text) return null
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean)
+  // First try the side-by-side single-line layout (List I + List II on one row).
+  const combined = parseCombinedMatch(lines)
+  if (combined) return combined
+  if (lines.length < 5) return null
+  const cls = lines.map(classifyMatchLine)
+
+  // List I = first contiguous run of letter-labelled items.
+  const i1 = cls.findIndex((c) => c?.kind === 'alpha')
+  if (i1 < 0) return null
+  let i1end = i1
+  while (i1end + 1 < cls.length && cls[i1end + 1]?.kind === 'alpha') i1end++
+
+  // List II = first contiguous run of number-labelled items after List I.
+  let i2 = -1
+  for (let k = i1end + 1; k < cls.length; k++) {
+    if (cls[k]?.kind === 'num') {
+      i2 = k
+      break
+    }
+  }
+  if (i2 < 0) return null
+  let i2end = i2
+  while (i2end + 1 < cls.length && cls[i2end + 1]?.kind === 'num') i2end++
+
+  const toItems = (start: number, end: number): MatchItem[] =>
+    cls.slice(start, end + 1).map((c) => ({ label: c!.label, text: c!.text }))
+  const listIItems = toItems(i1, i1end)
+  const listIIItems = toItems(i2, i2end)
+  if (listIItems.length < 2 || listIIItems.length < 2) return null
+
+  // A list's header is the short plain line immediately above its first item
+  // (e.g. 'List I', 'Schedule'). A full prompt sentence ('Match the following…')
+  // is the preamble, not a header.
+  const headerAbove = (start: number): number =>
+    start > 0 && !cls[start - 1] && !isMatchPrompt(lines[start - 1]) ? start - 1 : -1
+  const hI = headerAbove(i1)
+  const hII = headerAbove(i2)
+
+  return {
+    preamble: lines.slice(0, hI >= 0 ? hI : i1).join(' ').trim(),
+    listI: { header: hI >= 0 ? lines[hI] : '', items: listIItems },
+    listII: { header: hII >= 0 ? lines[hII] : '', items: listIIItems },
+    trailing: lines.slice(i2end + 1).join(' ').trim(),
+  }
+}
+
+/** Format a parsed match label for display: letters as "(a)", numbers as "1.". */
+export function formatMatchLabel(label: string): string {
+  return /^\d+$/.test(label) ? `${label}.` : `(${label})`
 }
 
 /** Same fallback logic for an individual option. */

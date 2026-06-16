@@ -5,6 +5,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { useAuth } from '../hooks/useAuth'
 import { fetchHabit, type HabitState } from '../lib/habit'
+import { SHOW_STREAK } from '../lib/features'
 import { useProgressStore } from '../store/progressStore'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
@@ -60,20 +61,22 @@ export default function DailyPage() {
         </div>
 
         {/* Reward + streak status strip */}
-        <div className="mb-5 grid grid-cols-2 gap-3">
-          <div className="card flex items-center gap-3 p-3.5">
-            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-streaksoft text-streak">
-              <Flame size={18} />
-            </span>
-            <div className="min-w-0">
-              <div className="font-heading text-xl font-semibold leading-none text-ink">
-                {habit?.currentStreak ?? 0}
-              </div>
-              <div className="tamil mt-1 truncate font-body text-[11px] uppercase tracking-wide text-ink2">
-                {t('dayStreak')}
+        <div className={SHOW_STREAK ? 'mb-5 grid grid-cols-2 gap-3' : 'mb-5'}>
+          {SHOW_STREAK && (
+            <div className="card flex items-center gap-3 p-3.5">
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-streaksoft text-streak">
+                <Flame size={18} />
+              </span>
+              <div className="min-w-0">
+                <div className="font-heading text-xl font-semibold leading-none text-ink">
+                  {habit?.currentStreak ?? 0}
+                </div>
+                <div className="tamil mt-1 truncate font-body text-[11px] uppercase tracking-wide text-ink2">
+                  {t('dayStreak')}
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="card flex items-center gap-3 p-3.5">
             <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
               <Gift size={18} />

@@ -1,6 +1,7 @@
 import { Flame, Gift } from 'lucide-react'
 import { badgeIcon } from './badgeIcons'
 import type { Badge } from '../lib/achievements'
+import { SHOW_STREAK } from '../lib/features'
 import { useT } from '../lib/i18n'
 
 export interface DailyReward {
@@ -44,7 +45,7 @@ export default function RewardOverlay({ leveledTo, newBadges, daily, onClose }: 
               <span className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3 py-1 font-heading text-sm font-semibold text-white">
                 +{daily.points} {t('rewardPoints')}
               </span>
-              {daily.streak > 0 && (
+              {SHOW_STREAK && daily.streak > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-streaksoft px-3 py-1 font-heading text-sm font-semibold text-streak">
                   <Flame size={14} /> {daily.streak}
                 </span>

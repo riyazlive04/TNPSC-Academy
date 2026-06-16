@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, FileText, Layers, Loader2, Trophy } from 'lucide-react'
+import { ArrowLeft, Clock, FileText, Layers, Loader2, Minus, Plus, Trophy } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import PillButton from '../components/UI/PillButton'
@@ -13,6 +13,16 @@ import type { Difficulty, MockBlueprint, QuizConfig } from '../types'
 type Tab = 'group' | 'subject'
 
 const ALL_TOPICS = '__all__'
+
+// Bounds for the subject-exam configuration controls.
+const Q_MIN = 10
+const Q_MAX = 100
+const Q_STEP = 5
+const Q_DEFAULT = 50
+const T_MIN = 10
+const T_MAX = 120
+const T_STEP = 5
+const T_DEFAULT = 50
 
 const DIFFICULTIES: { key: Difficulty | null; labelKey: 'diffMixed' | 'diffEasy' | 'diffMedium' | 'diffHard' }[] = [
   { key: null, labelKey: 'diffMixed' },
@@ -151,6 +161,8 @@ function SubjectExamTab() {
   const [topic, setTopic] = useState<string | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
   const [topics, setTopics] = useState<string[]>([])
+  const [questionCount, setQuestionCount] = useState(Q_DEFAULT)
+  const [minutes, setMinutes] = useState(T_DEFAULT)
 
   const [loadingSubjects, setLoadingSubjects] = useState(true)
   const [loadingTopics, setLoadingTopics] = useState(false)
@@ -198,8 +210,8 @@ function SubjectExamTab() {
       subject,
       topic: isAll ? undefined : topic,
       difficulty: difficulty ?? undefined,
-      mockQuestionCount: 50,
-      mockDurationSeconds: 50 * 60,
+      mockQuestionCount: questionCount,
+      mockDurationSeconds: minutes * 60,
       negativeMark: 0,
       label: `${subject} · ${isAll ? t('allTopics') : topic} · ${diffLabel}`,
     }
@@ -270,6 +282,72 @@ function SubjectExamTab() {
                 {t(labelKey)}
               </PillButton>
             ))}
+          </div>
+        </PillSection>
+      )}
+
+      {/* Step 4 — questions & time (side by side) */}
+      {subject && topic && (
+        <PillSection title={t('examSetup')} className="mb-8 animate-fadeIn" wrap={false}>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Number of questions — stepper */}
+            <div className="card p-4">
+              <div className="mb-3 flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
+                <FileText size={14} /> {t('numQuestions')}
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  aria-label="−"
+                  onClick={() => setQuestionCount((c) => Math.max(Q_MIN, c - Q_STEP))}
+                  disabled={questionCount <= Q_MIN}
+                  className="icon-btn h-10 w-10 disabled:opacity-40"
+                >
+                  <Minus size={18} />
+                </button>
+                <span className="font-heading text-2xl font-bold tabular-nums text-ink">
+                  {questionCount}
+                </span>
+                <button
+                  type="button"
+                  aria-label="+"
+                  onClick={() => setQuestionCount((c) => Math.min(Q_MAX, c + Q_STEP))}
+                  disabled={questionCount >= Q_MAX}
+                  className="icon-btn h-10 w-10 disabled:opacity-40"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Time limit — slider */}
+            <div className="card p-4">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
+                  <Clock size={14} /> {t('timeLimit')}
+                </span>
+                <span className="font-heading text-sm font-bold tabular-nums text-brand">
+                  {minutes} {t('minutesUnit')}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={T_MIN}
+                max={T_MAX}
+                step={T_STEP}
+                value={minutes}
+                onChange={(e) => setMinutes(Number(e.target.value))}
+                className="h-2 w-full cursor-pointer accent-brand"
+              />
+              <div className="mt-1 flex justify-between font-body text-[10px] text-ink2">
+                <span>
+                  {T_MIN} {t('minutesUnit')}
+                </span>
+                <span>
+                  {T_MAX} {t('minutesUnit')}
+                </span>
+              </div>
+            </div>
           </div>
         </PillSection>
       )}

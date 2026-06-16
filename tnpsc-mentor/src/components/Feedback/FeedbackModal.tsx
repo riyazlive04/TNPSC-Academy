@@ -8,6 +8,8 @@ import { toast } from '../../store/toastStore'
 interface FeedbackModalProps {
   open: boolean
   onClose: () => void
+  /** Called after a rating is successfully submitted (used to hide the entry point). */
+  onSubmitted?: () => void
 }
 
 /**
@@ -15,7 +17,7 @@ interface FeedbackModalProps {
  * preview + pop animation), optional comment, auto-captured page. Submits via
  * api.feedback.submit, then toasts a thank-you. Escape / click-outside closes.
  */
-export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
+export default function FeedbackModal({ open, onClose, onSubmitted }: FeedbackModalProps) {
   const { t } = useT()
   const [rating, setRating] = useState(0)
   const [hover, setHover] = useState(0)
@@ -48,6 +50,7 @@ export default function FeedbackModal({ open, onClose }: FeedbackModalProps) {
     try {
       await api.feedback.submit(rating, message.trim(), window.location.pathname)
       toast.success(t('feedbackThanks'))
+      onSubmitted?.()
       onClose()
     } catch {
       toast.error(t('feedbackError'))

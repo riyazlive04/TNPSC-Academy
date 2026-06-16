@@ -57,7 +57,7 @@ const FEATURES = [
   {
     icon: ShieldCheck,
     title: 'Honest, server-graded scores',
-    desc: 'Answer keys never reach the browser. Grading happens on the server and explanations unlock once you attempt 80% — so scores mean something.',
+    desc: 'Answer keys never reach the browser. Grading happens on the server and explanations unlock once you attempt 25% — so scores mean something.',
   },
   {
     icon: BarChart3,

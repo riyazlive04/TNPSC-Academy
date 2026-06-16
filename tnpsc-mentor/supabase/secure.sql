@@ -144,7 +144,8 @@ begin
   v_attempted := coalesce(v_attempted, 0);
   v_correct   := coalesce(v_correct, 0);
   v_score  := case when v_total > 0 then round(100.0 * v_correct / v_total) else 0 end;
-  v_passed := v_total > 0 and v_attempted::numeric / v_total >= 0.8;
+  -- Explanations unlock once the student has attempted at least 25% of the test.
+  v_passed := v_total > 0 and v_attempted::numeric / v_total >= 0.25;
 
   insert into public.test_sessions (
     user_id, category, group_type, subject, standard, ca_month, ca_type,
