@@ -386,14 +386,17 @@ export default function QuizPage() {
       </div>
       {/* Top bar */}
       <div className="sticky top-0 z-20 border-b border-line bg-canvas px-4 py-3">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3">
-          <span className="font-heading text-lg font-extrabold text-ink">
-            Q {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
-          </span>
-          <span className="hidden max-w-[40%] truncate font-body text-xs text-ink2 sm:block">
+        {/* On desktop the test name fills the left and everything else - question
+            number, language, timer - is grouped on the right. On phones it stays
+            split (Q-number left, controls right). */}
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 sm:justify-end">
+          <span className="hidden min-w-0 flex-1 truncate font-body text-xs text-ink2 sm:order-1 sm:block">
             {describeConfig(config)}
           </span>
-          <div className="flex items-center gap-2">
+          <span className="font-heading text-lg font-extrabold text-ink sm:order-2">
+            Q {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
+          </span>
+          <div className="flex items-center gap-2 sm:order-3">
             {proctored && violations.length > 0 && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-coral/10 px-2 py-1 font-heading text-xs font-semibold text-coral">
                 <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
@@ -408,15 +411,6 @@ export default function QuizPage() {
               <Languages size={14} /> {QUIZ_LANG_LABEL[quizLang]}
             </button>
             <Timer secondsLeft={totalTimeLeft} />
-            {!config.mock && (
-              <button
-                onClick={() => setShowExitModal(true)}
-                aria-label={t('exitTest')}
-                className="rounded-full p-1.5 text-ink2 transition hover:bg-coralsoft hover:text-coral"
-              >
-                <X size={18} />
-              </button>
-            )}
           </div>
         </div>
         <div className="mx-auto mt-2 max-w-2xl">
@@ -470,38 +464,65 @@ export default function QuizPage() {
         )}
       </div>
 
-      {/* Bottom nav bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-4 py-3">
+      {/* Bottom nav bar - icons always show; text labels appear on wider screens
+          so nothing overflows on phones (Tamil labels are long). */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-3 py-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-2">
+          {/* Previous */}
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="inline-flex items-center gap-1 rounded-2xl border border-line bg-card px-4 py-2.5 font-heading text-sm font-semibold text-ink shadow-pill transition hover:border-brand-ring disabled:opacity-40"
+            aria-label={t('prev')}
+            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink shadow-pill transition hover:border-brand-ring disabled:opacity-40 sm:px-4"
           >
-            <ChevronLeft size={18} /> {t('prev')}
+            <ChevronLeft size={18} className="flex-shrink-0" />
+            <span className="hidden whitespace-nowrap sm:inline">{t('prev')}</span>
           </button>
 
-          <button
-            onClick={toggleFlag}
-            aria-pressed={isFlagged}
-            aria-label={isFlagged ? t('unflagQuestion') : t('flagForReview')}
-            className={[
-              'press inline-flex items-center gap-1 rounded-2xl px-4 py-2.5 font-heading text-sm font-semibold transition',
-              isFlagged
-                ? 'bg-coral text-white shadow-pill'
-                : 'border border-line bg-card text-ink2 shadow-pill hover:text-coral',
-            ].join(' ')}
-          >
-            <Flag size={16} className={isFlagged ? 'animate-popStar' : ''} /> {isFlagged ? t('flagged') : t('flag')}
-          </button>
+          {/* Centre: close (exit) sits to the LEFT of flag */}
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {!config.mock && (
+              <button
+                onClick={() => setShowExitModal(true)}
+                aria-label={t('exitTest')}
+                title={t('exitTest')}
+                className="grid h-[42px] w-[42px] flex-shrink-0 place-items-center rounded-2xl border border-line bg-card text-ink2 shadow-pill transition hover:bg-coralsoft hover:text-coral"
+              >
+                <X size={18} />
+              </button>
+            )}
+            <button
+              onClick={toggleFlag}
+              aria-pressed={isFlagged}
+              aria-label={isFlagged ? t('unflagQuestion') : t('flagForReview')}
+              className={[
+                'press inline-flex flex-shrink-0 items-center gap-1.5 rounded-2xl px-3 py-2.5 font-heading text-sm font-semibold transition sm:px-4',
+                isFlagged
+                  ? 'bg-coral text-white shadow-pill'
+                  : 'border border-line bg-card text-ink2 shadow-pill hover:text-coral',
+              ].join(' ')}
+            >
+              <Flag size={16} className={`flex-shrink-0 ${isFlagged ? 'animate-popStar' : ''}`} />
+              <span className="hidden whitespace-nowrap sm:inline">
+                {isFlagged ? t('flagged') : t('flag')}
+              </span>
+            </button>
+          </div>
 
+          {/* Next / Submit */}
           {isLast ? (
-            <button onClick={requestSubmit} className="btn-brand px-6 py-2.5 text-sm">
+            <button
+              onClick={requestSubmit}
+              className="btn-brand flex-shrink-0 whitespace-nowrap px-4 py-2.5 text-sm sm:px-6"
+            >
               {t('submitTest')}
             </button>
           ) : (
-            <button onClick={goNext} className="btn-brand px-6 py-2.5 text-sm">
-              {t('next')} <ChevronRight size={18} />
+            <button
+              onClick={goNext}
+              className="btn-brand inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap px-4 py-2.5 text-sm sm:px-6"
+            >
+              {t('next')} <ChevronRight size={18} className="flex-shrink-0" />
             </button>
           )}
         </div>
