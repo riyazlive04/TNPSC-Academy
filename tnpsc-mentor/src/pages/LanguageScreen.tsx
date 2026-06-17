@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, Globe } from 'lucide-react'
 import { useLanguageStore, type Lang } from '../store/languageStore'
+import { api } from '../lib/api'
 import { useT } from '../lib/i18n'
 
 interface Opt {
@@ -27,6 +28,10 @@ export default function LanguageScreen() {
   const proceed = () => {
     if (!selected) return
     setLang(selected)
+    // Persist to the account so the choice follows the user across devices and
+    // this screen is never shown again. Best-effort: the local store already
+    // drives the UI, and the column may not exist until the migration is run.
+    api.updateProfile({ language: selected }).catch(() => {})
     navigate('/test-arena', { replace: true })
   }
 

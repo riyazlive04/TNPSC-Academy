@@ -3,7 +3,7 @@ import type { AnswerLetter, Question, QuizConfig } from '../types'
 
 export const MAX_QUESTIONS = 100
 
-/** Fisher–Yates shuffle (non-mutating). */
+/** Fisher-Yates shuffle (non-mutating). */
 export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -29,7 +29,7 @@ export async function fetchQuestionsForConfig(
 }
 
 /**
- * Admin question bank fetch — full rows (answers + explanations) via the
+ * Admin question bank fetch - full rows (answers + explanations) via the
  * `admin_list_questions` RPC, which is gated server-side by is_admin(). A
  * non-admin calling it simply gets an empty list.
  */

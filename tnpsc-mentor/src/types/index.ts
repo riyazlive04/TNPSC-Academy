@@ -30,7 +30,7 @@ export interface Question {
   topic?: string
   // Subject Practice style tag (chronological / match / assertion_reason / …).
   question_type?: string
-  // Short provenance marker (e.g. 'TU') — rendered as a small badge when set.
+  // Short provenance marker (e.g. 'TU') - rendered as a small badge when set.
   source_tag?: string | null
   question_text: string
   // Ordered public URLs of figures that belong to the question stem (diagrams
@@ -43,7 +43,7 @@ export interface Question {
   option_d: string
   // Answer/explanation columns are NOT delivered to the client during a quiz
   // (they're stripped server-side). They're only populated for the admin bank
-  // and merged in after a result is graded — hence optional.
+  // and merged in after a result is graded - hence optional.
   correct_answer?: AnswerLetter
   explanation?: string
   // Per-option rationale: for each WRONG option letter, why it is incorrect.
@@ -98,7 +98,8 @@ export interface TestAnswer {
 }
 
 // Per-question result returned by the `submit_test` RPC. correct_answer /
-// explanation fields are only present when the 80% gate unlocked them.
+// explanation fields are only present when the attendance gate (>=25%) unlocked
+// them. NOTE: the `passed_80*` field names are historical - the gate is 25%.
 export interface GradedResult {
   question_id: string
   selected_answer: AnswerLetter | null
@@ -129,13 +130,13 @@ export interface QuizConfig {
   topic?: string
   /**
    * Broad unit/section filter (the `questions.unit` column). Used by the PYQ
-   * History selector to scope a test to one period — 'ancient' | 'medieval' |
+   * History selector to scope a test to one period - 'ancient' | 'medieval' |
    * 'modern' (the 214 History PYQs are tagged this way).
    */
   unit?: string
   /** Subject Practice: restrict to one question style (omit for "Mixed"). */
   question_type?: SubjectQType
-  /** Difficulty filter (easy/medium/hard) — used by subject/topic mock tests. */
+  /** Difficulty filter (easy/medium/hard) - used by subject/topic mock tests. */
   difficulty?: Difficulty
   ca_month?: string
   ca_type?: string
@@ -156,7 +157,7 @@ export interface QuizConfig {
   negativeMark?: number
   /** For mock mode: restrict the random pool to `category` (e.g. daily CA). */
   scopeToCategory?: boolean
-  /** Daily Current-Affairs challenge — completing it grants the daily reward. */
+  /** Daily Current-Affairs challenge - completing it grants the daily reward. */
   daily?: boolean
   /** Weekly Current-Affairs consolidation drill. */
   weekly?: boolean
@@ -199,6 +200,9 @@ export interface Profile {
   role?: UserRole
   exam_date?: string | null
   daily_goal?: number | null
+  /** Preferred UI language. Account-bound so it follows the user across devices
+   * and is set ONCE at onboarding; changeable later from the Profile page. */
+  language?: DisplayLang | null
 }
 
 // ─── Result payload passed via router state to /result ──────────────────────
@@ -294,7 +298,7 @@ export interface ParsedMatch {
 }
 
 // An item line: optional "(", a short label, a closing ")" or ".", then the
-// item text. The label tells us which list it belongs to — letters → List I,
+// item text. The label tells us which list it belongs to - letters → List I,
 // numbers → List II. Roman numerals (i, ii, iii, iv…) are allowed up to 4 chars
 // so List I items labelled (i)-(iv) aren't truncated.
 const MATCH_ITEM = /^\(?\s*([ivxlcdm]{1,4}|[IVXLCDM]{1,4}|[A-Za-z]{1,2}|\d{1,2}|[அ-ஔ])\s*[).]\s*(.+)$/
@@ -338,7 +342,7 @@ function parseCombinedMatch(lines: string[]): ParsedMatch | null {
     listII.push({ label: m[3], text: m[4].trim() })
   }
   if (listI.length < 2) return null
-  // List II labels must be distinct — guards against matching stray punctuation.
+  // List II labels must be distinct - guards against matching stray punctuation.
   const nums = listII.map((i) => i.label)
   if (new Set(nums).size !== nums.length) return null
 
@@ -370,9 +374,9 @@ function parseCombinedMatch(lines: string[]): ParsedMatch | null {
  * Parse a "Match the following" question body into its two lists. List I is the
  * first run of letter-labelled items ((a)-(d) or A-D); List II is the following
  * run of number-labelled items (1-4). Each list's header is the plain line just
- * above it — works for "List I/List II", "Schedule/Subject", "Extremity/Place",
+ * above it - works for "List I/List II", "Schedule/Subject", "Extremity/Place",
  * etc. Returns null when the text isn't a recognisable two-list match (callers
- * then fall back to plain text). Operates on a single language's raw text — for
+ * then fall back to plain text). Operates on a single language's raw text - for
  * bilingual display, call once per language string.
  */
 export function parseMatchQuestion(text: string | null | undefined): ParsedMatch | null {

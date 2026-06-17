@@ -11,7 +11,7 @@ interface MascotProps {
 }
 
 /**
- * "Sipi" — TNPSC Mentor's study-buddy mascot. A friendly purple droplet whose
+ * "Sipi" - TNPSC Mentor's study-buddy mascot. A friendly purple droplet whose
  * face + arms react to context: celebrating a great score, thinking on a hard
  * question, waving hello on the dashboard, or cheering you on in revision.
  * Pure inline SVG so it scales crisply and ships with zero assets.

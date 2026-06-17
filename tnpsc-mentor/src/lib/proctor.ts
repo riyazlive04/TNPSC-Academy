@@ -2,7 +2,7 @@
  * Fullscreen + anti-capture helpers for proctored mock tests.
  *
  * Mobile browsers are the problem this module solves. iOS Safari has no
- * Fullscreen API on arbitrary elements, and Android's is quirky — so the old
+ * Fullscreen API on arbitrary elements, and Android's is quirky - so the old
  * desktop-style "you must stay full-screen" gate locked every phone user out of
  * the test: `requestFullscreen()` rejected silently, the re-entry overlay stayed
  * up forever, and tapping it did nothing. Here we detect support up front and
@@ -44,7 +44,7 @@ export async function enterFullscreen(): Promise<void> {
     if (el.requestFullscreen) await el.requestFullscreen()
     else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen()
   } catch {
-    /* user/device rejected — caller falls back to soft proctoring */
+    /* user/device rejected - caller falls back to soft proctoring */
   }
 }
 
@@ -60,7 +60,7 @@ export async function exitFullscreen(): Promise<void> {
   }
 }
 
-/** Coarse-pointer / touch heuristic — used only for copy tweaks & messaging. */
+/** Coarse-pointer / touch heuristic - used only for copy tweaks & messaging. */
 export function isTouchDevice(): boolean {
   if (typeof window === 'undefined') return false
   return window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window

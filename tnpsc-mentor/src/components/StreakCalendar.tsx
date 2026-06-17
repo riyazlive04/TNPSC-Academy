@@ -14,7 +14,7 @@ function isoUTC(d: Date): string {
 }
 
 /**
- * The last 7 days as a row of day-dots — active days filled & checked, today
+ * The last 7 days as a row of day-dots - active days filled & checked, today
  * ringed. Mirrors the streak calendar from the design reference.
  */
 export default function StreakCalendar({

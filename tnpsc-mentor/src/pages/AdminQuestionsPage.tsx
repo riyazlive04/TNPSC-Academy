@@ -55,7 +55,7 @@ export default function AdminQuestionsPage() {
   const [actionError, setActionError] = useState('')
   const [downloading, setDownloading] = useState(false)
 
-  // Config actually sent to the API — the chosen subject overrides the base one.
+  // Config actually sent to the API - the chosen subject overrides the base one.
   const activeConfig = useMemo<QuizConfig | null>(
     () => (config ? { ...config, subject: subject || undefined } : null),
     [config, subject]
@@ -68,7 +68,7 @@ export default function AdminQuestionsPage() {
       const data = await fetchAdminQuestions(activeConfig)
       setQuestions(data)
     } catch {
-      setActionError('Imported, but could not refresh the list — reload the page to see new questions.')
+      setActionError('Imported, but could not refresh the list - reload the page to see new questions.')
     }
   }
 
@@ -100,7 +100,7 @@ export default function AdminQuestionsPage() {
     }
   }, [config, navigate])
 
-  // Non-admins should never see this page — bounce them to the quiz instead.
+  // Non-admins should never see this page - bounce them to the quiz instead.
   useEffect(() => {
     if (!authLoading && !isAdmin && config) {
       navigate('/quiz', { replace: true, state: config })
@@ -174,7 +174,7 @@ export default function AdminQuestionsPage() {
         <div className="mb-5 flex flex-col items-center gap-3 text-center">
           <YellowBadge>Question Bank</YellowBadge>
           <div className="flex items-center gap-2 rounded-full bg-gold/15 px-3 py-1.5 font-heading text-xs font-bold uppercase text-gold">
-            <ShieldCheck size={14} /> Admin View — answers revealed
+            <ShieldCheck size={14} /> Admin View - answers revealed
           </div>
           <p className="tamil font-body text-sm text-ink2">{describeConfig(config)}</p>
         </div>
@@ -269,7 +269,7 @@ export default function AdminQuestionsPage() {
         {!loading && !error && filtered.length > 0 && (
           <div className="flex flex-col gap-4">
             {filtered.map((q, i) => (
-              <article key={q.id} className="rounded-2xl bg-white p-4 shadow-card sm:p-5">
+              <article key={q.id} className="rounded-2xl border border-line bg-card p-4 shadow-card sm:p-5">
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
                     <span className="mr-1 text-secondary">{i + 1}.</span>

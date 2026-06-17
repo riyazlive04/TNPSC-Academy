@@ -1,6 +1,17 @@
 import { create } from 'zustand'
 import { api, tokens, isApiConfigured } from '../lib/api'
+import { useLanguageStore } from './languageStore'
 import type { Profile, UserRole } from '../types'
+
+/** Adopt the account's saved language so the preference follows the user across
+ * devices and the one-time language screen isn't shown again after onboarding.
+ * No-op when the profile has no language yet (keeps the local choice). */
+function applyProfileLanguage(profile: Profile | null): void {
+  const lang = profile?.language
+  if (lang === 'en' || lang === 'ta' || lang === 'both') {
+    useLanguageStore.getState().setLang(lang)
+  }
+}
 
 /** Minimal user identity (the browser no longer holds a Supabase session). */
 export interface AuthUser {
@@ -46,6 +57,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     try {
       const { user, profile } = await api.auth.me()
+      applyProfileLanguage(profile)
       set({ user, profile, loading: false })
     } catch {
       tokens.clear()
@@ -58,13 +70,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const profile = await api.getProfile()
       set({ profile })
     } catch {
-      /* non-fatal — profile may not exist yet */
+      /* non-fatal - profile may not exist yet */
     }
   },
 
   signIn: async (email, password) => {
     try {
       const { user, profile } = await api.auth.login(email.trim(), password)
+      applyProfileLanguage(profile)
       set({ user, profile })
       return { error: null }
     } catch (e) {
@@ -78,6 +91,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if ('requiresConfirmation' in res) {
         return { error: 'Check your email to confirm your account, then sign in.' }
       }
+      applyProfileLanguage(res.profile)
       set({ user: res.user, profile: res.profile })
       return { error: null }
     } catch (e) {

@@ -14,7 +14,7 @@ export function formatTime(totalSeconds: number): string {
 }
 
 /**
- * Compact human duration for per-question timing — e.g. "12s" or "1m 05s".
+ * Compact human duration for per-question timing - e.g. "12s" or "1m 05s".
  * Reads better than a zero-padded clock for the short spans on a result card.
  */
 export function formatDuration(totalSeconds: number): string {
@@ -26,15 +26,18 @@ export function formatDuration(totalSeconds: number): string {
 }
 
 /**
- * Large countdown timer for the quiz. Turns red (#FF5722) when under 60s.
+ * Large countdown timer for the quiz. Turns red when under 60s, and in the final
+ * 5 seconds switches to a slow "breathing" pulse (scale + halo) for urgency.
  */
 export default function Timer({ secondsLeft, className = '' }: TimerProps) {
   const danger = secondsLeft <= 60
+  const critical = secondsLeft <= 5
   return (
     <div
       className={[
         'inline-flex items-center gap-2 rounded-full px-4 py-2 font-heading font-bold tabular-nums',
-        danger ? 'bg-warn text-white animate-pulse' : 'bg-white text-navytext',
+        danger ? 'bg-warn text-white' : 'border border-line bg-card text-ink',
+        critical ? 'animate-breathe' : danger ? 'animate-pulse' : '',
         className,
       ].join(' ')}
       role="timer"

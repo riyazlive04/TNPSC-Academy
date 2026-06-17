@@ -9,7 +9,7 @@ export const SHOW_STREAK = false
 /** Daily-question goal + exam-date countdown surfaces (Test Arena & Setup). */
 export const SHOW_GOALS = false
 
-/** Badge ids tied to the streak feature — hidden from the grid when SHOW_STREAK is off. */
+/** Badge ids tied to the streak feature - hidden from the grid when SHOW_STREAK is off. */
 export const STREAK_BADGE_IDS = new Set(['consistent', 'onfire', 'unstoppable'])
 
 /** Whether a badge should be hidden from display/celebration right now. */

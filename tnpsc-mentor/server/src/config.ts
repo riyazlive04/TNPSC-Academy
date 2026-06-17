@@ -28,8 +28,12 @@ export function isAllowedOrigin(origin?: string): boolean {
   return corsOrigins.some((pattern) => {
     if (pattern === origin) return true
     if (!pattern.includes('*')) return false
+    // A `*` matches within a SINGLE DNS label only ([^.]*), never across dots.
+    // This keeps Vercel preview wildcards working (`https://*-proj.vercel.app`)
+    // while preventing a broad `*` from matching an attacker subdomain on a
+    // different parent (greedy `.*` previously let `evil.vercel.app` through).
     const re = new RegExp(
-      '^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*') + '$'
+      '^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '[^.]*') + '$'
     )
     return re.test(origin)
   })

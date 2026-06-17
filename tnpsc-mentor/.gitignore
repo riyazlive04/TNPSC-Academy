@@ -7,9 +7,11 @@ node_modules
 dist
 dist-ssr
 *.local
+*.zip
 
-# Environment — never commit secrets
+# Environment — never commit secrets (defense in depth; server has its own too)
 .env
+**/.env
 scrapers/.env
 
 # Scraper output / working dirs

@@ -52,7 +52,7 @@ export default function RevisionPage() {
         explanation_ta: grade.explanation_ta ?? undefined,
       })
     } else {
-      // Grading unavailable (offline) — reveal without the answer highlight.
+      // Grading unavailable (offline) - reveal without the answer highlight.
       setRevealed(q)
     }
   }

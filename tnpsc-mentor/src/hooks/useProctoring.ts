@@ -34,7 +34,7 @@ export const MAX_VIOLATIONS = 5
  * auto-submit threshold triggers `onAutoSubmit`.
  *
  * On phones without the Fullscreen API it degrades to visibility/blur
- * proctoring — see lib/proctor.ts. Extracted from the mock OMR engine so the
+ * proctoring - see lib/proctor.ts. Extracted from the mock OMR engine so the
  * regular timed quiz can reuse the exact same enforcement.
  */
 export function useProctoring(opts: {
@@ -56,6 +56,7 @@ export function useProctoring(opts: {
 
   const startedAtRef = useRef(Date.now())
   const doneRef = useRef(false) // stop recording after auto-submit
+  const toastTimers = useRef<number[]>([]) // pending toast-dismiss timeouts, cleared on unmount
   const idxRef = useRef(questionIndex)
   idxRef.current = questionIndex
   const autoRef = useRef(onAutoSubmit)
@@ -70,7 +71,7 @@ export function useProctoring(opts: {
           { type, at: Date.now() - startedAtRef.current, questionIndex: idxRef.current },
         ]
         setViolationToast(t('violationWarning'))
-        window.setTimeout(() => setViolationToast(''), 4000)
+        toastTimers.current.push(window.setTimeout(() => setViolationToast(''), 4000))
         if (next.length >= maxViolations && !doneRef.current) {
           doneRef.current = true
           autoRef.current()
@@ -116,7 +117,7 @@ export function useProctoring(opts: {
         recordViolation('copy_paste')
       }
     }
-    // Windows' PrintScreen reports on keyup only — catch it there too.
+    // Windows' PrintScreen reports on keyup only - catch it there too.
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'PrintScreen') {
         navigator.clipboard?.writeText('').catch(() => {})
@@ -150,6 +151,9 @@ export function useProctoring(opts: {
       document.removeEventListener('contextmenu', blockContext)
       document.removeEventListener('keydown', blockKeys)
       document.removeEventListener('keyup', onKeyUp)
+      // Cancel any pending toast-dismiss timers so they don't setState after unmount.
+      toastTimers.current.forEach((id) => window.clearTimeout(id))
+      toastTimers.current = []
     }
   }, [active, recordViolation, fsSupported])
 

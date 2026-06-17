@@ -18,16 +18,15 @@ export interface SubjectAsset {
   links: AssetLink[]
 }
 
-// Free, official, broadly-useful resources for every subject.
-const COMMON: AssetLink[] = [
-  { label: 'Samacheer Kalvi textbooks (free, TN Govt)', url: 'https://www.tnschools.gov.in/', kind: 'textbook' },
-  { label: 'Official TNPSC syllabus', url: 'https://www.tnpsc.gov.in/english/syllabus.html', kind: 'official' },
-]
+// Free, official, broadly-useful resources for every subject. (The TNPSC
+// syllabus + Samacheer textbook links were removed by request, so this is now
+// empty; subject-specific links below still apply.)
+const COMMON: AssetLink[] = []
 
 const SUBJECT_ASSETS: Record<string, SubjectAsset> = {
   'History and INM': {
-    tip: 'Build a timeline of the Indian freedom movement — link each event to its leaders, sessions and acts. Dates + cause→effect win marks.',
-    tipTa: 'இந்திய சுதந்திரப் போராட்டத்தின் கால வரிசையை உருவாக்குங்கள் — ஒவ்வொரு நிகழ்வையும் தலைவர்கள், மாநாடுகள், சட்டங்களுடன் இணைக்கவும்.',
+    tip: 'Build a timeline of the Indian freedom movement - link each event to its leaders, sessions and acts. Dates + cause→effect win marks.',
+    tipTa: 'இந்திய சுதந்திரப் போராட்டத்தின் கால வரிசையை உருவாக்குங்கள் - ஒவ்வொரு நிகழ்வையும் தலைவர்கள், மாநாடுகள், சட்டங்களுடன் இணைக்கவும்.',
     links: [
       { label: 'NCERT History textbooks (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
       ...COMMON,

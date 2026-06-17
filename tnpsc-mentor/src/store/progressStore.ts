@@ -30,7 +30,7 @@ interface ProgressState {
   lastDailyDate: string | null
   dailyRewardPoints: number
 
-  /** Seed the baseline silently (called on the dashboard) — no rewards shown. */
+  /** Seed the baseline silently (called on the dashboard) - no rewards shown. */
   sync: (badgeIds: string[], level: number) => void
   /**
    * Compare the latest state against what's been seen, advance the baseline,
@@ -62,7 +62,7 @@ export const useProgressStore = create<ProgressState>()(
       claim: (badgeIds, level) => {
         const { initialized, seenBadges, seenLevel } = get()
         if (!initialized) {
-          // First ever sighting — seed, don't celebrate retroactively.
+          // First ever sighting - seed, don't celebrate retroactively.
           set({ initialized: true, seenBadges: badgeIds, seenLevel: level })
           return { newBadges: [], leveledTo: null }
         }
@@ -80,7 +80,7 @@ export const useProgressStore = create<ProgressState>()(
       claimDaily: (today) => {
         const { lastDailyDate, dailyRewardPoints } = get()
         if (lastDailyDate === today) {
-          // Already rewarded today — no double-dipping.
+          // Already rewarded today - no double-dipping.
           return { granted: false, points: 0, total: dailyRewardPoints }
         }
         const total = dailyRewardPoints + DAILY_REWARD_POINTS

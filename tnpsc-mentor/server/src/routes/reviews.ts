@@ -10,7 +10,8 @@ router.get(
   '/due',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const limit = Number(req.query.limit ?? 30)
+    // Clamp: an unvalidated `limit=abc` would forward NaN to the RPC.
+    const limit = Math.min(Math.max(Math.trunc(Number(req.query.limit)) || 30, 1), 100)
     const { data, error } = await req.db!.rpc('get_due_reviews', { p_limit: limit })
     if (error) return sendDbError(res, error)
     res.json({ items: data ?? [] })

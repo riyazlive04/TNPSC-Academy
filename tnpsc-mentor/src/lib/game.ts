@@ -1,5 +1,5 @@
 // ─── XP & levels ────────────────────────────────────────────────────────────
-// A light progression layer derived entirely from existing analytics — no new
+// A light progression layer derived entirely from existing analytics - no new
 // tables. XP rewards correct answers most, attempts a little, and finishing
 // tests. Levels use a gently escalating curve.
 
@@ -15,7 +15,7 @@ export interface LevelInfo {
   xp: number
   into: number // xp accumulated within the current level
   span: number // xp required to clear the current level
-  pct: number // 0–100 progress to the next level
+  pct: number // 0-100 progress to the next level
   toNext: number // xp remaining to next level
 }
 

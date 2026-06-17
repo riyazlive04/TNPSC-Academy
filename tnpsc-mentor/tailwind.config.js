@@ -1,49 +1,49 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // ─── Blue travel-booking palette ───────────────────────────────────
-        // A confident royal blue carries the hero surfaces; white cards float on
-        // a soft blue-tinted canvas; a warm orange is the single call-to-action
-        // accent (used sparingly, the way the inspiration does).
+        // ─── Violet design system (light + dark) ───────────────────────────
+        // Every colour is a CSS variable defined in index.css (:root for light,
+        // .dark for dark mode), so the whole UI re-themes from one place. The
+        // channel-triplet form `rgb(var(--x) / <alpha-value>)` keeps Tailwind's
+        // /opacity modifiers working, e.g. `bg-brand/30`, `text-ink2/60`.
         brand: {
-          DEFAULT: '#2563EB', // royal blue — primary actions, active states
-          dark: '#1D4ED8',
-          deep: '#1E3A8A', // deep navy-blue for hero gradients
-          soft: '#EAF1FF', // faint blue wash for chips / icon tiles
-          ring: '#BFD3FF',
+          DEFAULT: 'rgb(var(--c-brand) / <alpha-value>)',
+          dark: 'rgb(var(--c-brand-dark) / <alpha-value>)',
+          deep: 'rgb(var(--c-brand-deep) / <alpha-value>)',
+          soft: 'rgb(var(--c-brand-soft) / <alpha-value>)',
+          ring: 'rgb(var(--c-brand-ring) / <alpha-value>)',
         },
-        canvas: '#F4F7FC', // app background — light blue-gray
-        card: '#FFFFFF',
-        ink: '#0F1B3D', // primary text — deep navy
-        ink2: '#5B6B8C', // secondary text — muted slate-blue
-        line: '#E4EAF4', // hairline borders
-        tint: '#EEF3FF', // neutral blue fill for icon tiles / chips
+        canvas: 'rgb(var(--c-canvas) / <alpha-value>)',
+        card: 'rgb(var(--c-card) / <alpha-value>)',
+        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+        ink2: 'rgb(var(--c-ink2) / <alpha-value>)',
+        line: 'rgb(var(--c-line) / <alpha-value>)',
+        tint: 'rgb(var(--c-tint) / <alpha-value>)',
 
-        // ─── Warm accent (the orange CTA from the inspiration) ─────────────
-        accentwarm: '#FF6B35',
-        accentwarmsoft: '#FFEDE4',
+        accentwarm: 'rgb(var(--c-accentwarm) / <alpha-value>)',
+        accentwarmsoft: 'rgb(var(--c-accentwarm-soft) / <alpha-value>)',
 
-        // ─── Semantic accents ──────────────────────────────────────────────
-        gold: '#F59E0B',
-        goldsoft: '#FEF3E2',
-        mint: '#16A34A',
-        mintsoft: '#E7F7EE',
-        coral: '#EF4444',
-        coralsoft: '#FDECEC',
-        sky: '#2563EB',
-        skysoft: '#EAF1FF',
-        streak: '#FF6B35',
-        streaksoft: '#FFEDE4',
+        gold: 'rgb(var(--c-gold) / <alpha-value>)',
+        goldsoft: 'rgb(var(--c-gold-soft) / <alpha-value>)',
+        mint: 'rgb(var(--c-mint) / <alpha-value>)',
+        mintsoft: 'rgb(var(--c-mint-soft) / <alpha-value>)',
+        coral: 'rgb(var(--c-coral) / <alpha-value>)',
+        coralsoft: 'rgb(var(--c-coral-soft) / <alpha-value>)',
+        sky: 'rgb(var(--c-sky) / <alpha-value>)',
+        skysoft: 'rgb(var(--c-sky-soft) / <alpha-value>)',
+        streak: 'rgb(var(--c-streak) / <alpha-value>)',
+        streaksoft: 'rgb(var(--c-streak-soft) / <alpha-value>)',
 
-        // ─── Legacy aliases (remapped onto the blue scheme) ─────────────────
-        primary: '#2563EB',
-        secondary: '#3B82F6',
-        accent: '#FF6B35',
-        navytext: '#0F1B3D',
-        warn: '#EF4444',
+        // ─── Legacy aliases (remapped onto the violet scheme) ───────────────
+        primary: 'rgb(var(--c-brand) / <alpha-value>)',
+        secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
+        accent: 'rgb(var(--c-accentwarm) / <alpha-value>)',
+        navytext: 'rgb(var(--c-ink) / <alpha-value>)',
+        warn: 'rgb(var(--c-coral) / <alpha-value>)',
       },
       fontFamily: {
         heading: ['Inter', 'system-ui', 'sans-serif'],
@@ -55,20 +55,24 @@ export default {
         '5xl': '2.25rem',
       },
       boxShadow: {
-        // Restrained, hairline-first elevation — professional, not floaty.
-        pill: '0 1px 2px rgba(15,27,61,0.05)',
-        card: '0 1px 3px rgba(15,27,61,0.06)',
-        soft: '0 1px 2px rgba(15,27,61,0.04)',
-        brand: '0 4px 14px rgba(37,99,235,0.18)',
-        warm: '0 4px 14px rgba(255,107,53,0.18)',
-        gold: '0 4px 14px rgba(245,158,11,0.16)',
+        // Restrained, hairline-first elevation. The neutral shadows fade on the
+        // dark canvas (where the card border carries elevation); the brand glow
+        // tracks the violet accent in both modes.
+        pill: '0 1px 2px rgb(var(--c-shadow) / 0.05)',
+        card: '0 1px 3px rgb(var(--c-shadow) / 0.07)',
+        soft: '0 1px 2px rgb(var(--c-shadow) / 0.05)',
+        brand: '0 8px 22px rgb(var(--c-brand) / 0.32)',
+        warm: '0 4px 14px rgb(var(--c-accentwarm) / 0.22)',
+        gold: '0 4px 14px rgb(var(--c-gold) / 0.18)',
       },
       backgroundImage: {
-        // A refined, deeper royal-blue → navy hero gradient (less neon).
-        'brand-gradient': 'linear-gradient(135deg, #2563EB 0%, #1E40AF 55%, #172554 100%)',
-        'brand-gradient-soft': 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+        // Violet → deep-violet hero gradient (variable-backed, themes per mode).
+        'brand-gradient':
+          'linear-gradient(135deg, rgb(var(--c-brand)) 0%, rgb(var(--c-brand-dark)) 55%, rgb(var(--c-brand-deep)) 100%)',
+        'brand-gradient-soft':
+          'linear-gradient(135deg, rgb(var(--c-secondary)) 0%, rgb(var(--c-brand)) 100%)',
         'brand-radial':
-          'radial-gradient(900px 400px at 50% -12%, rgba(37,99,235,0.06), rgba(244,247,252,0) 70%)',
+          'radial-gradient(900px 400px at 50% -12%, rgb(var(--c-brand) / 0.07), transparent 70%)',
         'hero-grid':
           'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.10) 1px, transparent 0)',
       },
@@ -145,6 +149,12 @@ export default {
           '70%': { transform: 'scale(1.15)', opacity: '1' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        // Final-seconds "breathing" pulse for the countdown timer — a slow
+        // scale + expanding red halo that reads as urgency without flickering.
+        breathe: {
+          '0%,100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(239,68,68,0.55)' },
+          '50%': { transform: 'scale(1.07)', boxShadow: '0 0 0 9px rgba(239,68,68,0)' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 0.35s ease-out',
@@ -162,6 +172,7 @@ export default {
         shimmer: 'shimmer 1.6s linear infinite',
         indeterminate: 'indeterminate 1.1s ease-in-out infinite',
         checkPop: 'checkPop 0.3s cubic-bezier(0.22,1,0.36,1)',
+        breathe: 'breathe 1.05s ease-in-out infinite',
       },
     },
   },

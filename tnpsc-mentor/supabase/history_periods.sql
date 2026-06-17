@@ -22,7 +22,7 @@ returns table (
   aptitude_type text, aptitude_topic text, subject text, topic text,
   question_type text, external_id text,
   question_text text, option_a text, option_b text, option_c text, option_d text,
-  difficulty text, source_tag text,
+  difficulty text, images jsonb, source_tag text,
   question_text_ta text, option_a_ta text, option_b_ta text,
   option_c_ta text, option_d_ta text
 )
@@ -53,7 +53,7 @@ as $$
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
          q.question_type, q.external_id,
          q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-         q.difficulty, q.source_tag,
+         q.difficulty, q.images, q.source_tag,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q, cfg
@@ -99,6 +99,7 @@ begin
     and ((p_config->>'standard')     is null or q.standard       = (p_config->>'standard')::int)
     and (p_config->>'topic'          is null or q.topic          = p_config->>'topic')
     and (p_config->>'unit'           is null or q.unit           = p_config->>'unit')
+    and (p_config->>'question_type'  is null or q.question_type  = p_config->>'question_type')
     and (p_config->>'ca_type'        is null or q.ca_type        = p_config->>'ca_type')
     and (p_config->>'ca_month'       is null or q.ca_month       = p_config->>'ca_month')
     and (p_config->>'ca_topic'       is null or q.ca_topic       = p_config->>'ca_topic')

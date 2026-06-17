@@ -12,7 +12,7 @@ const DIFFICULTIES = ['easy', 'medium', 'hard']
 interface QuestionEditorProps {
   /** The question being edited; null/undefined means "create new". */
   initial?: Question | null
-  /** Config the admin arrived with — prefills classification for a new row. */
+  /** Config the admin arrived with - prefills classification for a new row. */
   config?: QuizConfig | null
   onClose: () => void
   onSaved: (q: Question, isNew: boolean) => void
@@ -140,14 +140,14 @@ export default function QuestionEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
-      <div className="animate-pop my-4 w-full max-w-2xl rounded-3xl bg-white p-5 shadow-card sm:p-6">
+      <div className="animate-pop my-4 w-full max-w-2xl rounded-3xl border border-line bg-card p-5 shadow-card sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-heading text-xl font-bold text-navytext">
             {isNew ? 'New Question' : 'Edit Question'}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-full p-1.5 text-ink2 transition hover:bg-black/5"
+            className="rounded-full p-1.5 text-ink2 transition hover:bg-ink/5"
             aria-label="Close"
           >
             <X size={20} />
@@ -165,7 +165,7 @@ export default function QuestionEditor({
             <SelectField label="Difficulty" value={form.difficulty} onChange={set('difficulty')} options={DIFFICULTIES} />
             <SelectField label="Subject" value={form.subject} onChange={set('subject')} options={['', ...SUBJECTS]} />
             <Field label="Topic" value={form.topic} onChange={set('topic')} />
-            <Field label="Standard" value={form.standard} onChange={set('standard')} placeholder="6–10" />
+            <Field label="Standard" value={form.standard} onChange={set('standard')} placeholder="6-10" />
             <Field label="Year" value={form.year} onChange={set('year')} placeholder="e.g. 2023" />
             <Field label="CA Month" value={form.ca_month} onChange={set('ca_month')} placeholder="August 2025" />
             <Field label="CA Type" value={form.ca_type} onChange={set('ca_type')} placeholder="month_wise" />
@@ -333,7 +333,7 @@ function SelectField({
       <select value={value} onChange={(e) => onChange(e.target.value)} className={INPUT_CLS}>
         {options.map((o) => (
           <option key={o} value={o}>
-            {o === '' ? '—' : o}
+            {o === '' ? '-' : o}
           </option>
         ))}
       </select>

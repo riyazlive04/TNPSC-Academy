@@ -35,6 +35,10 @@ begin
     and (p_config->>'subject'        is null or q.subject        = p_config->>'subject')
     and ((p_config->>'standard')     is null or q.standard       = (p_config->>'standard')::int)
     and (p_config->>'topic'          is null or q.topic          = p_config->>'topic')
+    -- unit (History period) + question_type (Subject Practice style) so the
+    -- admin bank mirrors exactly what get_quiz_questions serves students.
+    and (p_config->>'unit'           is null or q.unit           = p_config->>'unit')
+    and (p_config->>'question_type'  is null or q.question_type  = p_config->>'question_type')
     and (p_config->>'ca_type'        is null or q.ca_type        = p_config->>'ca_type')
     and (p_config->>'ca_month'       is null or q.ca_month       = p_config->>'ca_month')
     and (p_config->>'ca_topic'       is null or q.ca_topic       = p_config->>'ca_topic')

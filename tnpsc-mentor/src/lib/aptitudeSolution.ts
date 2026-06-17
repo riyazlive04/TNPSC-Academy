@@ -4,7 +4,7 @@ import type { AnswerLetter } from '../types'
  * Parser that turns an aptitude explanation into a sectioned "worked solution"
  * (Given / From question / Asked), so it can be rendered like a textbook
  * solution. Explanations authored in the sectioned convention carry header
- * lines ("Given:", "From question:", "Asked:" — or their Tamil equivalents);
+ * lines ("Given:", "From question:", "Asked:" - or their Tamil equivalents);
  * within a section, "Formula:" / "Rule:" lines are emphasised and a trailing
  * "→ Option (X)" becomes the answer. Unstructured/legacy text still renders:
  * it just falls into a single default section as plain steps.

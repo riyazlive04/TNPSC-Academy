@@ -24,12 +24,12 @@ const TRACKS = [
   {
     icon: BookOpen,
     title: 'Previous Year Papers',
-    desc: 'Authentic PYQs for Group 1, Group 2/2A and Group 4 & VAO — practise the questions that actually appear.',
+    desc: 'Authentic PYQs for Group 1, Group 2/2A and Group 4 & VAO - practise the questions that actually appear.',
   },
   {
     icon: GraduationCap,
     title: 'Samacheer Foundation',
-    desc: 'Class 6–10 Samacheer Kalvi, organised subject- and topic-wise so you build a rock-solid base.',
+    desc: 'Class 6-10 Samacheer Kalvi, organised subject- and topic-wise so you build a rock-solid base.',
   },
   {
     icon: Newspaper,
@@ -57,7 +57,7 @@ const FEATURES = [
   {
     icon: ShieldCheck,
     title: 'Honest, server-graded scores',
-    desc: 'Answer keys never reach the browser. Grading happens on the server and explanations unlock once you attempt 25% — so scores mean something.',
+    desc: 'Answer keys never reach the browser. Grading happens on the server and explanations unlock once you attempt 25% - so scores mean something.',
   },
   {
     icon: BarChart3,
@@ -82,7 +82,7 @@ const FEATURES = [
   {
     icon: Languages,
     title: 'Fully bilingual',
-    desc: 'Every question and screen in English, தமிழ், or both side-by-side — switch language anytime, instantly.',
+    desc: 'Every question and screen in English, தமிழ், or both side-by-side - switch language anytime, instantly.',
   },
 ]
 
@@ -100,7 +100,7 @@ const STEPS = [
   {
     n: '03',
     title: 'Revise & improve',
-    desc: 'Smart revision and insights show you exactly what to fix next — and you watch your scores climb.',
+    desc: 'Smart revision and insights show you exactly what to fix next - and you watch your scores climb.',
   },
 ]
 
@@ -163,7 +163,7 @@ export default function LandingPage() {
             <span className="text-brand"> bilingual practice.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl font-body text-base leading-relaxed text-ink2 sm:text-lg">
-            One calm, structured workspace for every TNPSC aspirant — thousands of
+            One calm, structured workspace for every TNPSC aspirant - thousands of
             real questions, timed mock tests, smart revision and clear insights, in
             English and தமிழ். Prepare smarter, and walk into the hall confident.
           </p>
@@ -206,7 +206,7 @@ export default function LandingPage() {
         <SectionHeading
           eyebrow="What you can study"
           title="Four tracks that cover the whole syllabus"
-          subtitle="Every part of the TNPSC pattern, organised the way you actually revise — by group, subject, topic and month."
+          subtitle="Every part of the TNPSC pattern, organised the way you actually revise - by group, subject, topic and month."
         />
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TRACKS.map(({ icon: Icon, title, desc }) => (
@@ -227,7 +227,7 @@ export default function LandingPage() {
           <SectionHeading
             eyebrow="How it helps you win"
             title="Everything a serious aspirant needs"
-            subtitle="Not just a question bank — a full preparation system that keeps you honest, consistent and improving."
+            subtitle="Not just a question bank - a full preparation system that keeps you honest, consistent and improving."
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map(({ icon: Icon, title, desc }) => (
@@ -273,16 +273,16 @@ export default function LandingPage() {
             <p className="mt-4 font-body text-base leading-relaxed text-white/75">
               Good coaching shouldn't depend on your city, your budget or your
               language. TNPSC Mentor puts a structured, bilingual, data-driven
-              preparation system in everyone's hands — so the only thing that
+              preparation system in everyone's hands - so the only thing that
               decides your result is your effort.
             </p>
           </div>
           <div className="min-w-0 space-y-3">
             {[
-              'Equal access — full prep in English and தமிழ்',
-              'Honesty by design — fair grading you can trust',
-              'Clarity, not guesswork — know exactly what to study next',
-              'Consistency — habits and streaks that carry you to exam day',
+              'Equal access - full prep in English and தமிழ்',
+              'Honesty by design - fair grading you can trust',
+              'Clarity, not guesswork - know exactly what to study next',
+              'Consistency - habits and streaks that carry you to exam day',
             ].map((point) => (
               <div
                 key={point}
@@ -305,7 +305,7 @@ export default function LandingPage() {
         </h2>
         <p className="mx-auto mt-4 max-w-xl font-body text-base text-ink2">
           Join the aspirants building exam-ready habits with TNPSC Mentor. It's
-          free to begin — your progress saves as you go.
+          free to begin - your progress saves as you go.
         </p>
         <button
           onClick={() => navigate(startTarget)}

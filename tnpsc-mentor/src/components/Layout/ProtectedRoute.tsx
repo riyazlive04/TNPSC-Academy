@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore, selectIsAdmin, selectIsSuperAdmin } from '../../store/authStore'
 import { isApiConfigured } from '../../lib/api'
+import { useT } from '../../lib/i18n'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -20,6 +21,8 @@ interface ProtectedRouteProps {
  *
  * UI-preview mode: when the API isn't configured there's no backend to
  * authenticate against, so we let every page through to browse the interface.
+ * This bypass is DEV-ONLY - a production build that ships without VITE_API_URL
+ * must NOT silently disable auth (that would expose every admin console).
  */
 export default function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const user = useAuthStore((s) => s.user)
@@ -27,8 +30,9 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
   const isAdmin = useAuthStore(selectIsAdmin)
   const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
   const location = useLocation()
+  const { t } = useT()
 
-  if (!isApiConfigured) {
+  if (!isApiConfigured && import.meta.env.DEV) {
     return <>{children}</>
   }
 
@@ -37,7 +41,7 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
       <div className="flex min-h-screen items-center justify-center bg-canvas bg-brand-radial">
         <div className="flex flex-col items-center gap-4 animate-fadeIn">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-soft border-t-brand" />
-          <p className="font-heading text-sm uppercase tracking-widest text-ink2">Loading…</p>
+          <p className="font-heading text-sm uppercase tracking-widest text-ink2">{t('loading')}</p>
         </div>
       </div>
     )

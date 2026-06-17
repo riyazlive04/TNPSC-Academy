@@ -58,7 +58,7 @@ export default function BookmarksPage() {
         <div className="mb-6 flex flex-col items-center gap-2 text-center">
           <YellowBadge>Saved Questions</YellowBadge>
           <p className="font-body text-sm text-ink2">
-            Questions you bookmarked for revision — answers and explanations included.
+            Questions you bookmarked for revision - answers and explanations included.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export default function BookmarksPage() {
         {!loading && !error && questions.length > 0 && (
           <div className="flex flex-col gap-4">
             {questions.map((q, i) => (
-              <article key={q.id} className="rounded-2xl bg-white p-4 shadow-card sm:p-5">
+              <article key={q.id} className="rounded-2xl border border-line bg-card p-4 shadow-card sm:p-5">
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
                     <span className="mr-1 text-secondary">{i + 1}.</span>

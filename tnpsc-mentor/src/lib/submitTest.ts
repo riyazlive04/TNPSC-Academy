@@ -15,15 +15,16 @@ export interface SubmitTestInput {
   answers: Record<string, TestAnswer>
   flags: Record<string, boolean>
   timeLimitSeconds: number
-  /** Date.now() when the test started — used for accurate wall-clock timing. */
+  /** Date.now() when the test started - used for accurate wall-clock timing. */
   startedAt: number
 }
 
 /**
  * Grades a finished test on the server and assembles the result payload for the
- * Result page. The server (`submit_test` RPC) is the sole grader — scores can't
- * be forged client-side, and gated explanations are only returned when the 80%
- * attendance gate unlocks them. Throws on any transport/grading failure so the
+ * Result page. The server (`submit_test` RPC) is the sole grader - scores can't
+ * be forged client-side, and gated explanations are only returned when the
+ * attendance gate (>=25% attempted) unlocks them. Throws on any transport/
+ * grading failure so the
  * caller can offer a retry.
  */
 export async function submitTest(input: SubmitTestInput): Promise<ResultPayload> {

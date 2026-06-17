@@ -50,7 +50,7 @@ export interface ImportRow {
   option_c_ta?: string
   option_d_ta?: string
   explanation_ta?: string
-  // Per-option "why wrong" — accepted as separate CSV columns or a JSON object.
+  // Per-option "why wrong" - accepted as separate CSV columns or a JSON object.
   why_wrong_a?: string
   why_wrong_b?: string
   why_wrong_c?: string
@@ -179,7 +179,7 @@ export function validateRows(raw: Record<string, unknown>[]): {
 
     const standard = str(r.standard)
     if (standard && ![6, 7, 8, 9, 10].includes(Number(standard)))
-      rowErrs.push('standard must be 6–10')
+      rowErrs.push('standard must be 6-10')
     const difficulty = str(r.difficulty).toLowerCase()
     if (difficulty && !DIFFICULTIES.includes(difficulty))
       rowErrs.push('difficulty must be easy, medium or hard')

@@ -3,7 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   BookOpen,
   CheckCircle2,
+  FileDown,
   Home,
+  Loader2,
   Lock,
   RefreshCw,
   Target,
@@ -20,8 +22,10 @@ import { fetchHabit } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
 import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
 import { isHiddenBadge } from '../lib/features'
-import { GROUP_SUBJECTS } from '../lib/constants'
+import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
+import { generateQuestionBankPdf } from '../lib/pdfGenerator'
+import { exitFullscreen } from '../lib/proctor'
 import { useAuth } from '../hooks/useAuth'
 import { useProgressStore } from '../store/progressStore'
 import { useT } from '../lib/i18n'
@@ -52,10 +56,17 @@ export default function ResultPage() {
     daily: DailyReward | null
   } | null>(null)
 
-  // Guard — no result data means a direct visit; bounce home.
+  // Guard - no result data means a direct visit; bounce home.
   useEffect(() => {
     if (!payload) navigate('/test-arena', { replace: true })
   }, [payload, navigate])
+
+  // The test is over once results are shown - make sure we're never left stuck
+  // in full-screen, regardless of which path (submit / auto-submit / abandon /
+  // violation) ended the test.
+  useEffect(() => {
+    void exitFullscreen()
+  }, [])
 
   // After this test is saved, check for newly-earned level-ups / badges and
   // celebrate them once.
@@ -92,7 +103,7 @@ export default function ResultPage() {
       ).level
       const res = claim(unlockedIds, level)
 
-      // Daily-challenge reward — granted at most once per calendar day.
+      // Daily-challenge reward - granted at most once per calendar day.
       let daily: DailyReward | null = null
       if (payload.config.daily) {
         const today = new Date().toISOString().slice(0, 10)
@@ -143,6 +154,20 @@ export default function ResultPage() {
   const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
   const attendancePct = totalQuestions > 0 ? Math.round((attempted / totalQuestions) * 100) : 0
 
+  // The full questions-with-explanations PDF unlocks only when EVERY question was
+  // attempted (a completely-attended test); otherwise we just nudge them to it.
+  const fullyAttended = totalQuestions > 0 && attempted === totalQuestions
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
+  const downloadExplanationPdf = async () => {
+    if (downloadingPdf) return
+    setDownloadingPdf(true)
+    try {
+      await generateQuestionBankPdf({ questions, label, lang, watermark: 'TNPSC MENTOR' })
+    } finally {
+      setDownloadingPdf(false)
+    }
+  }
+
   // Post-test focus areas (weak topics in THIS test) + negative-marking net score.
   const focus = weakAreas(scoreByTopic(questions, answers), 60).slice(0, 5)
   const wrong = attempted - correct
@@ -150,7 +175,7 @@ export default function ResultPage() {
   const netMarks = negMark > 0 ? Math.max(0, +(correct - wrong * negMark).toFixed(2)) : null
 
   // Review filter: keep original question numbers while showing a subset.
-  // Unattended (skipped) questions are never shown — only ones the user answered.
+  // Unattended (skipped) questions are never shown - only ones the user answered.
   const isAttended = (q: Question) => classifyAnswer(answers[q.id]) !== 'skipped'
   const flaggedCount = questions.filter((q) => isAttended(q) && answers[q.id]?.flagged).length
   const reviewItems: { q: Question; index: number }[] = questions
@@ -169,7 +194,7 @@ export default function ResultPage() {
     navigate('/quiz', { state: config, replace: true })
   }
 
-  // Optimistic bookmark toggle — revert the local set if the write fails.
+  // Optimistic bookmark toggle - revert the local set if the write fails.
   const toggleBookmark = async (questionId: string) => {
     const saved = bookmarkIds.has(questionId)
     setBookmarkIds((prev) => {
@@ -194,7 +219,7 @@ export default function ResultPage() {
         {/* Score hero */}
         <div className="card mb-5 p-6 text-center sm:p-8">
           <p className="font-heading text-xs font-semibold uppercase tracking-[0.14em] text-ink2">
-            Test complete
+            {t('testCompleteLabel')}
           </p>
 
           <div className="mt-3 font-heading text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
@@ -216,29 +241,28 @@ export default function ResultPage() {
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-3">
-            <Stat icon={<Target size={16} />} label="Accuracy" value={`${accuracy}%`} />
+            <Stat icon={<Target size={16} />} label={t('accuracy')} value={`${accuracy}%`} />
             <Stat
               icon={<CheckCircle2 size={16} />}
-              label="Attended"
+              label={t('attended')}
               value={`${attempted}/${totalQuestions}`}
             />
             <Stat
               icon={<TimerIcon size={16} />}
-              label="Time"
+              label={t('timeTaken')}
               value={formatTime(timeTakenSeconds)}
             />
           </div>
         </div>
 
-        {/* Explanation unlock status — explanations are shown inline in the
+        {/* Explanation unlock status - explanations are shown inline in the
             review below; there is no downloadable document. */}
         <div className="card mb-5 p-5">
           {pdfUnlocked ? (
             <div className="flex items-center justify-center gap-2 text-center">
               <BookOpen size={18} className="text-brand" />
               <p className="font-body text-sm text-ink2">
-                You attended {attendancePct}% — explanations are unlocked in the
-                review below.
+                {t('youAttended')} {attendancePct}% - {t('explanationsUnlockedMsg')}
               </p>
             </div>
           ) : (
@@ -247,8 +271,7 @@ export default function ResultPage() {
                 <Lock size={24} className="text-coral" />
               </div>
               <p className="font-body text-sm font-medium text-coral">
-                Attempt at least 25% of questions to unlock explanations. You
-                attended {attendancePct}%.
+                {t('unlockExplanationsMsg')} {t('youAttended')} {attendancePct}%.
               </p>
             </div>
           )}
@@ -277,10 +300,10 @@ export default function ResultPage() {
               {focus.map((f) => {
                 const asset = assetsFor(f.key)
                 return (
-                  <div key={f.key} className="rounded-2xl bg-white p-3.5 shadow-card">
+                  <div key={f.key} className="rounded-2xl border border-line bg-card p-3.5 shadow-card">
                     <div className="flex items-center justify-between gap-3">
                       <span className="tamil font-heading text-sm font-bold text-navytext">
-                        {f.key}
+                        {subjectName(f.key, lang)}
                       </span>
                       <span className="font-heading text-sm font-bold text-warn">
                         {f.accuracy}% ({f.correct}/{f.attempted})
@@ -317,14 +340,35 @@ export default function ResultPage() {
           {t('questionBreakdown')}
         </h3>
 
-        {/* Review filter — attended questions only (correct / wrong / flagged) */}
+        {/* Full explanation PDF - unlocked only when every question was attempted */}
+        {fullyAttended ? (
+          <button
+            onClick={downloadExplanationPdf}
+            disabled={downloadingPdf}
+            className="btn-soft mb-3 w-full px-5 py-3 text-sm disabled:opacity-60"
+          >
+            {downloadingPdf ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <FileDown size={16} />
+            )}
+            {downloadingPdf ? t('preparingPdf') : t('downloadExplanations')}
+          </button>
+        ) : (
+          <div className="mb-3 flex items-center gap-2 rounded-xl border border-line bg-tint px-4 py-2.5 font-body text-xs text-ink2">
+            <FileDown size={14} className="flex-shrink-0 text-ink2" />
+            <span className="tamil">{t('pdfWhenComplete')}</span>
+          </div>
+        )}
+
+        {/* Review filter - attended questions only (correct / wrong / flagged) */}
         <div className="mb-3 flex flex-wrap gap-2">
           {(
             [
-              ['all', 'All', attempted],
-              ['wrong', 'Wrong', wrong],
-              ['correct', 'Correct', correct],
-              ['flagged', 'Flagged', flaggedCount],
+              ['all', t('filterAll'), attempted],
+              ['wrong', t('filterWrong'), wrong],
+              ['correct', t('filterCorrect'), correct],
+              ['flagged', t('filterFlagged'), flaggedCount],
             ] as [ReviewFilter, string, number][]
           ).map(([key, lbl, count]) => (
             <button
@@ -342,10 +386,14 @@ export default function ResultPage() {
           ))}
         </div>
 
-        <div className="mb-8 flex flex-col gap-3">
+        {/* The question list scrolls within its own bounded area so the score,
+            filters and action buttons stay in view instead of the whole page
+            growing tall. overscroll-contain stops the scroll from chaining to
+            the page once the list hits its top/bottom. */}
+        <div className="mb-8 flex max-h-[65vh] flex-col gap-3 overflow-y-auto overscroll-contain pr-1">
           {reviewItems.length === 0 ? (
             <p className="rounded-2xl border border-line bg-card px-4 py-6 text-center font-body text-sm text-ink2">
-              No {reviewFilter} questions in this test.
+              {t('noFilterQuestions')}
             </p>
           ) : (
             reviewItems.map(({ q, index }) => (
@@ -365,10 +413,10 @@ export default function ResultPage() {
         {/* Actions */}
         <div className="flex flex-col gap-3 sm:flex-row">
           <button onClick={handleRetry} className="btn-ghost flex-1 px-6 py-3.5">
-            <RefreshCw size={18} /> Retry Test
+            <RefreshCw size={18} /> {t('retryTest')}
           </button>
           <button onClick={() => navigate('/test-arena')} className="btn-brand flex-1 px-6 py-3.5">
-            <Home size={18} /> Test Arena
+            <Home size={18} /> {t('testArena')}
           </button>
         </div>
       </div>

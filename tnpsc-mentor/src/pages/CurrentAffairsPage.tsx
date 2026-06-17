@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Info, Loader2, RefreshCw, ChevronRight } from 'lucide-react'
+import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import PillButton from '../components/UI/PillButton'
-import PillSection from '../components/UI/PillSection'
-import { CA_MONTHS, CA_TOPIC_CATEGORIES } from '../lib/constants'
+import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName } from '../lib/constants'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
@@ -15,11 +13,10 @@ type CAView = 'month_wise' | 'topic_wise'
 export default function CurrentAffairsPage() {
   const startTest = useStartTest()
   const navigate = useNavigate()
-  const { t } = useT()
+  const { t, lang } = useT()
   const [view, setView] = useState<CAView>('month_wise')
 
-  // Weekly revision — a 20-question mixed current-affairs consolidation drill.
-  // Scoped to the whole CA pool (like the daily drill) so it's always playable.
+  // Weekly revision - a 20-question mixed current-affairs consolidation drill.
   const startWeeklyRevision = () => {
     const config: QuizConfig = {
       category: 'current_affairs',
@@ -33,7 +30,7 @@ export default function CurrentAffairsPage() {
     navigate('/quiz', { state: config })
   }
 
-  // Topic-wise: distinct ca_topic values from the DB.
+  // Topic-wise: distinct ca topic values from the DB.
   const [topics, setTopics] = useState<string[]>([])
   const [loadingTopics, setLoadingTopics] = useState(false)
   const [topicError, setTopicError] = useState('')
@@ -45,16 +42,11 @@ export default function CurrentAffairsPage() {
       setLoadingTopics(true)
       setTopicError('')
       try {
-        const distinct = await api.distinctTopics({
-          category: 'current_affairs',
-        })
+        const distinct = await api.distinctTopics({ category: 'current_affairs' })
+        if (!cancelled) setTopics(distinct.length ? distinct : CA_TOPIC_CATEGORIES)
+      } catch {
         if (!cancelled) {
-          // Fall back to the curated category list if the DB has none yet.
-          setTopics(distinct.length ? distinct : CA_TOPIC_CATEGORIES)
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setTopicError('Could not load topics from the database. Showing default categories.')
+          setTopicError(t('couldNotLoad'))
           setTopics(CA_TOPIC_CATEGORIES)
         }
       } finally {
@@ -65,6 +57,7 @@ export default function CurrentAffairsPage() {
     return () => {
       cancelled = true
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view])
 
   const handleMonth = (label: string) => {
@@ -72,91 +65,116 @@ export default function CurrentAffairsPage() {
       category: 'current_affairs',
       ca_type: 'month_wise',
       ca_month: label,
-      label: `Current Affairs · ${label}`,
+      label: `${t('currentAffairsBadge')} · ${label}`,
     })
   }
 
   const handleTopic = (topic: string) => {
-    // Topic-wise pulls CA questions tagged with this `topic` across all months.
     startTest({
       category: 'current_affairs',
       topic,
-      label: `Current Affairs · ${topic}`,
+      label: `${t('currentAffairsBadge')} · ${topicName(topic, lang)}`,
     })
   }
 
   return (
     <PickerPage badge={t('currentAffairsBadge')}>
-      {/* Weekly revision — a quick consolidation drill across the CA pool */}
+      {/* Weekly revision - a quick consolidation drill across the CA pool */}
       <button
         onClick={startWeeklyRevision}
-        className="group interactive mx-auto mb-8 flex w-full max-w-2xl items-center gap-4 rounded-2xl border border-brand/15 bg-brand-soft p-4 text-left lg:p-5"
+        className="hero-panel interactive group relative mx-auto mb-7 flex w-full max-w-2xl items-center gap-4 p-5 text-left"
       >
-        <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand text-white">
+        <span
+          className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+          style={{ backgroundSize: '18px 18px' }}
+        />
+        <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
           <RefreshCw size={20} />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="tamil block font-heading text-[15px] font-semibold text-ink">
+        <span className="relative min-w-0 flex-1">
+          <span className="tamil block font-heading text-[15px] font-semibold text-white">
             {t('weeklyRevision')}
           </span>
-          <span className="tamil block font-body text-sm text-ink2">
-            {t('weeklyRevisionCta')}
-          </span>
+          <span className="tamil block font-body text-sm text-white/70">{t('weeklyRevisionCta')}</span>
         </span>
-        <ChevronRight
-          size={20}
-          className="flex-shrink-0 text-brand/40 transition group-hover:text-brand"
-        />
+        <ChevronRight size={20} className="relative flex-shrink-0 text-white/50" />
       </button>
 
-      {/* Sub-category pills */}
-      <div className="mb-8 flex justify-center gap-3">
-        <PillButton active={view === 'topic_wise'} onClick={() => setView('topic_wise')}>
-          {t('topicWise').toUpperCase()}
-        </PillButton>
-        <PillButton active={view === 'month_wise'} onClick={() => setView('month_wise')}>
-          {t('monthWise').toUpperCase()}
-        </PillButton>
+      {/* Topic / Month segmented toggle */}
+      <div className="mb-7 flex justify-center">
+        <div className="seg-wrap">
+          <button
+            className={['seg', view === 'topic_wise' ? 'seg-active' : ''].join(' ')}
+            onClick={() => setView('topic_wise')}
+          >
+            {t('topicWise')}
+          </button>
+          <button
+            className={['seg', view === 'month_wise' ? 'seg-active' : ''].join(' ')}
+            onClick={() => setView('month_wise')}
+          >
+            {t('monthWise')}
+          </button>
+        </div>
       </div>
 
+      {/* Month-wise cards */}
       {view === 'month_wise' && (
-        <PillSection
-          title={`${t('selectMonth')} (July 2025 → June 2026)`}
-          className="animate-fadeIn"
-        >
-          {CA_MONTHS.map((m) => (
-            <PillButton key={m.slug} size="sm" onClick={() => handleMonth(m.label)}>
-              {m.label}
-            </PillButton>
-          ))}
-        </PillSection>
+        <section className="animate-fadeIn">
+          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+            {t('selectMonth')}
+          </h3>
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {CA_MONTHS.map((m, i) => (
+              <button
+                key={m.slug}
+                onClick={() => handleMonth(m.label)}
+                style={{ '--i': i } as React.CSSProperties}
+                className="stagger-item flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+              >
+                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <CalendarDays size={16} />
+                </span>
+                <span className="min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
+                  {m.label}
+                </span>
+                <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
+              </button>
+            ))}
+          </div>
+        </section>
       )}
 
+      {/* Topic-wise cards */}
       {view === 'topic_wise' && (
         <section className="animate-fadeIn">
-          <div className="mx-auto mb-5 flex max-w-2xl items-start gap-2 rounded-2xl border border-line bg-brand-soft px-4 py-3">
-            <Info size={18} className="mt-0.5 flex-shrink-0 text-brand" />
-            <p className="font-body text-sm text-ink2">
-              Topic-wise practice pulls current-affairs questions by theme across
-              all months. The topics below reflect what is currently available in
-              the database.
-            </p>
-          </div>
-
+          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+            {t('step2Topic')}
+          </h3>
           {topicError && (
             <p className="mb-4 text-center font-body text-sm text-coral">{topicError}</p>
           )}
-
           {loadingTopics ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-12">
               <Loader2 size={28} className="animate-spin text-brand" />
             </div>
           ) : (
-            <div className="flex flex-wrap justify-center gap-3">
-              {topics.map((topic) => (
-                <PillButton key={topic} size="sm" onClick={() => handleTopic(topic)}>
-                  {topic.toUpperCase()}
-                </PillButton>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {topics.map((topic, i) => (
+                <button
+                  key={topic}
+                  onClick={() => handleTopic(topic)}
+                  style={{ '--i': i } as React.CSSProperties}
+                  className="stagger-item flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+                >
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                    <Newspaper size={16} />
+                  </span>
+                  <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
+                    {topicName(topic, lang)}
+                  </span>
+                  <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
+                </button>
               ))}
             </div>
           )}

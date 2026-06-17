@@ -2,8 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Theme tokens ─────────────────────────────────────────────────────────
+ * Colours are stored as "R G B" channel triplets so Tailwind can apply opacity
+ * (rgb(var(--c-brand) / 0.3)). :root = light theme; .dark (toggled on <html> by
+ * the theme store) = dark theme. The whole UI re-skins from these two blocks. */
 :root {
   color-scheme: light;
+
+  --c-brand: 124 92 255; /* violet — primary actions, active states */
+  --c-brand-dark: 109 74 244;
+  --c-brand-deep: 76 29 149; /* deep violet for hero gradients */
+  --c-brand-soft: 238 235 254; /* faint violet wash for chips / icon tiles */
+  --c-brand-ring: 205 193 255;
+
+  --c-canvas: 245 244 251; /* app background — light violet-gray */
+  --c-card: 255 255 255;
+  --c-ink: 24 20 43; /* primary text — near-black violet */
+  --c-ink2: 107 106 128; /* secondary text — muted slate */
+  --c-line: 232 230 243; /* hairline borders */
+  --c-tint: 240 238 251; /* neutral violet fill */
+  --c-shadow: 24 16 54; /* elevation shadow base */
+
+  --c-secondary: 159 134 255;
+
+  --c-accentwarm: 255 107 53;
+  --c-accentwarm-soft: 255 237 228;
+  --c-gold: 245 158 11;
+  --c-gold-soft: 254 243 226;
+  --c-mint: 22 163 74;
+  --c-mint-soft: 231 247 238;
+  --c-coral: 239 68 68;
+  --c-coral-soft: 253 236 236;
+  --c-sky: 124 92 255;
+  --c-sky-soft: 238 235 254;
+  --c-streak: 255 107 53;
+  --c-streak-soft: 255 237 228;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --c-brand: 141 116 255; /* lifted so the violet pops on near-black */
+  --c-brand-dark: 124 92 255;
+  --c-brand-deep: 67 48 130;
+  --c-brand-soft: 42 35 70; /* dark violet tile */
+  --c-brand-ring: 96 78 175;
+
+  --c-canvas: 13 12 22; /* near-black background (inspo) */
+  --c-card: 25 23 40; /* raised dark surface */
+  --c-ink: 237 235 248; /* light text */
+  --c-ink2: 159 157 184; /* muted light text */
+  --c-line: 43 40 62; /* subtle dark hairline */
+  --c-tint: 33 30 52;
+  --c-shadow: 0 0 0;
+
+  --c-secondary: 168 148 255;
+
+  --c-accentwarm: 255 124 74;
+  --c-accentwarm-soft: 58 36 26;
+  --c-gold: 246 179 53;
+  --c-gold-soft: 56 44 20;
+  --c-mint: 52 199 110;
+  --c-mint-soft: 21 48 33;
+  --c-coral: 248 113 113;
+  --c-coral-soft: 56 28 30;
+  --c-sky: 141 116 255;
+  --c-sky-soft: 42 35 70;
+  --c-streak: 255 124 74;
+  --c-streak-soft: 58 36 26;
 }
 
 * {
@@ -23,13 +89,28 @@ body,
   min-height: 100%;
 }
 
+/* App-wide smooth scrolling for in-page jumps and anchor/scrollIntoView calls.
+ * Route changes are kept instant in ScrollToTop (behavior: 'auto') so navigation
+ * never animates a long scroll-to-top. Disabled for prefers-reduced-motion below.
+ * scroll-padding-top keeps anchored content clear of the quiz's sticky top bar. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* Smoother momentum scrolling on iOS / touch devices. */
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #f4f7fc;
-  color: #0f1b3d;
+  background-color: rgb(var(--c-canvas));
+  color: rgb(var(--c-ink));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1,
@@ -46,7 +127,7 @@ h4,
   font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
 }
 
-/* Respect users who prefer reduced motion — neutralise all the micro-interaction
+/* Respect users who prefer reduced motion - neutralise all the micro-interaction
  * animations & transitions so nothing moves/flashes for them. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -80,11 +161,11 @@ h4,
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c8d4ec;
+  background: rgb(var(--c-brand-ring));
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #aebfe0;
+  background: rgb(var(--c-brand) / 0.7);
 }
 
 @layer components {
@@ -103,9 +184,9 @@ h4,
    * renders correctly. Buttons that need a different size still override with
    * their own px/py/text utilities (utility layer wins over this component
    * layer), so existing call-sites are unaffected. Tactile press + focus ring
-   * are built in — no need to add `press`/`focus-ring` alongside. */
+   * are built in - no need to add `press`/`focus-ring` alongside. */
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-2xl
       px-5 py-2.5 text-sm font-heading font-semibold leading-none
       transition-all duration-200 ease-out active:scale-[0.97]
       focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas
@@ -118,11 +199,12 @@ h4,
   .btn-lg {
     @apply px-7 py-3.5 text-base;
   }
-  /* Primary — royal blue, the signature action. Lifts on hover. */
+  /* Primary - the signature violet action: a gradient pill with a soft glow that
+   * brightens on hover (matches the inspiration's gradient buttons). */
   .btn-brand {
-    @apply btn bg-brand text-white shadow-sm hover:bg-brand-dark hover:shadow-brand active:bg-brand-deep;
+    @apply btn bg-brand-gradient text-white shadow-brand hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:brightness-95;
   }
-  /* Warm CTA — the orange accent, used sparingly for the key conversion action. */
+  /* Warm CTA - the orange accent, used sparingly for the key conversion action. */
   .btn-gold {
     @apply btn bg-accentwarm text-white shadow-sm hover:brightness-105 hover:shadow-warm active:brightness-95;
   }
@@ -154,7 +236,7 @@ h4,
       hover:border-brand/40 hover:text-brand-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/25;
   }
   .chip-active {
-    @apply border-transparent bg-brand text-white hover:text-white;
+    @apply border-transparent bg-brand-gradient text-white shadow-brand hover:text-white;
   }
 
   /* ─── Inputs ─────────────────────────────────────────────────────────── */
@@ -169,14 +251,14 @@ h4,
   .press {
     @apply transition-transform duration-150 ease-out active:scale-[0.97];
   }
-  /* Interactive card/tile — lifts and brightens its border on hover, depresses
+  /* Interactive card/tile - lifts and brightens its border on hover, depresses
    * on tap. The canonical feedback for the dashboard tiles & list rows. */
   .interactive {
     @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-card
       active:translate-y-0 active:scale-[0.985]
       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35;
   }
-  /* Icon button affordance — background blooms on hover, depresses on tap. */
+  /* Icon button affordance - background blooms on hover, depresses on tap. */
   .icon-btn {
     @apply grid place-items-center rounded-lg text-ink2 transition-all duration-150
       hover:bg-brand-soft hover:text-brand-dark active:scale-90
@@ -186,7 +268,7 @@ h4,
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas;
   }
-  /* Skeleton placeholder — shimmering blue-gray block for loading states. */
+  /* Skeleton placeholder - shimmering blue-gray block for loading states. */
   .skeleton {
     @apply rounded-lg bg-line/70;
     background-image: linear-gradient(
@@ -206,7 +288,7 @@ h4,
     content: '';
     @apply absolute inset-y-0 left-0 w-1/3 rounded-full bg-brand animate-indeterminate;
   }
-  /* Staggered list entrance — set --i on each child for a cascade. */
+  /* Staggered list entrance - set --i on each child for a cascade. */
   .stagger-item {
     opacity: 0;
     animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;

@@ -45,6 +45,12 @@ create index if not exists idx_questions_pyq
 -- Returns up to `limit` random questions matching the config. Random ordering
 -- fixes the previous "always the oldest 100" sampling bug and the mock-mode
 -- 1000-row client download.
+-- AUTHORITATIVE definition. This is the single source of truth for the quiz
+-- sampler; supabase/active_flag.sql and supabase/history_periods.sql carry an
+-- IDENTICAL body so any migration re-run order converges to the same function.
+-- Return-shape change (adds source_tag) → callers must DROP before recreating.
+-- Filters: active-only, 'outer' kept out of student tests, and the picker
+-- narrows by subject / standard / topic / unit / question_type when supplied.
 create or replace function public.get_quiz_questions(p_config jsonb)
 returns table (
   id uuid, category text, group_type text, year integer, standard integer,
@@ -52,7 +58,7 @@ returns table (
   aptitude_type text, aptitude_topic text, subject text, topic text,
   question_type text, external_id text,
   question_text text, option_a text, option_b text, option_c text, option_d text,
-  difficulty text, images jsonb,
+  difficulty text, images jsonb, source_tag text,
   question_text_ta text, option_a_ta text, option_b_ta text,
   option_c_ta text, option_d_ta text
 )
@@ -67,6 +73,8 @@ as $$
       p_config->>'subject'                             as subject,
       (p_config->>'standard')::int                     as standard,
       p_config->>'topic'                               as topic,
+      p_config->>'unit'                                as unit,
+      p_config->>'question_type'                       as question_type,
       p_config->>'ca_type'                             as ca_type,
       p_config->>'ca_month'                            as ca_month,
       p_config->>'ca_topic'                            as ca_topic,
@@ -81,18 +89,24 @@ as $$
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
          q.question_type, q.external_id,
          q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-         q.difficulty, q.images,
+         q.difficulty, q.images, q.source_tag,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q, cfg
   where
-    case when cfg.mock
+    q.active
+    -- 'outer' is an admin-only subject bank: keep it out of student tests.
+    -- It only surfaces when a config explicitly asks for category='outer'.
+    and (q.category <> 'outer' or cfg.category = 'outer')
+    and case when cfg.mock
       then (not cfg.scope_to_category or q.category = cfg.category)
       else q.category = cfg.category
     end
     and (cfg.mock or cfg.subject        is null or q.subject        = cfg.subject)
     and (cfg.mock or cfg.standard       is null or q.standard       = cfg.standard)
     and (cfg.mock or cfg.topic          is null or q.topic          = cfg.topic)
+    and (cfg.mock or cfg.unit           is null or q.unit           = cfg.unit)
+    and (cfg.mock or cfg.question_type  is null or q.question_type  = cfg.question_type)
     and (cfg.mock or cfg.ca_type        is null or q.ca_type        = cfg.ca_type)
     and (cfg.mock or cfg.ca_month       is null or q.ca_month       = cfg.ca_month)
     and (cfg.mock or cfg.ca_topic       is null or q.ca_topic       = cfg.ca_topic)
@@ -109,7 +123,7 @@ $$;
 -- p_answers : [ { question_id, selected_answer|null, time_spent_seconds,
 --                 flagged } ]  — one entry PER shown question.
 -- Returns the graded result; correct answers + explanations are included ONLY
--- when the 80% attendance gate is met.
+-- when the attendance gate (>= 25% attempted) is met.
 create or replace function public.submit_test(p_session jsonb, p_answers jsonb)
 returns jsonb
 language plpgsql
@@ -118,7 +132,7 @@ set search_path = public
 as $$
 declare
   v_user      uuid := auth.uid();
-  v_total     int  := coalesce((p_session->>'total_questions')::int, 0);
+  v_total     int;
   v_attempted int;
   v_correct   int;
   v_score     int;
@@ -131,16 +145,22 @@ begin
   end if;
 
   -- Grade against the real correct_answer (which the client never sees).
+  -- v_total is DERIVED from the submitted answer rows that join to real
+  -- questions — NOT taken from the client's p_session.total_questions, which a
+  -- malicious client could forge (e.g. claim total_questions=1 while sending
+  -- many answers, or vice-versa) to fake a 100% score or skew the unlock gate.
   select
+    count(*),
     count(*) filter (where a.selected_answer is not null),
     count(*) filter (where a.selected_answer is not null
                        and a.selected_answer = q.correct_answer)
-  into v_attempted, v_correct
+  into v_total, v_attempted, v_correct
   from jsonb_to_recordset(p_answers)
        as a(question_id uuid, selected_answer text,
              time_spent_seconds numeric, flagged boolean)
   join public.questions q on q.id = a.question_id;
 
+  v_total     := coalesce(v_total, 0);
   v_attempted := coalesce(v_attempted, 0);
   v_correct   := coalesce(v_correct, 0);
   v_score  := case when v_total > 0 then round(100.0 * v_correct / v_total) else 0 end;
@@ -409,10 +429,233 @@ as $$
   order by q.subject;
 $$;
 
+-- ─── 3f-bis. Count available questions for a config ─────────────────────────
+-- Powers the pre-test setup: the question-count slider is bounded by how many
+-- questions actually exist for the chosen topic. WHERE mirrors get_quiz_questions
+-- EXACTLY (minus order/limit) so the count matches what a real fetch would draw.
+create or replace function public.count_quiz_questions(p_config jsonb)
+returns integer
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  with cfg as (
+    select
+      p_config->>'category'                            as category,
+      p_config->>'subject'                             as subject,
+      (p_config->>'standard')::int                     as standard,
+      p_config->>'topic'                               as topic,
+      p_config->>'unit'                                as unit,
+      p_config->>'question_type'                       as question_type,
+      p_config->>'ca_type'                             as ca_type,
+      p_config->>'ca_month'                            as ca_month,
+      p_config->>'ca_topic'                            as ca_topic,
+      p_config->>'aptitude_type'                       as aptitude_type,
+      p_config->>'aptitude_topic'                      as aptitude_topic,
+      coalesce((p_config->>'mock')::boolean, false)    as mock,
+      coalesce((p_config->>'scopeToCategory')::boolean, false) as scope_to_category
+  )
+  select count(*)::int
+  from public.questions q, cfg
+  where
+    q.active
+    and (q.category <> 'outer' or cfg.category = 'outer')
+    and case when cfg.mock
+      then (not cfg.scope_to_category or q.category = cfg.category)
+      else q.category = cfg.category
+    end
+    and (cfg.mock or cfg.subject        is null or q.subject        = cfg.subject)
+    and (cfg.mock or cfg.standard       is null or q.standard       = cfg.standard)
+    and (cfg.mock or cfg.topic          is null or q.topic          = cfg.topic)
+    and (cfg.mock or cfg.unit           is null or q.unit           = cfg.unit)
+    and (cfg.mock or cfg.question_type  is null or q.question_type  = cfg.question_type)
+    and (cfg.mock or cfg.ca_type        is null or q.ca_type        = cfg.ca_type)
+    and (cfg.mock or cfg.ca_month       is null or q.ca_month       = cfg.ca_month)
+    and (cfg.mock or cfg.ca_topic       is null or q.ca_topic       = cfg.ca_topic)
+    and (cfg.mock or cfg.aptitude_type  is null or q.aptitude_type  = cfg.aptitude_type)
+    and (cfg.mock or cfg.aptitude_topic is null or q.aptitude_topic = cfg.aptitude_topic);
+$$;
+
+-- ─── 3g. Distinct topics for the pickers (avoids PostgREST's 1000-row cap) ───
+-- The /topics endpoint previously downloaded every matching row and computed
+-- DISTINCT in JS — capped at 1000 rows, so banks larger than 1000 returned an
+-- incomplete topic list. This computes DISTINCT server-side regardless of size.
+create or replace function public.distinct_question_topics(p_config jsonb)
+returns table(topic text)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  with cfg as (
+    select
+      p_config->>'category'        as category,
+      p_config->>'subject'         as subject,
+      (p_config->>'standard')::int as standard,
+      p_config->>'aptitude_type'   as aptitude_type
+  )
+  select t from (
+    select distinct
+      case
+        when cfg.category = 'aptitude'        then q.aptitude_topic
+        when cfg.category = 'current_affairs' then coalesce(q.topic, q.ca_topic)
+        else q.topic
+      end as t
+    from public.questions q, cfg
+    where q.category = cfg.category
+      -- 'samacheer' and 'current_affairs' historically included inactive rows;
+      -- the other categories restrict to active. Mirror the original behaviour.
+      and (cfg.category in ('samacheer', 'current_affairs') or q.active)
+      and (cfg.subject is null or q.subject = cfg.subject)
+      and (cfg.standard is null or q.standard = cfg.standard)
+      and (cfg.aptitude_type is null or cfg.category <> 'aptitude'
+            or q.aptitude_type = cfg.aptitude_type)
+  ) s
+  where t is not null
+  order by t;
+$$;
+
+-- ─── 3h. Grouped value counts for the pickers (qtypes / history periods) ─────
+create or replace function public.subject_qtype_counts(p_subject text, p_topic text)
+returns table(value text, total bigint)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.question_type, count(*)
+  from public.questions q
+  where q.category = 'subject' and q.active and q.question_type is not null
+    and (p_subject is null or q.subject = p_subject)
+    and (p_topic   is null or q.topic   = p_topic)
+  group by q.question_type;
+$$;
+
+create or replace function public.pyq_history_period_counts()
+returns table(value text, total bigint)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.unit, count(*)
+  from public.questions q
+  where q.category = 'pyq' and q.subject = 'History and INM'
+    and q.active and q.unit is not null
+  group by q.unit;
+$$;
+
+-- ─── 3i. Random mock samples (server-side ORDER BY random, no 1000-row cap) ──
+-- Subject/topic mock with optional difficulty. Answer columns are NOT returned.
+create or replace function public.subject_mock_questions(
+  p_subject text, p_topic text, p_difficulty text, p_count int
+)
+returns table (
+  id uuid, category text, group_type text, year integer, standard integer,
+  ca_month text, ca_year integer, ca_type text, ca_topic text,
+  aptitude_type text, aptitude_topic text, subject text, topic text,
+  question_type text, external_id text,
+  question_text text, option_a text, option_b text, option_c text, option_d text,
+  difficulty text, images jsonb,
+  question_text_ta text, option_a_ta text, option_b_ta text,
+  option_c_ta text, option_d_ta text
+)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.id, q.category, q.group_type, q.year, q.standard,
+         q.ca_month, q.ca_year, q.ca_type, q.ca_topic,
+         q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
+         q.question_type, q.external_id,
+         q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+         q.difficulty, q.images,
+         q.question_text_ta, q.option_a_ta, q.option_b_ta,
+         q.option_c_ta, q.option_d_ta
+  from public.questions q
+  where q.category = 'subject' and q.active
+    and (p_subject    is null or q.subject    = p_subject)
+    and (p_topic      is null or q.topic      = p_topic)
+    and (p_difficulty is null or q.difficulty = p_difficulty)
+  order by random()
+  limit greatest(least(coalesce(p_count, 50), 200), 1);
+$$;
+
+-- One group-exam slot: union of {category, subjects?} queries, de-duplicated,
+-- randomly sampled to p_count. p_queries = [{ "category": text, "subjects": [text] }].
+create or replace function public.mock_slot_questions(p_queries jsonb, p_count int)
+returns table (
+  id uuid, category text, group_type text, year integer, standard integer,
+  ca_month text, ca_year integer, ca_type text, ca_topic text,
+  aptitude_type text, aptitude_topic text, subject text, topic text,
+  question_type text, external_id text,
+  question_text text, option_a text, option_b text, option_c text, option_d text,
+  difficulty text, images jsonb,
+  question_text_ta text, option_a_ta text, option_b_ta text,
+  option_c_ta text, option_d_ta text
+)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.id, q.category, q.group_type, q.year, q.standard,
+         q.ca_month, q.ca_year, q.ca_type, q.ca_topic,
+         q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
+         q.question_type, q.external_id,
+         q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+         q.difficulty, q.images,
+         q.question_text_ta, q.option_a_ta, q.option_b_ta,
+         q.option_c_ta, q.option_d_ta
+  from public.questions q
+  where q.active
+    -- match ANY of the slot's queries; the EXISTS dedupes (each row once).
+    and exists (
+      select 1
+      from jsonb_array_elements(p_queries) elem
+      where q.category = elem->>'category'
+        and (
+          elem->'subjects' is null
+          or q.subject = any (
+            select jsonb_array_elements_text(elem->'subjects')
+          )
+        )
+    )
+  order by random()
+  limit greatest(coalesce(p_count, 0), 0);
+$$;
+
+-- ─── 3j. Atomic daily-activity increment (no read-modify-write race) ─────────
+-- The previous route read the row, added in JS, and wrote the sum — two
+-- concurrent submits could both read the same value and lose one increment.
+-- This performs the add atomically inside the upsert.
+create or replace function public.increment_activity(p_questions int, p_tests int)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  insert into public.daily_activity (user_id, activity_date, questions, tests)
+  values (auth.uid(), current_date, greatest(coalesce(p_questions, 0), 0),
+          greatest(coalesce(p_tests, 0), 0))
+  on conflict (user_id, activity_date)
+  do update set questions = public.daily_activity.questions + excluded.questions,
+                tests     = public.daily_activity.tests + excluded.tests;
+$$;
+
 -- ─── 4. Execute grants ──────────────────────────────────────────────────────
 grant execute on function public.get_quiz_questions(jsonb)   to authenticated;
+grant execute on function public.count_quiz_questions(jsonb) to authenticated;
 grant execute on function public.subject_practice_subjects() to authenticated;
 grant execute on function public.submit_test(jsonb, jsonb)   to authenticated;
 grant execute on function public.get_due_reviews(int)        to authenticated;
 grant execute on function public.grade_review(uuid, text)    to authenticated;
 grant execute on function public.admin_list_questions(jsonb) to authenticated;
+grant execute on function public.distinct_question_topics(jsonb) to authenticated;
+grant execute on function public.subject_qtype_counts(text, text) to authenticated;
+grant execute on function public.pyq_history_period_counts()  to authenticated;
+grant execute on function public.subject_mock_questions(text, text, text, int) to authenticated;
+grant execute on function public.mock_slot_questions(jsonb, int) to authenticated;
+grant execute on function public.increment_activity(int, int) to authenticated;

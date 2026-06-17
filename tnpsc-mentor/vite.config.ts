@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5174,
+    port: 5173,
     host: true,
     // Fail loudly instead of drifting to a new port (which spawns duplicate
     // servers and leaves the browser on a stale one).

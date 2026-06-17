@@ -8,7 +8,7 @@ interface OmrBubblesProps {
 }
 
 /**
- * A row of four darken-to-fill OMR bubbles (A–D), like a printed answer sheet.
+ * A row of four darken-to-fill OMR bubbles (A-D), like a printed answer sheet.
  * The chosen option fills solid; the rest stay hollow outlines. Sizes down on
  * phones so the row + actions fit a narrow screen.
  */

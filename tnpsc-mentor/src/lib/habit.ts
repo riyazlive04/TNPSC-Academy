@@ -29,7 +29,7 @@ export async function recordActivity(userId: string, questions: number, tests = 
     // The server reads-modifies-writes today's row (RLS: own rows).
     await api.recordActivity(questions, tests)
   } catch {
-    /* non-fatal — table may not exist until migration is run */
+    /* non-fatal - table may not exist until migration is run */
   }
 }
 
@@ -37,11 +37,14 @@ export async function recordActivity(userId: string, questions: number, tests = 
 function computeStreak(dates: Set<string>): number {
   let streak = 0
   const cursor = new Date()
+  // Walk the cursor in UTC so it matches isoDate() (toISOString → UTC) and the
+  // server's activity_date (Postgres current_date). Mixing local getDate()/
+  // setDate() with a UTC date string miscounts streaks near midnight off-UTC.
   // Allow today to be missing (streak continues from yesterday until today ends).
-  if (!dates.has(isoDate(cursor))) cursor.setDate(cursor.getDate() - 1)
+  if (!dates.has(isoDate(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1)
   while (dates.has(isoDate(cursor))) {
     streak += 1
-    cursor.setDate(cursor.getDate() - 1)
+    cursor.setUTCDate(cursor.getUTCDate() - 1)
   }
   return streak
 }

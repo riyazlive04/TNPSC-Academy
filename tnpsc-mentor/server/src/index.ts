@@ -29,8 +29,9 @@ app.use(
     // Supports exact origins and `*` wildcards (Vercel preview URLs change every
     // deploy). An origin that isn't allowed simply gets no CORS headers → the
     // browser blocks it, which is the intended behaviour.
+    // No `credentials: true`: auth is via Authorization: Bearer headers, not
+    // cookies, so allowing credentials would needlessly widen the attack surface.
     origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
-    credentials: true,
   })
 )
 app.use(express.json({ limit: '2mb' }))

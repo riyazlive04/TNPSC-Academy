@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect } from 'react'
 import type { ReactElement } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
+import { useThemeStore } from './store/themeStore'
+import { warmApi } from './lib/api'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import Toaster from './components/UI/Toaster'
@@ -67,10 +69,36 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
 export default function App() {
   const init = useAuthStore((s) => s.init)
 
-  // Bootstrap the Supabase session once on mount.
+  // Bootstrap the Supabase session once on mount, and immediately ping the API
+  // so a sleeping (Render free) container starts waking in parallel. Also wire
+  // the theme store (re-apply + listen for OS light/dark changes).
   useEffect(() => {
+    useThemeStore.getState().init()
+    warmApi()
     init()
   }, [init])
+
+  // Warm the chunks for the most-likely next screens during browser idle time,
+  // so moving between pages is instant instead of hitting the Suspense spinner.
+  // Vite dedupes these against the lazy() loaders above - no double download.
+  useEffect(() => {
+    const prefetch = () => {
+      void import('./pages/TestArenaPage')
+      void import('./pages/SubjectPracticePage')
+      void import('./pages/PreviousYearPage')
+      void import('./pages/QuizInstructionsPage')
+      void import('./pages/QuizPage')
+      void import('./pages/ResultPage')
+      void import('./pages/MockTestPage')
+    }
+    const ric = window.requestIdleCallback
+    if (ric) {
+      const id = ric(prefetch)
+      return () => window.cancelIdleCallback?.(id)
+    }
+    const id = window.setTimeout(prefetch, 1500)
+    return () => window.clearTimeout(id)
+  }, [])
 
   return (
     <>

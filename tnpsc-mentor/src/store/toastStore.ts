@@ -21,7 +21,7 @@ export const useToastStore = create<ToastState>((set, get) => ({
   push: (kind, message, ttlMs = 3200) => {
     const id = ++seq
     set((s) => ({ toasts: [...s.toasts, { id, kind, message }] }))
-    // Auto-dismiss after the TTL (timers are fine here — this is browser-only).
+    // Auto-dismiss after the TTL (timers are fine here - this is browser-only).
     window.setTimeout(() => get().dismiss(id), ttlMs)
   },
   dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),

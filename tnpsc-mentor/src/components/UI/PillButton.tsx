@@ -11,7 +11,7 @@ interface PillButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * The core navigation element of TNPSC Mentor — a white pill button that turns
+ * The core navigation element of TNPSC Mentor - a white pill button that turns
  * yellow (#FFC107) with dark navy text when `active`.
  */
 export default function PillButton({

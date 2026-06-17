@@ -8,11 +8,25 @@ import OmrOptions from '../components/Quiz/OmrOptions'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
 import { formatTime } from '../components/UI/Timer'
 import { api } from '../lib/api'
-import { enterFullscreen, exitFullscreen, fullscreenSupported, isFullscreen } from '../lib/proctor'
+import { exitFullscreen } from '../lib/proctor'
 import { submitTest } from '../lib/submitTest'
+import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
+import { useMockQuizStore } from '../store/mockQuizStore'
 import { useT } from '../lib/i18n'
 import { LETTERS, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
+
+/** Loose structural match so resuming a refreshed mock reuses the same session. */
+function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
+  return (
+    a.mockKind === b.mockKind &&
+    a.mockGroup === b.mockGroup &&
+    a.subject === b.subject &&
+    a.topic === b.topic &&
+    a.difficulty === b.difficulty &&
+    a.label === b.label
+  )
+}
 
 /** True when a question carries any answer-option text (option_a..d / _ta). */
 function hasOptions(q: Question, lang: DisplayLang): boolean {
@@ -25,40 +39,16 @@ function hasOptions(q: Question, lang: DisplayLang): boolean {
 /** Per-question status used to colour the OMR palette. */
 type Status = 'notVisited' | 'visited' | 'answered' | 'markedReview' | 'answeredMarked'
 
-interface Violation {
-  type: 'fullscreen_exit' | 'tab_switch' | 'copy_paste' | 'screenshot' | 'screen_record'
-  at: number // ms since test start
-  questionIndex: number
-}
-
-/**
- * Classify a keystroke that triggers an OS/browser screen capture, so it can be
- * flagged and the captured clipboard wiped. Returns null for everything else.
- */
-function screenCaptureType(e: KeyboardEvent): 'screenshot' | 'screen_record' | null {
-  if (e.key === 'PrintScreen') return 'screenshot'
-  const k = e.key.toLowerCase()
-  // Screen-recording shortcuts: Win+Alt+R (Game Bar), Win+Shift+R.
-  if (e.metaKey && (e.altKey || e.shiftKey) && k === 'r') return 'screen_record'
-  // Screenshot shortcuts: Win+Shift+S (Snip), Ctrl+Shift+S, macOS Cmd+Shift+3/4/5.
-  if ((e.metaKey || e.ctrlKey) && e.shiftKey && ['s', '3', '4', '5'].includes(k)) return 'screenshot'
-  return null
-}
-
-const MAX_VIOLATIONS = 5 // auto-submit threshold
 const PAGE_SIZE = 50 // questions per OMR answer-sheet page (100-Q exam → 2 pages of 50)
 
 export default function MockQuizPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { t, lang } = useT()
-  const config = location.state as QuizConfig | null
-
-  // Fullscreen is enforced only where the platform supports it. Phones (iOS
-  // Safari especially) can't reliably go full-screen, so on those we degrade to
-  // tab-switch / focus-loss proctoring rather than locking the user out behind
-  // an overlay they can never satisfy.
-  const fsSupported = useRef(fullscreenSupported()).current
+  // On a hard refresh, router `location.state` is lost - fall back to the
+  // persisted in-progress mock session's config so the test can resume.
+  const navConfig = location.state as QuizConfig | null
+  const config = navConfig ?? useMockQuizStore.getState().config
 
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
@@ -66,34 +56,59 @@ export default function MockQuizPage() {
   const [empty, setEmpty] = useState(false)
 
   const [index, setIndex] = useState(0)
-  const [page, setPage] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, AnswerLetter>>({})
-  const [marked, setMarked] = useState<Record<string, boolean>>({})
-  const [visited, setVisited] = useState<Record<number, boolean>>({ 0: true })
+  const [page, setPage] = useState(() => useMockQuizStore.getState().page)
+  const [answers, setAnswers] = useState<Record<string, AnswerLetter>>(
+    () => useMockQuizStore.getState().answers
+  )
+  const [marked, setMarked] = useState<Record<string, boolean>>(
+    () => useMockQuizStore.getState().marked
+  )
+  const [visited, setVisited] = useState<Record<number, boolean>>(
+    () => useMockQuizStore.getState().visited
+  )
 
   const [timeLeft, setTimeLeft] = useState(config?.mockDurationSeconds ?? 0)
-  const [violations, setViolations] = useState<Violation[]>([])
-  const [violationToast, setViolationToast] = useState('')
   const [timeToast, setTimeToast] = useState('')
-  const [notFullscreen, setNotFullscreen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
   const startedAtRef = useRef<number>(Date.now())
   const submittedRef = useRef(false)
+  // Latest proctoring violations, read at submit time (kept in a ref so the
+  // memoised submit handler doesn't need them as a dependency).
+  const violationsRef = useRef<Violation[]>([])
   // Time thresholds (sec) we've already warned about, so each fires once.
   const warnedRef = useRef<Set<number>>(new Set())
+  const timeToastTimers = useRef<number[]>([]) // pending time-toast dismiss timers
 
   // ── Guard: must have a proctored config ──
   useEffect(() => {
     if (!config?.proctored) navigate('/mock', { replace: true })
   }, [config, navigate])
 
-  // ── Load questions once ──
+  // ── Load questions once (or resume an in-progress one after a refresh) ──
   useEffect(() => {
     if (!config?.proctored) return
     let cancelled = false
+
+    // Resume: the persisted store already holds a matching, unfinished mock.
+    const persisted = useMockQuizStore.getState()
+    const canResume =
+      persisted.questions.length > 0 &&
+      persisted.config != null &&
+      sameMockConfig(persisted.config, config)
+    if (canResume) {
+      setQuestions(persisted.questions)
+      startedAtRef.current = persisted.startedAt
+      // Recompute remaining time from startedAt (wall clock kept moving while
+      // the tab was closed).
+      const elapsed = Math.floor((Date.now() - persisted.startedAt) / 1000)
+      setTimeLeft(Math.max(0, (config.mockDurationSeconds ?? 0) - elapsed))
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     ;(async () => {
       try {
@@ -111,7 +126,15 @@ export default function MockQuizPage() {
           setEmpty(true)
         } else {
           setQuestions(qs)
-          startedAtRef.current = Date.now()
+          const now = Date.now()
+          startedAtRef.current = now
+          // Begin a fresh persisted session so a refresh can resume it.
+          useMockQuizStore.getState().start(config, qs)
+          setTimeLeft(config.mockDurationSeconds ?? 0)
+          setAnswers({})
+          setMarked({})
+          setVisited({ 0: true })
+          setPage(0)
         }
       } catch {
         if (!cancelled) setLoadError('Could not load the test. Please try again.')
@@ -160,16 +183,18 @@ export default function MockQuizPage() {
           timeLimitSeconds: config?.mockDurationSeconds ?? 0,
           startedAt: startedAtRef.current,
         })
+        // Clear the persisted in-progress mock session.
+        useMockQuizStore.getState().reset()
         // Exit fullscreen on the way out.
         await exitFullscreen()
-        navigate('/result', { state: { ...payload, violations, autoSubmitted: auto } })
+        navigate('/result', { state: { ...payload, violations: violationsRef.current, autoSubmitted: auto } })
       } catch {
         submittedRef.current = false
         setSubmitError('Could not submit your test. Check your connection and try again.')
         setSubmitting(false)
       }
     },
-    [answers, marked, questions, config, violations, navigate]
+    [answers, marked, questions, config, navigate]
   )
 
   // ── Countdown timer (auto-submit at zero, warn at 30/10/5 min) ──
@@ -192,102 +217,32 @@ export default function MockQuizPage() {
           if (next === sec && !warnedRef.current.has(sec)) {
             warnedRef.current.add(sec)
             setTimeToast(key)
-            window.setTimeout(() => setTimeToast(''), 5000)
+            timeToastTimers.current.push(window.setTimeout(() => setTimeToast(''), 5000))
           }
         }
         return next
       })
     }, 1000)
-    return () => window.clearInterval(id)
+    return () => {
+      window.clearInterval(id)
+      timeToastTimers.current.forEach((tid) => window.clearTimeout(tid))
+      timeToastTimers.current = []
+    }
   }, [loading, empty, loadError, total, doSubmit, t])
 
-  // ── Record a violation; auto-submit once the threshold is crossed ──
-  const recordViolation = useCallback(
-    (type: Violation['type']) => {
-      if (submittedRef.current) return
-      setViolations((prev) => {
-        const next = [...prev, { type, at: Date.now() - startedAtRef.current, questionIndex: index }]
-        setViolationToast(t('violationWarning'))
-        window.setTimeout(() => setViolationToast(''), 4000)
-        if (next.length >= MAX_VIOLATIONS) void doSubmit(true)
-        return next
-      })
-    },
-    [index, doSubmit, t]
-  )
-
-  // ── Fullscreen + tab-switch + copy/paste enforcement ──
-  useEffect(() => {
-    if (loading || empty || loadError || !total) return
-
-    const onFsChange = () => {
-      const fs = isFullscreen()
-      setNotFullscreen(!fs)
-      if (!fs) recordViolation('fullscreen_exit')
-    }
-    const onVisibility = () => {
-      if (document.hidden) recordViolation('tab_switch')
-    }
-    const onBlur = () => recordViolation('tab_switch')
-    const blockCopy = (e: Event) => {
-      e.preventDefault()
-      recordViolation('copy_paste')
-    }
-    const blockContext = (e: Event) => e.preventDefault()
-    const blockKeys = (e: KeyboardEvent) => {
-      // Screen capture/record keys — flag as a violation and wipe the clipboard.
-      const capture = screenCaptureType(e)
-      if (capture) {
-        e.preventDefault()
-        navigator.clipboard?.writeText('').catch(() => {})
-        recordViolation(capture)
-        return
-      }
-      const k = e.key.toLowerCase()
-      if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a'].includes(k)) {
-        e.preventDefault()
-        recordViolation('copy_paste')
-      }
-    }
-    // Windows' PrintScreen reports on keyup only — catch it there too.
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'PrintScreen') {
-        navigator.clipboard?.writeText('').catch(() => {})
-        recordViolation('screenshot')
-      }
-    }
-
-    // Full-screen enforcement applies only on platforms that support it; on
-    // phones the visibility/blur listeners below carry the proctoring.
-    if (fsSupported) {
-      document.addEventListener('fullscreenchange', onFsChange)
-      document.addEventListener('webkitfullscreenchange', onFsChange)
-    }
-    document.addEventListener('visibilitychange', onVisibility)
-    window.addEventListener('blur', onBlur)
-    document.addEventListener('copy', blockCopy)
-    document.addEventListener('paste', blockCopy)
-    document.addEventListener('cut', blockCopy)
-    document.addEventListener('contextmenu', blockContext)
-    document.addEventListener('keydown', blockKeys)
-    document.addEventListener('keyup', onKeyUp)
-
-    // Establish initial fullscreen state (only relevant when supported).
-    setNotFullscreen(fsSupported && !isFullscreen())
-
-    return () => {
-      document.removeEventListener('fullscreenchange', onFsChange)
-      document.removeEventListener('webkitfullscreenchange', onFsChange)
-      document.removeEventListener('visibilitychange', onVisibility)
-      window.removeEventListener('blur', onBlur)
-      document.removeEventListener('copy', blockCopy)
-      document.removeEventListener('paste', blockCopy)
-      document.removeEventListener('cut', blockCopy)
-      document.removeEventListener('contextmenu', blockContext)
-      document.removeEventListener('keydown', blockKeys)
-      document.removeEventListener('keyup', onKeyUp)
-    }
-  }, [loading, empty, loadError, total, recordViolation, fsSupported])
+  // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
+  // Shared engine; mirrors QuizPage. Its synchronous done-latch prevents rapid
+  // violations from double-submitting, and it clears its own toast timers.
+  const proctorActive = !loading && !empty && !loadError && total > 0
+  const { violations, violationToast, notFullscreen, fsSupported, reEnterFullscreen } =
+    useProctoring({
+      active: proctorActive,
+      questionIndex: index,
+      onAutoSubmit: () => {
+        void doSubmit(true)
+      },
+    })
+  violationsRef.current = violations
 
   // ── Warn before an accidental browser back / refresh ──
   useEffect(() => {
@@ -313,6 +268,26 @@ export default function MockQuizPage() {
     })
     window.scrollTo({ top: 0 })
   }, [page, pageStart, total])
+
+  // ── Persist answers / marks / visited / page so a refresh can resume ──
+  // Only mirrors into the store while a session is live (questions loaded);
+  // guards against clobbering a freshly-reset store on unmount.
+  useEffect(() => {
+    if (!total) return
+    useMockQuizStore.getState().setAnswers(answers)
+  }, [answers, total])
+  useEffect(() => {
+    if (!total) return
+    useMockQuizStore.getState().setMarked(marked)
+  }, [marked, total])
+  useEffect(() => {
+    if (!total) return
+    useMockQuizStore.getState().setVisited(visited)
+  }, [visited, total])
+  useEffect(() => {
+    if (!total) return
+    useMockQuizStore.getState().setPage(page)
+  }, [page, total])
 
   const jumpToQuestion = (i: number) => {
     if (i < 0 || i >= total) return
@@ -357,10 +332,6 @@ export default function MockQuizPage() {
     })
     return c
   }, [questions, statusOf])
-
-  const reEnterFullscreen = () => {
-    void enterFullscreen()
-  }
 
   // ── Render states ──
   if (!config?.proctored) return null
@@ -426,7 +397,7 @@ export default function MockQuizPage() {
           >
             {formatTime(timeLeft)}
           </span>
-          {/* Palette toggle — phones/tablets only; desktop shows the sidebar. */}
+          {/* Palette toggle - phones/tablets only; desktop shows the sidebar. */}
           <button
             onClick={() => setPaletteOpen(true)}
             aria-label={t('openPalette')}
@@ -442,11 +413,11 @@ export default function MockQuizPage() {
       {violationToast && <Toast tone="error">{violationToast}</Toast>}
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-3 py-4 sm:px-4 sm:py-5 lg:flex-row">
-        {/* OMR answer sheet — one page of question rows */}
+        {/* OMR answer sheet - one page of question rows */}
         <main className="min-w-0 flex-1">
           <div className="mb-3 flex items-center justify-between">
             <span className="font-heading text-sm font-semibold text-ink2">
-              {t('question')} {pageStart + 1}–{Math.min(total, pageStart + PAGE_SIZE)} {t('of')} {total}
+              {t('question')} {pageStart + 1}-{Math.min(total, pageStart + PAGE_SIZE)} {t('of')} {total}
             </span>
             <span className="font-body text-xs tabular-nums text-ink2">
               {page + 1} / {pageCount}
@@ -502,8 +473,8 @@ export default function MockQuizPage() {
                     <QuestionFigures images={q.images} className="mt-3" />
                   </div>
 
-                  {/* Answer choices — full option text + OMR-style bubble. Falls
-                      back to a bare A–D bubble row only if the question has no
+                  {/* Answer choices - full option text + OMR-style bubble. Falls
+                      back to a bare A-D bubble row only if the question has no
                       option text stored. */}
                   {hasOptions(q, lang) ? (
                     <OmrOptions question={q} lang={lang} selected={sel} onSelect={(l) => setAnswer(q, l)} />
@@ -533,13 +504,13 @@ export default function MockQuizPage() {
           </button>
         </main>
 
-        {/* Palette — inline sidebar on desktop. */}
+        {/* Palette - inline sidebar on desktop. */}
         <aside className="hidden w-72 shrink-0 lg:block">
           <div className="card sticky top-20 p-4">{palette}</div>
         </aside>
       </div>
 
-      {/* Palette — slide-up drawer on phones/tablets. */}
+      {/* Palette - slide-up drawer on phones/tablets. */}
       {paletteOpen && (
         <div className="fixed inset-0 z-40 flex flex-col justify-end lg:hidden">
           <button
@@ -561,7 +532,7 @@ export default function MockQuizPage() {
         </div>
       )}
 
-      {/* Fullscreen re-entry overlay — only on platforms that can go full-screen. */}
+      {/* Fullscreen re-entry overlay - only on platforms that can go full-screen. */}
       {fsSupported && notFullscreen && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-ink/80 px-6 text-center backdrop-blur-sm">
           <Maximize2 size={40} className="text-white" />
@@ -574,15 +545,15 @@ export default function MockQuizPage() {
         </div>
       )}
 
-      {/* Anti-capture shield — blanks the screen on focus loss / PrintScreen. */}
+      {/* Anti-capture shield - blanks the screen on focus loss / PrintScreen. */}
       <ScreenGuard message={t('screenProtected')} />
     </div>
   )
 }
 
-/** Shared palette body — rendered in the desktop sidebar and the mobile drawer.
- * The number grid is SCOPED to the current page: page 1 shows pills 1–50, page 2
- * shows 51–100, etc. A header switcher moves between pages; tapping a pill jumps
+/** Shared palette body - rendered in the desktop sidebar and the mobile drawer.
+ * The number grid is SCOPED to the current page: page 1 shows pills 1-50, page 2
+ * shows 51-100, etc. A header switcher moves between pages; tapping a pill jumps
  * to that question (and, since pills are page-scoped, stays on the current page). */
 function Palette({
   questions,
@@ -624,7 +595,7 @@ function Palette({
         <SummaryStat value={counts.notVisited} label={t('notVisited')} cls="text-ink2" />
       </div>
 
-      {/* Page switcher — only when the sheet spans more than one page */}
+      {/* Page switcher - only when the sheet spans more than one page */}
       {pageCount > 1 && (
         <div className="mb-3 flex items-center justify-between gap-2">
           <button
@@ -636,7 +607,7 @@ function Palette({
             <ChevronLeft size={16} />
           </button>
           <span className="font-heading text-xs font-semibold tabular-nums text-ink2">
-            {start + 1}–{end} <span className="text-ink2/50">/ {total}</span>
+            {start + 1}-{end} <span className="text-ink2/50">/ {total}</span>
           </span>
           <button
             onClick={() => onPageChange(Math.min(pageCount - 1, page + 1))}
@@ -649,7 +620,7 @@ function Palette({
         </div>
       )}
 
-      {/* Grid — current page only */}
+      {/* Grid - current page only */}
       <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 lg:grid-cols-6">
         {pageIndices.map((i) => (
           <button

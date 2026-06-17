@@ -1,5 +1,5 @@
 interface ProgressBarProps {
-  /** 0–100 */
+  /** 0-100 */
   percent: number
   className?: string
   /** colour of the filled portion */
@@ -10,7 +10,9 @@ interface ProgressBarProps {
 export default function ProgressBar({
   percent,
   className = '',
-  color = '#6C5CE7',
+  // Theme-aware default (violet). Callers may pass a CSS colour or a
+  // `rgb(var(--c-…))` string, which resolves live on theme switch.
+  color = 'rgb(var(--c-brand))',
   height = 8,
 }: ProgressBarProps) {
   const pct = Math.max(0, Math.min(100, percent))

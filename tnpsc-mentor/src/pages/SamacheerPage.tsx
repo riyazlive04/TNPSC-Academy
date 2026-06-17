@@ -59,7 +59,7 @@ export default function SamacheerPage() {
 
   return (
     <PickerPage badge={t('samacheerBadge')}>
-      {/* Row 1 — subject */}
+      {/* Row 1 - subject */}
       <PillSection title={t('step1Subject')} className="mb-8">
         {SUBJECTS.map((s) => (
           <PillButton
@@ -77,7 +77,7 @@ export default function SamacheerPage() {
         ))}
       </PillSection>
 
-      {/* Row 2 — standard */}
+      {/* Row 2 - standard */}
       {subject && (
         <PillSection title={t('step2Standard')} className="mb-8 animate-fadeIn">
           {STANDARDS.map((n) => (
@@ -88,7 +88,7 @@ export default function SamacheerPage() {
         </PillSection>
       )}
 
-      {/* Row 3 — topics from DB */}
+      {/* Row 3 - topics from DB */}
       {subject && standard !== null && (
         <PillSection
           title={`${t('step3Topic')} (${subject} · ${standardLabel(standard)})`}

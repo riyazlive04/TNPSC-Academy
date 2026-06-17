@@ -49,7 +49,7 @@ export default function WorkedSolution({
               line.kind === 'formula' ? (
                 <div
                   key={i}
-                  className="tamil rounded-lg border border-secondary/30 bg-white px-3 py-1.5 text-[13px] font-semibold leading-relaxed text-navytext"
+                  className="tamil rounded-lg border border-secondary/30 bg-tint px-3 py-1.5 text-[13px] font-semibold leading-relaxed text-ink"
                 >
                   {line.label && (
                     <span className="mr-1 font-heading text-secondary">{line.label}:</span>
