@@ -393,10 +393,11 @@ export default function QuizPage() {
           <span className="hidden min-w-0 flex-1 truncate font-body text-xs text-ink2 sm:order-1 sm:block">
             {describeConfig(config)}
           </span>
-          <span className="font-heading text-lg font-extrabold text-ink sm:order-2">
+          {/* These controls move into the sticky side panel on desktop (lg). */}
+          <span className="font-heading text-lg font-extrabold text-ink sm:order-2 lg:hidden">
             Q {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
           </span>
-          <div className="flex items-center gap-2 sm:order-3">
+          <div className="flex items-center gap-2 sm:order-3 lg:hidden">
             {proctored && violations.length > 0 && (
               <span className="inline-flex items-center gap-1 rounded-lg bg-coral/10 px-2 py-1 font-heading text-xs font-semibold text-coral">
                 <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
@@ -437,7 +438,41 @@ export default function QuizPage() {
       </div>
 
       {/* Question */}
-      <div className="mx-auto mt-5 max-w-2xl px-4">
+      <div className="relative mx-auto mt-5 max-w-2xl px-4">
+        {/* Desktop only: question number, timer and language move into a sticky
+            panel parallel to the question that follows the scroll. */}
+        <div className="absolute left-full top-0 hidden h-full pl-4 lg:block">
+          <aside className="sticky top-24 flex w-36 flex-col gap-3">
+            {proctored && violations.length > 0 && (
+              <span className="inline-flex items-center justify-center gap-1 rounded-xl bg-coral/10 px-2 py-1.5 font-heading text-xs font-semibold text-coral">
+                <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
+              </span>
+            )}
+            <div className="rounded-2xl border border-line bg-card px-3 py-2.5 text-center shadow-soft">
+              <span className="block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+                {t('question')}
+              </span>
+              <span className="font-heading text-lg font-extrabold text-ink">
+                {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-3 shadow-soft">
+              <span className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+                {t('timeLeft')}
+              </span>
+              <Timer secondsLeft={totalTimeLeft} />
+            </div>
+            <button
+              onClick={cycleQuizLang}
+              title={t('viewLanguage')}
+              aria-label={`${t('viewLanguage')} (${QUIZ_LANG_LABEL[quizLang]})`}
+              className="tamil press inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-brand-dark shadow-soft transition hover:bg-tint focus-ring"
+            >
+              <Languages size={15} /> {QUIZ_LANG_LABEL[quizLang]}
+            </button>
+          </aside>
+        </div>
+
         <QuestionCard
           question={currentQuestion}
           index={currentIndex}

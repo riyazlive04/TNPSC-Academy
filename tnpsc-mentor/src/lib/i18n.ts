@@ -17,6 +17,7 @@ const STRINGS = {
   darkMode: { en: 'Dark mode', ta: 'இருண்ட பயன்முறை' },
   lightMode: { en: 'Light mode', ta: 'ஒளி பயன்முறை' },
   viewLanguage: { en: 'Question language', ta: 'வினா மொழி' },
+  timeLeft: { en: 'Time left', ta: 'மீதமுள்ள நேரம்' },
   // Auth split-screen hero (login / register / forgot)
   authHeroTitle: {
     en: 'Your fast track to the TNPSC exam hall.',
