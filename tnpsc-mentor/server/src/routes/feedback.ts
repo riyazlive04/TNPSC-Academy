@@ -19,6 +19,26 @@ router.post(
       return res.status(400).json({ error: 'rating must be an integer 1–5' })
     }
 
+    // Rate-limit: one submission per user per 3 months. The user-scoped client
+    // (RLS "Users read own feedback") only ever sees this user's own rows.
+    const since = new Date()
+    since.setMonth(since.getMonth() - 3)
+    const { data: recent, error: recentErr } = await req.db!
+      .from('app_feedback')
+      .select('created_at')
+      .eq('user_id', req.userId)
+      .gte('created_at', since.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+    if (recentErr) return sendDbError(res, recentErr)
+    if (recent && recent.length > 0) {
+      const nextAt = new Date(recent[0].created_at)
+      nextAt.setMonth(nextAt.getMonth() + 3)
+      return res
+        .status(429)
+        .json({ error: 'feedback_rate_limited', nextAt: nextAt.toISOString() })
+    }
+
     const { data, error } = await req.db!
       .from('app_feedback')
       .insert({ user_id: req.userId, rating, message, page })

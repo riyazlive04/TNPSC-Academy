@@ -22,7 +22,7 @@ router.get(
 router.get(
   '/users',
   asyncH(async (req: AuthedRequest, res) => {
-    const limit = Number(req.query.limit ?? 200)
+    const limit = Math.min(Math.max(Math.trunc(Number(req.query.limit)) || 200, 1), 1000)
     const search = req.query.search ? String(req.query.search) : null
     const { data, error } = await req.db!.rpc('superadmin_list_users', {
       p_limit: limit,
@@ -41,6 +41,11 @@ router.post(
     if (!userId || !role) {
       return res.status(400).json({ error: 'userId and role are required' })
     }
+    // Allow-list the role before it reaches the RPC (the RPC also validates,
+    // but reject obviously-bad input early with a clear message).
+    if (!['user', 'admin', 'superadmin'].includes(role)) {
+      return res.status(400).json({ error: `Invalid role: ${role}` })
+    }
     const { data, error } = await req.db!.rpc('superadmin_set_role', {
       p_user: userId,
       p_role: role,
@@ -54,7 +59,7 @@ router.post(
 router.get(
   '/feedback',
   asyncH(async (req: AuthedRequest, res) => {
-    const limit = Number(req.query.limit ?? 100)
+    const limit = Math.min(Math.max(Math.trunc(Number(req.query.limit)) || 100, 1), 1000)
     const { data, error } = await req.db!.rpc('list_app_feedback', { p_limit: limit })
     if (error) return sendDbError(res, error)
     res.json({ feedback: data ?? [] })

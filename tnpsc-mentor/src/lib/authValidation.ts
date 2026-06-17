@@ -17,7 +17,7 @@ export function friendlyAuthError(raw: string | null | undefined): {
 } {
   if (!raw) return { key: 'errServerUnreachable' }
   const msg = raw.toLowerCase()
-  // Known-safe auth messages from Supabase/GoTrue — show as-is.
+  // Known-safe auth messages from Supabase/GoTrue - show as-is.
   if (
     msg.includes('invalid login') ||
     msg.includes('invalid credentials') ||
@@ -44,11 +44,11 @@ export function friendlyAuthError(raw: string | null | undefined): {
   ) {
     return { key: 'errServerUnreachable' }
   }
-  // Unknown but non-infra — surface it (likely a meaningful validation msg).
+  // Unknown but non-infra - surface it (likely a meaningful validation msg).
   return { text: raw }
 }
 
-/** Score a password 0–4 for the strength meter. */
+/** Score a password 0-4 for the strength meter. */
 export function passwordStrength(pw: string): number {
   let score = 0
   if (pw.length >= 6) score++

@@ -12,7 +12,7 @@ import type { QuizConfig } from '../types'
  * Pre-test instructions screen for a proctored mock. Shows exam rules and a
  * mandatory confirmation checkbox; "Begin Test" requests full-screen and hands
  * off to the OMR engine (/mock/quiz). Reached only via router state from the
- * mock picker — a direct/refresh hit with no config bounces back to /mock.
+ * mock picker - a direct/refresh hit with no config bounces back to /mock.
  */
 export default function MockInstructionsPage() {
   const navigate = useNavigate()
@@ -36,7 +36,7 @@ export default function MockInstructionsPage() {
     if (!agreed) return
     // Request full-screen before handing off; the quiz engine enforces it where
     // supported. On phones (no Fullscreen API) this is a no-op and the quiz
-    // falls back to visibility/blur proctoring — see lib/proctor.ts.
+    // falls back to visibility/blur proctoring - see lib/proctor.ts.
     await enterFullscreen()
     navigate('/mock/quiz', { state: config })
   }

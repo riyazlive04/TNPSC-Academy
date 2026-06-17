@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2, Maximize2, X } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Loader2, Maximize2, X } from 'lucide-react'
+import type { Lang } from '../store/languageStore'
 import Timer from '../components/UI/Timer'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ProgressBar from '../components/UI/ProgressBar'
@@ -31,11 +32,19 @@ function sameConfig(a: QuizConfig, b: QuizConfig): boolean {
   return describeConfig(a) === describeConfig(b) && Boolean(a.mock) === Boolean(b.mock)
 }
 
+const QUIZ_LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
+const QUIZ_LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
+
 export default function QuizPage() {
   const navigate = useNavigate()
-  const { t } = useT()
+  const { t, lang } = useT()
+  // In-test language for the question CONTENT (independent of the app UI
+  // language) so an aspirant can flip a question to bilingual on demand.
+  const [quizLang, setQuizLang] = useState<Lang>(lang)
+  const cycleQuizLang = () =>
+    setQuizLang((l) => QUIZ_LANG_CYCLE[(QUIZ_LANG_CYCLE.indexOf(l) + 1) % QUIZ_LANG_CYCLE.length])
   const location = useLocation()
-  // On a hard refresh, router `location.state` is lost — fall back to the
+  // On a hard refresh, router `location.state` is lost - fall back to the
   // persisted in-progress session's config so the test can resume.
   const navConfig = location.state as QuizConfig | null
   const config = navConfig ?? useQuizStore.getState().config
@@ -62,7 +71,7 @@ export default function QuizPage() {
   const [secondsOnQuestion, setSecondsOnQuestion] = useState(0)
   const [minWarning, setMinWarning] = useState(false)
 
-  // 80% attendance gate modal before submit
+  // Attendance gate modal before submit (unlocks explanations at >=25% attempted)
   const [showGateModal, setShowGateModal] = useState(false)
 
   // Exit confirmation modal (practice tests only)
@@ -72,6 +81,9 @@ export default function QuizPage() {
   // Latest proctoring violations, read at submit time (kept in a ref so the
   // memoised submit handler doesn't need them as a dependency).
   const violationsRef = useRef<Violation[]>([])
+  // Always points at the current handleSubmit so the countdown timer never
+  // calls a stale closure (the timer effect must not re-subscribe per render).
+  const submitRef = useRef<(auto?: boolean) => void>(() => {})
 
   // ── Guard: must have config ──
   useEffect(() => {
@@ -114,9 +126,7 @@ export default function QuizPage() {
         setLoading(false)
       } catch (e) {
         if (!cancelled) {
-          setLoadError(
-            'Could not load questions. Check your connection / Supabase config and try again.'
-          )
+          setLoadError(t('loadQuestionsError'))
           setLoading(false)
         }
       }
@@ -136,7 +146,7 @@ export default function QuizPage() {
       if (left <= 1) {
         clearInterval(id)
         useQuizStore.getState().tick()
-        handleSubmit(true)
+        submitRef.current(true)
       } else {
         useQuizStore.getState().tick()
       }
@@ -149,7 +159,7 @@ export default function QuizPage() {
   useEffect(() => {
     setSecondsOnQuestion(0)
     setMinWarning(false)
-    // Long questions can leave the next one scrolled past its top — reset to the
+    // Long questions can leave the next one scrolled past its top - reset to the
     // top of the question on every navigation so it always starts in view.
     window.scrollTo({ top: 0, behavior: 'smooth' })
     const id = setInterval(() => setSecondsOnQuestion((s) => s + 1), 1000)
@@ -209,6 +219,8 @@ export default function QuizPage() {
       }
     }
     s.reset()
+    // The test is over - leave full-screen before returning to the arena.
+    await exitFullscreen()
     navigate('/test-arena', { replace: true })
   }
 
@@ -267,7 +279,7 @@ export default function QuizPage() {
       s.setSubmitting(false)
       submittedRef.current = false
       setSubmitError(
-        'Could not submit your test — grading happens on the server. Check your connection and retry.'
+        'Could not submit your test - grading happens on the server. Check your connection and retry.'
       )
       return
     }
@@ -281,6 +293,9 @@ export default function QuizPage() {
       replace: true,
     })
   }, [navigate])
+
+  // Keep the timer's submit pointer fresh without re-subscribing the interval.
+  submitRef.current = handleSubmit
 
   // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
   const proctored = !!config?.proctored
@@ -303,7 +318,7 @@ export default function QuizPage() {
       <CenteredMessage>
         <Loader2 size={36} className="animate-spin text-brand" />
         <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
-          Preparing your test…
+          {t('preparingTest')}
         </p>
       </CenteredMessage>
     )
@@ -315,7 +330,7 @@ export default function QuizPage() {
         <AlertTriangle size={36} className="text-coral" />
         <p className="max-w-sm text-center font-body text-ink2">{loadError}</p>
         <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
-          Back to Test Arena
+          {t('backToTestArena')}
         </button>
       </CenteredMessage>
     )
@@ -326,11 +341,10 @@ export default function QuizPage() {
       <CenteredMessage>
         <AlertTriangle size={36} className="text-brand" />
         <p className="max-w-sm text-center font-body text-ink2">
-          No questions are available for this selection yet. Please run the content
-          upload, or choose another topic.
+          {t('noQuestionsLong')}
         </p>
         <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
-          Back to Test Arena
+          {t('backToTestArena')}
         </button>
       </CenteredMessage>
     )
@@ -341,6 +355,13 @@ export default function QuizPage() {
   const isFlagged = flags[currentQuestion.id] ?? false
   const isLast = currentIndex + 1 >= total
   const flaggedCount = Object.values(flags).filter(Boolean).length
+  // A "long" question (in either language) gets a stronger "read it carefully"
+  // nudge instead of the plain "slow down" one.
+  const isLongQuestion =
+    Math.max(
+      currentQuestion.question_text?.length ?? 0,
+      currentQuestion.question_text_ta?.length ?? 0
+    ) > 160
 
   // Announce time milestones to screen readers instead of ticking every second.
   const timeAnnouncement =
@@ -351,6 +372,12 @@ export default function QuizPage() {
         : totalTimeLeft === 10
           ? '10 seconds remaining'
           : ''
+
+  // Visible low-time warning shown for the whole final minute, escalating as the
+  // clock runs down so the aspirant clearly sees that time is about to end.
+  const lowTime = totalTimeLeft > 0 && totalTimeLeft <= 60
+  const lowTimeText =
+    totalTimeLeft <= 10 ? t('timeWarn10') : totalTimeLeft <= 30 ? t('timeWarn30') : t('timeWarn60')
 
   return (
     <div className="min-h-screen bg-canvas pb-28">
@@ -372,11 +399,19 @@ export default function QuizPage() {
                 <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
               </span>
             )}
+            <button
+              onClick={cycleQuizLang}
+              title={t('viewLanguage')}
+              aria-label={`${t('viewLanguage')} (${QUIZ_LANG_LABEL[quizLang]})`}
+              className="tamil press inline-flex items-center gap-1 rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
+            >
+              <Languages size={14} /> {QUIZ_LANG_LABEL[quizLang]}
+            </button>
             <Timer secondsLeft={totalTimeLeft} />
             {!config.mock && (
               <button
                 onClick={() => setShowExitModal(true)}
-                aria-label="Exit test"
+                aria-label={t('exitTest')}
                 className="rounded-full p-1.5 text-ink2 transition hover:bg-coralsoft hover:text-coral"
               >
                 <X size={18} />
@@ -387,10 +422,24 @@ export default function QuizPage() {
         <div className="mx-auto mt-2 max-w-2xl">
           <ProgressBar percent={total > 0 ? ((currentIndex + 1) / total) * 100 : 0} />
           <div className="mt-1 flex justify-between font-body text-[11px] font-medium text-ink2">
-            <span>Attempted: {attempted}/{total}</span>
-            <span>Flagged: {flaggedCount}</span>
+            <span>{t('attemptedLabel')}: {attempted}/{total}</span>
+            <span>{t('flagged')}: {flaggedCount}</span>
           </div>
         </div>
+
+        {/* Visible low-time warning - shown through the final minute, escalating */}
+        {lowTime && (
+          <div className="mx-auto mt-2 max-w-2xl">
+            <div
+              className={[
+                'flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-center font-heading text-sm font-semibold text-warn',
+                totalTimeLeft <= 10 ? 'bg-warn/15 animate-pulse' : 'bg-warn/10 animate-slideDown',
+              ].join(' ')}
+            >
+              <Clock size={15} className="flex-shrink-0" /> {lowTimeText}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Question */}
@@ -401,13 +450,22 @@ export default function QuizPage() {
           total={total}
           selected={selectedLetter}
           onSelect={handleSelect}
+          displayLang={quizLang}
         />
 
         {minWarning && !canAdvance && (
-          <div className="mt-3 flex items-center gap-2 rounded-2xl bg-coralsoft px-4 py-3 font-body text-sm font-medium text-coral">
-            <AlertTriangle size={18} className="flex-shrink-0" />
-            Please spend at least {MIN_SECONDS_PER_QUESTION} seconds on this question.
-            ({Math.max(0, MIN_SECONDS_PER_QUESTION - secondsOnQuestion)}s left)
+          <div className="pointer-events-none fixed inset-x-0 top-24 z-40 flex justify-center px-4">
+            <div className="animate-slideDown flex w-full max-w-md items-center gap-3 rounded-2xl bg-warn px-5 py-4 text-white shadow-2xl ring-4 ring-warn/25">
+              <AlertTriangle size={26} className="flex-shrink-0 animate-pulse" />
+              <div className="min-w-0 flex-1">
+                <p className="tamil font-heading text-sm font-bold leading-snug">
+                  {isLongQuestion ? t('readCarefully') : t('min15')}
+                </p>
+                <p className="tamil mt-0.5 font-body text-xs font-medium text-white/85">
+                  {t('waitSeconds')} {Math.max(0, MIN_SECONDS_PER_QUESTION - secondsOnQuestion)}s
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -420,13 +478,13 @@ export default function QuizPage() {
             disabled={currentIndex === 0}
             className="inline-flex items-center gap-1 rounded-2xl border border-line bg-card px-4 py-2.5 font-heading text-sm font-semibold text-ink shadow-pill transition hover:border-brand-ring disabled:opacity-40"
           >
-            <ChevronLeft size={18} /> Prev
+            <ChevronLeft size={18} /> {t('prev')}
           </button>
 
           <button
             onClick={toggleFlag}
             aria-pressed={isFlagged}
-            aria-label={isFlagged ? 'Unflag this question' : 'Flag this question for review'}
+            aria-label={isFlagged ? t('unflagQuestion') : t('flagForReview')}
             className={[
               'press inline-flex items-center gap-1 rounded-2xl px-4 py-2.5 font-heading text-sm font-semibold transition',
               isFlagged
@@ -434,16 +492,16 @@ export default function QuizPage() {
                 : 'border border-line bg-card text-ink2 shadow-pill hover:text-coral',
             ].join(' ')}
           >
-            <Flag size={16} className={isFlagged ? 'animate-popStar' : ''} /> {isFlagged ? 'Flagged' : 'Flag'}
+            <Flag size={16} className={isFlagged ? 'animate-popStar' : ''} /> {isFlagged ? t('flagged') : t('flag')}
           </button>
 
           {isLast ? (
             <button onClick={requestSubmit} className="btn-brand px-6 py-2.5 text-sm">
-              Submit Test
+              {t('submitTest')}
             </button>
           ) : (
             <button onClick={goNext} className="btn-brand px-6 py-2.5 text-sm">
-              Next <ChevronRight size={18} />
+              {t('next')} <ChevronRight size={18} />
             </button>
           )}
         </div>
@@ -458,7 +516,7 @@ export default function QuizPage() {
         />
       )}
 
-      {/* 80% gate modal */}
+      {/* Attendance gate modal (25%) */}
       {showGateModal && (
         <AttendanceGateModal
           attempted={attempted}

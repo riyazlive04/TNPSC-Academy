@@ -5,11 +5,25 @@ timed test engine, score tracking, and gated PDF explanation downloads.
 
 ## Tech stack
 
-- **React 18 + Vite + TypeScript**
+- **React 18 + Vite + TypeScript** (SPA frontend)
+- **Express API** (`server/`) — the only client that talks to Supabase
 - **Tailwind CSS** (strict TNPSC palette — navy `#0D47A1`, yellow `#FFC107`)
-- **Supabase** for auth + Postgres (self-hosted compatible)
+- **Supabase** for auth + Postgres (reached server-side only)
 - **Zustand** state, **React Router v6**, **jsPDF**, **Lucide** icons
 - Fonts: Rajdhani (headings), Inter (body), Noto Sans Tamil (Tamil)
+
+## Architecture
+
+The browser never holds Supabase keys. The SPA talks **only** to the Express
+API, which in turn talks to Supabase:
+
+```
+SPA (React/Vite)  →  Express API (server/)  →  Supabase (auth + Postgres)
+```
+
+The frontend needs a single env var, `VITE_API_URL`, pointing at the Express
+server. All Supabase credentials (URL, anon key, service-role key) live
+exclusively in the server's environment.
 
 ## Getting started
 
@@ -17,14 +31,23 @@ timed test engine, score tracking, and gated PDF explanation downloads.
 cd tnpsc-mentor
 npm install
 
-# Configure Supabase
+# Configure the frontend: only VITE_API_URL is needed (see .env.example).
 cp .env.example .env
-#   VITE_SUPABASE_URL=...
-#   VITE_SUPABASE_ANON_KEY=...
+#   VITE_API_URL=http://localhost:4000
 
 npm run dev      # http://localhost:5173
 npm run build    # type-check + production build to dist/
 npm run preview  # preview the production build
+```
+
+Then start the backend separately (its env lives in `server/.env` — see
+[`server/.env.example`](server/.env.example)):
+
+```bash
+cd server
+npm install
+cp .env.example .env   # SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, CORS_ORIGIN
+npm run dev            # http://localhost:4000
 ```
 
 ## Database
@@ -97,8 +120,12 @@ cp .env.example .env                # SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
 python upload_to_supabase.py        # bulk insert into the questions table
 ```
 
-## Deployment (Hostinger VPS)
+## Deployment (Vercel + Render)
 
-- `npm run build` → serve `dist/` with Nginx as static files.
-- Self-hosted Supabase via Docker; point `VITE_SUPABASE_URL` at the Kong gateway
-  (e.g. `https://api.yourdomain.com`).
+- **Frontend → Vercel.** Build the SPA (`npm run build` → `dist/`) and deploy
+  via [`vercel.json`](vercel.json). Set `VITE_API_URL` to your Render service URL.
+- **Backend → Render.** Deploy the Express API in `server/` via
+  [`render.yaml`](render.yaml); set its Supabase + `CORS_ORIGIN` env vars there.
+
+See [`docs/DEPLOY-VERCEL-RENDER.md`](docs/DEPLOY-VERCEL-RENDER.md) for the
+step-by-step walkthrough.

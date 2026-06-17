@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
+import { useLanguageStore, type Lang } from '../store/languageStore'
+import { api } from '../lib/api'
 import AuthShell from '../components/Auth/AuthShell'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
@@ -13,6 +15,12 @@ const TARGET_GROUPS = [
   { value: 'Group1', label: 'Group 1' },
   { value: 'Group2_2A', label: 'Group 2 / 2A' },
   { value: 'Group4_VAO', label: 'Group 4 & VAO' },
+]
+
+const LANGUAGES: { id: Lang; labelKey: StringKey }[] = [
+  { id: 'en', labelKey: 'langEnglish' },
+  { id: 'ta', labelKey: 'langTamil' },
+  { id: 'both', labelKey: 'langBoth' },
 ]
 
 const STRENGTH_META: { key: StringKey; color: string }[] = [
@@ -27,6 +35,7 @@ export default function RegisterPage() {
   const navigate = useNavigate()
   const { signUp } = useAuth()
   const { t } = useT()
+  const setLang = useLanguageStore((s) => s.setLang)
 
   const [form, setForm] = useState({
     fullName: '',
@@ -35,6 +44,7 @@ export default function RegisterPage() {
     password: '',
     confirm: '',
     targetGroup: 'Group1',
+    language: 'en' as Lang,
   })
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
@@ -76,8 +86,12 @@ export default function RegisterPage() {
       return
     }
 
+    // Apply the language chosen at signup right away (drives the UI), persist it
+    // to the profile when the account is live, and skip the language screen.
+    setLang(form.language)
     if (useAuthStore.getState().user) {
-      navigate('/language', { replace: true })
+      api.updateProfile({ language: form.language }).catch(() => {})
+      navigate('/test-arena', { replace: true })
     } else {
       setInfo(t('confirmEmailSent'))
     }
@@ -137,7 +151,7 @@ export default function RegisterPage() {
               autoComplete="new-password"
               invalid={touched && form.password.length > 0 && form.password.length < 6}
             />
-            {/* Password strength meter — animates as the user types. */}
+            {/* Password strength meter - animates as the user types. */}
             {form.password.length > 0 && (
               <div className="mt-2 flex items-center gap-2">
                 <div className="flex h-1.5 flex-1 gap-1">
@@ -198,6 +212,34 @@ export default function RegisterPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Preferred language - chosen at signup so the language screen is skipped */}
+          <div>
+            <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
+              {t('language')}
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {LANGUAGES.map((o) => {
+                const active = form.language === o.id
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, language: o.id }))}
+                    aria-pressed={active}
+                    className={[
+                      'tamil rounded-xl border px-3 py-2.5 font-heading text-sm font-semibold transition-all',
+                      active
+                        ? 'border-transparent bg-brand-gradient text-white shadow-brand'
+                        : 'border-line bg-card text-ink2 hover:border-brand/30',
+                    ].join(' ')}
+                  >
+                    {t(o.labelKey)}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {error && (

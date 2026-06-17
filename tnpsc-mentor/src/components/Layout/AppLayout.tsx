@@ -9,9 +9,13 @@ import {
   BarChart3,
   Bookmark,
   MessageSquarePlus,
+  Sun,
+  Moon,
 } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
+import { useThemeStore } from '../../store/themeStore'
+import { api } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import FeedbackModal from '../Feedback/FeedbackModal'
 
@@ -24,7 +28,16 @@ interface AppLayoutProps {
 const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
 const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
 
-// Learner navigation — the personal study tabs (spaced revision, progress
+// Feedback is accepted once every 3 months. The stored value is the last
+// submission's epoch (ms); returns true while still inside that window.
+const FEEDBACK_WINDOW_MS = 92 * 24 * 60 * 60 * 1000 // ~3 months
+function withinFeedbackWindow(key: string | null): boolean {
+  if (!key) return false
+  const last = Number(localStorage.getItem(key))
+  return Number.isFinite(last) && last > 0 && Date.now() - last < FEEDBACK_WINDOW_MS
+}
+
+// Learner navigation - the personal study tabs (spaced revision, progress
 // insights, profile) shown to regular users.
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
@@ -33,7 +46,7 @@ const LEARNER_NAV = [
   { to: '/profile', icon: User, key: 'profile' as const, short: 'profile' as const },
 ]
 
-// Admin/superadmin navigation — content managers don't use the personal
+// Admin/superadmin navigation - content managers don't use the personal
 // learner-progress tabs, so the nav is just the Test Arena (their gateway to
 // the question banks via the same picker, which routes them to the admin bank).
 const ADMIN_NAV = [
@@ -41,7 +54,7 @@ const ADMIN_NAV = [
 ]
 
 /**
- * Shared app shell — soft light canvas, a clean top brand bar, and a responsive
+ * Shared app shell - soft light canvas, a clean top brand bar, and a responsive
  * bottom tab bar (the primary navigation on phones; centred on larger screens).
  */
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
@@ -50,31 +63,36 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const { signOut, profile, isAdmin, isSuperAdmin, user } = useAuth()
   const { t } = useT()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
-  // Once a user has rated the app we hide the feedback entry point so we don't
-  // keep nudging them. Persisted per-user in localStorage (no extra request).
+  // Feedback is accepted once per 3 months (enforced server-side). After a user
+  // rates the app we hide the entry point for that window, then surface it again.
+  // Persisted per-user in localStorage as the last-submission epoch (no request).
   const feedbackKey = user?.id ? `tnpsc:feedbackGiven:${user.id}` : null
   const [feedbackGiven, setFeedbackGiven] = useState(
-    () => !!feedbackKey && localStorage.getItem(feedbackKey) === '1'
+    () => withinFeedbackWindow(feedbackKey)
   )
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
+  const resolvedTheme = useThemeStore((s) => s.resolved)
+  const toggleTheme = useThemeStore((s) => s.toggle)
 
   // Admins/superadmins manage content; learners get the study tabs.
   const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
 
   // Re-read once the auth bootstrap resolves the user id (key starts out null).
   useEffect(() => {
-    setFeedbackGiven(!!feedbackKey && localStorage.getItem(feedbackKey) === '1')
+    setFeedbackGiven(withinFeedbackWindow(feedbackKey))
   }, [feedbackKey])
 
   const markFeedbackGiven = () => {
-    if (feedbackKey) localStorage.setItem(feedbackKey, '1')
+    if (feedbackKey) localStorage.setItem(feedbackKey, String(Date.now()))
     setFeedbackGiven(true)
   }
 
   const cycleLang = () => {
-    const idx = LANG_CYCLE.indexOf(lang)
-    setLang(LANG_CYCLE[(idx + 1) % LANG_CYCLE.length])
+    const next = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length]
+    setLang(next)
+    // Keep the account preference in sync so the choice persists across devices.
+    api.updateProfile({ language: next }).catch(() => {})
   }
 
   const handleSignOut = async () => {
@@ -104,7 +122,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               </span>
             </button>
 
-            {/* Desktop primary nav — replaces the bottom tab bar on large screens. */}
+            {/* Desktop primary nav - replaces the bottom tab bar on large screens. */}
             <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
               {nav.map(({ to, icon: Icon, key }) => {
                 const active = isActive(to)
@@ -135,6 +153,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
               >
                 {LANG_LABEL[lang]}
+              </button>
+              <button
+                onClick={toggleTheme}
+                title={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
+                aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
+                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90"
+              >
+                {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               {!feedbackGiven && (
                 <button

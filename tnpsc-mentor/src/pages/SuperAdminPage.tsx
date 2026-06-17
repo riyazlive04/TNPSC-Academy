@@ -132,7 +132,7 @@ function OverviewTab() {
     { icon: FileCheck2, value: String(metrics.testsCompleted), label: 'testsCompleted', tile: 'bg-goldsoft text-gold' },
     { icon: FileMinus2, value: String(metrics.testsAbandoned ?? 0), label: 'testsAbandoned', tile: 'bg-coralsoft text-coral' },
     { icon: Database, value: String(metrics.totalQuestions), label: 'totalQuestions', tile: 'bg-brand-soft text-brand' },
-    { icon: Star, value: metrics.avgRating ? metrics.avgRating.toFixed(2) : '—', label: 'avgRating', tile: 'bg-goldsoft text-gold' },
+    { icon: Star, value: metrics.avgRating ? metrics.avgRating.toFixed(2) : '-', label: 'avgRating', tile: 'bg-goldsoft text-gold' },
     { icon: MessageSquare, value: String(metrics.feedbackCount), label: 'totalFeedback', tile: 'bg-accentwarmsoft text-accentwarm' },
   ]
 
@@ -205,7 +205,7 @@ function BreakdownCard({ title, data }: { title: string; data: Record<string, nu
     <div className="card p-5">
       <h2 className="mb-4 font-heading text-sm font-semibold text-ink">{title}</h2>
       <div className="space-y-3">
-        {entries.length === 0 && <p className="font-body text-sm text-ink2">—</p>}
+        {entries.length === 0 && <p className="font-body text-sm text-ink2">-</p>}
         {entries.map(([k, v]) => (
           <div key={k}>
             <div className="mb-1 flex items-center justify-between font-body text-xs">
@@ -317,7 +317,7 @@ function UsersTab() {
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-heading text-sm font-semibold text-ink">
-                  {u.full_name || '—'}
+                  {u.full_name || '-'}
                 </p>
                 <p className="truncate font-body text-xs text-ink2">{u.email}</p>
               </div>
@@ -328,7 +328,7 @@ function UsersTab() {
               <select
                 value={u.role}
                 onChange={(e) => setPending({ user: u, role: e.target.value as UserRole })}
-                aria-label={`${t('role')} — ${u.email}`}
+                aria-label={`${t('role')} - ${u.email}`}
                 className="focus-ring rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs font-semibold text-ink transition hover:border-brand/40"
               >
                 {(['user', 'admin', 'superadmin'] as UserRole[]).map((r) => (
@@ -377,7 +377,7 @@ function FeedbackTab() {
 
   const avg = items.length
     ? (items.reduce((s, f) => s + f.rating, 0) / items.length).toFixed(2)
-    : '—'
+    : '-'
 
   if (loading) {
     return (

@@ -38,7 +38,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           </h1>
           <p className="max-w-sm font-body text-sm text-white/70">
             An unexpected error interrupted the page. Your progress is saved where
-            possible — try reloading.
+            possible - try reloading.
           </p>
           <button
             onClick={this.handleReload}

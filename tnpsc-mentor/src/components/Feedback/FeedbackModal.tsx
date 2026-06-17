@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Star, X } from 'lucide-react'
 import Spinner from '../UI/Spinner'
-import { api } from '../../lib/api'
+import { api, ApiError } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
 
@@ -13,7 +13,7 @@ interface FeedbackModalProps {
 }
 
 /**
- * Lightweight, user-initiated app rating + message. 1–5 stars (with hover
+ * Lightweight, user-initiated app rating + message. 1-5 stars (with hover
  * preview + pop animation), optional comment, auto-captured page. Submits via
  * api.feedback.submit, then toasts a thank-you. Escape / click-outside closes.
  */
@@ -52,8 +52,16 @@ export default function FeedbackModal({ open, onClose, onSubmitted }: FeedbackMo
       toast.success(t('feedbackThanks'))
       onSubmitted?.()
       onClose()
-    } catch {
-      toast.error(t('feedbackError'))
+    } catch (e) {
+      // Already submitted within the last 3 months - treat as a soft success so
+      // we still retire the entry point, but tell them why nothing was saved.
+      if (e instanceof ApiError && e.status === 429) {
+        toast.success(t('feedbackRateLimited'))
+        onSubmitted?.()
+        onClose()
+      } else {
+        toast.error(t('feedbackError'))
+      }
     } finally {
       setSaving(false)
     }

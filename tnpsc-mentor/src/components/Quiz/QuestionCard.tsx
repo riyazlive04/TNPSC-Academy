@@ -1,9 +1,10 @@
-import type { AnswerLetter, Question } from '../../types'
+import type { AnswerLetter, DisplayLang, Question } from '../../types'
 import { LETTERS, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
 import QuestionFigures from './QuestionFigures'
 import QuestionStem from './QuestionStem'
 import { useT } from '../../lib/i18n'
+import { topicName } from '../../lib/constants'
 
 interface QuestionCardProps {
   question: Question
@@ -14,6 +15,9 @@ interface QuestionCardProps {
   /** review/admin grading mode */
   reveal?: boolean
   disabled?: boolean
+  /** Overrides the UI language for the question CONTENT only (in-test bilingual
+   *  toggle). Falls back to the user's interface language when omitted. */
+  displayLang?: DisplayLang
 }
 
 /**
@@ -28,15 +32,24 @@ export default function QuestionCard({
   onSelect,
   reveal = false,
   disabled = false,
+  displayLang,
 }: QuestionCardProps) {
-  const { t, lang } = useT()
+  const { t, lang: uiLang } = useT()
+  const lang = displayLang ?? uiLang
   return (
-    <div className="animate-fadeIn rounded-3xl bg-white p-5 shadow-card sm:p-7">
+    <div className="animate-fadeIn rounded-3xl border border-line bg-card p-5 shadow-card sm:p-7">
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="tamil font-heading text-sm font-bold uppercase tracking-wide text-secondary">
           {t('question')} {index + 1} {t('of')} {total}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center justify-end gap-2">
+          {/* Topic label - useful for PYQ, where every question carries its own
+              topic (e.g. "Ozone Depletion Cause"). */}
+          {question.topic && (
+            <span className="tamil max-w-[55vw] truncate rounded-full bg-brand-soft px-3 py-1 font-heading text-xs font-semibold text-brand sm:max-w-[16rem]">
+              {topicName(question.topic, lang)}
+            </span>
+          )}
           {question.category === 'current_affairs' && question.ca_month && (
             <span className="rounded-full bg-secondary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-secondary">
               {question.ca_month}

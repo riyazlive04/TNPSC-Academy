@@ -65,17 +65,17 @@ export default function BulkImportPanel({ onClose, onImported }: BulkImportPanel
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
-      <div className="animate-pop my-4 w-full max-w-xl rounded-3xl bg-white p-5 shadow-card sm:p-6">
+      <div className="animate-pop my-4 w-full max-w-xl rounded-3xl border border-line bg-card p-5 shadow-card sm:p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-heading text-xl font-bold text-navytext">Bulk Import Questions</h3>
-          <button onClick={onClose} className="rounded-full p-1.5 text-ink2 transition hover:bg-black/5" aria-label="Close">
+          <button onClick={onClose} className="rounded-full p-1.5 text-ink2 transition hover:bg-ink/5" aria-label="Close">
             <X size={20} />
           </button>
         </div>
 
         <p className="mb-4 font-body text-sm text-ink2">
           Upload a <strong>CSV</strong> or <strong>JSON</strong> file. Required columns:
-          <code className="mx-1 rounded bg-canvas px-1 text-xs">category, question_text, option_a–d, correct_answer</code>.
+          <code className="mx-1 rounded bg-canvas px-1 text-xs">category, question_text, option_a-d, correct_answer</code>.
           Every imported row is tagged <code className="rounded bg-canvas px-1 text-xs">tnpsc-official</code> so the old
           mock bank can be removed afterwards. See <code className="rounded bg-canvas px-1 text-xs">docs/IMPORT-FORMAT.md</code>.
         </p>

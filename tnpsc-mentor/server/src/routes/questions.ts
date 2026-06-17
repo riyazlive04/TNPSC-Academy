@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { asyncH, sendDbError } from '../util.js'
+import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 
 const router = Router()
 
-// Columns safe to return to the client (answers stripped at column-grant level,
-// but we also list them explicitly to be unambiguous).
+// Columns safe to return to the client during a quiz (answer/explanation columns
+// are stripped at the column-grant level; listed explicitly for the fallbacks).
 const QUIZ_COLS = [
   'id', 'category', 'group_type', 'year', 'standard',
   'ca_month', 'ca_year', 'ca_type', 'ca_topic',
@@ -165,6 +165,40 @@ router.post(
   })
 )
 
+// ─── POST /api/questions/count ───────────────────────────────────────────────
+// How many questions are available for a config — bounds the question-count
+// slider on the pre-test setup screen. Mirrors get_quiz_questions' filters.
+router.post(
+  '/count',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const config = req.body?.config ?? {}
+    const { data, error } = await req.db!.rpc('count_quiz_questions', { p_config: config })
+    if (!error) return res.json({ count: Number(data ?? 0) })
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): a HEAD count with the same core filters.
+    let q = req.db!
+      .from('questions')
+      .select('id', { count: 'exact', head: true })
+      .eq('active', true)
+    if (config.category) q = q.eq('category', config.category)
+    if (config.subject) q = q.eq('subject', config.subject)
+    if (config.standard != null) q = q.eq('standard', config.standard)
+    if (config.topic) q = q.eq('topic', config.topic)
+    if (config.unit) q = q.eq('unit', config.unit)
+    if (config.question_type) q = q.eq('question_type', config.question_type)
+    if (config.ca_type) q = q.eq('ca_type', config.ca_type)
+    if (config.ca_month) q = q.eq('ca_month', config.ca_month)
+    if (config.ca_topic) q = q.eq('ca_topic', config.ca_topic)
+    if (config.aptitude_type) q = q.eq('aptitude_type', config.aptitude_type)
+    if (config.aptitude_topic) q = q.eq('aptitude_topic', config.aptitude_topic)
+    const { count, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
+    res.json({ count: count ?? 0 })
+  })
+)
+
 // ─── POST /api/questions/topics ──────────────────────────────────────────────
 // Distinct topic list for a picker (Samacheer `topic`, Current-Affairs `ca_topic`).
 router.post(
@@ -172,101 +206,49 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const { category, subject, standard, aptitude_type } = req.body ?? {}
+    const known = ['aptitude', 'samacheer', 'pyq', 'subject', 'current_affairs']
+    if (!known.includes(category)) return res.json({ topics: [] })
 
-    if (category === 'aptitude') {
-      // Aptitude bank: distinct topics for a chosen sub-category (numerics /
-      // reasoning), active rows only so empty/hidden topics don't surface.
-      let q = req.db!
-        .from('questions')
-        .select('aptitude_topic')
-        .eq('category', 'aptitude')
-        .eq('active', true)
-        .not('aptitude_topic', 'is', null)
-      if (aptitude_type) q = q.eq('aptitude_type', aptitude_type)
-      const { data, error } = await q
-      if (error) return sendDbError(res, error)
-      const topics = Array.from(
-        new Set(
-          (data ?? []).map((r: { aptitude_topic: string | null }) => r.aptitude_topic).filter(Boolean)
-        )
-      ).sort()
+    // DISTINCT is computed server-side (distinct_question_topics RPC) so banks
+    // larger than 1000 rows don't get truncated by PostgREST's row cap. The RPC
+    // encapsulates the per-category column logic (aptitude_topic / topic /
+    // topic-or-ca_topic) and active-row rules.
+    const { data, error } = await req.db!.rpc('distinct_question_topics', {
+      p_config: {
+        category,
+        subject: subject ?? null,
+        standard: standard ?? null,
+        aptitude_type: aptitude_type ?? null,
+      },
+    })
+    if (!error) {
+      const topics = ((data ?? []) as { topic: string }[]).map((r) => r.topic)
       return res.json({ topics })
     }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
 
-    if (category === 'samacheer') {
-      let q = req.db!
-        .from('questions')
-        .select('topic')
-        .eq('category', 'samacheer')
-        .not('topic', 'is', null)
-      if (subject) q = q.eq('subject', subject)
-      if (standard != null) q = q.eq('standard', standard)
-      const { data, error } = await q
-      if (error) return sendDbError(res, error)
-      const topics = Array.from(
-        new Set((data ?? []).map((r: { topic: string | null }) => r.topic).filter(Boolean))
-      )
-      return res.json({ topics })
+    // Fallback (RPC not migrated yet): distinct in JS, per-category column logic.
+    const col = category === 'aptitude' ? 'aptitude_topic'
+      : category === 'current_affairs' ? 'topic, ca_topic'
+      : 'topic'
+    let q = req.db!.from('questions').select(col).eq('category', category)
+    // samacheer + current_affairs historically include inactive rows.
+    if (category !== 'samacheer' && category !== 'current_affairs') {
+      q = q.eq('active', true)
     }
-
-    if (category === 'pyq') {
-      // PYQ topic-level practice (currently used by the Aptitude subject, whose
-      // imported bank carries fine-grained topics). Only ACTIVE rows so hidden
-      // legacy questions don't leave dead topic pills. group_type is intentionally
-      // not filtered — it mirrors get_quiz_questions, which pools PYQ by subject.
-      let q = req.db!
-        .from('questions')
-        .select('topic')
-        .eq('category', 'pyq')
-        .eq('active', true)
-        .not('topic', 'is', null)
-      if (subject) q = q.eq('subject', subject)
-      const { data, error } = await q
-      if (error) return sendDbError(res, error)
-      const topics = Array.from(
-        new Set((data ?? []).map((r: { topic: string | null }) => r.topic).filter(Boolean))
-      ).sort()
-      return res.json({ topics })
+    if (subject) q = q.eq('subject', subject)
+    if (category === 'samacheer' && standard != null) q = q.eq('standard', standard)
+    if (category === 'aptitude' && aptitude_type) q = q.eq('aptitude_type', aptitude_type)
+    const { data: rows, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
+    const set = new Set<string>()
+    for (const r of (rows ?? []) as unknown as Record<string, string | null>[]) {
+      const v = category === 'aptitude' ? r.aptitude_topic
+        : category === 'current_affairs' ? (r.topic ?? r.ca_topic)
+        : r.topic
+      if (v) set.add(v)
     }
-
-    if (category === 'subject') {
-      // Subject Practice bank: distinct topics for a chosen subject (active only).
-      let q = req.db!
-        .from('questions')
-        .select('topic')
-        .eq('category', 'subject')
-        .eq('active', true)
-        .not('topic', 'is', null)
-      if (subject) q = q.eq('subject', subject)
-      const { data, error } = await q
-      if (error) return sendDbError(res, error)
-      const topics = Array.from(
-        new Set((data ?? []).map((r: { topic: string | null }) => r.topic).filter(Boolean))
-      ).sort()
-      return res.json({ topics })
-    }
-
-    if (category === 'current_affairs') {
-      // Topic-wise CA is driven by the question `topic` column (e.g. 'Tamil Nadu',
-      // 'Economy', 'Sports') — the imported real bank tags every row this way.
-      // (Legacy ca_topic/ca_type='topic_wise' rows, if any, are also covered by
-      // falling back to ca_topic when topic is absent.)
-      const { data, error } = await req.db!
-        .from('questions')
-        .select('topic, ca_topic')
-        .eq('category', 'current_affairs')
-      if (error) return sendDbError(res, error)
-      const topics = Array.from(
-        new Set(
-          (data ?? [])
-            .map((r: { topic: string | null; ca_topic: string | null }) => r.topic ?? r.ca_topic)
-            .filter(Boolean)
-        )
-      ).sort()
-      return res.json({ topics })
-    }
-
-    res.json({ topics: [] })
+    res.json({ topics: [...set].sort() })
   })
 )
 
@@ -274,23 +256,33 @@ router.post(
 // Counts the PYQ History bank (category='pyq', subject='History and INM') by
 // historical period — the `unit` column holds 'ancient' | 'medieval' | 'modern'.
 // Powers the three-criteria History selector (counts + disable empty periods).
-const HISTORY_PYQ_SUBJECT = 'History and INM'
 router.post(
   '/history-periods',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { data, error } = await req.db!
+    // Grouped server-side so counts are correct on banks larger than 1000 rows.
+    const { data, error } = await req.db!.rpc('pyq_history_period_counts')
+    if (!error) {
+      const counts: Record<string, number> = {}
+      for (const r of (data ?? []) as { value: string; total: number }[]) {
+        counts[r.value] = Number(r.total)
+      }
+      return res.json({ counts })
+    }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): count in JS.
+    const { data: rows, error: e2 } = await req.db!
       .from('questions')
       .select('unit')
       .eq('category', 'pyq')
-      .eq('subject', HISTORY_PYQ_SUBJECT)
+      .eq('subject', 'History and INM')
       .eq('active', true)
       .not('unit', 'is', null)
-    if (error) return sendDbError(res, error)
+    if (e2) return sendDbError(res, e2)
     const counts: Record<string, number> = {}
-    for (const r of (data ?? []) as { unit: string | null }[]) {
-      if (!r.unit) continue
-      counts[r.unit] = (counts[r.unit] ?? 0) + 1
+    for (const r of (rows ?? []) as { unit: string | null }[]) {
+      if (r.unit) counts[r.unit] = (counts[r.unit] ?? 0) + 1
     }
     res.json({ counts })
   })
@@ -328,6 +320,21 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const { subject, topic } = req.body ?? {}
+    // Grouped server-side so counts are correct on banks larger than 1000 rows.
+    const { data, error } = await req.db!.rpc('subject_qtype_counts', {
+      p_subject: subject ?? null,
+      p_topic: topic ?? null,
+    })
+    if (!error) {
+      const counts: Record<string, number> = {}
+      for (const r of (data ?? []) as { value: string; total: number }[]) {
+        counts[r.value] = Number(r.total)
+      }
+      return res.json({ counts })
+    }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): count in JS.
     let q = req.db!
       .from('questions')
       .select('question_type')
@@ -336,12 +343,11 @@ router.post(
       .not('question_type', 'is', null)
     if (subject) q = q.eq('subject', subject)
     if (topic) q = q.eq('topic', topic)
-    const { data, error } = await q
-    if (error) return sendDbError(res, error)
+    const { data: rows, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
     const counts: Record<string, number> = {}
-    for (const r of (data ?? []) as { question_type: string | null }[]) {
-      if (!r.question_type) continue
-      counts[r.question_type] = (counts[r.question_type] ?? 0) + 1
+    for (const r of (rows ?? []) as { question_type: string | null }[]) {
+      if (r.question_type) counts[r.question_type] = (counts[r.question_type] ?? 0) + 1
     }
     res.json({ counts })
   })
@@ -360,28 +366,60 @@ router.post(
     if (!slots) return res.status(400).json({ error: `Unknown group_type: ${group_type}` })
 
     const result: Record<string, unknown>[] = []
+    // Dedup ACROSS slots too (a question tagged for two slots must appear once).
+    const globalSeen = new Set<string>()
 
     for (const slot of slots) {
-      const pool: Record<string, unknown>[] = []
-      const seen = new Set<string>()
-
-      for (const qdef of slot.queries) {
-        let q = req.db!
-          .from('questions')
-          .select(QUIZ_COLS)
-          .eq('category', qdef.category)
-          .eq('active', true)
-        if (qdef.subjects?.length) q = q.in('subject', qdef.subjects)
-        const { data, error } = await q
-        if (error) return sendDbError(res, error)
-        for (const row of (data ?? []) as unknown as Record<string, unknown>[]) {
-          const id = row.id as string
-          if (!seen.has(id)) { seen.add(id); pool.push(row) }
+      // Sampling (dedup + ORDER BY random + limit) happens in the RPC, so it's
+      // not capped by PostgREST's 1000-row limit — the previous plain select
+      // only ever shuffled the first 1000 rows of each (much larger) bank.
+      let rows: Record<string, unknown>[]
+      const { data, error } = await req.db!.rpc('mock_slot_questions', {
+        p_queries: slot.queries.map((qd) => ({
+          category: qd.category,
+          subjects: qd.subjects ?? null,
+        })),
+        p_count: slot.count,
+      })
+      if (!error) {
+        rows = (data ?? []) as unknown as Record<string, unknown>[]
+      } else if (isMissingFunction(error)) {
+        // Fallback (RPC not migrated yet): pool each query, shuffle, take count.
+        const pool: Record<string, unknown>[] = []
+        const seen = new Set<string>()
+        for (const qdef of slot.queries) {
+          let q = req.db!
+            .from('questions')
+            .select(QUIZ_COLS)
+            .eq('category', qdef.category)
+            .eq('active', true)
+          if (qdef.subjects?.length) q = q.in('subject', qdef.subjects)
+          const { data: qd, error: e2 } = await q
+          if (e2) return sendDbError(res, e2)
+          for (const row of (qd ?? []) as unknown as Record<string, unknown>[]) {
+            const id = row.id as string
+            if (!seen.has(id)) { seen.add(id); pool.push(row) }
+          }
         }
+        rows = shuffle(pool).slice(0, slot.count)
+      } else {
+        return sendDbError(res, error)
       }
 
-      const picked = shuffle(pool).slice(0, slot.count)
-      result.push(...picked)
+      let picked = 0
+      for (const row of rows) {
+        const id = row.id as string
+        if (globalSeen.has(id)) continue
+        globalSeen.add(id)
+        result.push(row)
+        picked++
+      }
+      if (picked < slot.count) {
+        // Surface thin pools instead of silently delivering a short test.
+        console.warn(
+          `[mock-group] ${group_type} slot "${slot.label}" filled ${picked}/${slot.count}`
+        )
+      }
     }
 
     res.json({ questions: shuffle(result) })
@@ -396,7 +434,22 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const { subject, topic, difficulty, count = 50 } = req.body ?? {}
+    // Clamp the requested count to a sane range (the RPC also clamps to [1,200],
+    // but guard here so a NaN/negative never reaches it).
+    const n = Math.min(Math.max(Math.trunc(Number(count)) || 50, 1), 200)
 
+    // Random sampling done server-side (ORDER BY random + limit) so it's not
+    // limited to the first 1000 rows of the subject bank.
+    const { data, error } = await req.db!.rpc('subject_mock_questions', {
+      p_subject: subject ?? null,
+      p_topic: topic ?? null,
+      p_difficulty: difficulty ?? null,
+      p_count: n,
+    })
+    if (!error) return res.json({ questions: data ?? [] })
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): fetch then shuffle/slice in JS.
     let q = req.db!
       .from('questions')
       .select(QUIZ_COLS)
@@ -405,12 +458,9 @@ router.post(
     if (subject) q = q.eq('subject', subject)
     if (topic) q = q.eq('topic', topic)
     if (difficulty) q = q.eq('difficulty', difficulty)
-
-    const { data, error } = await q
-    if (error) return sendDbError(res, error)
-
-    const rows = (data ?? []) as unknown as Record<string, unknown>[]
-    const questions = shuffle(rows).slice(0, Number(count))
+    const { data: rows, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
+    const questions = shuffle((rows ?? []) as unknown as Record<string, unknown>[]).slice(0, n)
     res.json({ questions })
   })
 )

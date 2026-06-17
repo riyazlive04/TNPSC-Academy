@@ -203,6 +203,11 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
+-- Preferred UI language (account-bound; chosen once at onboarding, editable from
+-- the Profile page). Idempotent so re-running the schema is safe.
+alter table profiles add column if not exists language text
+  check (language in ('en', 'ta', 'both'));
+
 -- ─── Row Level Security ─────────────────────────────────────────────────────
 alter table questions enable row level security;
 alter table test_sessions enable row level security;
@@ -251,10 +256,36 @@ create policy "Users can manage own answers"
     select id from test_sessions where user_id = auth.uid()
   ));
 
+-- Profile access is split so a user CANNOT escalate their own privileges.
+-- The previous "for all" policy with no `with check` let any authenticated user
+-- PATCH their own row's `role` to 'admin'/'superadmin' via PostgREST directly
+-- (the anon key + URL ship to every browser). Role changes must flow only
+-- through the is_superadmin()-gated superadmin_set_role RPC (SECURITY DEFINER,
+-- which bypasses RLS, so the with-check below never blocks it).
 drop policy if exists "Users can manage own profile" on profiles;
-create policy "Users can manage own profile"
-  on profiles for all to authenticated
+drop policy if exists "Users can read own profile" on profiles;
+drop policy if exists "Users can insert own profile" on profiles;
+drop policy if exists "Users can update own profile" on profiles;
+
+create policy "Users can read own profile"
+  on profiles for select to authenticated
   using (auth.uid() = id);
+
+create policy "Users can insert own profile"
+  on profiles for insert to authenticated
+  with check (auth.uid() = id and role = 'user');
+
+create policy "Users can update own profile"
+  on profiles for update to authenticated
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    -- role must remain exactly what it already is; no self-escalation.
+    and role is not distinct from (select p.role from public.profiles p where p.id = auth.uid())
+  );
+
+-- Defense in depth: even if a future policy is loosened, revoke the column grant.
+revoke update (role) on public.profiles from authenticated;
 
 -- ─── Auto-create profile on signup ──────────────────────────────────────────
 create or replace function public.handle_new_user()

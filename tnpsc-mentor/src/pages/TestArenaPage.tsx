@@ -12,7 +12,6 @@ import {
   CalendarClock,
   Target,
   ChevronRight,
-  Sparkles,
   Layers,
   Activity,
 } from 'lucide-react'
@@ -77,7 +76,7 @@ const CARDS: ArenaCard[] = [
 ]
 
 // The admin "Manage Question Bank" grid lists only the actual question-bank
-// categories — the Mock Test card (a student exam mode, not a bank) is excluded.
+// categories - the Mock Test card (a student exam mode, not a bank) is excluded.
 const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 
 export default function TestArenaPage() {
@@ -88,7 +87,7 @@ export default function TestArenaPage() {
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
 
   useEffect(() => {
-    // Admins/superadmins don't use the aspirant gamification layer — skip the
+    // Admins/superadmins don't use the aspirant gamification layer - skip the
     // habit/analytics fetches entirely for them.
     if (!user || isAdmin) return
     let cancelled = false
@@ -123,7 +122,7 @@ export default function TestArenaPage() {
   )
 
   // Seed the reward baseline once, so the celebration overlay (on the Result
-  // page) only fires for progress earned AFTER this point — never a backlog.
+  // page) only fires for progress earned AFTER this point - never a backlog.
   const syncProgress = useProgressStore((s) => s.sync)
   useEffect(() => {
     if (!analytics || !habit) return
@@ -144,7 +143,7 @@ export default function TestArenaPage() {
   }, [analytics, habit, profile, lvl.level, syncProgress])
 
   // ─── Admin / superadmin: a focused content-management home (no aspirant
-  // gamification — no level, streak, daily goal or achievements). ──────────────
+  // gamification - no level, streak, daily goal or achievements). ──────────────
   if (isAdmin) {
     return (
       <AdminDashboard
@@ -161,7 +160,7 @@ export default function TestArenaPage() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:py-8">
-        {/* Greeting — compact royal-blue strip (no gamification) */}
+        {/* Greeting - compact royal-blue strip (no gamification) */}
         <div className="hero-panel relative flex items-center justify-between gap-4 p-5 animate-slideDown lg:p-6">
           <div
             className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
@@ -174,10 +173,9 @@ export default function TestArenaPage() {
             </h1>
             <p className="tamil mt-1 font-body text-sm text-white/70">{t('dashboardSub')}</p>
           </div>
-          <Sparkles size={40} className="relative hidden flex-shrink-0 text-white/20 sm:block" />
         </div>
 
-        {/* Progress rail — feature-flagged; rendered as a row when re-enabled */}
+        {/* Progress rail - feature-flagged; rendered as a row when re-enabled */}
         {showRail && habit && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -220,7 +218,7 @@ export default function TestArenaPage() {
                   </div>
                   <ProgressBar
                     percent={goalPct}
-                    color={habit.goalMetToday ? '#16A34A' : '#2563EB'}
+                    color={habit.goalMetToday ? 'rgb(var(--c-mint))' : 'rgb(var(--c-brand))'}
                     height={6}
                   />
                 </div>
@@ -232,7 +230,7 @@ export default function TestArenaPage() {
           </div>
         )}
 
-        {/* Practice categories — bento tiles */}
+        {/* Practice categories - bento tiles */}
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
           {restCards.map((card, i) => (
             <button
@@ -256,7 +254,7 @@ export default function TestArenaPage() {
           ))}
         </div>
 
-        {/* Keep going — study-loop quick links */}
+        {/* Keep going - study-loop quick links */}
         <div>
           <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
             Keep going
@@ -280,7 +278,7 @@ export default function TestArenaPage() {
           </div>
         </div>
 
-        {/* Mock Tests — full-width gradient CTA at the bottom */}
+        {/* Mock Tests - full-width gradient CTA at the bottom */}
         <button
           onClick={() => navigate(featured.to)}
           className="hero-panel interactive group relative flex w-full items-center gap-4 p-6 text-left"
@@ -308,7 +306,7 @@ export default function TestArenaPage() {
 }
 
 /**
- * Admin / superadmin home — a clean content-management surface. No aspirant
+ * Admin / superadmin home - a clean content-management surface. No aspirant
  * gamification (level, streak, daily goal, achievements). Picking a category
  * routes (via useStartTest) into the full question-bank view with answers shown.
  */
@@ -326,7 +324,7 @@ function AdminDashboard({
   return (
     <AppLayout>
       <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
-        {/* Admin header — restrained, role-aware, no gamification */}
+        {/* Admin header - restrained, role-aware, no gamification */}
         <div className="hero-panel mb-6 flex items-center justify-between gap-4 p-6 animate-slideDown">
           <div className="min-w-0">
             <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white ring-1 ring-white/20">

@@ -17,6 +17,18 @@ const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replac
 /** When false the app runs in "UI-preview" mode (no backend, no auth gate). */
 export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
 
+/**
+ * Fire-and-forget ping to /api/health. The API runs on Render's free plan, which
+ * spins the container down after ~15 min idle and takes 30-60s to cold-start.
+ * Calling this on app mount starts that wake-up in parallel with the rest of the
+ * boot, so the server is (often already) warm by the time the user navigates.
+ * A scheduled cron (see .github/workflows/keep-alive.yml) keeps it warm even
+ * when no one is on the site.
+ */
+export function warmApi(): void {
+  fetch(`${API_URL}/api/health`).catch(() => {})
+}
+
 const ACCESS_KEY = 'tnpsc_access_token'
 const REFRESH_KEY = 'tnpsc_refresh_token'
 
@@ -170,6 +182,13 @@ export const api = {
       body: { config },
     })
     return data.questions
+  },
+  async countQuestions(config: QuizConfig): Promise<number> {
+    const data = await request<{ count: number }>('/api/questions/count', {
+      method: 'POST',
+      body: { config },
+    })
+    return data.count
   },
   async submitTest(session: Record<string, unknown>, answers: unknown[]): Promise<SubmitResult> {
     return request<SubmitResult>('/api/tests/submit', {

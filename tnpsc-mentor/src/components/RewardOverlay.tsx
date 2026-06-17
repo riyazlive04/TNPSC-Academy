@@ -21,8 +21,8 @@ interface RewardOverlayProps {
 
 /**
  * Minimal celebration shown after a test when the user levels up and/or unlocks
- * new badges — plus the daily-challenge reward when one was just earned.
- * Restrained, premium — no confetti.
+ * new badges - plus the daily-challenge reward when one was just earned.
+ * Restrained, premium - no confetti.
  */
 export default function RewardOverlay({ leveledTo, newBadges, daily, onClose }: RewardOverlayProps) {
   const { t } = useT()

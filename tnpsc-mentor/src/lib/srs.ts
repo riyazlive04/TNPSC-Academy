@@ -4,7 +4,7 @@ import type { AnswerLetter, Question } from '../types'
 // Spaced-repetition (SM-2-lite). Wrong/flagged questions are enqueued and
 // resurface on a growing interval as the user gets them right. Enqueueing,
 // grading and rescheduling all happen server-side (see secure.sql) so the
-// answer key is never shipped to the browser — this module is the thin client.
+// answer key is never shipped to the browser - this module is the thin client.
 
 export interface ReviewItem {
   id: string
@@ -22,7 +22,7 @@ export async function enqueueReviewItems(userId: string, questionIds: string[]) 
   try {
     await api.enqueueReviews(questionIds)
   } catch {
-    /* non-fatal — table may not exist until ALTERs are run */
+    /* non-fatal - table may not exist until ALTERs are run */
   }
 }
 
@@ -47,6 +47,7 @@ interface DueRow {
   aptitude_topic?: string
   subject?: string
   topic?: string
+  question_type?: Question['question_type']
   question_text: string
   option_a: string
   option_b: string
@@ -60,7 +61,7 @@ interface DueRow {
   option_d_ta?: string | null
 }
 
-/** Items due now (with their question — no answers), oldest-due first. */
+/** Items due now (with their question - no answers), oldest-due first. */
 export async function fetchDueItems(_userId: string, limit = 30): Promise<ReviewItem[]> {
   try {
     const data = await api.dueReviews(limit)
@@ -86,6 +87,9 @@ export async function fetchDueItems(_userId: string, limit = 30): Promise<Review
         aptitude_topic: r.aptitude_topic,
         subject: r.subject,
         topic: r.topic,
+        // Needed so "Match the Following" questions render as the side-by-side
+        // grid (QuestionStem keys off question_type === 'match') in revision too.
+        question_type: r.question_type,
         question_text: r.question_text,
         option_a: r.option_a,
         option_b: r.option_b,

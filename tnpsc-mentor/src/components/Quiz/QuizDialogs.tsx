@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { AlertTriangle } from 'lucide-react'
+import { useT } from '../../lib/i18n'
 
 /** Full-screen loading / error / empty states shown before the quiz renders. */
 export function CenteredMessage({ children }: { children: ReactNode }) {
@@ -10,14 +11,54 @@ export function CenteredMessage({ children }: { children: ReactNode }) {
   )
 }
 
-/** Shared modal shell (dimmed backdrop + popped card with a warning header). */
-function ModalShell({ title, children }: { title: string; children: ReactNode }) {
+/**
+ * Shared modal shell (dimmed backdrop + popped card with a warning header).
+ * Accessible: announced as a dialog, labelled by its title, closes on Escape,
+ * and moves initial focus to the dialog container on open.
+ */
+function ModalShell({
+  title,
+  children,
+  onClose,
+}: {
+  title: string
+  children: ReactNode
+  /** Optional dismiss handler invoked when the user presses Escape. */
+  onClose?: () => void
+}) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+
+  // Move focus into the dialog on open so keyboard / screen-reader users land here.
+  useEffect(() => {
+    dialogRef.current?.focus()
+  }, [])
+
+  // Close on Escape (when a dismiss handler is provided).
+  useEffect(() => {
+    if (!onClose) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="animate-pop w-full max-w-md rounded-3xl bg-white p-6 shadow-card">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="animate-pop w-full max-w-md rounded-3xl border border-line bg-card p-6 shadow-card outline-none"
+      >
         <div className="mb-3 flex items-center gap-2 text-warn">
           <AlertTriangle size={24} />
-          <h3 className="font-heading text-xl font-bold uppercase text-navytext">{title}</h3>
+          <h3 id={titleId} className="font-heading text-xl font-bold uppercase text-navytext">
+            {title}
+          </h3>
         </div>
         {children}
       </div>
@@ -39,24 +80,24 @@ export function AttendanceGateModal({
   onSubmitAnyway,
   onContinue,
 }: AttendanceGateModalProps) {
+  const { t } = useT()
   const pct = total > 0 ? Math.round((attempted / total) * 100) : 0
   return (
-    <ModalShell title="Attendance below 25%">
+    <ModalShell title={t('attendanceBelow25')} onClose={onContinue}>
       <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">
-        You have attempted <span className="font-bold">{attempted}/{total}</span> ({pct}
-        %). You must attempt at least <span className="font-bold">25%</span> of the
-        questions to unlock the explanations. You can still submit now to see your
-        score only.
+        {t('attendanceAttemptedLine')}{' '}
+        <span className="font-bold">{attempted}/{total}</span> ({pct}%).{' '}
+        {t('attendanceGateMsg')}
       </p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <button
           onClick={onSubmitAnyway}
           className="flex-1 rounded-full bg-navytext px-5 py-3 font-heading text-sm font-bold uppercase text-white transition hover:opacity-90"
         >
-          Submit Anyway (Score Only)
+          {t('submitAnywayScore')}
         </button>
         <button onClick={onContinue} className="btn-brand flex-1 px-5 py-3 text-sm">
-          Continue Test
+          {t('continueTest')}
         </button>
       </div>
     </ModalShell>
@@ -71,29 +112,30 @@ interface ExitTestModalProps {
 
 /** Shown when a student tries to exit a practice test mid-way. */
 export function ExitTestModal({ onEvaluate, onDiscard, onCancel }: ExitTestModalProps) {
+  const { t } = useT()
   return (
-    <ModalShell title="Exit Test?">
+    <ModalShell title={t('exitTestTitle')} onClose={onCancel}>
       <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">
-        What would you like to do with your progress so far?
+        {t('exitTestMsg')}
       </p>
       <div className="flex flex-col gap-2">
         <button
           onClick={onEvaluate}
           className="btn-brand w-full px-5 py-3 text-sm"
         >
-          Submit &amp; See Results
+          {t('submitSeeResults')}
         </button>
         <button
           onClick={onDiscard}
           className="w-full rounded-full bg-coral px-5 py-3 font-heading text-sm font-bold uppercase text-white transition hover:opacity-90"
         >
-          Exit Without Saving
+          {t('exitWithoutSaving')}
         </button>
         <button
           onClick={onCancel}
           className="w-full rounded-full border border-line px-5 py-3 font-heading text-sm font-semibold text-ink2 transition hover:border-brand-ring"
         >
-          Keep Going
+          {t('keepGoingBtn')}
         </button>
       </div>
     </ModalShell>
@@ -108,18 +150,19 @@ interface SubmitErrorModalProps {
 
 /** Shown when server-side grading fails; offers a retry or re-auth. */
 export function SubmitErrorModal({ message, onRetry, onSignIn }: SubmitErrorModalProps) {
+  const { t } = useT()
   return (
-    <ModalShell title="Submit failed">
+    <ModalShell title={t('submitFailed')}>
       <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">{message}</p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <button onClick={onRetry} className="btn-brand flex-1 px-5 py-3 text-sm">
-          Retry Submit
+          {t('retrySubmit')}
         </button>
         <button
           onClick={onSignIn}
           className="flex-1 rounded-full bg-navytext px-5 py-3 font-heading text-sm font-bold uppercase text-white transition hover:opacity-90"
         >
-          Sign In Again
+          {t('signInAgain')}
         </button>
       </div>
     </ModalShell>

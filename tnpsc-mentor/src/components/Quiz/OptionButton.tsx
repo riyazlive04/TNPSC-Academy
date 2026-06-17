@@ -15,7 +15,7 @@ interface OptionButtonProps {
 }
 
 /**
- * A single answer option rendered as a white pill labelled A–D. Highlights in
+ * A single answer option rendered as a white pill labelled A-D. Highlights in
  * yellow when selected. In `reveal` mode it shows correct (green) / wrong (red).
  */
 export default function OptionButton({

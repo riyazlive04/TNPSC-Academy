@@ -20,7 +20,7 @@ import ProgressBar from '../components/UI/ProgressBar'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
 import { fetchPercentile } from '../lib/habit'
 import { assetsFor } from '../lib/assets'
-import { GROUP_SUBJECTS } from '../lib/constants'
+import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
@@ -156,7 +156,7 @@ export default function InsightsPage() {
                 <HeroStat
                   icon={<Users size={16} />}
                   label={t('yourRank')}
-                  value={percentile != null ? `Top ${100 - percentile}%` : '—'}
+                  value={percentile != null ? `Top ${100 - percentile}%` : '-'}
                 />
               </div>
             </section>
@@ -227,7 +227,7 @@ export default function InsightsPage() {
                       key={s.key}
                       className="tamil inline-flex items-center gap-1.5 rounded-full bg-mintsoft px-3 py-1.5 font-heading text-sm font-semibold text-mint"
                     >
-                      {s.key}
+                      {subjectName(s.key, lang)}
                       <span className="rounded-full bg-mint/15 px-1.5 text-xs">{s.accuracy}%</span>
                     </span>
                   ))}
@@ -251,7 +251,7 @@ export default function InsightsPage() {
                       <div key={w.key} className="card flex flex-col p-4">
                         <div className="mb-2 flex items-center justify-between gap-3">
                           <span className="tamil min-w-0 break-words font-heading text-sm font-bold text-ink">
-                            {w.key}
+                            {subjectName(w.key, lang)}
                           </span>
                           <span className="flex-shrink-0 rounded-md bg-coralsoft px-2 py-0.5 font-heading text-xs font-bold text-coral">
                             {w.accuracy}%
@@ -315,7 +315,7 @@ export default function InsightsPage() {
                     >
                       <div className="mb-2 flex items-start justify-between gap-2">
                         <span className="tamil min-w-0 break-words font-heading text-sm font-semibold leading-snug text-ink">
-                          {s.key}
+                          {subjectName(s.key, lang)}
                         </span>
                         <span
                           className={[
@@ -409,8 +409,8 @@ function TrendChart({ points }: { points: { accuracy: number; label: string }[] 
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Performance trend">
       <defs>
         <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2563EB" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+          <stop offset="0%" style={{ stopColor: 'rgb(var(--c-brand))' }} stopOpacity="0.22" />
+          <stop offset="100%" style={{ stopColor: 'rgb(var(--c-brand))' }} stopOpacity="0" />
         </linearGradient>
       </defs>
 

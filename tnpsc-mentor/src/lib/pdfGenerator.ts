@@ -40,20 +40,23 @@ interface QuestionBankPdfParams {
   questions: Question[]
   /** Title shown under the header band (e.g. "Outer Questions · Polity"). */
   label: string
-  /** UI language — drives which language the PDF content is rendered in. */
+  /** UI language - drives which language the PDF content is rendered in. */
   lang?: DisplayLang
+  /** Optional faint horizontal watermark drawn across the centre of every page. */
+  watermark?: string
 }
 
 /**
  * Generates and auto-downloads an answer-key PDF for a set of questions: each
  * question with its options (the correct one marked) and explanation. Unlike
- * the per-test report it needs no score/answers — it's a plain study/print
+ * the per-test report it needs no score/answers - it's a plain study/print
  * export of the bank, used by the admin Outer-questions view.
  */
 export async function generateQuestionBankPdf({
   questions,
   label,
   lang = 'en',
+  watermark,
 }: QuestionBankPdfParams): Promise<void> {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
@@ -91,7 +94,7 @@ export async function generateQuestionBankPdf({
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(20)
-  doc.text('TNPSC Mentor — Question Bank', margin, 44)
+  doc.text('TNPSC Mentor - Question Bank', margin, 44)
   y = 92
 
   doc.setTextColor(...NAVY)
@@ -152,8 +155,30 @@ export async function generateQuestionBankPdf({
 
   addFooter(doc, pageW, pageH, margin)
 
+  if (watermark) addWatermark(doc, pageW, pageH, watermark)
+
   const safe = label.replace(/[^a-z0-9]+/gi, '_').slice(0, 50)
   doc.save(`TNPSC_Mentor_${safe || 'QuestionBank'}.pdf`)
+}
+
+/** Draws a faint, horizontal watermark across the centre of every page. Done as
+ *  a final pass (over all pages) so it never disturbs the content font state. */
+function addWatermark(doc: jsPDF, pageW: number, pageH: number, text: string) {
+  // jsPDF's GState (opacity) isn't in the type defs - access it loosely.
+  const g = doc as unknown as {
+    GState?: new (o: { opacity: number }) => unknown
+    setGState?: (s: unknown) => void
+  }
+  const total = doc.getNumberOfPages()
+  for (let i = 1; i <= total; i++) {
+    doc.setPage(i)
+    if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.07 }))
+    doc.setTextColor(...BLUE)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(58)
+    doc.text(text, pageW / 2, pageH / 2, { align: 'center', baseline: 'middle' })
+    if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
+  }
 }
 
 function addFooter(doc: jsPDF, pageW: number, pageH: number, margin: number) {
@@ -162,7 +187,7 @@ function addFooter(doc: jsPDF, pageW: number, pageH: number, margin: number) {
   doc.setTextColor(...GREY)
   const page = doc.getNumberOfPages()
   doc.text(
-    '✳ TNPSC MENTOR — Prepare smart. Score high.',
+    '✳ TNPSC MENTOR - Prepare smart. Score high.',
     margin,
     pageH - margin + 8
   )

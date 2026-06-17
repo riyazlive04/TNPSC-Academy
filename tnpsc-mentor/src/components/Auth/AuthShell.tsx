@@ -1,22 +1,54 @@
 import type { ReactNode } from 'react'
+import { Languages, Sun, Moon } from 'lucide-react'
+import { useLanguageStore, type Lang } from '../../store/languageStore'
+import { useThemeStore } from '../../store/themeStore'
+import { useT, type StringKey } from '../../lib/i18n'
 
 interface AuthShellProps {
   /** The form card rendered on the right / center. */
   children: ReactNode
 }
 
-const CHIPS = ['Previous Year', 'Samacheer', 'Current Affairs', 'Aptitude']
+const CHIP_KEYS: StringKey[] = ['chipPyq', 'chipSamacheer', 'chipCa', 'chipAptitude']
+
+const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
+const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
 
 /**
- * Shared split-screen auth layout: a royal-blue marketing hero on the left
- * (desktop) and the form panel on the right. Login, Register and Forgot all
- * share this so the auth flow is visually consistent. On phones the hero
- * collapses and a compact brand mark appears above the form.
+ * Shared split-screen auth layout: a violet marketing hero on the left (desktop)
+ * and the form panel on the right. Login, Register and Forgot all share this. A
+ * language + theme switcher sits top-right (auth screens don't have the app's
+ * top bar, so these controls live here).
  */
 export default function AuthShell({ children }: AuthShellProps) {
+  const { t, lang } = useT()
+  const setLang = useLanguageStore((s) => s.setLang)
+  const resolvedTheme = useThemeStore((s) => s.resolved)
+  const toggleTheme = useThemeStore((s) => s.toggle)
+
+  const cycleLang = () => setLang(LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length])
+
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* ─── Left: blue marketing hero (desktop only) ─────────────────────── */}
+    <div className="relative grid min-h-screen lg:grid-cols-2">
+      {/* Language + theme controls (top-right, above both columns) */}
+      <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+        <button
+          onClick={cycleLang}
+          aria-label={`${t('language')} (${LANG_LABEL[lang]})`}
+          className="tamil inline-flex items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs font-semibold text-ink2 shadow-soft transition hover:border-brand/30 hover:text-brand"
+        >
+          <Languages size={14} /> {LANG_LABEL[lang]}
+        </button>
+        <button
+          onClick={toggleTheme}
+          aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
+          className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-card text-ink2 shadow-soft transition hover:border-brand/30 hover:text-brand"
+        >
+          {resolvedTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+      </div>
+
+      {/* ─── Left: violet marketing hero (desktop only) ───────────────────── */}
       <aside className="relative hidden overflow-hidden bg-brand-gradient p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <div className="absolute inset-0 bg-hero-grid [background-size:22px_22px] opacity-60" />
         <div className="relative animate-slideDown">
@@ -28,28 +60,23 @@ export default function AuthShell({ children }: AuthShellProps) {
           </div>
         </div>
         <div className="relative max-w-sm animate-slideUp">
-          <h2 className="font-heading text-4xl font-bold leading-tight tracking-tight">
-            Your fast track to the TNPSC exam hall.
+          <h2 className="tamil font-heading text-4xl font-bold leading-tight tracking-tight">
+            {t('authHeroTitle')}
           </h2>
-          <p className="mt-4 font-body text-base text-white/75">
-            12,000+ bilingual questions, timed mock tests, smart revision and
-            progress insights — all in one focused workspace.
-          </p>
+          <p className="tamil mt-4 font-body text-base text-white/75">{t('authHeroSub')}</p>
           <div className="mt-8 flex flex-wrap gap-2">
-            {CHIPS.map((t, i) => (
+            {CHIP_KEYS.map((key, i) => (
               <span
-                key={t}
+                key={key}
                 style={{ '--i': i } as React.CSSProperties}
-                className="stagger-item rounded-full bg-white/10 px-3.5 py-1.5 font-heading text-xs font-medium text-white/90 ring-1 ring-white/15"
+                className="tamil stagger-item rounded-full bg-white/10 px-3.5 py-1.5 font-heading text-xs font-medium text-white/90 ring-1 ring-white/15"
               >
-                {t}
+                {t(key)}
               </span>
             ))}
           </div>
         </div>
-        <div className="relative font-body text-xs text-white/60">
-          Tamil Nadu Public Service Commission · Aspirant Portal
-        </div>
+        <div className="tamil relative font-body text-xs text-white/60">{t('authFooter')}</div>
       </aside>
 
       {/* ─── Right: form panel ────────────────────────────────────────────── */}

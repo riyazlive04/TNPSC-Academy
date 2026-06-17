@@ -1,8 +1,32 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2 } from 'lucide-react'
-import PickerPage from '../components/Layout/PickerPage'
-import PillButton from '../components/UI/PillButton'
-import PillSection from '../components/UI/PillSection'
+import { useNavigate } from 'react-router-dom'
+import {
+  ArrowLeft,
+  ChevronRight,
+  Loader2,
+  Atom,
+  FlaskConical,
+  Leaf,
+  Globe2,
+  Landmark,
+  Flag,
+  Scale,
+  TrendingUp,
+  Building2,
+  Palette,
+  Languages,
+  BookOpen,
+  Layers,
+  Shuffle,
+  Clock,
+  ArrowLeftRight,
+  Lightbulb,
+  ListChecks,
+  Target,
+  type LucideIcon,
+} from 'lucide-react'
+import AppLayout from '../components/Layout/AppLayout'
+import YellowBadge from '../components/UI/YellowBadge'
 import { api } from '../lib/api'
 import {
   SUBJECT_PRACTICE_ORDER,
@@ -10,93 +34,178 @@ import {
   SUBJECT_TOPIC_GROUPS,
   bySyllabusOrder,
   groupTopics,
+  subjectName,
+  topicName,
 } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
 import type { SubjectQType } from '../types'
 
 // The five testable question styles, in display order. `key` is null for the
-// "Mixed" option (no question_type filter — pools every style for the topic).
-const QTYPES: { key: SubjectQType | null; labelKey: StringKey }[] = [
-  { key: null, labelKey: 'typeMixed' },
-  { key: 'chronological', labelKey: 'typeChronological' },
-  { key: 'match', labelKey: 'typeMatch' },
-  { key: 'assertion_reason', labelKey: 'typeAssertionReason' },
-  { key: 'statements', labelKey: 'typeStatements' },
-  { key: 'direct', labelKey: 'typeDirect' },
+// "Mixed" option (no question_type filter - pools every style for the topic).
+const QTYPES: { key: SubjectQType | null; labelKey: StringKey; icon: LucideIcon }[] = [
+  { key: null, labelKey: 'typeMixed', icon: Shuffle },
+  { key: 'chronological', labelKey: 'typeChronological', icon: Clock },
+  { key: 'match', labelKey: 'typeMatch', icon: ArrowLeftRight },
+  { key: 'assertion_reason', labelKey: 'typeAssertionReason', icon: Lightbulb },
+  { key: 'statements', labelKey: 'typeStatements', icon: ListChecks },
+  { key: 'direct', labelKey: 'typeDirect', icon: Target },
 ]
 
 const ALL_TOPICS = '__all__'
+type Step = 'subject' | 'topic' | 'type'
+
+// ─── Per-subject visuals ─────────────────────────────────────────────────────
+// Subjects are matched to an icon by keyword (the bank uses slightly different
+// spellings), falling back to a generic book. The grid uses ONE restrained brand
+// accent across every card (premium, not a playful rainbow); see SubjectStep.
+
+function subjectIcon(name: string): LucideIcon {
+  const n = name.toLowerCase()
+  if (n.includes('physics')) return Atom
+  if (n.includes('chemistry')) return FlaskConical
+  if (n.includes('biology') || n.includes('science')) return Leaf
+  if (n.includes('geograph')) return Globe2
+  if (n.includes('national movement') || n.includes('inm')) return Flag
+  if (n.includes('culture') || n.includes('heritage')) return Palette
+  if (n.includes('history')) return Landmark
+  if (n.includes('polity') || n.includes('constitution')) return Scale
+  if (n.includes('econom')) return TrendingUp
+  if (n.includes('administration')) return Building2
+  if (n.includes('tamil') || n.includes('english')) return Languages
+  return BookOpen
+}
+
+// ─── Session caches ──────────────────────────────────────────────────────────
+// Module-level so the data survives navigating away and back: re-entering the
+// picker is then instant (no spinner, no refetch). Cleared only on full reload.
+let subjectsCache: { subject: string; total: number }[] | null = null
+const topicsCache = new Map<string, string[]>()
+const qtypeCache = new Map<string, Record<string, number>>()
+const qKey = (subject: string, topic?: string) => `${subject}|${topic ?? ALL_TOPICS}`
 
 export default function SubjectPracticePage() {
   const startTest = useStartTest()
-  const { t } = useT()
+  const navigate = useNavigate()
+  const { t, lang } = useT()
 
-  const [subjects, setSubjects] = useState<{ subject: string; total: number }[]>([])
+  const [step, setStep] = useState<Step>('subject')
+
+  const [subjects, setSubjects] = useState<{ subject: string; total: number }[]>(
+    subjectsCache ?? []
+  )
   const [subject, setSubject] = useState<string | null>(null)
-  const [topic, setTopic] = useState<string | null>(null) // null = none picked; ALL_TOPICS = all
-  // For subjects split into sub-groups (e.g. Geography → Physical / Human), the
-  // chosen group heading. Topics are only revealed once a group is picked.
-  const [subgroup, setSubgroup] = useState<string | null>(null)
+  const [topic, setTopic] = useState<string | null>(null) // null = none; ALL_TOPICS = all
 
   const [topics, setTopics] = useState<string[]>([])
   const [counts, setCounts] = useState<Record<string, number>>({})
 
-  const [loadingSubjects, setLoadingSubjects] = useState(true)
+  const [loadingSubjects, setLoadingSubjects] = useState(!subjectsCache)
   const [loadingTopics, setLoadingTopics] = useState(false)
-  const [error, setError] = useState('')
+  // Boolean (not a string) so the fetch effects never depend on the unstable
+  // `t()` identity - the message is translated at render time instead.
+  const [errored, setErrored] = useState(false)
+  const errorText = errored ? t('couldNotLoad') : ''
 
-  // Step 1 — subjects (once).
+  // Step 1 - subjects (cached after first load).
   useEffect(() => {
+    if (subjectsCache) return
     let cancelled = false
     api
       .subjects()
       .then((s) => {
         if (cancelled) return
-        // Re-order subjects into TNPSC syllabus sequence (unmapped sink to end).
         const order = bySyllabusOrder(
           s.map((r) => r.subject),
           SUBJECT_PRACTICE_ORDER
         )
-        setSubjects([...s].sort((a, b) => order.indexOf(a.subject) - order.indexOf(b.subject)))
+        const sorted = [...s].sort((a, b) => order.indexOf(a.subject) - order.indexOf(b.subject))
+        subjectsCache = sorted
+        setSubjects(sorted)
       })
-      .catch(() => !cancelled && setError('Could not load subjects. Please try again.'))
+      .catch(() => !cancelled && setErrored(true))
       .finally(() => !cancelled && setLoadingSubjects(false))
     return () => {
       cancelled = true
     }
   }, [])
 
-  // Step 2 — topics for the chosen subject.
+  // Step 2 - topics for the chosen subject (cached per subject).
   useEffect(() => {
     if (!subject) return
+    const cached = topicsCache.get(subject)
+    if (cached) {
+      setTopics(cached)
+      setLoadingTopics(false)
+      return
+    }
     let cancelled = false
     setLoadingTopics(true)
-    setError('')
+    setErrored(false)
     setTopics([])
     api
       .distinctTopics({ category: 'subject', subject })
-      .then((tp) => !cancelled && setTopics(bySyllabusOrder(tp, SUBJECT_TOPIC_ORDER[subject])))
-      .catch(() => !cancelled && setError('Could not load topics. Please try again.'))
+      .then((tp) => {
+        if (cancelled) return
+        const ordered = bySyllabusOrder(tp, SUBJECT_TOPIC_ORDER[subject])
+        topicsCache.set(subject, ordered)
+        setTopics(ordered)
+      })
+      .catch(() => !cancelled && setErrored(true))
       .finally(() => !cancelled && setLoadingTopics(false))
     return () => {
       cancelled = true
     }
   }, [subject])
 
-  // Step 3 — per-type counts for subject (+ topic when a specific one is picked).
+  // Step 3 - per-type counts for subject (+ topic when a specific one is picked).
   useEffect(() => {
     if (!subject || !topic) return
+    const key = qKey(subject, topic === ALL_TOPICS ? undefined : topic)
+    const cached = qtypeCache.get(key)
+    if (cached) {
+      setCounts(cached)
+      return
+    }
     let cancelled = false
     setCounts({})
     api
       .questionTypeCounts({ subject, topic: topic === ALL_TOPICS ? undefined : topic })
-      .then((c) => !cancelled && setCounts(c))
+      .then((c) => {
+        if (cancelled) return
+        qtypeCache.set(key, c)
+        setCounts(c)
+      })
       .catch(() => {})
     return () => {
       cancelled = true
     }
   }, [subject, topic])
+
+  const topicGroups = useMemo(
+    () => groupTopics(topics, subject ? SUBJECT_TOPIC_GROUPS[subject] : undefined),
+    [topics, subject]
+  )
+
+  // ─── Step transitions ──────────────────────────────────────────────────────
+  const chooseSubject = (s: string) => {
+    setSubject(s)
+    setTopic(null)
+    setCounts({})
+    setStep('topic')
+  }
+  const chooseTopic = (tp: string) => {
+    setTopic(tp)
+    setStep('type')
+  }
+  const back = () => {
+    if (step === 'type') return setStep('topic')
+    if (step === 'topic') {
+      setSubject(null)
+      return setStep('subject')
+    }
+    navigate('/test-arena')
+  }
 
   const handleType = (qtype: SubjectQType | null, label: string) => {
     if (!subject || !topic) return
@@ -106,7 +215,7 @@ export default function SubjectPracticePage() {
       subject,
       topic: isAll ? undefined : topic,
       question_type: qtype ?? undefined,
-      label: `${subject} · ${isAll ? t('allTopics') : topic} · ${label}`,
+      label: `${subjectName(subject, lang)} · ${isAll ? t('allTopics') : topicName(topic, lang)} · ${label}`,
     })
   }
 
@@ -115,141 +224,353 @@ export default function SubjectPracticePage() {
     return Object.values(counts).reduce((s, n) => s + n, 0) // Mixed = sum of all
   }
 
-  // Topics split into syllabus sub-groups (e.g. Geography → Physical / Human).
-  // Subjects without a grouping config yield a single null-headed group.
-  const topicGroups = useMemo(
-    () => groupTopics(topics, subject ? SUBJECT_TOPIC_GROUPS[subject] : undefined),
-    [topics, subject]
-  )
-  const grouped = topicGroups.length > 1 || topicGroups[0]?.heading != null
+  const heading =
+    step === 'subject' ? t('pickSubject') : step === 'topic' ? t('pickTopic') : t('pickType')
+  const hint =
+    step === 'subject'
+      ? t('subjectStepHint')
+      : step === 'topic'
+        ? t('topicStepHint')
+        : t('typeStepHint')
 
   return (
-    <PickerPage badge={t('subjectPracticeBadge')}>
-      {/* Step 1 — subject */}
-      <PillSection title={t('step1Subject')} className="mb-8" wrap={false}>
-        {loadingSubjects ? (
-          <div className="flex justify-center py-8">
-            <Loader2 size={28} className="animate-spin text-brand" />
-          </div>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-3">
-            {subjects.map((s) => (
-              <PillButton
-                key={s.subject}
-                size="sm"
-                active={subject === s.subject}
-                onClick={() => {
-                  setSubject(s.subject)
-                  setTopic(null)
-                  setSubgroup(null)
-                  setCounts({})
-                }}
+    <AppLayout>
+      <div className="mx-auto max-w-4xl px-4 py-5">
+        {/* Back + breadcrumb */}
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <button
+            onClick={back}
+            className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          >
+            <ArrowLeft size={16} /> {step === 'subject' ? t('testArena') : t('back')}
+          </button>
+          <Breadcrumb
+            step={step}
+            subject={subject}
+            subjectLabel={subject ? subjectName(subject, lang) : ''}
+            topic={topic}
+            topicLabel={topic && topic !== ALL_TOPICS ? topicName(topic, lang) : ''}
+            allTopicsLabel={t('allTopics')}
+            onSubject={() => subject && (setStep('subject'), setSubject(null))}
+            onTopic={() => setStep('topic')}
+          />
+        </div>
+
+        {/* Title block */}
+        <div className="mb-5 text-center">
+          <YellowBadge>{t('subjectPracticeBadge')}</YellowBadge>
+          <h1 className="mt-2.5 font-heading text-xl font-bold tracking-tight text-ink lg:text-2xl">
+            {heading}
+          </h1>
+          <p className="tamil mt-1 font-body text-sm text-ink2">{hint}</p>
+        </div>
+
+        {/* Animated step body (re-keyed so each step animates in) */}
+        <div key={step} className="animate-fadeInFast">
+          {step === 'subject' && (
+            <SubjectStep
+              subjects={subjects}
+              loading={loadingSubjects}
+              error={errorText}
+              questionsWord={t('questionsCount')}
+              nameOf={(s) => subjectName(s, lang)}
+              onPick={chooseSubject}
+            />
+          )}
+
+          {step === 'topic' && (
+            <TopicStep
+              loading={loadingTopics}
+              error={errorText}
+              groups={topicGroups}
+              topic={topic}
+              allTopicsLabel={t('allTopics')}
+              allTopicsSub={t('allTopicsSub')}
+              topicLabel={(tp) => topicName(tp, lang)}
+              onPick={chooseTopic}
+            />
+          )}
+
+          {step === 'type' && (
+            <TypeStep
+              qtypes={QTYPES}
+              totalForType={totalForType}
+              label={(k) => t(k)}
+              onPick={handleType}
+            />
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  )
+}
+
+// ─── Breadcrumb chips (Subject › Topic) ──────────────────────────────────────
+function Breadcrumb({
+  step,
+  subject,
+  subjectLabel,
+  topic,
+  topicLabel,
+  allTopicsLabel,
+  onSubject,
+  onTopic,
+}: {
+  step: Step
+  subject: string | null
+  subjectLabel: string
+  topic: string | null
+  topicLabel: string
+  allTopicsLabel: string
+  onSubject: () => void
+  onTopic: () => void
+}) {
+  if (step === 'subject' || !subject) return <span />
+  const topicText = topic === ALL_TOPICS ? allTopicsLabel : topicLabel
+  return (
+    <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
+      <button
+        onClick={onSubject}
+        className="max-w-[8rem] truncate rounded-full bg-brand-soft px-2.5 py-1 font-heading text-brand transition hover:bg-brand/10"
+      >
+        {subjectLabel}
+      </button>
+      {step === 'type' && topicText && (
+        <>
+          <ChevronRight size={13} className="flex-shrink-0 text-ink2/40" />
+          <button
+            onClick={onTopic}
+            className="max-w-[8rem] truncate rounded-full bg-brand-soft px-2.5 py-1 font-heading text-brand transition hover:bg-brand/10"
+          >
+            {topicText}
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
+// ─── Step 1: premium subject card grid ───────────────────────────────────────
+function SubjectStep({
+  subjects,
+  loading,
+  error,
+  questionsWord,
+  nameOf,
+  onPick,
+}: {
+  subjects: { subject: string; total: number }[]
+  loading: boolean
+  error: string
+  questionsWord: string
+  nameOf: (s: string) => string
+  onPick: (s: string) => void
+}) {
+  if (loading) return <CenterSpinner />
+  if (error) return <ErrorText text={error} />
+
+  return (
+    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+      {subjects.map((s, i) => {
+        const Icon = subjectIcon(s.subject)
+        return (
+          <button
+            key={s.subject}
+            onClick={() => onPick(s.subject)}
+            style={{ '--i': i } as React.CSSProperties}
+            className="stagger-item relative flex items-center gap-3 overflow-hidden rounded-2xl border border-line bg-card p-3 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+          >
+            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand ring-1 ring-brand/10">
+              <Icon size={20} strokeWidth={2} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="tamil block font-heading text-sm font-bold leading-snug text-ink">
+                {nameOf(s.subject)}
+              </span>
+              <span className="mt-0.5 flex items-baseline gap-1">
+                <span className="font-heading text-xs font-bold tabular-nums text-brand">
+                  {s.total.toLocaleString()}
+                </span>
+                <span className="font-body text-[11px] text-ink2">{questionsWord}</span>
+              </span>
+            </span>
+            <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+// ─── Step 2: topic selection (All Topics hero + grouped rows) ────────────────
+function TopicStep({
+  loading,
+  error,
+  groups,
+  topic,
+  allTopicsLabel,
+  allTopicsSub,
+  topicLabel,
+  onPick,
+}: {
+  loading: boolean
+  error: string
+  groups: { heading: string | null; topics: string[] }[]
+  topic: string | null
+  allTopicsLabel: string
+  allTopicsSub: string
+  topicLabel: (tp: string) => string
+  onPick: (tp: string) => void
+}) {
+  if (loading) return <CenterSpinner />
+  if (error) return <ErrorText text={error} />
+
+  return (
+    <div className="space-y-6">
+      {/* All Topics - the highlighted shortcut */}
+      <button
+        onClick={() => onPick(ALL_TOPICS)}
+        className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
+      >
+        <span
+          className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+          style={{ backgroundSize: '18px 18px' }}
+        />
+        <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+          <Shuffle size={20} />
+        </span>
+        <span className="relative min-w-0 flex-1">
+          <span className="block font-heading text-base font-semibold text-white">
+            {allTopicsLabel}
+          </span>
+          <span className="tamil block font-body text-xs text-white/70">{allTopicsSub}</span>
+        </span>
+        <ChevronRight
+          size={18}
+          className="relative flex-shrink-0 text-white/50 transition group-hover:translate-x-0.5 group-hover:text-white"
+        />
+      </button>
+
+      {/* Topic rows, grouped into syllabus sections when configured */}
+      {groups.map((g, gi) => (
+        <div key={g.heading ?? `g${gi}`} className="space-y-2.5">
+          {g.heading && (
+            <h3 className="tamil px-1 font-heading text-xs font-bold uppercase tracking-widest text-ink2">
+              {topicLabel(g.heading)}
+            </h3>
+          )}
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {g.topics.map((tp, i) => (
+              <button
+                key={tp}
+                onClick={() => onPick(tp)}
+                style={{ '--i': i } as React.CSSProperties}
+                className={`card interactive stagger-item group flex items-center gap-3 p-3.5 text-left ${
+                  topic === tp ? 'ring-2 ring-brand-ring' : ''
+                }`}
               >
-                {s.subject}
-              </PillButton>
+                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <Layers size={16} />
+                </span>
+                <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
+                  {topicLabel(tp)}
+                </span>
+                <ChevronRight
+                  size={16}
+                  className="flex-shrink-0 text-ink2/30 transition group-hover:text-brand"
+                />
+              </button>
             ))}
           </div>
-        )}
-      </PillSection>
-
-      {/* Step 2 — topic */}
-      {subject && (
-        <PillSection title={t('step3Topic')} className="mb-8 animate-fadeIn" wrap={false}>
-          {loadingTopics && (
-            <div className="flex justify-center py-8">
-              <Loader2 size={28} className="animate-spin text-brand" />
-            </div>
-          )}
-          {!loadingTopics && error && (
-            <p className="text-center font-body text-sm text-coral">{error}</p>
-          )}
-          {!loadingTopics && !error && !grouped && (
-            <div className="flex flex-wrap justify-center gap-3">
-              <PillButton
-                size="sm"
-                active={topic === ALL_TOPICS}
-                onClick={() => setTopic(ALL_TOPICS)}
-              >
-                {t('allTopics')}
-              </PillButton>
-              {topics.map((tp) => (
-                <PillButton key={tp} size="sm" active={topic === tp} onClick={() => setTopic(tp)}>
-                  {tp}
-                </PillButton>
-              ))}
-            </div>
-          )}
-          {!loadingTopics && !error && grouped && (
-            <div className="space-y-6">
-              {/* Pick a sub-group first (e.g. Physical / Human Geography). The
-                  group's topics are only revealed once a group is chosen. */}
-              <div className="flex flex-wrap justify-center gap-3">
-                <PillButton
-                  size="sm"
-                  active={topic === ALL_TOPICS}
-                  onClick={() => {
-                    setSubgroup(null)
-                    setTopic(ALL_TOPICS)
-                  }}
-                >
-                  {t('allTopics')}
-                </PillButton>
-                {topicGroups.map((g) => (
-                  <PillButton
-                    key={g.heading ?? 'more'}
-                    size="sm"
-                    active={subgroup === g.heading}
-                    onClick={() => {
-                      setSubgroup(g.heading)
-                      setTopic(null)
-                    }}
-                  >
-                    {g.heading}
-                  </PillButton>
-                ))}
-              </div>
-
-              {/* Topics within the chosen sub-group */}
-              {subgroup && (
-                <div className="flex flex-wrap justify-center gap-3 animate-fadeIn">
-                  {(topicGroups.find((g) => g.heading === subgroup)?.topics ?? []).map((tp) => (
-                    <PillButton
-                      key={tp}
-                      size="sm"
-                      active={topic === tp}
-                      onClick={() => setTopic(tp)}
-                    >
-                      {tp}
-                    </PillButton>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </PillSection>
-      )}
-
-      {/* Step 3 — question type */}
-      {subject && topic && (
-        <PillSection title={t('step3Type')} className="animate-fadeIn" wrap={false}>
-          <div className="flex flex-wrap justify-center gap-3">
-            {QTYPES.map(({ key, labelKey }) => {
-              const n = totalForType(key)
-              const label = t(labelKey)
-              return (
-                <PillButton
-                  key={labelKey}
-                  size="md"
-                  disabled={n === 0}
-                  onClick={() => handleType(key, label)}
-                >
-                  {label} {n > 0 && <span className="opacity-60">· {n}</span>}
-                </PillButton>
-              )
-            })}
-          </div>
-        </PillSection>
-      )}
-    </PickerPage>
+        </div>
+      ))}
+    </div>
   )
+}
+
+// ─── Step 3: question-type cards (with live counts) ──────────────────────────
+function TypeStep({
+  qtypes,
+  totalForType,
+  label,
+  onPick,
+}: {
+  qtypes: { key: SubjectQType | null; labelKey: StringKey; icon: LucideIcon }[]
+  totalForType: (k: SubjectQType | null) => number
+  label: (k: StringKey) => string
+  onPick: (k: SubjectQType | null, label: string) => void
+}) {
+  const [mixed, ...rest] = qtypes
+  const mixedCount = totalForType(mixed.key)
+  const MixedIcon = mixed.icon
+
+  return (
+    <div className="space-y-3">
+      {/* Mixed - the recommended, highlighted option */}
+      <button
+        onClick={() => onPick(mixed.key, label(mixed.labelKey))}
+        disabled={mixedCount === 0}
+        className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span
+          className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+          style={{ backgroundSize: '18px 18px' }}
+        />
+        <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+          <MixedIcon size={20} />
+        </span>
+        <span className="relative min-w-0 flex-1">
+          <span className="tamil block font-heading text-base font-semibold text-white">
+            {label(mixed.labelKey)}
+          </span>
+          {mixedCount > 0 && (
+            <span className="block font-body text-xs text-white/70">
+              {mixedCount} {label('questionsCount')}
+            </span>
+          )}
+        </span>
+        <ChevronRight
+          size={18}
+          className="relative flex-shrink-0 text-white/50 transition group-hover:translate-x-0.5 group-hover:text-white"
+        />
+      </button>
+
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        {rest.map(({ key, labelKey, icon: Icon }, i) => {
+          const n = totalForType(key)
+          return (
+            <button
+              key={labelKey}
+              onClick={() => onPick(key, label(labelKey))}
+              disabled={n === 0}
+              style={{ '--i': i } as React.CSSProperties}
+              className="card interactive stagger-item group flex items-center gap-3 p-3.5 text-left disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                <Icon size={16} />
+              </span>
+              <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
+                {label(labelKey)}
+              </span>
+              <span className="flex-shrink-0 font-heading text-xs font-semibold text-ink2">
+                {n > 0 ? n : '—'}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─── Small shared bits ───────────────────────────────────────────────────────
+function CenterSpinner() {
+  return (
+    <div className="flex justify-center py-16">
+      <Loader2 size={28} className="animate-spin text-brand" />
+    </div>
+  )
+}
+function ErrorText({ text }: { text: string }) {
+  return <p className="py-12 text-center font-body text-sm text-coral">{text}</p>
 }

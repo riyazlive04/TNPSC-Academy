@@ -12,6 +12,9 @@ alter table public.questions add column if not exists active boolean not null de
 create index if not exists idx_questions_active on public.questions(active);
 
 -- ─── get_quiz_questions: only serve active rows ─────────────────────────────
+-- NOTE: this body is kept IDENTICAL to the authoritative copy in secure.sql
+-- (and history_periods.sql) so re-run order can't regress the return shape or
+-- the filters. Edit all three together.
 create or replace function public.get_quiz_questions(p_config jsonb)
 returns table (
   id uuid, category text, group_type text, year integer, standard integer,
@@ -19,7 +22,7 @@ returns table (
   aptitude_type text, aptitude_topic text, subject text, topic text,
   question_type text, external_id text,
   question_text text, option_a text, option_b text, option_c text, option_d text,
-  difficulty text, source_tag text,
+  difficulty text, images jsonb, source_tag text,
   question_text_ta text, option_a_ta text, option_b_ta text,
   option_c_ta text, option_d_ta text
 )
@@ -34,6 +37,7 @@ as $$
       p_config->>'subject'                             as subject,
       (p_config->>'standard')::int                     as standard,
       p_config->>'topic'                               as topic,
+      p_config->>'unit'                                as unit,
       p_config->>'question_type'                       as question_type,
       p_config->>'ca_type'                             as ca_type,
       p_config->>'ca_month'                            as ca_month,
@@ -49,7 +53,7 @@ as $$
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
          q.question_type, q.external_id,
          q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-         q.difficulty, q.source_tag,
+         q.difficulty, q.images, q.source_tag,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q, cfg
@@ -65,6 +69,7 @@ as $$
     and (cfg.mock or cfg.subject        is null or q.subject        = cfg.subject)
     and (cfg.mock or cfg.standard       is null or q.standard       = cfg.standard)
     and (cfg.mock or cfg.topic          is null or q.topic          = cfg.topic)
+    and (cfg.mock or cfg.unit           is null or q.unit           = cfg.unit)
     and (cfg.mock or cfg.question_type  is null or q.question_type  = cfg.question_type)
     and (cfg.mock or cfg.ca_type        is null or q.ca_type        = cfg.ca_type)
     and (cfg.mock or cfg.ca_month       is null or q.ca_month       = cfg.ca_month)

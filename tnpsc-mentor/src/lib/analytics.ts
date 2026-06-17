@@ -14,7 +14,7 @@ export interface TopicScore {
 /**
  * Compute per-topic (falling back to subject) scores for a single finished
  * test, straight from the in-memory questions + answers. Used on the Result
- * page to recommend focus areas immediately — no DB round-trip.
+ * page to recommend focus areas immediately - no DB round-trip.
  */
 export function scoreByTopic(
   questions: Question[],

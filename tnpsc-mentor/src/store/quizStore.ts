@@ -4,7 +4,7 @@ import type { AnswerLetter, Question, QuizConfig, TestAnswer } from '../types'
 
 export const SECONDS_PER_QUESTION = 45
 export const MIN_SECONDS_PER_QUESTION = 7
-export const ATTENDANCE_GATE = 0.25 // 25% — explanations unlock at this attendance
+export const ATTENDANCE_GATE = 0.25 // 25% - explanations unlock at this attendance
 
 interface QuizState {
   config: QuizConfig | null
@@ -45,7 +45,6 @@ interface QuizState {
 
   // derived
   attemptedCount: () => number
-  correctCount: () => number
 }
 
 const initialState = {
@@ -120,7 +119,7 @@ export const useQuizStore = create<QuizState>()(
     const answer: TestAnswer = {
       question_id: questionId,
       selected_answer: letter,
-      // is_correct is intentionally NOT set here — the client has no answer key.
+      // is_correct is intentionally NOT set here - the client has no answer key.
       // Grading happens server-side in submit_test().
       // Keep the time recorded on the first selection for this question.
       time_spent_seconds: prior ? prior.time_spent_seconds : elapsed,
@@ -152,9 +151,6 @@ export const useQuizStore = create<QuizState>()(
   setSubmitting: (v) => set({ isSubmitting: v }),
 
   attemptedCount: () => Object.keys(get().answers).length,
-
-  correctCount: () =>
-    Object.values(get().answers).filter((a) => a.is_correct).length,
     }),
     {
       name: 'tnpsc-mentor-quiz',

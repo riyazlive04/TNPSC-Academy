@@ -51,7 +51,7 @@ export default function MockTestPage() {
         </div>
         <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('fullLength')}</p>
 
-        {/* Tab switch — segmented control */}
+        {/* Tab switch - segmented control */}
         <div className="mb-8 flex justify-center">
           <div className="seg-wrap">
             <button
@@ -222,7 +222,7 @@ function SubjectExamTab() {
     <div className="animate-fadeIn">
       <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('mockSubjectSub')}</p>
 
-      {/* Step 1 — subject */}
+      {/* Step 1 - subject */}
       <PillSection title={t('step1Subject')} className="mb-8" wrap={false}>
         {loadingSubjects ? (
           <div className="flex justify-center py-8">
@@ -247,7 +247,7 @@ function SubjectExamTab() {
         )}
       </PillSection>
 
-      {/* Step 2 — topic */}
+      {/* Step 2 - topic */}
       {subject && (
         <PillSection title={t('step3Topic')} className="mb-8 animate-fadeIn" wrap={false}>
           {loadingTopics && (
@@ -273,7 +273,7 @@ function SubjectExamTab() {
         </PillSection>
       )}
 
-      {/* Step 3 — difficulty */}
+      {/* Step 3 - difficulty */}
       {subject && topic && (
         <PillSection title={t('diffLevel')} className="mb-8 animate-fadeIn" wrap={false}>
           <div className="flex flex-wrap justify-center gap-3">
@@ -286,11 +286,11 @@ function SubjectExamTab() {
         </PillSection>
       )}
 
-      {/* Step 4 — questions & time (side by side) */}
+      {/* Step 4 - questions & time (side by side) */}
       {subject && topic && (
         <PillSection title={t('examSetup')} className="mb-8 animate-fadeIn" wrap={false}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Number of questions — stepper */}
+            {/* Number of questions - stepper */}
             <div className="card p-4">
               <div className="mb-3 flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
                 <FileText size={14} /> {t('numQuestions')}
@@ -320,7 +320,7 @@ function SubjectExamTab() {
               </div>
             </div>
 
-            {/* Time limit — slider */}
+            {/* Time limit - slider */}
             <div className="card p-4">
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">

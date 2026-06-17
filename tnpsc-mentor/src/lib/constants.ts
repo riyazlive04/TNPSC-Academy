@@ -1,4 +1,211 @@
 import type { GroupType, MockBlueprint } from '../types'
+import type { Lang } from '../store/languageStore'
+
+// ─── Subject display names (English → Tamil) ────────────────────────────────
+// The question bank stores subjects in English. This map lets the pickers and
+// test labels show Tamil subject names when the user has chosen Tamil. Keyed by
+// the exact English strings used across the subject / PYQ banks; unknown names
+// fall through to English unchanged.
+export const SUBJECT_NAME_TA: Record<string, string> = {
+  Physics: 'இயற்பியல்',
+  Chemistry: 'வேதியியல்',
+  Biology: 'உயிரியல்',
+  'General Science': 'பொது அறிவியல்',
+  Geography: 'புவியியல்',
+  History: 'வரலாறு',
+  'History and INM': 'வரலாறு மற்றும் இந்திய தேசிய இயக்கம்',
+  'Indian National Movement': 'இந்திய தேசிய இயக்கம்',
+  Polity: 'அரசியலமைப்பு',
+  Economy: 'பொருளியல்',
+  'Indian Economy': 'இந்தியப் பொருளாதாரம்',
+  'Tamil Nadu Administration': 'தமிழ்நாடு நிர்வாகம்',
+  'Development Administration of TamilNadu': 'தமிழ்நாடு வளர்ச்சி நிர்வாகம்',
+  'History, Culture & Heritage of TN': 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & பாரம்பரியம்',
+  'History Culture Heritage of TN': 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & பாரம்பரியம்',
+  'History, Culture, Heritage': 'வரலாறு, பண்பாடு, பாரம்பரியம்',
+  Tamil: 'தமிழ்',
+  English: 'ஆங்கிலம்',
+  'Current Affairs': 'நடப்பு நிகழ்வுகள்',
+  Aptitude: 'திறனாய்வு மற்றும் மனக்கணக்கு',
+}
+
+/** A subject name in the chosen language: Tamil for 'ta', "EN / TA" for 'both',
+ *  English otherwise. Unknown subjects return unchanged. */
+export function subjectName(name: string, lang: Lang | null): string {
+  const ta = SUBJECT_NAME_TA[name]
+  if (!ta) return name
+  if (lang === 'ta') return ta
+  if (lang === 'both') return `${name} / ${ta}`
+  return name
+}
+
+// ─── Topic display names (English → Tamil) ──────────────────────────────────
+// The Subject Practice bank has a fixed set of ~100 syllabus topics (plus the
+// sub-group headings). They're stored in English; this map shows them in Tamil.
+// PYQ's per-question micro-topics are NOT here, so they fall through to English.
+export const TOPIC_NAME_TA: Record<string, string> = {
+  '06th-Std': '6ஆம் வகுப்பு',
+  'Acids, Base and Salts': 'அமிலங்கள், காரங்கள் மற்றும் உப்புகள்',
+  'Agricultural Pattern': 'வேளாண் முறை',
+  Budget: 'பட்ஜெட்',
+  Citizenship: 'குடியுரிமை',
+  'Classification of Living Organism': 'உயிரினங்களின் வகைப்பாடு',
+  'Constitution of India': 'இந்திய அரசியலமைப்பு',
+  'Development of Press in Modern India': 'நவீன இந்தியாவில் பத்திரிகை வளர்ச்சி',
+  'Directive Principles of State Policy': 'அரசின் வழிகாட்டு நெறிமுறைகள்',
+  'e-Governance in TN': 'தமிழ்நாட்டில் மின்-ஆளுகை',
+  'Economic Committees': 'பொருளாதாரக் குழுக்கள்',
+  'Economic Reforms': 'பொருளாதார சீர்திருத்தங்கள்',
+  'Education & Health Systems': 'கல்வி & சுகாதார அமைப்புகள்',
+  Election: 'தேர்தல்',
+  'Electricity and Magnetism': 'மின்சாரம் மற்றும் காந்தவியல்',
+  'Electronics and Communications': 'மின்னணுவியல் மற்றும் தொடர்பு',
+  'Elements and Compounds': 'தனிமங்கள் மற்றும் சேர்மங்கள்',
+  'Environment and Ecology': 'சுற்றுச்சூழல் மற்றும் சூழலியல்',
+  'Everyday application of the basic principles of Mechanics':
+    'இயக்கவியலின் அடிப்படைக் கோட்பாடுகளின் அன்றாடப் பயன்பாடு',
+  Evolution: 'பரிணாமம்',
+  'Evolution of Indian Constitution': 'இந்திய அரசியலமைப்பின் பரிணாமம்',
+  'Fertilizers and Pesticides': 'உரங்கள் மற்றும் பூச்சிக்கொல்லிகள்',
+  'Figures of Speech': 'அணி இலக்கணம்',
+  'Finance Commission': 'நிதி ஆணையம்',
+  'Five Year Plan Models-An Assessment': 'ஐந்தாண்டுத் திட்ட மாதிரிகள் - மதிப்பீடு',
+  'Forest and Wildlife': 'காடு மற்றும் வனவிலங்குகள்',
+  'Fundamental Rights': 'அடிப்படை உரிமைகள்',
+  'Gandhi & Early Movements': 'காந்தி & ஆரம்பகால இயக்கங்கள்',
+  'General Scientific Laws': 'பொது அறிவியல் விதிகள்',
+  Genetics: 'மரபியல்',
+  'Geography of TN & its Impact on Economic Growth':
+    'தமிழ்நாட்டின் புவியியல் & பொருளாதார வளர்ச்சியில் அதன் தாக்கம்',
+  'Government Schemes': 'அரசுத் திட்டங்கள்',
+  Grammar: 'இலக்கணம்',
+  'Grammar and Comprehension': 'இலக்கணம் மற்றும் விளக்கம்',
+  'Growth of Jainism and Buddhism': 'சமணம் மற்றும் பௌத்தத்தின் வளர்ச்சி',
+  'Health and Hygiene': 'சுகாதாரம் மற்றும் தூய்மை',
+  'History of Tamil society': 'தமிழ்ச் சமூகத்தின் வரலாறு',
+  'Human Development Indicators': 'மனித மேம்பாட்டுக் குறியீடுகள்',
+  'Human Diseases': 'மனித நோய்கள்',
+  'Human rights charter': 'மனித உரிமைகள் சாசனம்',
+  'Indian Freedom Struggle': 'இந்திய சுதந்திரப் போராட்டம்',
+  'Indian National Congress': 'இந்திய தேசிய காங்கிரஸ்',
+  'Indus Valley Civilization (2500 - 1800 BC)': 'சிந்து சமவெளி நாகரிகம் (கி.மு. 2500 - 1800)',
+  'Industrial growth': 'தொழில் வளர்ச்சி',
+  'Judiciary in India': 'இந்தியாவில் நீதித்துறை',
+  'Local Governments': 'உள்ளாட்சி அமைப்புகள்',
+  Location: 'அமைவிடம்',
+  'Main Concepts of Life Science': 'உயிரியலின் முக்கியக் கருத்துகள்',
+  'Mechanics and Properties of Matter': 'இயக்கவியல் மற்றும் பொருளின் பண்புகள்',
+  'Monsoon, Rainfall, Weather and Climate': 'பருவமழை, மழை, வானிலை மற்றும் காலநிலை',
+  'Natural Calamity': 'இயற்கைப் பேரிடர்',
+  'Nature of Universe': 'பேரண்டத்தின் இயல்பு',
+  'Nuclear Physics and Laser': 'அணுக்கரு இயற்பியல் மற்றும் லேசர்',
+  Nutrition: 'ஊட்டச்சத்து',
+  'Other Topics': 'பிற தலைப்புகள்',
+  Others: 'பிற',
+  'Partition of India and Independence': 'இந்தியப் பிரிவினை மற்றும் சுதந்திரம்',
+  'Petroleum Products': 'பெட்ரோலியப் பொருட்கள்',
+  'Physical Features': 'இயற்கை அமைப்புகள்',
+  Physiology: 'உடலியக்கவியல்',
+  'Planning Commission and Niti Ayog': 'திட்டக்குழு மற்றும் நிதி ஆயோக்',
+  'Political Institution Established before Congress':
+    'காங்கிரஸுக்கு முன் நிறுவப்பட்ட அரசியல் அமைப்புகள்',
+  'Political Parties & Welfare Schemes': 'அரசியல் கட்சிகள் & நலத்திட்டங்கள்',
+  'Population Density and Distribution': 'மக்கள்தொகை அடர்த்தி மற்றும் பரவல்',
+  'Post - Mauryan Period': 'மௌரியருக்குப் பிந்தைய காலம்',
+  'Pre Historic Tamilagam & Archaeological': 'தொல்பழங்கால தமிழகம் & தொல்லியல்',
+  'Preamble to the Constitution': 'அரசியலமைப்பின் முகவுரை',
+  'Public Finance': 'பொது நிதி',
+  'Quit India Movement': 'வெள்ளையனே வெளியேறு இயக்கம்',
+  'Regional Powers during Mughal Period': 'முகலாயர் காலத்தில் பிராந்திய சக்திகள்',
+  'Reserve Bank of India': 'இந்திய ரிசர்வ் வங்கி',
+  'Revolution of 1857': '1857 புரட்சி',
+  'Rivers in India': 'இந்தியாவின் ஆறுகள்',
+  'Role of Tamilnadu in freedom struggle': 'சுதந்திரப் போராட்டத்தில் தமிழ்நாட்டின் பங்கு',
+  'Rule of Law': 'சட்டத்தின் ஆட்சி',
+  'Rural welfare oriented programmes': 'கிராம நலன் சார்ந்த திட்டங்கள்',
+  'Social And Religious Movements In The Nineteenth Century':
+    'பத்தொன்பதாம் நூற்றாண்டின் சமூக மற்றும் சமய இயக்கங்கள்',
+  'Social Geography': 'சமூகப் புவியியல்',
+  'Social Justice & Harmony': 'சமூக நீதி & நல்லிணக்கம்',
+  'Socio Political movements in Tamil Nadu': 'தமிழ்நாட்டில் சமூக-அரசியல் இயக்கங்கள்',
+  'Soil, Minerals and Natural Resources': 'மண், கனிமங்கள் மற்றும் இயற்கை வளங்கள்',
+  'Sources of revenue': 'வருவாய் ஆதாரங்கள்',
+  'State Executive': 'மாநில நிறைவேற்று அதிகாரம்',
+  'State Legislature': 'மாநில சட்டமன்றம்',
+  'Structure of Indian Economy and Employment Generation':
+    'இந்தியப் பொருளாதாரத்தின் கட்டமைப்பு மற்றும் வேலைவாய்ப்பு உருவாக்கம்',
+  'The Coming of Islam': 'இஸ்லாத்தின் வருகை',
+  'The Coming of The Europeans': 'ஐரோப்பியர்களின் வருகை',
+  'The Gupta Dynasty (AD 320 - 550)': 'குப்த வம்சம் (கி.பி. 320 - 550)',
+  'The Mauryan Empire (321 - 289 BC)': 'மௌரியப் பேரரசு (கி.மு. 321 - 289)',
+  'The Mughal Dynasty (1526 - 1540 and 1555 - 1857)':
+    'முகலாய வம்சம் (1526 - 1540 மற்றும் 1555 - 1857)',
+  'The Pre-Historic Period': 'தொல்பழங்காலம்',
+  'The Southern Dynasties': 'தென்னக வம்சங்கள்',
+  'The Vardhanas (AD 550 - 647)': 'வர்தனர்கள் (கி.பி. 550 - 647)',
+  'The Vedic Period- the Aryans': 'வேத காலம் - ஆரியர்கள்',
+  'Transport and Communication': 'போக்குவரத்து மற்றும் தொடர்பு',
+  'Union Executive': 'மத்திய நிறைவேற்று அதிகாரம்',
+  'Union Legislature': 'மத்திய சட்டமன்றம்',
+  'Union, State and Union Territory': 'மத்திய, மாநில மற்றும் யூனியன் பிரதேசம்',
+  'Viceroys of India': 'இந்தியாவின் வைஸ்ராய்கள்',
+  'Water Resources': 'நீர் வளங்கள்',
+  // Sub-group headings (from SUBJECT_TOPIC_GROUPS) + the auto "More" bucket.
+  'Core Economics': 'அடிப்படைப் பொருளியல்',
+  'Economic Development': 'பொருளாதார வளர்ச்சி',
+  'Physical Geography': 'இயற்கைப் புவியியல்',
+  'Human Geography': 'மானிடப் புவியியல்',
+  More: 'மேலும்',
+  // ── Aptitude · Numerics ──
+  'AP, GP and Special Series': 'கூட்டுத்தொடர், பெருக்குத்தொடர் & சிறப்புத் தொடர்கள்',
+  'Area And Volume': 'பரப்பளவு மற்றும் கன அளவு',
+  'Average, Mean Median Mode': 'சராசரி, இடைநிலை, முகடு',
+  'Compound Interest': 'கூட்டு வட்டி',
+  'LCM and HCF': 'மீ.சி.ம மற்றும் மீ.பொ.வ',
+  Percentage: 'சதவீதம்',
+  'Profit And Loss': 'லாபம் மற்றும் நட்டம்',
+  'Ratio And Proportion': 'விகிதம் மற்றும் விகிதாசாரம்',
+  'Simple Interest': 'தனி வட்டி',
+  Simplification: 'எளிமைப்படுத்துதல்',
+  'Surds And Indices': 'மூலங்கள் மற்றும் அடுக்குகள்',
+  'Time, Work , Speed And Distance': 'நேரம், வேலை, வேகம் மற்றும் தூரம்',
+  // ── Aptitude · Reasoning ──
+  'Alphabet Series': 'எழுத்துத் தொடர்',
+  Analogy: 'ஒப்புமை',
+  'Clock Problems': 'கடிகாரக் கணக்குகள்',
+  'Coding Decoding': 'குறியீடு - மறைகுறியீடு',
+  'Date Problems': 'தேதிக் கணக்குகள்',
+  'Dice Problems': 'பகடைக் கணக்குகள்',
+  'Direction Based': 'திசை சார்ந்தவை',
+  'Mathematical Operators': 'கணிதச் செயற்குறிகள்',
+  'No Of Figures': 'உருவங்களின் எண்ணிக்கை',
+  'Number Series': 'எண் தொடர்',
+  Puzzles: 'புதிர்கள்',
+  'Seating Arangement': 'இருக்கை அமைப்பு',
+  // ── Current Affairs themes ──
+  Economy: 'பொருளாதாரம்',
+  Environment: 'சுற்றுச்சூழல்',
+  'Important Days': 'முக்கிய நாட்கள்',
+  International: 'சர்வதேசம்',
+  Miscellaneous: 'இதர',
+  National: 'தேசியம்',
+  'Personalities, Awards and Events': 'பிரபலங்கள், விருதுகள் மற்றும் நிகழ்வுகள்',
+  'Reports and Indices': 'அறிக்கைகள் மற்றும் குறியீடுகள்',
+  'Science and Technology': 'அறிவியல் மற்றும் தொழில்நுட்பம்',
+  Sports: 'விளையாட்டு',
+  States: 'மாநிலங்கள்',
+  'Tamil Nadu': 'தமிழ்நாடு',
+}
+
+/** A topic (or sub-group heading) in the chosen language. Unknown topics — e.g.
+ *  PYQ's per-question labels — return unchanged. */
+export function topicName(name: string, lang: Lang | null): string {
+  const ta = TOPIC_NAME_TA[name]
+  if (!ta) return name
+  if (lang === 'ta') return ta
+  if (lang === 'both') return `${name} / ${ta}`
+  return name
+}
 
 // ─── Groups for Previous Year Question Papers ───────────────────────────────
 
@@ -407,7 +614,7 @@ export function groupLabel(id?: string): string {
 
 // ─── Mock-test blueprints (TNPSC 2024 / 2025 group patterns) ─────────────────
 // Subject-wise question distribution per group exam. The `slots` counts here
-// MUST match the GROUP_SLOTS table in server/src/routes/questions.ts — the UI
+// MUST match the GROUP_SLOTS table in server/src/routes/questions.ts - the UI
 // renders these for the pre-test breakdown; the server pulls the real questions.
 
 export const MOCK_BLUEPRINTS: MockBlueprint[] = [
@@ -427,6 +634,44 @@ export const MOCK_BLUEPRINTS: MockBlueprint[] = [
       { label: 'TN Administration', count: 6 },
       { label: 'Current Affairs', count: 10 },
       { label: 'Aptitude', count: 10 },
+    ],
+  },
+  {
+    id: 'Group2_2A',
+    title: 'Group 2 / 2A Prelims',
+    totalQuestions: 100,
+    durationMinutes: 90,
+    negativeMark: 0,
+    // Slots MUST match GROUP_SLOTS['Group2_2A'] in server/src/routes/questions.ts.
+    slots: [
+      { label: 'History & INM', count: 10 },
+      { label: 'Polity', count: 8 },
+      { label: 'Geography', count: 8 },
+      { label: 'General Science', count: 10 },
+      { label: 'Economy', count: 4 },
+      { label: 'TN History & Culture', count: 10 },
+      { label: 'TN Administration', count: 5 },
+      { label: 'General Tamil', count: 15 },
+      { label: 'Current Affairs', count: 15 },
+      { label: 'Aptitude', count: 15 },
+    ],
+  },
+  {
+    id: 'Group4_VAO',
+    title: 'Group 4 & VAO',
+    totalQuestions: 100,
+    durationMinutes: 90,
+    negativeMark: 0,
+    // Slots MUST match GROUP_SLOTS['Group4_VAO'] in server/src/routes/questions.ts.
+    slots: [
+      { label: 'General Tamil', count: 20 },
+      { label: 'History & INM', count: 15 },
+      { label: 'Geography', count: 10 },
+      { label: 'Polity', count: 10 },
+      { label: 'General Science', count: 20 },
+      { label: 'Economy', count: 10 },
+      { label: 'Current Affairs', count: 10 },
+      { label: 'Aptitude', count: 5 },
     ],
   },
 ]

@@ -14,6 +14,7 @@ import {
   Trophy,
   Clock,
   Award,
+  Globe,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -24,12 +25,30 @@ import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS, groupLabel } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
+import { useLanguageStore, type Lang } from '../store/languageStore'
+import { api } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
+
+const LANG_OPTIONS: { id: Lang; labelKey: StringKey }[] = [
+  { id: 'en', labelKey: 'langEnglish' },
+  { id: 'ta', labelKey: 'langTamil' },
+  { id: 'both', labelKey: 'langBoth' },
+]
 
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { user, profile, isAdmin, isSuperAdmin, signOut } = useAuth()
   const { t } = useT()
+  const lang = useLanguageStore((s) => s.lang) ?? 'en'
+  const setLang = useLanguageStore((s) => s.setLang)
+
+  // Change the account's language preference: update the UI instantly (local
+  // store) and persist to the profile (best-effort — survives across devices).
+  const changeLanguage = (next: Lang) => {
+    if (next === lang) return
+    setLang(next)
+    api.updateProfile({ language: next }).catch(() => {})
+  }
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [loading, setLoading] = useState(true)
@@ -168,6 +187,25 @@ export default function ProfilePage() {
                 {profile?.phone && (
                   <DetailRow icon={<ShieldCheck size={16} />} label={t('phone')} value={profile.phone} />
                 )}
+                {/* Language preference — chosen once at onboarding, editable here. */}
+                <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center">
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                    <Globe size={16} />
+                  </span>
+                  <span className="tamil flex-1 font-body text-sm text-ink2">{t('language')}</span>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label={t('language')}>
+                    {LANG_OPTIONS.map((o) => (
+                      <button
+                        key={o.id}
+                        onClick={() => changeLanguage(o.id)}
+                        aria-pressed={lang === o.id}
+                        className={lang === o.id ? 'chip chip-active' : 'chip'}
+                      >
+                        {t(o.labelKey)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -248,18 +286,17 @@ function LevelRing({ level, pct, size = 56 }: { level: number; pct: number; size
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#E4EAF4" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-line" />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke="#2563EB"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={off}
-          className="transition-all duration-500"
+          className="stroke-brand transition-all duration-500"
         />
       </svg>
       <span className="absolute inset-0 grid place-items-center font-heading text-base font-semibold text-ink">

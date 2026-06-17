@@ -2,7 +2,7 @@ import { api } from './api'
 import type { Question } from '../types'
 
 /**
- * Bookmarks — let a student save questions and review them later. All calls go
+ * Bookmarks - let a student save questions and review them later. All calls go
  * through the API (the server writes to the RLS-protected `bookmarks` table and
  * reveals answers only for the user's own saved rows via `get_bookmarks`).
  */

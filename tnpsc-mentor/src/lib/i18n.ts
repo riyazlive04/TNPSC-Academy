@@ -14,6 +14,32 @@ const STRINGS = {
   home: { en: 'Home', ta: 'முகப்பு' },
   admin: { en: 'Admin', ta: 'நிர்வாகி' },
   back: { en: 'Back', ta: 'பின்செல்' },
+  darkMode: { en: 'Dark mode', ta: 'இருண்ட பயன்முறை' },
+  lightMode: { en: 'Light mode', ta: 'ஒளி பயன்முறை' },
+  viewLanguage: { en: 'Question language', ta: 'வினா மொழி' },
+  // Auth split-screen hero (login / register / forgot)
+  authHeroTitle: {
+    en: 'Your fast track to the TNPSC exam hall.',
+    ta: 'TNPSC தேர்வு அரங்கிற்கான உங்கள் விரைவுப் பாதை.',
+  },
+  authHeroSub: {
+    en: '12,000+ bilingual questions, timed mock tests, smart revision and progress insights - all in one focused workspace.',
+    ta: '12,000+ இருமொழி வினாக்கள், நேரத் தேர்வுகள், திறன்மிகு மீள்பார்வை மற்றும் முன்னேற்றப் பகுப்பாய்வு - அனைத்தும் ஒரே இடத்தில்.',
+  },
+  authFooter: {
+    en: 'Tamil Nadu Public Service Commission · Aspirant Portal',
+    ta: 'தமிழ்நாடு அரசுப் பணியாளர் தேர்வாணையம் · மாணவர் வாயில்',
+  },
+  chipPyq: { en: 'Previous Year', ta: 'முந்தைய ஆண்டு' },
+  chipSamacheer: { en: 'Samacheer', ta: 'சமச்சீர்' },
+  chipCa: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
+  chipAptitude: { en: 'Aptitude', ta: 'திறனாய்வு' },
+  downloadExplanations: { en: 'Download explanations (PDF)', ta: 'விளக்கங்களைப் பதிவிறக்கு (PDF)' },
+  preparingPdf: { en: 'Preparing PDF…', ta: 'PDF தயாராகிறது…' },
+  pdfWhenComplete: {
+    en: 'Attempt all the questions to unlock the full explanation PDF.',
+    ta: 'முழு விளக்க PDF-ஐப் பெற அனைத்து வினாக்களுக்கும் பதிலளிக்கவும்.',
+  },
   loading: { en: 'Loading…', ta: 'ஏற்றுகிறது…' },
   correctMark: { en: 'Correct', ta: 'சரியானது' },
   deleteQuestionTitle: { en: 'Delete this question?', ta: 'இந்த வினாவை நீக்கவா?' },
@@ -26,6 +52,7 @@ const STRINGS = {
 
   // Language screen
   chooseLanguage: { en: 'Choose Your Language', ta: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்' },
+  language: { en: 'Language', ta: 'மொழி' },
   languageHint: {
     en: 'You can change this anytime from the top bar.',
     ta: 'மேல் பட்டியில் இருந்து இதை எப்போது வேண்டுமானாலும் மாற்றலாம்.',
@@ -57,8 +84,8 @@ const STRINGS = {
   },
   manageBank: { en: 'Manage Question Bank', ta: 'வினாத் தொகுப்பை நிர்வகி' },
   pickCategoryAdmin: {
-    en: 'Pick a category to browse, edit and export its questions — answers are shown.',
-    ta: 'ஒரு பிரிவைத் தேர்ந்தெடுத்து வினாக்களைப் பார்க்க, திருத்த, ஏற்றுமதி செய்ய — விடைகள் காட்டப்படும்.',
+    en: 'Pick a category to browse, edit and export its questions - answers are shown.',
+    ta: 'ஒரு பிரிவைத் தேர்ந்தெடுத்து வினாக்களைப் பார்க்க, திருத்த, ஏற்றுமதி செய்ய - விடைகள் காட்டப்படும்.',
   },
   browseEditBank: { en: 'Browse & edit · answers shown', ta: 'பார்க்க & திருத்த · விடைகளுடன்' },
   outerQuestionsSub: { en: 'Subject-wise bank · view & download PDF', ta: 'பாட வாரியான தொகுப்பு · PDF பதிவிறக்கம்' },
@@ -67,32 +94,41 @@ const STRINGS = {
   pyqTitle: { en: 'PREVIOUS YEAR QUESTION PAPERS', ta: 'முந்தைய ஆண்டு வினாத்தாள்கள்' },
   samacheerTitle: { en: 'SAMACHEER BASED', ta: 'சமச்சீர் அடிப்படையில்' },
   currentAffairsTitle: { en: 'CURRENT AFFAIRS', ta: 'நடப்பு நிகழ்வுகள்' },
-  aptitudeTitle: { en: 'APTITUDE TOPIC WISE', ta: 'திறன் தலைப்பு வாரியாக' },
+  aptitudeTitle: { en: 'APTITUDE TOPIC WISE', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு' },
 
   // Section badges
   pyqBadge: { en: 'Previous Year Question Paper', ta: 'முந்தைய ஆண்டு வினாத்தாள்' },
   samacheerBadge: { en: 'Samacheer Based', ta: 'சமச்சீர் அடிப்படையில்' },
   currentAffairsBadge: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
-  aptitudeBadge: { en: 'Aptitude', ta: 'திறன் அறிவு' },
+  aptitudeBadge: { en: 'Aptitude', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு' },
   questionBank: { en: 'Question Bank', ta: 'வினாத் தொகுப்பு' },
 
   // Subject Practice (rewritten bank: subject -> topic -> question type)
   subjectPracticeTitle: { en: 'SUBJECT PRACTICE', ta: 'பாடப் பயிற்சி' },
   subjectPracticeBadge: { en: 'Subject Practice', ta: 'பாடப் பயிற்சி' },
-  step3Type: { en: 'Step 3 — Select Question Type', ta: 'படி 3 — வினா வகையைத் தேர்ந்தெடுக்கவும்' },
+  step3Type: { en: 'Step 3 - Select Question Type', ta: 'படி 3 - வினா வகையைத் தேர்ந்தெடுக்கவும்' },
   typeMixed: { en: 'Mixed (All Types)', ta: 'கலப்பு (அனைத்து வகைகள்)' },
   typeChronological: { en: 'Chronological', ta: 'காலவரிசை' },
   typeMatch: { en: 'Match the Following', ta: 'பொருத்துக' },
-  typeAssertionReason: { en: 'Assertion & Reason', ta: 'கூற்று – காரணம்' },
+  typeAssertionReason: { en: 'Assertion & Reason', ta: 'கூற்று - காரணம்' },
   typeStatements: { en: 'Statements', ta: 'கூற்றுகள்' },
   typeDirect: { en: 'Direct', ta: 'நேரடி' },
+  // Subject Practice wizard (3 full-screen steps)
+  pickSubject: { en: 'Pick a Subject', ta: 'ஒரு பாடத்தைத் தேர்ந்தெடுக்கவும்' },
+  pickTopic: { en: 'Pick a Topic', ta: 'ஒரு தலைப்பைத் தேர்ந்தெடுக்கவும்' },
+  pickType: { en: 'Question Type', ta: 'வினா வகை' },
+  subjectStepHint: { en: 'Choose a subject to practise', ta: 'பயிற்சி செய்ய ஒரு பாடத்தைத் தேர்ந்தெடுக்கவும்' },
+  topicStepHint: { en: 'Choose a topic, or mix them all', ta: 'ஒரு தலைப்பைத் தேர்ந்தெடுக்கவும், அல்லது அனைத்தையும் கலக்கவும்' },
+  typeStepHint: { en: 'Pick a style to start the test', ta: 'தேர்வைத் தொடங்க ஒரு வகையைத் தேர்ந்தெடுக்கவும்' },
+  allTopicsSub: { en: 'Mix questions from every topic', ta: 'அனைத்து தலைப்புகளிலிருந்தும் கலந்து' },
+  byPeriod: { en: 'by period', ta: 'காலகட்ட வாரியாக' },
 
   // History period selector (PYQ History → Ancient / Medieval / Modern)
-  historyPeriodBadge: { en: 'History — Previous Year Questions', ta: 'வரலாறு — முந்தைய ஆண்டு வினாக்கள்' },
+  historyPeriodBadge: { en: 'History - Previous Year Questions', ta: 'வரலாறு - முந்தைய ஆண்டு வினாக்கள்' },
   historyPickPeriod: { en: 'Select a Period', ta: 'காலகட்டத்தைத் தேர்ந்தெடுக்கவும்' },
   historyPickPeriodSub: {
-    en: 'Pick a period to begin a History test (Group 1 Prelims, 2019–2025).',
-    ta: 'வரலாறு தேர்வைத் தொடங்க ஒரு காலகட்டத்தைத் தேர்ந்தெடுக்கவும் (குரூப் 1 முதனிலை, 2019–2025).',
+    en: 'Pick a period to begin a History test (Group 1 Prelims, 2019-2025).',
+    ta: 'வரலாறு தேர்வைத் தொடங்க ஒரு காலகட்டத்தைத் தேர்ந்தெடுக்கவும் (குரூப் 1 முதனிலை, 2019-2025).',
   },
   periodAncient: { en: 'Ancient History', ta: 'பண்டைய வரலாறு' },
   periodMedieval: { en: 'Medieval History', ta: 'இடைக்கால வரலாறு' },
@@ -103,19 +139,19 @@ const STRINGS = {
   questionsCount: { en: 'questions', ta: 'வினாக்கள்' },
 
   // Steps / selectors
-  step1Group: { en: 'Step 1 — Select Group', ta: 'படி 1 — குழுவைத் தேர்ந்தெடுக்கவும்' },
-  step2Subject: { en: 'Step 2 — Select Subject', ta: 'படி 2 — பாடத்தைத் தேர்ந்தெடுக்கவும்' },
-  step1Subject: { en: 'Step 1 — Select Subject', ta: 'படி 1 — பாடத்தைத் தேர்ந்தெடுக்கவும்' },
-  step2Standard: { en: 'Step 2 — Select Standard', ta: 'படி 2 — வகுப்பைத் தேர்ந்தெடுக்கவும்' },
-  step3Topic: { en: 'Step 3 — Select Topic', ta: 'படி 3 — தலைப்பைத் தேர்ந்தெடுக்கவும்' },
+  step1Group: { en: 'Step 1 - Select Group', ta: 'படி 1 - குழுவைத் தேர்ந்தெடுக்கவும்' },
+  step2Subject: { en: 'Step 2 - Select Subject', ta: 'படி 2 - பாடத்தைத் தேர்ந்தெடுக்கவும்' },
+  step1Subject: { en: 'Step 1 - Select Subject', ta: 'படி 1 - பாடத்தைத் தேர்ந்தெடுக்கவும்' },
+  step2Standard: { en: 'Step 2 - Select Standard', ta: 'படி 2 - வகுப்பைத் தேர்ந்தெடுக்கவும்' },
+  step3Topic: { en: 'Step 3 - Select Topic', ta: 'படி 3 - தலைப்பைத் தேர்ந்தெடுக்கவும்' },
   allTopics: { en: 'All Topics', ta: 'அனைத்து தலைப்புகள்' },
   solGiven: { en: 'Given', ta: 'தரவுகள்' },
   solWorking: { en: 'From question', ta: 'வினாவிலிருந்து' },
   solAsked: { en: 'Asked', ta: 'கேட்டது' },
   solAnswer: { en: 'Answer', ta: 'விடை' },
   explanationLabel: { en: 'Explanation', ta: 'விளக்கம்' },
-  step1Category: { en: 'Step 1 — Select Category', ta: 'படி 1 — பிரிவைத் தேர்ந்தெடுக்கவும்' },
-  step2Topic: { en: 'Step 2 — Select Topic', ta: 'படி 2 — தலைப்பைத் தேர்ந்தெடுக்கவும்' },
+  step1Category: { en: 'Step 1 - Select Category', ta: 'படி 1 - பிரிவைத் தேர்ந்தெடுக்கவும்' },
+  step2Topic: { en: 'Step 2 - Select Topic', ta: 'படி 2 - தலைப்பைத் தேர்ந்தெடுக்கவும்' },
   selectMonth: { en: 'Select Month', ta: 'மாதத்தைத் தேர்ந்தெடுக்கவும்' },
   topicWise: { en: 'Topic Wise', ta: 'தலைப்பு வாரியாக' },
   monthWise: { en: 'Month Wise', ta: 'மாத வாரியாக' },
@@ -135,9 +171,83 @@ const STRINGS = {
   explanation: { en: 'Explanation', ta: 'விளக்கம்' },
   preparingTest: { en: 'Preparing your test…', ta: 'உங்கள் தேர்வு தயாராகிறது…' },
   min15: {
-    en: 'Please spend at least 15 seconds on this question.',
-    ta: 'இந்த வினாவில் குறைந்தது 15 வினாடிகள் செலவிடவும்.',
+    en: 'Hold on — please read the question before moving on.',
+    ta: 'பொறுங்கள் — தொடரும் முன் வினாவை வாசியுங்கள்.',
   },
+  readCarefully: {
+    en: 'This is a long question — read it carefully before answering.',
+    ta: 'இது நீளமான வினா — பதிலளிக்கும் முன் கவனமாக வாசியுங்கள்.',
+  },
+  waitSeconds: {
+    en: 'You can continue in',
+    ta: 'தொடர முடியும்',
+  },
+  exitTest: { en: 'Exit test', ta: 'தேர்வை விட்டு வெளியேறு' },
+  flagForReview: { en: 'Flag this question for review', ta: 'மதிப்பாய்வுக்காக இந்த வினாவைக் குறி' },
+  unflagQuestion: { en: 'Unflag this question', ta: 'இந்த வினாவின் குறியை அகற்று' },
+  attemptedLabel: { en: 'Attempted', ta: 'முயற்சித்தவை' },
+  loadQuestionsError: {
+    en: 'Could not load questions. Check your connection and try again.',
+    ta: 'வினாக்களை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+  },
+  backToTestArena: { en: 'Back to Test Arena', ta: 'தேர்வு அரங்கத்திற்குத் திரும்பு' },
+  noQuestionsLong: {
+    en: 'No questions are available for this selection yet. Please choose another topic.',
+    ta: 'இந்தத் தேர்வுக்கு இன்னும் வினாக்கள் இல்லை. வேறு தலைப்பைத் தேர்ந்தெடுக்கவும்.',
+  },
+
+  // Quiz dialogs (modals)
+  attendanceBelow25: { en: 'Attendance below 25%', ta: 'வருகை 25%க்குக் கீழே' },
+  attendanceGateMsg: {
+    en: 'You must attempt at least 25% of the questions to unlock the explanations. You can still submit now to see your score only.',
+    ta: 'விளக்கங்களைத் திறக்க குறைந்தது 25% வினாக்களை முயற்சிக்க வேண்டும். மதிப்பெண்ணை மட்டும் காண இப்போதே சமர்ப்பிக்கலாம்.',
+  },
+  attendanceAttemptedLine: { en: 'You have attempted', ta: 'நீங்கள் முயற்சித்துள்ளீர்கள்' },
+  submitAnywayScore: { en: 'Submit Anyway (Score Only)', ta: 'எப்படியும் சமர்ப்பி (மதிப்பெண் மட்டும்)' },
+  continueTest: { en: 'Continue Test', ta: 'தேர்வைத் தொடரவும்' },
+  exitTestTitle: { en: 'Exit Test?', ta: 'தேர்வை விட்டு வெளியேறவா?' },
+  exitTestMsg: {
+    en: 'What would you like to do with your progress so far?',
+    ta: 'இதுவரையிலான உங்கள் முன்னேற்றத்தை என்ன செய்ய விரும்புகிறீர்கள்?',
+  },
+  submitSeeResults: { en: 'Submit & See Results', ta: 'சமர்ப்பித்து முடிவுகளைக் காண்க' },
+  exitWithoutSaving: { en: 'Exit Without Saving', ta: 'சேமிக்காமல் வெளியேறு' },
+  keepGoingBtn: { en: 'Keep Going', ta: 'தொடரவும்' },
+  submitFailed: { en: 'Submit failed', ta: 'சமர்ப்பிப்பு தோல்வியடைந்தது' },
+  retrySubmit: { en: 'Retry Submit', ta: 'மீண்டும் சமர்ப்பி' },
+  signInAgain: { en: 'Sign In Again', ta: 'மீண்டும் உள்நுழை' },
+
+  // Result page labels
+  testCompleteLabel: { en: 'Test complete', ta: 'தேர்வு முடிந்தது' },
+  explanationsUnlockedMsg: {
+    en: 'explanations are unlocked in the review below.',
+    ta: 'கீழே உள்ள மதிப்பாய்வில் விளக்கங்கள் திறக்கப்பட்டுள்ளன.',
+  },
+  youAttended: { en: 'You attended', ta: 'நீங்கள் முயற்சித்தது' },
+  unlockExplanationsMsg: {
+    en: 'Attempt at least 25% of questions to unlock explanations.',
+    ta: 'விளக்கங்களைத் திறக்க குறைந்தது 25% வினாக்களை முயற்சிக்கவும்.',
+  },
+  filterAll: { en: 'All', ta: 'அனைத்தும்' },
+  filterWrong: { en: 'Wrong', ta: 'தவறு' },
+  filterCorrect: { en: 'Correct', ta: 'சரி' },
+  filterFlagged: { en: 'Flagged', ta: 'குறிக்கப்பட்டவை' },
+  noFilterQuestions: { en: 'No questions in this test.', ta: 'இந்தத் தேர்வில் வினாக்கள் இல்லை.' },
+
+  // Result card (per-question review)
+  statusSkipped: { en: 'Skipped', ta: 'தவிர்க்கப்பட்டது' },
+  statusCorrect: { en: 'Correct', ta: 'சரி' },
+  statusWrong: { en: 'Wrong', ta: 'தவறு' },
+  removeBookmark: { en: 'Remove bookmark', ta: 'புத்தகக்குறியை அகற்று' },
+  saveQuestion: { en: 'Save question', ta: 'வினாவைச் சேமி' },
+  savedTapRemove: { en: 'Saved - tap to remove', ta: 'சேமிக்கப்பட்டது - அகற்ற தட்டவும்' },
+  saveForLater: { en: 'Save for later', ta: 'பின்னர் பார்க்கச் சேமி' },
+  yourAnswerLabel: { en: 'Your answer', ta: 'உங்கள் பதில்' },
+  yourAnswerSuffix: { en: '(your answer)', ta: '(உங்கள் பதில்)' },
+  whyAnswerWrong: { en: 'Why your answer', ta: 'உங்கள் பதில் ஏன்' },
+  isWrong: { en: 'is wrong:', ta: 'தவறு:' },
+  explanationColon: { en: 'Explanation:', ta: 'விளக்கம்:' },
+  notAttempted: { en: 'Not attempted', ta: 'முயற்சிக்கப்படவில்லை' },
 
   // Result
   testComplete: { en: 'Test Complete', ta: 'தேர்வு முடிந்தது' },
@@ -167,8 +277,8 @@ const STRINGS = {
   studyTime: { en: 'Study Time', ta: 'படிப்பு நேரம்' },
   focusAreas: { en: 'Focus Areas', ta: 'கவனம் தேவைப்படும் பகுதிகள்' },
   focusHint: {
-    en: 'These topics need work — revise and re-attempt them next.',
-    ta: 'இந்தத் தலைப்புகளில் கவனம் தேவை — மீள்பார்வை செய்து மீண்டும் முயற்சிக்கவும்.',
+    en: 'These topics need work - revise and re-attempt them next.',
+    ta: 'இந்தத் தலைப்புகளில் கவனம் தேவை - மீள்பார்வை செய்து மீண்டும் முயற்சிக்கவும்.',
   },
   strengths: { en: 'Your Strengths', ta: 'உங்கள் பலங்கள்' },
   bySubject: { en: 'By Subject', ta: 'பாடம் வாரியாக' },
@@ -198,8 +308,8 @@ const STRINGS = {
   startRevision: { en: 'Start Revision', ta: 'மீள்பார்வையைத் தொடங்கு' },
   practiceMistakes: { en: 'Practice your mistakes', ta: 'தவறுகளைப் பயிற்சி செய்' },
   revisionEmpty: {
-    en: 'Nothing due. Finish a test — wrong & flagged questions come here for spaced revision.',
-    ta: 'எதுவும் இல்லை. ஒரு தேர்வை முடியுங்கள் — தவறான & குறித்த வினாக்கள் மீள்பார்வைக்கு இங்கே வரும்.',
+    en: 'Nothing due. Finish a test - wrong & flagged questions come here for spaced revision.',
+    ta: 'எதுவும் இல்லை. ஒரு தேர்வை முடியுங்கள் - தவறான & குறித்த வினாக்கள் மீள்பார்வைக்கு இங்கே வரும்.',
   },
   allCaughtUp: { en: 'All caught up', ta: 'அனைத்தும் முடிந்தது' },
 
@@ -210,7 +320,7 @@ const STRINGS = {
   negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
   startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
 
-  // Mock test — group exam vs subject/topic
+  // Mock test - group exam vs subject/topic
   mockGroupExam: { en: 'Group Exam', ta: 'குரூப் தேர்வு' },
   mockSubjectExam: { en: 'Subject / Topic', ta: 'பாடம் / தலைப்பு' },
   mockGroupSub: {
@@ -267,6 +377,16 @@ const STRINGS = {
   // Pre-quiz setup (practice quizzes)
   numQuestions: { en: 'Number of Questions', ta: 'வினாக்களின் எண்ணிக்கை' },
   timeLimitMin: { en: 'Time Limit (minutes)', ta: 'கால அளவு (நிமிடங்கள்)' },
+  questionsAvailable: { en: 'available', ta: 'வினாக்கள் உள்ளன' },
+  minutesShort: { en: 'min', ta: 'நிமி.' },
+  countingQuestions: { en: 'Counting available questions…', ta: 'உள்ள வினாக்கள் கணக்கிடப்படுகிறது…' },
+  recommendedTime: { en: 'Recommended', ta: 'பரிந்துரைக்கப்பட்டது' },
+  recommendedTimeHint: { en: '≈1 minute per question', ta: 'ஒரு வினாவுக்கு ≈1 நிமிடம்' },
+  applyRecommended: { en: 'Use', ta: 'பயன்படுத்து' },
+  // In-test low-time warning banner (shown visibly in the final minute)
+  timeWarn60: { en: 'Less than 1 minute left — wrap up your answers.', ta: '1 நிமிடத்திற்கும் குறைவே — உங்கள் பதில்களை முடிக்கவும்.' },
+  timeWarn30: { en: 'Only 30 seconds left!', ta: '30 வினாடிகள் மட்டுமே!' },
+  timeWarn10: { en: 'Time is almost up — submitting soon!', ta: 'நேரம் முடிய உள்ளது — விரைவில் சமர்ப்பிக்கப்படும்!' },
 
   // OMR interface
   notVisited: { en: 'Not Visited', ta: 'பார்க்கப்படவில்லை' },
@@ -283,8 +403,8 @@ const STRINGS = {
     ta: 'எச்சரிக்கை: தேர்வுத் திரையை விட்டு வெளியேறுவது பதிவு செய்யப்படுகிறது. மீண்டும் மீண்டும் மீறல்கள் தேர்வைத் தானாகச் சமர்ப்பிக்கும்.',
   },
   screenProtected: {
-    en: 'Screen protected — capture is blocked during the test.',
-    ta: 'திரை பாதுகாக்கப்பட்டது — தேர்வின் போது ஸ்கிரீன்ஷாட் தடுக்கப்படுகிறது.',
+    en: 'Screen protected - capture is blocked during the test.',
+    ta: 'திரை பாதுகாக்கப்பட்டது - தேர்வின் போது ஸ்கிரீன்ஷாட் தடுக்கப்படுகிறது.',
   },
   openPalette: { en: 'Question palette', ta: 'வினாப் பலகம்' },
   done: { en: 'Done', ta: 'முடிந்தது' },
@@ -305,8 +425,8 @@ const STRINGS = {
   // Weekly revision (Current Affairs)
   weeklyRevision: { en: 'Weekly Revision', ta: 'வாராந்திர மீள்பார்வை' },
   weeklyRevisionCta: {
-    en: 'Consolidate the week — a 20-question current-affairs mixed drill.',
-    ta: 'வாரத்தை ஒருங்கிணைக்கவும் — 20-வினா நடப்பு நிகழ்வுக் கலப்புப் பயிற்சி.',
+    en: 'Consolidate the week - a 20-question current-affairs mixed drill.',
+    ta: 'வாரத்தை ஒருங்கிணைக்கவும் - 20-வினா நடப்பு நிகழ்வுக் கலப்புப் பயிற்சி.',
   },
   startRevisionDrill: { en: 'Start Weekly Revision', ta: 'வாராந்திர மீள்பார்வையைத் தொடங்கு' },
 
@@ -320,7 +440,7 @@ const STRINGS = {
     ta: 'உங்கள் தொடர்ச்சியைத் தக்கவைக்க நாளை மீண்டும் வாருங்கள்.',
   },
   claimedToday: { en: "Today's reward claimed", ta: 'இன்றைய வெகுமதி பெறப்பட்டது' },
-  rewardReady: { en: 'Reward ready — finish today’s drill', ta: 'வெகுமதி தயார் — இன்றைய பயிற்சியை முடியுங்கள்' },
+  rewardReady: { en: 'Reward ready - finish today’s drill', ta: 'வெகுமதி தயார் - இன்றைய பயிற்சியை முடியுங்கள்' },
   totalRewards: { en: 'Total reward points', ta: 'மொத்த வெகுமதிப் புள்ளிகள்' },
   // Short labels for the compact bottom tab bar (full labels overflow on phones).
   navDaily: { en: 'Daily', ta: 'தினசரி' },
@@ -334,7 +454,7 @@ const STRINGS = {
   saveContinue: { en: 'Save & Continue', ta: 'சேமித்துத் தொடரவும்' },
   skip: { en: 'Skip', ta: 'தவிர்' },
 
-  // Gamification — level, XP, achievements
+  // Gamification - level, XP, achievements
   achievements: { en: 'Awards', ta: 'விருதுகள்' },
   profile: { en: 'Profile', ta: 'சுயவிவரம்' },
   accountDetails: { en: 'Account Details', ta: 'கணக்கு விவரங்கள்' },
@@ -347,7 +467,7 @@ const STRINGS = {
   toNextLevel: { en: 'XP to next level', ta: 'அடுத்த நிலைக்கு புள்ளிகள்' },
   badgesEarned: { en: 'badges earned', ta: 'பேட்ஜ்கள் பெற்றது' },
   locked: { en: 'Locked', ta: 'பூட்டப்பட்டது' },
-  keepGoing: { en: 'Keep going — you’re doing great!', ta: 'தொடருங்கள் — அருமை!' },
+  keepGoing: { en: 'Keep going - you’re doing great!', ta: 'தொடருங்கள் - அருமை!' },
 
   // Percentile + syllabus
   yourRank: { en: 'Your Standing', ta: 'உங்கள் நிலை' },
@@ -388,7 +508,7 @@ const STRINGS = {
   resetPasswordTitle: { en: 'Reset your password', ta: 'கடவுச்சொல்லை மீட்டமைக்கவும்' },
   resetPasswordHint: {
     en: "Enter your email and we'll send a reset link.",
-    ta: 'உங்கள் மின்னஞ்சலை உள்ளிடுங்கள் — மீட்டமைப்பு இணைப்பை அனுப்புவோம்.',
+    ta: 'உங்கள் மின்னஞ்சலை உள்ளிடுங்கள் - மீட்டமைப்பு இணைப்பை அனுப்புவோம்.',
   },
   sendResetLink: { en: 'Send reset link', ta: 'மீட்டமைப்பு இணைப்பை அனுப்பு' },
   sending: { en: 'Sending…', ta: 'அனுப்புகிறது…' },
@@ -432,6 +552,10 @@ const STRINGS = {
   feedbackThanks: { en: 'Thank you for your feedback!', ta: 'உங்கள் கருத்துக்கு நன்றி!' },
   feedbackRatingRequired: { en: 'Please pick a rating first.', ta: 'முதலில் ஒரு மதிப்பீட்டைத் தேர்ந்தெடுக்கவும்.' },
   feedbackError: { en: "Couldn't send feedback. Please try again.", ta: 'கருத்தை அனுப்ப முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
+  feedbackRateLimited: {
+    en: 'Thanks! You can share feedback again once every 3 months.',
+    ta: 'நன்றி! ஒவ்வொரு 3 மாதங்களுக்கு ஒருமுறை மீண்டும் கருத்து தெரிவிக்கலாம்.',
+  },
 
   // ─── Superadmin console ───────────────────────────────────────────────────
   superadmin: { en: 'Super Admin', ta: 'மேலாண்மை நிர்வாகி' },

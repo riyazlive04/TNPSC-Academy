@@ -14,7 +14,7 @@ interface OmrOptionsProps {
  * row: an OMR-style letter bubble plus the option's TEXT (from option_a..d /
  * their Tamil variants). The bare bubble row alone can't convey assertion-reason
  * choices ("Both A and R are true…") or match codes ("(a)-2,(b)-1,…"), so the
- * text is essential — this renders it for every question type.
+ * text is essential - this renders it for every question type.
  *
  * If a question has no option text at all (blank columns), nothing renders and
  * the caller's bubble fallback can take over.
