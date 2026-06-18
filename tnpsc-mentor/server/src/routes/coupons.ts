@@ -59,8 +59,10 @@ export async function evaluateCoupon(rawCode: string, baseAmount: number): Promi
     }
   }
 
-  // Compute the discount, then clamp so the final charge stays ≥ ₹1 (Razorpay
-  // can't take a zero-value order).
+  // Compute the discount. A coupon may cover the ENTIRE price (finalAmount 0 →
+  // nothing to pay). Razorpay can't take an order between ₹0 and ₹1, so any
+  // leftover below the minimum charge is rounded down to free rather than bumped
+  // up to ₹1 — the /order route then skips Checkout for a zero-amount order.
   let discount =
     coupon.discount_type === 'flat'
       ? coupon.discount_value
@@ -68,9 +70,14 @@ export async function evaluateCoupon(rawCode: string, baseAmount: number): Promi
   if (coupon.discount_type === 'percent' && coupon.max_discount != null) {
     discount = Math.min(discount, coupon.max_discount)
   }
-  discount = Math.max(0, Math.min(discount, baseAmount - MIN_CHARGE_PAISE))
+  discount = Math.max(0, Math.min(discount, baseAmount))
+  let finalAmount = baseAmount - discount
+  if (finalAmount > 0 && finalAmount < MIN_CHARGE_PAISE) {
+    finalAmount = 0
+    discount = baseAmount
+  }
 
-  return { ok: true, coupon, discount, finalAmount: baseAmount - discount }
+  return { ok: true, coupon, discount, finalAmount }
 }
 
 // ─── Input validation helpers ────────────────────────────────────────────────

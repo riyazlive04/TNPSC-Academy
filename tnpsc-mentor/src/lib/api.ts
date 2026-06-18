@@ -12,6 +12,8 @@ import type {
   UserRole,
 } from '../types'
 
+import { getDeviceId } from './device'
+
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
 
 /** When false the app runs in "UI-preview" mode (no backend, no auth gate). */
@@ -68,7 +70,7 @@ async function doRefresh(): Promise<boolean> {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token }),
+      body: JSON.stringify({ refresh_token, device_id: getDeviceId() }),
     })
     if (!res.ok) return false
     const data = (await res.json()) as SessionResponse
@@ -135,13 +137,22 @@ export interface SessionResponse {
   profile: Profile | null
 }
 
+/** One active device session (manage-devices screen). */
+export interface DeviceSession {
+  id: string
+  device_id: string
+  label: string | null
+  created_at: string
+  last_seen_at: string
+}
+
 export const api = {
   auth: {
     async login(email: string, password: string): Promise<SessionResponse> {
       const data = await request<SessionResponse>('/api/auth/login', {
         method: 'POST',
         auth: false,
-        body: { email, password },
+        body: { email, password, device_id: getDeviceId() },
       })
       tokens.set(data.access_token, data.refresh_token)
       return data
@@ -156,7 +167,7 @@ export const api = {
     }): Promise<SessionResponse | { requiresConfirmation: true }> {
       const data = await request<SessionResponse | { requiresConfirmation: true }>(
         '/api/auth/register',
-        { method: 'POST', auth: false, body: params }
+        { method: 'POST', auth: false, body: { ...params, device_id: getDeviceId() } }
       )
       if ('access_token' in data) tokens.set(data.access_token, data.refresh_token)
       return data
@@ -168,7 +179,7 @@ export const api = {
       const data = await request<SessionResponse>('/api/auth/google', {
         method: 'POST',
         auth: false,
-        body: { idToken },
+        body: { idToken, device_id: getDeviceId() },
       })
       tokens.set(data.access_token, data.refresh_token)
       return data
@@ -183,8 +194,23 @@ export const api = {
     async me(): Promise<{ user: { id: string }; profile: Profile | null }> {
       return request('/api/auth/me')
     },
-    logout() {
+    async logout() {
+      // Revoke this device's session server-side (frees a slot for the 2-device
+      // limit), then drop tokens locally. Best-effort — never block sign-out.
+      try {
+        await request('/api/auth/logout', { method: 'POST', body: { device_id: getDeviceId() } })
+      } catch {
+        /* ignore network/SSR failures */
+      }
       tokens.clear()
+    },
+    /** Active device sessions for the manage-devices screen. */
+    listSessions(): Promise<{ sessions: DeviceSession[] }> {
+      return request('/api/auth/sessions')
+    },
+    /** Sign out one device by session id. */
+    async revokeSession(id: string): Promise<void> {
+      await request('/api/auth/sessions/revoke', { method: 'POST', body: { id } })
     },
   },
 
@@ -622,10 +648,14 @@ export interface RazorpayOrder {
   status: string
 }
 
-export interface CreateOrderResponse {
-  order: RazorpayOrder
-  keyId: string
-}
+/**
+ * Order-creation result. A coupon that fully covers the price yields `free`
+ * (the server already recorded a paid ₹0 row — no Razorpay order to open);
+ * otherwise a real Razorpay order + public key for Checkout.
+ */
+export type CreateOrderResponse =
+  | { free: true }
+  | { free?: false; order: RazorpayOrder; keyId: string }
 
 export interface PaymentRow {
   id: string

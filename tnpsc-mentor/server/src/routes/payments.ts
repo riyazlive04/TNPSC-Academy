@@ -7,6 +7,7 @@ import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { baseAmountForPlan } from '../pricing.js'
 import { evaluateCoupon } from './coupons.js'
+import { notifyAdmins } from '../notify.js'
 
 const router = Router()
 
@@ -51,6 +52,7 @@ router.post(
     // forged; an invalid/expired/exhausted code fails the order with a clear msg.
     let couponId: string | null = null
     let couponCode: string | null = null
+    let couponPromoter: string | null = null
     let discount = 0
     let amount = base
     const rawCoupon = typeof req.body?.couponCode === 'string' ? req.body.couponCode.trim() : ''
@@ -59,6 +61,7 @@ router.post(
       if (!ev.ok) return res.status(400).json({ error: ev.reason })
       couponId = ev.coupon.id
       couponCode = ev.coupon.code
+      couponPromoter = ev.coupon.promoter_name
       discount = ev.discount
       amount = ev.finalAmount
       notes.coupon = ev.coupon.code // surfaced in the Razorpay dashboard too
@@ -66,6 +69,50 @@ router.post(
 
     // Receipt must be ≤ 40 chars for Razorpay; a short user-scoped token is plenty.
     const receipt = `rcpt_${req.userId!.slice(0, 8)}_${Date.now().toString(36)}`
+
+    // Fully covered by the coupon → nothing to pay. Razorpay rejects a zero-amount
+    // order, so we skip Checkout entirely: write a server-trusted `paid` row (₹0)
+    // — synthetic order id (no Razorpay order exists) and no signature to verify —
+    // so entitlement and coupon-redemption counting work exactly as a real
+    // purchase. The client gets `{ free: true }` and unlocks without Checkout.
+    if (amount === 0) {
+      const freeOrderId = `free_${req.userId!.slice(0, 8)}_${Date.now().toString(36)}_${crypto
+        .randomBytes(4)
+        .toString('hex')}`
+      const { error } = await supabaseAdmin.from('payments').insert({
+        user_id: req.userId,
+        razorpay_order_id: freeOrderId,
+        amount: 0,
+        currency,
+        receipt,
+        notes,
+        status: 'paid',
+        coupon_id: couponId,
+        coupon_code: couponCode,
+        original_amount: base,
+        discount_amount: discount,
+      })
+      if (error) return sendDbError(res, error)
+
+      // Passively alert admins: a 100%-discount coupon just unlocked a paid plan
+      // for free. Best-effort (notifyAdmins never throws) so it can't fail the
+      // unlock. Includes who, which coupon, the promoter, and the value waived.
+      const { data: prof } = await supabaseAdmin
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', req.userId)
+        .single()
+      const who = (prof?.full_name as string) || (prof?.email as string) || 'A user'
+      const planLabel = notes.plan === 'premium_annual' ? 'Premium' : 'a paid plan'
+      const waived = `₹${Math.round(base / 100)}`
+      await notifyAdmins(
+        'Free unlock via coupon',
+        `${who} activated ${planLabel} free using coupon ${couponCode}` +
+          `${couponPromoter ? ` (${couponPromoter})` : ''} — ${waived} waived (100% off).`
+      )
+
+      return res.json({ free: true })
+    }
 
     const order = await rzp!.orders.create({ amount, currency, receipt, notes })
 

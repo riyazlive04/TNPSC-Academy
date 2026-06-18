@@ -127,6 +127,7 @@ export default function PremiumCard({
   if (!loaded || premium || (dismissible && dismissed)) return null
 
   const finalPaise = applied ? applied.finalAmount : PREMIUM_PRICE_PAISE
+  const isFree = finalPaise === 0
 
   return (
     <div
@@ -194,7 +195,7 @@ export default function PremiumCard({
                   ₹{PREMIUM_PRICE_RUPEES}
                 </span>
                 <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                  ₹{rupees(finalPaise)}
+                  {isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
                 </span>
               </>
             ) : (
@@ -207,7 +208,7 @@ export default function PremiumCard({
                 </span>
               </>
             )}
-            <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>
+            {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
           </div>
           <span className="tamil inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
             {applied
@@ -267,7 +268,7 @@ export default function PremiumCard({
               <Loader2 size={16} className="animate-spin" />
             ) : (
               <>
-                <Crown size={16} /> {t('premiumGet')}
+                <Crown size={16} /> {isFree ? t('premiumGetFree') : t('premiumGet')}
               </>
             )}
           </button>

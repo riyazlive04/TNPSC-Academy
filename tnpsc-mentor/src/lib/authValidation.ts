@@ -17,6 +17,8 @@ export function friendlyAuthError(raw: string | null | undefined): {
 } {
   if (!raw) return { key: 'errServerUnreachable' }
   const msg = raw.toLowerCase()
+  // Concurrent-device limit reached (max 2 devices per account).
+  if (msg.includes('device_limit')) return { key: 'errDeviceLimit' }
   // Known-safe auth messages from Supabase/GoTrue - show as-is.
   if (
     msg.includes('invalid login') ||

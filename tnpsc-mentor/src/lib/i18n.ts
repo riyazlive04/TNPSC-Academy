@@ -568,6 +568,8 @@ const STRINGS = {
   premiumApply: { en: 'Apply', ta: 'பயன்படுத்து' },
   premiumRemoveCoupon: { en: 'Remove coupon', ta: 'கூப்பனை அகற்று' },
   premiumGet: { en: 'Get Premium', ta: 'பிரீமியம் பெறு' },
+  premiumGetFree: { en: 'Unlock Premium — Free', ta: 'பிரீமியத்தை இலவசமாகத் திற' },
+  premiumFree: { en: 'FREE', ta: 'இலவசம்' },
   premiumThanks: {
     en: 'Welcome to Premium — thank you!',
     ta: 'பிரீமியத்திற்கு வரவேற்கிறோம் — நன்றி!',
@@ -690,6 +692,23 @@ const STRINGS = {
     en: "Couldn't reach the server. Please try again in a moment.",
     ta: 'சேவையகத்தை அணுக முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்.',
   },
+  errDeviceLimit: {
+    en: "You're already signed in on 2 devices. Sign out on one of them first, then try again.",
+    ta: 'நீங்கள் ஏற்கனவே 2 சாதனங்களில் உள்நுழைந்துள்ளீர்கள். அவற்றில் ஒன்றிலிருந்து வெளியேறிய பிறகு மீண்டும் முயற்சிக்கவும்.',
+  },
+  // ── Devices / sessions (manage-devices screen) ──
+  devicesTitle: { en: 'Devices', ta: 'சாதனங்கள்' },
+  devicesSub: {
+    en: 'Your account can be used on up to 2 devices at a time.',
+    ta: 'உங்கள் கணக்கை ஒரே நேரத்தில் 2 சாதனங்களில் பயன்படுத்தலாம்.',
+  },
+  devicesThis: { en: 'This device', ta: 'இந்தச் சாதனம்' },
+  devicesActive: { en: 'active', ta: 'செயலில்' },
+  devicesLastActive: { en: 'Last active', ta: 'கடைசியாக செயலில்' },
+  devicesSignOut: { en: 'Sign out', ta: 'வெளியேறு' },
+  devicesEmpty: { en: 'No other active devices.', ta: 'வேறு செயலில் உள்ள சாதனங்கள் இல்லை.' },
+  devicesSignedOut: { en: 'Device signed out.', ta: 'சாதனம் வெளியேற்றப்பட்டது.' },
+  devicesUnknown: { en: 'Unknown device', ta: 'அறியப்படாத சாதனம்' },
   pwStrengthWeak: { en: 'Weak', ta: 'பலவீனம்' },
   pwStrengthFair: { en: 'Fair', ta: 'சுமார்' },
   pwStrengthGood: { en: 'Good', ta: 'நன்று' },

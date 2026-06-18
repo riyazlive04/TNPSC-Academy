@@ -37,7 +37,7 @@ async function premiumUserIds(): Promise<Set<string>> {
 function matches(
   audience: string,
   audienceValue: string | null,
-  ctx: { premium: boolean; group: string | null }
+  ctx: { premium: boolean; group: string | null; isAdmin: boolean }
 ): boolean {
   switch (audience) {
     case 'premium':
@@ -46,6 +46,8 @@ function matches(
       return !ctx.premium
     case 'group':
       return !!audienceValue && ctx.group === audienceValue
+    case 'admin':
+      return ctx.isAdmin
     case 'all':
     default:
       return true
@@ -118,7 +120,7 @@ router.get(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const [{ data: profile }, premiumIds, { data: rows }, { data: reads }] = await Promise.all([
-      supabaseAdmin.from('profiles').select('target_group').eq('id', req.userId).single(),
+      supabaseAdmin.from('profiles').select('target_group, role').eq('id', req.userId).single(),
       premiumUserIds(),
       supabaseAdmin
         .from('notifications')
@@ -128,9 +130,11 @@ router.get(
       supabaseAdmin.from('notification_reads').select('notification_id').eq('user_id', req.userId),
     ])
 
+    const role = (profile?.role as string | null) ?? null
     const ctx = {
       premium: premiumIds.has(req.userId!),
       group: (profile?.target_group as string | null) ?? null,
+      isAdmin: role === 'admin' || role === 'superadmin',
     }
     const readSet = new Set((reads ?? []).map((r) => (r as { notification_id: string }).notification_id))
 
@@ -224,6 +228,13 @@ async function audienceUserIds(audience: string, audienceValue: string | null): 
       .from('profiles')
       .select('id')
       .eq('target_group', audienceValue ?? '')
+    return (data ?? []).map((p) => p.id as string)
+  }
+  if (audience === 'admin') {
+    const { data } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .in('role', ['admin', 'superadmin'])
     return (data ?? []).map((p) => p.id as string)
   }
   // 'all'
