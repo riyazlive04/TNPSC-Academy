@@ -27,6 +27,7 @@ export interface AuthState {
   init: () => Promise<void>
   fetchProfile: () => Promise<void>
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
+  signInWithGoogle: (idToken: string) => Promise<{ error: string | null }>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -85,6 +86,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  signInWithGoogle: async (idToken) => {
+    try {
+      const { user, profile } = await api.auth.google(idToken)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Google sign-in failed' }
+    }
+  },
+
   signUp: async (params) => {
     try {
       const res = await api.auth.register({ ...params, email: params.email.trim() })
@@ -132,4 +144,14 @@ export function selectIsAdmin(s: AuthState): boolean {
 
 export function selectIsSuperAdmin(s: AuthState): boolean {
   return s.profile?.role === 'superadmin'
+}
+
+// A Google signup arrives with only name/email — no target group or phone. Such
+// aspirants are routed through /complete-profile until both are filled. Admins and
+// superadmins are seeded directly and skip this onboarding gate.
+export function selectProfileNeedsOnboarding(s: AuthState): boolean {
+  const p = s.profile
+  if (!p) return false
+  if (p.role === 'admin' || p.role === 'superadmin') return false
+  return !p.target_group || !p.phone
 }

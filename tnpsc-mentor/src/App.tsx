@@ -15,6 +15,7 @@ import Spinner from './components/UI/Spinner'
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'))
 const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
 const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
@@ -40,6 +41,7 @@ const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 
 /** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
 const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
+  { path: '/complete-profile', element: <CompleteProfilePage /> },
   { path: '/language', element: <LanguageScreen /> },
   { path: '/test-arena', element: <TestArenaPage /> },
   { path: '/test-arena/pyq', element: <PreviousYearPage /> },

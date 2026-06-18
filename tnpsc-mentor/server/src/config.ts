@@ -51,7 +51,15 @@ export const config = {
   // browser to open Checkout); KEY_SECRET is server-only and signs/verifies.
   razorpayKeyId: process.env.RAZORPAY_KEY_ID ?? '',
   razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ?? '',
+  // Optional: enables Google sign-in. When unset, POST /api/auth/google returns
+  // 503 and the frontend hides the Google button — the rest of auth is
+  // unaffected. This same Client ID must ALSO be added to Supabase → Auth →
+  // Providers → Google → "Authorized Client IDs" for the ID-token flow to work.
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
 export const razorpayEnabled = Boolean(config.razorpayKeyId && config.razorpayKeySecret)
+
+/** True when a Google OAuth Client ID is configured — gates Google sign-in. */
+export const googleEnabled = Boolean(config.googleClientId)

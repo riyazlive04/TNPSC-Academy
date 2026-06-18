@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuthStore, selectIsAdmin, selectIsSuperAdmin } from '../../store/authStore'
+import {
+  useAuthStore,
+  selectIsAdmin,
+  selectIsSuperAdmin,
+  selectProfileNeedsOnboarding,
+} from '../../store/authStore'
 import { isApiConfigured } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 
@@ -29,6 +34,7 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
   const loading = useAuthStore((s) => s.loading)
   const isAdmin = useAuthStore(selectIsAdmin)
   const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
+  const needsOnboarding = useAuthStore(selectProfileNeedsOnboarding)
   const location = useLocation()
   const { t } = useT()
 
@@ -49,6 +55,12 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location }} />
+  }
+
+  // Fresh Google signups lack a phone / target group — funnel them through the
+  // onboarding screen before any app page (the screen itself is exempt).
+  if (needsOnboarding && location.pathname !== '/complete-profile') {
+    return <Navigate to="/complete-profile" replace />
   }
 
   if (role === 'superadmin' && !isSuperAdmin) {

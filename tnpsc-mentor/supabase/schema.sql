@@ -208,6 +208,10 @@ create table if not exists profiles (
 alter table profiles add column if not exists language text
   check (language in ('en', 'ta', 'both'));
 
+-- Avatar URL — populated from Google's profile picture on Google sign-in. Null
+-- for email/password accounts. Optional everywhere the UI uses it.
+alter table profiles add column if not exists avatar_url text;
+
 -- ─── Row Level Security ─────────────────────────────────────────────────────
 alter table questions enable row level security;
 alter table test_sessions enable row level security;

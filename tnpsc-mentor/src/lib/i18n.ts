@@ -502,6 +502,18 @@ const STRINGS = {
   startPreparing: { en: 'Start preparing today.', ta: 'இன்றே தயாராகத் தொடங்குங்கள்.' },
   creatingAccount: { en: 'Creating account…', ta: 'கணக்கை உருவாக்குகிறது…' },
   alreadyRegistered: { en: 'Already registered?', ta: 'ஏற்கனவே பதிவு செய்துள்ளீர்களா?' },
+  orDivider: { en: 'or', ta: 'அல்லது' },
+  googleSignInFailed: {
+    en: "Couldn't sign in with Google. Please try again.",
+    ta: 'Google மூலம் உள்நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+  },
+  // Complete-profile onboarding (Google signups land here to add the details
+  // Google doesn't provide — phone + target group).
+  completeProfileTitle: { en: 'Almost there', ta: 'கிட்டத்தட்ட முடிந்தது' },
+  completeProfileSub: {
+    en: 'Just a couple more details to set up your preparation.',
+    ta: 'உங்கள் தயாரிப்பை அமைக்க இன்னும் சில விவரங்கள்.',
+  },
   confirmEmailSent: {
     en: 'Account created! Please check your email to confirm, then sign in.',
     ta: 'கணக்கு உருவாக்கப்பட்டது! உறுதிப்படுத்த உங்கள் மின்னஞ்சலைப் பார்த்து, பிறகு உள்நுழையவும்.',

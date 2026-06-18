@@ -1,12 +1,13 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { useAuthStore, selectIsSuperAdmin } from '../store/authStore'
-import { useLanguageStore } from '../store/languageStore'
 import AuthShell from '../components/Auth/AuthShell'
+import AuthDivider from '../components/Auth/AuthDivider'
+import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
+import { postAuthDestination } from '../lib/authRouting'
 import { useT } from '../lib/i18n'
 
 export default function LoginPage() {
@@ -21,8 +22,8 @@ export default function LoginPage() {
   const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  // After login: superadmins go straight to their console; everyone else routes
-  // through the language screen (deep links to a specific page are honoured).
+  // After login the destination (console / onboarding / deep link / arena) is
+  // resolved by the shared post-auth router from the freshly-loaded profile.
   const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
 
   const emailInvalid = touched && !isValidEmail(email)
@@ -47,17 +48,7 @@ export default function LoginPage() {
       return
     }
 
-    // Resolve destination from the freshly-loaded profile.
-    const isSuper = selectIsSuperAdmin(useAuthStore.getState())
-    const langAlreadySet = useLanguageStore.getState().lang !== null
-    const dest = isSuper
-      ? '/superadmin'
-      : fromPath && fromPath !== '/test-arena'
-        ? fromPath
-        : langAlreadySet
-          ? '/test-arena'
-          : '/language'
-    navigate(dest, { replace: true })
+    navigate(postAuthDestination(fromPath), { replace: true })
   }
 
   return (
@@ -117,6 +108,13 @@ export default function LoginPage() {
             {loading ? t('signingIn') : t('signIn')}
           </button>
         </form>
+
+        {isGoogleConfigured && (
+          <>
+            <AuthDivider label={t('orDivider')} />
+            <GoogleSignInButton onError={setError} fromPath={fromPath} text="signin_with" />
+          </>
+        )}
 
         <div className="mt-6 flex flex-col items-center gap-3 text-sm">
           <Link

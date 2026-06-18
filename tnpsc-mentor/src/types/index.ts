@@ -203,6 +203,8 @@ export interface Profile {
   /** Preferred UI language. Account-bound so it follows the user across devices
    * and is set ONCE at onboarding; changeable later from the Profile page. */
   language?: DisplayLang | null
+  /** Profile picture URL — set from Google on Google sign-in; null otherwise. */
+  avatar_url?: string | null
 }
 
 // ─── Result payload passed via router state to /result ──────────────────────

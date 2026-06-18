@@ -17,6 +17,7 @@ export function useAuth() {
   const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
 
   const signIn = useAuthStore((s) => s.signIn)
+  const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle)
   const signUp = useAuthStore((s) => s.signUp)
   const signOut = useAuthStore((s) => s.signOut)
   const resetPassword = useAuthStore((s) => s.resetPassword)
@@ -29,6 +30,7 @@ export function useAuth() {
     isAdmin,
     isSuperAdmin,
     signIn,
+    signInWithGoogle,
     signUp,
     signOut,
     resetPassword,
