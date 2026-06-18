@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { postAuthDestination } from '../../lib/authRouting'
+import { useT } from '../../lib/i18n'
 
 // Public OAuth Web Client ID (safe to ship to the browser). When unset the
 // component renders nothing, so the rest of auth works without Google.
@@ -70,18 +72,26 @@ export default function GoogleSignInButton({
 }: GoogleSignInButtonProps) {
   const navigate = useNavigate()
   const { signInWithGoogle } = useAuth()
+  const { t } = useT()
   const containerRef = useRef<HTMLDivElement>(null)
+  // Drives a full-screen overlay while the ID token is exchanged for a session
+  // and the next page loads — without it the page looks frozen ("lag") between
+  // picking the Google account and the profile/onboarding screen appearing.
+  const [busy, setBusy] = useState(false)
 
   // GIS registers its callback ONCE; keep the latest deps in a ref so that single
   // callback always sees fresh props/handlers without re-initialising the widget.
   const handleRef = useRef<(credential: string) => void>(() => {})
   handleRef.current = async (credential: string) => {
+    setBusy(true)
     onStart?.()
     const { error } = await signInWithGoogle(credential)
     if (error) {
+      setBusy(false)
       onError(error)
       return
     }
+    // Leave the overlay up through navigation; it unmounts with this component.
     navigate(postAuthDestination(fromPath), { replace: true })
   }
   const errorRef = useRef(onError)
@@ -118,5 +128,21 @@ export default function GoogleSignInButton({
 
   if (!CLIENT_ID) return null
   // GIS renders its own fixed-width button; center it within the form column.
-  return <div ref={containerRef} className="flex justify-center" />
+  return (
+    <>
+      <div ref={containerRef} className="flex justify-center" />
+      {busy && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed inset-0 z-[100] grid place-items-center bg-black/40 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-3 rounded-2xl bg-card px-5 py-4 shadow-pill">
+            <Loader2 size={20} className="animate-spin text-brand" />
+            <span className="font-heading text-sm font-semibold text-ink">{t('signingIn')}</span>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
