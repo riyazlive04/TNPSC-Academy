@@ -64,12 +64,14 @@ export type CheckoutResult =
   | { status: 'failed'; error: string }
 
 export interface CheckoutParams {
-  /** Amount in paise (₹1 = 100). */
+  /** Amount in paise (₹1 = 100). For known plans the server overrides this. */
   amount: number
   /** Profile used to prefill name/email/contact in the Checkout form. */
   profile?: Profile | null
   description?: string
   notes?: Record<string, string>
+  /** Optional promoter coupon; validated + applied server-side. */
+  couponCode?: string
 }
 
 /**
@@ -85,7 +87,7 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
   let order
   let keyId: string
   try {
-    const res = await api.payments.createOrder(params.amount, params.notes)
+    const res = await api.payments.createOrder(params.amount, params.notes, params.couponCode)
     order = res.order
     keyId = res.keyId
   } catch (e) {

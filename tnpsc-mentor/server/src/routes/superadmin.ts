@@ -18,6 +18,16 @@ router.get(
   })
 )
 
+// ─── GET /api/superadmin/revenue ─────────────────────────────────────────────
+router.get(
+  '/revenue',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!.rpc('get_revenue_metrics')
+    if (error) return sendDbError(res, error)
+    res.json({ revenue: data ?? {} })
+  })
+)
+
 // ─── GET /api/superadmin/users?search=&limit= ────────────────────────────────
 router.get(
   '/users',
