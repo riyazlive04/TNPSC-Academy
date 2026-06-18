@@ -6,6 +6,7 @@ import { useThemeStore } from './store/themeStore'
 import { warmApi } from './lib/api'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
+import SmoothScroll from './components/SmoothScroll'
 import Toaster from './components/UI/Toaster'
 import Spinner from './components/UI/Spinner'
 
@@ -105,6 +106,7 @@ export default function App() {
   return (
     <>
     <ScrollToTop />
+    <SmoothScroll />
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Root is auth-aware: logged-in users go to the app, everyone else to

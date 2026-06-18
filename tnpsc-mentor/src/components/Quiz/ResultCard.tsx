@@ -47,17 +47,17 @@ export default function ResultCard({
   const wrongReason =
     attempted && !correct && chosen ? whyWrongFor(question, chosen) : ''
 
-  let statusIcon = <MinusCircle size={20} className="text-slate-400" />
+  let statusIcon = <MinusCircle size={20} className="text-ink2/50" />
   let statusLabel = t('statusSkipped')
-  let ring = 'border-slate-200'
+  let ring = 'border-line'
   if (attempted && correct) {
-    statusIcon = <Check size={20} className="text-green-600" />
+    statusIcon = <Check size={20} className="text-mint" />
     statusLabel = t('statusCorrect')
-    ring = 'border-green-300'
+    ring = 'border-mint/45'
   } else if (attempted && !correct) {
-    statusIcon = <X size={20} className="text-red-600" />
+    statusIcon = <X size={20} className="text-coral" />
     statusLabel = t('statusWrong')
-    ring = 'border-red-300'
+    ring = 'border-coral/45'
   }
 
   return (
@@ -129,9 +129,9 @@ export default function ResultCard({
                   className={[
                     'tamil rounded-lg px-3 py-1.5 text-sm',
                     isCorrect
-                      ? 'bg-green-50 font-semibold text-green-700'
+                      ? 'bg-mintsoft font-semibold text-mint'
                       : isChosenWrong
-                        ? 'bg-red-50 font-semibold text-red-700'
+                        ? 'bg-coralsoft font-semibold text-coral'
                         : 'text-navytext/70',
                   ].join(' ')}
                 >
@@ -144,8 +144,8 @@ export default function ResultCard({
             })}
           </div>
           {wrongReason && (
-            <div className="mt-3 rounded-lg border-l-4 border-red-400 bg-red-50 p-3">
-              <p className="tamil whitespace-pre-line text-xs leading-relaxed text-red-700">
+            <div className="mt-3 rounded-lg border-l-4 border-coral bg-coralsoft p-3">
+              <p className="tamil whitespace-pre-line text-xs leading-relaxed text-coral">
                 <span className="font-heading font-bold">
                   {t('whyAnswerWrong')} ({chosen}) {t('isWrong')}{' '}
                 </span>

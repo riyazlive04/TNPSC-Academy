@@ -70,11 +70,11 @@ export default function WorkedSolution({
       ))}
 
       {answer && (
-        <div className="mt-3.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg border-l-4 border-green-400 bg-green-50 px-3 py-2">
-          <span className="font-heading text-xs font-bold uppercase tracking-wide text-green-700">
+        <div className="mt-3.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg border-l-4 border-mint bg-mintsoft px-3 py-2">
+          <span className="font-heading text-xs font-bold uppercase tracking-wide text-mint">
             {t('solAnswer')}
           </span>
-          <span className="tamil text-sm font-semibold text-green-700">
+          <span className="tamil text-sm font-semibold text-mint">
             ({answer}) {displayOption(question, answer, lang)}
           </span>
         </div>

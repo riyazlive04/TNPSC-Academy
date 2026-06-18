@@ -38,41 +38,44 @@ interface ArenaCard {
   tile: string // icon-tile colour classes
 }
 
+// Each category gets its own pastel tile (design-system.md §1) — soft tinted
+// square + the icon in the matching strong colour, so the grid reads as a set
+// of distinct destinations rather than a wall of violet.
 const CARDS: ArenaCard[] = [
   {
     to: '/mock',
     titleKey: 'mockTests',
     subtitle: 'Group exam · subject · timed',
     icon: <ShieldCheck size={20} />,
-    tile: 'bg-accentwarmsoft text-accentwarm',
+    tile: 'bg-tint-coral text-accent',
   },
   {
     to: '/test-arena/subjects',
     titleKey: 'subjectPracticeTitle',
     subtitle: 'Subject · topic · question type',
     icon: <Layers size={20} />,
-    tile: 'bg-brand-soft text-brand',
+    tile: 'bg-tint-violet text-primary',
   },
   {
     to: '/test-arena/pyq',
     titleKey: 'pyqTitle',
     subtitle: 'Group 1',
     icon: <BookOpen size={20} />,
-    tile: 'bg-brand-soft text-brand',
+    tile: 'bg-tint-blue text-sky',
   },
   {
     to: '/test-arena/current-affairs',
     titleKey: 'currentAffairsTitle',
     subtitle: 'Month & topic wise',
     icon: <Newspaper size={20} />,
-    tile: 'bg-brand-soft text-brand',
+    tile: 'bg-tint-green text-mint',
   },
   {
     to: '/test-arena/aptitude',
     titleKey: 'aptitudeTitle',
     subtitle: 'Numerics · Reasoning',
     icon: <Calculator size={20} />,
-    tile: 'bg-brand-soft text-brand',
+    tile: 'bg-tint-coral text-accent',
   },
 ]
 
@@ -176,8 +179,9 @@ export default function TestArenaPage() {
           </div>
         </div>
 
-        {/* Premium upsell - annual plan (₹1899 → ₹1399/yr) */}
-        <PremiumCard />
+        {/* Premium upsell - 3-month plan (₹1899 → ₹1399). Dismissible on the
+            dashboard; closing hides it for this view only — it returns on reload. */}
+        <PremiumCard dismissible />
 
         {/* Progress rail - feature-flagged; rendered as a row when re-enabled */}
         {showRail && habit && (
@@ -244,7 +248,7 @@ export default function TestArenaPage() {
               className="card interactive stagger-item group flex min-h-[120px] flex-col justify-between gap-3 p-5 text-left"
             >
               <span
-                className={`grid h-11 w-11 place-items-center rounded-xl transition-transform group-hover:scale-105 ${card.tile}`}
+                className={`grid h-12 w-12 place-items-center rounded-tile transition-transform group-hover:scale-105 ${card.tile}`}
               >
                 {card.icon}
               </span>
@@ -291,7 +295,7 @@ export default function TestArenaPage() {
             className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
             style={{ backgroundSize: '18px 18px' }}
           />
-          <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20">
+          <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
             {featured.icon}
           </span>
           <span className="relative min-w-0 flex-1">
@@ -348,7 +352,7 @@ function AdminDashboard({
             onClick={() => onNavigate('/superadmin')}
             className="card interactive group mb-6 flex w-full items-center gap-4 p-4 text-left"
           >
-            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-brand-gradient text-white shadow-brand">
+            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-brand-gradient text-white shadow-brand">
               <Activity size={20} />
             </span>
             <span className="min-w-0 flex-1">
@@ -376,7 +380,7 @@ function AdminDashboard({
               style={{ '--i': i } as React.CSSProperties}
               className="card interactive stagger-item group flex items-center gap-4 p-4 text-left"
             >
-              <span className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg ${card.tile}`}>
+              <span className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile ${card.tile}`}>
                 {card.icon}
               </span>
               <span className="min-w-0 flex-1">
@@ -397,7 +401,7 @@ function AdminDashboard({
             style={{ '--i': BANK_CARDS.length } as React.CSSProperties}
             className="card interactive stagger-item group flex items-center gap-4 p-4 text-left"
           >
-            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg bg-gold/15 text-gold">
+            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-gold/15 text-gold">
               <Layers size={20} />
             </span>
             <span className="min-w-0 flex-1">
@@ -427,7 +431,7 @@ function StatTile({
 }) {
   return (
     <div className="card flex items-center gap-3 p-3.5">
-      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
+      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-tile bg-tint-violet text-primary">
         {icon}
       </span>
       <div className="min-w-0">
@@ -454,7 +458,7 @@ function QuickLink({
       onClick={onClick}
       className="card interactive flex flex-col items-center gap-2 p-3"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-soft text-brand">{icon}</span>
+      <span className="grid h-10 w-10 place-items-center rounded-tile bg-tint-violet text-primary">{icon}</span>
       <span className="tamil font-heading text-xs font-medium text-ink">{label}</span>
     </button>
   )

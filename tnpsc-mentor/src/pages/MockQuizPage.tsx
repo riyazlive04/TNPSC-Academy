@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Grid3x3, Loader2, Maximize2, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Flag, Grid3x3, GripVertical, Loader2, Maximize2, X } from 'lucide-react'
 import QuestionStem from '../components/Quiz/QuestionStem'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
 import OmrBubbles from '../components/Quiz/OmrBubbles'
 import OmrOptions from '../components/Quiz/OmrOptions'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
+import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import { formatTime } from '../components/UI/Timer'
 import { api } from '../lib/api'
 import { exitFullscreen } from '../lib/proctor'
@@ -70,8 +71,18 @@ export default function MockQuizPage() {
   const [timeLeft, setTimeLeft] = useState(config?.mockDurationSeconds ?? 0)
   const [timeToast, setTimeToast] = useState('')
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [showFlaggedOnly, setShowFlaggedOnly] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  // Questions the student has flagged for correction (reported to admins). Kept
+  // in memory; the server is the source of truth.
+  const [reported, setReported] = useState<Record<string, boolean>>({})
+  const [reportToast, setReportToast] = useState('')
+  const reportTimers = useRef<number[]>([]) // pending report-toast dismiss timers
+  // Absolute index of the question whose feedback box is open (null = closed).
+  // While open the countdown is paused so reporting never costs exam time.
+  const [reportIdx, setReportIdx] = useState<number | null>(null)
+  const pauseStartRef = useRef<number | null>(null)
 
   const startedAtRef = useRef<number>(Date.now())
   const submittedRef = useRef(false)
@@ -151,7 +162,25 @@ export default function MockQuizPage() {
   const total = questions.length
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const pageStart = page * PAGE_SIZE
-  const pageQuestions = questions.slice(pageStart, pageStart + PAGE_SIZE)
+
+  // Absolute indices of flagged questions (across every page), and the indices
+  // the OMR sheet actually renders: the whole current page, or — when the
+  // "flagged only" filter is on — just the flagged ones.
+  const flaggedIndices = useMemo(
+    () =>
+      questions.reduce<number[]>((acc, q, i) => {
+        if (marked[q.id]) acc.push(i)
+        return acc
+      }, []),
+    [questions, marked]
+  )
+  const visibleIndices = useMemo(
+    () =>
+      showFlaggedOnly
+        ? flaggedIndices
+        : Array.from({ length: Math.max(0, Math.min(PAGE_SIZE, total - pageStart)) }, (_, k) => pageStart + k),
+    [showFlaggedOnly, flaggedIndices, total, pageStart]
+  )
 
   // ── Submit (memoised so timers/handlers share one instance) ──
   const doSubmit = useCallback(
@@ -199,7 +228,8 @@ export default function MockQuizPage() {
 
   // ── Countdown timer (auto-submit at zero, warn at 30/10/5 min) ──
   useEffect(() => {
-    if (loading || empty || loadError || !total) return
+    // `reportIdx !== null` pauses the countdown while the feedback box is open.
+    if (loading || empty || loadError || !total || reportIdx !== null) return
     const id = window.setInterval(() => {
       setTimeLeft((prev) => {
         const next = prev - 1
@@ -228,7 +258,7 @@ export default function MockQuizPage() {
       timeToastTimers.current.forEach((tid) => window.clearTimeout(tid))
       timeToastTimers.current = []
     }
-  }, [loading, empty, loadError, total, doSubmit, t])
+  }, [loading, empty, loadError, total, doSubmit, t, reportIdx])
 
   // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
   // Shared engine; mirrors QuizPage. Its synchronous done-latch prevents rapid
@@ -293,6 +323,9 @@ export default function MockQuizPage() {
     if (i < 0 || i >= total) return
     setPage(Math.floor(i / PAGE_SIZE))
     setPaletteOpen(false)
+    // Jumping to a question the flagged-only filter would hide drops the filter
+    // so the target is actually visible to scroll to.
+    if (showFlaggedOnly && !marked[questions[i]?.id]) setShowFlaggedOnly(false)
     requestAnimationFrame(() =>
       document.getElementById(`omr-q-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     )
@@ -306,6 +339,53 @@ export default function MockQuizPage() {
       return next
     })
   const toggleFlag = (q: Question) => setMarked((m) => ({ ...m, [q.id]: !m[q.id] }))
+
+  const reportToastFor = (msg: string) => {
+    setReportToast(msg)
+    reportTimers.current.push(window.setTimeout(() => setReportToast(''), 3500))
+  }
+
+  // Tapping the report icon: an already-reported question is un-reported in
+  // place; otherwise the feedback box opens (which pauses the countdown).
+  const onReportClick = (q: Question, i: number) => {
+    if (reported[q.id]) {
+      setReported((r) => ({ ...r, [q.id]: false }))
+      void api.feedback.reportQuestion(q.id, false).catch(() => {})
+      reportToastFor(t('reportQuestionUndone'))
+      return
+    }
+    pauseStartRef.current = Date.now()
+    setReportIdx(i)
+  }
+
+  // Closing the box (submit or cancel) resumes the clock; the paused span is
+  // credited back to startedAt so the recorded time-taken stays honest.
+  const resumeAfterReport = () => {
+    if (pauseStartRef.current != null) {
+      startedAtRef.current += Date.now() - pauseStartRef.current
+      pauseStartRef.current = null
+    }
+    setReportIdx(null)
+  }
+
+  const submitReport = (reason: string) => {
+    const q = reportIdx != null ? questions[reportIdx] : null
+    if (q) {
+      setReported((r) => ({ ...r, [q.id]: true }))
+      void api.feedback.reportQuestion(q.id, true, reason || undefined).catch(() => {})
+      reportToastFor(t('reportQuestionDone'))
+    }
+    resumeAfterReport()
+  }
+
+  // Clear pending report-toast timers on unmount.
+  useEffect(
+    () => () => {
+      reportTimers.current.forEach((id) => window.clearTimeout(id))
+      reportTimers.current = []
+    },
+    []
+  )
 
   const statusOf = useCallback(
     (i: number): Status => {
@@ -372,6 +452,9 @@ export default function MockQuizPage() {
       goTo={jumpToQuestion}
       onSubmit={() => doSubmit(false)}
       submitting={submitting}
+      flaggedCount={flaggedIndices.length}
+      showFlaggedOnly={showFlaggedOnly}
+      onToggleFlagged={() => setShowFlaggedOnly((v) => !v)}
       t={t}
     />
   )
@@ -411,22 +494,36 @@ export default function MockQuizPage() {
       {/* Toasts */}
       {timeToast && <Toast tone="warn">{timeToast}</Toast>}
       {violationToast && <Toast tone="error">{violationToast}</Toast>}
+      {reportToast && <Toast tone="info">{reportToast}</Toast>}
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-3 py-4 sm:px-4 sm:py-5 lg:flex-row">
         {/* OMR answer sheet - one page of question rows */}
         <main className="min-w-0 flex-1">
-          <div className="mb-3 flex items-center justify-between">
-            <span className="font-heading text-sm font-semibold text-ink2">
-              {t('question')} {pageStart + 1}-{Math.min(total, pageStart + PAGE_SIZE)} {t('of')} {total}
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate font-heading text-sm font-semibold text-ink2">
+              {showFlaggedOnly
+                ? `${t('flagged')} (${flaggedIndices.length})`
+                : `${t('question')} ${pageStart + 1}-${Math.min(total, pageStart + PAGE_SIZE)} ${t('of')} ${total}`}
             </span>
-            <span className="font-body text-xs tabular-nums text-ink2">
-              {page + 1} / {pageCount}
-            </span>
+            {!showFlaggedOnly && (
+              <span className="flex-shrink-0 font-body text-xs tabular-nums text-ink2">
+                {page + 1} / {pageCount}
+              </span>
+            )}
           </div>
 
+          {showFlaggedOnly && flaggedIndices.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-line bg-card p-8 text-center">
+              <Flag size={28} className="mx-auto text-ink2/40" />
+              <p className="mx-auto mt-3 max-w-xs font-body text-sm text-ink2">{t('noFlagged')}</p>
+              <button onClick={() => setShowFlaggedOnly(false)} className="btn-soft mt-4">
+                {t('showAll')}
+              </button>
+            </div>
+          ) : (
           <div className="space-y-3">
-            {pageQuestions.map((q, k) => {
-              const i = pageStart + k
+            {visibleIndices.map((i) => {
+              const q = questions[i]
               const sel = answers[q.id] ?? null
               const flagged = Boolean(marked[q.id])
               return (
@@ -441,6 +538,18 @@ export default function MockQuizPage() {
                       {i + 1}
                     </span>
                     <div className="ml-auto flex items-center gap-1">
+                      <button
+                        onClick={() => onReportClick(q, i)}
+                        aria-label={t('reportQuestionAria')}
+                        aria-pressed={Boolean(reported[q.id])}
+                        title={reported[q.id] ? t('reportedLabel') : t('reportError')}
+                        className={[
+                          'icon-btn h-9 w-9 flex-shrink-0',
+                          reported[q.id] ? 'text-coral' : 'text-ink2/45',
+                        ].join(' ')}
+                      >
+                        <AlertCircle size={16} />
+                      </button>
                       <button
                         onClick={() => toggleFlag(q)}
                         aria-label={t('markedReview')}
@@ -487,21 +596,40 @@ export default function MockQuizPage() {
               )
             })}
           </div>
+          )}
 
-          {/* Pagination */}
-          <Paginator page={page} pageCount={pageCount} onJump={setPage} t={t} />
+          {/* Pagination - only in the full (unfiltered) view */}
+          {!showFlaggedOnly && <Paginator page={page} pageCount={pageCount} onJump={setPage} t={t} />}
 
           {submitError && (
             <p className="mt-3 text-center font-body text-sm text-coral">{submitError}</p>
           )}
 
-          <button
-            onClick={() => doSubmit(false)}
-            disabled={submitting}
-            className="btn-brand btn-lg mt-4 w-full"
-          >
-            {submitting ? <Loader2 size={18} className="animate-spin" /> : t('submitTest')}
-          </button>
+          <div className="mt-4 flex items-stretch gap-2">
+            {/* Flagged-only filter: collapses the sheet to just the flagged questions. */}
+            <button
+              onClick={() => setShowFlaggedOnly((v) => !v)}
+              aria-pressed={showFlaggedOnly}
+              aria-label={t('flagged')}
+              className={[
+                'btn btn-lg flex-shrink-0 border',
+                showFlaggedOnly
+                  ? 'border-violet-500 bg-violet-500 text-white'
+                  : 'border-line bg-card text-ink2 hover:border-brand-ring',
+              ].join(' ')}
+            >
+              <Flag size={16} className={showFlaggedOnly ? 'fill-current' : ''} />
+              {t('flagged')}
+              <span className="tabular-nums opacity-90">{flaggedIndices.length}</span>
+            </button>
+            <button
+              onClick={() => doSubmit(false)}
+              disabled={submitting}
+              className="btn-brand btn-lg flex-1"
+            >
+              {submitting ? <Loader2 size={18} className="animate-spin" /> : t('submitTest')}
+            </button>
+          </div>
         </main>
 
         {/* Palette - inline sidebar on desktop. */}
@@ -510,27 +638,52 @@ export default function MockQuizPage() {
         </aside>
       </div>
 
-      {/* Palette - slide-up drawer on phones/tablets. */}
-      {paletteOpen && (
-        <div className="fixed inset-0 z-40 flex flex-col justify-end lg:hidden">
-          <button
-            aria-label={t('done')}
-            onClick={() => setPaletteOpen(false)}
-            className="absolute inset-0 bg-ink/50 backdrop-blur-sm"
-          />
-          <div className="relative max-h-[85dvh] overflow-y-auto rounded-t-3xl border-t border-line bg-card p-4 shadow-card">
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
-                {t('questionPalette')}
-              </h3>
-              <button onClick={() => setPaletteOpen(false)} className="icon-btn h-8 w-8" aria-label={t('done')}>
-                <X size={18} />
-              </button>
-            </div>
-            {palette}
-          </div>
-        </div>
+      {/* Right-edge palette handle - phones/tablets only (desktop has the inline
+          sidebar). Tap to slide the panel in from the right. Hidden once open. */}
+      {!paletteOpen && (
+        <button
+          onClick={() => setPaletteOpen(true)}
+          aria-label={t('openPalette')}
+          className="fixed right-0 top-1/2 z-30 flex h-16 w-7 -translate-y-1/2 flex-col items-center justify-center gap-0.5 rounded-l-xl border border-r-0 border-line bg-card/95 text-ink2 shadow-card backdrop-blur lg:hidden"
+        >
+          <ChevronLeft size={15} />
+          <GripVertical size={14} className="opacity-60" />
+        </button>
       )}
+
+      {/* Palette - slide-in edge panel from the right on phones/tablets. Always
+          mounted so it can transition both ways; pointer-events drop when closed
+          so the OMR sheet underneath stays interactive. */}
+      <div
+        className={['fixed inset-0 z-40 lg:hidden', paletteOpen ? '' : 'pointer-events-none'].join(' ')}
+        aria-hidden={!paletteOpen}
+      >
+        <button
+          aria-label={t('done')}
+          tabIndex={paletteOpen ? 0 : -1}
+          onClick={() => setPaletteOpen(false)}
+          className={[
+            'absolute inset-0 bg-ink/50 backdrop-blur-sm transition-opacity duration-300',
+            paletteOpen ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
+        />
+        <div
+          className={[
+            'absolute right-0 top-0 flex h-full w-[82vw] max-w-sm flex-col border-l border-line bg-card shadow-card transition-transform duration-300 ease-out',
+            paletteOpen ? 'translate-x-0' : 'translate-x-full',
+          ].join(' ')}
+        >
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <h3 className="font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
+              {t('questionPalette')}
+            </h3>
+            <button onClick={() => setPaletteOpen(false)} className="icon-btn h-8 w-8" aria-label={t('done')}>
+              <X size={18} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">{palette}</div>
+        </div>
+      </div>
 
       {/* Fullscreen re-entry overlay - only on platforms that can go full-screen. */}
       {fsSupported && notFullscreen && (
@@ -543,6 +696,15 @@ export default function MockQuizPage() {
             {t('enterFullscreen')}
           </button>
         </div>
+      )}
+
+      {/* Report-a-question feedback box. While open the countdown is paused. */}
+      {reportIdx !== null && (
+        <ReportQuestionModal
+          questionNumber={reportIdx + 1}
+          onSubmit={submitReport}
+          onCancel={resumeAfterReport}
+        />
       )}
 
       {/* Anti-capture shield - blanks the screen on focus loss / PrintScreen. */}
@@ -566,6 +728,9 @@ function Palette({
   goTo,
   onSubmit,
   submitting,
+  flaggedCount,
+  showFlaggedOnly,
+  onToggleFlagged,
   t,
 }: {
   questions: Question[]
@@ -578,6 +743,9 @@ function Palette({
   goTo: (i: number) => void
   onSubmit: () => void
   submitting: boolean
+  flaggedCount: number
+  showFlaggedOnly: boolean
+  onToggleFlagged: () => void
   t: ReturnType<typeof useT>['t']
 }) {
   const total = questions.length
@@ -646,9 +814,27 @@ function Palette({
         ))}
       </div>
 
-      <button onClick={onSubmit} disabled={submitting} className="btn-brand mt-4 w-full">
-        {submitting ? <Loader2 size={16} className="animate-spin" /> : t('submitTest')}
-      </button>
+      <div className="mt-4 flex items-stretch gap-2">
+        {/* Flagged-only filter - mirrors the in-sheet toggle so it's reachable
+            from the desktop sidebar and mobile panel without scrolling. */}
+        <button
+          onClick={onToggleFlagged}
+          aria-pressed={showFlaggedOnly}
+          aria-label={t('flagged')}
+          className={[
+            'btn flex-shrink-0 border',
+            showFlaggedOnly
+              ? 'border-violet-500 bg-violet-500 text-white'
+              : 'border-line bg-card text-ink2 hover:border-brand-ring',
+          ].join(' ')}
+        >
+          <Flag size={15} className={showFlaggedOnly ? 'fill-current' : ''} />
+          <span className="tabular-nums">{flaggedCount}</span>
+        </button>
+        <button onClick={onSubmit} disabled={submitting} className="btn-brand flex-1">
+          {submitting ? <Loader2 size={16} className="animate-spin" /> : t('submitTest')}
+        </button>
+      </div>
     </>
   )
 }
@@ -748,12 +934,14 @@ function CenteredScreen({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Toast({ tone, children }: { tone: 'warn' | 'error'; children: React.ReactNode }) {
+function Toast({ tone, children }: { tone: 'warn' | 'error' | 'info'; children: React.ReactNode }) {
+  const toneCls =
+    tone === 'error' ? 'bg-coral text-white' : tone === 'info' ? 'bg-brand text-white' : 'bg-amber-500 text-white'
   return (
     <div
       className={[
         'fixed left-1/2 top-16 z-50 w-[min(92vw,28rem)] -translate-x-1/2 rounded-xl px-4 py-2.5 text-center font-heading text-sm font-semibold shadow-card',
-        tone === 'error' ? 'bg-coral text-white' : 'bg-amber-500 text-white',
+        toneCls,
       ].join(' ')}
     >
       {children}

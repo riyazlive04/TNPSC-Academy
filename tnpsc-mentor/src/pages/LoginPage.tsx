@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Check } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import AuthShell from '../components/Auth/AuthShell'
@@ -53,11 +54,11 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="rounded-3xl border border-line bg-card p-6 shadow-card sm:p-8">
-        <h2 className="mb-1 text-center font-heading text-xl font-semibold tracking-tight text-ink">
+      <div className="rounded-hero border border-line bg-card p-7 shadow-soft sm:p-9">
+        <h2 className="mb-1 text-center font-display text-2xl font-bold tracking-tight text-ink">
           {t('welcomeBack')}
         </h2>
-        <p className="mb-6 text-center font-body text-sm text-ink2">{t('signInToContinue')}</p>
+        <p className="mb-7 text-center font-body text-sm text-ink2">{t('signInToContinue')}</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <div>
@@ -67,25 +68,42 @@ export default function LoginPage() {
             >
               {t('email')}
             </label>
-            <input
-              id="login-email"
-              type="email"
-              autoComplete="email"
-              className={`input-soft ${emailInvalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
-              placeholder="aspirant@email.com"
-              value={email}
-              aria-invalid={emailInvalid || undefined}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                className={`input-soft pr-10 ${emailInvalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
+                placeholder="aspirant@email.com"
+                value={email}
+                aria-invalid={emailInvalid || undefined}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {isValidEmail(email) && (
+                <Check
+                  size={16}
+                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-correct"
+                />
+              )}
+            </div>
           </div>
 
           <div>
-            <label
-              htmlFor="login-password"
-              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
-            >
-              {t('password')}
-            </label>
+            <div className="mb-1.5 flex items-center justify-between gap-3">
+              <label
+                htmlFor="login-password"
+                className="font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+              >
+                {t('password')}
+              </label>
+              {/* Inline "Forgot?" in the coral accent, as in the reference */}
+              <Link
+                to="/forgot-password"
+                className="focus-ring rounded font-heading text-xs font-semibold text-accent transition hover:opacity-80"
+              >
+                {t('forgotPassword')}
+              </Link>
+            </div>
             <PasswordInput
               id="login-password"
               value={password}
@@ -97,18 +115,19 @@ export default function LoginPage() {
           {error && (
             <div
               role="alert"
-              className="animate-slideDown rounded-2xl bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+              className="animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
             >
               {error}
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-brand press mt-2 px-6 py-3.5 text-base">
+          <button type="submit" disabled={loading} className="btn-brand press mt-2 w-full px-6 py-3.5 text-base">
             {loading && <Spinner size={18} />}
             {loading ? t('signingIn') : t('signIn')}
           </button>
         </form>
 
+        {/* Google + "create account" grouped together at the foot of the card. */}
         {isGoogleConfigured && (
           <>
             <AuthDivider label={t('orDivider')} />
@@ -116,24 +135,15 @@ export default function LoginPage() {
           </>
         )}
 
-        <div className="mt-6 flex flex-col items-center gap-3 text-sm">
+        <p className="mt-6 text-center font-body text-sm text-ink2">
+          {t('newHere')}{' '}
           <Link
-            to="/forgot-password"
-            className="focus-ring rounded font-heading font-semibold text-brand transition hover:text-brand-dark"
+            to="/register"
+            className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
           >
-            {t('forgotPassword')}
+            {t('createAccount')}
           </Link>
-          <div className="h-px w-full bg-line" />
-          <p className="font-body text-ink2">
-            {t('newHere')}{' '}
-            <Link
-              to="/register"
-              className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
-            >
-              {t('createAccount')}
-            </Link>
-          </p>
-        </div>
+        </p>
       </div>
     </AuthShell>
   )

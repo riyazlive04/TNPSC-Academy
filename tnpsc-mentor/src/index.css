@@ -6,70 +6,117 @@
  * Colours are stored as "R G B" channel triplets so Tailwind can apply opacity
  * (rgb(var(--c-brand) / 0.3)). :root = light theme; .dark (toggled on <html> by
  * the theme store) = dark theme. The whole UI re-skins from these two blocks. */
+/* Palette ported from design-system.md (Refined). Values stay in "R G B"
+ * channel-triplet form so Tailwind's /opacity modifiers keep working
+ * (rgb(var(--c-brand) / 0.3)). Legacy var names are retained and remapped onto
+ * the new violet scheme; doc-named tokens (--c-correct/-wrong/-selected/-tint-*)
+ * are added so new code can use the spec names directly. */
 :root {
   color-scheme: light;
 
-  --c-brand: 124 92 255; /* violet — primary actions, active states */
-  --c-brand-dark: 109 74 244;
-  --c-brand-deep: 76 29 149; /* deep violet for hero gradients */
-  --c-brand-soft: 238 235 254; /* faint violet wash for chips / icon tiles */
-  --c-brand-ring: 205 193 255;
+  /* Bolder pass: deeper/saturated violet, punchier coral, crisper text and
+   * slightly deeper tints so tiles read with confidence (less pastel). */
+  --c-brand: 110 79 232; /* #6E4FE8 vivid violet — buttons, active, progress */
+  --c-brand-dark: 100 70 224; /* gradient mid */
+  --c-brand-deep: 91 61 214; /* #5B3DD6 gradient end, pressed/hover */
+  --c-brand-soft: 230 225 251; /* #E6E1FB violet tint — chips / icon tiles */
+  --c-brand-ring: 179 166 242; /* focus ring */
 
-  --c-canvas: 245 244 251; /* app background — light violet-gray */
-  --c-card: 255 255 255;
-  --c-ink: 24 20 43; /* primary text — near-black violet */
-  --c-ink2: 107 106 128; /* secondary text — muted slate */
-  --c-line: 232 230 243; /* hairline borders */
-  --c-tint: 240 238 251; /* neutral violet fill */
-  --c-shadow: 24 16 54; /* elevation shadow base */
+  --c-canvas: 244 241 249; /* page background — soft lavender */
+  --c-card: 255 255 255; /* #FFFFFF cards, sheets */
+  --c-ink: 34 30 58; /* #221E3A primary text — deeper for contrast */
+  --c-ink2: 110 105 134; /* #6E6986 muted text — crisper, less washed */
+  --c-line: 231 227 240; /* #E7E3F0 hairline dividers */
+  --c-tint: 230 225 251; /* neutral violet fill (= tint-violet) */
+  --c-shadow: 88 72 200; /* violet elevation base */
 
-  --c-secondary: 159 134 255;
+  --c-secondary: 138 92 240; /* #8A5CF0 hero gradient start */
 
-  --c-accentwarm: 255 107 53;
-  --c-accentwarm-soft: 255 237 228;
+  --c-accentwarm: 255 107 74; /* #FF6B4A accent — punchier coral */
+  --c-accentwarm-soft: 255 227 219; /* #FFE3DB tint-coral */
   --c-gold: 245 158 11;
-  --c-gold-soft: 254 243 226;
-  --c-mint: 22 163 74;
-  --c-mint-soft: 231 247 238;
-  --c-coral: 239 68 68;
-  --c-coral-soft: 253 236 236;
-  --c-sky: 124 92 255;
-  --c-sky-soft: 238 235 254;
-  --c-streak: 255 107 53;
-  --c-streak-soft: 255 237 228;
+  --c-gold-soft: 253 240 217; /* #FDF0D9 */
+  --c-mint: 0 178 140; /* #00B28C correct */
+  --c-mint-soft: 221 242 234; /* #DDF2EA tint-green */
+  --c-coral: 255 91 91; /* #FF5B5B wrong — bolder red */
+  --c-coral-soft: 253 230 230;
+  --c-sky: 59 130 217; /* #3B82D9 tint-blue icon — bolder */
+  --c-sky-soft: 223 235 250; /* #DFEBFA tint-blue */
+  --c-streak: 255 107 74; /* accent */
+  --c-streak-soft: 255 227 219;
+
+  /* ── design-system.md spec tokens ── */
+  --c-correct: 0 178 140; /* #00B28C */
+  --c-wrong: 255 91 91; /* #FF5B5B */
+  --c-selected: 230 225 251; /* #E6E1FB chosen option pre-submit */
+  --c-tint-violet: 230 225 251; /* #E6E1FB */
+  --c-tint-coral: 255 227 219; /* #FFE3DB */
+  --c-tint-blue: 223 235 250; /* #DFEBFA */
+  --c-tint-green: 221 242 234; /* #DDF2EA */
+  --c-tint-green-icon: 16 168 132; /* #10A884 */
+
+  /* Elevation — soft, large-blur in light mode (switched off in .dark). */
+  --shadow-pill: 0 2px 8px rgb(var(--c-shadow) / 0.06);
+  --shadow-card: 0 12px 28px rgb(var(--c-shadow) / 0.08);
+  --shadow-soft: 0 12px 28px rgb(var(--c-shadow) / 0.08);
+  --shadow-hero: 0 18px 36px rgb(var(--c-brand-deep) / 0.30);
+  --shadow-brand: none; /* violet glow removed app-wide (was a halo on primary buttons/chips) */
+  --shadow-warm: 0 8px 22px rgb(var(--c-accentwarm) / 0.22);
+  --shadow-gold: 0 8px 22px rgb(var(--c-gold) / 0.18);
 }
 
 .dark {
   color-scheme: dark;
 
-  --c-brand: 141 116 255; /* lifted so the violet pops on near-black */
-  --c-brand-dark: 124 92 255;
-  --c-brand-deep: 67 48 130;
-  --c-brand-soft: 42 35 70; /* dark violet tile */
-  --c-brand-ring: 96 78 175;
+  /* Bolder pass (dark): more saturated violet, deeper canvas, brighter muted
+   * text for crisper hierarchy on near-black. */
+  --c-brand: 155 134 245; /* #9B86F5 vivid violet for dark */
+  --c-brand-dark: 138 116 240; /* gradient mid */
+  --c-brand-deep: 91 61 214; /* deep gradient end stays rich */
+  --c-brand-soft: 42 35 78; /* #2A234E dark violet tile */
+  --c-brand-ring: 110 90 190;
 
-  --c-canvas: 13 12 22; /* near-black background (inspo) */
-  --c-card: 25 23 40; /* raised dark surface */
-  --c-ink: 237 235 248; /* light text */
-  --c-ink2: 159 157 184; /* muted light text */
-  --c-line: 43 40 62; /* subtle dark hairline */
-  --c-tint: 33 30 52;
+  --c-canvas: 22 19 34; /* #161322 page background — deeper */
+  --c-card: 36 31 54; /* #241F36 raised surface */
+  --c-ink: 237 234 248; /* light text */
+  --c-ink2: 168 162 188; /* #A8A2BC muted light text — brighter */
+  --c-line: 52 46 73; /* #342E49 dark hairline */
+  --c-tint: 42 35 78; /* tint-violet dark */
   --c-shadow: 0 0 0;
 
-  --c-secondary: 168 148 255;
+  --c-secondary: 169 140 247; /* #A98CF7 */
 
-  --c-accentwarm: 255 124 74;
-  --c-accentwarm-soft: 58 36 26;
+  --c-accentwarm: 255 130 102; /* #FF8266 */
+  --c-accentwarm-soft: 60 40 34; /* tint-coral dark */
   --c-gold: 246 179 53;
-  --c-gold-soft: 56 44 20;
-  --c-mint: 52 199 110;
-  --c-mint-soft: 21 48 33;
-  --c-coral: 248 113 113;
-  --c-coral-soft: 56 28 30;
-  --c-sky: 141 116 255;
-  --c-sky-soft: 42 35 70;
-  --c-streak: 255 124 74;
-  --c-streak-soft: 58 36 26;
+  --c-gold-soft: 58 46 22;
+  --c-mint: 32 214 174; /* #20D6AE correct dark */
+  --c-mint-soft: 22 52 44; /* tint-green dark */
+  --c-coral: 255 120 120; /* wrong dark */
+  --c-coral-soft: 58 30 32;
+  --c-sky: 122 168 224; /* lifted blue icon for dark */
+  --c-sky-soft: 30 46 61; /* tint-blue dark */
+  --c-streak: 255 130 102;
+  --c-streak-soft: 60 40 34;
+
+  /* ── design-system.md spec tokens ── */
+  --c-correct: 32 214 174; /* #20D6AE */
+  --c-wrong: 255 120 120;
+  --c-selected: 44 38 70;
+  --c-tint-violet: 42 35 78; /* #2A234E */
+  --c-tint-coral: 60 40 34;
+  --c-tint-blue: 30 46 61;
+  --c-tint-green: 22 52 44;
+  --c-tint-green-icon: 43 184 154;
+
+  /* No elevation shadows in dark mode — borders carry depth instead. */
+  --shadow-pill: none;
+  --shadow-card: none;
+  --shadow-soft: none;
+  --shadow-hero: none;
+  --shadow-brand: none;
+  --shadow-warm: none;
+  --shadow-gold: none;
 }
 
 * {
@@ -105,7 +152,7 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', 'Noto Sans Tamil', system-ui, sans-serif;
   background-color: rgb(var(--c-canvas));
   color: rgb(var(--c-ink));
   -webkit-font-smoothing: antialiased;
@@ -117,8 +164,9 @@ h1,
 h2,
 h3,
 h4,
-.font-heading {
-  font-family: 'Inter', system-ui, sans-serif;
+.font-heading,
+.font-display {
+  font-family: 'Plus Jakarta Sans', 'Anek Tamil', system-ui, sans-serif;
   letter-spacing: -0.018em;
 }
 
@@ -178,12 +226,19 @@ h4,
 @layer components {
   /* ─── Surfaces ───────────────────────────────────────────────────────── */
   .card {
-    @apply rounded-2xl border border-line bg-card shadow-soft;
+    @apply rounded-card border border-line bg-card shadow-soft;
   }
 
-  /* The signature royal-blue hero panel. */
+  /* Pastel icon tile — soft square behind an icon (design-system.md §1).
+   * Pair with a tint-* bg and the matching strong icon colour, e.g.
+   * `<div class="tile bg-tint-coral"><Icon class="text-accent"/></div>`. */
+  .tile {
+    @apply grid h-14 w-14 place-items-center rounded-tile;
+  }
+
+  /* The signature violet hero panel — generous radius + soft glow. */
   .hero-panel {
-    @apply relative overflow-hidden rounded-2xl bg-brand-gradient text-white;
+    @apply relative overflow-hidden rounded-hero bg-brand-gradient text-white shadow-hero;
   }
 
   /* ─── Buttons ────────────────────────────────────────────────────────── */
@@ -193,7 +248,7 @@ h4,
    * layer), so existing call-sites are unaffected. Tactile press + focus ring
    * are built in - no need to add `press`/`focus-ring` alongside. */
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-2xl
+    @apply inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-pill
       px-5 py-2.5 text-sm font-heading font-semibold leading-none
       transition-all duration-200 ease-out active:scale-[0.97]
       focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas
@@ -209,7 +264,7 @@ h4,
   /* Primary - the signature violet action: a gradient pill with a soft glow that
    * brightens on hover (matches the inspiration's gradient buttons). */
   .btn-brand {
-    @apply btn bg-brand-gradient text-white shadow-brand hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:brightness-95;
+    @apply btn bg-brand-gradient text-white hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:brightness-95;
   }
   /* Warm CTA - the orange accent, used sparingly for the key conversion action. */
   .btn-gold {
@@ -248,7 +303,7 @@ h4,
 
   /* ─── Inputs ─────────────────────────────────────────────────────────── */
   .input-soft {
-    @apply w-full rounded-xl border border-line bg-card px-4 py-2.5 font-body text-ink
+    @apply w-full rounded-field border border-line bg-card px-4 py-2.5 font-body text-ink
       placeholder:text-ink2/50 focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/15;
   }
 

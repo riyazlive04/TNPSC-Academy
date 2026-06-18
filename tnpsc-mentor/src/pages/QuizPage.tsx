@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Loader2, Maximize2, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Loader2, Maximize2, X } from 'lucide-react'
 import type { Lang } from '../store/languageStore'
 import Timer from '../components/UI/Timer'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
+import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
 import {
@@ -20,6 +21,7 @@ import {
 import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
+import { api } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
@@ -50,6 +52,13 @@ export default function QuizPage() {
   const config = navConfig ?? useQuizStore.getState().config
 
   const [submitError, setSubmitError] = useState('')
+
+  // Questions reported for correction (in memory; server is source of truth).
+  const [reported, setReported] = useState<Record<string, boolean>>({})
+  const [reportToast, setReportToast] = useState('')
+  const reportTimers = useRef<number[]>([])
+  // Feedback box open → the countdown is paused while it's up.
+  const [reportOpen, setReportOpen] = useState(false)
 
   const store = useQuizStore()
   const {
@@ -140,7 +149,8 @@ export default function QuizPage() {
 
   // ── Global countdown timer (auto-submit at 0) ──
   useEffect(() => {
-    if (loading || empty || loadError) return
+    // `reportOpen` pauses the countdown while the feedback box is open.
+    if (loading || empty || loadError || reportOpen) return
     const id = setInterval(() => {
       const left = useQuizStore.getState().totalTimeLeft
       if (left <= 1) {
@@ -153,7 +163,7 @@ export default function QuizPage() {
     }, 1000)
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, empty, loadError])
+  }, [loading, empty, loadError, reportOpen])
 
   // ── Per-question elapsed timer (resets on navigation) ──
   useEffect(() => {
@@ -196,6 +206,44 @@ export default function QuizPage() {
   const toggleFlag = () => {
     if (currentQuestion) store.toggleFlag(currentQuestion.id)
   }
+
+  const reportToastFor = (msg: string) => {
+    setReportToast(msg)
+    reportTimers.current.push(window.setTimeout(() => setReportToast(''), 3500))
+  }
+
+  // Tapping report: un-report in place if already reported, else open the
+  // feedback box (which pauses the countdown).
+  const onReportClick = () => {
+    if (!currentQuestion) return
+    if (reported[currentQuestion.id]) {
+      const id = currentQuestion.id
+      setReported((r) => ({ ...r, [id]: false }))
+      void api.feedback.reportQuestion(id, false).catch(() => {})
+      reportToastFor(t('reportQuestionUndone'))
+      return
+    }
+    setReportOpen(true)
+  }
+
+  const submitReport = (reason: string) => {
+    if (currentQuestion) {
+      const id = currentQuestion.id
+      setReported((r) => ({ ...r, [id]: true }))
+      void api.feedback.reportQuestion(id, true, reason || undefined).catch(() => {})
+      reportToastFor(t('reportQuestionDone'))
+    }
+    setReportOpen(false)
+  }
+
+  // Clear pending report-toast timers on unmount.
+  useEffect(
+    () => () => {
+      reportTimers.current.forEach((id) => window.clearTimeout(id))
+      reportTimers.current = []
+    },
+    []
+  )
 
   // ── Exit flow (practice tests only) ──
   const handleExitEvaluate = () => {
@@ -497,6 +545,23 @@ export default function QuizPage() {
             </div>
           </div>
         )}
+
+        {/* Report this question for correction (does not affect the score) */}
+        <div className="mt-5 flex justify-center">
+          <button
+            onClick={onReportClick}
+            aria-pressed={Boolean(reported[currentQuestion.id])}
+            className={[
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-heading text-xs font-semibold transition',
+              reported[currentQuestion.id]
+                ? 'bg-coral/10 text-coral'
+                : 'text-ink2/70 hover:bg-tint hover:text-coral',
+            ].join(' ')}
+          >
+            <AlertCircle size={14} />
+            {reported[currentQuestion.id] ? t('reportedLabel') : t('reportError')}
+          </button>
+        </div>
       </div>
 
       {/* Bottom nav bar - icons always show; text labels appear on wider screens
@@ -544,18 +609,19 @@ export default function QuizPage() {
             </button>
           </div>
 
-          {/* Next / Submit */}
+          {/* Next / Submit — warm rose CTA (per the quiz mockup), distinct from
+              the violet progress/selection so the primary action always pops. */}
           {isLast ? (
             <button
               onClick={requestSubmit}
-              className="btn-brand flex-shrink-0 whitespace-nowrap px-4 py-2.5 text-sm sm:px-6"
+              className="inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-pill bg-[#EC4D7E] px-4 py-2.5 font-heading text-sm font-semibold text-white shadow-[0_8px_22px_rgba(236,77,126,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95 sm:px-6"
             >
               {t('submitTest')}
             </button>
           ) : (
             <button
               onClick={goNext}
-              className="btn-brand inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap px-4 py-2.5 text-sm sm:px-6"
+              className="inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-pill bg-[#EC4D7E] px-4 py-2.5 font-heading text-sm font-semibold text-white shadow-[0_8px_22px_rgba(236,77,126,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95 sm:px-6"
             >
               {t('next')} <ChevronRight size={18} className="flex-shrink-0" />
             </button>
@@ -595,6 +661,22 @@ export default function QuizPage() {
           }}
           onSignIn={() => navigate('/login')}
         />
+      )}
+
+      {/* Report-a-question feedback box. While open the countdown is paused. */}
+      {reportOpen && (
+        <ReportQuestionModal
+          questionNumber={currentIndex + 1}
+          onSubmit={submitReport}
+          onCancel={() => setReportOpen(false)}
+        />
+      )}
+
+      {/* Report confirmation toast */}
+      {reportToast && (
+        <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-xl bg-brand px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
+          {reportToast}
+        </div>
       )}
 
       {/* ── Proctoring overlays ── */}

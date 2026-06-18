@@ -617,7 +617,11 @@ as $$
       from jsonb_array_elements(p_queries) elem
       where q.category = elem->>'category'
         and (
-          elem->'subjects' is null
+          -- No subjects filter when the key is absent OR an explicit JSON null
+          -- (the API sends "subjects": null for whole-category slots such as
+          -- aptitude / current_affairs). Only an actual array narrows by subject;
+          -- jsonb_array_elements_text() on a non-array would raise and 400 the call.
+          jsonb_typeof(elem->'subjects') is distinct from 'array'
           or q.subject = any (
             select jsonb_array_elements_text(elem->'subjects')
           )

@@ -73,4 +73,38 @@ router.post(
   })
 )
 
+// ─── POST /api/feedback/question-report ──────────────────────────────────────
+// "Mark this question for correction" during a test. `reported: true` records
+// (or updates) the report; `reported: false` removes it (re-tap to un-flag).
+// One report per user per question; the optional `reason` is a short note.
+router.post(
+  '/question-report',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const questionId = String(req.body?.questionId ?? '').trim()
+    if (!questionId) return res.status(400).json({ error: 'questionId is required' })
+    const reported = req.body?.reported !== false // default true
+    const reason: string | null = req.body?.reason?.toString().slice(0, 500).trim() || null
+
+    if (!reported) {
+      const { error } = await req.db!
+        .from('question_reports')
+        .delete()
+        .eq('user_id', req.userId)
+        .eq('question_id', questionId)
+      if (error) return sendDbError(res, error)
+      return res.json({ ok: true, reported: false })
+    }
+
+    const { error } = await req.db!
+      .from('question_reports')
+      .upsert(
+        { user_id: req.userId, question_id: questionId, reason, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id,question_id' }
+      )
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true, reported: true })
+  })
+)
+
 export default router

@@ -37,9 +37,9 @@ export default function QuestionCard({
   const { t, lang: uiLang } = useT()
   const lang = displayLang ?? uiLang
   return (
-    <div className="animate-fadeIn rounded-3xl border border-line bg-card p-5 shadow-card sm:p-7">
+    <div className="animate-fadeIn rounded-hero border border-line bg-card p-5 shadow-soft sm:p-7">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="tamil font-heading text-sm font-bold uppercase tracking-wide text-secondary">
+        <span className="tamil font-heading text-sm font-semibold text-ink2">
           {t('question')} {index + 1} {t('of')} {total}
         </span>
         <div className="flex min-w-0 items-center justify-end gap-2">
@@ -66,7 +66,7 @@ export default function QuestionCard({
       <QuestionStem
         question={question}
         lang={lang}
-        textClassName="mb-3 text-lg font-semibold leading-relaxed text-navytext sm:text-xl"
+        textClassName="mb-3 font-display text-lg font-bold leading-relaxed text-ink sm:text-xl"
       />
 
       <QuestionFigures images={question.images} className="mb-5" />

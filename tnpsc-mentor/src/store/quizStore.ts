@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { safeLocalStorage } from '../lib/safeStorage'
 import type { AnswerLetter, Question, QuizConfig, TestAnswer } from '../types'
 
 export const SECONDS_PER_QUESTION = 45
@@ -154,6 +155,8 @@ export const useQuizStore = create<QuizState>()(
     }),
     {
       name: 'tnpsc-mentor-quiz',
+      // Resilient storage: a full-quota write must never crash a running test.
+      storage: createJSONStorage(() => safeLocalStorage),
       // Persist enough to resume an in-progress test across a refresh. The
       // remaining time is recomputed from `startedAt` (not persisted) so a
       // closed tab doesn't "pause" the clock.
