@@ -13,10 +13,10 @@ import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
 import { useT, type StringKey } from '../lib/i18n'
 
-const TARGET_GROUPS = [
-  { value: 'Group1', label: 'Group 1' },
-  { value: 'Group2_2A', label: 'Group 2 / 2A' },
-  { value: 'Group4_VAO', label: 'Group 4 & VAO' },
+const GENDERS: { value: string; labelKey: StringKey }[] = [
+  { value: 'male', labelKey: 'genderMale' },
+  { value: 'female', labelKey: 'genderFemale' },
+  { value: 'other', labelKey: 'genderOther' },
 ]
 
 const LANGUAGES: { id: Lang; labelKey: StringKey }[] = [
@@ -43,6 +43,7 @@ export default function RegisterPage() {
     fullName: '',
     email: '',
     phone: '',
+    gender: '',
     password: '',
     confirm: '',
     targetGroup: 'Group1',
@@ -77,6 +78,7 @@ export default function RegisterPage() {
       fullName: form.fullName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
+      gender: form.gender || undefined,
       password: form.password,
       targetGroup: form.targetGroup,
     })
@@ -197,20 +199,21 @@ export default function RegisterPage() {
 
           <div>
             <label
-              htmlFor="reg-group"
+              htmlFor="reg-gender"
               className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
             >
-              {t('targetGroup')}
+              {t('gender')}
             </label>
             <select
-              id="reg-group"
+              id="reg-gender"
               className="input-soft appearance-none"
-              value={form.targetGroup}
-              onChange={(e) => update('targetGroup', e.target.value)}
+              value={form.gender}
+              onChange={(e) => update('gender', e.target.value)}
             >
-              {TARGET_GROUPS.map((g) => (
+              <option value="">{t('genderSelect')}</option>
+              {GENDERS.map((g) => (
                 <option key={g.value} value={g.value}>
-                  {g.label}
+                  {t(g.labelKey)}
                 </option>
               ))}
             </select>

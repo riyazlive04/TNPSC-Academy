@@ -49,4 +49,28 @@ router.post(
   })
 )
 
+// ─── POST /api/feedback/explanation ──────────────────────────────────────────
+// Per-explanation thumbs up/down while reviewing answers. One vote per user per
+// question (re-voting updates it). A 'down' marks an explanation as needing work.
+router.post(
+  '/explanation',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const questionId = String(req.body?.questionId ?? '').trim()
+    const vote = req.body?.vote
+    if (!questionId) return res.status(400).json({ error: 'questionId is required' })
+    if (vote !== 'up' && vote !== 'down') {
+      return res.status(400).json({ error: "vote must be 'up' or 'down'" })
+    }
+    const { error } = await req.db!
+      .from('explanation_feedback')
+      .upsert(
+        { user_id: req.userId, question_id: questionId, vote, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id,question_id' }
+      )
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true })
+  })
+)
+
 export default router

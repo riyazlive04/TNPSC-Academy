@@ -150,6 +150,7 @@ export const api = {
       fullName: string
       email: string
       phone: string
+      gender?: string
       password: string
       targetGroup: string
     }): Promise<SessionResponse | { requiresConfirmation: true }> {
@@ -390,6 +391,13 @@ export const api = {
     async submit(rating: number, message: string, page: string): Promise<void> {
       await request('/api/feedback', { method: 'POST', body: { rating, message, page } })
     },
+    /** Thumbs up/down on a single explanation ('down' = needs work). */
+    async explanation(questionId: string, vote: 'up' | 'down'): Promise<void> {
+      await request('/api/feedback/explanation', {
+        method: 'POST',
+        body: { questionId, vote },
+      })
+    },
   },
 
   // ─── Payments (Razorpay) ─────────────────────────────────────────────────
@@ -465,6 +473,79 @@ export const api = {
       await request(`/api/coupons/${id}`, { method: 'DELETE' })
     },
   },
+
+  // ─── Notifications (Web Push + in-app feed) ──────────────────────────────
+  notifications: {
+    /** The VAPID public key needed to create a push subscription (null = off). */
+    async vapidKey(): Promise<string | null> {
+      const data = await request<{ key: string | null }>('/api/notifications/vapid-public-key')
+      return data.key
+    },
+    /** Register this browser's push subscription with the server. */
+    async subscribe(subscription: unknown): Promise<void> {
+      await request('/api/notifications/subscribe', { method: 'POST', body: { subscription } })
+    },
+    async unsubscribe(endpoint: string): Promise<void> {
+      await request('/api/notifications/unsubscribe', { method: 'POST', body: { endpoint } })
+    },
+    /** The user's in-app feed + unread count. */
+    async feed(): Promise<{ notifications: NotificationItem[]; unread: number }> {
+      return request('/api/notifications')
+    },
+    async markRead(ids: string[]): Promise<void> {
+      await request('/api/notifications/read', { method: 'POST', body: { ids } })
+    },
+    /** Superadmin: create a notification (push kind also delivers to devices). */
+    async create(input: NotificationInput): Promise<{ pushSent: number; pushEnabled: boolean }> {
+      return request('/api/notifications', { method: 'POST', body: input })
+    },
+    /** Superadmin: authored-notification history. */
+    async adminList(): Promise<AdminNotification[]> {
+      const data = await request<{ notifications: AdminNotification[] }>('/api/notifications/admin')
+      return data.notifications
+    },
+    async remove(id: string): Promise<void> {
+      await request(`/api/notifications/${id}`, { method: 'DELETE' })
+    },
+  },
+}
+
+// ─── Notification shapes ────────────────────────────────────────────────────────
+export type NotificationKind = 'push' | 'system'
+export type NotificationAudience = 'all' | 'premium' | 'free' | 'group'
+
+/** One entry in a user's in-app feed. */
+export interface NotificationItem {
+  id: string
+  kind: NotificationKind
+  title: string
+  body: string
+  url: string | null
+  created_at: string
+  read: boolean
+}
+
+/** Body sent by the superadmin composer. */
+export interface NotificationInput {
+  kind: NotificationKind
+  title: string
+  body: string
+  url?: string | null
+  audience: NotificationAudience
+  audienceValue?: string | null
+}
+
+/** Full authored row in the admin history list. */
+export interface AdminNotification {
+  id: string
+  kind: NotificationKind
+  title: string
+  body: string
+  url: string | null
+  audience: NotificationAudience
+  audience_value: string | null
+  push_sent: number
+  created_at: string
 }
 
 export interface PremiumStatus {

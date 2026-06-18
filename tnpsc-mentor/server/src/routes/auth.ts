@@ -48,7 +48,7 @@ router.post(
 router.post(
   '/register',
   asyncH(async (req, res) => {
-    const { fullName, email, phone, password, targetGroup } = req.body ?? {}
+    const { fullName, email, phone, gender, password, targetGroup } = req.body ?? {}
     if (!email || !password || !fullName) {
       return res.status(400).json({ error: 'Name, email and password are required' })
     }
@@ -69,6 +69,7 @@ router.post(
       full_name: fullName,
       email: String(email).trim(),
       phone: phone ?? null,
+      gender: gender ?? null,
       target_group: targetGroup ?? null,
     })
     if (enrichError) {

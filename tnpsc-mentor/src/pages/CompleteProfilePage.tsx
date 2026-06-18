@@ -8,17 +8,12 @@ import AuthShell from '../components/Auth/AuthShell'
 import Spinner from '../components/UI/Spinner'
 import { useT } from '../lib/i18n'
 
-const TARGET_GROUPS = [
-  { value: 'Group1', label: 'Group 1' },
-  { value: 'Group2_2A', label: 'Group 2 / 2A' },
-  { value: 'Group4_VAO', label: 'Group 4 & VAO' },
-]
-
 /**
  * Post-signup onboarding for Google users, who arrive with only name + email.
- * Collects the two details Google doesn't provide — phone and target group — then
- * routes onward (language screen / arena). Email/password signups already supply
- * both, so the gate in ProtectedRoute never sends them here.
+ * Collects the one detail Google doesn't provide — phone — then routes onward
+ * (language screen / arena). Email/password signups already supply it, so the
+ * gate in ProtectedRoute never sends them here. A default target group is still
+ * submitted to keep group-derived logic working, but it isn't shown to the user.
  */
 export default function CompleteProfilePage() {
   const navigate = useNavigate()
@@ -28,7 +23,9 @@ export default function CompleteProfilePage() {
   const { t } = useT()
 
   const [phone, setPhone] = useState(profile?.phone ?? '')
-  const [group, setGroup] = useState(profile?.target_group ?? 'Group1')
+  const [gender, setGender] = useState(profile?.gender ?? '')
+  // Default group, submitted but not shown — keeps group-derived logic working.
+  const group = profile?.target_group ?? 'Group1'
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -46,7 +43,7 @@ export default function CompleteProfilePage() {
 
     setSaving(true)
     try {
-      await api.updateProfile({ phone: phone.trim(), target_group: group })
+      await api.updateProfile({ phone: phone.trim(), gender: gender || null, target_group: group })
       await fetchProfile()
       navigate(postAuthDestination(), { replace: true })
     } catch {
@@ -87,22 +84,21 @@ export default function CompleteProfilePage() {
 
           <div>
             <label
-              htmlFor="cp-group"
+              htmlFor="cp-gender"
               className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
             >
-              {t('targetGroup')}
+              {t('gender')}
             </label>
             <select
-              id="cp-group"
+              id="cp-gender"
               className="input-soft appearance-none"
-              value={group}
-              onChange={(e) => setGroup(e.target.value)}
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
             >
-              {TARGET_GROUPS.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
-                </option>
-              ))}
+              <option value="">{t('genderSelect')}</option>
+              <option value="male">{t('genderMale')}</option>
+              <option value="female">{t('genderFemale')}</option>
+              <option value="other">{t('genderOther')}</option>
             </select>
           </div>
 

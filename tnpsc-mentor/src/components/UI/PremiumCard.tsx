@@ -5,6 +5,7 @@ import { startCheckout } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
 import { usePremiumStore } from '../../store/premiumStore'
 import { api, type CouponValidation } from '../../lib/api'
+import { useT } from '../../lib/i18n'
 
 // ─── Premium plan pricing ───────────────────────────────────────────────────
 // Single source of truth for the annual plan. `PRICE_PAISE` is what the order is
@@ -15,12 +16,7 @@ export const PREMIUM_PRICE_RUPEES = 1299
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
 
-const PERKS = [
-  'Unlimited mock tests & full question bank',
-  'All PDF explanations unlocked',
-  'Detailed performance insights',
-  'Priority support',
-]
+const PERK_KEYS = ['premiumPerk1', 'premiumPerk2', 'premiumPerk3', 'premiumPerk4'] as const
 
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
@@ -39,6 +35,7 @@ function rupees(paise: number): string {
  */
 export default function PremiumCard({ className = '' }: { className?: string }) {
   const { profile } = useAuth()
+  const { t } = useT()
   const [paying, setPaying] = useState(false)
   const { premium, loaded, refresh, markPremium } = usePremiumStore()
 
@@ -94,7 +91,7 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
         couponCode: applied?.code,
       })
       if (result.status === 'paid') {
-        toast.success('Welcome to Premium — thank you!')
+        toast.success(t('premiumThanks'))
         markPremium() // hide the card immediately…
         refresh() // …then reconcile with the server (expiry etc.)
       } else if (result.status === 'failed') toast.error(result.error)
@@ -120,16 +117,16 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
         {/* Left: title + perks */}
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white ring-1 ring-white/20">
-            <Crown size={13} /> Premium
+            <Crown size={13} /> {t('premiumBadge')}
           </span>
           <h2 className="mt-3 font-heading text-xl font-semibold tracking-tight text-white">
-            Go Premium — crack TNPSC faster
+            {t('premiumTitle')}
           </h2>
           <ul className="mt-3 space-y-1.5">
-            {PERKS.map((p) => (
+            {PERK_KEYS.map((p) => (
               <li key={p} className="flex items-start gap-2 font-body text-sm text-white/85">
                 <Check size={15} className="mt-0.5 flex-shrink-0 text-white" />
-                <span>{p}</span>
+                <span className="tamil">{t(p)}</span>
               </li>
             ))}
           </ul>
@@ -157,12 +154,12 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
                 </span>
               </>
             )}
-            <span className="font-body text-sm text-white/70">/year</span>
+            <span className="font-body text-sm text-white/70">{t('premiumPerYear')}</span>
           </div>
-          <span className="inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+          <span className="tamil inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
             {applied
-              ? `You save ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`
-              : `Flat save ₹${SAVINGS}`}
+              ? `${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`
+              : `${t('premiumFlatSave')} ₹${SAVINGS}`}
           </span>
 
           {/* Coupon row */}
@@ -170,12 +167,12 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
             <div className="flex items-center gap-2 rounded-xl bg-white/15 px-3 py-2 ring-1 ring-white/25">
               <Tag size={14} className="text-white" />
               <span className="font-heading text-xs font-semibold text-white">
-                {applied.code} applied
+                {applied.code} {t('premiumApplied')}
               </span>
               <button
                 type="button"
                 onClick={removeCoupon}
-                aria-label="Remove coupon"
+                aria-label={t('premiumRemoveCoupon')}
                 className="text-white/70 transition-colors hover:text-white"
               >
                 <X size={14} />
@@ -188,7 +185,7 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
-                  placeholder="Coupon code"
+                  placeholder={t('premiumCouponPlaceholder')}
                   spellCheck={false}
                   autoCapitalize="characters"
                   className="w-32 rounded-lg bg-white/90 px-3 py-2 font-body text-sm text-brand-dark placeholder:text-brand-dark/40 focus:outline-none focus:ring-2 focus:ring-white"
@@ -199,7 +196,7 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
                   disabled={checking || !code.trim()}
                   className="inline-flex items-center justify-center rounded-lg bg-white/20 px-3 py-2 font-heading text-xs font-semibold text-white ring-1 ring-white/25 transition-all hover:bg-white/30 disabled:opacity-50"
                 >
-                  {checking ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
+                  {checking ? <Loader2 size={14} className="animate-spin" /> : t('premiumApply')}
                 </button>
               </div>
               {couponError && (
@@ -217,7 +214,7 @@ export default function PremiumCard({ className = '' }: { className?: string }) 
               <Loader2 size={16} className="animate-spin" />
             ) : (
               <>
-                <Crown size={16} /> Get Premium
+                <Crown size={16} /> {t('premiumGet')}
               </>
             )}
           </button>

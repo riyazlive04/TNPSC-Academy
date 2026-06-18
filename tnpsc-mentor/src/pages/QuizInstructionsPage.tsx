@@ -89,13 +89,12 @@ export default function QuizInstructionsPage() {
 
   const begin = async () => {
     if (!agreed || noQuestions) return
-    // Request full-screen on this user gesture; the quiz engine enforces it
-    // where supported and degrades to visibility proctoring on phones.
-    await enterFullscreen()
+    // Regular practice tests are NOT proctored — no fullscreen, no violation
+    // tracking. Proctoring is reserved for the Mock Test flow only.
     navigate('/quiz', {
       state: {
         ...config,
-        proctored: true,
+        proctored: false,
         questionCount: count,
         durationSeconds: minutes * 60,
       } as QuizConfig,

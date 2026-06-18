@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
 import { LETTERS, displayOption, displayExplanation, whyWrongFor } from '../../types'
-import { Bookmark, Check, X, MinusCircle, Clock } from 'lucide-react'
+import { Bookmark, Check, X, MinusCircle, Clock, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { topicName } from '../../lib/constants'
 import { formatDuration } from '../UI/Timer'
+import { api } from '../../lib/api'
+import { toast } from '../../store/toastStore'
 import WorkedSolution from './WorkedSolution'
 import QuestionFigures from './QuestionFigures'
 import QuestionStem from './QuestionStem'
@@ -153,16 +156,27 @@ export default function ResultCard({
           {isAptitude ? (
             <WorkedSolution question={question} lang={lang} />
           ) : (
-            displayExplanation(question, lang) && (
+            (displayExplanation(question, lang) ||
+              (question.category === 'pyq' && question.year)) && (
               <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-                <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
-                  <span className="font-heading font-bold text-secondary">
-                    {t('explanationColon')}{' '}
-                  </span>
-                  {displayExplanation(question, lang)}
-                </p>
+                {question.category === 'pyq' && question.year && (
+                  <p className="mb-1 font-heading text-[11px] font-bold uppercase tracking-wide text-secondary">
+                    {t('askedInYear')}: {question.year}
+                  </p>
+                )}
+                {displayExplanation(question, lang) && (
+                  <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
+                    <span className="font-heading font-bold text-secondary">
+                      {t('explanationColon')}{' '}
+                    </span>
+                    {displayExplanation(question, lang)}
+                  </p>
+                )}
               </div>
             )
+          )}
+          {(isAptitude || displayExplanation(question, lang)) && (
+            <ExplanationVote questionId={question.id} />
           )}
         </>
       ) : (
@@ -179,6 +193,54 @@ export default function ResultCard({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+/** Thumbs up/down on a single explanation. 'down' flags it as needing work. */
+function ExplanationVote({ questionId }: { questionId: string }) {
+  const { t } = useT()
+  const [vote, setVote] = useState<'up' | 'down' | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  const cast = async (v: 'up' | 'down') => {
+    if (busy || vote === v) return
+    setBusy(true)
+    const prev = vote
+    setVote(v)
+    try {
+      await api.feedback.explanation(questionId, v)
+      toast.success(v === 'down' ? t('explFlagged') : t('explThanks'))
+    } catch {
+      setVote(prev) // roll back on failure
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="mt-2 flex items-center gap-3 border-t border-line/60 pt-2">
+      <span className="font-body text-[11px] text-ink2">{t('explHelpful')}</span>
+      <button
+        type="button"
+        onClick={() => cast('up')}
+        disabled={busy}
+        aria-pressed={vote === 'up'}
+        aria-label={t('explHelpful')}
+        className={`press transition-colors ${vote === 'up' ? 'text-mint' : 'text-ink2/60 hover:text-mint'}`}
+      >
+        <ThumbsUp size={15} className={vote === 'up' ? 'fill-mint/20' : ''} />
+      </button>
+      <button
+        type="button"
+        onClick={() => cast('down')}
+        disabled={busy}
+        aria-pressed={vote === 'down'}
+        aria-label={t('explFlagged')}
+        className={`press transition-colors ${vote === 'down' ? 'text-coral' : 'text-ink2/60 hover:text-coral'}`}
+      >
+        <ThumbsDown size={15} className={vote === 'down' ? 'fill-coral/20' : ''} />
+      </button>
     </div>
   )
 }

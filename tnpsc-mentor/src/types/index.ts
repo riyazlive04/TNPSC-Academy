@@ -196,6 +196,7 @@ export interface Profile {
   full_name: string
   email: string
   phone?: string
+  gender?: string
   target_group?: string
   role?: UserRole
   exam_date?: string | null

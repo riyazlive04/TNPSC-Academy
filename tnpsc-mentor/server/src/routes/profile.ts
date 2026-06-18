@@ -25,7 +25,7 @@ router.patch(
   '/',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const allowed = ['full_name', 'phone', 'target_group', 'exam_date', 'daily_goal', 'language']
+    const allowed = ['full_name', 'phone', 'gender', 'target_group', 'exam_date', 'daily_goal', 'language']
     const fields: Record<string, unknown> = {}
     for (const k of allowed) {
       if (k in (req.body ?? {})) fields[k] = req.body[k]

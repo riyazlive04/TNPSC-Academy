@@ -159,7 +159,7 @@ export async function generateExplanationPdf({
       // Higher opacity + larger font so the "NAME · PHONE" mark is clearly
       // legible (still light enough to read the content through it); spacing
       // loosened to match the bigger text and keep tiles from overlapping.
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.12 }))
+      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.08 }))
       doc.setTextColor(...VIOLET_RGB)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(26)

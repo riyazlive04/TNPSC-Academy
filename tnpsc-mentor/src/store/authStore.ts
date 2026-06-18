@@ -37,6 +37,7 @@ export interface SignUpParams {
   fullName: string
   email: string
   phone: string
+  gender?: string
   password: string
   targetGroup: string
 }
@@ -146,12 +147,13 @@ export function selectIsSuperAdmin(s: AuthState): boolean {
   return s.profile?.role === 'superadmin'
 }
 
-// A Google signup arrives with only name/email — no target group or phone. Such
-// aspirants are routed through /complete-profile until both are filled. Admins and
-// superadmins are seeded directly and skip this onboarding gate.
+// A Google signup arrives with only name/email — no phone. Such aspirants are
+// routed through /complete-profile until phone is filled. (Target group is no
+// longer collected; a default is applied server-side.) Admins and superadmins
+// are seeded directly and skip this onboarding gate.
 export function selectProfileNeedsOnboarding(s: AuthState): boolean {
   const p = s.profile
   if (!p) return false
   if (p.role === 'admin' || p.role === 'superadmin') return false
-  return !p.target_group || !p.phone
+  return !p.phone
 }
