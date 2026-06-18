@@ -11,16 +11,32 @@ import {
   Search,
   AlertTriangle,
   RefreshCw,
+  Ticket,
+  Plus,
+  Copy,
+  Trash2,
+  IndianRupee,
+  TrendingUp,
+  Wallet,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Spinner from '../components/UI/Spinner'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
-import { api, type PlatformMetrics, type AdminUserRow, type FeedbackRow } from '../lib/api'
+import {
+  api,
+  type PlatformMetrics,
+  type RevenueMetrics,
+  type AdminUserRow,
+  type FeedbackRow,
+  type CouponWithStats,
+  type CouponInput,
+  type DiscountType,
+} from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
 import type { UserRole } from '../types'
 
-type Tab = 'overview' | 'users' | 'feedback'
+type Tab = 'overview' | 'revenue' | 'users' | 'feedback' | 'coupons'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -28,7 +44,9 @@ export default function SuperAdminPage() {
 
   const TABS: { id: Tab; label: StringKey; icon: typeof Activity }[] = [
     { id: 'overview', label: 'overview', icon: Activity },
+    { id: 'revenue', label: 'revenueTab', icon: IndianRupee },
     { id: 'users', label: 'users', icon: UsersIcon },
+    { id: 'coupons', label: 'couponsTab', icon: Ticket },
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
   ]
 
@@ -68,7 +86,9 @@ export default function SuperAdminPage() {
 
         <div key={tab} className="animate-fadeIn">
           {tab === 'overview' && <OverviewTab />}
+          {tab === 'revenue' && <RevenueTab />}
           {tab === 'users' && <UsersTab />}
+          {tab === 'coupons' && <CouponsTab />}
           {tab === 'feedback' && <FeedbackTab />}
         </div>
       </div>
@@ -221,6 +241,161 @@ function BreakdownCard({ title, data }: { title: string; data: Record<string, nu
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ─── Revenue (founder analytics) ────────────────────────────────────────────────
+// Amounts come from the API in paise; show them as whole rupees, Indian-grouped.
+function formatINR(paise: number): string {
+  return '₹' + Math.round(paise / 100).toLocaleString('en-IN')
+}
+
+function RevenueTab() {
+  const [m, setM] = useState<RevenueMetrics | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.superadmin
+      .revenue()
+      .then(setM)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  if (loading) return <SkeletonGrid />
+  if (error || !m) return <ErrorState onRetry={load} />
+
+  const conversion = m.totalUsers
+    ? `${((m.payingCustomers / m.totalUsers) * 100).toFixed(1)}%`
+    : '-'
+
+  const headline: { label: string; value: string; icon: typeof Wallet; tile: string }[] = [
+    { label: 'This week', value: formatINR(m.revenueWeek), icon: Wallet, tile: 'bg-mintsoft text-mint' },
+    { label: 'This month', value: formatINR(m.revenueMonth), icon: TrendingUp, tile: 'bg-brand-soft text-brand' },
+    { label: 'This year', value: formatINR(m.revenueYear), icon: IndianRupee, tile: 'bg-goldsoft text-gold' },
+    { label: 'All-time', value: formatINR(m.revenueAllTime), icon: IndianRupee, tile: 'bg-skysoft text-sky' },
+  ]
+
+  const stats: { label: string; value: string }[] = [
+    { label: 'Paying customers', value: String(m.payingCustomers) },
+    { label: 'Active premium', value: String(m.premiumActive) },
+    { label: 'Conversion', value: conversion },
+    { label: 'Avg order value', value: formatINR(m.avgOrderValue) },
+    { label: 'Paid orders', value: String(m.paidOrders) },
+    { label: 'Coupon orders', value: String(m.couponOrders) },
+    { label: 'Discounts given', value: formatINR(m.totalDiscount) },
+    { label: 'Failed payments', value: String(m.failedPayments) },
+  ]
+
+  return (
+    <div className="space-y-6">
+      <p className="font-body text-xs text-ink2">
+        Today:{' '}
+        <span className="font-heading font-semibold text-ink">{formatINR(m.revenueToday)}</span>
+      </p>
+
+      {/* Headline revenue windows */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {headline.map((c, i) => {
+          const Icon = c.icon
+          return (
+            <div
+              key={c.label}
+              style={{ '--i': i } as React.CSSProperties}
+              className="card stagger-item interactive p-4"
+            >
+              <span className={`mb-3 grid h-9 w-9 place-items-center rounded-lg ${c.tile}`}>
+                <Icon size={18} />
+              </span>
+              <div className="font-heading text-2xl font-semibold leading-none text-ink">
+                {c.value}
+              </div>
+              <div className="mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">
+                {c.label}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Secondary stats */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="card p-4">
+            <div className="font-heading text-xl font-semibold leading-none text-ink">{s.value}</div>
+            <div className="mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <RevenueChart data={m.revenueByMonth} />
+
+      {/* Top promoters */}
+      <div className="card p-5">
+        <h2 className="mb-4 font-heading text-sm font-semibold text-ink">
+          Top promoters by revenue
+        </h2>
+        {m.topPromoters.length === 0 ? (
+          <p className="font-body text-sm text-ink2">No coupon-driven sales yet.</p>
+        ) : (
+          <div className="space-y-2.5">
+            {m.topPromoters.map((p, i) => (
+              <div key={p.code} className="flex items-center gap-3">
+                <span className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-xs font-bold text-brand">
+                  {i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {p.promoter}
+                  </p>
+                  <p className="truncate font-body text-xs text-ink2">
+                    {p.code} · {p.redemptions} sale{p.redemptions === 1 ? '' : 's'}
+                  </p>
+                </div>
+                <span className="font-heading text-sm font-semibold text-ink">
+                  {formatINR(p.revenue)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function RevenueChart({ data }: { data: { month: string; revenue: number }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.revenue))
+  const allZero = data.every((d) => d.revenue === 0)
+  return (
+    <div className="card p-5">
+      <h2 className="mb-4 font-heading text-sm font-semibold text-ink">Revenue — last 12 months</h2>
+      {allZero ? (
+        <p className="py-6 text-center font-body text-sm text-ink2">No revenue recorded yet.</p>
+      ) : (
+        <div className="flex h-40 items-end gap-1.5">
+          {data.map((d, i) => (
+            <div key={d.month} className="group flex flex-1 flex-col items-center justify-end gap-1">
+              <span className="font-heading text-[9px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
+                {formatINR(d.revenue)}
+              </span>
+              <div
+                style={{ height: `${(d.revenue / max) * 100}%`, '--i': i } as React.CSSProperties}
+                className="w-full origin-bottom rounded-t-md bg-brand/80 transition-all duration-300 hover:bg-brand"
+                title={`${d.month}: ${formatINR(d.revenue)}`}
+              />
+              <span className="font-body text-[9px] text-ink2/70">{d.month.slice(5)}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -451,5 +626,315 @@ function Stars({ rating }: { rating: number }) {
         />
       ))}
     </span>
+  )
+}
+
+// ─── Coupons ────────────────────────────────────────────────────────────────────
+// Admin-only tooling: kept in English (matches the rest of the console's intent).
+const COUPON_INPUT =
+  'focus-ring w-full rounded-lg border border-line bg-card px-3 py-2 font-body text-sm text-ink outline-none transition placeholder:text-ink2/50 hover:border-brand/40'
+
+function paiseToRupees(paise: number): string {
+  const r = paise / 100
+  return Number.isInteger(r) ? String(r) : r.toFixed(2)
+}
+
+/** Human label for a coupon's discount, e.g. "20% (max ₹300)" or "₹150 off". */
+function discountLabel(c: CouponWithStats): string {
+  if (c.discount_type === 'flat') return `₹${paiseToRupees(c.discount_value)} off`
+  const cap = c.max_discount != null ? ` (max ₹${paiseToRupees(c.max_discount)})` : ''
+  return `${c.discount_value}% off${cap}`
+}
+
+const EMPTY_COUPON_FORM = {
+  promoterName: '',
+  code: '',
+  discountType: 'percent' as DiscountType,
+  value: '',
+  maxDiscount: '',
+  maxRedemptions: '',
+  expiresAt: '',
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+        {label}
+      </span>
+      {children}
+    </label>
+  )
+}
+
+function CouponsTab() {
+  const [list, setList] = useState<CouponWithStats[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [form, setForm] = useState(EMPTY_COUPON_FORM)
+  const [creating, setCreating] = useState(false)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<CouponWithStats | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.coupons
+      .list()
+      .then(setList)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (creating) return
+    const promoterName = form.promoterName.trim()
+    if (!promoterName) return toast.error('Promoter name is required.')
+    const num = Number(form.value)
+    if (!Number.isFinite(num) || num <= 0) return toast.error('Enter a valid discount value.')
+    if (form.discountType === 'percent' && (num < 1 || num > 100)) {
+      return toast.error('Percentage must be between 1 and 100.')
+    }
+
+    const payload: CouponInput = {
+      promoterName,
+      code: form.code.trim() || undefined,
+      discountType: form.discountType,
+      discountValue: form.discountType === 'flat' ? Math.round(num * 100) : Math.round(num),
+      maxDiscount:
+        form.discountType === 'percent' && form.maxDiscount.trim()
+          ? Math.round(Number(form.maxDiscount) * 100)
+          : null,
+      maxRedemptions: form.maxRedemptions.trim() ? Math.round(Number(form.maxRedemptions)) : null,
+      expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
+    }
+
+    setCreating(true)
+    try {
+      const created = await api.coupons.create(payload)
+      setList((prev) => [{ ...created, redemptions: 0, total_discount: 0 }, ...prev])
+      setForm(EMPTY_COUPON_FORM)
+      toast.success(`Coupon ${created.code} created.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not create coupon.')
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const toggleActive = async (c: CouponWithStats) => {
+    setBusyId(c.id)
+    try {
+      const updated = await api.coupons.update(c.id, { active: !c.active })
+      setList((prev) => prev.map((x) => (x.id === c.id ? { ...x, active: updated.active } : x)))
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update coupon.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    setBusyId(pendingDelete.id)
+    try {
+      await api.coupons.remove(pendingDelete.id)
+      setList((prev) => prev.filter((x) => x.id !== pendingDelete.id))
+      toast.success('Coupon deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete coupon.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const copyCode = (code: string) => {
+    navigator.clipboard?.writeText(code).then(
+      () => toast.success(`Copied ${code}`),
+      () => {}
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Create form */}
+      <form onSubmit={submit} className="card space-y-4 p-5">
+        <h2 className="flex items-center gap-2 font-heading text-sm font-semibold text-ink">
+          <Plus size={16} className="text-brand" /> New promoter coupon
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Promoter name *">
+            <input
+              className={COUPON_INPUT}
+              value={form.promoterName}
+              onChange={(e) => set('promoterName', e.target.value)}
+              placeholder="e.g. Riyaz"
+            />
+          </Field>
+          <Field label="Code (optional — auto-generated)">
+            <input
+              className={COUPON_INPUT}
+              value={form.code}
+              onChange={(e) => set('code', e.target.value.toUpperCase())}
+              placeholder="e.g. RIYAZ20"
+              spellCheck={false}
+            />
+          </Field>
+          <Field label="Discount type">
+            <select
+              className={COUPON_INPUT}
+              value={form.discountType}
+              onChange={(e) => set('discountType', e.target.value)}
+            >
+              <option value="percent">Percentage (%)</option>
+              <option value="flat">Flat amount (₹)</option>
+            </select>
+          </Field>
+          <Field label={form.discountType === 'flat' ? 'Amount off (₹)' : 'Percentage (%)'}>
+            <input
+              className={COUPON_INPUT}
+              type="number"
+              min="1"
+              value={form.value}
+              onChange={(e) => set('value', e.target.value)}
+              placeholder={form.discountType === 'flat' ? '150' : '20'}
+            />
+          </Field>
+          {form.discountType === 'percent' && (
+            <Field label="Max discount cap (₹, optional)">
+              <input
+                className={COUPON_INPUT}
+                type="number"
+                min="1"
+                value={form.maxDiscount}
+                onChange={(e) => set('maxDiscount', e.target.value)}
+                placeholder="e.g. 300"
+              />
+            </Field>
+          )}
+          <Field label="Max redemptions (optional)">
+            <input
+              className={COUPON_INPUT}
+              type="number"
+              min="1"
+              value={form.maxRedemptions}
+              onChange={(e) => set('maxRedemptions', e.target.value)}
+              placeholder="unlimited"
+            />
+          </Field>
+          <Field label="Expires on (optional)">
+            <input
+              className={COUPON_INPUT}
+              type="date"
+              value={form.expiresAt}
+              onChange={(e) => set('expiresAt', e.target.value)}
+            />
+          </Field>
+        </div>
+        <button type="submit" disabled={creating} className="btn-brand press disabled:opacity-60">
+          {creating ? <Spinner size={16} /> : <Plus size={16} />} Create coupon
+        </button>
+      </form>
+
+      {/* List */}
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton h-20 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <ErrorState onRetry={load} />
+      ) : list.length === 0 ? (
+        <p className="py-12 text-center font-body text-ink2">No coupons yet — create one above.</p>
+      ) : (
+        <div className="space-y-2">
+          {list.map((c, i) => (
+            <div
+              key={c.id}
+              style={{ '--i': i } as React.CSSProperties}
+              className={`card stagger-item flex flex-wrap items-center gap-3 p-3.5 ${
+                c.active ? '' : 'opacity-60'
+              }`}
+            >
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                <Ticket size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-heading text-sm font-bold tracking-wide text-ink">
+                    {c.code}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => copyCode(c.code)}
+                    aria-label="Copy code"
+                    className="text-ink2/60 transition-colors hover:text-brand"
+                  >
+                    <Copy size={13} />
+                  </button>
+                  {!c.active && (
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-semibold uppercase text-ink2">
+                      Paused
+                    </span>
+                  )}
+                </div>
+                <p className="truncate font-body text-xs text-ink2">
+                  {c.promoter_name} · {discountLabel(c)}
+                  {c.expires_at ? ` · expires ${new Date(c.expires_at).toLocaleDateString()}` : ''}
+                  {c.max_redemptions != null ? ` · limit ${c.max_redemptions}` : ''}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="font-heading text-sm font-semibold text-ink">{c.redemptions}</p>
+                <p className="font-body text-[10px] uppercase tracking-wide text-ink2">used</p>
+              </div>
+              <div className="text-center">
+                <p className="font-heading text-sm font-semibold text-ink">
+                  ₹{paiseToRupees(c.total_discount)}
+                </p>
+                <p className="font-body text-[10px] uppercase tracking-wide text-ink2">given</p>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => toggleActive(c)}
+                  disabled={busyId === c.id}
+                  className="focus-ring rounded-lg border border-line px-2.5 py-1.5 font-heading text-xs font-semibold text-ink transition hover:border-brand/40 disabled:opacity-50"
+                >
+                  {c.active ? 'Pause' : 'Activate'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingDelete(c)}
+                  disabled={busyId === c.id}
+                  aria-label="Delete coupon"
+                  className="focus-ring rounded-lg border border-line p-1.5 text-coral transition hover:border-coral/40 disabled:opacity-50"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete coupon?"
+        message={`Delete ${pendingDelete?.code ?? ''}? Past payments keep their record, but the code stops working.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={busyId === pendingDelete?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+    </div>
   )
 }

@@ -580,6 +580,8 @@ const STRINGS = {
   overview: { en: 'Overview', ta: 'மேலோட்டம்' },
   users: { en: 'Users', ta: 'பயனர்கள்' },
   feedbackTab: { en: 'Feedback', ta: 'கருத்துகள்' },
+  couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
+  revenueTab: { en: 'Revenue', ta: 'வருவாய்' },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },

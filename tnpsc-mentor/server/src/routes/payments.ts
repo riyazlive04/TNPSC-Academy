@@ -5,6 +5,8 @@ import { config, razorpayEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { baseAmountForPlan } from '../pricing.js'
+import { evaluateCoupon } from './coupons.js'
 
 const router = Router()
 
@@ -33,16 +35,35 @@ router.post(
   '/order',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    // Amount arrives in paise (₹1 = 100). Clamp to ₹1 … ₹1,00,000 to stop a
-    // malformed/hostile value reaching Razorpay. When the model firms up, derive
-    // this from a server-side plan/SKU table instead of the request body.
-    const raw = Math.trunc(Number(req.body?.amount))
-    const amount = Math.min(Math.max(Number.isFinite(raw) ? raw : 0, 100), 10_000_000)
     const currency = typeof req.body?.currency === 'string' ? req.body.currency : 'INR'
     const notes: Record<string, string> = {
       user_id: req.userId!,
       ...(req.body?.notes && typeof req.body.notes === 'object' ? req.body.notes : {}),
     }
+
+    // Base price is the SERVER's responsibility: for a known plan we use the
+    // server price and ignore the client amount; otherwise the clamped client
+    // amount (the flexible-contribution path). This is the price a coupon
+    // discounts — the browser can never send a pre-discounted number.
+    const base = baseAmountForPlan(notes.plan, Number(req.body?.amount))
+
+    // Optional coupon. Validated + applied server-side so the discount can't be
+    // forged; an invalid/expired/exhausted code fails the order with a clear msg.
+    let couponId: string | null = null
+    let couponCode: string | null = null
+    let discount = 0
+    let amount = base
+    const rawCoupon = typeof req.body?.couponCode === 'string' ? req.body.couponCode.trim() : ''
+    if (rawCoupon) {
+      const ev = await evaluateCoupon(rawCoupon, base)
+      if (!ev.ok) return res.status(400).json({ error: ev.reason })
+      couponId = ev.coupon.id
+      couponCode = ev.coupon.code
+      discount = ev.discount
+      amount = ev.finalAmount
+      notes.coupon = ev.coupon.code // surfaced in the Razorpay dashboard too
+    }
+
     // Receipt must be ≤ 40 chars for Razorpay; a short user-scoped token is plenty.
     const receipt = `rcpt_${req.userId!.slice(0, 8)}_${Date.now().toString(36)}`
 
@@ -57,6 +78,10 @@ router.post(
       receipt,
       notes,
       status: 'created',
+      coupon_id: couponId,
+      coupon_code: couponCode,
+      original_amount: base,
+      discount_amount: discount,
     })
     if (error) return sendDbError(res, error)
 
@@ -112,6 +137,34 @@ router.post(
 
     if (!ok) return res.status(400).json({ error: 'Signature verification failed.', verified: false })
     res.json({ verified: true })
+  })
+)
+
+// ─── GET /api/payments/premium ───────────────────────────────────────────────
+// Derive the user's premium entitlement from the ledger: a paid `premium_annual`
+// payment within the last 365 days. This is the single source of truth for
+// "is this user premium" — entitlement is computed, never stored as a flag, so
+// it stays correct without a separate sync step. Returns the expiry too.
+const YEAR_MS = 365 * 24 * 60 * 60 * 1000
+router.get(
+  '/premium',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const since = new Date(Date.now() - YEAR_MS).toISOString()
+    const { data, error } = await req.db!
+      .from('payments')
+      .select('created_at, notes')
+      .eq('status', 'paid')
+      .gte('created_at', since)
+      .order('created_at', { ascending: false })
+    if (error) return sendDbError(res, error)
+
+    const latest = (data ?? []).find(
+      (r) => (r.notes as { plan?: string } | null)?.plan === 'premium_annual'
+    )
+    if (!latest) return res.json({ premium: false, until: null })
+    const until = new Date(new Date(latest.created_at).getTime() + YEAR_MS).toISOString()
+    res.json({ premium: true, until })
   })
 )
 

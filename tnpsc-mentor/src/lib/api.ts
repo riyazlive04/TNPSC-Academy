@@ -363,6 +363,11 @@ export const api = {
       const data = await request<{ metrics: PlatformMetrics }>('/api/superadmin/metrics')
       return data.metrics
     },
+    /** Revenue / founder analytics (all amounts in paise). */
+    async revenue(): Promise<RevenueMetrics> {
+      const data = await request<{ revenue: RevenueMetrics }>('/api/superadmin/revenue')
+      return data.revenue
+    },
     async users(search?: string, limit = 200): Promise<AdminUserRow[]> {
       const data = await request<{ users: AdminUserRow[] }>('/api/superadmin/users', {
         query: { search: search || undefined, limit },
@@ -391,11 +396,19 @@ export const api = {
   // The browser only ever sees the PUBLIC key id (returned with the order); the
   // secret stays on the server, which also verifies the checkout signature.
   payments: {
-    /** Create a Razorpay order (amount in paise). Returns the order + public key. */
-    async createOrder(amount: number, notes?: Record<string, string>): Promise<CreateOrderResponse> {
+    /**
+     * Create a Razorpay order (amount in paise). Returns the order + public key.
+     * An optional `couponCode` is validated + applied server-side; the server is
+     * the source of truth for the final price (the browser never sends it).
+     */
+    async createOrder(
+      amount: number,
+      notes?: Record<string, string>,
+      couponCode?: string
+    ): Promise<CreateOrderResponse> {
       return request<CreateOrderResponse>('/api/payments/order', {
         method: 'POST',
-        body: { amount, notes },
+        body: { amount, notes, couponCode },
       })
     },
     /** Verify the checkout callback server-side; marks the payment paid on success. */
@@ -411,8 +424,106 @@ export const api = {
       const data = await request<{ payments: PaymentRow[] }>('/api/payments')
       return data.payments
     },
+    /** Premium entitlement, derived server-side from the ledger. */
+    async premiumStatus(): Promise<PremiumStatus> {
+      return request<PremiumStatus>('/api/payments/premium')
+    },
+  },
+
+  // ─── Coupons (promoter / affiliate discount codes) ───────────────────────
+  // `validate` is open to any signed-in user (checkout preview); the rest are
+  // superadmin-only (the server enforces the role).
+  coupons: {
+    /** Preview a code's discount for a plan/amount before paying. Never throws. */
+    async validate(input: {
+      code: string
+      plan?: string
+      amount?: number
+    }): Promise<CouponValidation> {
+      return request<CouponValidation>('/api/coupons/validate', { method: 'POST', body: input })
+    },
+    /** Superadmin: list all coupons with paid-redemption stats. */
+    async list(): Promise<CouponWithStats[]> {
+      const data = await request<{ coupons: CouponWithStats[] }>('/api/coupons')
+      return data.coupons
+    },
+    /** Superadmin: create a coupon (code auto-generated if omitted). */
+    async create(input: CouponInput): Promise<Coupon> {
+      const data = await request<{ coupon: Coupon }>('/api/coupons', { method: 'POST', body: input })
+      return data.coupon
+    },
+    /** Superadmin: edit a coupon / toggle active. */
+    async update(id: string, patch: Partial<CouponInput>): Promise<Coupon> {
+      const data = await request<{ coupon: Coupon }>(`/api/coupons/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      })
+      return data.coupon
+    },
+    /** Superadmin: delete a coupon (past payments keep their coupon_code). */
+    async remove(id: string): Promise<void> {
+      await request(`/api/coupons/${id}`, { method: 'DELETE' })
+    },
   },
 }
+
+export interface PremiumStatus {
+  premium: boolean
+  /** ISO expiry of the active premium year, or null when not premium. */
+  until: string | null
+}
+
+// ─── Coupon shapes ─────────────────────────────────────────────────────────────
+export type DiscountType = 'flat' | 'percent'
+
+export interface Coupon {
+  id: string
+  code: string
+  promoter_name: string
+  discount_type: DiscountType
+  /** flat → paise; percent → whole-number 1..100. */
+  discount_value: number
+  /** Cap (paise) for percentage discounts; null = uncapped. */
+  max_discount: number | null
+  /** Cap on successful redemptions; null = unlimited. */
+  max_redemptions: number | null
+  expires_at: string | null
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CouponWithStats extends Coupon {
+  redemptions: number
+  /** Total discount given across paid redemptions, in paise. */
+  total_discount: number
+}
+
+/** Body for create/update. Amounts (discount_value flat, max_discount) in paise. */
+export interface CouponInput {
+  code?: string
+  promoterName: string
+  discountType: DiscountType
+  discountValue: number
+  maxDiscount?: number | null
+  maxRedemptions?: number | null
+  expiresAt?: string | null
+  active?: boolean
+}
+
+export type CouponValidation =
+  | { valid: false; reason: string }
+  | {
+      valid: true
+      code: string
+      promoterName: string
+      discountType: DiscountType
+      discountValue: number
+      /** All in paise. */
+      baseAmount: number
+      discount: number
+      finalAmount: number
+    }
 
 // ─── Payment data shapes ───────────────────────────────────────────────────────
 export interface RazorpayOrder {
@@ -452,6 +563,26 @@ export interface PlatformMetrics {
   roleBreakdown: Record<string, number>
   questionsByCategory: Record<string, number>
   signups14d: { date: string; count: number }[]
+}
+
+/** Founder revenue analytics. All monetary fields are in paise (₹1 = 100). */
+export interface RevenueMetrics {
+  currency: string
+  revenueToday: number
+  revenueWeek: number
+  revenueMonth: number
+  revenueYear: number
+  revenueAllTime: number
+  paidOrders: number
+  payingCustomers: number
+  premiumActive: number
+  avgOrderValue: number
+  totalDiscount: number
+  couponOrders: number
+  failedPayments: number
+  totalUsers: number
+  revenueByMonth: { month: string; revenue: number }[]
+  topPromoters: { promoter: string; code: string; revenue: number; redemptions: number }[]
 }
 
 export interface AdminUserRow {
