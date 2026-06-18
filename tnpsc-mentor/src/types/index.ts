@@ -443,9 +443,18 @@ export function displayOption(q: Question, letter: AnswerLetter, lang: DisplayLa
 }
 
 /** Explanation with the same fallback. */
+/**
+ * Strip a leading correctness marker ("Correct." / "சரி.") that prefixes many
+ * stored explanations — it's redundant since the option is already shown as the
+ * answer, and reads awkwardly under the "Explanation:" label.
+ */
+function stripCorrectPrefix(text: string): string {
+  return text.replace(/^\s*(correct|சரி)\s*[.:\-–—]\s*/i, '')
+}
+
 export function displayExplanation(q: Question, lang: DisplayLang): string {
-  const en = q.explanation ?? ''
-  const ta = q.explanation_ta?.trim()
+  const en = stripCorrectPrefix(q.explanation ?? '')
+  const ta = stripCorrectPrefix(q.explanation_ta?.trim() ?? '')
   if (lang === 'ta' && ta) return ta
   if (lang === 'both' && ta) return `${en}\n${ta}`
   return en

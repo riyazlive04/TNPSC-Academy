@@ -59,47 +59,48 @@ export default function ResultCard({
 
   return (
     <div className={`rounded-2xl border-2 bg-card p-4 ${ring}`}>
-      <div className="mb-2 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <QuestionStem
-            question={question}
-            lang={lang}
-            textClassName="break-words text-sm font-semibold leading-snug text-navytext"
-            prefix={<span className="mr-1 text-secondary">Q{index + 1}.</span>}
-          />
-          {question.topic && (
-            <span className="tamil mt-1.5 inline-block max-w-full truncate rounded-md bg-brand-soft px-2 py-0.5 align-middle font-heading text-[11px] font-semibold text-brand">
-              {topicName(question.topic, lang)}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-shrink-0 items-center gap-1.5">
-          {attempted && (
-            <span
-              className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-0.5 font-heading text-[11px] font-semibold text-navytext/55"
-              title={`${t('timeTaken')}: ${formatDuration(timeSpent)}`}
-            >
-              <Clock size={12} /> {formatDuration(timeSpent)}
-            </span>
-          )}
-          {onToggleBookmark && (
-            <button
-              onClick={onToggleBookmark}
-              aria-label={bookmarked ? t('removeBookmark') : t('saveQuestion')}
-              title={bookmarked ? t('savedTapRemove') : t('saveForLater')}
-              className={[
-                'rounded-lg p-1 transition',
-                bookmarked ? 'text-gold' : 'text-navytext/30 hover:text-gold',
-              ].join(' ')}
-            >
-              <Bookmark size={18} fill={bookmarked ? 'currentColor' : 'none'} />
-            </button>
-          )}
-          {statusIcon}
-          <span className="font-heading text-xs font-bold uppercase text-navytext/60">
-            {statusLabel}
+      {/* Status row sits on its own line so the question stem (and any match-list
+          grid) can use the FULL card width below, instead of being squeezed into
+          a narrow flex cell beside the badges. */}
+      <div className="mb-2 flex items-center justify-end gap-1.5">
+        {attempted && (
+          <span
+            className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-0.5 font-heading text-[11px] font-semibold text-navytext/55"
+            title={`${t('timeTaken')}: ${formatDuration(timeSpent)}`}
+          >
+            <Clock size={12} /> {formatDuration(timeSpent)}
           </span>
-        </div>
+        )}
+        {onToggleBookmark && (
+          <button
+            onClick={onToggleBookmark}
+            aria-label={bookmarked ? t('removeBookmark') : t('saveQuestion')}
+            title={bookmarked ? t('savedTapRemove') : t('saveForLater')}
+            className={[
+              'rounded-lg p-1 transition',
+              bookmarked ? 'text-gold' : 'text-navytext/30 hover:text-gold',
+            ].join(' ')}
+          >
+            <Bookmark size={18} fill={bookmarked ? 'currentColor' : 'none'} />
+          </button>
+        )}
+        {statusIcon}
+        <span className="font-heading text-xs font-bold uppercase text-navytext/60">
+          {statusLabel}
+        </span>
+      </div>
+      <div className="min-w-0">
+        <QuestionStem
+          question={question}
+          lang={lang}
+          textClassName="break-words text-sm font-semibold leading-snug text-navytext"
+          prefix={<span className="mr-1 text-secondary">Q{index + 1}.</span>}
+        />
+        {question.topic && (
+          <span className="tamil mt-1.5 inline-block max-w-full truncate rounded-md bg-brand-soft px-2 py-0.5 align-middle font-heading text-[11px] font-semibold text-brand">
+            {topicName(question.topic, lang)}
+          </span>
+        )}
       </div>
 
       {isAptitude && (question.aptitude_type || question.topic) && (

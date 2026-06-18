@@ -50,6 +50,7 @@ export default function ResultPage() {
 
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
   const [rewards, setRewards] = useState<{
     leveledTo: number | null
     newBadges: Badge[]
@@ -157,12 +158,17 @@ export default function ResultPage() {
   // The full questions-with-explanations PDF unlocks only when EVERY question was
   // attempted (a completely-attended test); otherwise we just nudge them to it.
   const fullyAttended = totalQuestions > 0 && attempted === totalQuestions
-  const [downloadingPdf, setDownloadingPdf] = useState(false)
   const downloadExplanationPdf = async () => {
     if (downloadingPdf) return
     setDownloadingPdf(true)
     try {
-      await generateQuestionBankPdf({ questions, label, lang, watermark: 'TNPSC MENTOR' })
+      await generateQuestionBankPdf({
+        questions,
+        label,
+        title: 'Explanation Sheet',
+        lang,
+        watermark: 'TNPSC MENTOR',
+      })
     } finally {
       setDownloadingPdf(false)
     }
