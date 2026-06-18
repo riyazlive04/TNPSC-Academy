@@ -167,7 +167,13 @@ export default function ResultPage() {
         label,
         title: 'Explanation Sheet',
         lang,
-        watermark: 'TNPSC MENTOR',
+        // Personalised watermark: the downloader's name (falls back to their
+        // email handle, then the brand) so a shared/leaked sheet is traceable.
+        watermark: (
+          profile?.full_name?.trim() ||
+          profile?.email?.split('@')[0] ||
+          'TNPSC MENTOR'
+        ).toUpperCase(),
       })
     } finally {
       setDownloadingPdf(false)
