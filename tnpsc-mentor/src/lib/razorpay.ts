@@ -79,19 +79,22 @@ export interface CheckoutParams {
  * failure path resolves to a `failed`/`dismissed` result so callers can toast.
  */
 export async function startCheckout(params: CheckoutParams): Promise<CheckoutResult> {
+  // Create the order first: a fully-discounted (100%) coupon needs no Checkout,
+  // so we must not fail on an unavailable SDK in that case.
+  let res
+  try {
+    res = await api.payments.createOrder(params.amount, params.notes, params.couponCode)
+  } catch (e) {
+    return { status: 'failed', error: e instanceof Error ? e.message : 'Could not start payment.' }
+  }
+
+  // Coupon covered the whole price → the server already recorded it as paid.
+  if (res.free) return { status: 'paid' }
+  const { order, keyId } = res
+
   const ready = await loadCheckoutScript()
   if (!ready || !window.Razorpay) {
     return { status: 'failed', error: 'Could not load the payment SDK. Check your connection.' }
-  }
-
-  let order
-  let keyId: string
-  try {
-    const res = await api.payments.createOrder(params.amount, params.notes, params.couponCode)
-    order = res.order
-    keyId = res.keyId
-  } catch (e) {
-    return { status: 'failed', error: e instanceof Error ? e.message : 'Could not start payment.' }
   }
 
   return new Promise<CheckoutResult>((resolve) => {

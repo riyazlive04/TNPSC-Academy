@@ -3,8 +3,21 @@ import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
 import { isAllowedOrigin, googleEnabled } from '../config.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import {
+  registerLoginSession,
+  touchSession,
+  revokeSession,
+  revokeSessionById,
+  listSessions,
+  deviceLabel,
+} from '../sessions.js'
 
 const router = Router()
+
+/** The device id the browser sends with auth calls (empty for legacy clients). */
+function deviceId(req: { body?: { device_id?: unknown } }): string {
+  return typeof req.body?.device_id === 'string' ? req.body.device_id : ''
+}
 
 /** Shape returned to the browser after a successful auth call. */
 async function sessionPayload(session: {
@@ -40,6 +53,13 @@ router.post(
     if (error || !data.session) {
       return res.status(401).json({ error: error?.message ?? 'Invalid credentials' })
     }
+    // Concurrent-device limit: block a new device once 2 others are active.
+    const { blocked } = await registerLoginSession(
+      data.session.user.id,
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) return res.status(403).json({ error: 'device_limit' })
     res.json(await sessionPayload(data.session))
   })
 )
@@ -80,6 +100,12 @@ router.post(
     if (!data.session) {
       return res.json({ requiresConfirmation: true })
     }
+    // Record this device's session (a brand-new account is never over the limit).
+    await registerLoginSession(
+      data.session.user.id,
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
     res.json(await sessionPayload(data.session))
   })
 )
@@ -109,6 +135,14 @@ router.post(
     if (error || !data.session || !data.user) {
       return res.status(401).json({ error: error?.message ?? 'Google sign-in failed' })
     }
+
+    // Concurrent-device limit (same rule as password login).
+    const { blocked } = await registerLoginSession(
+      data.session.user.id,
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) return res.status(403).json({ error: 'device_limit' })
 
     // Enrich only the fields that are currently empty, so a returning Google user
     // who edited their display name doesn't get it overwritten on every login.
@@ -170,6 +204,14 @@ router.post(
     if (error || !data.session) {
       return res.status(401).json({ error: error?.message ?? 'Could not refresh session' })
     }
+    // Heartbeat this device + honour a remote sign-out (manage-devices revoke):
+    // a revoked session fails to refresh, so that device logs out on its next try.
+    const { revoked } = await touchSession(
+      data.session.user.id,
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (revoked) return res.status(401).json({ error: 'session_revoked' })
     res.json(await sessionPayload(data.session))
   })
 )
@@ -218,8 +260,43 @@ router.get(
 )
 
 // ─── POST /api/auth/logout ───────────────────────────────────────────────────
-// Stateless JWTs: the browser simply drops its tokens. Endpoint exists for
-// symmetry and future server-side revocation.
-router.post('/logout', (_req, res) => res.json({ ok: true }))
+// The browser drops its tokens; here we also revoke this device's session row so
+// it frees a slot for the 2-device limit. Best-effort and never fails the logout.
+router.post(
+  '/logout',
+  asyncH(async (req, res) => {
+    const dev = deviceId(req)
+    const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '').trim()
+    if (token && dev) {
+      const { data } = await supabaseAdmin.auth.getUser(token)
+      if (data.user) await revokeSession(data.user.id, dev)
+    }
+    res.json({ ok: true })
+  })
+)
+
+// ─── GET /api/auth/sessions ──────────────────────────────────────────────────
+// The signed-in user's active device sessions (manage-devices screen).
+router.get(
+  '/sessions',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    res.json({ sessions: await listSessions(req.userId!) })
+  })
+)
+
+// ─── POST /api/auth/sessions/revoke ──────────────────────────────────────────
+// Sign out one device by session id (frees a slot; that device logs out on its
+// next token refresh).
+router.post(
+  '/sessions/revoke',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = typeof req.body?.id === 'string' ? req.body.id : ''
+    if (!id) return res.status(400).json({ error: 'Session id required' })
+    await revokeSessionById(req.userId!, id)
+    res.json({ ok: true })
+  })
+)
 
 export default router

@@ -13,9 +13,12 @@ import {
   Clock,
   Award,
   Globe,
+  Smartphone,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
+import { getDeviceId } from '../lib/device'
+import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
@@ -25,7 +28,7 @@ import { GROUP_SUBJECTS } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../store/languageStore'
-import { api } from '../lib/api'
+import { api, type DeviceSession } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 
 const LANG_OPTIONS: { id: Lang; labelKey: StringKey }[] = [
@@ -224,6 +227,9 @@ export default function ProfilePage() {
             {/* Premium upsell - 3-month plan (₹1899 → ₹1399) */}
             <PremiumCard />
 
+            {/* Devices — manage the 2-device limit (sign out a lost/old device) */}
+            <DevicesSection />
+
             {/* Sign out */}
             <button onClick={handleSignOut} className="btn-ghost w-full">
               <LogOut size={16} /> {t('signOut')}
@@ -232,6 +238,116 @@ export default function ProfilePage() {
         )}
       </div>
     </AppLayout>
+  )
+}
+
+/** Compact relative time for "last active" (e.g. "5m ago", "2d ago"). */
+function relTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
+}
+
+/**
+ * Manage the account's active device sessions (the 2-device limit). Lists each
+ * active device, marks the current one, and lets the user sign out the others —
+ * the self-service escape hatch if a lost/old device is holding a slot.
+ */
+function DevicesSection() {
+  const { t } = useT()
+  const [sessions, setSessions] = useState<DeviceSession[] | null>(null)
+  const [revoking, setRevoking] = useState<string | null>(null)
+  const thisDevice = getDeviceId()
+
+  useEffect(() => {
+    let cancelled = false
+    api.auth
+      .listSessions()
+      .then((r) => !cancelled && setSessions(r.sessions))
+      .catch(() => !cancelled && setSessions([]))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const revoke = async (id: string) => {
+    setRevoking(id)
+    try {
+      await api.auth.revokeSession(id)
+      setSessions((s) => (s ?? []).filter((x) => x.id !== id))
+      toast.success(t('devicesSignedOut'))
+    } catch {
+      /* ignore — list will reconcile on next load */
+    } finally {
+      setRevoking(null)
+    }
+  }
+
+  const others = (sessions ?? []).filter((s) => s.device_id !== thisDevice)
+
+  return (
+    <div className="card p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <Smartphone size={18} className="text-brand" />
+        <h3 className="font-heading text-base font-semibold text-ink">{t('devicesTitle')}</h3>
+      </div>
+      <p className="tamil mb-4 font-body text-sm text-ink2">{t('devicesSub')}</p>
+
+      {sessions === null ? (
+        <div className="flex justify-center py-4">
+          <Loader2 size={20} className="animate-spin text-brand" />
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {sessions.map((s) => {
+            const current = s.device_id === thisDevice
+            return (
+              <li
+                key={s.id}
+                className="flex items-center gap-3 rounded-field border border-line bg-canvas px-3.5 py-3"
+              >
+                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <Smartphone size={16} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {s.label || t('devicesUnknown')}
+                    {current && (
+                      <span className="tamil ml-2 rounded-full bg-mintsoft px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-mint">
+                        {t('devicesThis')}
+                      </span>
+                    )}
+                  </p>
+                  <p className="font-body text-xs text-ink2">
+                    {t('devicesLastActive')}: {relTime(s.last_seen_at)}
+                  </p>
+                </div>
+                {!current && (
+                  <button
+                    onClick={() => revoke(s.id)}
+                    disabled={revoking === s.id}
+                    className="btn-ghost btn-sm flex-shrink-0"
+                  >
+                    {revoking === s.id ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      t('devicesSignOut')
+                    )}
+                  </button>
+                )}
+              </li>
+            )
+          })}
+          {others.length === 0 && (
+            <p className="tamil py-1 text-center font-body text-xs text-ink2">{t('devicesEmpty')}</p>
+          )}
+        </ul>
+      )}
+    </div>
   )
 }
 
