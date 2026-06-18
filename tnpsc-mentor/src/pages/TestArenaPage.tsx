@@ -176,7 +176,7 @@ export default function TestArenaPage() {
           </div>
         </div>
 
-        {/* Premium upsell - annual plan (₹1899 → ₹1299/yr) */}
+        {/* Premium upsell - annual plan (₹1899 → ₹1399/yr) */}
         <PremiumCard />
 
         {/* Progress rail - feature-flagged; rendered as a row when re-enabled */}
