@@ -456,6 +456,11 @@ const STRINGS = {
   genderFemale: { en: 'Female', ta: 'பெண்' },
   genderOther: { en: 'Other', ta: 'மற்றவை' },
   askedInYear: { en: 'Asked in', ta: 'கேட்கப்பட்ட ஆண்டு' },
+  pdfPremiumOnly: { en: 'Download PDF — upgrade to Premium', ta: 'PDF பதிவிறக்க — பிரீமியத்திற்கு மேம்படுத்தவும்' },
+  pdfPremiumPrompt: {
+    en: 'Downloading the explanation PDF is a Premium feature. Upgrade to unlock it.',
+    ta: 'விளக்க PDF பதிவிறக்கம் ஒரு பிரீமியம் வசதி. திறக்க மேம்படுத்தவும்.',
+  },
   explHelpful: { en: 'Was this explanation helpful?', ta: 'இந்த விளக்கம் பயனுள்ளதாக இருந்ததா?' },
   explThanks: { en: 'Thanks for your feedback!', ta: 'உங்கள் கருத்துக்கு நன்றி!' },
   explFlagged: {
