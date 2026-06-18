@@ -3,8 +3,8 @@
 // amount. The frontend mirrors PREMIUM_PRICE_PAISE for display only — the order
 // route recomputes the base here before applying any coupon.
 
-/** Premium annual plan price in paise (₹1 = 100). Mirrors PremiumCard.tsx. */
-export const PREMIUM_PRICE_PAISE = 139900 // ₹1,299
+/** Premium plan price in paise (₹1 = 100). Mirrors PremiumCard.tsx (₹1,399). */
+export const PREMIUM_PRICE_PAISE = 139900 // ₹1,399
 
 /** Razorpay needs a positive order; never charge below ₹1. */
 export const MIN_CHARGE_PAISE = 100
