@@ -98,7 +98,7 @@ function ListColumn({ list }: { list: MatchList }) {
             <span className="font-heading font-bold text-navytext/70">
               {formatMatchLabel(item.label)}
             </span>
-            <span className="min-w-0 flex-1 break-words">{item.text}</span>
+            <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{item.text}</span>
           </li>
         ))}
       </ul>
