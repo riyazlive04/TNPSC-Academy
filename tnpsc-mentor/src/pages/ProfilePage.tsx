@@ -17,6 +17,7 @@ import {
   Globe,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
+import PremiumCard from '../components/UI/PremiumCard'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
@@ -223,6 +224,9 @@ export default function ProfilePage() {
                 <StatCard icon={<Award size={18} />} value={`${earned}/${badges.length}`} labelKey="achievements" />
               </div>
             </div>
+
+            {/* Premium upsell - annual plan (₹1899 → ₹1299/yr) */}
+            <PremiumCard />
 
             {/* Sign out */}
             <button onClick={handleSignOut} className="btn-ghost w-full">
