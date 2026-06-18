@@ -12,7 +12,7 @@ import { useT } from '../../lib/i18n'
 // created for (₹1 = 100 paise); the MRP is shown struck-through. When the
 // monetisation model firms up, derive these from a server-side plan instead.
 export const PREMIUM_MRP_RUPEES = 1899
-export const PREMIUM_PRICE_RUPEES = 1299
+export const PREMIUM_PRICE_RUPEES = 1399
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
 

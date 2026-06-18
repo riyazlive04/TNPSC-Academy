@@ -16903,7 +16903,7 @@
 
 ## Current Affairs
 
-**Q1299. Who invented Gunpowder?**
+**Q1399. Who invented Gunpowder?**
 
 - **A.** G. Ferdinand Von Zeppelin
 - **B.** Sir Frank Whittle
@@ -52059,7 +52059,8 @@
 - **C.** cohesion of mercury is greater than its adhesion with glass  ✅ **(correct answer)**
 - **D.** cohesion of water is greater than its adhesion with glass
 
-**Explanation:** Whether a liquid spreads or stays spherical depends on the balance between cohesion (attraction among the liquid's own molecules) and adhesion (attraction between the liquid and the surface). For mercury on glass, cohesive forces strongly dominate over adhesion with glass, so the drop minimizes contact and stays nearly spherical, making (C) correct. Why not the others: (A) being a metal does not by itself explain the shapematter, not its conductivity or metallic nature; (B) density affects weight, not the spreading behaviour, which is governed by surface/intermolecular forces; (D) is the opposite case\u2014water spreads precisely because its adhesion with glass exceeds its cohesion, not the reverse.
+**Explanation:** Whether a liquid spreads or stays spherical depends on the balance between cohesion (attraction among the liquid's own molecules) and adhesion (attraction between the liquid and the surface). For mercury on glass, cohesive forces strongly dominate over adhesion with glass, so the drop minimizes contact and stays nearly spherical, making (C) correct. Why not the others: (A) being a metal does not by itself explain the shape
+matter, not its conductivity or metallic nature; (B) density affects weight, not the spreading behaviour, which is governed by surface/intermolecular forces; (D) is the opposite case\u2014water spreads precisely because its adhesion with glass exceeds its cohesion, not the reverse.
 
 *Source: [https://www.indiabix.com/general-knowledge/physics/010007](https://www.indiabix.com/general-knowledge/physics/010007)*
 

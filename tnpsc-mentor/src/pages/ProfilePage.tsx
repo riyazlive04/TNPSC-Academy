@@ -221,7 +221,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Premium upsell - annual plan (₹1899 → ₹1299/yr) */}
+            {/* Premium upsell - annual plan (₹1899 → ₹1399/yr) */}
             <PremiumCard />
 
             {/* Sign out */}
