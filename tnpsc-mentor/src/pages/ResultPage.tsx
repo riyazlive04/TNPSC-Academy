@@ -24,7 +24,7 @@ import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
 import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
-import { generateQuestionBankPdf } from '../lib/pdfGenerator'
+import { generateExplanationPdf } from '../lib/explanationPdf'
 import { exitFullscreen } from '../lib/proctor'
 import { useAuth } from '../hooks/useAuth'
 import { useProgressStore } from '../store/progressStore'
@@ -162,7 +162,7 @@ export default function ResultPage() {
     if (downloadingPdf) return
     setDownloadingPdf(true)
     try {
-      await generateQuestionBankPdf({
+      await generateExplanationPdf({
         questions,
         label,
         title: 'Explanation Sheet',
