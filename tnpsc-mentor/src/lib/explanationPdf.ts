@@ -156,12 +156,15 @@ export async function generateExplanationPdf({
         GState?: new (o: { opacity: number }) => unknown
         setGState?: (s: unknown) => void
       }
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.05 }))
+      // Higher opacity + larger font so the "NAME · PHONE" mark is clearly
+      // legible (still light enough to read the content through it); spacing
+      // loosened to match the bigger text and keep tiles from overlapping.
+      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.12 }))
       doc.setTextColor(...VIOLET_RGB)
       doc.setFont('helvetica', 'bold')
-      doc.setFontSize(34)
-      for (let yy = 120; yy < pageH; yy += 150)
-        for (let xx = 20; xx < pageW; xx += 260) doc.text(watermark, xx, yy, { angle: 30 })
+      doc.setFontSize(26)
+      for (let yy = 70; yy < pageH; yy += 120)
+        for (let xx = -10; xx < pageW; xx += 280) doc.text(watermark, xx, yy, { angle: 30 })
       if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
     }
     const fy = pageH - 26

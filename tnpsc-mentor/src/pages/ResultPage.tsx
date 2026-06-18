@@ -167,13 +167,19 @@ export default function ResultPage() {
         label,
         title: 'Explanation Sheet',
         lang,
-        // Personalised watermark: the downloader's name (falls back to their
-        // email handle, then the brand) so a shared/leaked sheet is traceable.
-        watermark: (
-          profile?.full_name?.trim() ||
-          profile?.email?.split('@')[0] ||
-          'TNPSC MENTOR'
-        ).toUpperCase(),
+        // Personalised watermark: the downloader's name + phone (falls back to
+        // their email handle, then the brand) so a shared/leaked sheet is
+        // traceable to whoever generated it.
+        watermark: [
+          (
+            profile?.full_name?.trim() ||
+            profile?.email?.split('@')[0] ||
+            'TNPSC MENTOR'
+          ).toUpperCase(),
+          profile?.phone?.trim(),
+        ]
+          .filter(Boolean)
+          .join('  ·  '),
       })
     } finally {
       setDownloadingPdf(false)
