@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
-import { isAllowedOrigin } from '../config.js'
+import { isAllowedOrigin, googleEnabled } from '../config.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 
 const router = Router()
@@ -79,6 +79,65 @@ router.post(
     if (!data.session) {
       return res.json({ requiresConfirmation: true })
     }
+    res.json(await sessionPayload(data.session))
+  })
+)
+
+// ─── POST /api/auth/google ───────────────────────────────────────────────────
+// Sign in (or auto-create) with a Google ID token obtained in the browser via
+// Google Identity Services. Supabase verifies the token's signature, expiry and
+// audience (the Client ID must be in its "Authorized Client IDs" list), then
+// mints the SAME access/refresh session the email/password flow returns. The
+// `handle_new_user` DB trigger creates the profile row on first sign-in; we then
+// enrich any still-empty name/email/avatar fields from Google's claims WITHOUT
+// clobbering values the user may have since edited.
+router.post(
+  '/google',
+  asyncH(async (req, res) => {
+    if (!googleEnabled) {
+      return res.status(503).json({ error: 'Google sign-in is not configured' })
+    }
+    const { idToken, nonce } = req.body ?? {}
+    if (!idToken) return res.status(400).json({ error: 'Missing Google credential' })
+
+    const { data, error } = await supabaseAuthClient.auth.signInWithIdToken({
+      provider: 'google',
+      token: String(idToken),
+      ...(nonce ? { nonce: String(nonce) } : {}),
+    })
+    if (error || !data.session || !data.user) {
+      return res.status(401).json({ error: error?.message ?? 'Google sign-in failed' })
+    }
+
+    // Enrich only the fields that are currently empty, so a returning Google user
+    // who edited their display name doesn't get it overwritten on every login.
+    const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>
+    const { data: existing } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name, email, avatar_url')
+      .eq('id', data.user.id)
+      .single()
+
+    const patch: Record<string, unknown> = {}
+    if (!existing?.full_name && (meta.full_name || meta.name)) {
+      patch.full_name = meta.full_name ?? meta.name
+    }
+    if (!existing?.email && data.user.email) patch.email = data.user.email
+    if (!existing?.avatar_url && (meta.avatar_url || meta.picture)) {
+      patch.avatar_url = meta.avatar_url ?? meta.picture
+    }
+    if (Object.keys(patch).length > 0) {
+      const { error: enrichError } = await supabaseAdmin
+        .from('profiles')
+        .update(patch)
+        .eq('id', data.user.id)
+      // Non-fatal: a missing avatar_url column (migration not yet run) only loses
+      // the avatar — the session is still valid. Log so it's visible, don't fail.
+      if (enrichError) {
+        console.error('[google] profile enrich failed', data.user.id, enrichError.message)
+      }
+    }
+
     res.json(await sessionPayload(data.session))
   })
 )

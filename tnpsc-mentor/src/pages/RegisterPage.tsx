@@ -6,6 +6,8 @@ import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { api } from '../lib/api'
 import AuthShell from '../components/Auth/AuthShell'
+import AuthDivider from '../components/Auth/AuthDivider'
+import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
@@ -265,6 +267,13 @@ export default function RegisterPage() {
             {loading ? t('creatingAccount') : t('createAccount')}
           </button>
         </form>
+
+        {isGoogleConfigured && (
+          <>
+            <AuthDivider label={t('orDivider')} />
+            <GoogleSignInButton onError={setError} text="signup_with" />
+          </>
+        )}
 
         <div className="mt-6 text-center text-sm">
           <span className="text-ink2">{t('alreadyRegistered')} </span>

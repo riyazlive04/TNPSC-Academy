@@ -160,6 +160,18 @@ export const api = {
       if ('access_token' in data) tokens.set(data.access_token, data.refresh_token)
       return data
     },
+    /** Exchange a Google ID token (from Google Identity Services in the browser)
+     * for the same session the email/password flow returns. Auto-creates the
+     * account on first sign-in. */
+    async google(idToken: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/google', {
+        method: 'POST',
+        auth: false,
+        body: { idToken },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
     async forgotPassword(email: string, redirectTo?: string): Promise<void> {
       await request('/api/auth/forgot-password', {
         method: 'POST',
