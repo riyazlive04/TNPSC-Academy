@@ -45,4 +45,13 @@ export const config = {
   supabaseUrl: required('SUPABASE_URL'),
   supabaseAnonKey: required('SUPABASE_ANON_KEY'),
   supabaseServiceKey: required('SUPABASE_SERVICE_ROLE_KEY'),
+  // Razorpay keys are OPTIONAL so the server still boots in environments where
+  // payments aren't configured yet. The payment routes check `razorpayEnabled`
+  // and return 503 when the keys are absent. KEY_ID is public (sent to the
+  // browser to open Checkout); KEY_SECRET is server-only and signs/verifies.
+  razorpayKeyId: process.env.RAZORPAY_KEY_ID ?? '',
+  razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ?? '',
 }
+
+/** True when both Razorpay credentials are present — gates the payment routes. */
+export const razorpayEnabled = Boolean(config.razorpayKeyId && config.razorpayKeySecret)

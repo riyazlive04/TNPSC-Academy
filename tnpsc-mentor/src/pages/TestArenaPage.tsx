@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
+import PremiumCard from '../components/UI/PremiumCard'
 import StreakCalendar from '../components/StreakCalendar'
 import { useAuth } from '../hooks/useAuth'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -174,6 +175,9 @@ export default function TestArenaPage() {
             <p className="tamil mt-1 font-body text-sm text-white/70">{t('dashboardSub')}</p>
           </div>
         </div>
+
+        {/* Premium upsell - annual plan (₹1899 → ₹1299/yr) */}
+        <PremiumCard />
 
         {/* Progress rail - feature-flagged; rendered as a row when re-enabled */}
         {showRail && habit && (

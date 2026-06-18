@@ -58,7 +58,10 @@ Run these in the Supabase SQL editor, **in order**:
    `test_sessions`, `test_answers`, `profiles`, `review_items`,
    `daily_activity`, RLS policies, the `handle_new_user` trigger, and the
    `role` column (`user` | `admin`).
-2. [`supabase/secure.sql`](supabase/secure.sql) — **required.** Hides the answer
+2. [`supabase/payments.sql`](supabase/payments.sql) — optional, for Razorpay.
+   Creates the `payments` ledger (server-written, RLS-read). Run it before
+   enabling payments; needs only the Razorpay env vars below to go live.
+3. [`supabase/secure.sql`](supabase/secure.sql) — **required.** Hides the answer
    columns from the client (column-level grants) and adds the SECURITY DEFINER
    RPCs that are the only way to fetch quiz questions, grade a submission, run
    spaced revision, and read the admin bank. **Until this runs, the app's
@@ -77,6 +80,25 @@ Grading is server-side: the browser never receives `correct_answer` /
 `explanation` during a test, and scores are computed by `submit_test` (they
 can't be forged from the client). Explanations are returned only once the 80%
 attendance gate is met.
+
+## Payments (Razorpay)
+
+Optional, and deliberately **model-agnostic** — it records payments without
+granting any entitlement yet, so it can later become a one-time unlock, a
+subscription, or per-item purchases with no change to the recording layer.
+
+- **Flow:** SPA → `POST /api/payments/order` (server creates a Razorpay order +
+  a `created` ledger row, returns the order and the *public* key id) → Razorpay
+  Checkout opens in the browser → on success the SPA calls
+  `POST /api/payments/verify`, where the server HMAC-verifies the signature and
+  flips the row to `paid`. `GET /api/payments` lists the user's history.
+- **Keys:** set `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` in `server/.env`
+  (see [`server/.env.example`](server/.env.example)). The secret never leaves
+  the server; the browser only ever receives the public key id. With the keys
+  unset, the `/api/payments/*` routes return `503` and the app runs normally.
+- **Try it:** the Profile page has a "Support TNPSC Mentor" button that runs the
+  full flow. Use Razorpay's test card `4111 1111 1111 1111`, any future expiry,
+  any CVV.
 
 ## Roles
 

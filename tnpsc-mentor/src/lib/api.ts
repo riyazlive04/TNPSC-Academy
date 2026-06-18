@@ -374,6 +374,56 @@ export const api = {
       await request('/api/feedback', { method: 'POST', body: { rating, message, page } })
     },
   },
+
+  // ─── Payments (Razorpay) ─────────────────────────────────────────────────
+  // The browser only ever sees the PUBLIC key id (returned with the order); the
+  // secret stays on the server, which also verifies the checkout signature.
+  payments: {
+    /** Create a Razorpay order (amount in paise). Returns the order + public key. */
+    async createOrder(amount: number, notes?: Record<string, string>): Promise<CreateOrderResponse> {
+      return request<CreateOrderResponse>('/api/payments/order', {
+        method: 'POST',
+        body: { amount, notes },
+      })
+    },
+    /** Verify the checkout callback server-side; marks the payment paid on success. */
+    async verify(params: {
+      razorpay_order_id: string
+      razorpay_payment_id: string
+      razorpay_signature: string
+    }): Promise<{ verified: boolean }> {
+      return request('/api/payments/verify', { method: 'POST', body: params })
+    },
+    /** The signed-in user's payment history. */
+    async list(): Promise<PaymentRow[]> {
+      const data = await request<{ payments: PaymentRow[] }>('/api/payments')
+      return data.payments
+    },
+  },
+}
+
+// ─── Payment data shapes ───────────────────────────────────────────────────────
+export interface RazorpayOrder {
+  id: string
+  amount: number
+  currency: string
+  receipt?: string
+  status: string
+}
+
+export interface CreateOrderResponse {
+  order: RazorpayOrder
+  keyId: string
+}
+
+export interface PaymentRow {
+  id: string
+  razorpay_order_id: string
+  razorpay_payment_id: string | null
+  amount: number
+  currency: string
+  status: 'created' | 'paid' | 'failed'
+  created_at: string
 }
 
 // ─── Superadmin / feedback data shapes ─────────────────────────────────────────

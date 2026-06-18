@@ -14,6 +14,7 @@ import analyticsRoutes from './routes/analytics.js'
 import adminRoutes from './routes/admin.js'
 import superadminRoutes from './routes/superadmin.js'
 import feedbackRoutes from './routes/feedback.js'
+import paymentRoutes from './routes/payments.js'
 
 const app = express()
 
@@ -58,6 +59,7 @@ app.use('/api/analytics', analyticsRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/superadmin', superadminRoutes)
 app.use('/api/feedback', feedbackRoutes)
+app.use('/api/payments', paymentRoutes)
 
 // 404 for unknown API routes.
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }))
