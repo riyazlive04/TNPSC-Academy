@@ -15,11 +15,17 @@ const MINT: RGB = [22, 163, 74] // --c-mint (correct)
 const MINT_SOFT: RGB = [231, 247, 238] // --c-mint-soft
 const WHITE: RGB = [255, 255, 255]
 
-// Tamil glyphs can't be drawn with jsPDF's built-in Helvetica. We lazily fetch a
-// Noto Sans Tamil TTF (which also covers Latin) at runtime and embed it. The
-// base64 is cached across calls. `undefined` = not attempted, `null` = failed.
+// Tamil glyphs can't be drawn with jsPDF's built-in Helvetica, so we lazily
+// fetch a Tamil TTF at runtime and embed it (base64 cached across calls;
+// `undefined` = not attempted, `null` = failed).
+//
+// IMPORTANT: must be a font that covers BOTH Tamil AND Latin. Noto Sans Tamil
+// has no Latin glyphs, and jsPDF (no complex-script fallback) silently drops the
+// rest of a string at the first missing glyph — so every Tamil string with an
+// embedded Latin token (FIDE, ATP, US, names, the "en / ta" bilingual options)
+// got truncated mid-line. Hind Madurai (OFL) covers Tamil + Latin + digits.
 const TAMIL_FONT_URL =
-  'https://cdn.jsdelivr.net/gh/googlefonts/noto-fonts@main/hinted/ttf/NotoSansTamil/NotoSansTamil-Regular.ttf'
+  'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/hindmadurai/HindMadurai-Regular.ttf'
 let tamilFontB64: string | null | undefined
 
 function arrayBufferToBase64(buf: ArrayBuffer): string {
@@ -92,11 +98,11 @@ export async function generateQuestionBankPdf({
   if (lang !== 'en') {
     const b64 = await loadTamilFontB64()
     if (b64) {
-      doc.addFileToVFS('NotoSansTamil.ttf', b64)
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'normal')
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'bold')
-      doc.addFont('NotoSansTamil.ttf', 'NotoSansTamil', 'italic')
-      bodyFont = 'NotoSansTamil'
+      doc.addFileToVFS('TamilLatin.ttf', b64)
+      doc.addFont('TamilLatin.ttf', 'TamilLatin', 'normal')
+      doc.addFont('TamilLatin.ttf', 'TamilLatin', 'bold')
+      doc.addFont('TamilLatin.ttf', 'TamilLatin', 'italic')
+      bodyFont = 'TamilLatin'
     } else {
       effLang = 'en'
     }
