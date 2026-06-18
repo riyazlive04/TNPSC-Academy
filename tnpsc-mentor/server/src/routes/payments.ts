@@ -142,15 +142,17 @@ router.post(
 
 // ─── GET /api/payments/premium ───────────────────────────────────────────────
 // Derive the user's premium entitlement from the ledger: a paid `premium_annual`
-// payment within the last 365 days. This is the single source of truth for
-// "is this user premium" — entitlement is computed, never stored as a flag, so
-// it stays correct without a separate sync step. Returns the expiry too.
-const YEAR_MS = 365 * 24 * 60 * 60 * 1000
+// payment within the plan window. Premium is a 3-MONTH plan, so the window is
+// 90 days — a payment older than that has lapsed. Entitlement is computed, never
+// stored as a flag, so it stays correct without a separate sync step. Returns
+// the expiry too. (The `premium_annual` plan id is retained for ledger continuity
+// even though the validity is now 3 months.)
+const PREMIUM_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 3 months
 router.get(
   '/premium',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const since = new Date(Date.now() - YEAR_MS).toISOString()
+    const since = new Date(Date.now() - PREMIUM_VALIDITY_MS).toISOString()
     const { data, error } = await req.db!
       .from('payments')
       .select('created_at, notes')
@@ -163,7 +165,7 @@ router.get(
       (r) => (r.notes as { plan?: string } | null)?.plan === 'premium_annual'
     )
     if (!latest) return res.json({ premium: false, until: null })
-    const until = new Date(new Date(latest.created_at).getTime() + YEAR_MS).toISOString()
+    const until = new Date(new Date(latest.created_at).getTime() + PREMIUM_VALIDITY_MS).toISOString()
     res.json({ premium: true, until })
   })
 )

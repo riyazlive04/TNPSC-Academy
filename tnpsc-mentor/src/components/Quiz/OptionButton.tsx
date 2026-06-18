@@ -26,24 +26,27 @@ export default function OptionButton({
   reveal,
   disabled = false,
 }: OptionButtonProps) {
+  // States follow design-system.md: a tinted fill + coloured border + coloured
+  // text (never colour alone — each carries a check/cross icon too). This reads
+  // correctly in dark mode, where solid fills with white text would look harsh.
   let stateCls = 'bg-card text-ink border-2 border-line'
   let badgeCls = 'bg-brand-soft text-brand'
   let icon: React.ReactNode = null
 
   if (reveal) {
     if (reveal.isCorrect) {
-      stateCls = 'bg-mintsoft text-ink border-2 border-mint'
+      stateCls = 'bg-mintsoft text-mint border-2 border-mint font-medium'
       badgeCls = 'bg-mint text-white'
       icon = <Check size={18} className="animate-checkPop text-mint" />
     } else if (reveal.isChosenWrong) {
-      stateCls = 'bg-coralsoft text-ink border-2 border-coral'
+      stateCls = 'bg-coralsoft text-coral border-2 border-coral font-medium'
       badgeCls = 'bg-coral text-white'
       icon = <X size={18} className="animate-checkPop text-coral" />
     } else {
       stateCls = 'bg-card text-ink border-2 border-line'
     }
   } else if (selected) {
-    stateCls = 'bg-brand-soft text-brand border-2 border-brand'
+    stateCls = 'bg-brand-soft text-brand border-2 border-brand font-medium'
     badgeCls = 'bg-brand text-white'
   }
 

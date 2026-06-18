@@ -398,6 +398,13 @@ export const api = {
         body: { questionId, vote },
       })
     },
+    /** Mark a question for correction (reported=false re-taps to remove it). */
+    async reportQuestion(questionId: string, reported: boolean, reason?: string): Promise<void> {
+      await request('/api/feedback/question-report', {
+        method: 'POST',
+        body: { questionId, reported, reason },
+      })
+    },
   },
 
   // ─── Payments (Razorpay) ─────────────────────────────────────────────────

@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, Copy, FileText, Maximize2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { mockBlueprint } from '../lib/constants'
 import { enterFullscreen } from '../lib/proctor'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
+
+// OMR answer-sheet palette legend. The `swatch` classes MUST stay in sync with
+// PALETTE_CLS in MockQuizPage so this preview matches the live answer sheet.
+const OMR_LEGEND = [
+  { status: 'notVisited', swatch: 'bg-tint text-ink2', label: 'notVisited', desc: 'descNotVisited' },
+  { status: 'visited', swatch: 'bg-ink2/20 text-ink', label: 'visited', desc: 'descVisited' },
+  { status: 'answered', swatch: 'bg-emerald-500 text-white', label: 'answered', desc: 'descAnswered' },
+  { status: 'markedReview', swatch: 'bg-violet-500 text-white', label: 'markedReview', desc: 'descMarkedReview' },
+  { status: 'answeredMarked', swatch: 'bg-amber-500 text-white', label: 'answeredMarked', desc: 'descAnsweredMarked' },
+] as const
 
 /**
  * Pre-test instructions screen for a proctored mock. Shows exam rules and a
@@ -88,6 +98,42 @@ export default function MockInstructionsPage() {
           <Rule icon={<Clock size={18} />} text={t('instrTimer')} />
           <Rule icon={<FileText size={18} />} text={t('instrPalette')} />
           <Rule icon={<Copy size={18} />} text={t('instrNoCopy')} />
+          {/* Report-a-problem — highlighted so aspirants notice it's available. */}
+          <div className="flex items-start gap-3 rounded-xl border border-accentwarm/30 bg-accentwarmsoft p-3.5">
+            <AlertCircle size={18} className="mt-0.5 shrink-0 text-accentwarm" />
+            <p className="tamil font-body text-sm text-ink">{t('instrReport')}</p>
+          </div>
+        </div>
+
+        {/* Answer-sheet (OMR) colour guide — mirrors the palette in MockQuizPage. */}
+        <div className="card mb-6 p-5">
+          <h3 className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
+            {t('omrColourGuide')}
+          </h3>
+          <div className="space-y-3">
+            {OMR_LEGEND.map(({ status, swatch, label, desc }) => (
+              <div key={status} className="flex items-start gap-3">
+                <span
+                  className={['mt-0.5 grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg font-heading text-xs font-bold', swatch].join(' ')}
+                  aria-hidden="true"
+                >
+                  1
+                </span>
+                <p className="tamil min-w-0 flex-1 font-body text-sm text-ink">
+                  <span className="font-heading font-semibold text-ink">{t(label)}</span>
+                  <span className="text-ink2"> — {t(desc)}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* What the flag means */}
+          <div className="mt-4 flex items-start gap-3 border-t border-line pt-4">
+            <span className="mt-0.5 shrink-0 text-violet-600">
+              <Flag size={18} className="fill-current" />
+            </span>
+            <p className="tamil min-w-0 flex-1 font-body text-sm text-ink">{t('flagMeaning')}</p>
+          </div>
         </div>
 
         {/* Confirmation */}

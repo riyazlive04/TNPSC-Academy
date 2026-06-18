@@ -38,37 +38,67 @@ export default {
         streak: 'rgb(var(--c-streak) / <alpha-value>)',
         streaksoft: 'rgb(var(--c-streak-soft) / <alpha-value>)',
 
+        // ─── design-system.md spec names (aliases onto the violet scheme) ───
+        // New code should prefer these; they map to the same CSS variables so
+        // the whole UI re-themes from index.css. Hyphenated/nested keys give
+        // `bg-primary`, `bg-primary-deep`, `bg-tint-violet`, etc.
+        primary: {
+          DEFAULT: 'rgb(var(--c-brand) / <alpha-value>)',
+          deep: 'rgb(var(--c-brand-deep) / <alpha-value>)',
+        },
+        surface: 'rgb(var(--c-canvas) / <alpha-value>)',
+        muted: 'rgb(var(--c-ink2) / <alpha-value>)',
+        correct: 'rgb(var(--c-correct) / <alpha-value>)',
+        wrong: 'rgb(var(--c-wrong) / <alpha-value>)',
+        selected: 'rgb(var(--c-selected) / <alpha-value>)',
+        'tint-violet': 'rgb(var(--c-tint-violet) / <alpha-value>)',
+        'tint-coral': 'rgb(var(--c-tint-coral) / <alpha-value>)',
+        'tint-blue': 'rgb(var(--c-tint-blue) / <alpha-value>)',
+        'tint-green': 'rgb(var(--c-tint-green) / <alpha-value>)',
+
         // ─── Legacy aliases (remapped onto the violet scheme) ───────────────
-        primary: 'rgb(var(--c-brand) / <alpha-value>)',
         secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
         accent: 'rgb(var(--c-accentwarm) / <alpha-value>)',
         navytext: 'rgb(var(--c-ink) / <alpha-value>)',
         warn: 'rgb(var(--c-coral) / <alpha-value>)',
       },
       fontFamily: {
-        heading: ['Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        // Display = Plus Jakarta Sans (Latin) → Anek Tamil (Tamil). Body = Inter
+        // (Latin) → Noto Sans Tamil. The Latin font has no Tamil glyphs, so the
+        // browser falls through to the Tamil face automatically.
+        display: ['"Plus Jakarta Sans"', '"Anek Tamil"', 'system-ui', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', '"Anek Tamil"', 'system-ui', 'sans-serif'],
+        body: ['Inter', '"Noto Sans Tamil"', 'system-ui', 'sans-serif'],
         tamil: ['"Noto Sans Tamil"', 'Inter', 'sans-serif'],
       },
       borderRadius: {
+        // design-system.md shape scale
+        field: '16px',
+        tile: '18px',
+        card: '20px',
+        hero: '24px',
+        pill: '9999px',
         '4xl': '1.75rem',
         '5xl': '2.25rem',
       },
       boxShadow: {
-        // Restrained, hairline-first elevation. The neutral shadows fade on the
-        // dark canvas (where the card border carries elevation); the brand glow
-        // tracks the violet accent in both modes.
-        pill: '0 1px 2px rgb(var(--c-shadow) / 0.05)',
-        card: '0 1px 3px rgb(var(--c-shadow) / 0.07)',
-        soft: '0 1px 2px rgb(var(--c-shadow) / 0.05)',
-        brand: '0 8px 22px rgb(var(--c-brand) / 0.32)',
-        warm: '0 4px 14px rgb(var(--c-accentwarm) / 0.22)',
-        gold: '0 4px 14px rgb(var(--c-gold) / 0.18)',
+        // Soft, large-blur elevation (design-system.md). Each maps to a CSS
+        // variable (defined in index.css) so the whole set can be switched off in
+        // dark mode — `.dark` sets them all to `none`, including hover variants,
+        // without affecting focus rings (which use the separate `ring` utilities).
+        pill: 'var(--shadow-pill)',
+        card: 'var(--shadow-card)',
+        soft: 'var(--shadow-soft)',
+        hero: 'var(--shadow-hero)',
+        brand: 'var(--shadow-brand)',
+        warm: 'var(--shadow-warm)',
+        gold: 'var(--shadow-gold)',
       },
       backgroundImage: {
-        // Violet → deep-violet hero gradient (variable-backed, themes per mode).
+        // Violet hero gradient — design-system.md: linear-gradient(135deg,#8175EC,#6A5DD6).
+        // Variable-backed (secondary → brand-deep) so it stays consistent per mode.
         'brand-gradient':
-          'linear-gradient(135deg, rgb(var(--c-brand)) 0%, rgb(var(--c-brand-dark)) 55%, rgb(var(--c-brand-deep)) 100%)',
+          'linear-gradient(135deg, rgb(var(--c-secondary)) 0%, rgb(var(--c-brand-deep)) 100%)',
         'brand-gradient-soft':
           'linear-gradient(135deg, rgb(var(--c-secondary)) 0%, rgb(var(--c-brand)) 100%)',
         'brand-radial':

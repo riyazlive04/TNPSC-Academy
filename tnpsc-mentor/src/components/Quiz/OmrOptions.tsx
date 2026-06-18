@@ -57,7 +57,12 @@ export default function OmrOptions({
             >
               {letter}
             </span>
-            <span className="tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm leading-relaxed text-navytext sm:text-[15px]">
+            <span
+              className={[
+                'tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm leading-relaxed sm:text-[15px]',
+                on ? 'font-medium text-brand' : 'text-navytext',
+              ].join(' ')}
+            >
               {texts[i]}
             </span>
           </button>

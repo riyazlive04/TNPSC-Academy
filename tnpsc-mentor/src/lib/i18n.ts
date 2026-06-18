@@ -50,6 +50,7 @@ const STRINGS = {
   },
   delete: { en: 'Delete', ta: 'நீக்கு' },
   cancel: { en: 'Cancel', ta: 'ரத்து' },
+  dismiss: { en: 'Dismiss', ta: 'மூடு' },
 
   // Language screen
   chooseLanguage: { en: 'Choose Your Language', ta: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்' },
@@ -375,6 +376,59 @@ const STRINGS = {
     en: 'Leaving the test screen is recorded. Repeated violations auto-submit your test.',
     ta: 'தேர்வுத் திரையை விட்டு வெளியேறுவது பதிவு செய்யப்படுகிறது. மீண்டும் மீண்டும் மீறல்கள் தேர்வைத் தானாகச் சமர்ப்பிக்கும்.',
   },
+  // OMR colour / flag guide (shown on the mock instructions screen)
+  omrColourGuide: { en: 'Answer-sheet colour guide', ta: 'விடைத்தாள் வண்ண வழிகாட்டி' },
+  descNotVisited: {
+    en: 'Question not opened yet.',
+    ta: 'வினா இன்னும் திறக்கப்படவில்லை.',
+  },
+  descVisited: {
+    en: 'Opened, but left without choosing an answer.',
+    ta: 'திறக்கப்பட்டது, ஆனால் பதில் தேர்ந்தெடுக்காமல் விடப்பட்டது.',
+  },
+  descAnswered: {
+    en: 'An answer has been selected.',
+    ta: 'ஒரு பதில் தேர்ந்தெடுக்கப்பட்டுள்ளது.',
+  },
+  descMarkedReview: {
+    en: 'Flagged to revisit later; no answer chosen yet.',
+    ta: 'பின்னர் மீண்டும் பார்க்கக் குறிக்கப்பட்டது; இன்னும் பதில் இல்லை.',
+  },
+  descAnsweredMarked: {
+    en: 'Answered and also flagged for review.',
+    ta: 'பதிலளிக்கப்பட்டு, மதிப்பாய்வுக்கும் குறிக்கப்பட்டது.',
+  },
+  flagMeaning: {
+    en: 'Tap the flag on any question to mark it for review — its palette tile turns violet (amber if you have also answered it). Flagged questions are still graded normally; the flag is just a personal reminder to come back to them before submitting.',
+    ta: 'எந்த வினாவையும் மதிப்பாய்வுக்குக் குறிக்க அதன் கொடியைத் தட்டவும் — அதன் பலகக் கட்டம் ஊதா நிறமாகும் (பதிலளித்திருந்தால் அம்பர் நிறம்). குறிக்கப்பட்ட வினாக்கள் வழக்கம் போலவே மதிப்பிடப்படும்; சமர்ப்பிக்கும் முன் மீண்டும் பார்ப்பதற்கான தனிப்பட்ட நினைவூட்டல் மட்டுமே இந்தக் கொடி.',
+  },
+  // Mark-a-question-for-correction (report) — student-facing
+  reportError: { en: 'Report error', ta: 'பிழையைப் புகாரளி' },
+  reportedLabel: { en: 'Reported', ta: 'புகாரளிக்கப்பட்டது' },
+  reportQuestionAria: {
+    en: 'Mark this question for correction',
+    ta: 'இந்த வினாவைத் திருத்தத்திற்குக் குறிக்கவும்',
+  },
+  reportQuestionDone: {
+    en: 'Thanks — flagged for our team to review. This does not affect your score.',
+    ta: 'நன்றி — எங்கள் குழு பரிசீலிக்கக் குறிக்கப்பட்டது. இது உங்கள் மதிப்பெண்ணைப் பாதிக்காது.',
+  },
+  reportQuestionUndone: { en: 'Report removed.', ta: 'புகார் அகற்றப்பட்டது.' },
+  reportModalTitle: { en: 'Report a problem with this question', ta: 'இந்த வினாவில் உள்ள சிக்கலைப் புகாரளி' },
+  reportModalHint: {
+    en: 'Tell us what looks wrong — a bad answer key, a typo, a broken option. The exam timer is paused while this box is open.',
+    ta: 'என்ன தவறாகத் தெரிகிறது என்று கூறுங்கள் — தவறான விடை, எழுத்துப் பிழை, குறையுள்ள விருப்பம். இந்தப் பெட்டி திறந்திருக்கும்போது தேர்வு நேரம் இடைநிறுத்தப்படும்.',
+  },
+  reportReasonPlaceholder: {
+    en: "e.g. The answer key looks wrong, or option C has a typo (optional)",
+    ta: 'எ.கா. விடை தவறாக உள்ளது, அல்லது விருப்பம் C-இல் எழுத்துப் பிழை (விருப்பத்திற்குரியது)',
+  },
+  submitReport: { en: 'Submit report', ta: 'புகாரைச் சமர்ப்பி' },
+  timerPaused: { en: 'Timer paused', ta: 'நேரம் இடைநிறுத்தப்பட்டது' },
+  instrReport: {
+    en: 'Spot a wrong answer key, a typo, or a broken question? Tap "Report error" on it and our team will review and fix it. Reporting never affects your score.',
+    ta: 'தவறான விடை, எழுத்துப் பிழை, அல்லது குறையுள்ள வினாவைக் கண்டால் அதில் "பிழையைப் புகாரளி" என்பதைத் தட்டவும் — எங்கள் குழு அதைப் பரிசீலித்துத் திருத்தும். புகாரளிப்பது உங்கள் மதிப்பெண்ணை ஒருபோதும் பாதிக்காது.',
+  },
   // Pre-quiz setup (practice quizzes)
   numQuestions: { en: 'Number of Questions', ta: 'வினாக்களின் எண்ணிக்கை' },
   timeLimitMin: { en: 'Time Limit (minutes)', ta: 'கால அளவு (நிமிடங்கள்)' },
@@ -408,6 +462,11 @@ const STRINGS = {
     ta: 'திரை பாதுகாக்கப்பட்டது - தேர்வின் போது ஸ்கிரீன்ஷாட் தடுக்கப்படுகிறது.',
   },
   openPalette: { en: 'Question palette', ta: 'வினாப் பலகம்' },
+  showAll: { en: 'Show all', ta: 'அனைத்தையும் காட்டு' },
+  noFlagged: {
+    en: 'No flagged questions yet. Tap the flag on any question to add it here.',
+    ta: 'இன்னும் குறிக்கப்பட்ட வினாக்கள் இல்லை. எந்த வினாவிலும் கொடியைத் தட்டி இங்கே சேர்க்கவும்.',
+  },
   done: { en: 'Done', ta: 'முடிந்தது' },
   timeWarning30: { en: '30 minutes remaining', ta: '30 நிமிடங்கள் மீதம்' },
   timeWarning10: { en: '10 minutes remaining', ta: '10 நிமிடங்கள் மீதம்' },
@@ -474,14 +533,34 @@ const STRINGS = {
     en: 'Go Premium — crack TNPSC faster',
     ta: 'பிரீமியம் பெறுங்கள் — TNPSC-ஐ விரைவாக வெல்லுங்கள்',
   },
-  premiumPerk1: {
-    en: 'Unlimited mock tests & full question bank',
-    ta: 'வரம்பற்ற மாதிரித் தேர்வுகள் & முழு வினா தொகுப்பு',
+  premiumValidity: { en: 'Group 1 · 3-month plan', ta: 'குரூப் 1 · 3-மாத திட்டம்' },
+  premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
+  premiumPerk2: {
+    en: '5 mock exams (2 anytime + 3 after the exam announcement)',
+    ta: '5 மாதிரித் தேர்வுகள் (2 எப்போது வேண்டுமானாலும் + அறிவிப்புக்குப் பின் 3)',
   },
-  premiumPerk2: { en: 'All PDF explanations unlocked', ta: 'அனைத்து PDF விளக்கங்களும் திறக்கப்படும்' },
-  premiumPerk3: { en: 'Detailed performance insights', ta: 'விரிவான செயல்திறன் பகுப்பாய்வு' },
-  premiumPerk4: { en: 'Priority support', ta: 'முன்னுரிமை ஆதரவு' },
-  premiumPerYear: { en: '/year', ta: '/ஆண்டு' },
+  premiumPerk3: {
+    en: 'Previous-year papers — last 5 years',
+    ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் — கடந்த 5 ஆண்டுகள்',
+  },
+  premiumPerk4: {
+    en: 'Current Affairs (Aug 2025 – Jun 2026)',
+    ta: 'நடப்பு நிகழ்வுகள் (ஆக 2025 – ஜூன் 2026)',
+  },
+  // Bonus benefits, shown as a separate "extras" block on the premium banner.
+  premiumBonusTitle: { en: 'Bonus with Premium', ta: 'பிரீமியத்துடன் போனஸ்' },
+  premiumBonus1: {
+    en: 'Aptitude & other-subject short notes',
+    ta: 'அப்டிட்யூட் & பிற பாடச் சுருக்கக் குறிப்புகள்',
+  },
+  premiumBonus2: { en: 'PYQ trend report', ta: 'PYQ போக்கு அறிக்கை' },
+  premiumBonus3: { en: '45-day revision plan', ta: '45-நாள் திருப்புதல் திட்டம்' },
+  premiumBonus4: {
+    en: 'Face the exam with confidence',
+    ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்',
+  },
+  premiumBonus5: { en: '1 exam kit', ta: '1 தேர்வு கிட்' },
+  premiumPerYear: { en: '/ 3 months', ta: '/ 3 மாதம்' },
   premiumFlatSave: { en: 'Flat save', ta: 'சேமிப்பு' },
   premiumYouSave: { en: 'You save', ta: 'நீங்கள் சேமிக்கிறீர்கள்' },
   premiumApplied: { en: 'applied', ta: 'பயன்படுத்தப்பட்டது' },

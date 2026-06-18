@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertTriangle, ArrowLeft, Clock, Copy, ListChecks, Loader2, Maximize2 } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ArrowLeft, Clock, Copy, ListChecks, Loader2, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { enterFullscreen } from '../lib/proctor'
@@ -227,6 +227,11 @@ export default function QuizInstructionsPage() {
           <Rule icon={<ListChecks size={18} />} text={t('instrQuizNav')} />
           <Rule icon={<Copy size={18} />} text={t('instrNoCopy')} />
           <Rule icon={<AlertTriangle size={18} />} text={t('instrViolations')} />
+          {/* Report-a-problem — highlighted so aspirants notice it's available. */}
+          <div className="flex items-start gap-3 rounded-xl border border-accentwarm/30 bg-accentwarmsoft p-3.5">
+            <AlertCircle size={18} className="mt-0.5 shrink-0 text-accentwarm" />
+            <p className="tamil font-body text-sm text-ink">{t('instrReport')}</p>
+          </div>
         </div>
 
         {/* Confirmation */}

@@ -636,44 +636,9 @@ export const MOCK_BLUEPRINTS: MockBlueprint[] = [
       { label: 'Aptitude', count: 10 },
     ],
   },
-  {
-    id: 'Group2_2A',
-    title: 'Group 2 / 2A Prelims',
-    totalQuestions: 100,
-    durationMinutes: 90,
-    negativeMark: 0,
-    // Slots MUST match GROUP_SLOTS['Group2_2A'] in server/src/routes/questions.ts.
-    slots: [
-      { label: 'History & INM', count: 10 },
-      { label: 'Polity', count: 8 },
-      { label: 'Geography', count: 8 },
-      { label: 'General Science', count: 10 },
-      { label: 'Economy', count: 4 },
-      { label: 'TN History & Culture', count: 10 },
-      { label: 'TN Administration', count: 5 },
-      { label: 'General Tamil', count: 15 },
-      { label: 'Current Affairs', count: 15 },
-      { label: 'Aptitude', count: 15 },
-    ],
-  },
-  {
-    id: 'Group4_VAO',
-    title: 'Group 4 & VAO',
-    totalQuestions: 100,
-    durationMinutes: 90,
-    negativeMark: 0,
-    // Slots MUST match GROUP_SLOTS['Group4_VAO'] in server/src/routes/questions.ts.
-    slots: [
-      { label: 'General Tamil', count: 20 },
-      { label: 'History & INM', count: 15 },
-      { label: 'Geography', count: 10 },
-      { label: 'Polity', count: 10 },
-      { label: 'General Science', count: 20 },
-      { label: 'Economy', count: 10 },
-      { label: 'Current Affairs', count: 10 },
-      { label: 'Aptitude', count: 5 },
-    ],
-  },
+  // Group 2 / 2A Prelims and Group 4 & VAO are intentionally not offered — the
+  // app currently ships Group 1 only. (Their server-side GROUP_SLOTS remain, so
+  // these can be re-enabled by restoring the blueprint entries.)
 ]
 
 export function mockBlueprint(id?: string): MockBlueprint | undefined {

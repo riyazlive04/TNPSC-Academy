@@ -53,7 +53,7 @@ export default function AuthShell({ children }: AuthShellProps) {
         <div className="absolute inset-0 bg-hero-grid [background-size:22px_22px] opacity-60" />
         <div className="relative animate-slideDown">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/15 text-lg font-semibold ring-1 ring-white/20">
+            <span className="grid h-11 w-11 place-items-center rounded-tile bg-white/15 text-lg font-semibold ring-1 ring-white/20">
               த
             </span>
             <span className="font-heading text-lg font-semibold tracking-tight">TNPSC Mentor</span>
@@ -83,7 +83,7 @@ export default function AuthShell({ children }: AuthShellProps) {
       <div className="flex min-h-screen items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
         <div className="w-full max-w-md animate-fadeIn">
           <div className="mb-7 flex flex-col items-center text-center lg:hidden">
-            <span className="mb-3 grid h-12 w-12 place-items-center rounded-xl bg-brand-gradient text-xl font-semibold text-white">
+            <span className="mb-3 grid h-12 w-12 place-items-center rounded-tile bg-brand-gradient text-xl font-semibold text-white shadow-brand">
               த
             </span>
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
