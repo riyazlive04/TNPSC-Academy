@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   BookOpen,
   CheckCircle2,
+  Crown,
   FileDown,
   Home,
   Loader2,
@@ -28,6 +29,8 @@ import { generateExplanationPdf } from '../lib/explanationPdf'
 import { exitFullscreen } from '../lib/proctor'
 import { useAuth } from '../hooks/useAuth'
 import { useProgressStore } from '../store/progressStore'
+import { usePremiumStore } from '../store/premiumStore'
+import { toast } from '../store/toastStore'
 import { useT } from '../lib/i18n'
 import type { GroupType, Question, ResultPayload, TestAnswer } from '../types'
 
@@ -51,6 +54,11 @@ export default function ResultPage() {
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())
   const [downloadingPdf, setDownloadingPdf] = useState(false)
+  // PDF download is a Premium perk; check entitlement (store dedupes the request).
+  const { premium, loaded: premiumLoaded, refresh: refreshPremium } = usePremiumStore()
+  useEffect(() => {
+    if (!premiumLoaded) refreshPremium()
+  }, [premiumLoaded, refreshPremium])
   const [rewards, setRewards] = useState<{
     leveledTo: number | null
     newBadges: Badge[]
@@ -158,8 +166,14 @@ export default function ResultPage() {
   // The full questions-with-explanations PDF unlocks only when EVERY question was
   // attempted (a completely-attended test); otherwise we just nudge them to it.
   const fullyAttended = totalQuestions > 0 && attempted === totalQuestions
+  // Non-premium users can't download the PDF — nudge them to upgrade instead.
+  const promptUpgrade = () => {
+    toast.info(t('pdfPremiumPrompt'))
+    navigate('/profile')
+  }
   const downloadExplanationPdf = async () => {
     if (downloadingPdf) return
+    if (!premium) return promptUpgrade()
     setDownloadingPdf(true)
     try {
       await generateExplanationPdf({
@@ -358,8 +372,20 @@ export default function ResultPage() {
           {t('questionBreakdown')}
         </h3>
 
-        {/* Full explanation PDF - unlocked only when every question was attempted */}
-        {fullyAttended ? (
+        {/* Full explanation PDF — a Premium perk; non-premium users get an upgrade
+            nudge, premium users get it once every question was attempted. */}
+        {!premiumLoaded ? (
+          <div className="mb-3 flex items-center justify-center rounded-xl border border-line bg-tint px-4 py-2.5">
+            <Loader2 size={14} className="animate-spin text-ink2" />
+          </div>
+        ) : !premium ? (
+          <button
+            onClick={promptUpgrade}
+            className="btn-brand press mb-3 flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
+          >
+            <Crown size={16} /> {t('pdfPremiumOnly')}
+          </button>
+        ) : fullyAttended ? (
           <button
             onClick={downloadExplanationPdf}
             disabled={downloadingPdf}
