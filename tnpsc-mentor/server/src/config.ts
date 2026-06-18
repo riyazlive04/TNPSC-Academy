@@ -56,6 +56,13 @@ export const config = {
   // unaffected. This same Client ID must ALSO be added to Supabase → Auth →
   // Providers → Google → "Authorized Client IDs" for the ID-token flow to work.
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? '',
+  // Web Push (VAPID). Optional: when unset, the push endpoints return 503 and the
+  // app falls back to in-app notifications only. PUBLIC key is shipped to the
+  // browser (to subscribe); PRIVATE key is server-only (signs push messages).
+  // SUBJECT is a mailto:/https: contact required by the Web Push spec.
+  vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? '',
+  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY ?? '',
+  vapidSubject: process.env.VAPID_SUBJECT ?? 'mailto:support@sirahdigital.in',
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -63,3 +70,6 @@ export const razorpayEnabled = Boolean(config.razorpayKeyId && config.razorpayKe
 
 /** True when a Google OAuth Client ID is configured — gates Google sign-in. */
 export const googleEnabled = Boolean(config.googleClientId)
+
+/** True when VAPID keys are present — gates Web Push (in-app feed works regardless). */
+export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateKey)

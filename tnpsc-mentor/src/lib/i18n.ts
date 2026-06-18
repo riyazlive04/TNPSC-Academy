@@ -450,6 +450,44 @@ const STRINGS = {
   // Setup / onboarding
   setupTitle: { en: 'Set Your Target', ta: 'உங்கள் இலக்கை அமைக்கவும்' },
   targetGroup: { en: 'Target Group', ta: 'இலக்கு குழு' },
+  gender: { en: 'Gender', ta: 'பாலினம்' },
+  genderSelect: { en: 'Select…', ta: 'தேர்ந்தெடுக்கவும்…' },
+  genderMale: { en: 'Male', ta: 'ஆண்' },
+  genderFemale: { en: 'Female', ta: 'பெண்' },
+  genderOther: { en: 'Other', ta: 'மற்றவை' },
+  askedInYear: { en: 'Asked in', ta: 'கேட்கப்பட்ட ஆண்டு' },
+  explHelpful: { en: 'Was this explanation helpful?', ta: 'இந்த விளக்கம் பயனுள்ளதாக இருந்ததா?' },
+  explThanks: { en: 'Thanks for your feedback!', ta: 'உங்கள் கருத்துக்கு நன்றி!' },
+  explFlagged: {
+    en: 'Thanks — we’ll improve this explanation.',
+    ta: 'நன்றி — இந்த விளக்கத்தை மேம்படுத்துவோம்.',
+  },
+
+  // Premium banner
+  premiumBadge: { en: 'Premium', ta: 'பிரீமியம்' },
+  premiumTitle: {
+    en: 'Go Premium — crack TNPSC faster',
+    ta: 'பிரீமியம் பெறுங்கள் — TNPSC-ஐ விரைவாக வெல்லுங்கள்',
+  },
+  premiumPerk1: {
+    en: 'Unlimited mock tests & full question bank',
+    ta: 'வரம்பற்ற மாதிரித் தேர்வுகள் & முழு வினா தொகுப்பு',
+  },
+  premiumPerk2: { en: 'All PDF explanations unlocked', ta: 'அனைத்து PDF விளக்கங்களும் திறக்கப்படும்' },
+  premiumPerk3: { en: 'Detailed performance insights', ta: 'விரிவான செயல்திறன் பகுப்பாய்வு' },
+  premiumPerk4: { en: 'Priority support', ta: 'முன்னுரிமை ஆதரவு' },
+  premiumPerYear: { en: '/year', ta: '/ஆண்டு' },
+  premiumFlatSave: { en: 'Flat save', ta: 'சேமிப்பு' },
+  premiumYouSave: { en: 'You save', ta: 'நீங்கள் சேமிக்கிறீர்கள்' },
+  premiumApplied: { en: 'applied', ta: 'பயன்படுத்தப்பட்டது' },
+  premiumCouponPlaceholder: { en: 'Coupon code', ta: 'கூப்பன் குறியீடு' },
+  premiumApply: { en: 'Apply', ta: 'பயன்படுத்து' },
+  premiumRemoveCoupon: { en: 'Remove coupon', ta: 'கூப்பனை அகற்று' },
+  premiumGet: { en: 'Get Premium', ta: 'பிரீமியம் பெறு' },
+  premiumThanks: {
+    en: 'Welcome to Premium — thank you!',
+    ta: 'பிரீமியத்திற்கு வரவேற்கிறோம் — நன்றி!',
+  },
   examDate: { en: 'Exam Date', ta: 'தேர்வு தேதி' },
   dailyGoalQ: { en: 'Daily question goal', ta: 'தினசரி வினா இலக்கு' },
   saveContinue: { en: 'Save & Continue', ta: 'சேமித்துத் தொடரவும்' },
@@ -484,6 +522,30 @@ const STRINGS = {
     ta: 'ஒரு தொகுப்பைத் தேர்ந்தெடுத்துப் பயிற்சியைத் தொடங்குங்கள்.',
   },
   start: { en: 'Start', ta: 'தொடங்கு' },
+
+  // ─── Notifications ────────────────────────────────────────────────────────
+  notifications: { en: 'Notifications', ta: 'அறிவிப்புகள்' },
+  noNotifications: { en: 'No notifications yet.', ta: 'இன்னும் அறிவிப்புகள் இல்லை.' },
+  markAllRead: { en: 'Mark all as read', ta: 'அனைத்தையும் படித்ததாகக் குறி' },
+  enableDeviceNotifications: {
+    en: 'Enable device notifications',
+    ta: 'சாதன அறிவிப்புகளை இயக்கு',
+  },
+  pushEnabled: { en: 'Device notifications enabled.', ta: 'சாதன அறிவிப்புகள் இயக்கப்பட்டன.' },
+  pushDenied: {
+    en: 'Notifications blocked. Allow them in your browser settings.',
+    ta: 'அறிவிப்புகள் தடுக்கப்பட்டன. உலாவி அமைப்புகளில் அனுமதிக்கவும்.',
+  },
+  pushUnsupported: {
+    en: 'This browser does not support push notifications.',
+    ta: 'இந்த உலாவி புஷ் அறிவிப்புகளை ஆதரிக்கவில்லை.',
+  },
+  pushUnavailable: {
+    en: 'Push notifications are not available right now.',
+    ta: 'புஷ் அறிவிப்புகள் தற்போது கிடைக்கவில்லை.',
+  },
+  pushFailed: { en: 'Could not enable notifications.', ta: 'அறிவிப்புகளை இயக்க முடியவில்லை.' },
+  notificationsTab: { en: 'Notify', ta: 'அறிவிப்பு' },
 
   // ─── Auth (login / register / forgot) ─────────────────────────────────────
   welcomeBack: { en: 'Welcome back', ta: 'மீண்டும் வரவேற்கிறோம்' },

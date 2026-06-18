@@ -18,6 +18,9 @@ import {
   IndianRupee,
   TrendingUp,
   Wallet,
+  Bell,
+  Megaphone,
+  Send,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Spinner from '../components/UI/Spinner'
@@ -31,12 +34,15 @@ import {
   type CouponWithStats,
   type CouponInput,
   type DiscountType,
+  type AdminNotification,
+  type NotificationAudience,
+  type NotificationKind,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
 import type { UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'feedback' | 'coupons'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -47,6 +53,7 @@ export default function SuperAdminPage() {
     { id: 'revenue', label: 'revenueTab', icon: IndianRupee },
     { id: 'users', label: 'users', icon: UsersIcon },
     { id: 'coupons', label: 'couponsTab', icon: Ticket },
+    { id: 'notifications', label: 'notificationsTab', icon: Bell },
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
   ]
 
@@ -89,6 +96,7 @@ export default function SuperAdminPage() {
           {tab === 'revenue' && <RevenueTab />}
           {tab === 'users' && <UsersTab />}
           {tab === 'coupons' && <CouponsTab />}
+          {tab === 'notifications' && <NotificationsTab />}
           {tab === 'feedback' && <FeedbackTab />}
         </div>
       </div>
@@ -932,6 +940,274 @@ function CouponsTab() {
         cancelLabel="Cancel"
         tone="danger"
         busy={busyId === pendingDelete?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+    </div>
+  )
+}
+
+// ─── Notifications ──────────────────────────────────────────────────────────────
+// Two sub-tabs: "Send to Users" (a real Web Push + in-app feed entry) and
+// "System" (in-app announcement only). Both target an audience. English copy,
+// matching the rest of the console.
+const AUDIENCE_OPTIONS: { value: NotificationAudience; label: string }[] = [
+  { value: 'all', label: 'All users' },
+  { value: 'premium', label: 'Premium users' },
+  { value: 'free', label: 'Free users' },
+  { value: 'group', label: 'By target group' },
+]
+
+const GROUP_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Group1', label: 'Group 1' },
+  { value: 'Group2_2A', label: 'Group 2 / 2A' },
+  { value: 'Group4_VAO', label: 'Group 4 / VAO' },
+]
+
+const EMPTY_NOTIF_FORM = {
+  title: '',
+  body: '',
+  url: '',
+  audience: 'all' as NotificationAudience,
+  audienceValue: 'Group1',
+}
+
+function NotificationsTab() {
+  const [sub, setSub] = useState<NotificationKind>('push')
+  const [form, setForm] = useState(EMPTY_NOTIF_FORM)
+  const [sending, setSending] = useState(false)
+  const [list, setList] = useState<AdminNotification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<AdminNotification | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.notifications
+      .adminList()
+      .then(setList)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (sending) return
+    const title = form.title.trim()
+    const body = form.body.trim()
+    if (!title || !body) return toast.error('Title and message are required.')
+
+    setSending(true)
+    try {
+      const res = await api.notifications.create({
+        kind: sub,
+        title,
+        body,
+        url: form.url.trim() || null,
+        audience: form.audience,
+        audienceValue: form.audience === 'group' ? form.audienceValue : null,
+      })
+      if (sub === 'push') {
+        toast.success(
+          res.pushEnabled
+            ? `Sent to ${res.pushSent} device${res.pushSent === 1 ? '' : 's'} + in-app feed.`
+            : 'Saved to in-app feed (Web Push not configured on the server).'
+        )
+      } else {
+        toast.success('Announcement published to the in-app feed.')
+      }
+      setForm(EMPTY_NOTIF_FORM)
+      load()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not send notification.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    try {
+      await api.notifications.remove(pendingDelete.id)
+      setList((prev) => prev.filter((n) => n.id !== pendingDelete.id))
+      toast.success('Notification deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete.')
+    }
+  }
+
+  const audienceLabel = (n: AdminNotification): string => {
+    if (n.audience === 'group') {
+      return GROUP_OPTIONS.find((g) => g.value === n.audience_value)?.label ?? n.audience_value ?? 'group'
+    }
+    return AUDIENCE_OPTIONS.find((a) => a.value === n.audience)?.label ?? n.audience
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Sub-tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setSub('push')}
+          className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
+            sub === 'push' ? 'bg-brand text-white shadow-brand' : 'bg-tint text-ink2 hover:text-ink'
+          }`}
+        >
+          <Send size={15} /> Send to Users
+        </button>
+        <button
+          onClick={() => setSub('system')}
+          className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
+            sub === 'system' ? 'bg-brand text-white shadow-brand' : 'bg-tint text-ink2 hover:text-ink'
+          }`}
+        >
+          <Megaphone size={15} /> System Notifications
+        </button>
+      </div>
+
+      {/* Composer */}
+      <form onSubmit={submit} className="card space-y-4 p-5">
+        <div className="flex items-start gap-2">
+          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+            {sub === 'push' ? <Bell size={18} /> : <Megaphone size={18} />}
+          </span>
+          <div>
+            <h2 className="font-heading text-sm font-semibold text-ink">
+              {sub === 'push' ? 'Send a push notification' : 'Post a system announcement'}
+            </h2>
+            <p className="font-body text-xs text-ink2">
+              {sub === 'push'
+                ? 'Delivered to subscribed devices (desktop & Android) and the in-app feed.'
+                : 'Shown only inside the app (in-app feed / bell). No device push.'}
+            </p>
+          </div>
+        </div>
+
+        <Field label="Title *">
+          <input
+            className={COUPON_INPUT}
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="e.g. New mock test added"
+            maxLength={120}
+          />
+        </Field>
+        <Field label="Message *">
+          <textarea
+            className={COUPON_INPUT + ' min-h-[80px] resize-y'}
+            value={form.body}
+            onChange={(e) => set('body', e.target.value)}
+            placeholder="Write the notification message…"
+            maxLength={500}
+          />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Link (optional)">
+            <input
+              className={COUPON_INPUT}
+              value={form.url}
+              onChange={(e) => set('url', e.target.value)}
+              placeholder="/mock  or  https://…"
+            />
+          </Field>
+          <Field label="Audience">
+            <select
+              className={COUPON_INPUT}
+              value={form.audience}
+              onChange={(e) => set('audience', e.target.value)}
+            >
+              {AUDIENCE_OPTIONS.map((a) => (
+                <option key={a.value} value={a.value}>
+                  {a.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {form.audience === 'group' && (
+            <Field label="Target group">
+              <select
+                className={COUPON_INPUT}
+                value={form.audienceValue}
+                onChange={(e) => set('audienceValue', e.target.value)}
+              >
+                {GROUP_OPTIONS.map((g) => (
+                  <option key={g.value} value={g.value}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+        </div>
+        <button type="submit" disabled={sending} className="btn-brand press disabled:opacity-60">
+          {sending ? <Spinner size={16} /> : <Send size={16} />}
+          {sub === 'push' ? 'Send notification' : 'Publish announcement'}
+        </button>
+      </form>
+
+      {/* History */}
+      <div>
+        <h2 className="mb-3 font-heading text-sm font-semibold text-ink">Sent history</h2>
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton h-16 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <ErrorState onRetry={load} />
+        ) : list.length === 0 ? (
+          <p className="py-10 text-center font-body text-ink2">Nothing sent yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {list.map((n, i) => (
+              <div
+                key={n.id}
+                style={{ '--i': i } as React.CSSProperties}
+                className="card stagger-item flex items-start gap-3 p-3.5"
+              >
+                <span
+                  className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg ${
+                    n.kind === 'system' ? 'bg-goldsoft text-gold' : 'bg-brand-soft text-brand'
+                  }`}
+                >
+                  {n.kind === 'system' ? <Megaphone size={18} /> : <Bell size={18} />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">{n.title}</p>
+                  <p className="line-clamp-2 font-body text-xs text-ink2">{n.body}</p>
+                  <p className="mt-1 font-body text-[11px] text-ink2/80">
+                    {n.kind === 'push' ? 'Push' : 'System'} · {audienceLabel(n)}
+                    {n.kind === 'push' ? ` · ${n.push_sent} sent` : ''} ·{' '}
+                    {new Date(n.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPendingDelete(n)}
+                  aria-label="Delete notification"
+                  className="focus-ring rounded-lg border border-line p-1.5 text-coral transition hover:border-coral/40"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete notification?"
+        message={`Remove "${pendingDelete?.title ?? ''}" from the feed? Devices already notified keep their copy.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       />

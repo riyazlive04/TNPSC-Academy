@@ -4,9 +4,7 @@ import {
   ArrowLeft,
   Loader2,
   LogOut,
-  Target,
-  CalendarClock,
-  Users,
+  User,
   ShieldCheck,
   ClipboardCheck,
   ListChecks,
@@ -23,7 +21,7 @@ import { fetchHabit, type HabitState } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
 import { computeBadges, type GameStats } from '../lib/achievements'
 import { isHiddenBadge } from '../lib/features'
-import { GROUP_SUBJECTS, groupLabel } from '../lib/constants'
+import { GROUP_SUBJECTS } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../store/languageStore'
@@ -99,13 +97,15 @@ export default function ProfilePage() {
   const name = profile?.full_name || 'Aspirant'
   const initial = name.trim().charAt(0).toUpperCase() || 'A'
   const roleLabel = isSuperAdmin ? t('superadmin') : isAdmin ? t('admin') : 'Aspirant'
-  const examDate = profile?.exam_date
-    ? new Date(profile.exam_date).toLocaleDateString(undefined, {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
-    : t('notSet')
+  const genderLabel = profile?.gender
+    ? t(
+        profile.gender === 'male'
+          ? 'genderMale'
+          : profile.gender === 'female'
+            ? 'genderFemale'
+            : 'genderOther'
+      )
+    : ''
 
   const handleSignOut = async () => {
     await signOut()
@@ -178,13 +178,9 @@ export default function ProfilePage() {
                 {t('accountDetails')}
               </h2>
               <div className="card divide-y divide-line">
-                <DetailRow icon={<Users size={16} />} label={t('targetGroup')} value={groupLabel(group)} />
-                <DetailRow icon={<CalendarClock size={16} />} label={t('examDate')} value={examDate} />
-                <DetailRow
-                  icon={<Target size={16} />}
-                  label={t('dailyGoal')}
-                  value={profile?.daily_goal ? String(profile.daily_goal) : t('notSet')}
-                />
+                {profile?.gender && (
+                  <DetailRow icon={<User size={16} />} label={t('gender')} value={genderLabel} />
+                )}
                 {profile?.phone && (
                   <DetailRow icon={<ShieldCheck size={16} />} label={t('phone')} value={profile.phone} />
                 )}

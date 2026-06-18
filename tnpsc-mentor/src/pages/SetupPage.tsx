@@ -9,19 +9,14 @@ import { saveGoals } from '../lib/habit'
 import { SHOW_GOALS } from '../lib/features'
 import { useT } from '../lib/i18n'
 
-const GROUPS = [
-  { value: 'Group1', label: 'Group 1' },
-  { value: 'Group2_2A', label: 'Group 2 / 2A' },
-  { value: 'Group4_VAO', label: 'Group 4 & VAO' },
-]
-
 export default function SetupPage() {
   const navigate = useNavigate()
   const { user, profile } = useAuth()
   const fetchProfile = useAuthStore((s) => s.fetchProfile)
   const { t } = useT()
 
-  const [group, setGroup] = useState(profile?.target_group ?? 'Group1')
+  // Default group, submitted but not shown — keeps group-derived logic working.
+  const group = profile?.target_group ?? 'Group1'
   const [examDate, setExamDate] = useState(profile?.exam_date ?? '')
   const [goal, setGoal] = useState(profile?.daily_goal ?? 20)
   const [saving, setSaving] = useState(false)
@@ -51,21 +46,6 @@ export default function SetupPage() {
           <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-3xl bg-brand-soft text-brand">
             <Target size={30} />
           </div>
-
-          <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
-            {t('targetGroup')}
-          </label>
-          <select
-            value={group}
-            onChange={(e) => setGroup(e.target.value)}
-            className="input-soft mb-4 appearance-none"
-          >
-            {GROUPS.map((g) => (
-              <option key={g.value} value={g.value}>
-                {g.label}
-              </option>
-            ))}
-          </select>
 
           {SHOW_GOALS && (
             <>

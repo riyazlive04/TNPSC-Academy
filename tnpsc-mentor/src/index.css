@@ -138,6 +138,13 @@ h4,
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+  /* A loading spinner is a functional status indicator, not decoration — keep it
+   * spinning even under reduced-motion, otherwise it freezes and looks broken
+   * (e.g. on desktops/browsers that have "reduce motion" enabled). */
+  .animate-spin {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
 
 /* Confetti keyframe retained but unused in the minimal theme. */

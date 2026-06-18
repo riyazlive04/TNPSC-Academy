@@ -18,6 +18,8 @@ import { useThemeStore } from '../../store/themeStore'
 import { api } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import FeedbackModal from '../Feedback/FeedbackModal'
+import NotificationBell from './NotificationBell'
+import { stopNotificationPolling } from '../../store/notificationStore'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -96,6 +98,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   }
 
   const handleSignOut = async () => {
+    stopNotificationPolling()
     await signOut()
     navigate('/login', { replace: true })
   }
@@ -162,6 +165,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               >
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
+              {user && <NotificationBell />}
               {!feedbackGiven && (
                 <button
                   onClick={() => setFeedbackOpen(true)}
