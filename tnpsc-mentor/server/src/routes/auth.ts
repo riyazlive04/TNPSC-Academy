@@ -111,10 +111,13 @@ router.post(
 
     // Enrich only the fields that are currently empty, so a returning Google user
     // who edited their display name doesn't get it overwritten on every login.
+    // Select the FULL row once and reuse it as the response profile — avoids a
+    // second identical fetch in sessionPayload (one less Sydney round-trip, the
+    // main source of the post-sign-in lag).
     const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>
     const { data: existing } = await supabaseAdmin
       .from('profiles')
-      .select('full_name, email, avatar_url')
+      .select('*')
       .eq('id', data.user.id)
       .single()
 
@@ -138,7 +141,19 @@ router.post(
       }
     }
 
-    res.json(await sessionPayload(data.session))
+    // Returning user: reuse the row we already have (merged with any enrichment).
+    // First sign-in only: the handle_new_user trigger may not have committed the
+    // row yet when we selected, so fall back to a fresh fetch via sessionPayload.
+    if (existing) {
+      res.json({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        user: { id: data.user.id },
+        profile: { ...existing, ...patch },
+      })
+    } else {
+      res.json(await sessionPayload(data.session))
+    }
   })
 )
 
