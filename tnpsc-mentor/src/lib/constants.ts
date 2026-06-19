@@ -252,6 +252,7 @@ export const PYQ_SUBJECTS: string[] = [
   'Physics',
   'Chemistry',
   'Indian Economy',
+  'Aptitude',
 ]
 
 // Per-group subject availability. Group 1 = full GS; Group 2/4 add the

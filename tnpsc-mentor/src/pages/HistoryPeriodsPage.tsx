@@ -50,6 +50,7 @@ export default function HistoryPeriodsPage() {
       subject: HISTORY_SUBJECT,
       unit,
       label: `PYQ · ${title}`,
+      availableCount: counts?.[unit],
     })
   }
 

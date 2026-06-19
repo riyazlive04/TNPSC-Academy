@@ -43,6 +43,13 @@ export default function QuestionCard({
           {t('question')} {index + 1} {t('of')} {total}
         </span>
         <div className="flex min-w-0 items-center justify-end gap-2">
+          {/* PYQ year badge - every previous-year question shows the exam year
+              it was asked in (e.g. "2024"). */}
+          {question.year && (
+            <span className="rounded-full bg-secondary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-secondary">
+              {question.year}
+            </span>
+          )}
           {/* Topic label - useful for PYQ, where every question carries its own
               topic (e.g. "Ozone Depletion Cause"). */}
           {question.topic && (

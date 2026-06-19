@@ -151,6 +151,13 @@ export interface QuizConfig {
   mockDurationSeconds?: number
   /** Practice quiz: user-chosen number of questions (caps the random pool). */
   questionCount?: number
+  /**
+   * Size of the available question pool for this config, when the originating
+   * picker page already knows it (e.g. the PYQ/Subject counts shown on its
+   * cards). Lets the pre-test setup screen render the slider bound instantly
+   * instead of flashing a "counting…" state while it re-fetches.
+   */
+  availableCount?: number
   /** Practice quiz: user-chosen time limit in seconds (overrides the per-question default). */
   durationSeconds?: number
   /** Negative mark per wrong answer (e.g. 0.33 for -1/3). 0 = none. */
