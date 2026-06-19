@@ -5,7 +5,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { enterFullscreen } from '../lib/proctor'
 import { api } from '../lib/api'
-import { MAX_QUESTIONS } from '../lib/fetchQuestions'
+import { DEFAULT_QUESTIONS } from '../lib/fetchQuestions'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
 
@@ -46,7 +46,9 @@ export default function QuizInstructionsPage() {
   // pace (≈1 min/question) so it always matches the chosen question count.
   const [timeTouched, setTimeTouched] = useState(false)
   // How many questions exist for this config - bounds the question slider.
-  const [available, setAvailable] = useState<number | null>(null)
+  // Seeded from the picker page's known count (config.availableCount) so the
+  // number shows immediately; otherwise null until the fetch below resolves.
+  const [available, setAvailable] = useState<number | null>(config?.availableCount ?? null)
 
   const recommended = recommendedMinutes(count)
   useEffect(() => {
@@ -57,22 +59,31 @@ export default function QuizInstructionsPage() {
     if (!config) navigate('/test-arena', { replace: true })
   }, [config, navigate])
 
-  // Fetch the available-question count so the slider can't exceed the real pool.
+  // Resolve the available-question count so the slider spans the full real pool
+  // (no artificial cap — the aspirant can practise every question in the topic).
+  // When the picker page already passed the count (config.availableCount), use
+  // it directly and skip the network round-trip; otherwise fetch it.
   useEffect(() => {
     if (!config) return
+    const clamp = (n: number) =>
+      setCount((c) => Math.max(Math.min(c, n), Math.min(MIN_QUESTIONS, n)))
+
+    if (config.availableCount != null) {
+      clamp(config.availableCount)
+      return
+    }
+
     let cancelled = false
     api
       .countQuestions(config)
       .then((n) => {
         if (cancelled) return
-        const capped = Math.min(n, MAX_QUESTIONS)
-        setAvailable(capped)
-        // Clamp the default selection into the valid range for this topic.
-        setCount((c) => Math.max(Math.min(c, capped), Math.min(MIN_QUESTIONS, capped)))
+        setAvailable(n)
+        clamp(n)
       })
       .catch(() => {
-        // On failure, fall back to the global cap so the user isn't blocked.
-        if (!cancelled) setAvailable(MAX_QUESTIONS)
+        // On failure, fall back to a sane default so the user isn't blocked.
+        if (!cancelled) setAvailable(DEFAULT_QUESTIONS)
       })
     return () => {
       cancelled = true
@@ -83,7 +94,7 @@ export default function QuizInstructionsPage() {
   if (!config) return null
 
   const loadingCount = available === null
-  const maxCount = available ?? MAX_QUESTIONS
+  const maxCount = available ?? DEFAULT_QUESTIONS
   const minCount = Math.min(MIN_QUESTIONS, maxCount)
   const noQuestions = available === 0
 

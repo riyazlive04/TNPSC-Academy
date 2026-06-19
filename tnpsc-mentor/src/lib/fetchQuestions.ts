@@ -1,7 +1,10 @@
 import { api } from './api'
 import type { AnswerLetter, Question, QuizConfig } from '../types'
 
-export const MAX_QUESTIONS = 100
+// Fallback question count when a config doesn't specify one (e.g. a direct quiz
+// start that skips the setup screen). NOT an upper cap — practice quizzes may
+// use the full available pool for the chosen topic.
+export const DEFAULT_QUESTIONS = 100
 
 /** Fisher-Yates shuffle (non-mutating). */
 export function shuffle<T>(arr: T[]): T[] {
@@ -24,7 +27,7 @@ export async function fetchQuestionsForConfig(
 ): Promise<Question[]> {
   const limit = config.mock
     ? (config.mockQuestionCount ?? 50)
-    : Math.min(config.questionCount ?? MAX_QUESTIONS, MAX_QUESTIONS)
+    : (config.questionCount ?? DEFAULT_QUESTIONS)
   return api.quizQuestions({ ...config, limit } as QuizConfig)
 }
 

@@ -12,6 +12,7 @@ import {
   Atom,
   FlaskConical,
   TrendingUp,
+  Calculator,
   BookOpen,
   type LucideIcon,
 } from 'lucide-react'
@@ -37,6 +38,7 @@ function subjectIcon(name: string): LucideIcon {
   if (n.includes('physics')) return Atom
   if (n.includes('chemistry')) return FlaskConical
   if (n.includes('econom')) return TrendingUp
+  if (n.includes('aptitude')) return Calculator
   return BookOpen
 }
 
@@ -77,7 +79,12 @@ export default function PreviousYearPage() {
       navigate('/test-arena/pyq/history')
       return
     }
-    startTest({ category: 'pyq', subject: subj, label: `PYQ · ${subjectName(subj, lang)}` })
+    startTest({
+      category: 'pyq',
+      subject: subj,
+      label: `PYQ · ${subjectName(subj, lang)}`,
+      availableCount: counts?.[subj],
+    })
   }
 
   return (
@@ -92,7 +99,8 @@ export default function PreviousYearPage() {
           <Loader2 size={28} className="animate-spin text-brand" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        // 10 subjects in two columns -> five rows of two (5-5).
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {PYQ_SUBJECTS.map((s, i) => {
             const Icon = subjectIcon(s)
             const n = counts[s] ?? 0

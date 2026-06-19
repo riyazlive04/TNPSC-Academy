@@ -216,6 +216,7 @@ export default function SubjectPracticePage() {
       topic: isAll ? undefined : topic,
       question_type: qtype ?? undefined,
       label: `${subjectName(subject, lang)} · ${isAll ? t('allTopics') : topicName(topic, lang)} · ${label}`,
+      availableCount: totalForType(qtype),
     })
   }
 
@@ -370,7 +371,8 @@ function SubjectStep({
   if (error) return <ErrorText text={error} />
 
   return (
-    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+    // 12 subjects in two columns -> six rows of two.
+    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
       {subjects.map((s, i) => {
         const Icon = subjectIcon(s.subject)
         return (
