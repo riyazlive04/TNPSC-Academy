@@ -51,11 +51,17 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     subject: config.subject ?? null,
     standard: config.standard ?? null,
     topic: config.topic ?? null,
+    // Extra scope the topic-revision hook needs to key/regenerate a test.
+    unit: config.unit ?? null,
+    question_type: config.question_type ?? null,
+    difficulty: config.difficulty ?? null,
     ca_month: config.ca_month ?? null,
     ca_type: config.ca_type ?? null,
     ca_topic: config.ca_topic ?? null,
     aptitude_type: config.aptitude_type ?? null,
     aptitude_topic: config.aptitude_topic ?? null,
+    // When set, this test is a revision re-attempt — a pass clears that row.
+    revision_id: config.revisionId ?? null,
     total_questions: questions.length,
     time_limit_seconds: timeLimitSeconds,
     time_taken_seconds: timeTaken,
@@ -107,5 +113,6 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     timeLimitSeconds,
     timeTakenSeconds: timeTaken,
     sessionId: result.session_id,
+    revision: result.revision,
   }
 }

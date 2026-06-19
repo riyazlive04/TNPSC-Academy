@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactElement } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { Compass, Home } from 'lucide-react'
 import { useAuthStore } from './store/authStore'
 import { useThemeStore } from './store/themeStore'
 import { warmApi } from './lib/api'
+import { pageVariants, pageTransition } from './lib/motion'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
@@ -28,6 +31,7 @@ const AptitudePage = lazy(() => import('./pages/AptitudePage'))
 const QuizInstructionsPage = lazy(() => import('./pages/QuizInstructionsPage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
 const AdminQuestionsPage = lazy(() => import('./pages/AdminQuestionsPage'))
+const AdminReportsPage = lazy(() => import('./pages/AdminReportsPage'))
 const ResultPage = lazy(() => import('./pages/ResultPage'))
 const InsightsPage = lazy(() => import('./pages/InsightsPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
@@ -56,6 +60,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/quiz/instructions', element: <QuizInstructionsPage /> },
   { path: '/quiz', element: <QuizPage /> },
   { path: '/admin/questions', element: <AdminQuestionsPage /> },
+  { path: '/admin/reports', element: <AdminReportsPage />, role: 'admin' },
   { path: '/result', element: <ResultPage /> },
   { path: '/insights', element: <InsightsPage /> },
   { path: '/profile', element: <ProfilePage /> },
@@ -108,29 +113,59 @@ export default function App() {
     <ScrollToTop />
     <SmoothScroll />
     <Suspense fallback={<PageLoader />}>
-      <Routes>
-        {/* Root is auth-aware: logged-in users go to the app, everyone else to
-            login. The marketing landing page is no longer in the flow. */}
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
-        {/* Protected */}
-        {PROTECTED_ROUTES.map(({ path, element, role }) => (
-          <Route
-            key={path}
-            path={path}
-            element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
-          />
-        ))}
-
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AnimatedRoutes />
     </Suspense>
     <Toaster />
     </>
+  )
+}
+
+/** The route table, with a native-feeling cross-fade between screens. Keyed on
+ * the pathname so AnimatePresence runs an exit→enter on every navigation; honours
+ * prefers-reduced-motion by rendering the routes statically. Motion tokens drive
+ * the timing (lib/motion). */
+function AnimatedRoutes() {
+  const location = useLocation()
+  const reduce = useReducedMotion()
+
+  const routes = (
+    <Routes location={location}>
+      {/* Root is auth-aware: logged-in users go to the app, everyone else to
+          login. The marketing landing page is no longer in the flow. */}
+      <Route path="/" element={<RootRedirect />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+      {/* Protected */}
+      {PROTECTED_ROUTES.map(({ path, element, role }) => (
+        <Route
+          key={path}
+          path={path}
+          element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
+        />
+      ))}
+
+      {/* Fallback */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  )
+
+  if (reduce) return routes
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={pageTransition}
+      >
+        {routes}
+      </motion.div>
+    </AnimatePresence>
   )
 }
 
@@ -156,14 +191,18 @@ function PageLoader() {
 function NotFound() {
   const navigate = useNavigate()
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-primary px-4 text-center">
-      <h1 className="font-heading text-5xl font-bold text-accent">404</h1>
-      <p className="font-body text-white/70">This page could not be found.</p>
-      <button
-        onClick={() => navigate('/test-arena')}
-        className="rounded-full bg-accent px-6 py-2.5 font-heading font-bold uppercase text-navytext"
-      >
-        Go to Test Arena
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-canvas px-5 text-center">
+      <span className="grid h-16 w-16 place-items-center rounded-hero bg-tint-violet">
+        <Compass size={30} className="text-primary" />
+      </span>
+      <div>
+        <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Page not found</h1>
+        <p className="mx-auto mt-2 max-w-xs font-body text-sm leading-relaxed text-muted">
+          The page you're looking for doesn't exist or may have moved.
+        </p>
+      </div>
+      <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-3 text-sm">
+        <Home size={16} /> Go to Home
       </button>
     </div>
   )

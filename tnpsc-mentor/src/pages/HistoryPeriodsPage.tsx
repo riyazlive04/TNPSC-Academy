@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Landmark, Castle, Flag, ChevronRight, Loader2 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import IconTile, { type Tint } from '../components/UI/IconTile'
+import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
@@ -15,11 +17,11 @@ const PERIODS: {
   titleKey: StringKey
   subKey: StringKey
   icon: React.ReactNode
-  tile: string
+  tint: Tint
 }[] = [
-  { unit: 'ancient', titleKey: 'periodAncient', subKey: 'periodAncientSub', icon: <Landmark size={22} />, tile: 'bg-brand-soft text-brand' },
-  { unit: 'medieval', titleKey: 'periodMedieval', subKey: 'periodMedievalSub', icon: <Castle size={22} />, tile: 'bg-gold/15 text-gold' },
-  { unit: 'modern', titleKey: 'periodModern', subKey: 'periodModernSub', icon: <Flag size={22} />, tile: 'bg-accentwarmsoft text-accentwarm' },
+  { unit: 'ancient', titleKey: 'periodAncient', subKey: 'periodAncientSub', icon: <Landmark size={19} />, tint: 'violet' },
+  { unit: 'medieval', titleKey: 'periodMedieval', subKey: 'periodMedievalSub', icon: <Castle size={19} />, tint: 'blue' },
+  { unit: 'modern', titleKey: 'periodModern', subKey: 'periodModernSub', icon: <Flag size={19} />, tint: 'coral' },
 ]
 
 /**
@@ -56,51 +58,46 @@ export default function HistoryPeriodsPage() {
 
   return (
     <PickerPage badge={t('historyPeriodBadge')}>
-      <div className="mx-auto max-w-xl">
-        <h2 className="mb-1 text-center font-heading text-lg font-semibold tracking-tight text-ink">
+      <div className="mb-5">
+        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
           {t('historyPickPeriod')}
         </h2>
-        <p className="mb-6 text-center font-body text-sm text-ink2">{t('historyPickPeriodSub')}</p>
-
-        {counts === null ? (
-          <div className="flex justify-center py-10">
-            <Loader2 size={28} className="animate-spin text-brand" />
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {PERIODS.map(({ unit, titleKey, subKey, icon, tile }) => {
-              const n = counts[unit] ?? 0
-              const title = t(titleKey)
-              return (
-                <button
-                  key={unit}
-                  disabled={n === 0}
-                  onClick={() => begin(unit, title)}
-                  className="card interactive group flex w-full items-center gap-4 p-4 text-left disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <span className={`grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl ${tile}`}>
-                    {icon}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="tamil block font-heading text-[15px] font-semibold leading-tight text-ink">
-                      {title}
-                    </span>
-                    <span className="tamil mt-0.5 block truncate font-body text-xs text-ink2">
-                      {t(subKey)}
-                    </span>
-                  </span>
-                  <span className="flex flex-shrink-0 items-center gap-2">
-                    <span className="font-heading text-sm font-semibold text-brand">
-                      {n} <span className="font-body text-xs font-normal text-ink2">{t('questionsCount')}</span>
-                    </span>
-                    <ChevronRight size={18} className="text-ink2/30 transition group-hover:text-brand" />
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        )}
+        <p className="tamil mt-1 font-body text-[15px] text-muted">{t('historyPickPeriodSub')}</p>
       </div>
+
+      {counts === null ? (
+        <div className="flex justify-center py-10">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      ) : (
+        <List>
+          {PERIODS.map(({ unit, titleKey, subKey, icon, tint }) => {
+            const n = counts[unit] ?? 0
+            const title = t(titleKey)
+            return (
+              <ListRow
+                key={unit}
+                disabled={n === 0}
+                onClick={() => begin(unit, title)}
+                leading={<IconTile tint={tint}>{icon}</IconTile>}
+                title={title}
+                subtitle={t(subKey)}
+                trailing={
+                  <span className="flex flex-shrink-0 items-center gap-2">
+                    <span className="font-heading text-sm font-semibold text-primary">
+                      {n}{' '}
+                      <span className="font-body text-xs font-normal text-muted">
+                        {t('questionsCount')}
+                      </span>
+                    </span>
+                    <ChevronRight size={18} className="text-muted/40" />
+                  </span>
+                }
+              />
+            )
+          })}
+        </List>
+      )}
     </PickerPage>
   )
 }

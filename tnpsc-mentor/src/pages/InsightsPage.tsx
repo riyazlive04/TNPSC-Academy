@@ -15,7 +15,6 @@ import {
   Users,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
 import ProgressBar from '../components/UI/ProgressBar'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
 import { fetchPercentile } from '../lib/habit'
@@ -25,8 +24,9 @@ import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
 
-// Accuracy → semantic colour (green / amber / coral).
-const accColor = (a: number) => (a >= 75 ? '#16A34A' : a >= 50 ? '#B7791F' : '#E5484D')
+// Accuracy → semantic colour (token-backed: correct / gold / wrong).
+const accColor = (a: number) =>
+  a >= 75 ? 'rgb(var(--c-mint))' : a >= 50 ? 'rgb(var(--c-gold))' : 'rgb(var(--c-coral))'
 // Accuracy → soft chip classes. Untested (0 attempted) reads neutral, not red.
 const accChip = (a: number, attempted: number) =>
   attempted === 0
@@ -102,14 +102,16 @@ export default function InsightsPage() {
       <div className="mx-auto max-w-4xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
-        <div className="mb-8 text-center">
-          <YellowBadge>{t('insightsTitle')}</YellowBadge>
-        </div>
+        <header className="mb-7 mt-4">
+          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+            {t('insightsTitle')}
+          </h1>
+        </header>
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-24">
@@ -171,7 +173,7 @@ export default function InsightsPage() {
 
             {/* ── Performance trend ── */}
             {data.trend.length >= 2 && (
-              <section className="card p-5">
+              <section className="rounded-card border border-line bg-card p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="font-heading text-base font-semibold tracking-tight text-ink">
                     {t('performanceTrend')}
@@ -186,7 +188,7 @@ export default function InsightsPage() {
 
             {/* ── Syllabus coverage ── */}
             {syllabusSubjects.length > 0 && (
-              <section className="card p-5">
+              <section className="rounded-card border border-line bg-card p-5">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="tamil font-heading text-base font-semibold tracking-tight text-ink">
                     {t('syllabusCoverage')}
@@ -217,7 +219,7 @@ export default function InsightsPage() {
 
             {/* ── Strengths ── */}
             {strong.length > 0 && (
-              <section className="card p-5">
+              <section className="rounded-card border border-line bg-card p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-heading text-base font-semibold tracking-tight text-ink">
                   <TrendingUp size={18} className="text-mint" /> {t('strengths')}
                 </h3>
@@ -248,7 +250,7 @@ export default function InsightsPage() {
                   {weak.map((w) => {
                     const asset = assetsFor(w.key)
                     return (
-                      <div key={w.key} className="card flex flex-col p-4">
+                      <div key={w.key} className="rounded-card border border-line bg-card flex flex-col p-4">
                         <div className="mb-2 flex items-center justify-between gap-3">
                           <span className="tamil min-w-0 break-words font-heading text-sm font-bold text-ink">
                             {subjectName(w.key, lang)}
@@ -257,7 +259,7 @@ export default function InsightsPage() {
                             {w.accuracy}%
                           </span>
                         </div>
-                        <ProgressBar percent={w.accuracy} color="#E5484D" height={6} />
+                        <ProgressBar percent={w.accuracy} color="rgb(var(--c-coral))" height={6} />
                         <p className="tamil mt-3 font-body text-xs leading-relaxed text-ink2">
                           <span className="font-bold text-brand">{t('studyTip')}: </span>
                           {lang === 'ta' ? asset.tipTa : asset.tip}
@@ -286,7 +288,7 @@ export default function InsightsPage() {
 
             {/* ── By subject ── */}
             {data.bySubject.length > 0 && (
-              <section className="card p-5">
+              <section className="rounded-card border border-line bg-card p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                   <h3 className="tamil font-heading text-base font-semibold tracking-tight text-ink">
                     {t('bySubject')}
@@ -511,7 +513,7 @@ function Paginator({
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="card p-4 text-center">
+    <div className="rounded-card border border-line bg-card p-4 text-center">
       <div className="mx-auto mb-1.5 grid h-9 w-9 place-items-center rounded-lg bg-brand-soft text-brand">
         {icon}
       </div>

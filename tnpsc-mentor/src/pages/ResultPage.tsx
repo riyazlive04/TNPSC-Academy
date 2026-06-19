@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useReducedMotion } from 'motion/react'
 import {
   BookOpen,
   CheckCircle2,
   Crown,
   FileDown,
+  GraduationCap,
   Home,
   Loader2,
   Lock,
   RefreshCw,
-  Target,
-  Timer as TimerIcon,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import RewardOverlay, { type DailyReward } from '../components/RewardOverlay'
 import ResultCard from '../components/Quiz/ResultCard'
+import CircularProgress from '../components/UI/CircularProgress'
+import SectionHeader from '../components/UI/SectionHeader'
 import { formatTime } from '../components/UI/Timer'
 import { describeConfig } from '../lib/fetchQuestions'
 import { addBookmark, fetchBookmarkIds, removeBookmark } from '../lib/bookmarks'
@@ -27,6 +29,7 @@ import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
 import { generateExplanationPdf } from '../lib/explanationPdf'
 import { exitFullscreen } from '../lib/proctor'
+import { formatDuration, msUntil } from '../lib/revisionTime'
 import { useAuth } from '../hooks/useAuth'
 import { useProgressStore } from '../store/progressStore'
 import { usePremiumStore } from '../store/premiumStore'
@@ -42,14 +45,37 @@ function classifyAnswer(answer?: TestAnswer): 'correct' | 'wrong' | 'skipped' {
   return answer.is_correct ? 'correct' : 'wrong'
 }
 
-export default function ResultPage() {
+/** Animate a number from 0 → target (ease-out cubic) for the score count-up.
+ * Snaps straight to the value under prefers-reduced-motion. */
+function useCountUp(target: number, ms = 900): number {
+  const reduce = useReducedMotion()
+  const [n, setN] = useState(reduce ? target : 0)
+  useEffect(() => {
+    if (reduce) {
+      setN(target)
+      return
+    }
+    let raf = 0
+    const start = performance.now()
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / ms)
+      setN(Math.round(target * (1 - Math.pow(1 - p, 3))))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, ms, reduce])
+  return n
+}
+
+export default function ResultPage({ previewPayload }: { previewPayload?: ResultPayload } = {}) {
   const navigate = useNavigate()
   const location = useLocation()
   const { t, lang } = useT()
   const { user, profile } = useAuth()
   const claim = useProgressStore((s) => s.claim)
   const claimDaily = useProgressStore((s) => s.claimDaily)
-  const payload = location.state as ResultPayload | null
+  const payload = previewPayload ?? (location.state as ResultPayload | null)
 
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())
@@ -145,6 +171,11 @@ export default function ResultPage() {
     }
   }, [payload, user])
 
+  // Score count-up — driven from the (possibly null) payload so the hooks run
+  // unconditionally, before the guard below.
+  const animCorrect = useCountUp(payload?.correct ?? 0)
+  const animPct = useCountUp(payload?.scorePercentage ?? 0)
+
   if (!payload) return null
 
   const {
@@ -159,7 +190,7 @@ export default function ResultPage() {
     timeTakenSeconds,
   } = payload
 
-  const label = describeConfig(config)
+  const label = describeConfig(config, lang)
   const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
   const attendancePct = totalQuestions > 0 ? Math.round((attempted / totalQuestions) * 100) : 0
 
@@ -219,8 +250,8 @@ export default function ResultPage() {
       return classifyAnswer(answers[q.id]) === reviewFilter
     })
 
-  const scoreColor =
-    scorePercentage >= 80 ? '#16A34A' : scorePercentage >= 50 ? '#B7791F' : '#E5484D'
+  const verdictKey =
+    scorePercentage >= 80 ? 'verdictGreat' : scorePercentage >= 50 ? 'verdictGood' : 'verdictKeepGoing'
 
   const handleRetry = () => {
     navigate('/quiz', { state: config, replace: true })
@@ -247,215 +278,255 @@ export default function ResultPage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-2xl px-4 py-6">
-        {/* Score hero */}
-        <div className="card mb-5 p-6 text-center sm:p-8">
-          <p className="font-heading text-xs font-semibold uppercase tracking-[0.14em] text-ink2">
-            {t('testCompleteLabel')}
-          </p>
-
-          <div className="mt-3 font-heading text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
-            {correct}
-            <span className="text-3xl font-medium text-ink2/40"> / {totalQuestions}</span>
-          </div>
-          <p className="tamil mt-1 font-body text-sm text-ink2">{label}</p>
-
-          <div className="mx-auto mt-5 max-w-[260px]">
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${scorePercentage}%`, backgroundColor: scoreColor }}
-              />
-            </div>
-            <div className="mt-2 font-heading text-sm font-semibold" style={{ color: scoreColor }}>
-              {scorePercentage}%
-            </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            <Stat icon={<Target size={16} />} label={t('accuracy')} value={`${accuracy}%`} />
-            <Stat
-              icon={<CheckCircle2 size={16} />}
-              label={t('attended')}
-              value={`${attempted}/${totalQuestions}`}
-            />
-            <Stat
-              icon={<TimerIcon size={16} />}
-              label={t('timeTaken')}
-              value={formatTime(timeTakenSeconds)}
-            />
-          </div>
-        </div>
-
-        {/* Explanation unlock status - explanations are shown inline in the
-            review below; there is no downloadable document. */}
-        <div className="card mb-5 p-5">
-          {pdfUnlocked ? (
-            <div className="flex items-center justify-center gap-2 text-center">
-              <BookOpen size={18} className="text-brand" />
-              <p className="font-body text-sm text-ink2">
-                {t('youAttended')} {attendancePct}% - {t('explanationsUnlockedMsg')}
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-coralsoft">
-                <Lock size={24} className="text-coral" />
-              </div>
-              <p className="font-body text-sm font-medium text-coral">
-                {t('unlockExplanationsMsg')} {t('youAttended')} {attendancePct}%.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Net marks (mock tests with negative marking) */}
-        {netMarks !== null && (
-          <div className="mb-5 rounded-2xl bg-brand-soft p-4 text-center">
-            <span className="font-body text-sm text-ink2">
-              {t('negMarking')} ({negMark}/wrong):{' '}
-            </span>
-            <span className="font-heading text-xl font-extrabold text-brand">
-              {netMarks} {t('of')} {totalQuestions}
-            </span>
-          </div>
-        )}
-
-        {/* Focus areas from this test + learn links */}
-        {focus.length > 0 && (
-          <section className="mb-6">
-            <h3 className="tamil mb-1 font-heading text-lg font-extrabold tracking-tight text-ink">
-              {t('focusAreas')}
-            </h3>
-            <p className="tamil mb-3 font-body text-sm text-ink2">{t('focusHint')}</p>
-            <div className="flex flex-col gap-2.5">
-              {focus.map((f) => {
-                const asset = assetsFor(f.key)
-                return (
-                  <div key={f.key} className="rounded-2xl border border-line bg-card p-3.5 shadow-card">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="tamil font-heading text-sm font-bold text-navytext">
-                        {subjectName(f.key, lang)}
-                      </span>
-                      <span className="font-heading text-sm font-bold text-warn">
-                        {f.accuracy}% ({f.correct}/{f.attempted})
-                      </span>
-                    </div>
-                    <p className="tamil mt-1.5 font-body text-xs leading-relaxed text-navytext/70">
-                      {lang === 'ta' ? asset.tipTa : asset.tip}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {asset.links.slice(0, 2).map((l) => (
-                        <a
-                          key={l.url}
-                          href={l.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="rounded-full bg-primary/10 px-3 py-1 font-heading text-[11px] font-semibold text-primary transition hover:bg-primary/20"
-                        >
-                          {t('learnThis')}: {l.label} ↗
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-            <button onClick={() => navigate('/revision')} className="btn-soft mt-3 w-full px-5 py-3 text-sm">
-              {t('practiceMistakes')} →
-            </button>
-          </section>
-        )}
-
-        {/* Per-question breakdown */}
-        <h3 className="mb-3 font-heading text-lg font-extrabold tracking-tight text-ink">
-          {t('questionBreakdown')}
-        </h3>
-
-        {/* Full explanation PDF — a Premium perk; non-premium users get an upgrade
-            nudge, premium users get it once every question was attempted. */}
-        {!premiumLoaded ? (
-          <div className="mb-3 flex items-center justify-center rounded-xl border border-line bg-tint px-4 py-2.5">
-            <Loader2 size={14} className="animate-spin text-ink2" />
-          </div>
-        ) : !premium ? (
-          <button
-            onClick={promptUpgrade}
-            className="btn-brand press mb-3 flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
-          >
-            <Crown size={16} /> {t('pdfPremiumOnly')}
-          </button>
-        ) : fullyAttended ? (
-          <button
-            onClick={downloadExplanationPdf}
-            disabled={downloadingPdf}
-            className="btn-soft mb-3 w-full px-5 py-3 text-sm disabled:opacity-60"
-          >
-            {downloadingPdf ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <FileDown size={16} />
-            )}
-            {downloadingPdf ? t('preparingPdf') : t('downloadExplanations')}
-          </button>
-        ) : (
-          <div className="mb-3 flex items-center gap-2 rounded-xl border border-line bg-tint px-4 py-2.5 font-body text-xs text-ink2">
-            <FileDown size={14} className="flex-shrink-0 text-ink2" />
-            <span className="tamil">{t('pdfWhenComplete')}</span>
-          </div>
-        )}
-
-        {/* Review filter - attended questions only (correct / wrong / flagged) */}
-        <div className="mb-3 flex flex-wrap gap-2">
-          {(
-            [
-              ['all', t('filterAll'), attempted],
-              ['wrong', t('filterWrong'), wrong],
-              ['correct', t('filterCorrect'), correct],
-              ['flagged', t('filterFlagged'), flaggedCount],
-            ] as [ReviewFilter, string, number][]
-          ).map(([key, lbl, count]) => (
-            <button
-              key={key}
-              onClick={() => setReviewFilter(key)}
-              className={[
-                'rounded-full px-3.5 py-1.5 font-heading text-xs font-semibold transition',
-                reviewFilter === key
-                  ? 'bg-brand-gradient text-white'
-                  : 'border border-line bg-card text-ink2 hover:border-brand-ring',
-              ].join(' ')}
+      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
+        {/* Score moment — one of the three gradient beats (design-system.md).
+            The single elevated element: circular ring + score count-up + verdict,
+            with a restrained fade/draw celebration (no confetti). */}
+        <section className="hero-panel relative overflow-hidden p-6 animate-fadeIn sm:p-8">
+          <div
+            className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+            style={{ backgroundSize: '18px 18px' }}
+          />
+          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:gap-8 sm:text-left">
+            <CircularProgress
+              value={scorePercentage}
+              size={140}
+              stroke={11}
+              trackClassName="text-white/20"
+              progressClassName="text-white"
             >
-              {lbl} <span className="opacity-70">({count})</span>
-            </button>
-          ))}
+              <div className="flex flex-col items-center">
+                <span className="font-display text-3xl font-bold leading-none text-white">{animPct}%</span>
+                <span className="mt-1 font-body text-[11px] uppercase tracking-wide text-white/70">
+                  {t('scoreLabel')}
+                </span>
+              </div>
+            </CircularProgress>
+            <div className="min-w-0 flex-1">
+              <p className="font-body text-[13px] font-medium uppercase tracking-[0.14em] text-white/70">
+                {t('testCompleteLabel')}
+              </p>
+              <div className="mt-2 font-display text-[32px] font-bold leading-none tracking-tight text-white sm:text-4xl">
+                {animCorrect}
+                <span className="text-white/50"> / {totalQuestions}</span>
+              </div>
+              <p className="tamil mt-2 font-display text-base font-semibold text-white/90">
+                {t(verdictKey)}
+              </p>
+              <p className="tamil mt-1 truncate font-body text-sm text-white/60">{label}</p>
+            </div>
+          </div>
+          {/* Stat strip on the gradient, separated by translucent hairlines. */}
+          <div className="relative mt-6 flex items-stretch border-t border-white/15 pt-5">
+            <HeroStat label={t('accuracy')} value={`${accuracy}%`} />
+            <HeroStat label={t('attended')} value={`${attempted}/${totalQuestions}`} divider />
+            <HeroStat label={t('timeTaken')} value={formatTime(timeTakenSeconds)} divider />
+          </div>
+        </section>
+
+        {/* Topic-revision outcome: a low score was saved to study & retry, or a
+            re-test passed and cleared the topic. */}
+        {payload.revision?.enqueued && (
+          <div className="mt-6 flex items-start gap-3 rounded-card border border-gold/40 bg-gold/10 p-4">
+            <GraduationCap size={20} className="mt-0.5 shrink-0 text-gold" />
+            <div className="min-w-0">
+              <p className="tamil font-heading text-sm font-bold text-ink">{t('revSavedTitle')}</p>
+              <p className="tamil mt-1 font-body text-sm text-ink2">
+                {t('revSavedBody')}
+                {payload.revision.available_at
+                  ? ` (~${formatDuration(msUntil(payload.revision.available_at))})`
+                  : ''}{' '}
+                — {t('revSavedSleep')}
+              </p>
+              <button onClick={() => navigate('/revision')} className="btn-ghost mt-2.5 px-4 py-2 text-sm">
+                {t('revGoToRevision')}
+              </button>
+            </div>
+          </div>
+        )}
+        {payload.revision?.cleared && (
+          <div className="mt-6 flex items-start gap-3 rounded-card border border-mint/40 bg-mint/10 p-4">
+            <CheckCircle2 size={20} className="mt-0.5 shrink-0 text-mint" />
+            <div className="min-w-0">
+              <p className="tamil font-heading text-sm font-bold text-ink">{t('revClearedNoticeTitle')}</p>
+              <p className="tamil mt-1 font-body text-sm text-ink2">{t('revClearedNoticeBody')}</p>
+              <button onClick={() => navigate('/revision')} className="btn-ghost mt-2.5 px-4 py-2 text-sm">
+                {t('revGoToRevision')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Body — two intentional columns on desktop: summary | review. */}
+        <div className="mt-8 lg:grid lg:grid-cols-[1fr_1.2fr] lg:gap-8 lg:items-start">
+          {/* LEFT — summary */}
+          <div className="space-y-6">
+            {/* Explanation unlock status — inline, no card */}
+            <div className="flex items-start gap-2.5">
+              {pdfUnlocked ? (
+                <>
+                  <BookOpen size={18} className="mt-0.5 flex-shrink-0 text-primary" />
+                  <p className="font-body text-sm text-muted">
+                    {t('youAttended')} {attendancePct}% — {t('explanationsUnlockedMsg')}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Lock size={18} className="mt-0.5 flex-shrink-0 text-accent" />
+                  <p className="font-body text-sm font-medium text-accent">
+                    {t('unlockExplanationsMsg')} {t('youAttended')} {attendancePct}%.
+                  </p>
+                </>
+              )}
+            </div>
+
+            {/* Net marks (mock tests with negative marking) */}
+            {netMarks !== null && (
+              <div className="flex items-center justify-between gap-3 border-y border-line py-3">
+                <span className="tamil font-body text-sm text-muted">
+                  {t('negMarking')} ({negMark}/wrong)
+                </span>
+                <span className="font-display text-lg font-bold text-primary">
+                  {netMarks} <span className="font-body font-normal text-muted">/ {totalQuestions}</span>
+                </span>
+              </div>
+            )}
+
+            {/* Focus areas — a flat hairline list, not cards */}
+            {focus.length > 0 && (
+              <section>
+                <SectionHeader title={t('focusAreas')} />
+                <p className="tamil mb-1 mt-1 font-body text-[13px] text-muted">{t('focusHint')}</p>
+                <div className="divide-y divide-line">
+                  {focus.map((f) => {
+                    const asset = assetsFor(f.key)
+                    return (
+                      <div key={f.key} className="py-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="tamil font-display text-[15px] font-semibold text-ink">
+                            {subjectName(f.key, lang)}
+                          </span>
+                          <span className="font-display text-sm font-bold text-accent">
+                            {f.accuracy}%{' '}
+                            <span className="font-body font-normal text-muted">
+                              ({f.correct}/{f.attempted})
+                            </span>
+                          </span>
+                        </div>
+                        <p className="tamil mt-1.5 font-body text-[13px] leading-relaxed text-muted">
+                          {lang === 'ta' ? asset.tipTa : asset.tip}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                          {asset.links.slice(0, 2).map((l) => (
+                            <a
+                              key={l.url}
+                              href={l.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-body text-[13px] font-medium text-accent transition-opacity hover:opacity-80"
+                            >
+                              {t('learnThis')}: {l.label} ↗
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                <button onClick={() => navigate('/revision')} className="btn-soft mt-4 w-full px-5 py-3 text-sm">
+                  {t('practiceMistakes')} →
+                </button>
+              </section>
+            )}
+          </div>
+
+          {/* RIGHT — per-question review */}
+          <div className="mt-8 lg:mt-0">
+            <SectionHeader title={t('questionBreakdown')} />
+
+            {/* Full explanation PDF — a Premium perk; non-premium users get an
+                upgrade nudge, premium users get it once every question was attempted. */}
+            <div className="mt-3">
+              {!premiumLoaded ? (
+                <div className="flex items-center justify-center rounded-field border border-line bg-card px-4 py-2.5">
+                  <Loader2 size={14} className="animate-spin text-muted" />
+                </div>
+              ) : !premium ? (
+                <button
+                  onClick={promptUpgrade}
+                  className="btn-brand press flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
+                >
+                  <Crown size={16} /> {t('pdfPremiumOnly')}
+                </button>
+              ) : fullyAttended ? (
+                <button
+                  onClick={downloadExplanationPdf}
+                  disabled={downloadingPdf}
+                  className="btn-soft w-full px-5 py-3 text-sm disabled:opacity-60"
+                >
+                  {downloadingPdf ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
+                  {downloadingPdf ? t('preparingPdf') : t('downloadExplanations')}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 rounded-field border border-line bg-card px-4 py-2.5 font-body text-xs text-muted">
+                  <FileDown size={14} className="flex-shrink-0 text-muted" />
+                  <span className="tamil">{t('pdfWhenComplete')}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Review filter — attended questions only (correct / wrong / flagged) */}
+            <div className="mb-3 mt-3 flex flex-wrap gap-2">
+              {(
+                [
+                  ['all', t('filterAll'), attempted],
+                  ['wrong', t('filterWrong'), wrong],
+                  ['correct', t('filterCorrect'), correct],
+                  ['flagged', t('filterFlagged'), flaggedCount],
+                ] as [ReviewFilter, string, number][]
+              ).map(([key, lbl, count]) => (
+                <button
+                  key={key}
+                  onClick={() => setReviewFilter(key)}
+                  className={[
+                    'rounded-pill px-3.5 py-1.5 font-heading text-xs font-semibold transition-colors',
+                    reviewFilter === key
+                      ? 'bg-brand-gradient text-white'
+                      : 'border border-line bg-card text-muted hover:border-primary/40 hover:text-ink',
+                  ].join(' ')}
+                >
+                  {lbl} <span className="opacity-70">({count})</span>
+                </button>
+              ))}
+            </div>
+
+            {/* The list scrolls within its own bounded area so the score and
+                filters stay in view. overscroll-contain stops the scroll from
+                chaining to the page (also avoids iOS Safari rubber-banding). */}
+            <div className="flex max-h-[65vh] flex-col gap-3 overflow-y-auto overscroll-contain pr-1 lg:max-h-[74vh]">
+              {reviewItems.length === 0 ? (
+                <p className="rounded-card border border-line bg-card px-4 py-6 text-center font-body text-sm text-muted">
+                  {t('noFilterQuestions')}
+                </p>
+              ) : (
+                reviewItems.map(({ q, index }) => (
+                  <ResultCard
+                    key={q.id}
+                    question={q}
+                    index={index}
+                    answer={answers[q.id]}
+                    showExplanation={pdfUnlocked}
+                    bookmarked={bookmarkIds.has(q.id)}
+                    onToggleBookmark={user ? () => toggleBookmark(q.id) : undefined}
+                  />
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* The question list scrolls within its own bounded area so the score,
-            filters and action buttons stay in view instead of the whole page
-            growing tall. overscroll-contain stops the scroll from chaining to
-            the page once the list hits its top/bottom. */}
-        <div className="mb-8 flex max-h-[65vh] flex-col gap-3 overflow-y-auto overscroll-contain pr-1">
-          {reviewItems.length === 0 ? (
-            <p className="rounded-2xl border border-line bg-card px-4 py-6 text-center font-body text-sm text-ink2">
-              {t('noFilterQuestions')}
-            </p>
-          ) : (
-            reviewItems.map(({ q, index }) => (
-              <ResultCard
-                key={q.id}
-                question={q}
-                index={index}
-                answer={answers[q.id]}
-                showExplanation={pdfUnlocked}
-                bookmarked={bookmarkIds.has(q.id)}
-                onToggleBookmark={user ? () => toggleBookmark(q.id) : undefined}
-              />
-            ))
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        {/* Actions — the single primary pill + a quiet retry, full width below. */}
+        <div className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row">
           <button onClick={handleRetry} className="btn-ghost flex-1 px-6 py-3.5">
             <RefreshCw size={18} /> {t('retryTest')}
           </button>
@@ -477,22 +548,13 @@ export default function ResultPage() {
   )
 }
 
-function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: string
-}) {
+/** A single metric in the score hero's stat strip — white-on-gradient, with a
+ * translucent hairline divider before all but the first. */
+function HeroStat({ label, value, divider = false }: { label: string; value: string; divider?: boolean }) {
   return (
-    <div className="rounded-xl border border-line p-3">
-      <div className="mx-auto mb-1.5 grid h-8 w-8 place-items-center rounded-lg bg-tint text-ink2">
-        {icon}
-      </div>
-      <div className="font-heading text-base font-semibold text-ink">{value}</div>
-      <div className="font-body text-[11px] uppercase tracking-wide text-ink2">{label}</div>
+    <div className={`flex-1 ${divider ? 'border-l border-white/15 pl-4' : 'pr-4'}`}>
+      <div className="font-display text-xl font-bold leading-none text-white">{value}</div>
+      <div className="tamil mt-2 font-body text-[12px] uppercase tracking-wide text-white/65">{label}</div>
     </div>
   )
 }

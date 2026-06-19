@@ -18,11 +18,15 @@ interface QuestionCardProps {
   /** Overrides the UI language for the question CONTENT only (in-test bilingual
    *  toggle). Falls back to the user's interface language when omitted. */
   displayLang?: DisplayLang
+  /** Quiz focus mode: render on the bare surface (no card / shadow), with larger
+   *  type and lighter chrome. Off (default) keeps the boxed reveal/admin layout. */
+  bare?: boolean
 }
 
 /**
- * The white question card shown during a quiz. Question text in dark navy,
- * four option pills below.
+ * The question + four options. In `bare` (quiz focus) mode it sits directly on
+ * the surface for a zero-chrome, type-driven feel; otherwise it's the boxed card
+ * used in review/admin grading.
  */
 export default function QuestionCard({
   question,
@@ -33,52 +37,72 @@ export default function QuestionCard({
   reveal = false,
   disabled = false,
   displayLang,
+  bare = false,
 }: QuestionCardProps) {
   const { t, lang: uiLang } = useT()
   const lang = displayLang ?? uiLang
+  const hasBadges =
+    Boolean(question.year) ||
+    Boolean(question.topic) ||
+    (question.category === 'current_affairs' && Boolean(question.ca_month)) ||
+    Boolean(question.difficulty)
   return (
-    <div className="animate-fadeIn rounded-hero border border-line bg-card p-5 shadow-soft sm:p-7">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="tamil font-heading text-sm font-semibold text-ink2">
-          {t('question')} {index + 1} {t('of')} {total}
-        </span>
-        <div className="flex min-w-0 items-center justify-end gap-2">
-          {/* PYQ year badge - every previous-year question shows the exam year
-              it was asked in (e.g. "2024"). */}
-          {question.year && (
-            <span className="rounded-full bg-secondary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-secondary">
-              {question.year}
+    <div
+      className={
+        bare
+          ? 'animate-fadeIn'
+          : 'animate-fadeIn rounded-hero border border-line bg-card p-5 shadow-soft sm:p-7'
+      }
+    >
+      {/* Header: in bare mode the top bar already shows "Q n / total", so we drop
+          the duplicate counter and keep just a quiet badges row. */}
+      {(!bare || hasBadges) && (
+        <div className={`flex items-center gap-2 ${bare ? 'mb-4 flex-wrap' : 'mb-3 justify-between'}`}>
+          {!bare && (
+            <span className="tamil font-heading text-sm font-semibold text-ink2">
+              {t('question')} {index + 1} {t('of')} {total}
             </span>
           )}
-          {/* Topic label - useful for PYQ, where every question carries its own
-              topic (e.g. "Ozone Depletion Cause"). */}
-          {question.topic && (
-            <span className="tamil max-w-[55vw] truncate rounded-full bg-brand-soft px-3 py-1 font-heading text-xs font-semibold text-brand sm:max-w-[16rem]">
-              {topicName(question.topic, lang)}
-            </span>
-          )}
-          {question.category === 'current_affairs' && question.ca_month && (
-            <span className="rounded-full bg-secondary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-secondary">
-              {question.ca_month}
-            </span>
-          )}
-          {question.difficulty && (
-            <span className="rounded-full bg-primary/10 px-3 py-1 font-heading text-xs font-semibold uppercase text-primary">
-              {question.difficulty}
-            </span>
-          )}
+          <div className={`flex min-w-0 items-center gap-2 ${bare ? 'flex-wrap' : 'justify-end'}`}>
+            {/* PYQ year badge - the exam year the question was asked in. */}
+            {question.year && (
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-primary">
+                {question.year}
+              </span>
+            )}
+            {/* Topic label - useful for PYQ (each question carries its topic). */}
+            {question.topic && (
+              <span className="tamil max-w-[55vw] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary sm:max-w-[16rem]">
+                {topicName(question.topic, lang)}
+              </span>
+            )}
+            {question.category === 'current_affairs' && question.ca_month && (
+              <span className="rounded-full bg-tint-blue px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-sky">
+                {question.ca_month}
+              </span>
+            )}
+            {question.difficulty && (
+              <span className="rounded-full bg-tint-coral px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-accent">
+                {question.difficulty}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <QuestionStem
         question={question}
         lang={lang}
-        textClassName="mb-3 font-display text-lg font-bold leading-relaxed text-ink sm:text-xl"
+        textClassName={
+          bare
+            ? 'mb-5 font-display text-lg font-bold leading-relaxed text-ink sm:text-xl'
+            : 'mb-3 font-display text-lg font-bold leading-relaxed text-ink sm:text-xl'
+        }
       />
 
       <QuestionFigures images={question.images} className="mb-5" />
 
-      <div className="flex flex-col gap-3">
+      <div className={`flex flex-col ${bare ? 'gap-2.5' : 'gap-3'}`}>
         {LETTERS.map((letter) => {
           const isCorrect = reveal && question.correct_answer === letter
           const isChosenWrong =

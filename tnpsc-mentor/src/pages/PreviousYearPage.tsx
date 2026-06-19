@@ -17,6 +17,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import IconTile from '../components/UI/IconTile'
+import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
 import { PYQ_SUBJECTS, subjectName } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
@@ -82,58 +84,55 @@ export default function PreviousYearPage() {
     startTest({
       category: 'pyq',
       subject: subj,
-      label: `PYQ · ${subjectName(subj, lang)}`,
+      labelParts: ['PYQ', { subject: subj }],
       availableCount: counts?.[subj],
     })
   }
 
   return (
     <PickerPage badge={t('pyqBadge')}>
-      <div className="mb-5 text-center">
-        <h2 className="font-heading text-xl font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
-        <p className="tamil mt-1 font-body text-sm text-ink2">{t('subjectStepHint')}</p>
+      <div className="mb-5">
+        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
+        <p className="tamil mt-1 font-body text-[15px] text-muted">{t('subjectStepHint')}</p>
       </div>
 
       {counts === null ? (
         <div className="flex justify-center py-16">
-          <Loader2 size={28} className="animate-spin text-brand" />
+          <Loader2 size={28} className="animate-spin text-primary" />
         </div>
       ) : (
-        // 10 subjects in two columns -> five rows of two (5-5).
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        // Subjects as a hairline-divided list with small tint tiles + chevron.
+        <List>
           {PYQ_SUBJECTS.map((s, i) => {
             const Icon = subjectIcon(s)
             const n = counts[s] ?? 0
             const isHistory = s === HISTORY_SUBJECT
             return (
-              <button
+              <ListRow
                 key={s}
                 onClick={() => begin(s)}
                 style={{ '--i': i } as React.CSSProperties}
-                className="stagger-item relative flex items-center gap-3 overflow-hidden rounded-2xl border border-line bg-card p-3 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-              >
-                <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand ring-1 ring-brand/10">
-                  <Icon size={20} strokeWidth={2} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="tamil block font-heading text-sm font-bold leading-snug text-ink">
-                    {subjectName(s, lang)}
-                  </span>
-                  <span className="mt-0.5 flex items-baseline gap-1">
-                    <span className="font-heading text-xs font-bold tabular-nums text-brand">
+                leading={
+                  <IconTile tint="violet">
+                    <Icon size={19} strokeWidth={2} />
+                  </IconTile>
+                }
+                title={subjectName(s, lang)}
+                subtitle={
+                  <span className="flex items-baseline gap-1">
+                    <span className="font-heading font-bold tabular-nums text-primary">
                       {n.toLocaleString()}
                     </span>
-                    <span className="font-body text-[11px] text-ink2">
+                    <span>
                       {t('questionsCount')}
                       {isHistory ? ` · ${t('byPeriod')}` : ''}
                     </span>
                   </span>
-                </span>
-                <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
-              </button>
+                }
+              />
             )
           })}
-        </div>
+        </List>
       )}
     </PickerPage>
   )

@@ -1,5 +1,8 @@
 import { api } from './api'
-import type { AnswerLetter, Question, QuizConfig } from '../types'
+import { translate } from './i18n'
+import { subjectName, topicName } from './constants'
+import type { Lang } from '../store/languageStore'
+import type { AnswerLetter, Question, QuizConfig, QuizLabelSeg } from '../types'
 
 // Fallback question count when a config doesn't specify one (e.g. a direct quiz
 // start that skips the setup screen). NOT an upper cap — practice quizzes may
@@ -70,8 +73,25 @@ export async function deleteAdminQuestion(id: string): Promise<void> {
   await api.adminDeleteQuestion(id)
 }
 
-/** Build a readable label from a config when none was supplied. */
-export function describeConfig(config: QuizConfig): string {
+/** Resolve one language-neutral label segment against a language. */
+function resolveSeg(seg: QuizLabelSeg, lang: Lang | null): string {
+  if (typeof seg === 'string') return seg
+  if ('t' in seg) return translate(seg.t, lang)
+  if ('subject' in seg) return subjectName(seg.subject, lang)
+  return topicName(seg.topic, lang)
+}
+
+/**
+ * Build a readable heading for a config. Pass `lang` to render it in the current
+ * language (reactive headings); omit it for a stable English string suitable for
+ * identity comparison. `labelParts` (language-neutral segments) win over a baked
+ * `label`, so the heading follows the language toggle instead of freezing the
+ * language that was active when the test was set up.
+ */
+export function describeConfig(config: QuizConfig, lang: Lang | null = null): string {
+  if (config.labelParts?.length) {
+    return config.labelParts.map((s) => resolveSeg(s, lang)).join(' · ')
+  }
   if (config.label) return config.label
   const parts: string[] = [config.category.toUpperCase()]
   if (config.group_type) parts.push(config.group_type)

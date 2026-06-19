@@ -439,7 +439,7 @@ export default function QuizPage() {
             split (Q-number left, controls right). */}
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 sm:justify-end">
           <span className="hidden min-w-0 flex-1 truncate font-body text-xs text-ink2 sm:order-1 sm:block">
-            {describeConfig(config)}
+            {describeConfig(config, lang)}
           </span>
           {/* These controls move into the sticky side panel on desktop (lg). */}
           <span className="font-heading text-lg font-extrabold text-ink sm:order-2 lg:hidden">
@@ -496,7 +496,7 @@ export default function QuizPage() {
                 <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}
               </span>
             )}
-            <div className="rounded-2xl border border-line bg-card px-3 py-2.5 text-center shadow-soft">
+            <div className="rounded-2xl border border-line bg-card px-3 py-2.5 text-center">
               <span className="block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
                 {t('question')}
               </span>
@@ -504,7 +504,7 @@ export default function QuizPage() {
                 {currentIndex + 1} <span className="text-ink2/50">/ {total}</span>
               </span>
             </div>
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-3 shadow-soft">
+            <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-3">
               <span className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
                 {t('timeLeft')}
               </span>
@@ -514,7 +514,7 @@ export default function QuizPage() {
               onClick={cycleQuizLang}
               title={t('viewLanguage')}
               aria-label={`${t('viewLanguage')} (${QUIZ_LANG_LABEL[quizLang]})`}
-              className="tamil press inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-brand-dark shadow-soft transition hover:bg-tint focus-ring"
+              className="tamil press inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-brand-dark transition hover:bg-tint focus-ring"
             >
               <Languages size={15} /> {QUIZ_LANG_LABEL[quizLang]}
             </button>
@@ -528,6 +528,7 @@ export default function QuizPage() {
           selected={selectedLetter}
           onSelect={handleSelect}
           displayLang={quizLang}
+          bare
         />
 
         {minWarning && !canAdvance && (
@@ -573,7 +574,7 @@ export default function QuizPage() {
             onClick={goPrev}
             disabled={currentIndex === 0}
             aria-label={t('prev')}
-            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink shadow-pill transition hover:border-brand-ring disabled:opacity-40 sm:px-4"
+            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-pill border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink2 transition-colors hover:border-primary/40 hover:text-ink disabled:opacity-40 sm:px-4"
           >
             <ChevronLeft size={18} className="flex-shrink-0" />
             <span className="hidden whitespace-nowrap sm:inline">{t('prev')}</span>
@@ -586,7 +587,7 @@ export default function QuizPage() {
                 onClick={() => setShowExitModal(true)}
                 aria-label={t('exitTest')}
                 title={t('exitTest')}
-                className="grid h-[42px] w-[42px] flex-shrink-0 place-items-center rounded-2xl border border-line bg-card text-ink2 shadow-pill transition hover:bg-coralsoft hover:text-coral"
+                className="grid h-[42px] w-[42px] flex-shrink-0 place-items-center rounded-pill border border-line bg-card text-ink2 transition-colors hover:bg-coralsoft hover:text-coral"
               >
                 <X size={18} />
               </button>
@@ -596,10 +597,10 @@ export default function QuizPage() {
               aria-pressed={isFlagged}
               aria-label={isFlagged ? t('unflagQuestion') : t('flagForReview')}
               className={[
-                'press inline-flex flex-shrink-0 items-center gap-1.5 rounded-2xl px-3 py-2.5 font-heading text-sm font-semibold transition sm:px-4',
+                'press inline-flex flex-shrink-0 items-center gap-1.5 rounded-pill px-3 py-2.5 font-heading text-sm font-semibold transition-colors sm:px-4',
                 isFlagged
-                  ? 'bg-coral text-white shadow-pill'
-                  : 'border border-line bg-card text-ink2 shadow-pill hover:text-coral',
+                  ? 'bg-accent text-white'
+                  : 'border border-line bg-card text-ink2 hover:border-accent/40 hover:text-accent',
               ].join(' ')}
             >
               <Flag size={16} className={`flex-shrink-0 ${isFlagged ? 'animate-popStar' : ''}`} />
@@ -611,17 +612,19 @@ export default function QuizPage() {
 
           {/* Next / Submit — warm rose CTA (per the quiz mockup), distinct from
               the violet progress/selection so the primary action always pops. */}
+          {/* The single filled primary pill — the only filled button on the
+              screen (design-system.md). Token gradient, not a hardcoded colour. */}
           {isLast ? (
             <button
               onClick={requestSubmit}
-              className="inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-pill bg-[#EC4D7E] px-4 py-2.5 font-heading text-sm font-semibold text-white shadow-[0_8px_22px_rgba(236,77,126,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95 sm:px-6"
+              className="inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-pill bg-brand-gradient px-5 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
             >
               {t('submitTest')}
             </button>
           ) : (
             <button
               onClick={goNext}
-              className="inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-pill bg-[#EC4D7E] px-4 py-2.5 font-heading text-sm font-semibold text-white shadow-[0_8px_22px_rgba(236,77,126,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:translate-y-0 active:brightness-95 sm:px-6"
+              className="inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-pill bg-brand-gradient px-5 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
             >
               {t('next')} <ChevronRight size={18} className="flex-shrink-0" />
             </button>

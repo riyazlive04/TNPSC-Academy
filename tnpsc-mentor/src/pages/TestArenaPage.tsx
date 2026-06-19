@@ -1,32 +1,35 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
+import { motion, useReducedMotion } from 'motion/react'
 import {
   BookOpen,
   Newspaper,
   Calculator,
   ShieldCheck,
-  TrendingUp,
   RefreshCw,
-  FileText,
   Flame,
-  CalendarClock,
-  Target,
   ChevronRight,
   Layers,
   Activity,
+  BarChart3,
+  ScrollText,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import ProgressBar from '../components/UI/ProgressBar'
+import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
+import { loadKurals, kuralOfDay, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
-import StreakCalendar from '../components/StreakCalendar'
+import IconTile, { type Tint } from '../components/UI/IconTile'
+import SectionHeader from '../components/UI/SectionHeader'
+import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { fetchHabit, type HabitState } from '../lib/habit'
-import { SHOW_STREAK, SHOW_GOALS } from '../lib/features'
+import { SHOW_STREAK } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { computeXp, levelInfo } from '../lib/game'
 import { unlockedBadgeIds, type GameStats } from '../lib/achievements'
 import { GROUP_SUBJECTS } from '../lib/constants'
 import { useProgressStore } from '../store/progressStore'
+import { tapScaleSubtle } from '../lib/motion'
 import type { GroupType } from '../types'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -35,60 +38,75 @@ interface ArenaCard {
   titleKey: StringKey
   subtitle: string
   icon: React.ReactNode
-  tile: string // icon-tile colour classes
+  tint: Tint
 }
 
-// Each category gets its own pastel tile (design-system.md §1) — soft tinted
-// square + the icon in the matching strong colour, so the grid reads as a set
-// of distinct destinations rather than a wall of violet.
+// Each category carries a tint for its in-row IconTile (design-system.md §1) —
+// a small tinted square, never a large category card. The first entry (Mock) is
+// promoted to the single gradient hero; the rest render as a hairline list.
 const CARDS: ArenaCard[] = [
   {
     to: '/mock',
     titleKey: 'mockTests',
     subtitle: 'Group exam · subject · timed',
     icon: <ShieldCheck size={20} />,
-    tile: 'bg-tint-coral text-accent',
+    tint: 'coral',
   },
   {
     to: '/test-arena/subjects',
     titleKey: 'subjectPracticeTitle',
     subtitle: 'Subject · topic · question type',
-    icon: <Layers size={20} />,
-    tile: 'bg-tint-violet text-primary',
+    icon: <Layers size={19} />,
+    tint: 'violet',
   },
   {
     to: '/test-arena/pyq',
     titleKey: 'pyqTitle',
     subtitle: 'Group 1',
-    icon: <BookOpen size={20} />,
-    tile: 'bg-tint-blue text-sky',
+    icon: <BookOpen size={19} />,
+    tint: 'blue',
   },
   {
     to: '/test-arena/current-affairs',
     titleKey: 'currentAffairsTitle',
     subtitle: 'Month & topic wise',
-    icon: <Newspaper size={20} />,
-    tile: 'bg-tint-green text-mint',
+    icon: <Newspaper size={19} />,
+    tint: 'green',
   },
   {
     to: '/test-arena/aptitude',
     titleKey: 'aptitudeTitle',
     subtitle: 'Numerics · Reasoning',
-    icon: <Calculator size={20} />,
-    tile: 'bg-tint-coral text-accent',
+    icon: <Calculator size={19} />,
+    tint: 'coral',
   },
 ]
 
-// The admin "Manage Question Bank" grid lists only the actual question-bank
-// categories - the Mock Test card (a student exam mode, not a bank) is excluded.
+// The admin "Manage Question Bank" list shows only the actual question-bank
+// categories - the Mock Test entry (a student exam mode, not a bank) is excluded.
 const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 
 export default function TestArenaPage() {
   const navigate = useNavigate()
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
-  const { t } = useT()
+  const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
+  const [thirukuralOpen, setThirukuralOpen] = useState(false)
+  const [dailyKural, setDailyKural] = useState<Kural | null>(null)
+
+  // Load the kural bank once and pick today's couplet for the header. The modal
+  // shares the same module-level cache, so opening it makes no extra request.
+  useEffect(() => {
+    if (isAdmin) return
+    let cancelled = false
+    loadKurals()
+      .then((all) => !cancelled && setDailyKural(kuralOfDay(all) ?? null))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [isAdmin])
 
   useEffect(() => {
     // Admins/superadmins don't use the aspirant gamification layer - skip the
@@ -111,12 +129,6 @@ export default function TestArenaPage() {
   }, [user, isAdmin, profile?.daily_goal, profile?.exam_date])
 
   const firstName = profile?.full_name?.split(' ')[0]
-  // Streak / daily-goal / exam-countdown surfaces are hidden for now (the habit
-  // data is still fetched so they light up instantly when re-enabled).
-  const showRail = SHOW_STREAK || SHOW_GOALS
-  const goalPct = habit
-    ? Math.min(100, (habit.questionsToday / Math.max(1, habit.dailyGoal)) * 100)
-    : 0
   const lvl = levelInfo(
     computeXp({
       totalCorrect: analytics?.overview.totalCorrect ?? 0,
@@ -160,156 +172,166 @@ export default function TestArenaPage() {
   }
 
   const [featured, ...restCards] = CARDS
+  const showStreak = SHOW_STREAK && (habit?.currentStreak ?? 0) > 0
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 lg:py-8">
-        {/* Greeting - compact royal-blue strip (no gamification) */}
-        <div className="hero-panel relative flex items-center justify-between gap-4 p-5 animate-slideDown lg:p-6">
-          <div
-            className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
-            style={{ backgroundSize: '18px 18px' }}
-          />
-          <div className="relative min-w-0">
-            <p className="font-body text-sm text-white/60">{t('welcomeBack')}</p>
-            <h1 className="truncate font-heading text-2xl font-semibold tracking-tight text-white">
+      <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
+        {/* Greeting — bare on the surface. Hierarchy from type + space, no box. */}
+        <header className="px-1">
+          <p className="font-body text-[13px] text-muted">{t('welcomeBack')}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink">
               {firstName || 'Aspirant'}
             </h1>
-            <p className="tamil mt-1 font-body text-sm text-white/70">{t('dashboardSub')}</p>
-          </div>
-        </div>
-
-        {/* Premium upsell - 3-month plan (₹1899 → ₹1399). Dismissible on the
-            dashboard; closing hides it for this view only — it returns on reload. */}
-        <PremiumCard dismissible />
-
-        {/* Progress rail - feature-flagged; rendered as a row when re-enabled */}
-        {showRail && habit && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {SHOW_STREAK && (
-                <StatTile
-                  icon={<Flame size={18} />}
-                  value={String(habit.currentStreak)}
-                  label={t('dayStreak')}
-                />
-              )}
-              {SHOW_GOALS &&
-                (habit.daysToExam != null ? (
-                  <StatTile
-                    icon={<CalendarClock size={18} />}
-                    value={String(Math.max(0, habit.daysToExam))}
-                    label={t('daysToExam')}
-                  />
-                ) : (
-                  <button
-                    onClick={() => navigate('/setup')}
-                    className="card interactive flex flex-col items-start gap-2 p-3.5 text-left"
-                  >
-                    <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-soft text-brand">
-                      <CalendarClock size={18} />
-                    </span>
-                    <span className="tamil font-heading text-xs font-semibold text-ink">
-                      {t('setExamDate')}
-                    </span>
-                  </button>
-                ))}
-              {SHOW_GOALS && (
-                <div className="card col-span-2 flex flex-col justify-center gap-2 p-3.5">
-                  <div className="flex items-center justify-between">
-                    <span className="tamil flex items-center gap-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
-                      <Target size={13} /> {t('dailyGoal')}
-                    </span>
-                    <span className="font-heading text-xs font-semibold text-ink">
-                      {habit.questionsToday}/{habit.dailyGoal}
-                    </span>
-                  </div>
-                  <ProgressBar
-                    percent={goalPct}
-                    color={habit.goalMetToday ? 'rgb(var(--c-mint))' : 'rgb(var(--c-brand))'}
-                    height={6}
-                  />
-                </div>
-              )}
-            </div>
-            {SHOW_STREAK && (
-              <StreakCalendar last30={habit.last30} currentStreak={habit.currentStreak} />
+            {showStreak && (
+              <span className="inline-flex items-center gap-1 font-display text-[15px] font-semibold text-accent">
+                <Flame size={15} /> {habit!.currentStreak}
+                <span className="tamil font-body text-[13px] font-normal text-muted">
+                  {t('dayStreak')}
+                </span>
+              </span>
             )}
           </div>
-        )}
-
-        {/* Practice categories - bento tiles */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-          {restCards.map((card, i) => (
+          {/* Kural of the day — the actual couplet, rotating daily. Tapping it
+              opens the box straight at this kural's full detail. */}
+          {dailyKural && (
             <button
-              key={card.to}
-              onClick={() => navigate(card.to)}
-              style={{ '--i': i } as React.CSSProperties}
-              className="card interactive stagger-item group flex min-h-[120px] flex-col justify-between gap-3 p-5 text-left"
+              onClick={() => setThirukuralOpen(true)}
+              className="focus-ring group mt-4 block w-full rounded-card border border-line bg-tint-violet/40 p-4 text-left transition-colors hover:bg-tint-violet/60"
             >
-              <span
-                className={`grid h-12 w-12 place-items-center rounded-tile transition-transform group-hover:scale-105 ${card.tile}`}
-              >
-                {card.icon}
+              <span className="flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+                <ScrollText size={13} />
+                <span className="tamil">{t('kuralOfTheDay')}</span>
+                <ChevronRight
+                  size={15}
+                  className="ml-auto text-primary/50 transition-transform group-hover:translate-x-0.5"
+                />
               </span>
-              <span className="min-w-0">
-                <span className="tamil block font-heading text-sm font-semibold leading-snug text-ink">
-                  {t(card.titleKey)}
-                </span>
-                <span className="mt-1 block font-body text-xs text-ink2">{card.subtitle}</span>
-              </span>
+              {lang !== 'en' && (
+                <p className="tamil mt-2 font-display text-[16px] font-semibold leading-relaxed text-ink">
+                  {dailyKural.line1_ta} {dailyKural.line2_ta}
+                </p>
+              )}
+              {lang !== 'ta' && (
+                <p
+                  className={`font-body text-[13px] leading-relaxed text-muted ${
+                    lang === 'en' ? 'mt-2 not-italic' : 'mt-1 italic'
+                  }`}
+                >
+                  {lang === 'en' ? dailyKural.translation_en : dailyKural.transliteration}
+                </p>
+              )}
             </button>
-          ))}
-        </div>
+          )}
+        </header>
 
-        {/* Keep going - study-loop quick links */}
-        <div>
-          <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
-            Keep going
-          </h2>
-          <div className="grid grid-cols-3 gap-3">
-            <QuickLink
-              icon={<RefreshCw size={18} />}
-              label={t('revision')}
-              onClick={() => navigate('/revision')}
-            />
-            <QuickLink
-              icon={<FileText size={18} />}
-              label={t('mockTests')}
-              onClick={() => navigate('/mock')}
-            />
-            <QuickLink
-              icon={<TrendingUp size={18} />}
-              label={t('insights')}
-              onClick={() => navigate('/insights')}
-            />
-          </div>
-        </div>
-
-        {/* Mock Tests - full-width gradient CTA at the bottom */}
-        <button
+        {/* The one gradient hero — the single elevated element on the screen. */}
+        <Hero
+          icon={featured.icon}
+          title={t(featured.titleKey)}
+          subtitle={featured.subtitle}
+          cta={t('start')}
           onClick={() => navigate(featured.to)}
-          className="hero-panel interactive group relative flex w-full items-center gap-4 p-6 text-left"
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
-            style={{ backgroundSize: '18px 18px' }}
-          />
-          <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
-            {featured.icon}
-          </span>
-          <span className="relative min-w-0 flex-1">
-            <span className="tamil block font-heading text-lg font-semibold tracking-tight text-white">
-              {t(featured.titleKey)}
-            </span>
-            <span className="block font-body text-sm text-white/70">{featured.subtitle}</span>
-          </span>
-          <span className="relative hidden flex-shrink-0 items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 font-heading text-sm font-semibold text-brand-dark transition-all group-hover:gap-2.5 sm:inline-flex">
-            {t('start')} <ChevronRight size={16} />
-          </span>
-        </button>
+        />
+
+        {/* Practice — subjects as a hairline-divided list, not a card grid. */}
+        <section className="space-y-2">
+          <SectionHeader title={t('practice')} className="px-1" />
+          <List>
+            {restCards.map((card, i) => (
+              <ListRow
+                key={card.to}
+                onClick={() => navigate(card.to)}
+                style={{ '--i': i } as React.CSSProperties}
+                leading={<IconTile tint={card.tint}>{card.icon}</IconTile>}
+                title={t(card.titleKey)}
+                subtitle={card.subtitle}
+              />
+            ))}
+          </List>
+        </section>
+
+        {/* Premium upsell — the one deliberately distinct surface (its own coral
+            identity), kept as a self-contained monetisation unit. */}
+        <PremiumCard dismissible />
+
+        {/* Keep going — study-loop quick links, also a list. */}
+        <section className="space-y-2">
+          <SectionHeader title={t('keepGoingShort')} className="px-1" />
+          <List>
+            <ListRow
+              onClick={() => navigate('/revision')}
+              leading={
+                <IconTile tint="violet">
+                  <RefreshCw size={19} />
+                </IconTile>
+              }
+              title={t('revision')}
+            />
+            <ListRow
+              onClick={() => navigate('/insights')}
+              leading={
+                <IconTile tint="blue">
+                  <BarChart3 size={19} />
+                </IconTile>
+              }
+              title={t('insights')}
+            />
+          </List>
+        </section>
       </div>
+
+      <ThirukuralModal
+        open={thirukuralOpen}
+        onClose={() => setThirukuralOpen(false)}
+        initialKuralNo={dailyKural?.kural_no}
+      />
     </AppLayout>
+  )
+}
+
+/** The single gradient hero — the only elevated/shadowed element on a screen
+ * (design-system.md elevation budget). Full-bleed brand gradient, dotted
+ * overlay, white "Start" pill. Tactile press via motion. */
+function Hero({
+  icon,
+  title,
+  subtitle,
+  cta,
+  onClick,
+}: {
+  icon: React.ReactNode
+  title: string
+  subtitle: string
+  cta: string
+  onClick: () => void
+}) {
+  const reduce = useReducedMotion()
+  return (
+    <motion.button
+      onClick={onClick}
+      whileTap={reduce ? undefined : tapScaleSubtle}
+      className="hero-panel focus-ring group relative flex w-full items-center gap-4 p-6 text-left"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
+        style={{ backgroundSize: '18px 18px' }}
+      />
+      <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
+        {icon}
+      </span>
+      <span className="relative min-w-0 flex-1">
+        <span className="tamil block font-display text-lg font-semibold tracking-tight text-white">
+          {title}
+        </span>
+        <span className="block font-body text-sm text-white/70">{subtitle}</span>
+      </span>
+      <span className="relative hidden flex-shrink-0 items-center gap-1.5 rounded-pill bg-white px-4 py-2 font-display text-sm font-semibold text-primary-deep transition-all group-hover:gap-2.5 sm:inline-flex">
+        {cta} <ChevronRight size={16} />
+      </span>
+      <ChevronRight size={20} className="relative flex-shrink-0 text-white/70 sm:hidden" />
+    </motion.button>
   )
 }
 
@@ -331,135 +353,61 @@ function AdminDashboard({
 }) {
   return (
     <AppLayout>
-      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
-        {/* Admin header - restrained, role-aware, no gamification */}
-        <div className="hero-panel mb-6 flex items-center justify-between gap-4 p-6 animate-slideDown">
-          <div className="min-w-0">
-            <div className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white ring-1 ring-white/20">
-              <ShieldCheck size={13} /> {isSuperAdmin ? t('superadmin') : t('admin')}
-            </div>
-            <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-white">
-              {name || (isSuperAdmin ? 'Super Admin' : 'Admin')}
-            </h1>
-            <p className="mt-1 font-body text-sm text-white/70">{t('adminHomeSub')}</p>
-          </div>
-          <ShieldCheck size={40} className="hidden flex-shrink-0 text-white/25 sm:block" />
-        </div>
+      <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
+        {/* Admin greeting — bare, role-aware, no gamification, no gradient panel. */}
+        <header className="px-1">
+          <span className="inline-flex items-center gap-1.5 font-display text-[13px] font-bold uppercase tracking-wide text-accent">
+            <ShieldCheck size={14} /> {isSuperAdmin ? t('superadmin') : t('admin')}
+          </span>
+          <h1 className="mt-1.5 font-display text-[28px] font-bold leading-tight tracking-tight text-ink">
+            {name || (isSuperAdmin ? 'Super Admin' : 'Admin')}
+          </h1>
+          <p className="mt-1 font-body text-[15px] text-muted">{t('adminHomeSub')}</p>
+        </header>
 
-        {/* Superadmin-only: platform console */}
+        {/* Superadmin-only: the platform console is the primary action → hero. */}
         {isSuperAdmin && (
-          <button
+          <Hero
+            icon={<Activity size={20} />}
+            title={t('superadminConsole')}
+            subtitle={t('platformMetricsSub')}
+            cta={t('start')}
             onClick={() => onNavigate('/superadmin')}
-            className="card interactive group mb-6 flex w-full items-center gap-4 p-4 text-left"
-          >
-            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-brand-gradient text-white shadow-brand">
-              <Activity size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-heading text-sm font-semibold leading-tight text-ink">
-                {t('superadminConsole')}
-              </span>
-              <span className="mt-0.5 block truncate font-body text-xs text-ink2">
-                {t('platformMetricsSub')}
-              </span>
-            </span>
-            <ChevronRight size={18} className="flex-shrink-0 text-ink2/30 transition group-hover:text-brand" />
-          </button>
+          />
         )}
 
-        {/* Question bank management */}
-        <h2 className="mb-1 font-heading text-base font-semibold tracking-tight text-ink">
-          {t('manageBank')}
-        </h2>
-        <p className="mb-3 font-body text-sm text-ink2">{t('pickCategoryAdmin')}</p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {BANK_CARDS.map((card, i) => (
-            <button
-              key={card.to}
-              onClick={() => onNavigate(card.to)}
-              style={{ '--i': i } as React.CSSProperties}
-              className="card interactive stagger-item group flex items-center gap-4 p-4 text-left"
-            >
-              <span className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile ${card.tile}`}>
-                {card.icon}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="tamil block font-heading text-sm font-semibold leading-tight text-ink">
-                  {t(card.titleKey)}
-                </span>
-                <span className="mt-0.5 block truncate font-body text-xs text-ink2">
-                  {t('browseEditBank')}
-                </span>
-              </span>
-              <ChevronRight size={18} className="flex-shrink-0 text-ink2/30 transition group-hover:text-ink2" />
-            </button>
-          ))}
-
-          {/* Outer subject bank (admin-only content) */}
-          <button
-            onClick={() => onNavigate('/admin/questions', { state: { category: 'outer', label: 'Outer Questions' } })}
-            style={{ '--i': BANK_CARDS.length } as React.CSSProperties}
-            className="card interactive stagger-item group flex items-center gap-4 p-4 text-left"
-          >
-            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-gold/15 text-gold">
-              <Layers size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-heading text-sm font-semibold leading-tight text-ink">
-                Outer Questions
-              </span>
-              <span className="mt-0.5 block truncate font-body text-xs text-ink2">
-                {t('outerQuestionsSub')}
-              </span>
-            </span>
-            <ChevronRight size={18} className="flex-shrink-0 text-ink2/30 transition group-hover:text-ink2" />
-          </button>
-        </div>
+        {/* Question bank management — a list, not a card grid. */}
+        <section className="space-y-2">
+          <SectionHeader title={t('manageBank')} className="px-1" />
+          <p className="px-1 font-body text-[13px] text-muted">{t('pickCategoryAdmin')}</p>
+          <List>
+            {BANK_CARDS.map((card, i) => (
+              <ListRow
+                key={card.to}
+                onClick={() => onNavigate(card.to)}
+                style={{ '--i': i } as React.CSSProperties}
+                leading={<IconTile tint={card.tint}>{card.icon}</IconTile>}
+                title={t(card.titleKey)}
+                subtitle={t('browseEditBank')}
+              />
+            ))}
+            <ListRow
+              onClick={() =>
+                onNavigate('/admin/questions', {
+                  state: { category: 'outer', label: 'Outer Questions' },
+                })
+              }
+              leading={
+                <IconTile tint="coral">
+                  <Layers size={20} />
+                </IconTile>
+              }
+              title="Outer Questions"
+              subtitle={t('outerQuestionsSub')}
+            />
+          </List>
+        </section>
       </div>
     </AppLayout>
-  )
-}
-
-function StatTile({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode
-  value: string
-  label: string
-}) {
-  return (
-    <div className="card flex items-center gap-3 p-3.5">
-      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-tile bg-tint-violet text-primary">
-        {icon}
-      </span>
-      <div className="min-w-0">
-        <div className="font-heading text-xl font-semibold leading-none text-ink">{value}</div>
-        <div className="tamil mt-1 truncate font-body text-[11px] uppercase tracking-wide text-ink2">
-          {label}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function QuickLink({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: React.ReactNode
-  label: string
-  onClick: () => void
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="card interactive flex flex-col items-center gap-2 p-3"
-    >
-      <span className="grid h-10 w-10 place-items-center rounded-tile bg-tint-violet text-primary">{icon}</span>
-      <span className="tamil font-heading text-xs font-medium text-ink">{label}</span>
-    </button>
   )
 }

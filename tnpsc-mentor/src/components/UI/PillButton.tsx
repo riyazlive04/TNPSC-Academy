@@ -11,8 +11,8 @@ interface PillButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * The core navigation element of TNPSC Mentor - a white pill button that turns
- * yellow (#FFC107) with dark navy text when `active`.
+ * The core selection chip - a flat pill on the surface that fills with the brand
+ * gradient when `active`. No shadow; a hairline border that firms up on hover.
  */
 export default function PillButton({
   active = false,
@@ -34,13 +34,12 @@ export default function PillButton({
     <button
       {...rest}
       className={[
-        'inline-flex max-w-full items-center justify-center gap-2 rounded-2xl font-heading font-semibold',
-        'shadow-pill transition-all duration-200 hover:-translate-y-0.5',
-        'active:translate-y-0 active:scale-[0.98] focus:outline-none focus-visible:ring-4 focus-visible:ring-brand-ring',
-        'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0',
+        'inline-flex max-w-full items-center justify-center gap-2 rounded-pill font-heading font-semibold',
+        'transition-all duration-150 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35',
+        'disabled:cursor-not-allowed disabled:opacity-50',
         active
           ? 'bg-brand-gradient text-white'
-          : 'border border-line bg-card text-ink hover:border-brand-ring',
+          : 'border border-line bg-card text-ink hover:border-primary/40 hover:text-primary',
         fullWidth ? 'w-full' : '',
         sizeCls,
         className,

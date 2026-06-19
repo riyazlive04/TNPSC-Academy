@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import AppLayout from './AppLayout'
-import YellowBadge from '../UI/YellowBadge'
 import { useT } from '../../lib/i18n'
 
 interface PickerPageProps {
@@ -23,16 +22,18 @@ export default function PickerPage({ badge, children }: PickerPageProps) {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
-        <div className="mb-8 text-center">
-          <YellowBadge>{badge}</YellowBadge>
+        <div className="mb-7 mt-4 text-center">
+          <span className="tamil font-display text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+            {badge}
+          </span>
         </div>
 
         {children}

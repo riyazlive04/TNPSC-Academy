@@ -29,20 +29,20 @@ export default function AuthShell({ children }: AuthShellProps) {
   const cycleLang = () => setLang(LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length])
 
   return (
-    <div className="relative grid min-h-screen lg:grid-cols-2">
+    <div className="relative grid min-h-dvh lg:grid-cols-2">
       {/* Language + theme controls (top-right, above both columns) */}
-      <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+      <div className="pt-safe absolute right-4 top-4 z-20 flex items-center gap-2">
         <button
           onClick={cycleLang}
           aria-label={`${t('language')} (${LANG_LABEL[lang]})`}
-          className="tamil inline-flex items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs font-semibold text-ink2 shadow-soft transition hover:border-brand/30 hover:text-brand"
+          className="tamil inline-flex items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs font-semibold text-muted transition-colors hover:border-primary/40 hover:text-primary"
         >
           <Languages size={14} /> {LANG_LABEL[lang]}
         </button>
         <button
           onClick={toggleTheme}
           aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
-          className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-card text-ink2 shadow-soft transition hover:border-brand/30 hover:text-brand"
+          className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-card text-muted transition-colors hover:border-primary/40 hover:text-primary"
         >
           {resolvedTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
@@ -80,7 +80,7 @@ export default function AuthShell({ children }: AuthShellProps) {
       </aside>
 
       {/* ─── Right: form panel ────────────────────────────────────────────── */}
-      <div className="flex min-h-screen items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
+      <div className="flex min-h-dvh items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
         <div className="w-full max-w-md animate-fadeIn">
           <div className="mb-7 flex flex-col items-center text-center lg:hidden">
             <span className="mb-3 grid h-12 w-12 place-items-center rounded-tile bg-brand-gradient text-xl font-semibold text-white shadow-brand">

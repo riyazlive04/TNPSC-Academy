@@ -1,5 +1,43 @@
 // ─── Core domain types ──────────────────────────────────────────────────────
 
+import type { StringKey } from '../lib/i18n'
+
+/**
+ * A language-neutral piece of a test heading. Producers emit these instead of a
+ * baked string so describeConfig() can resolve them against the CURRENT language
+ * at render time — the heading then follows the EN/தமிழ்/both toggle live,
+ * instead of freezing whichever language was active when the test was set up.
+ */
+export type QuizLabelSeg =
+  | string // literal, language-neutral (e.g. "PYQ", a month name)
+  | { t: StringKey } // a translation key
+  | { subject: string } // subject name, resolved via subjectName(lang)
+  | { topic: string } // topic name, resolved via topicName(lang)
+
+/** A single Thirukkural couplet with all renderings + classical commentaries. */
+export interface Kural {
+  kural_no: number
+  paal_no: number
+  paal_ta: string
+  paal_en: string
+  iyal_no: number
+  iyal_ta: string
+  iyal_en: string
+  adhigaram_no: number
+  adhigaram_ta: string
+  adhigaram_en: string
+  adhigaram_translit: string
+  line1_ta: string
+  line2_ta: string
+  transliteration: string
+  couplet_en: string
+  translation_en: string
+  explanation_en: string
+  urai_mu_varadarajan: string
+  urai_solomon_pappaiya: string
+  urai_mu_karunanidhi: string
+}
+
 export type Category = 'pyq' | 'samacheer' | 'current_affairs' | 'aptitude' | 'outer' | 'subject'
 // The five question styles testable in the Subject Practice flow.
 export type SubjectQType = 'chronological' | 'match' | 'assertion_reason' | 'statements' | 'direct'
@@ -120,6 +158,71 @@ export interface SubmitResult {
   passed_80: boolean
   unlocked: boolean
   results: GradedResult[]
+  /** Set by the API's topic-revision hook (see server/routes/tests.ts). */
+  revision?: RevisionInfo
+}
+
+// ─── Topic revision (study-gate + similar-question re-tests) ────────────────
+
+export type RevisionStatus = 'locked' | 'available' | 'cleared'
+
+/** The summary the submit response carries so the Result page can react. */
+export interface RevisionInfo {
+  /** A low-scoring topic test was saved (or re-saved) to Revisions. */
+  enqueued?: boolean
+  /** A passing re-attempt cleared an existing revision. */
+  cleared?: boolean
+  status?: RevisionStatus
+  /** ISO instant the re-test unlocks (awake-hours aware). */
+  available_at?: string
+  label?: string
+}
+
+/** One saved topic revision (list_revision_topics row + derived status). */
+export interface RevisionTopic {
+  id: string
+  topic_key: string
+  config: QuizConfig
+  label: string | null
+  first_score: number
+  last_score: number
+  best_score: number
+  attempts: number
+  available_at: string
+  cleared_at: string | null
+  last_session_id: string | null
+  created_at: string
+  status: RevisionStatus
+}
+
+export interface RevisionSubjectStat {
+  subject: string
+  count: number
+  avg_score: number
+}
+
+export interface RevisionFocusItem {
+  id: string
+  label: string | null
+  last_score: number
+  best_score: number
+  attempts: number
+  status: RevisionStatus
+}
+
+/** Pure-logic aggregates for the revision dashboard (revision_analytics RPC). */
+export interface RevisionAnalytics {
+  total: number
+  cleared: number
+  pending: number
+  available_now: number
+  locked: number
+  total_attempts: number
+  avg_last_score: number
+  avg_best_score: number
+  improvement: number
+  by_subject: RevisionSubjectStat[]
+  focus: RevisionFocusItem[]
 }
 
 export interface QuizConfig {
@@ -143,8 +246,18 @@ export interface QuizConfig {
   ca_topic?: string
   aptitude_type?: string
   aptitude_topic?: string
-  /** Human-friendly label shown in the quiz header & result page. */
+  /**
+   * Free-form heading, used when the label has no structured equivalent (mock
+   * blueprint titles, daily/weekly drills, "Outer Questions"). For flows built
+   * from subject/topic/type, prefer `labelParts` so the heading stays reactive
+   * to the language toggle.
+   */
   label?: string
+  /**
+   * Language-neutral heading segments (joined with " · "), resolved against the
+   * current language by describeConfig(). Takes precedence over `label`.
+   */
+  labelParts?: QuizLabelSeg[]
   /** Mock-test mode: mixed questions, fixed duration, optional negative marking. */
   mock?: boolean
   mockQuestionCount?: number
@@ -178,6 +291,10 @@ export interface QuizConfig {
   mockKind?: 'group' | 'subject'
   /** Which TNPSC group blueprint a group mock follows (2024/2025 pattern). */
   mockGroup?: GroupType
+  /** Set when this quiz is a revision re-test (gates similar-question fetch). */
+  revision?: boolean
+  /** The revision_topics row id, threaded back through submit so a pass clears it. */
+  revisionId?: string
 }
 
 // ─── Mock-test blueprint (group-exam patterns) ──────────────────────────────
@@ -230,6 +347,8 @@ export interface ResultPayload {
   timeLimitSeconds: number
   timeTakenSeconds: number
   sessionId?: string
+  /** Topic-revision outcome of this test, surfaced as a notice on the Result page. */
+  revision?: RevisionInfo
 }
 
 // Letter helpers for mapping option index <-> letter

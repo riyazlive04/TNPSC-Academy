@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
 import { mockBlueprint } from '../lib/constants'
+import { describeConfig } from '../lib/fetchQuestions'
 import { enterFullscreen } from '../lib/proctor'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
@@ -13,9 +13,9 @@ import type { QuizConfig } from '../types'
 const OMR_LEGEND = [
   { status: 'notVisited', swatch: 'bg-tint text-ink2', label: 'notVisited', desc: 'descNotVisited' },
   { status: 'visited', swatch: 'bg-ink2/20 text-ink', label: 'visited', desc: 'descVisited' },
-  { status: 'answered', swatch: 'bg-emerald-500 text-white', label: 'answered', desc: 'descAnswered' },
-  { status: 'markedReview', swatch: 'bg-violet-500 text-white', label: 'markedReview', desc: 'descMarkedReview' },
-  { status: 'answeredMarked', swatch: 'bg-amber-500 text-white', label: 'answeredMarked', desc: 'descAnsweredMarked' },
+  { status: 'answered', swatch: 'bg-correct text-white', label: 'answered', desc: 'descAnswered' },
+  { status: 'markedReview', swatch: 'bg-primary text-white', label: 'markedReview', desc: 'descMarkedReview' },
+  { status: 'answeredMarked', swatch: 'bg-gold text-white', label: 'answeredMarked', desc: 'descAnsweredMarked' },
 ] as const
 
 /**
@@ -27,7 +27,7 @@ const OMR_LEGEND = [
 export default function MockInstructionsPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { t } = useT()
+  const { t, lang } = useT()
   const config = location.state as QuizConfig | null
 
   const [agreed, setAgreed] = useState(false)
@@ -56,15 +56,17 @@ export default function MockInstructionsPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate('/mock')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> {t('mockTests')}
         </button>
 
-        <div className="mb-3 text-center">
-          <YellowBadge>{t('examInstructions')}</YellowBadge>
-        </div>
-        <p className="mb-6 text-center font-heading text-lg font-semibold text-ink">{config.label}</p>
+        <header className="mb-6 mt-4">
+          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+            {t('examInstructions')}
+          </h1>
+          <p className="tamil mt-1 font-heading text-base font-semibold text-primary">{describeConfig(config, lang)}</p>
+        </header>
 
         {/* Exam summary */}
         <div className="mb-6 flex flex-wrap justify-center gap-3">
@@ -74,7 +76,7 @@ export default function MockInstructionsPage() {
 
         {/* Blueprint breakdown (group exams only) */}
         {blueprint && (
-          <div className="card mb-6 p-5">
+          <div className="rounded-card border border-line bg-card mb-6 p-5">
             <h3 className="mb-3 font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
               {t('questionDistribution')}
             </h3>
@@ -93,7 +95,7 @@ export default function MockInstructionsPage() {
         )}
 
         {/* Instructions */}
-        <div className="card mb-6 space-y-4 p-5">
+        <div className="rounded-card border border-line bg-card mb-6 space-y-4 p-5">
           <Rule icon={<Maximize2 size={18} />} text={t('instrFullscreen')} />
           <Rule icon={<Clock size={18} />} text={t('instrTimer')} />
           <Rule icon={<FileText size={18} />} text={t('instrPalette')} />
@@ -106,7 +108,7 @@ export default function MockInstructionsPage() {
         </div>
 
         {/* Answer-sheet (OMR) colour guide — mirrors the palette in MockQuizPage. */}
-        <div className="card mb-6 p-5">
+        <div className="rounded-card border border-line bg-card mb-6 p-5">
           <h3 className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
             {t('omrColourGuide')}
           </h3>
@@ -129,7 +131,7 @@ export default function MockInstructionsPage() {
 
           {/* What the flag means */}
           <div className="mt-4 flex items-start gap-3 border-t border-line pt-4">
-            <span className="mt-0.5 shrink-0 text-violet-600">
+            <span className="mt-0.5 shrink-0 text-primary">
               <Flag size={18} className="fill-current" />
             </span>
             <p className="tamil min-w-0 flex-1 font-body text-sm text-ink">{t('flagMeaning')}</p>

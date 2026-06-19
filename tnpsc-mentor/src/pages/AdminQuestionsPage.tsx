@@ -150,7 +150,7 @@ export default function AdminQuestionsPage() {
     try {
       const label = isOuter
         ? `Outer Questions${subject ? ` · ${subject}` : ''}`
-        : describeConfig(activeConfig)
+        : describeConfig(activeConfig, lang)
       await generateQuestionBankPdf({ questions: filtered, label, lang })
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Could not generate the PDF.')
@@ -176,7 +176,7 @@ export default function AdminQuestionsPage() {
           <div className="flex items-center gap-2 rounded-full bg-gold/15 px-3 py-1.5 font-heading text-xs font-bold uppercase text-gold">
             <ShieldCheck size={14} /> Admin View - answers revealed
           </div>
-          <p className="tamil font-body text-sm text-ink2">{describeConfig(config)}</p>
+          <p className="tamil font-body text-sm text-ink2">{describeConfig(config, lang)}</p>
         </div>
 
         {!loading && !error && (

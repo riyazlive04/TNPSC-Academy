@@ -26,7 +26,9 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
+import IconTile from '../components/UI/IconTile'
+import SectionHeader from '../components/UI/SectionHeader'
+import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
 import {
   SUBJECT_PRACTICE_ORDER,
@@ -207,7 +209,7 @@ export default function SubjectPracticePage() {
     navigate('/test-arena')
   }
 
-  const handleType = (qtype: SubjectQType | null, label: string) => {
+  const handleType = (qtype: SubjectQType | null, labelKey: StringKey) => {
     if (!subject || !topic) return
     const isAll = topic === ALL_TOPICS
     startTest({
@@ -215,7 +217,7 @@ export default function SubjectPracticePage() {
       subject,
       topic: isAll ? undefined : topic,
       question_type: qtype ?? undefined,
-      label: `${subjectName(subject, lang)} · ${isAll ? t('allTopics') : topicName(topic, lang)} · ${label}`,
+      labelParts: [{ subject }, isAll ? { t: 'allTopics' } : { topic }, { t: labelKey }],
       availableCount: totalForType(qtype),
     })
   }
@@ -236,12 +238,12 @@ export default function SubjectPracticePage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-4xl px-4 py-5">
+      <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         {/* Back + breadcrumb */}
         <div className="mb-5 flex items-center justify-between gap-3">
           <button
             onClick={back}
-            className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+            className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
           >
             <ArrowLeft size={16} /> {step === 'subject' ? t('testArena') : t('back')}
           </button>
@@ -258,12 +260,14 @@ export default function SubjectPracticePage() {
         </div>
 
         {/* Title block */}
-        <div className="mb-5 text-center">
-          <YellowBadge>{t('subjectPracticeBadge')}</YellowBadge>
-          <h1 className="mt-2.5 font-heading text-xl font-bold tracking-tight text-ink lg:text-2xl">
+        <div className="mb-5">
+          <span className="tamil font-display text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+            {t('subjectPracticeBadge')}
+          </span>
+          <h1 className="tamil mt-1.5 font-display text-[22px] font-bold tracking-tight text-ink lg:text-[26px]">
             {heading}
           </h1>
-          <p className="tamil mt-1 font-body text-sm text-ink2">{hint}</p>
+          <p className="tamil mt-1 font-body text-[15px] text-muted">{hint}</p>
         </div>
 
         {/* Animated step body (re-keyed so each step animates in) */}
@@ -332,7 +336,7 @@ function Breadcrumb({
     <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
       <button
         onClick={onSubject}
-        className="max-w-[8rem] truncate rounded-full bg-brand-soft px-2.5 py-1 font-heading text-brand transition hover:bg-brand/10"
+        className="max-w-[8rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80"
       >
         {subjectLabel}
       </button>
@@ -341,7 +345,7 @@ function Breadcrumb({
           <ChevronRight size={13} className="flex-shrink-0 text-ink2/40" />
           <button
             onClick={onTopic}
-            className="max-w-[8rem] truncate rounded-full bg-brand-soft px-2.5 py-1 font-heading text-brand transition hover:bg-brand/10"
+            className="max-w-[8rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80"
           >
             {topicText}
           </button>
@@ -371,36 +375,32 @@ function SubjectStep({
   if (error) return <ErrorText text={error} />
 
   return (
-    // 12 subjects in two columns -> six rows of two.
-    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+    <List>
       {subjects.map((s, i) => {
         const Icon = subjectIcon(s.subject)
         return (
-          <button
+          <ListRow
             key={s.subject}
             onClick={() => onPick(s.subject)}
             style={{ '--i': i } as React.CSSProperties}
-            className="stagger-item relative flex items-center gap-3 overflow-hidden rounded-2xl border border-line bg-card p-3 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-          >
-            <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand ring-1 ring-brand/10">
-              <Icon size={20} strokeWidth={2} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="tamil block font-heading text-sm font-bold leading-snug text-ink">
-                {nameOf(s.subject)}
-              </span>
-              <span className="mt-0.5 flex items-baseline gap-1">
-                <span className="font-heading text-xs font-bold tabular-nums text-brand">
+            leading={
+              <IconTile tint="violet">
+                <Icon size={19} strokeWidth={2} />
+              </IconTile>
+            }
+            title={nameOf(s.subject)}
+            subtitle={
+              <span className="flex items-baseline gap-1">
+                <span className="font-heading font-bold tabular-nums text-primary">
                   {s.total.toLocaleString()}
                 </span>
-                <span className="font-body text-[11px] text-ink2">{questionsWord}</span>
+                <span>{questionsWord}</span>
               </span>
-            </span>
-            <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
-          </button>
+            }
+          />
         )
       })}
-    </div>
+    </List>
   )
 }
 
@@ -455,36 +455,25 @@ function TopicStep({
 
       {/* Topic rows, grouped into syllabus sections when configured */}
       {groups.map((g, gi) => (
-        <div key={g.heading ?? `g${gi}`} className="space-y-2.5">
-          {g.heading && (
-            <h3 className="tamil px-1 font-heading text-xs font-bold uppercase tracking-widest text-ink2">
-              {topicLabel(g.heading)}
-            </h3>
-          )}
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+        <section key={g.heading ?? `g${gi}`} className="space-y-1">
+          {g.heading && <SectionHeader title={topicLabel(g.heading)} className="px-1" />}
+          <List>
             {g.topics.map((tp, i) => (
-              <button
+              <ListRow
                 key={tp}
                 onClick={() => onPick(tp)}
                 style={{ '--i': i } as React.CSSProperties}
-                className={`card interactive stagger-item group flex items-center gap-3 p-3.5 text-left ${
-                  topic === tp ? 'ring-2 ring-brand-ring' : ''
-                }`}
-              >
-                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                  <Layers size={16} />
-                </span>
-                <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
-                  {topicLabel(tp)}
-                </span>
-                <ChevronRight
-                  size={16}
-                  className="flex-shrink-0 text-ink2/30 transition group-hover:text-brand"
-                />
-              </button>
+                className={topic === tp ? 'rounded-field ring-2 ring-primary/40' : ''}
+                leading={
+                  <IconTile tint="violet">
+                    <Layers size={18} />
+                  </IconTile>
+                }
+                title={topicLabel(tp)}
+              />
             ))}
-          </div>
-        </div>
+          </List>
+        </section>
       ))}
     </div>
   )
@@ -500,7 +489,7 @@ function TypeStep({
   qtypes: { key: SubjectQType | null; labelKey: StringKey; icon: LucideIcon }[]
   totalForType: (k: SubjectQType | null) => number
   label: (k: StringKey) => string
-  onPick: (k: SubjectQType | null, label: string) => void
+  onPick: (k: SubjectQType | null, labelKey: StringKey) => void
 }) {
   const [mixed, ...rest] = qtypes
   const mixedCount = totalForType(mixed.key)
@@ -510,7 +499,7 @@ function TypeStep({
     <div className="space-y-3">
       {/* Mixed - the recommended, highlighted option */}
       <button
-        onClick={() => onPick(mixed.key, label(mixed.labelKey))}
+        onClick={() => onPick(mixed.key, mixed.labelKey)}
         disabled={mixedCount === 0}
         className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left disabled:cursor-not-allowed disabled:opacity-50"
       >
@@ -537,30 +526,30 @@ function TypeStep({
         />
       </button>
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <List>
         {rest.map(({ key, labelKey, icon: Icon }, i) => {
           const n = totalForType(key)
           return (
-            <button
+            <ListRow
               key={labelKey}
-              onClick={() => onPick(key, label(labelKey))}
+              onClick={() => onPick(key, labelKey)}
               disabled={n === 0}
               style={{ '--i': i } as React.CSSProperties}
-              className="card interactive stagger-item group flex items-center gap-3 p-3.5 text-left disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
-            >
-              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                <Icon size={16} />
-              </span>
-              <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
-                {label(labelKey)}
-              </span>
-              <span className="flex-shrink-0 font-heading text-xs font-semibold text-ink2">
-                {n > 0 ? n : '—'}
-              </span>
-            </button>
+              leading={
+                <IconTile tint="violet">
+                  <Icon size={18} />
+                </IconTile>
+              }
+              title={label(labelKey)}
+              trailing={
+                <span className="flex-shrink-0 font-heading text-sm font-semibold text-muted">
+                  {n > 0 ? n : '—'}
+                </span>
+              }
+            />
           )
         })}
-      </div>
+      </List>
     </div>
   )
 }
@@ -569,10 +558,10 @@ function TypeStep({
 function CenterSpinner() {
   return (
     <div className="flex justify-center py-16">
-      <Loader2 size={28} className="animate-spin text-brand" />
+      <Loader2 size={28} className="animate-spin text-primary" />
     </div>
   )
 }
 function ErrorText({ text }: { text: string }) {
-  return <p className="py-12 text-center font-body text-sm text-coral">{text}</p>
+  return <p className="py-12 text-center font-body text-sm text-wrong">{text}</p>
 }

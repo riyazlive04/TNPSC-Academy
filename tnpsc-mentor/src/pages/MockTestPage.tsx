@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Layers, Loader2, Minus, Plus, Trophy } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import { api } from '../lib/api'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
-import { useT } from '../lib/i18n'
+import { useT, type StringKey } from '../lib/i18n'
 import type { Difficulty, MockBlueprint, QuizConfig } from '../types'
 
 type Tab = 'group' | 'subject'
@@ -41,15 +40,17 @@ export default function MockTestPage() {
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
-        <div className="mb-3 text-center">
-          <YellowBadge>{t('mockTests')}</YellowBadge>
-        </div>
-        <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('fullLength')}</p>
+        <header className="mb-6 mt-4">
+          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+            {t('mockTests')}
+          </h1>
+          <p className="tamil mt-1 font-body text-[15px] text-muted">{t('fullLength')}</p>
+        </header>
 
         {/* Tab switch - segmented control */}
         <div className="mb-8 flex justify-center">
@@ -111,7 +112,7 @@ function GroupExamTab() {
       </div>
 
       {/* Blueprint card */}
-      <div className="card p-5 sm:p-6">
+      <div className="rounded-card border border-line bg-card p-5 sm:p-6">
         {/* Title + key stats */}
         <div className="mb-5 flex items-center justify-between gap-4 border-b border-line pb-4">
           <h3 className="font-heading text-lg font-semibold tracking-tight text-ink">{selected.title}</h3>
@@ -201,7 +202,7 @@ function SubjectExamTab() {
   const launch = () => {
     if (!subject || !topic) return
     const isAll = topic === ALL_TOPICS
-    const diffLabel = difficulty ? t(`diff${cap(difficulty)}` as 'diffEasy') : t('diffMixed')
+    const diffKey: StringKey = difficulty ? (`diff${cap(difficulty)}` as 'diffEasy') : 'diffMixed'
     const config: QuizConfig = {
       category: 'subject',
       proctored: true,
@@ -213,7 +214,7 @@ function SubjectExamTab() {
       mockQuestionCount: questionCount,
       mockDurationSeconds: minutes * 60,
       negativeMark: 0,
-      label: `${subject} · ${isAll ? t('allTopics') : topic} · ${diffLabel}`,
+      labelParts: [{ subject }, isAll ? { t: 'allTopics' } : { topic }, { t: diffKey }],
     }
     navigate('/mock/instructions', { state: config })
   }
@@ -256,7 +257,7 @@ function SubjectExamTab() {
             </div>
           )}
           {!loadingTopics && error && (
-            <p className="text-center font-body text-sm text-coral">{error}</p>
+            <p className="text-center font-body text-sm text-wrong">{error}</p>
           )}
           {!loadingTopics && !error && (
             <div className="flex flex-wrap justify-center gap-3">
@@ -291,7 +292,7 @@ function SubjectExamTab() {
         <PillSection title={t('examSetup')} className="mb-8 animate-fadeIn" wrap={false}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Number of questions - stepper */}
-            <div className="card p-4">
+            <div className="rounded-card border border-line bg-card p-4">
               <div className="mb-3 flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
                 <FileText size={14} /> {t('numQuestions')}
               </div>
@@ -321,7 +322,7 @@ function SubjectExamTab() {
             </div>
 
             {/* Time limit - slider */}
-            <div className="card p-4">
+            <div className="rounded-card border border-line bg-card p-4">
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
                   <Clock size={14} /> {t('timeLimit')}
