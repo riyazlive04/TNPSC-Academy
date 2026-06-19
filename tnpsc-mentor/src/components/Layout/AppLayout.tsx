@@ -1,17 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import {
-  LogOut,
-  Home,
-  ShieldCheck,
-  RefreshCw,
-  User,
-  BarChart3,
-  Bookmark,
-  MessageSquarePlus,
-  Sun,
-  Moon,
-} from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
@@ -19,7 +8,6 @@ import { api } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
-import { stopNotificationPolling } from '../../store/notificationStore'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -49,10 +37,11 @@ const LEARNER_NAV = [
 ]
 
 // Admin/superadmin navigation - content managers don't use the personal
-// learner-progress tabs, so the nav is just the Test Arena (their gateway to
-// the question banks via the same picker, which routes them to the admin bank).
+// learner-progress tabs, so the nav is the Test Arena (their gateway to the
+// question banks via the same picker) plus the student-report triage queue.
 const ADMIN_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
+  { to: '/admin/reports', icon: Flag, key: 'reports' as const, short: 'reports' as const },
 ]
 
 /**
@@ -62,7 +51,7 @@ const ADMIN_NAV = [
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signOut, profile, isAdmin, isSuperAdmin, user } = useAuth()
+  const { profile, isAdmin, isSuperAdmin, user } = useAuth()
   const { t } = useT()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   // Feedback is accepted once per 3 months (enforced server-side). After a user
@@ -80,6 +69,20 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // Admins/superadmins manage content; learners get the study tabs.
   const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
 
+  // Badge: number of open student question-reports awaiting triage (admins only).
+  const [openReports, setOpenReports] = useState(0)
+  useEffect(() => {
+    if (!isAdmin) return
+    let cancelled = false
+    api
+      .adminOpenReportCount()
+      .then((n) => !cancelled && setOpenReports(n))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [isAdmin])
+
   // Re-read once the auth bootstrap resolves the user id (key starts out null).
   useEffect(() => {
     setFeedbackGiven(withinFeedbackWindow(feedbackKey))
@@ -90,17 +93,21 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
     setFeedbackGiven(true)
   }
 
+  // Feedback is no longer a toolbar button. Instead it surfaces ONCE per user as
+  // a gentle, delayed prompt on the home screen; closing or submitting it stamps
+  // the 3-month window so it won't reappear. Admins are exempt.
+  useEffect(() => {
+    if (feedbackGiven || !user || isAdmin) return
+    if (location.pathname !== '/test-arena') return
+    const id = window.setTimeout(() => setFeedbackOpen(true), 2500)
+    return () => window.clearTimeout(id)
+  }, [feedbackGiven, user, isAdmin, location.pathname])
+
   const cycleLang = () => {
     const next = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length]
     setLang(next)
     // Keep the account preference in sync so the choice persists across devices.
     api.updateProfile({ language: next }).catch(() => {})
-  }
-
-  const handleSignOut = async () => {
-    stopNotificationPolling()
-    await signOut()
-    navigate('/login', { replace: true })
   }
 
   const isActive = (to: string) =>
@@ -109,9 +116,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
       : location.pathname.startsWith(to)
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-canvas bg-brand-radial">
+    <div className="min-h-dvh overflow-x-hidden bg-canvas bg-brand-radial">
       {!bare && (
-        <header className="sticky top-0 z-30 border-b border-line bg-card">
+        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
             <button
               onClick={() => navigate('/test-arena')}
@@ -143,6 +150,11 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   >
                     <Icon size={17} />
                     <span className="tamil">{t(key)}</span>
+                    {to === '/admin/reports' && openReports > 0 && (
+                      <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-[11px] font-bold text-white">
+                        {openReports}
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -166,29 +178,6 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               {user && <NotificationBell />}
-              {!feedbackGiven && (
-                <button
-                  onClick={() => setFeedbackOpen(true)}
-                  title={t('sendFeedback')}
-                  aria-label={t('sendFeedback')}
-                  className="icon-btn h-9 w-9"
-                >
-                  <MessageSquarePlus size={18} />
-                </button>
-              )}
-              <button
-                onClick={() => navigate('/bookmarks')}
-                title={t('questionBank')}
-                aria-label={t('questionBank')}
-                className={[
-                  'grid h-9 w-9 place-items-center rounded-lg transition focus-ring active:scale-90',
-                  location.pathname.startsWith('/bookmarks')
-                    ? 'bg-brand text-white'
-                    : 'text-ink2 hover:bg-brand-soft hover:text-brand-dark',
-                ].join(' ')}
-              >
-                <Bookmark size={18} />
-              </button>
               {isSuperAdmin ? (
                 <button
                   onClick={() => navigate('/superadmin')}
@@ -214,12 +203,17 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 </span>
               )}
               <button
-                onClick={handleSignOut}
-                title={t('signOut')}
-                aria-label={t('signOut')}
-                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral focus-ring active:scale-90"
+                onClick={() => navigate('/profile')}
+                title={t('profile')}
+                aria-label={t('profile')}
+                className={[
+                  'grid h-9 w-9 place-items-center rounded-lg transition focus-ring active:scale-90',
+                  location.pathname.startsWith('/profile')
+                    ? 'bg-brand text-white'
+                    : 'text-ink2 hover:bg-brand-soft hover:text-brand-dark',
+                ].join(' ')}
               >
-                <LogOut size={18} />
+                <User size={18} />
               </button>
             </div>
           </div>
@@ -246,13 +240,18 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 >
                   <span
                     className={[
-                      'grid h-9 w-9 place-items-center rounded-xl transition-all duration-200 group-active:scale-90',
+                      'relative grid h-9 w-9 place-items-center rounded-xl transition-all duration-200 group-active:scale-90',
                       active
                         ? 'bg-brand-gradient text-white'
                         : 'text-ink2 group-hover:bg-brand-soft group-hover:text-brand-dark',
                     ].join(' ')}
                   >
                     <Icon size={19} />
+                    {to === '/admin/reports' && openReports > 0 && (
+                      <span className="absolute -right-1 -top-1 grid h-4 min-w-[1rem] place-items-center rounded-full bg-coral px-0.5 font-heading text-[10px] font-bold text-white">
+                        {openReports}
+                      </span>
+                    )}
                   </span>
                   <span
                     className={[
@@ -271,7 +270,12 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
 
       <FeedbackModal
         open={feedbackOpen}
-        onClose={() => setFeedbackOpen(false)}
+        onClose={() => {
+          // Showing it once is enough — stamp the 3-month window on close so it
+          // won't surface again (whether or not the user submitted).
+          setFeedbackOpen(false)
+          markFeedbackGiven()
+        }}
         onSubmitted={markFeedbackGiven}
       />
     </div>

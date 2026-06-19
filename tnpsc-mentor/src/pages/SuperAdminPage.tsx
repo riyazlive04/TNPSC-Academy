@@ -21,10 +21,12 @@ import {
   Bell,
   Megaphone,
   Send,
+  Flag,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Spinner from '../components/UI/Spinner'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
+import ReportedQuestions from '../components/Admin/ReportedQuestions'
 import {
   api,
   type PlatformMetrics,
@@ -42,7 +44,7 @@ import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
 import type { UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -55,6 +57,7 @@ export default function SuperAdminPage() {
     { id: 'coupons', label: 'couponsTab', icon: Ticket },
     { id: 'notifications', label: 'notificationsTab', icon: Bell },
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
+    { id: 'reports', label: 'reportsTab', icon: Flag },
   ]
 
   return (
@@ -98,6 +101,7 @@ export default function SuperAdminPage() {
           {tab === 'coupons' && <CouponsTab />}
           {tab === 'notifications' && <NotificationsTab />}
           {tab === 'feedback' && <FeedbackTab />}
+          {tab === 'reports' && <ReportedQuestions />}
         </div>
       </div>
     </AppLayout>

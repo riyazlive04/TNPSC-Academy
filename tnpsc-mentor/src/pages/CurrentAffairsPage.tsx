@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import IconTile from '../components/UI/IconTile'
+import { List, ListRow } from '../components/UI/ListRow'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName } from '../lib/constants'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
@@ -65,7 +67,7 @@ export default function CurrentAffairsPage() {
       category: 'current_affairs',
       ca_type: 'month_wise',
       ca_month: label,
-      label: `${t('currentAffairsBadge')} · ${label}`,
+      labelParts: [{ t: 'currentAffairsBadge' }, label],
     })
   }
 
@@ -73,7 +75,7 @@ export default function CurrentAffairsPage() {
     startTest({
       category: 'current_affairs',
       topic,
-      label: `${t('currentAffairsBadge')} · ${topicName(topic, lang)}`,
+      labelParts: [{ t: 'currentAffairsBadge' }, { topic }],
     })
   }
 
@@ -118,65 +120,59 @@ export default function CurrentAffairsPage() {
         </div>
       </div>
 
-      {/* Month-wise cards */}
+      {/* Month-wise list */}
       {view === 'month_wise' && (
         <section className="animate-fadeIn">
-          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+          <h3 className="tamil mb-2 font-heading text-sm font-bold uppercase tracking-widest text-muted">
             {t('selectMonth')}
           </h3>
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <List>
             {CA_MONTHS.map((m, i) => (
-              <button
+              <ListRow
                 key={m.slug}
                 onClick={() => handleMonth(m.label)}
                 style={{ '--i': i } as React.CSSProperties}
-                className="stagger-item flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-              >
-                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                  <CalendarDays size={16} />
-                </span>
-                <span className="min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
-                  {m.label}
-                </span>
-                <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
-              </button>
+                leading={
+                  <IconTile tint="green">
+                    <CalendarDays size={18} />
+                  </IconTile>
+                }
+                title={m.label}
+              />
             ))}
-          </div>
+          </List>
         </section>
       )}
 
-      {/* Topic-wise cards */}
+      {/* Topic-wise list */}
       {view === 'topic_wise' && (
         <section className="animate-fadeIn">
-          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+          <h3 className="tamil mb-2 font-heading text-sm font-bold uppercase tracking-widest text-muted">
             {t('step2Topic')}
           </h3>
           {topicError && (
-            <p className="mb-4 text-center font-body text-sm text-coral">{topicError}</p>
+            <p className="mb-4 text-center font-body text-sm text-wrong">{topicError}</p>
           )}
           {loadingTopics ? (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-brand" />
+              <Loader2 size={28} className="animate-spin text-primary" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <List>
               {topics.map((topic, i) => (
-                <button
+                <ListRow
                   key={topic}
                   onClick={() => handleTopic(topic)}
                   style={{ '--i': i } as React.CSSProperties}
-                  className="stagger-item flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-                >
-                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                    <Newspaper size={16} />
-                  </span>
-                  <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
-                    {topicName(topic, lang)}
-                  </span>
-                  <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
-                </button>
+                  leading={
+                    <IconTile tint="green">
+                      <Newspaper size={18} />
+                    </IconTile>
+                  }
+                  title={topicName(topic, lang)}
+                />
               ))}
-            </div>
+            </List>
           )}
         </section>
       )}

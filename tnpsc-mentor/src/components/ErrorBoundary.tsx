@@ -1,4 +1,5 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Component, useState, type ErrorInfo, type ReactNode } from 'react'
+import { AlertTriangle, RotateCw, Home, Copy, Check } from 'lucide-react'
 
 interface Props {
   children: ReactNode
@@ -6,49 +7,113 @@ interface Props {
 
 interface State {
   error: Error | null
+  componentStack: string | null
 }
 
 /**
- * Top-level error boundary so a render-time throw shows a recoverable screen
- * (with the brand chrome) instead of a blank white page.
+ * Top-level error boundary so a render-time throw shows a recoverable, on-brand
+ * screen (with the exact error surfaced to the user) instead of a blank page.
  */
 export default class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null }
+  state: State = { error: null, componentStack: null }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { error }
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     // eslint-disable-next-line no-console
     console.error('[TNPSC Mentor] Unhandled UI error:', error, info.componentStack)
-  }
-
-  private handleReload = () => {
-    this.setState({ error: null })
-    window.location.assign('/test-arena')
+    this.setState({ componentStack: info.componentStack ?? null })
   }
 
   render() {
     if (this.state.error) {
       return (
-        <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-primary px-4 text-center">
-          <h1 className="font-heading text-3xl font-bold text-accent">
-            Something went wrong
-          </h1>
-          <p className="max-w-sm font-body text-sm text-white/70">
-            An unexpected error interrupted the page. Your progress is saved where
-            possible - try reloading.
-          </p>
-          <button
-            onClick={this.handleReload}
-            className="rounded-full bg-accent px-6 py-2.5 font-heading font-bold uppercase text-navytext"
-          >
-            Reload
-          </button>
-        </div>
+        <ErrorScreen error={this.state.error} componentStack={this.state.componentStack} />
       )
     }
     return this.props.children
   }
+}
+
+/**
+ * The recoverable error screen. Shown by ErrorBoundary on a crash; standalone so
+ * it can be reused/previewed. Surfaces the real error message directly so the
+ * user (and support) can see exactly what failed, with a one-tap copy.
+ */
+export function ErrorScreen({
+  error,
+  componentStack,
+}: {
+  error: Error
+  componentStack?: string | null
+}) {
+  const [copied, setCopied] = useState(false)
+
+  const details = [error.name ? `${error.name}: ${error.message}` : error.message, componentStack]
+    .filter(Boolean)
+    .join('\n')
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(details)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {
+      /* clipboard unavailable — no-op */
+    }
+  }
+
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-canvas px-5 py-10 text-center">
+      <span className="grid h-16 w-16 place-items-center rounded-hero bg-tint-coral">
+        <AlertTriangle size={30} className="text-wrong" />
+      </span>
+
+      <div>
+        <h1 className="font-display text-[24px] font-bold tracking-tight text-ink">
+          Something went wrong
+        </h1>
+        <p className="mx-auto mt-2 max-w-sm font-body text-sm leading-relaxed text-muted">
+          An unexpected error interrupted the app. Your progress is saved where possible. Here's
+          exactly what happened:
+        </p>
+      </div>
+
+      {/* The actual issue, shown directly. */}
+      <div className="w-full max-w-md rounded-card border border-line bg-card p-4 text-left">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+            Error details
+          </span>
+          <button
+            onClick={copy}
+            className="inline-flex items-center gap-1 font-body text-[12px] font-medium text-accent transition-opacity hover:opacity-80"
+          >
+            {copied ? <Check size={13} /> : <Copy size={13} />}
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
+        <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-relaxed text-wrong">
+          {error.message || 'Unknown error'}
+        </pre>
+      </div>
+
+      <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
+        <button
+          onClick={() => window.location.reload()}
+          className="btn-brand flex-1 px-6 py-3 text-sm"
+        >
+          <RotateCw size={16} /> Reload app
+        </button>
+        <button
+          onClick={() => window.location.assign('/test-arena')}
+          className="btn-ghost flex-1 px-6 py-3 text-sm"
+        >
+          <Home size={16} /> Go to Home
+        </button>
+      </div>
+    </div>
+  )
 }

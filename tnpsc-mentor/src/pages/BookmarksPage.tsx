@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Bookmark, BookmarkX, Loader2 } from 'lucide-react'
+import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
 import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
@@ -47,60 +46,58 @@ export default function BookmarksPage() {
 
   return (
     <AppLayout>
-      <div className="mx-auto max-w-2xl px-4 py-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> Back
         </button>
 
-        <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <YellowBadge>Saved Questions</YellowBadge>
-          <p className="font-body text-sm text-ink2">
-            Questions you bookmarked for revision - answers and explanations included.
+        <header className="mb-6 mt-4">
+          <h1 className="font-display text-[22px] font-bold tracking-tight text-ink">Saved Questions</h1>
+          <p className="mt-1 font-body text-sm text-muted">
+            Questions you bookmarked for revision — answers and explanations included.
           </p>
-        </div>
+        </header>
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-16">
-            <Loader2 size={32} className="animate-spin text-brand" />
-            <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
+            <Loader2 size={32} className="animate-spin text-primary" />
+            <p className="font-heading font-semibold uppercase tracking-widest text-muted">
               Loading saved questions…
             </p>
           </div>
         )}
 
-        {!loading && error && (
-          <p className="py-12 text-center font-body text-ink2">{error}</p>
-        )}
+        {!loading && error && <p className="py-12 text-center font-body text-muted">{error}</p>}
 
         {!loading && !error && questions.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-goldsoft">
-              <Bookmark size={26} className="text-gold" />
+            <div className="grid h-14 w-14 place-items-center rounded-tile bg-tint-coral">
+              <Bookmark size={26} className="text-accent" />
             </div>
-            <p className="max-w-xs font-body text-ink2">
-              No saved questions yet. On any result page, tap the bookmark icon on a
-              question to save it here.
+            <p className="max-w-xs font-body text-muted">
+              No saved questions yet. On any result page, tap the bookmark icon on a question to save
+              it here.
             </p>
           </div>
         )}
 
         {!loading && !error && questions.length > 0 && (
-          <div className="flex flex-col gap-4">
+          <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
             {questions.map((q, i) => (
-              <article key={q.id} className="rounded-2xl border border-line bg-card p-4 shadow-card sm:p-5">
+              <article key={q.id} className="rounded-card border border-line bg-card p-4 sm:p-5">
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
-                    <span className="mr-1 text-secondary">{i + 1}.</span>
+                  <p className="tamil whitespace-pre-line font-display text-base font-bold leading-snug text-ink">
+                    <span className="mr-1 text-primary">{i + 1}.</span>
                     {displayQuestion(q, lang)}
                   </p>
                   <button
                     onClick={() => handleRemove(q.id)}
                     disabled={removingId === q.id}
                     aria-label="Remove bookmark"
-                    className="rounded-lg p-1.5 text-ink2 transition hover:bg-coralsoft hover:text-coral disabled:opacity-50"
+                    className="rounded-lg p-1.5 text-muted transition-colors hover:bg-coralsoft hover:text-coral disabled:opacity-50"
                   >
                     {removingId === q.id ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -118,28 +115,28 @@ export default function BookmarksPage() {
                         key={letter}
                         className={[
                           'tamil flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm',
-                          isCorrect ? 'bg-green-50 font-semibold text-green-700' : 'text-navytext/75',
+                          isCorrect ? 'bg-tint-green font-semibold text-ink' : 'text-ink/75',
                         ].join(' ')}
                       >
                         <span
                           className={[
-                            'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                            isCorrect ? 'bg-green-500 text-white' : 'bg-primary/10 text-primary',
+                            'grid h-5 w-5 flex-shrink-0 place-items-center rounded-full text-xs font-bold',
+                            isCorrect ? 'bg-correct text-white' : 'bg-tint-violet text-primary',
                           ].join(' ')}
                         >
                           {letter}
                         </span>
                         {displayOption(q, letter, lang)}
-                        {isCorrect && <span className="ml-auto text-xs font-bold">✓</span>}
+                        {isCorrect && <Check size={14} className="ml-auto flex-shrink-0 text-correct" />}
                       </div>
                     )
                   })}
                 </div>
 
                 {displayExplanation(q, lang) && (
-                  <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-                    <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
-                      <span className="font-heading font-bold text-secondary">Explanation: </span>
+                  <div className="mt-3 rounded-lg border-l-2 border-primary bg-tint-violet/50 p-3">
+                    <p className="tamil whitespace-pre-line text-xs leading-relaxed text-ink/80">
+                      <span className="font-heading font-bold text-primary">Explanation: </span>
                       {displayExplanation(q, lang)}
                     </p>
                   </div>

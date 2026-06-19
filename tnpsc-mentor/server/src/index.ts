@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js'
 import questionRoutes from './routes/questions.js'
 import testRoutes from './routes/tests.js'
 import reviewRoutes from './routes/reviews.js'
+import revisionRoutes from './routes/revisions.js'
 import bookmarkRoutes from './routes/bookmarks.js'
 import profileRoutes from './routes/profile.js'
 import analyticsRoutes from './routes/analytics.js'
@@ -17,6 +18,7 @@ import feedbackRoutes from './routes/feedback.js'
 import paymentRoutes from './routes/payments.js'
 import couponRoutes from './routes/coupons.js'
 import notificationRoutes from './routes/notifications.js'
+import thirukuralRoutes from './routes/thirukural.js'
 
 const app = express()
 
@@ -55,6 +57,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/questions', questionRoutes)
 app.use('/api/tests', testRoutes)
 app.use('/api/reviews', reviewRoutes)
+app.use('/api/revisions', revisionRoutes)
 app.use('/api/bookmarks', bookmarkRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/analytics', analyticsRoutes)
@@ -64,6 +67,7 @@ app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/coupons', couponRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/thirukural', thirukuralRoutes)
 
 // 404 for unknown API routes.
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }))

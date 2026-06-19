@@ -97,16 +97,16 @@ export default function SamacheerPage() {
         >
           {loading && (
             <div className="flex justify-center py-8">
-              <Loader2 size={28} className="animate-spin text-brand" />
+              <Loader2 size={28} className="animate-spin text-primary" />
             </div>
           )}
 
           {!loading && error && (
-            <p className="text-center font-body text-sm text-coral">{error}</p>
+            <p className="text-center font-body text-sm text-wrong">{error}</p>
           )}
 
           {!loading && !error && topics.length === 0 && (
-            <p className="text-center font-body text-sm text-ink2">
+            <p className="text-center font-body text-sm text-muted">
               No topics found for this subject & standard yet. Run the content
               upload, or pick another combination.
             </p>

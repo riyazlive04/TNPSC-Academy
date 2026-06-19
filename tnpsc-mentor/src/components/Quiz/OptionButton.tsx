@@ -15,8 +15,11 @@ interface OptionButtonProps {
 }
 
 /**
- * A single answer option rendered as a white pill labelled A-D. Highlights in
- * yellow when selected. In `reveal` mode it shows correct (green) / wrong (red).
+ * A single answer option as a clean, flat selectable row labelled A-D — the
+ * quiz focus mode's core control (design-system.md "Minimal typographic = the
+ * quiz flow"). No shadow; a hairline border that firms up on selection. States
+ * follow the spec — tinted fill + coloured border + coloured marker, and ALWAYS
+ * a check/cross icon (never colour alone), which also reads correctly in dark.
  */
 export default function OptionButton({
   letter,
@@ -26,28 +29,25 @@ export default function OptionButton({
   reveal,
   disabled = false,
 }: OptionButtonProps) {
-  // States follow design-system.md: a tinted fill + coloured border + coloured
-  // text (never colour alone — each carries a check/cross icon too). This reads
-  // correctly in dark mode, where solid fills with white text would look harsh.
-  let stateCls = 'bg-card text-ink border-2 border-line'
-  let badgeCls = 'bg-brand-soft text-brand'
+  let stateCls = 'border-line bg-card text-ink hover:border-primary/40'
+  let badgeCls = 'bg-tint-violet text-primary'
   let icon: React.ReactNode = null
 
   if (reveal) {
     if (reveal.isCorrect) {
-      stateCls = 'bg-mintsoft text-mint border-2 border-mint font-medium'
-      badgeCls = 'bg-mint text-white'
-      icon = <Check size={18} className="animate-checkPop text-mint" />
+      stateCls = 'border-correct bg-tint-green text-ink'
+      badgeCls = 'bg-correct text-white'
+      icon = <Check size={18} className="animate-checkPop flex-shrink-0 text-correct" />
     } else if (reveal.isChosenWrong) {
-      stateCls = 'bg-coralsoft text-coral border-2 border-coral font-medium'
-      badgeCls = 'bg-coral text-white'
-      icon = <X size={18} className="animate-checkPop text-coral" />
+      stateCls = 'border-wrong bg-coralsoft text-ink'
+      badgeCls = 'bg-wrong text-white'
+      icon = <X size={18} className="animate-checkPop flex-shrink-0 text-wrong" />
     } else {
-      stateCls = 'bg-card text-ink border-2 border-line'
+      stateCls = 'border-line bg-card text-ink'
     }
   } else if (selected) {
-    stateCls = 'bg-brand-soft text-brand border-2 border-brand font-medium'
-    badgeCls = 'bg-brand text-white'
+    stateCls = 'border-primary bg-selected text-ink'
+    badgeCls = 'bg-primary text-white'
   }
 
   return (
@@ -57,21 +57,22 @@ export default function OptionButton({
       disabled={disabled}
       aria-pressed={selected}
       className={[
-        'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left font-body transition-all duration-150',
-        'shadow-pill hover:-translate-y-0.5 active:scale-[0.99] disabled:cursor-default disabled:hover:translate-y-0 disabled:active:scale-100',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35',
+        'flex w-full items-center gap-3 rounded-field border-2 px-4 py-3 text-left font-body',
+        'transition-colors duration-150 active:scale-[0.99]',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35',
+        'disabled:cursor-default disabled:active:scale-100',
         stateCls,
       ].join(' ')}
     >
       <span
         className={[
-          'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-heading font-bold',
+          'grid h-8 w-8 flex-shrink-0 place-items-center rounded-xl font-display text-sm font-bold transition-colors',
           badgeCls,
         ].join(' ')}
       >
         {letter}
       </span>
-      <span className="tamil min-w-0 flex-1 text-[15px] leading-snug [overflow-wrap:anywhere]">
+      <span className="tamil min-w-0 flex-1 text-[15px] leading-relaxed [overflow-wrap:anywhere]">
         {text}
       </span>
       {icon}

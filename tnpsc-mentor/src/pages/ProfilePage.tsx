@@ -14,6 +14,10 @@ import {
   Award,
   Globe,
   Smartphone,
+  Bookmark,
+  ChevronRight,
+  Pencil,
+  Check,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
@@ -27,14 +31,25 @@ import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS } from '../lib/constants'
 import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
+import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { api, type DeviceSession } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 
-const LANG_OPTIONS: { id: Lang; labelKey: StringKey }[] = [
-  { id: 'en', labelKey: 'langEnglish' },
-  { id: 'ta', labelKey: 'langTamil' },
-  { id: 'both', labelKey: 'langBoth' },
+// Each language is shown in its OWN script (English in English, Tamil in Tamil)
+// regardless of the active UI language — the standard language-picker pattern.
+const LANG_OPTIONS: { id: Lang; label: string }[] = [
+  { id: 'en', label: 'English' },
+  { id: 'ta', label: 'தமிழ்' },
+  { id: 'both', label: 'English + தமிழ்' },
+]
+
+// Stored values stay 'male' | 'female' | 'other' (consistent with the signup /
+// complete-profile forms); 'other' is surfaced as "Do not prefer" via i18n.
+const GENDER_OPTIONS: { id: string; labelKey: StringKey }[] = [
+  { id: 'male', labelKey: 'genderMale' },
+  { id: 'female', labelKey: 'genderFemale' },
+  { id: 'other', labelKey: 'genderOther' },
 ]
 
 export default function ProfilePage() {
@@ -51,6 +66,35 @@ export default function ProfilePage() {
     setLang(next)
     api.updateProfile({ language: next }).catch(() => {})
   }
+
+  // Gender — editable here. Optimistic chip highlight, persisted to the profile
+  // and synced back into the auth store (best-effort; reverts on failure).
+  const refreshProfile = useAuthStore((s) => s.fetchProfile)
+  const [genderSel, setGenderSel] = useState(profile?.gender ?? '')
+  useEffect(() => {
+    setGenderSel(profile?.gender ?? '')
+  }, [profile?.gender])
+  const changeGender = (next: string) => {
+    if (next === genderSel) return
+    const prev = genderSel
+    setGenderSel(next)
+    api
+      .updateProfile({ gender: next })
+      .then(() => refreshProfile())
+      .catch(() => {
+        setGenderSel(prev)
+        toast.error(t('genderSaveFailed'))
+      })
+  }
+
+  // Account details start read-only; the pencil toggles inline editing of the
+  // gender + language chips. Selections still save immediately while editing.
+  const [editing, setEditing] = useState(false)
+  const genderLabel = genderSel
+    ? t(GENDER_OPTIONS.find((o) => o.id === genderSel)?.labelKey ?? 'genderOther')
+    : t('notSet')
+  const languageLabel = LANG_OPTIONS.find((o) => o.id === lang)?.label ?? 'English'
+
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [loading, setLoading] = useState(true)
@@ -100,15 +144,6 @@ export default function ProfilePage() {
   const name = profile?.full_name || 'Aspirant'
   const initial = name.trim().charAt(0).toUpperCase() || 'A'
   const roleLabel = isSuperAdmin ? t('superadmin') : isAdmin ? t('admin') : 'Aspirant'
-  const genderLabel = profile?.gender
-    ? t(
-        profile.gender === 'male'
-          ? 'genderMale'
-          : profile.gender === 'female'
-            ? 'genderFemale'
-            : 'genderOther'
-      )
-    : ''
 
   const handleSignOut = async () => {
     await signOut()
@@ -177,34 +212,77 @@ export default function ProfilePage() {
 
             {/* Account details */}
             <div>
-              <h2 className="mb-3 font-heading text-base font-semibold tracking-tight text-ink">
-                {t('accountDetails')}
-              </h2>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="font-heading text-base font-semibold tracking-tight text-ink">
+                  {t('accountDetails')}
+                </h2>
+                {/* Pencil toggles inline editing of gender + language. */}
+                <button
+                  onClick={() => setEditing((v) => !v)}
+                  aria-pressed={editing}
+                  aria-label={editing ? t('done') : t('edit')}
+                  title={editing ? t('done') : t('edit')}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5 font-heading text-xs font-semibold text-ink2 transition hover:border-brand hover:text-brand"
+                >
+                  {editing ? <Check size={14} /> : <Pencil size={14} />}
+                  {editing ? t('done') : t('edit')}
+                </button>
+              </div>
               <div className="card divide-y divide-line">
-                {profile?.gender && (
-                  <DetailRow icon={<User size={16} />} label={t('gender')} value={genderLabel} />
-                )}
+                {/* Gender — read-only value by default; chips appear (right-aligned)
+                    in edit mode and save on selection. */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                    <User size={16} />
+                  </span>
+                  <span className="tamil font-body text-sm text-ink2">{t('gender')}</span>
+                  {editing ? (
+                    <div className="ml-auto flex flex-wrap justify-end gap-2" role="group" aria-label={t('gender')}>
+                      {GENDER_OPTIONS.map((o) => (
+                        <button
+                          key={o.id}
+                          onClick={() => changeGender(o.id)}
+                          aria-pressed={genderSel === o.id}
+                          className={genderSel === o.id ? 'chip chip-active' : 'chip'}
+                        >
+                          {t(o.labelKey)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="tamil ml-auto truncate text-right font-heading text-sm font-semibold text-ink">
+                      {genderLabel}
+                    </span>
+                  )}
+                </div>
                 {profile?.phone && (
                   <DetailRow icon={<ShieldCheck size={16} />} label={t('phone')} value={profile.phone} />
                 )}
-                {/* Language preference — chosen once at onboarding, editable here. */}
-                <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center">
+                {/* Language preference — read-only value by default; chips appear
+                    (right-aligned) in edit mode. Each language shown in its own script. */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
                     <Globe size={16} />
                   </span>
-                  <span className="tamil flex-1 font-body text-sm text-ink2">{t('language')}</span>
-                  <div className="flex flex-wrap gap-2" role="group" aria-label={t('language')}>
-                    {LANG_OPTIONS.map((o) => (
-                      <button
-                        key={o.id}
-                        onClick={() => changeLanguage(o.id)}
-                        aria-pressed={lang === o.id}
-                        className={lang === o.id ? 'chip chip-active' : 'chip'}
-                      >
-                        {t(o.labelKey)}
-                      </button>
-                    ))}
-                  </div>
+                  <span className="tamil font-body text-sm text-ink2">{t('language')}</span>
+                  {editing ? (
+                    <div className="ml-auto flex flex-wrap justify-end gap-2" role="group" aria-label={t('language')}>
+                      {LANG_OPTIONS.map((o) => (
+                        <button
+                          key={o.id}
+                          onClick={() => changeLanguage(o.id)}
+                          aria-pressed={lang === o.id}
+                          className={lang === o.id ? 'chip chip-active' : 'chip'}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="ml-auto truncate text-right font-heading text-sm font-semibold text-ink">
+                      {languageLabel}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -227,6 +305,21 @@ export default function ProfilePage() {
             {/* Premium upsell - 3-month plan (₹1899 → ₹1399) */}
             <PremiumCard />
 
+            {/* Saved Questions — moved here from the top bar so the toolbar stays
+                to language · theme · profile. */}
+            <button
+              onClick={() => navigate('/bookmarks')}
+              className="flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/40"
+            >
+              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+                <Bookmark size={16} />
+              </span>
+              <span className="tamil flex-1 font-display text-sm font-semibold text-ink">
+                {t('questionBank')}
+              </span>
+              <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
+            </button>
+
             {/* Devices — manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />
 
@@ -234,10 +327,78 @@ export default function ProfilePage() {
             <button onClick={handleSignOut} className="btn-ghost w-full">
               <LogOut size={16} /> {t('signOut')}
             </button>
+
+            <AppFooter />
           </div>
         )}
       </div>
     </AppLayout>
+  )
+}
+
+// App version — bump on release (kept in one place so the footer always matches).
+const APP_VERSION = '1.0.0'
+
+/**
+ * Profile footer: brand mark, developer credit, support + legal links, version
+ * and copyright. The single place the app advertises who built it.
+ */
+function AppFooter() {
+  const year = new Date().getFullYear()
+  return (
+    <footer className="mt-2 flex flex-col items-center gap-3 border-t border-line pb-2 pt-6 text-center">
+      <div className="flex items-center gap-2">
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-gradient font-display text-sm font-bold text-white">
+          த
+        </span>
+        <span className="font-display text-sm font-semibold tracking-tight text-ink">
+          TNPSC <span className="text-primary">Mentor</span>
+        </span>
+      </div>
+
+      <p className="font-body text-[13px] text-muted">
+        Developed by{' '}
+        <a
+          href="https://sirahdigital.in"
+          target="_blank"
+          rel="noreferrer"
+          className="font-display font-semibold text-accent transition-opacity hover:opacity-80"
+        >
+          Sirah Digital
+        </a>
+      </p>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-[12px] text-muted">
+        <a
+          href="mailto:support@sirahdigital.in"
+          className="transition-colors hover:text-ink"
+        >
+          Contact support
+        </a>
+        <span className="text-muted/40">·</span>
+        <a
+          href="https://sirahdigital.in/privacy"
+          target="_blank"
+          rel="noreferrer"
+          className="transition-colors hover:text-ink"
+        >
+          Privacy Policy
+        </a>
+        <span className="text-muted/40">·</span>
+        <a
+          href="https://sirahdigital.in/terms"
+          target="_blank"
+          rel="noreferrer"
+          className="transition-colors hover:text-ink"
+        >
+          Terms of Use
+        </a>
+      </div>
+
+      <p className="font-body text-[11px] text-muted/70">
+        Version {APP_VERSION} · © {year} Sirah Digital. All rights reserved.
+      </p>
+    </footer>
   )
 }
 

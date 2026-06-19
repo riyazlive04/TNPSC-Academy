@@ -82,6 +82,11 @@ as $$
       p_config->>'aptitude_topic'                      as aptitude_topic,
       coalesce((p_config->>'mock')::boolean, false)    as mock,
       coalesce((p_config->>'scopeToCategory')::boolean, false) as scope_to_category,
+      -- Revision re-tests pass exclude_ids so already-seen questions are skipped
+      -- (serves SIMILAR questions from the same scope, not identical ones).
+      case when p_config ? 'exclude_ids'
+        then array(select (jsonb_array_elements_text(p_config->'exclude_ids'))::uuid)
+        else null end                                  as exclude_ids,
       greatest(coalesce((p_config->>'limit')::int, 100), 1)    as lim
   )
   select q.id, q.category, q.group_type, q.year, q.standard,
@@ -112,6 +117,7 @@ as $$
     and (cfg.mock or cfg.ca_topic       is null or q.ca_topic       = cfg.ca_topic)
     and (cfg.mock or cfg.aptitude_type  is null or q.aptitude_type  = cfg.aptitude_type)
     and (cfg.mock or cfg.aptitude_topic is null or q.aptitude_topic = cfg.aptitude_topic)
+    and (cfg.exclude_ids is null or not (q.id = any(cfg.exclude_ids)))
   order by random()
   limit (select lim from cfg);
 $$;

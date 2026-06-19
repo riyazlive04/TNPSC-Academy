@@ -223,6 +223,43 @@ h4,
   background: rgb(var(--c-brand) / 0.7);
 }
 
+/* ─── iOS Safari / native-app hardening ────────────────────────────────────
+ * Removes the 300ms double-tap delay on controls, adds dynamic-viewport (dvh)
+ * and safe-area helpers so full-height screens and fixed bars sit clear of the
+ * notch / home indicator. */
+@layer base {
+  button,
+  [role='button'],
+  a,
+  label,
+  input,
+  select,
+  textarea,
+  summary {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  /* Dynamic viewport — iOS Safari's URL bar changes the visible height, so
+   * `100dvh` avoids the content jumping that `100vh` causes. */
+  .min-h-dvh {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .h-dvh {
+    height: 100vh;
+    height: 100dvh;
+  }
+  /* Safe-area insets for fixed top/bottom chrome (notch + home indicator). */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @layer components {
   /* ─── Surfaces ───────────────────────────────────────────────────────── */
   .card {

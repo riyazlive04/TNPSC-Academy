@@ -9,6 +9,7 @@ import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import { formatTime } from '../components/UI/Timer'
 import { api } from '../lib/api'
+import { describeConfig } from '../lib/fetchQuestions'
 import { exitFullscreen } from '../lib/proctor'
 import { submitTest } from '../lib/submitTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
@@ -24,8 +25,7 @@ function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
     a.mockGroup === b.mockGroup &&
     a.subject === b.subject &&
     a.topic === b.topic &&
-    a.difficulty === b.difficulty &&
-    a.label === b.label
+    a.difficulty === b.difficulty
   )
 }
 
@@ -464,7 +464,7 @@ export default function MockQuizPage() {
       {/* Top bar */}
       <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-line bg-card px-3 py-2.5 sm:px-4 sm:py-3">
         <span className="min-w-0 flex-1 truncate font-heading text-sm font-semibold text-ink">
-          {config.label}
+          {describeConfig(config, lang)}
         </span>
         <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
           {violations.length > 0 && (
@@ -530,7 +530,7 @@ export default function MockQuizPage() {
                 <div
                   key={q.id}
                   id={`omr-q-${i}`}
-                  className="scroll-mt-20 rounded-2xl border border-line bg-card p-4 shadow-soft sm:p-5"
+                  className="scroll-mt-20 rounded-card border border-line bg-card p-4 sm:p-5"
                 >
                   {/* Top: question number + flag / clear */}
                   <div className="flex items-center gap-3 border-b border-line pb-3">
@@ -556,7 +556,7 @@ export default function MockQuizPage() {
                         aria-pressed={flagged}
                         className={[
                           'icon-btn h-9 w-9 flex-shrink-0',
-                          flagged ? 'text-violet-600' : 'text-ink2/45',
+                          flagged ? 'text-primary' : 'text-ink2/45',
                         ].join(' ')}
                       >
                         <Flag size={16} className={flagged ? 'fill-current' : ''} />
@@ -614,7 +614,7 @@ export default function MockQuizPage() {
               className={[
                 'btn btn-lg flex-shrink-0 border',
                 showFlaggedOnly
-                  ? 'border-violet-500 bg-violet-500 text-white'
+                  ? 'border-primary bg-primary text-white'
                   : 'border-line bg-card text-ink2 hover:border-brand-ring',
               ].join(' ')}
             >
@@ -758,8 +758,8 @@ function Palette({
     <>
       {/* Summary */}
       <div className="mb-4 grid grid-cols-3 gap-2 text-center">
-        <SummaryStat value={counts.answered} label={t('answered')} cls="text-emerald-600" />
-        <SummaryStat value={counts.marked} label={t('markedReview')} cls="text-violet-600" />
+        <SummaryStat value={counts.answered} label={t('answered')} cls="text-correct" />
+        <SummaryStat value={counts.marked} label={t('markedReview')} cls="text-primary" />
         <SummaryStat value={counts.notVisited} label={t('notVisited')} cls="text-ink2" />
       </div>
 
@@ -900,13 +900,13 @@ function Paginator({
   )
 }
 
-// Tailwind classes per palette status.
+// Tailwind classes per palette status (token-backed so it themes + flips in dark).
 const PALETTE_CLS: Record<Status, string> = {
   notVisited: 'bg-tint text-ink2',
   visited: 'bg-ink2/20 text-ink',
-  answered: 'bg-emerald-500 text-white',
-  markedReview: 'bg-violet-500 text-white',
-  answeredMarked: 'bg-amber-500 text-white',
+  answered: 'bg-correct text-white',
+  markedReview: 'bg-primary text-white',
+  answeredMarked: 'bg-gold text-white',
 }
 
 const LEGEND: Record<Status, true> = {
@@ -936,7 +936,7 @@ function CenteredScreen({ children }: { children: React.ReactNode }) {
 
 function Toast({ tone, children }: { tone: 'warn' | 'error' | 'info'; children: React.ReactNode }) {
   const toneCls =
-    tone === 'error' ? 'bg-coral text-white' : tone === 'info' ? 'bg-brand text-white' : 'bg-amber-500 text-white'
+    tone === 'error' ? 'bg-coral text-white' : tone === 'info' ? 'bg-brand text-white' : 'bg-gold text-white'
   return (
     <div
       className={[

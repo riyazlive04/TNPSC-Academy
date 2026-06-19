@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Loader2, Calculator, Brain, Shuffle, Layers, ChevronRight } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import IconTile from '../components/UI/IconTile'
+import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
 import { topicName } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
@@ -46,19 +48,22 @@ export default function AptitudePage() {
 
   const begin = (topic: string | null) => {
     if (!type) return
-    const typeLabel = type === 'numerics' ? t('numerics') : t('reasoning')
     startTest({
       category: 'aptitude',
       aptitude_type: type,
       aptitude_topic: topic ?? undefined,
-      label: `${t('aptitudeBadge')} · ${typeLabel}${topic ? ` · ${topicName(topic, lang)}` : ''}`,
+      labelParts: [
+        { t: 'aptitudeBadge' },
+        { t: type === 'numerics' ? 'numerics' : 'reasoning' },
+        ...(topic ? [{ topic }] : []),
+      ],
     })
   }
 
   return (
     <PickerPage badge={t('aptitudeBadge')}>
-      {/* Step 1 - sub-category cards */}
-      <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+      {/* Step 1 - sub-category */}
+      <h3 className="tamil mb-3 font-heading text-sm font-bold uppercase tracking-widest text-muted">
         {t('step1Category')}
       </h3>
       <div className="mb-8 grid grid-cols-2 gap-3">
@@ -69,21 +74,21 @@ export default function AptitudePage() {
               key={c.id}
               onClick={() => setType(c.id)}
               className={[
-                'flex items-center gap-3 rounded-2xl border p-4 text-left transition-all duration-200',
+                'flex items-center gap-3 rounded-card border p-4 text-left transition-colors duration-150',
                 active
-                  ? 'border-transparent bg-brand-gradient text-white shadow-brand'
-                  : 'border-line bg-card text-ink shadow-soft hover:border-brand/30',
+                  ? 'border-transparent bg-brand-gradient text-white'
+                  : 'border-line bg-card text-ink hover:border-primary/40',
               ].join(' ')}
             >
               <span
                 className={[
-                  'grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl',
-                  active ? 'bg-white/15 text-white' : 'bg-brand-soft text-brand',
+                  'grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile',
+                  active ? 'bg-white/15 text-white' : 'bg-tint-violet text-primary',
                 ].join(' ')}
               >
                 {c.icon}
               </span>
-              <span className="tamil font-heading text-sm font-bold">{t(c.labelKey)}</span>
+              <span className="tamil font-display text-sm font-bold">{t(c.labelKey)}</span>
             </button>
           )
         })}
@@ -92,21 +97,21 @@ export default function AptitudePage() {
       {/* Step 2 - topic cards */}
       {type && (
         <section className="animate-fadeIn">
-          <h3 className="tamil mb-3 text-center font-heading text-sm font-bold uppercase tracking-widest text-ink2">
+          <h3 className="tamil mb-3 font-heading text-sm font-bold uppercase tracking-widest text-muted">
             {t('step3Topic')}
           </h3>
 
           {loading && (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-brand" />
+              <Loader2 size={28} className="animate-spin text-primary" />
             </div>
           )}
           {!loading && error && (
-            <p className="py-8 text-center font-body text-sm text-coral">{error}</p>
+            <p className="py-8 text-center font-body text-sm text-wrong">{error}</p>
           )}
           {!loading && !error && (
-            <div className="space-y-3">
-              {/* All Topics - highlighted shortcut */}
+            <div className="space-y-4">
+              {/* All Topics - the one highlighted (gradient) shortcut for this step */}
               <button
                 onClick={() => begin(null)}
                 className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
@@ -115,33 +120,30 @@ export default function AptitudePage() {
                   className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
                   style={{ backgroundSize: '18px 18px' }}
                 />
-                <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+                <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
                   <Shuffle size={20} />
                 </span>
-                <span className="relative min-w-0 flex-1 font-heading text-base font-semibold text-white">
+                <span className="relative min-w-0 flex-1 font-display text-base font-semibold text-white">
                   {t('allTopics')}
                 </span>
                 <ChevronRight size={18} className="relative flex-shrink-0 text-white/50" />
               </button>
 
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <List>
                 {topics.map((tp, i) => (
-                  <button
+                  <ListRow
                     key={tp}
                     onClick={() => begin(tp)}
                     style={{ '--i': i } as React.CSSProperties}
-                    className="stagger-item flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 text-left shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-                  >
-                    <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                      <Layers size={16} />
-                    </span>
-                    <span className="tamil min-w-0 flex-1 font-heading text-sm font-semibold leading-snug text-ink">
-                      {topicName(tp, lang)}
-                    </span>
-                    <ChevronRight size={16} className="flex-shrink-0 text-ink2/25" />
-                  </button>
+                    leading={
+                      <IconTile tint="violet">
+                        <Layers size={18} />
+                      </IconTile>
+                    }
+                    title={topicName(tp, lang)}
+                  />
                 ))}
-              </div>
+              </List>
             </div>
           )}
         </section>

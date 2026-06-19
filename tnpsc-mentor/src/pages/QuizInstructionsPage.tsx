@@ -5,7 +5,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { enterFullscreen } from '../lib/proctor'
 import { api } from '../lib/api'
-import { DEFAULT_QUESTIONS } from '../lib/fetchQuestions'
+import { DEFAULT_QUESTIONS, describeConfig } from '../lib/fetchQuestions'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
 
@@ -36,7 +36,7 @@ function recommendedMinutes(count: number): number {
 export default function QuizInstructionsPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { t } = useT()
+  const { t, lang } = useT()
   const config = location.state as QuizConfig | null
 
   const [agreed, setAgreed] = useState(false)
@@ -125,9 +125,9 @@ export default function QuizInstructionsPage() {
         <div className="mb-3 text-center">
           <YellowBadge>{t('examInstructions')}</YellowBadge>
         </div>
-        {config.label && (
+        {(config.labelParts?.length || config.label) && (
           <p className="mb-6 text-center font-heading text-lg font-semibold text-ink">
-            {config.label}
+            {describeConfig(config, lang)}
           </p>
         )}
 

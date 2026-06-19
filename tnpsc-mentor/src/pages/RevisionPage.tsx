@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Loader2, RefreshCw, Check } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import YellowBadge from '../components/UI/YellowBadge'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
 import { fetchDueItems, gradeReview, type ReviewItem } from '../lib/srs'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
+import TopicRevisionSection from '../components/revision/TopicRevisionSection'
 import type { AnswerLetter, Question } from '../types'
 
 export default function RevisionPage() {
@@ -72,23 +72,38 @@ export default function RevisionPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>
 
-        <div className="mb-8 text-center">
-          <YellowBadge>{t('revisionTitle')}</YellowBadge>
+        <header className="mb-7 mt-4">
+          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+            {t('topicRevisionTitle')}
+          </h1>
+        </header>
+
+        {/* New: topic-level revisions (study gate + similar-question re-tests). */}
+        <TopicRevisionSection />
+
+        <div className="my-8 border-t border-line" />
+
+        {/* Existing: per-question spaced-repetition drill. */}
+        <div className="mb-4">
+          <h2 className="tamil font-heading text-lg font-bold tracking-tight text-ink">
+            {t('revisionTitle')}
+          </h2>
+          <p className="tamil mt-0.5 font-body text-sm text-muted">{t('practiceMistakes')}</p>
         </div>
 
         {loading && (
           <div className="flex justify-center py-16">
-            <Loader2 size={32} className="animate-spin text-brand" />
+            <Loader2 size={32} className="animate-spin text-primary" />
           </div>
         )}
 
         {!loading && items.length === 0 && (
-          <p className="tamil py-12 text-center font-body text-ink2">{t('revisionEmpty')}</p>
+          <p className="tamil py-12 text-center font-body text-muted">{t('revisionEmpty')}</p>
         )}
 
         {!loading && items.length > 0 && !done && q && (

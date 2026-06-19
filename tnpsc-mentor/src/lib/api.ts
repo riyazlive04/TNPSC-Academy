@@ -4,9 +4,12 @@
 // every data call. A thin typed surface keeps the rest of the app unchanged.
 
 import type {
+  Kural,
   Profile,
   Question,
   QuizConfig,
+  RevisionAnalytics,
+  RevisionTopic,
   SubmitResult,
   TestAnswer,
   UserRole,
@@ -275,6 +278,13 @@ export const api = {
     return data.counts
   },
 
+  // ─── Thirukural ─────────────────────────────────────────────────────────────
+  /** All 1330 kurals (public reference content). */
+  async thirukural(): Promise<Kural[]> {
+    const data = await request<{ kurals: Kural[] }>('/api/thirukural', { auth: false })
+    return data.kurals
+  },
+
   // ─── Mock tests ─────────────────────────────────────────────────────────────
   /** Full group-exam mock (2024/2025 pattern): questions pooled per subject slot. */
   async mockGroupQuestions(groupType: string): Promise<Question[]> {
@@ -335,6 +345,26 @@ export const api = {
     return request('/api/reviews/grade', { method: 'POST', body: { itemId, selected } })
   },
 
+  // ─── Topic revision (study-gate + similar-question re-tests) ────────────────
+  async revisions(): Promise<RevisionTopic[]> {
+    const data = await request<{ items: RevisionTopic[] }>('/api/revisions')
+    return data.items
+  },
+  async revisionAnalytics(): Promise<RevisionAnalytics> {
+    const data = await request<{ analytics: RevisionAnalytics }>('/api/revisions/analytics')
+    return data.analytics
+  },
+  /** Open the study gate: returns a ready QuizConfig + similar questions, or throws
+   *  ApiError(423) when the re-test is still locked. */
+  async startRevision(
+    id: string
+  ): Promise<{ revisionId: string; label: string | null; config: QuizConfig; questions: Question[] }> {
+    return request(`/api/revisions/${id}/start`, { method: 'POST' })
+  },
+  async dismissRevision(id: string): Promise<void> {
+    await request(`/api/revisions/${id}/dismiss`, { method: 'POST' })
+  },
+
   // ─── Profile / activity ────────────────────────────────────────────────────
   async getProfile(): Promise<Profile> {
     const data = await request<{ profile: Profile }>('/api/profile')
@@ -382,6 +412,29 @@ export const api = {
       { method: 'POST', body: { rows } }
     )
     return data.result ?? {}
+  },
+  /** Admin/superadmin: student-reported questions for triage (default: open). */
+  async adminQuestionReports(status: ReportStatus = 'open', limit = 200): Promise<ReportedQuestion[]> {
+    const data = await request<{ reports: ReportedQuestion[] }>('/api/admin/question-reports', {
+      query: { status, limit },
+    })
+    return data.reports
+  },
+  /** Admin/superadmin: count of currently-open question reports (nav badge). */
+  async adminOpenReportCount(): Promise<number> {
+    const data = await request<{ count: number }>('/api/admin/question-reports/count')
+    return data.count
+  },
+  /** Admin/superadmin: set a reported question's triage state. */
+  async adminSetReportStatus(
+    questionId: string,
+    status: ReportStatus,
+    note?: string
+  ): Promise<void> {
+    await request('/api/admin/question-reports/status', {
+      method: 'POST',
+      body: { questionId, status, note },
+    })
   },
 
   // ─── Superadmin console ──────────────────────────────────────────────────
@@ -721,4 +774,27 @@ export interface FeedbackRow {
   created_at: string
   user_name: string | null
   user_email: string | null
+}
+
+// ─── Question reports (admin triage) ───────────────────────────────────────────
+export type ReportStatus = 'open' | 'resolved' | 'dismissed'
+
+/** One reported question (aggregated across all students who flagged it). */
+export interface ReportedQuestion {
+  question_id: string
+  /** Number of distinct students who reported this question. */
+  report_count: number
+  /** Reasons students gave (newest first); may be empty if none added notes. */
+  reasons: string[]
+  first_reported: string
+  last_reported: string
+  /** Effective triage state — reopens automatically on a fresh report. */
+  status: ReportStatus
+  /** Admin triage note, if any. */
+  note: string | null
+  resolved_at: string | null
+  /** Name of the admin who last resolved/dismissed it. */
+  resolver_name: string | null
+  /** The full question row, or null if it has since been deleted. */
+  question: Question | null
 }
