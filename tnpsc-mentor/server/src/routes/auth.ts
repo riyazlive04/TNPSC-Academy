@@ -59,7 +59,47 @@ router.post(
       deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
-    if (blocked) return res.status(403).json({ error: 'device_limit' })
+    if (blocked) {
+      // Return the active devices so the browser can show them and let the user
+      // sign one out (they've proven ownership with the correct password).
+      const devices = await listSessions(data.session.user.id)
+      return res.status(403).json({ error: 'device_limit', devices })
+    }
+    res.json(await sessionPayload(data.session))
+  })
+)
+
+// ─── POST /api/auth/login/replace-device ─────────────────────────────────────
+// Reached after a `device_limit` block: the user picked an existing device to
+// sign out so they can sign in here. We re-verify the password (no app token
+// exists yet), revoke the chosen session, then claim this device's slot.
+router.post(
+  '/login/replace-device',
+  asyncH(async (req, res) => {
+    const { email, password, session_id } = req.body ?? {}
+    if (!email || !password || !session_id) {
+      return res.status(400).json({ error: 'Email, password and session_id are required' })
+    }
+    const { data, error } = await supabaseAuthClient.auth.signInWithPassword({
+      email: String(email).trim(),
+      password: String(password),
+    })
+    if (error || !data.session) {
+      return res.status(401).json({ error: error?.message ?? 'Invalid credentials' })
+    }
+    const userId = data.session.user.id
+    // revokeSessionById is scoped to userId, so a forged session_id from another
+    // account is a no-op rather than a cross-account sign-out.
+    await revokeSessionById(userId, String(session_id))
+    const { blocked } = await registerLoginSession(
+      userId,
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = await listSessions(userId)
+      return res.status(403).json({ error: 'device_limit', devices })
+    }
     res.json(await sessionPayload(data.session))
   })
 )
@@ -142,7 +182,10 @@ router.post(
       deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
-    if (blocked) return res.status(403).json({ error: 'device_limit' })
+    if (blocked) {
+      const devices = await listSessions(data.session.user.id)
+      return res.status(403).json({ error: 'device_limit', devices })
+    }
 
     // Enrich only the fields that are currently empty, so a returning Google user
     // who edited their display name doesn't get it overwritten on every login.

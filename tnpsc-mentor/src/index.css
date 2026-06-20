@@ -136,6 +136,15 @@ body,
   min-height: 100%;
 }
 
+/* App-wide guard against horizontal overflow on mobile. `clip` (not `hidden`)
+ * does NOT create a scroll container, so it never breaks `position: sticky`
+ * headers/toolbars. Individual offenders are still fixed at the source; this is
+ * the last-resort net so a stray wide child can't sideways-scroll the page. */
+html,
+body {
+  overflow-x: clip;
+}
+
 /* App-wide smooth scrolling for in-page jumps and anchor/scrollIntoView calls.
  * Route changes are kept instant in ScrollToTop (behavior: 'auto') so navigation
  * never animates a long scroll-to-top. Disabled for prefers-reduced-motion below.

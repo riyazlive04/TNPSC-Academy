@@ -124,6 +124,7 @@ const STRINGS = {
   typeStepHint: { en: 'Pick a style to start the test', ta: 'தேர்வைத் தொடங்க ஒரு வகையைத் தேர்ந்தெடுக்கவும்' },
   allTopicsSub: { en: 'Mix questions from every topic', ta: 'அனைத்து தலைப்புகளிலிருந்தும் கலந்து' },
   byPeriod: { en: 'by period', ta: 'காலகட்ட வாரியாக' },
+  byType: { en: 'by type', ta: 'வகை வாரியாக' },
 
   // History period selector (PYQ History → Ancient / Medieval / Modern)
   historyPeriodBadge: { en: 'History - Previous Year Questions', ta: 'வரலாறு - முந்தைய ஆண்டு வினாக்கள்' },
@@ -159,6 +160,16 @@ const STRINGS = {
   monthWise: { en: 'Month Wise', ta: 'மாத வாரியாக' },
   numerics: { en: 'Numerics', ta: 'எண் கணிதம்' },
   reasoning: { en: 'Reasoning', ta: 'பகுத்தறிவு' },
+
+  // PYQ Aptitude type selector (PYQ Aptitude → Numerics / Reasoning)
+  pyqAptitudeBadge: { en: 'Aptitude - Previous Year Questions', ta: 'திறனாய்வு - முந்தைய ஆண்டு வினாக்கள்' },
+  pyqAptitudePickType: { en: 'Select a Type', ta: 'ஒரு வகையைத் தேர்ந்தெடுக்கவும்' },
+  pyqAptitudePickTypeSub: {
+    en: 'Numerics or reasoning? Pick a style to begin an Aptitude test.',
+    ta: 'எண் கணிதமா அல்லது பகுத்தறிவா? திறனாய்வுத் தேர்வைத் தொடங்க ஒரு வகையைத் தேர்ந்தெடுக்கவும்.',
+  },
+  numericsSub: { en: 'Arithmetic, numbers & calculations', ta: 'எண்கணிதம், எண்கள் மற்றும் கணக்கீடுகள்' },
+  reasoningSub: { en: 'Logical & analytical reasoning', ta: 'தர்க்க மற்றும் பகுப்பாய்வு பகுத்தறிவு' },
 
   // Quiz
   question: { en: 'Question', ta: 'வினா' },
@@ -847,6 +858,22 @@ const STRINGS = {
     en: 'This changes what this user can access across the platform.',
     ta: 'இது தளம் முழுவதும் இந்தப் பயனர் அணுகக்கூடியதை மாற்றும்.',
   },
+  // ─── Device limit (login) ─────────────────────────────────────────────────
+  deviceLimitTitle: { en: 'Device limit reached', ta: 'சாதன வரம்பை அடைந்தது' },
+  deviceLimitMsg: {
+    en: 'This account is already signed in on 2 devices. Sign out of one to continue here.',
+    ta: 'இந்தக் கணக்கு ஏற்கனவே 2 சாதனங்களில் உள்நுழைந்துள்ளது. இங்கே தொடர ஒன்றிலிருந்து வெளியேறவும்.',
+  },
+  signOutThisDevice: { en: 'Sign out & continue here', ta: 'வெளியேறி இங்கே தொடரவும்' },
+  lastActive: { en: 'Last active', ta: 'கடைசி செயல்பாடு' },
+  firstSignedIn: { en: 'Signed in', ta: 'உள்நுழைந்தது' },
+  unknownDevice: { en: 'Unknown device', ta: 'அறியப்படாத சாதனம்' },
+  activeNow: { en: 'Active now', ta: 'இப்போது செயலில்' },
+  justNow: { en: 'just now', ta: 'சற்று முன்' },
+  minutesAgo: { en: 'min ago', ta: 'நிமிடங்களுக்கு முன்' },
+  hoursAgo: { en: 'hr ago', ta: 'மணி நேரத்திற்கு முன்' },
+  daysAgo: { en: 'days ago', ta: 'நாட்களுக்கு முன்' },
+
   // ─── Thirukural ───────────────────────────────────────────────────────────
   thirukuralTitle: { en: 'Thirukkural', ta: 'திருக்குறள்' },
   thirukuralSub: { en: '1330 couplets · 133 chapters', ta: '1330 குறட்பாக்கள் · 133 அதிகாரம்' },

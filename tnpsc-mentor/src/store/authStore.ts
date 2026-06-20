@@ -1,7 +1,28 @@
 import { create } from 'zustand'
-import { api, tokens, isApiConfigured } from '../lib/api'
+import { api, tokens, isApiConfigured, ApiError, type DeviceSession } from '../lib/api'
 import { useLanguageStore } from './languageStore'
 import type { Profile, UserRole } from '../types'
+
+/** Result of a sign-in attempt. `deviceLimit` means the account is already on
+ * the max number of devices — `devices` carries them so the UI can offer to
+ * sign one out. */
+export interface SignInResult {
+  error: string | null
+  deviceLimit?: boolean
+  devices?: DeviceSession[]
+}
+
+/** Pull the device list off a `device_limit` 403, or null if it's a different error. */
+function deviceLimitFrom(e: unknown): DeviceSession[] | null {
+  if (
+    e instanceof ApiError &&
+    e.status === 403 &&
+    (e.data as { error?: string })?.error === 'device_limit'
+  ) {
+    return ((e.data as { devices?: DeviceSession[] }).devices ?? []) as DeviceSession[]
+  }
+  return null
+}
 
 /** Adopt the account's saved language so the preference follows the user across
  * devices and the one-time language screen isn't shown again after onboarding.
@@ -26,8 +47,10 @@ export interface AuthState {
 
   init: () => Promise<void>
   fetchProfile: () => Promise<void>
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>
-  signInWithGoogle: (idToken: string) => Promise<{ error: string | null }>
+  signIn: (email: string, password: string) => Promise<SignInResult>
+  signInWithGoogle: (idToken: string) => Promise<SignInResult>
+  /** Sign out one existing device (by session id) and sign in here. */
+  replaceDevice: (email: string, password: string, sessionId: string) => Promise<SignInResult>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -83,6 +106,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user, profile })
       return { error: null }
     } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices }
       return { error: e instanceof Error ? e.message : 'Sign in failed' }
     }
   },
@@ -94,7 +119,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user, profile })
       return { error: null }
     } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices }
       return { error: e instanceof Error ? e.message : 'Google sign-in failed' }
+    }
+  },
+
+  replaceDevice: async (email, password, sessionId) => {
+    try {
+      const { user, profile } = await api.auth.replaceDevice(email.trim(), password, sessionId)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices }
+      return { error: e instanceof Error ? e.message : 'Could not switch device' }
     }
   },
 

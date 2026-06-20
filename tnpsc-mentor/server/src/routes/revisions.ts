@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { recordSeen } from '../lib/seen.js'
 
 const router = Router()
 
@@ -86,6 +87,8 @@ router.post(
         if (questions.length >= requested) break
       }
     }
+
+    void recordSeen(req, questions)
 
     res.json({
       revisionId: row.id,

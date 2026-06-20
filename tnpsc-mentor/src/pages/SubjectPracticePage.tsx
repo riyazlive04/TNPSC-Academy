@@ -83,6 +83,7 @@ function subjectIcon(name: string): LucideIcon {
 // picker is then instant (no spinner, no refetch). Cleared only on full reload.
 let subjectsCache: { subject: string; total: number }[] | null = null
 const topicsCache = new Map<string, string[]>()
+const topicCountsCache = new Map<string, Record<string, number>>()
 const qtypeCache = new Map<string, Record<string, number>>()
 const qKey = (subject: string, topic?: string) => `${subject}|${topic ?? ALL_TOPICS}`
 
@@ -100,6 +101,7 @@ export default function SubjectPracticePage() {
   const [topic, setTopic] = useState<string | null>(null) // null = none; ALL_TOPICS = all
 
   const [topics, setTopics] = useState<string[]>([])
+  const [topicCounts, setTopicCounts] = useState<Record<string, number>>({})
   const [counts, setCounts] = useState<Record<string, number>>({})
 
   const [loadingSubjects, setLoadingSubjects] = useState(!subjectsCache)
@@ -132,9 +134,11 @@ export default function SubjectPracticePage() {
     }
   }, [])
 
-  // Step 2 - topics for the chosen subject (cached per subject).
+  // Step 2 - topics for the chosen subject (cached per subject), with the
+  // per-topic question counts shown on each row.
   useEffect(() => {
     if (!subject) return
+    setTopicCounts(topicCountsCache.get(subject) ?? {})
     const cached = topicsCache.get(subject)
     if (cached) {
       setTopics(cached)
@@ -155,6 +159,23 @@ export default function SubjectPracticePage() {
       })
       .catch(() => !cancelled && setErrored(true))
       .finally(() => !cancelled && setLoadingTopics(false))
+    return () => {
+      cancelled = true
+    }
+  }, [subject])
+
+  // Step 2 - per-topic counts (cached per subject; independent of topic order).
+  useEffect(() => {
+    if (!subject || topicCountsCache.has(subject)) return
+    let cancelled = false
+    api
+      .subjectTopicCounts(subject)
+      .then((c) => {
+        if (cancelled) return
+        topicCountsCache.set(subject, c)
+        setTopicCounts(c)
+      })
+      .catch(() => {})
     return () => {
       cancelled = true
     }
@@ -289,6 +310,8 @@ export default function SubjectPracticePage() {
               error={errorText}
               groups={topicGroups}
               topic={topic}
+              topicCounts={topicCounts}
+              questionsWord={t('questionsCount')}
               allTopicsLabel={t('allTopics')}
               allTopicsSub={t('allTopicsSub')}
               topicLabel={(tp) => topicName(tp, lang)}
@@ -410,6 +433,8 @@ function TopicStep({
   error,
   groups,
   topic,
+  topicCounts,
+  questionsWord,
   allTopicsLabel,
   allTopicsSub,
   topicLabel,
@@ -419,6 +444,8 @@ function TopicStep({
   error: string
   groups: { heading: string | null; topics: string[] }[]
   topic: string | null
+  topicCounts: Record<string, number>
+  questionsWord: string
   allTopicsLabel: string
   allTopicsSub: string
   topicLabel: (tp: string) => string
@@ -426,6 +453,8 @@ function TopicStep({
 }) {
   if (loading) return <CenterSpinner />
   if (error) return <ErrorText text={error} />
+
+  const grandTotal = Object.values(topicCounts).reduce((s, n) => s + n, 0)
 
   return (
     <div className="space-y-6">
@@ -445,7 +474,18 @@ function TopicStep({
           <span className="block font-heading text-base font-semibold text-white">
             {allTopicsLabel}
           </span>
-          <span className="tamil block font-body text-xs text-white/70">{allTopicsSub}</span>
+          <span className="tamil block font-body text-xs text-white/70">
+            {allTopicsSub}
+            {grandTotal > 0 && (
+              <>
+                {' · '}
+                <span className="font-heading font-semibold tabular-nums text-white/90">
+                  {grandTotal.toLocaleString()}
+                </span>{' '}
+                {questionsWord}
+              </>
+            )}
+          </span>
         </span>
         <ChevronRight
           size={18}
@@ -458,20 +498,33 @@ function TopicStep({
         <section key={g.heading ?? `g${gi}`} className="space-y-1">
           {g.heading && <SectionHeader title={topicLabel(g.heading)} className="px-1" />}
           <List>
-            {g.topics.map((tp, i) => (
-              <ListRow
-                key={tp}
-                onClick={() => onPick(tp)}
-                style={{ '--i': i } as React.CSSProperties}
-                className={topic === tp ? 'rounded-field ring-2 ring-primary/40' : ''}
-                leading={
-                  <IconTile tint="violet">
-                    <Layers size={18} />
-                  </IconTile>
-                }
-                title={topicLabel(tp)}
-              />
-            ))}
+            {g.topics.map((tp, i) => {
+              const n = topicCounts[tp]
+              return (
+                <ListRow
+                  key={tp}
+                  onClick={() => onPick(tp)}
+                  style={{ '--i': i } as React.CSSProperties}
+                  className={topic === tp ? 'rounded-field ring-2 ring-primary/40' : ''}
+                  leading={
+                    <IconTile tint="violet">
+                      <Layers size={18} />
+                    </IconTile>
+                  }
+                  title={topicLabel(tp)}
+                  subtitle={
+                    n != null ? (
+                      <span className="flex items-baseline gap-1">
+                        <span className="font-heading font-bold tabular-nums text-primary">
+                          {n.toLocaleString()}
+                        </span>
+                        <span>{questionsWord}</span>
+                      </span>
+                    ) : undefined
+                  }
+                />
+              )
+            })}
           </List>
         </section>
       ))}

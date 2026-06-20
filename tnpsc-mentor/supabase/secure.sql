@@ -97,7 +97,10 @@ as $$
          q.difficulty, q.images, q.source_tag,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
-  from public.questions q, cfg
+  from public.questions q
+  cross join cfg
+  left join public.seen_questions sq
+    on sq.question_id = q.id and sq.user_id = auth.uid()
   where
     q.active
     -- 'outer' is an admin-only subject bank: keep it out of student tests.
@@ -118,7 +121,8 @@ as $$
     and (cfg.mock or cfg.aptitude_type  is null or q.aptitude_type  = cfg.aptitude_type)
     and (cfg.mock or cfg.aptitude_topic is null or q.aptitude_topic = cfg.aptitude_topic)
     and (cfg.exclude_ids is null or not (q.id = any(cfg.exclude_ids)))
-  order by random()
+  -- Unseen first; among seen, longest-ago first; random within each group.
+  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
   limit (select lim from cfg);
 $$;
 
@@ -538,6 +542,22 @@ as $$
   group by q.question_type;
 $$;
 
+-- Per-topic question counts for a Subject-Practice subject. Powers the count
+-- shown on each topic row of the Topic step (and the "All Topics" total).
+create or replace function public.subject_topic_counts(p_subject text)
+returns table(value text, total bigint)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select q.topic, count(*)
+  from public.questions q
+  where q.category = 'subject' and q.active and q.topic is not null
+    and (p_subject is null or q.subject = p_subject)
+  group by q.topic;
+$$;
+
 create or replace function public.pyq_history_period_counts()
 returns table(value text, total bigint)
 language sql
@@ -581,11 +601,13 @@ as $$
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q
+  left join public.seen_questions sq
+    on sq.question_id = q.id and sq.user_id = auth.uid()
   where q.category = 'subject' and q.active
     and (p_subject    is null or q.subject    = p_subject)
     and (p_topic      is null or q.topic      = p_topic)
     and (p_difficulty is null or q.difficulty = p_difficulty)
-  order by random()
+  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
   limit greatest(least(coalesce(p_count, 50), 200), 1);
 $$;
 
@@ -616,6 +638,8 @@ as $$
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
   from public.questions q
+  left join public.seen_questions sq
+    on sq.question_id = q.id and sq.user_id = auth.uid()
   where q.active
     -- match ANY of the slot's queries; the EXISTS dedupes (each row once).
     and exists (
@@ -633,7 +657,7 @@ as $$
           )
         )
     )
-  order by random()
+  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
   limit greatest(coalesce(p_count, 0), 0);
 $$;
 
@@ -665,6 +689,7 @@ grant execute on function public.grade_review(uuid, text)    to authenticated;
 grant execute on function public.admin_list_questions(jsonb) to authenticated;
 grant execute on function public.distinct_question_topics(jsonb) to authenticated;
 grant execute on function public.subject_qtype_counts(text, text) to authenticated;
+grant execute on function public.subject_topic_counts(text)   to authenticated;
 grant execute on function public.pyq_history_period_counts()  to authenticated;
 grant execute on function public.subject_mock_questions(text, text, text, int) to authenticated;
 grant execute on function public.mock_slot_questions(jsonb, int) to authenticated;

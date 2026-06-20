@@ -312,7 +312,10 @@ as $$
          q.difficulty, q.images, q.source_tag,
          q.question_text_ta, q.option_a_ta, q.option_b_ta,
          q.option_c_ta, q.option_d_ta
-  from public.questions q, cfg
+  from public.questions q
+  cross join cfg
+  left join public.seen_questions sq
+    on sq.question_id = q.id and sq.user_id = auth.uid()
   where
     q.active
     and (q.category <> 'outer' or cfg.category = 'outer')
@@ -331,7 +334,8 @@ as $$
     and (cfg.mock or cfg.aptitude_type  is null or q.aptitude_type  = cfg.aptitude_type)
     and (cfg.mock or cfg.aptitude_topic is null or q.aptitude_topic = cfg.aptitude_topic)
     and (cfg.exclude_ids is null or not (q.id = any(cfg.exclude_ids)))
-  order by random()
+  -- Unseen first; among seen, longest-ago first; random within each group.
+  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
   limit (select lim from cfg);
 $$;
 

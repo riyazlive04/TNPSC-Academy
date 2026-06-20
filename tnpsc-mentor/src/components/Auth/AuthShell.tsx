@@ -80,8 +80,8 @@ export default function AuthShell({ children }: AuthShellProps) {
       </aside>
 
       {/* ─── Right: form panel ────────────────────────────────────────────── */}
-      <div className="flex min-h-dvh items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
-        <div className="w-full max-w-md animate-fadeIn">
+      <div className="flex min-h-dvh min-w-0 items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
+        <div className="w-full min-w-0 max-w-md animate-fadeIn">
           <div className="mb-7 flex flex-col items-center text-center lg:hidden">
             <span className="mb-3 grid h-12 w-12 place-items-center rounded-tile bg-brand-gradient text-xl font-semibold text-white shadow-brand">
               த
