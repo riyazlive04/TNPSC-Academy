@@ -169,7 +169,7 @@ export default function SubjectPracticePage() {
     if (!subject || topicCountsCache.has(subject)) return
     let cancelled = false
     api
-      .subjectTopicCounts(subject)
+      .topicCounts({ category: 'subject', subject })
       .then((c) => {
         if (cancelled) return
         topicCountsCache.set(subject, c)

@@ -12,11 +12,58 @@ import type { QuizConfig } from '../types'
 
 type CAView = 'month_wise' | 'topic_wise'
 
+// Module-level caches so the counts survive navigating away and back.
+let monthCountsCache: Record<string, number> | null = null
+let topicCountsCache: Record<string, number> | null = null
+
 export default function CurrentAffairsPage() {
   const startTest = useStartTest()
   const navigate = useNavigate()
   const { t, lang } = useT()
   const [view, setView] = useState<CAView>('month_wise')
+
+  // Per-month / per-topic question counts shown on every row.
+  const [monthCounts, setMonthCounts] = useState<Record<string, number> | null>(monthCountsCache)
+  const [topicCounts, setTopicCounts] = useState<Record<string, number> | null>(topicCountsCache)
+
+  // Month counts: one HEAD count per month (mirrors the PYQ subject pattern).
+  useEffect(() => {
+    if (monthCountsCache) return
+    let cancelled = false
+    Promise.all(
+      CA_MONTHS.map((m) =>
+        api
+          .countQuestions({ category: 'current_affairs', ca_type: 'month_wise', ca_month: m.label })
+          .then((n) => [m.label, n] as const)
+          .catch(() => [m.label, 0] as const)
+      )
+    ).then((pairs) => {
+      if (cancelled) return
+      const map = Object.fromEntries(pairs)
+      monthCountsCache = map
+      setMonthCounts(map)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Topic counts: a single grouped call across the CA bank.
+  useEffect(() => {
+    if (topicCountsCache) return
+    let cancelled = false
+    api
+      .topicCounts({ category: 'current_affairs' })
+      .then((m) => {
+        if (cancelled) return
+        topicCountsCache = m
+        setTopicCounts(m)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Weekly revision - a 20-question mixed current-affairs consolidation drill.
   const startWeeklyRevision = () => {
@@ -127,19 +174,33 @@ export default function CurrentAffairsPage() {
             {t('selectMonth')}
           </h3>
           <List>
-            {CA_MONTHS.map((m, i) => (
-              <ListRow
-                key={m.slug}
-                onClick={() => handleMonth(m.label)}
-                style={{ '--i': i } as React.CSSProperties}
-                leading={
-                  <IconTile tint="green">
-                    <CalendarDays size={18} />
-                  </IconTile>
-                }
-                title={m.label}
-              />
-            ))}
+            {CA_MONTHS.map((m, i) => {
+              const n = monthCounts?.[m.label]
+              return (
+                <ListRow
+                  key={m.slug}
+                  disabled={n === 0}
+                  onClick={() => handleMonth(m.label)}
+                  style={{ '--i': i } as React.CSSProperties}
+                  leading={
+                    <IconTile tint="green">
+                      <CalendarDays size={18} />
+                    </IconTile>
+                  }
+                  title={m.label}
+                  subtitle={
+                    n != null ? (
+                      <span className="flex items-baseline gap-1">
+                        <span className="font-heading font-bold tabular-nums text-primary">
+                          {n.toLocaleString()}
+                        </span>
+                        <span>{t('questionsCount')}</span>
+                      </span>
+                    ) : undefined
+                  }
+                />
+              )
+            })}
           </List>
         </section>
       )}
@@ -159,19 +220,32 @@ export default function CurrentAffairsPage() {
             </div>
           ) : (
             <List>
-              {topics.map((topic, i) => (
-                <ListRow
-                  key={topic}
-                  onClick={() => handleTopic(topic)}
-                  style={{ '--i': i } as React.CSSProperties}
-                  leading={
-                    <IconTile tint="green">
-                      <Newspaper size={18} />
-                    </IconTile>
-                  }
-                  title={topicName(topic, lang)}
-                />
-              ))}
+              {topics.map((topic, i) => {
+                const n = topicCounts?.[topic]
+                return (
+                  <ListRow
+                    key={topic}
+                    onClick={() => handleTopic(topic)}
+                    style={{ '--i': i } as React.CSSProperties}
+                    leading={
+                      <IconTile tint="green">
+                        <Newspaper size={18} />
+                      </IconTile>
+                    }
+                    title={topicName(topic, lang)}
+                    subtitle={
+                      n != null ? (
+                        <span className="flex items-baseline gap-1">
+                          <span className="font-heading font-bold tabular-nums text-primary">
+                            {n.toLocaleString()}
+                          </span>
+                          <span>{t('questionsCount')}</span>
+                        </span>
+                      ) : undefined
+                    }
+                  />
+                )
+              })}
             </List>
           )}
         </section>

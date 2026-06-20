@@ -15,6 +15,12 @@ const CATEGORIES: { id: AptType; labelKey: StringKey; icon: React.ReactNode }[] 
   { id: 'reasoning', labelKey: 'reasoning', icon: <Brain size={22} /> },
 ]
 
+// Per-topic counts for each sub-category, fetched once and cached module-level so
+// re-entering the page is instant. Map: aptitude_type -> { topic -> count }.
+let aptCountsCache: Record<AptType, Record<string, number>> | null = null
+const sumCounts = (m?: Record<string, number>) =>
+  m ? Object.values(m).reduce((s, n) => s + n, 0) : 0
+
 /**
  * Aptitude picker. Step 1 chooses the sub-category (Numerics / Reasoning); step 2
  * lists that sub-category's topics as cards. Picking a topic - or "All Topics" -
@@ -28,6 +34,31 @@ export default function AptitudePage() {
   const [topics, setTopics] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [counts, setCounts] = useState<Record<AptType, Record<string, number>> | null>(
+    aptCountsCache
+  )
+
+  // Per-topic counts for both sub-categories, fetched once on mount.
+  useEffect(() => {
+    if (aptCountsCache) return
+    let cancelled = false
+    Promise.all(
+      CATEGORIES.map((c) =>
+        api
+          .topicCounts({ category: 'aptitude', aptitude_type: c.id })
+          .then((m) => [c.id, m] as const)
+          .catch(() => [c.id, {}] as const)
+      )
+    ).then((pairs) => {
+      if (cancelled) return
+      const map = Object.fromEntries(pairs) as Record<AptType, Record<string, number>>
+      aptCountsCache = map
+      setCounts(map)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (!type) return
@@ -69,6 +100,7 @@ export default function AptitudePage() {
       <div className="mb-8 grid grid-cols-2 gap-3">
         {CATEGORIES.map((c) => {
           const active = type === c.id
+          const n = sumCounts(counts?.[c.id])
           return (
             <button
               key={c.id}
@@ -88,7 +120,19 @@ export default function AptitudePage() {
               >
                 {c.icon}
               </span>
-              <span className="tamil font-display text-sm font-bold">{t(c.labelKey)}</span>
+              <span className="min-w-0">
+                <span className="tamil block font-display text-sm font-bold">{t(c.labelKey)}</span>
+                {n > 0 && (
+                  <span
+                    className={[
+                      'block font-body text-xs',
+                      active ? 'text-white/70' : 'text-muted',
+                    ].join(' ')}
+                  >
+                    <span className="font-heading font-bold tabular-nums">{n}</span> {t('questionsCount')}
+                  </span>
+                )}
+              </span>
             </button>
           )
         })}
@@ -123,26 +167,49 @@ export default function AptitudePage() {
                 <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
                   <Shuffle size={20} />
                 </span>
-                <span className="relative min-w-0 flex-1 font-display text-base font-semibold text-white">
-                  {t('allTopics')}
+                <span className="relative min-w-0 flex-1">
+                  <span className="block font-display text-base font-semibold text-white">
+                    {t('allTopics')}
+                  </span>
+                  {sumCounts(counts?.[type]) > 0 && (
+                    <span className="block font-body text-xs text-white/70">
+                      <span className="font-heading font-bold tabular-nums">
+                        {sumCounts(counts?.[type])}
+                      </span>{' '}
+                      {t('questionsCount')}
+                    </span>
+                  )}
                 </span>
                 <ChevronRight size={18} className="relative flex-shrink-0 text-white/50" />
               </button>
 
               <List>
-                {topics.map((tp, i) => (
-                  <ListRow
-                    key={tp}
-                    onClick={() => begin(tp)}
-                    style={{ '--i': i } as React.CSSProperties}
-                    leading={
-                      <IconTile tint="violet">
-                        <Layers size={18} />
-                      </IconTile>
-                    }
-                    title={topicName(tp, lang)}
-                  />
-                ))}
+                {topics.map((tp, i) => {
+                  const n = counts?.[type]?.[tp]
+                  return (
+                    <ListRow
+                      key={tp}
+                      onClick={() => begin(tp)}
+                      style={{ '--i': i } as React.CSSProperties}
+                      leading={
+                        <IconTile tint="violet">
+                          <Layers size={18} />
+                        </IconTile>
+                      }
+                      title={topicName(tp, lang)}
+                      subtitle={
+                        n != null ? (
+                          <span className="flex items-baseline gap-1">
+                            <span className="font-heading font-bold tabular-nums text-primary">
+                              {n.toLocaleString()}
+                            </span>
+                            <span>{t('questionsCount')}</span>
+                          </span>
+                        ) : undefined
+                      }
+                    />
+                  )
+                })}
               </List>
             </div>
           )}
