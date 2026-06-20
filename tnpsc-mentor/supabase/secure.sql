@@ -558,6 +558,44 @@ as $$
   group by q.topic;
 $$;
 
+-- Per-topic question counts for ANY category's topic picker. Mirrors the
+-- per-category column logic of distinct_question_topics (aptitude_topic /
+-- topic-or-ca_topic / topic) so the Aptitude, Current-Affairs, Samacheer and
+-- Subject pickers can all show a count on every topic row from one call.
+create or replace function public.question_topic_counts(p_config jsonb)
+returns table(value text, total bigint)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  with cfg as (
+    select
+      p_config->>'category'        as category,
+      p_config->>'subject'         as subject,
+      (p_config->>'standard')::int as standard,
+      p_config->>'aptitude_type'   as aptitude_type
+  )
+  select t, count(*) from (
+    select
+      case
+        when cfg.category = 'aptitude'        then q.aptitude_topic
+        when cfg.category = 'current_affairs' then coalesce(q.topic, q.ca_topic)
+        else q.topic
+      end as t
+    from public.questions q, cfg
+    where q.category = cfg.category
+      -- Match distinct_question_topics' active rule per category.
+      and (cfg.category in ('samacheer', 'current_affairs') or q.active)
+      and (cfg.subject is null or q.subject = cfg.subject)
+      and (cfg.standard is null or q.standard = cfg.standard)
+      and (cfg.aptitude_type is null or cfg.category <> 'aptitude'
+            or q.aptitude_type = cfg.aptitude_type)
+  ) s
+  where t is not null
+  group by t;
+$$;
+
 create or replace function public.pyq_history_period_counts()
 returns table(value text, total bigint)
 language sql
@@ -690,6 +728,7 @@ grant execute on function public.admin_list_questions(jsonb) to authenticated;
 grant execute on function public.distinct_question_topics(jsonb) to authenticated;
 grant execute on function public.subject_qtype_counts(text, text) to authenticated;
 grant execute on function public.subject_topic_counts(text)   to authenticated;
+grant execute on function public.question_topic_counts(jsonb) to authenticated;
 grant execute on function public.pyq_history_period_counts()  to authenticated;
 grant execute on function public.subject_mock_questions(text, text, text, int) to authenticated;
 grant execute on function public.mock_slot_questions(jsonb, int) to authenticated;

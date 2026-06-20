@@ -257,16 +257,26 @@ router.post(
 )
 
 // ─── POST /api/questions/topic-counts ────────────────────────────────────────
-// Subject Practice: per-topic question counts for a subject (category='subject').
-// Lets the Topic step show how many questions each topic holds + an "All Topics"
-// total. Grouped server-side so banks larger than 1000 rows stay accurate.
+// Per-topic question counts for a category's topic picker — the count shown on
+// every topic row (Subject Practice, Aptitude, Current Affairs, …). Grouped
+// server-side so banks larger than 1000 rows stay accurate. The per-category
+// topic column (aptitude_topic / topic-or-ca_topic / topic) is handled by the
+// question_topic_counts RPC, mirroring the /topics endpoint.
 router.post(
   '/topic-counts',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { subject } = req.body ?? {}
-    const { data, error } = await req.db!.rpc('subject_topic_counts', {
-      p_subject: subject ?? null,
+    const { category = 'subject', subject, standard, aptitude_type } = req.body ?? {}
+    const known = ['aptitude', 'samacheer', 'pyq', 'subject', 'current_affairs']
+    if (!known.includes(category)) return res.json({ counts: {} })
+
+    const { data, error } = await req.db!.rpc('question_topic_counts', {
+      p_config: {
+        category,
+        subject: subject ?? null,
+        standard: standard ?? null,
+        aptitude_type: aptitude_type ?? null,
+      },
     })
     if (!error) {
       const counts: Record<string, number> = {}
@@ -277,19 +287,25 @@ router.post(
     }
     if (!isMissingFunction(error)) return sendDbError(res, error)
 
-    // Fallback (RPC not migrated yet): count in JS.
-    let q = req.db!
-      .from('questions')
-      .select('topic')
-      .eq('category', 'subject')
-      .eq('active', true)
-      .not('topic', 'is', null)
+    // Fallback (RPC not migrated yet): count in JS with per-category column logic.
+    const col = category === 'aptitude' ? 'aptitude_topic'
+      : category === 'current_affairs' ? 'topic, ca_topic'
+      : 'topic'
+    let q = req.db!.from('questions').select(col).eq('category', category)
+    if (category !== 'samacheer' && category !== 'current_affairs') {
+      q = q.eq('active', true)
+    }
     if (subject) q = q.eq('subject', subject)
+    if (category === 'samacheer' && standard != null) q = q.eq('standard', standard)
+    if (category === 'aptitude' && aptitude_type) q = q.eq('aptitude_type', aptitude_type)
     const { data: rows, error: e2 } = await q
     if (e2) return sendDbError(res, e2)
     const counts: Record<string, number> = {}
-    for (const r of (rows ?? []) as { topic: string | null }[]) {
-      if (r.topic) counts[r.topic] = (counts[r.topic] ?? 0) + 1
+    for (const r of (rows ?? []) as unknown as Record<string, string | null>[]) {
+      const v = category === 'aptitude' ? r.aptitude_topic
+        : category === 'current_affairs' ? (r.topic ?? r.ca_topic)
+        : r.topic
+      if (v) counts[v] = (counts[v] ?? 0) + 1
     }
     res.json({ counts })
   })

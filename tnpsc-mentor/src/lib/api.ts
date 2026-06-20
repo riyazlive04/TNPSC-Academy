@@ -288,11 +288,16 @@ export const api = {
     })
     return data.counts
   },
-  /** Subject Practice: per-topic question counts for one subject. */
-  async subjectTopicCounts(subject: string): Promise<Record<string, number>> {
+  /** Per-topic question counts for a category's topic picker (count on each row). */
+  async topicCounts(params: {
+    category: string
+    subject?: string
+    standard?: number | null
+    aptitude_type?: string
+  }): Promise<Record<string, number>> {
     const data = await request<{ counts: Record<string, number> }>('/api/questions/topic-counts', {
       method: 'POST',
-      body: { subject },
+      body: params,
     })
     return data.counts
   },
