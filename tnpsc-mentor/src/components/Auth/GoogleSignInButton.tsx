@@ -100,6 +100,29 @@ export default function GoogleSignInButton({
   useEffect(() => {
     if (!CLIENT_ID) return
     let cancelled = false
+    let ro: ResizeObserver | undefined
+    // GIS only takes a fixed pixel width — a hardcoded one overflows narrow
+    // phones. Size it to the container instead (clamped to GIS's 200–400 range)
+    // and re-render on resize so it stays inside the card. The width guard stops
+    // the ResizeObserver from looping on the button's own height changes.
+    let lastWidth = 0
+    const renderButton = () => {
+      const el = containerRef.current
+      if (!el || !window.google) return
+      const avail = Math.floor(el.clientWidth || 300)
+      const width = Math.min(400, Math.max(200, avail))
+      if (Math.abs(width - lastWidth) < 2) return
+      lastWidth = width
+      el.innerHTML = ''
+      window.google.accounts.id.renderButton(el, {
+        theme: 'outline',
+        size: 'large',
+        width,
+        text,
+        shape: 'pill',
+        logo_alignment: 'center',
+      })
+    }
     loadGsi()
       .then(() => {
         if (cancelled || !window.google || !containerRef.current) return
@@ -107,20 +130,16 @@ export default function GoogleSignInButton({
           client_id: CLIENT_ID,
           callback: (resp) => handleRef.current(resp.credential),
         })
-        window.google.accounts.id.renderButton(containerRef.current, {
-          theme: 'outline',
-          size: 'large',
-          width: 320,
-          text,
-          shape: 'pill',
-          logo_alignment: 'center',
-        })
+        renderButton()
+        ro = new ResizeObserver(() => renderButton())
+        ro.observe(containerRef.current)
       })
       .catch((e) =>
         errorRef.current(e instanceof Error ? e.message : 'Failed to load Google sign-in')
       )
     return () => {
       cancelled = true
+      ro?.disconnect()
     }
     // Mount-once: deps are read via refs so the widget isn't re-created per render.
     // eslint-disable-next-line react-hooks/exhaustive-deps

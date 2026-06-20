@@ -5,16 +5,18 @@ import { useAuth } from '../hooks/useAuth'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
 import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
+import DeviceLimitModal from '../components/Auth/DeviceLimitModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
 import { postAuthDestination } from '../lib/authRouting'
+import type { DeviceSession } from '../lib/api'
 import { useT } from '../lib/i18n'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signIn } = useAuth()
+  const { signIn, replaceDevice } = useAuth()
   const { t } = useT()
 
   const [email, setEmail] = useState('')
@@ -22,6 +24,10 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
+  // Device-limit flow: the active devices to choose from, and which one is
+  // currently being signed out.
+  const [devices, setDevices] = useState<DeviceSession[] | null>(null)
+  const [busyDeviceId, setBusyDeviceId] = useState<string | null>(null)
 
   // After login the destination (console / onboarding / deep link / arena) is
   // resolved by the shared post-auth router from the freshly-loaded profile.
@@ -40,15 +46,43 @@ export default function LoginPage() {
     if (!password) return setError(t('errPasswordRequired'))
 
     setLoading(true)
-    const { error: err } = await signIn(email, password)
+    const res = await signIn(email, password)
     setLoading(false)
 
-    if (err) {
-      const f = friendlyAuthError(err)
+    // Account already on the max number of devices → show them so the user can
+    // sign one out and continue here.
+    if (res.deviceLimit) {
+      setDevices(res.devices ?? [])
+      return
+    }
+    if (res.error) {
+      const f = friendlyAuthError(res.error)
       setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
 
+    navigate(postAuthDestination(fromPath), { replace: true })
+  }
+
+  // Sign out the chosen device and sign in here, then continue to the app.
+  const handleSignOutDevice = async (sessionId: string) => {
+    setBusyDeviceId(sessionId)
+    setError('')
+    const res = await replaceDevice(email, password, sessionId)
+    setBusyDeviceId(null)
+
+    if (res.deviceLimit) {
+      // Still over the limit (rare race) — refresh the list and let them retry.
+      setDevices(res.devices ?? [])
+      return
+    }
+    if (res.error) {
+      setDevices(null)
+      const f = friendlyAuthError(res.error)
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+      return
+    }
+    setDevices(null)
     navigate(postAuthDestination(fromPath), { replace: true })
   }
 
@@ -145,6 +179,14 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
+
+      <DeviceLimitModal
+        open={devices !== null}
+        devices={devices ?? []}
+        busyId={busyDeviceId}
+        onSignOut={handleSignOutDevice}
+        onClose={() => setDevices(null)}
+      />
     </AuthShell>
   )
 }

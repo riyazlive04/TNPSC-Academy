@@ -191,6 +191,17 @@ create table if not exists review_items (
 
 create index if not exists idx_review_user_due on review_items(user_id, due_at);
 
+-- ─── Seen-question ledger ("don't show the same question twice") ────────────
+-- Every question served to a learner is recorded here; the sampling RPCs order
+-- unseen questions first. Defined here (before secure.sql) so those functions
+-- can reference it. Full notes in supabase/seen_questions.sql.
+create table if not exists seen_questions (
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  question_id uuid not null references questions(id) on delete cascade,
+  seen_at     timestamptz not null default now(),
+  primary key (user_id, question_id)
+);
+
 -- ─── User Profiles ──────────────────────────────────────────────────────────
 create table if not exists profiles (
   id uuid references auth.users(id) primary key,
@@ -218,11 +229,18 @@ alter table test_sessions enable row level security;
 alter table test_answers enable row level security;
 alter table profiles enable row level security;
 alter table review_items enable row level security;
+alter table seen_questions enable row level security;
 
 drop policy if exists "Users can manage own review items" on review_items;
 create policy "Users can manage own review items"
   on review_items for all to authenticated
   using (auth.uid() = user_id);
+
+drop policy if exists "manage own seen_questions" on seen_questions;
+create policy "manage own seen_questions"
+  on seen_questions for all to authenticated
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+grant select, insert, update, delete on seen_questions to authenticated;
 
 -- Helper: is the current user an admin?
 create or replace function public.is_admin()

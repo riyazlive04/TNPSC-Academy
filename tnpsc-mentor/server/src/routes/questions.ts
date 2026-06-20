@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { recordSeen } from '../lib/seen.js'
 
 const router = Router()
 
@@ -161,7 +162,10 @@ router.post(
     const config = req.body?.config ?? {}
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
-    res.json({ questions: data ?? [] })
+    const questions = (data ?? []) as { id?: string }[]
+    // Mark these as seen so they sink to the back of future draws.
+    void recordSeen(req, questions)
+    res.json({ questions })
   })
 )
 
@@ -249,6 +253,45 @@ router.post(
       if (v) set.add(v)
     }
     res.json({ topics: [...set].sort() })
+  })
+)
+
+// ─── POST /api/questions/topic-counts ────────────────────────────────────────
+// Subject Practice: per-topic question counts for a subject (category='subject').
+// Lets the Topic step show how many questions each topic holds + an "All Topics"
+// total. Grouped server-side so banks larger than 1000 rows stay accurate.
+router.post(
+  '/topic-counts',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { subject } = req.body ?? {}
+    const { data, error } = await req.db!.rpc('subject_topic_counts', {
+      p_subject: subject ?? null,
+    })
+    if (!error) {
+      const counts: Record<string, number> = {}
+      for (const r of (data ?? []) as { value: string; total: number }[]) {
+        counts[r.value] = Number(r.total)
+      }
+      return res.json({ counts })
+    }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): count in JS.
+    let q = req.db!
+      .from('questions')
+      .select('topic')
+      .eq('category', 'subject')
+      .eq('active', true)
+      .not('topic', 'is', null)
+    if (subject) q = q.eq('subject', subject)
+    const { data: rows, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
+    const counts: Record<string, number> = {}
+    for (const r of (rows ?? []) as { topic: string | null }[]) {
+      if (r.topic) counts[r.topic] = (counts[r.topic] ?? 0) + 1
+    }
+    res.json({ counts })
   })
 )
 
@@ -422,6 +465,7 @@ router.post(
       }
     }
 
+    void recordSeen(req, result as { id?: string }[])
     res.json({ questions: shuffle(result) })
   })
 )
@@ -446,7 +490,11 @@ router.post(
       p_difficulty: difficulty ?? null,
       p_count: n,
     })
-    if (!error) return res.json({ questions: data ?? [] })
+    if (!error) {
+      const questions = (data ?? []) as { id?: string }[]
+      void recordSeen(req, questions)
+      return res.json({ questions })
+    }
     if (!isMissingFunction(error)) return sendDbError(res, error)
 
     // Fallback (RPC not migrated yet): fetch then shuffle/slice in JS.
@@ -461,6 +509,7 @@ router.post(
     const { data: rows, error: e2 } = await q
     if (e2) return sendDbError(res, e2)
     const questions = shuffle((rows ?? []) as unknown as Record<string, unknown>[]).slice(0, n)
+    void recordSeen(req, questions as { id?: string }[])
     res.json({ questions })
   })
 )

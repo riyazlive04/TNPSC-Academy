@@ -24,6 +24,7 @@ const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
 const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
 const HistoryPeriodsPage = lazy(() => import('./pages/HistoryPeriodsPage'))
+const PyqAptitudePage = lazy(() => import('./pages/PyqAptitudePage'))
 const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
 const SubjectPracticePage = lazy(() => import('./pages/SubjectPracticePage'))
 const CurrentAffairsPage = lazy(() => import('./pages/CurrentAffairsPage'))
@@ -51,6 +52,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/test-arena', element: <TestArenaPage /> },
   { path: '/test-arena/pyq', element: <PreviousYearPage /> },
   { path: '/test-arena/pyq/history', element: <HistoryPeriodsPage /> },
+  { path: '/test-arena/pyq/aptitude', element: <PyqAptitudePage /> },
   { path: '/test-arena/subjects', element: <SubjectPracticePage /> },
   // Samacheer is hidden from the dashboard but its route is kept for direct/admin
   // access (its data currently lives in questions_backup).

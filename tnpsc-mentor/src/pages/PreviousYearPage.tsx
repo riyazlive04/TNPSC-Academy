@@ -27,6 +27,9 @@ import { useT } from '../lib/i18n'
 // The History PYQ subject is split by period - picking it opens the
 // Ancient/Medieval/Modern selector instead of starting a test directly.
 const HISTORY_SUBJECT = 'History and INM'
+// The Aptitude PYQ subject is split by style (Numerics / Reasoning) - picking it
+// opens that selector first, mirroring the standalone Aptitude section.
+const APTITUDE_SUBJECT = 'Aptitude'
 
 // Match a PYQ subject to an icon by keyword (bank spellings vary slightly).
 function subjectIcon(name: string): LucideIcon {
@@ -76,9 +79,14 @@ export default function PreviousYearPage() {
   }, [])
 
   const begin = (subj: string) => {
-    // History opens the period selector; every other subject starts a test.
+    // History opens the period selector, Aptitude the numeric/reasoning selector;
+    // every other subject starts a test directly.
     if (subj === HISTORY_SUBJECT) {
       navigate('/test-arena/pyq/history')
+      return
+    }
+    if (subj === APTITUDE_SUBJECT) {
+      navigate('/test-arena/pyq/aptitude')
       return
     }
     startTest({
@@ -107,6 +115,7 @@ export default function PreviousYearPage() {
             const Icon = subjectIcon(s)
             const n = counts[s] ?? 0
             const isHistory = s === HISTORY_SUBJECT
+            const isAptitude = s === APTITUDE_SUBJECT
             return (
               <ListRow
                 key={s}
@@ -125,7 +134,7 @@ export default function PreviousYearPage() {
                     </span>
                     <span>
                       {t('questionsCount')}
-                      {isHistory ? ` · ${t('byPeriod')}` : ''}
+                      {isHistory ? ` · ${t('byPeriod')}` : isAptitude ? ` · ${t('byType')}` : ''}
                     </span>
                   </span>
                 }

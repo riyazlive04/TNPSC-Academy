@@ -57,9 +57,13 @@ export const tokens = {
 
 export class ApiError extends Error {
   status: number
-  constructor(message: string, status: number) {
+  /** The parsed JSON error body, so callers can read extra fields (e.g. the
+   * device list returned with a `device_limit` 403). */
+  data: unknown
+  constructor(message: string, status: number, data?: unknown) {
     super(message)
     this.status = status
+    this.data = data
   }
 }
 
@@ -127,7 +131,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   if (res.status === 204) return undefined as T
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
-    throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status)
+    throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
   }
   return data as T
 }
@@ -156,6 +160,21 @@ export const api = {
         method: 'POST',
         auth: false,
         body: { email, password, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
+    /** After a `device_limit` block: sign out the chosen device and sign in here.
+     * Re-sends the credentials (no app token exists yet). */
+    async replaceDevice(
+      email: string,
+      password: string,
+      sessionId: string
+    ): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/login/replace-device', {
+        method: 'POST',
+        auth: false,
+        body: { email, password, session_id: sessionId, device_id: getDeviceId() },
       })
       tokens.set(data.access_token, data.refresh_token)
       return data
@@ -266,6 +285,14 @@ export const api = {
     const data = await request<{ counts: Record<string, number> }>('/api/questions/qtypes', {
       method: 'POST',
       body: params,
+    })
+    return data.counts
+  },
+  /** Subject Practice: per-topic question counts for one subject. */
+  async subjectTopicCounts(subject: string): Promise<Record<string, number>> {
+    const data = await request<{ counts: Record<string, number> }>('/api/questions/topic-counts', {
+      method: 'POST',
+      body: { subject },
     })
     return data.counts
   },
