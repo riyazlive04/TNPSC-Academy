@@ -5,17 +5,19 @@ interface OmrBubblesProps {
   selected: AnswerLetter | null
   onSelect: (letter: AnswerLetter) => void
   disabled?: boolean
+  /** Which letters to show; defaults to A–D. Pass optionLetters(q) for 5-option items. */
+  letters?: AnswerLetter[]
 }
 
 /**
- * A row of four darken-to-fill OMR bubbles (A-D), like a printed answer sheet.
- * The chosen option fills solid; the rest stay hollow outlines. Sizes down on
- * phones so the row + actions fit a narrow screen.
+ * A row of darken-to-fill OMR bubbles (A-D, or A-E for 5-option items), like a
+ * printed answer sheet. The chosen option fills solid; the rest stay hollow
+ * outlines. Sizes down on phones so the row + actions fit a narrow screen.
  */
-export default function OmrBubbles({ selected, onSelect, disabled = false }: OmrBubblesProps) {
+export default function OmrBubbles({ selected, onSelect, disabled = false, letters = LETTERS }: OmrBubblesProps) {
   return (
     <div className="flex items-center gap-2 sm:gap-3">
-      {LETTERS.map((letter) => {
+      {letters.map((letter) => {
         const on = selected === letter
         return (
           <button

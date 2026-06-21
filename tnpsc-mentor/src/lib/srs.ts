@@ -53,12 +53,14 @@ interface DueRow {
   option_b: string
   option_c: string
   option_d: string
+  option_e?: string | null
   difficulty?: Question['difficulty']
   question_text_ta?: string | null
   option_a_ta?: string | null
   option_b_ta?: string | null
   option_c_ta?: string | null
   option_d_ta?: string | null
+  option_e_ta?: string | null
 }
 
 /** Items due now (with their question - no answers), oldest-due first. */
@@ -95,12 +97,14 @@ export async function fetchDueItems(_userId: string, limit = 30): Promise<Review
         option_b: r.option_b,
         option_c: r.option_c,
         option_d: r.option_d,
+        option_e: r.option_e,
         difficulty: r.difficulty,
         question_text_ta: r.question_text_ta,
         option_a_ta: r.option_a_ta,
         option_b_ta: r.option_b_ta,
         option_c_ta: r.option_c_ta,
         option_d_ta: r.option_d_ta,
+        option_e_ta: r.option_e_ta,
       },
     }))
   } catch {

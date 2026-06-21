@@ -1,7 +1,8 @@
-import { Router } from 'express'
+import { Router, type Request, type Response } from 'express'
+import { rateLimit } from 'express-rate-limit'
 import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
-import { isAllowedOrigin, googleEnabled } from '../config.js'
+import { config, isAllowedOrigin, googleEnabled } from '../config.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import {
   registerLoginSession,
@@ -10,6 +11,8 @@ import {
   revokeSessionById,
   listSessions,
   deviceLabel,
+  sessionIdFromToken,
+  type DeviceSession,
 } from '../sessions.js'
 
 const router = Router()
@@ -17,6 +20,113 @@ const router = Router()
 /** The device id the browser sends with auth calls (empty for legacy clients). */
 function deviceId(req: { body?: { device_id?: unknown } }): string {
   return typeof req.body?.device_id === 'string' ? req.body.device_id : ''
+}
+
+/**
+ * Identity the device-limit binds to. Prefer the un-forgeable GoTrue `session_id`
+ * carried in the freshly-minted access token; fall back to the client `device_id`
+ * only for legacy tokens that lack the claim. Using the session id means the cap
+ * counts REAL sessions — a client can no longer pin one id to share an account, or
+ * rotate ids to evict the owner, because it doesn't choose this value.
+ */
+function deviceKey(accessToken: string | undefined, req: { body?: { device_id?: unknown } }): string {
+  return sessionIdFromToken(accessToken) || deviceId(req)
+}
+
+// ─── Refresh-token cookie (web only) ─────────────────────────────────────────
+// The WEB client keeps its refresh token in this HttpOnly cookie — unreadable by
+// JS, so an XSS can't exfiltrate it (the durable credential). The native app
+// can't rely on cross-site cookies in the Android WebView, so it continues to
+// receive the refresh token in the JSON body and send it back explicitly; both
+// transports are supported in parallel.
+const RT_COOKIE = 'tnpsc_rt'
+const RT_MAX_AGE_MS = 60 * 24 * 60 * 60 * 1000 // 60 days
+// Scoped to /api/auth so the cookie is only ever sent to the auth endpoints that
+// need it (login/refresh/logout), never to data routes.
+const RT_PATH = '/api/auth'
+
+/** Persist the refresh token in the HttpOnly cookie (web path). Harmless for the
+ * native app, which ignores it and uses the body token instead. */
+function setRtCookie(res: Response, refreshToken: string): void {
+  res.cookie(RT_COOKIE, refreshToken, {
+    httpOnly: true,
+    secure: config.isProd,
+    sameSite: config.isProd ? 'none' : 'lax',
+    path: RT_PATH,
+    maxAge: RT_MAX_AGE_MS,
+  })
+}
+
+/** Clear the refresh-token cookie on logout. */
+function clearRtCookie(res: Response): void {
+  res.clearCookie(RT_COOKIE, {
+    httpOnly: true,
+    secure: config.isProd,
+    sameSite: config.isProd ? 'none' : 'lax',
+    path: RT_PATH,
+  })
+}
+
+// ─── Brute-force / abuse limiters ────────────────────────────────────────────
+// The global /api/auth limiter (30/min/IP, see index.ts) is a coarse net. These
+// are per-CREDENTIAL and per-ACTION so password guessing, credential stuffing and
+// reset-email bombing stay bounded no matter how the attacker spreads requests.
+
+/** Key on the targeted email + client IP, so guessing ONE account is throttled
+ * even across many IPs, and one IP can't fan out across many accounts unchecked. */
+function emailIpKey(req: Request): string {
+  const email =
+    typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : ''
+  return `${email}|${req.ip}`
+}
+
+/** Failed sign-ins per email+IP. Successful logins are skipped, so a legitimate
+ * user is never locked out by their own activity — only wrong guesses count. */
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 8,
+  keyGenerator: emailIpKey,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many sign-in attempts. Please wait a few minutes and try again.' },
+})
+
+/** Sign-ups and password-reset emails per email+IP — stops inbox flooding and
+ * automated account spam. Counts every attempt (success included). */
+const sensitiveLimiter = rateLimit({
+  windowMs: 60 * 60_000,
+  max: 5,
+  keyGenerator: emailIpKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many attempts. Please wait a while and try again.' },
+})
+
+/** Token-based endpoints (Google sign-in, refresh) keyed by IP — no password to
+ * guess, but caps replay / refresh floods from a single source. */
+const tokenLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many requests. Please slow down.' },
+})
+
+/** Device list for the PRE-AUTH device-limit screen. Strips the raw device_id —
+ * a fingerprint an attacker who has the password could otherwise harvest to spoof
+ * or evict sessions. The client only needs the opaque session `id` to sign one
+ * out (label + last_seen are display-only). */
+function publicDevices(list: DeviceSession[]) {
+  return list.map((d) => ({
+    id: d.id,
+    label: d.label,
+    created_at: d.created_at,
+    last_seen_at: d.last_seen_at,
+  }))
 }
 
 /** Shape returned to the browser after a successful auth call. */
@@ -41,6 +151,7 @@ async function sessionPayload(session: {
 // ─── POST /api/auth/login ────────────────────────────────────────────────────
 router.post(
   '/login',
+  loginLimiter,
   asyncH(async (req, res) => {
     const { email, password } = req.body ?? {}
     if (!email || !password) {
@@ -51,20 +162,24 @@ router.post(
       password: String(password),
     })
     if (error || !data.session) {
-      return res.status(401).json({ error: error?.message ?? 'Invalid credentials' })
+      // Constant, generic message: never echo GoTrue's text (which can distinguish
+      // "wrong password" from "no such user" → account enumeration).
+      return res.status(401).json({ error: 'Invalid email or password' })
     }
     // Concurrent-device limit: block a new device once 2 others are active.
     const { blocked } = await registerLoginSession(
       data.session.user.id,
-      deviceId(req),
+      deviceKey(data.session.access_token, req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
       // Return the active devices so the browser can show them and let the user
-      // sign one out (they've proven ownership with the correct password).
-      const devices = await listSessions(data.session.user.id)
+      // sign one out (they've proven ownership with the correct password). The
+      // raw device_id is stripped — see publicDevices.
+      const devices = publicDevices(await listSessions(data.session.user.id))
       return res.status(403).json({ error: 'device_limit', devices })
     }
+    setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
   })
 )
@@ -75,6 +190,7 @@ router.post(
 // exists yet), revoke the chosen session, then claim this device's slot.
 router.post(
   '/login/replace-device',
+  loginLimiter,
   asyncH(async (req, res) => {
     const { email, password, session_id } = req.body ?? {}
     if (!email || !password || !session_id) {
@@ -85,7 +201,7 @@ router.post(
       password: String(password),
     })
     if (error || !data.session) {
-      return res.status(401).json({ error: error?.message ?? 'Invalid credentials' })
+      return res.status(401).json({ error: 'Invalid email or password' })
     }
     const userId = data.session.user.id
     // revokeSessionById is scoped to userId, so a forged session_id from another
@@ -93,13 +209,14 @@ router.post(
     await revokeSessionById(userId, String(session_id))
     const { blocked } = await registerLoginSession(
       userId,
-      deviceId(req),
+      deviceKey(data.session.access_token, req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
-      const devices = await listSessions(userId)
+      const devices = publicDevices(await listSessions(userId))
       return res.status(403).json({ error: 'device_limit', devices })
     }
+    setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
   })
 )
@@ -107,6 +224,7 @@ router.post(
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
 router.post(
   '/register',
+  sensitiveLimiter,
   asyncH(async (req, res) => {
     const { fullName, email, phone, gender, password, targetGroup } = req.body ?? {}
     if (!email || !password || !fullName) {
@@ -118,7 +236,13 @@ router.post(
       options: { data: { full_name: fullName } },
     })
     if (error || !data.user) {
-      return res.status(400).json({ error: error?.message ?? 'Sign up failed' })
+      // Don't echo GoTrue's message ("User already registered" confirms an email
+      // exists → enumeration). Log the real reason server-side, return a soft,
+      // non-confirming message to the client.
+      console.error('[register] sign-up failed', String(email).trim(), error?.message)
+      return res.status(400).json({
+        error: 'Could not complete sign up. If you already have an account, please sign in instead.',
+      })
     }
 
     // Enrich the profile row created by the DB trigger (best-effort, but log
@@ -143,9 +267,10 @@ router.post(
     // Record this device's session (a brand-new account is never over the limit).
     await registerLoginSession(
       data.session.user.id,
-      deviceId(req),
+      deviceKey(data.session.access_token, req),
       deviceLabel(req.headers['user-agent'])
     )
+    setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
   })
 )
@@ -160,6 +285,7 @@ router.post(
 // clobbering values the user may have since edited.
 router.post(
   '/google',
+  tokenLimiter,
   asyncH(async (req, res) => {
     if (!googleEnabled) {
       return res.status(503).json({ error: 'Google sign-in is not configured' })
@@ -173,17 +299,17 @@ router.post(
       ...(nonce ? { nonce: String(nonce) } : {}),
     })
     if (error || !data.session || !data.user) {
-      return res.status(401).json({ error: error?.message ?? 'Google sign-in failed' })
+      return res.status(401).json({ error: 'Google sign-in failed' })
     }
 
     // Concurrent-device limit (same rule as password login).
     const { blocked } = await registerLoginSession(
       data.session.user.id,
-      deviceId(req),
+      deviceKey(data.session.access_token, req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
-      const devices = await listSessions(data.session.user.id)
+      const devices = publicDevices(await listSessions(data.session.user.id))
       return res.status(403).json({ error: 'device_limit', devices })
     }
 
@@ -223,6 +349,7 @@ router.post(
     // First sign-in only: the handle_new_user trigger may not have committed the
     // row yet when we selected, so fall back to a fresh fetch via sessionPayload.
     if (existing) {
+      setRtCookie(res, data.session.refresh_token)
       res.json({
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
@@ -230,6 +357,7 @@ router.post(
         profile: { ...existing, ...patch },
       })
     } else {
+      setRtCookie(res, data.session.refresh_token)
       res.json(await sessionPayload(data.session))
     }
   })
@@ -238,23 +366,40 @@ router.post(
 // ─── POST /api/auth/refresh ──────────────────────────────────────────────────
 router.post(
   '/refresh',
+  tokenLimiter,
   asyncH(async (req, res) => {
-    const { refresh_token } = req.body ?? {}
+    // Web sends the refresh token via the HttpOnly cookie; native sends it in the
+    // body. Accept either, preferring the body (native) when both are present.
+    const bodyToken = typeof req.body?.refresh_token === 'string' ? req.body.refresh_token : ''
+    const cookieToken =
+      typeof req.cookies?.[RT_COOKIE] === 'string' ? (req.cookies[RT_COOKIE] as string) : ''
+    const refresh_token = bodyToken || cookieToken
     if (!refresh_token) return res.status(400).json({ error: 'Missing refresh token' })
     const { data, error } = await supabaseAuthClient.auth.refreshSession({
       refresh_token: String(refresh_token),
     })
     if (error || !data.session) {
-      return res.status(401).json({ error: error?.message ?? 'Could not refresh session' })
+      // The refresh token is dead/rotated → drop the cookie so the browser stops
+      // sending a stale one on every retry.
+      clearRtCookie(res)
+      return res.status(401).json({ error: 'Could not refresh session' })
     }
     // Heartbeat this device + honour a remote sign-out (manage-devices revoke):
     // a revoked session fails to refresh, so that device logs out on its next try.
+    // The refreshed token keeps the SAME session_id, so this matches the row
+    // created at login.
     const { revoked } = await touchSession(
       data.session.user.id,
-      deviceId(req),
+      deviceKey(data.session.access_token, req),
       deviceLabel(req.headers['user-agent'])
     )
-    if (revoked) return res.status(401).json({ error: 'session_revoked' })
+    if (revoked) {
+      clearRtCookie(res)
+      return res.status(401).json({ error: 'session_revoked' })
+    }
+    // Supabase rotates the refresh token on every refresh — persist the new one
+    // back to the cookie (web). Native picks the new token up from the body.
+    setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
   })
 )
@@ -262,6 +407,7 @@ router.post(
 // ─── POST /api/auth/forgot-password ──────────────────────────────────────────
 router.post(
   '/forgot-password',
+  sensitiveLimiter,
   asyncH(async (req, res) => {
     const { email, redirectTo } = req.body ?? {}
     if (!email) return res.status(400).json({ error: 'Email is required' })
@@ -282,7 +428,10 @@ router.post(
       String(email).trim(),
       safeRedirect ? { redirectTo: safeRedirect } : undefined
     )
-    if (error) return res.status(400).json({ error: error.message })
+    // Always answer { ok: true } regardless of outcome: a differential response
+    // (or a raw GoTrue error) would reveal whether the email has an account.
+    // Log the real error server-side for diagnostics.
+    if (error) console.error('[forgot-password] reset failed', String(email).trim(), error.message)
     res.json({ ok: true })
   })
 )
@@ -308,12 +457,16 @@ router.get(
 router.post(
   '/logout',
   asyncH(async (req, res) => {
-    const dev = deviceId(req)
     const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '').trim()
-    if (token && dev) {
+    // Bind to the token's session_id (fall back to the client device_id for legacy
+    // sessions) so logout revokes the same row login created.
+    const key = sessionIdFromToken(token) || deviceId(req)
+    if (token && key) {
       const { data } = await supabaseAdmin.auth.getUser(token)
-      if (data.user) await revokeSession(data.user.id, dev)
+      if (data.user) await revokeSession(data.user.id, key)
     }
+    // Drop the web refresh-token cookie so the browser can't silently re-auth.
+    clearRtCookie(res)
     res.json({ ok: true })
   })
 )
@@ -324,7 +477,19 @@ router.get(
   '/sessions',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    res.json({ sessions: await listSessions(req.userId!) })
+    // Flag the caller's own session via the token's session_id, and strip the raw
+    // device_id/session key from the response — the client only needs the opaque
+    // row `id` (to revoke) and the `current` flag (to mark "this device").
+    const token = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '').trim()
+    const list = await listSessions(req.userId!, sessionIdFromToken(token))
+    const sessions = list.map((d) => ({
+      id: d.id,
+      label: d.label,
+      created_at: d.created_at,
+      last_seen_at: d.last_seen_at,
+      current: !!d.current,
+    }))
+    res.json({ sessions })
   })
 )
 

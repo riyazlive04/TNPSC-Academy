@@ -32,6 +32,22 @@ router.post(
   })
 )
 
+// ─── POST /api/admin/questions/active ────────────────────────────────────────
+// Enable/disable a single question for students (toggles questions.active).
+// active=false hides it from quizzes/revision but keeps it in the admin bank.
+router.post(
+  '/questions/active',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { id, active } = req.body ?? {}
+    if (!id || typeof active !== 'boolean') {
+      return res.status(400).json({ error: 'id and active (boolean) are required' })
+    }
+    const { data, error } = await req.db!.rpc('admin_set_question_active', { p_id: id, p_active: active })
+    if (error) return sendDbError(res, error)
+    res.json({ question: data })
+  })
+)
+
 // ─── DELETE /api/admin/questions/:id ─────────────────────────────────────────
 router.delete(
   '/questions/:id',

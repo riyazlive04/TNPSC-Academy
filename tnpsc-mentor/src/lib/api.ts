@@ -16,8 +16,17 @@ import type {
 } from '../types'
 
 import { getDeviceId } from './device'
+import { Capacitor } from '@capacitor/core'
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
+
+// Web keeps its refresh token in an HttpOnly cookie (set by the server) so a XSS
+// can't read it; the native Android WebView can't rely on cross-site cookies, so
+// it keeps the refresh token in storage and sends it in the request body.
+const isNative = Capacitor.isNativePlatform()
+// Web must send credentials so the refresh cookie is set/sent cross-site; native
+// uses Bearer tokens only and never depends on the cookie.
+const CREDENTIALS: RequestCredentials = isNative ? 'same-origin' : 'include'
 
 /** When false the app runs in "UI-preview" mode (no backend, no auth gate). */
 export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
@@ -47,12 +56,21 @@ export const tokens = {
   },
   set(access: string, refresh: string) {
     localStorage.setItem(ACCESS_KEY, access)
-    localStorage.setItem(REFRESH_KEY, refresh)
+    // Web NEVER persists the refresh token in JS-readable storage — the server's
+    // HttpOnly cookie holds it. Only native (no cross-site cookie) stores it.
+    if (isNative) localStorage.setItem(REFRESH_KEY, refresh)
   },
   clear() {
     localStorage.removeItem(ACCESS_KEY)
     localStorage.removeItem(REFRESH_KEY)
   },
+}
+
+/** Whether a token refresh is worth attempting. Native needs a stored refresh
+ * token; web relies on the HttpOnly cookie (invisible to JS), so it always tries
+ * and lets the server decide based on the cookie. */
+export function canTryRefresh(): boolean {
+  return isNative ? !!tokens.refresh : true
 }
 
 export class ApiError extends Error {
@@ -71,13 +89,17 @@ export class ApiError extends Error {
 let refreshing: Promise<boolean> | null = null
 
 async function doRefresh(): Promise<boolean> {
-  const refresh_token = tokens.refresh
-  if (!refresh_token) return false
+  if (!canTryRefresh()) return false
   try {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token, device_id: getDeviceId() }),
+      credentials: CREDENTIALS,
+      // Native sends its stored refresh token; web sends none — the HttpOnly
+      // cookie carries it automatically with credentials: 'include'.
+      body: JSON.stringify(
+        isNative ? { refresh_token: tokens.refresh, device_id: getDeviceId() } : { device_id: getDeviceId() }
+      ),
     })
     if (!res.ok) return false
     const data = (await res.json()) as SessionResponse
@@ -114,6 +136,10 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     return fetch(url, {
       method,
       headers,
+      // Web includes credentials so the auth endpoints can set/read the HttpOnly
+      // refresh cookie; the cookie is Path-scoped to /api/auth, so data routes
+      // carry nothing extra.
+      credentials: CREDENTIALS,
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
   }
@@ -121,7 +147,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   let res = await send()
 
   // Transparent one-shot refresh on expiry.
-  if (res.status === 401 && auth && tokens.refresh) {
+  if (res.status === 401 && auth && canTryRefresh()) {
     if (!refreshing) refreshing = doRefresh().finally(() => (refreshing = null))
     const ok = await refreshing
     if (ok) res = await send()
@@ -144,13 +170,15 @@ export interface SessionResponse {
   profile: Profile | null
 }
 
-/** One active device session (manage-devices screen). */
+/** One active device session (manage-devices screen). The raw device/session key
+ * is never sent to the client; `current` (set by the server from the request's own
+ * session) marks "this device". */
 export interface DeviceSession {
   id: string
-  device_id: string
   label: string | null
   created_at: string
   last_seen_at: string
+  current?: boolean
 }
 
 export const api = {
@@ -437,6 +465,14 @@ export const api = {
   },
   async adminDeleteQuestion(id: string): Promise<void> {
     await request(`/api/admin/questions/${id}`, { method: 'DELETE' })
+  },
+  /** Admin/superadmin: enable/disable a question for students (toggles active). */
+  async adminSetQuestionActive(id: string, active: boolean): Promise<Question> {
+    const data = await request<{ question: Question }>('/api/admin/questions/active', {
+      method: 'POST',
+      body: { id, active },
+    })
+    return data.question
   },
   async adminBulkInsert(rows: Record<string, unknown>[]): Promise<{ inserted?: number }> {
     const data = await request<{ result: { inserted?: number } | null }>(

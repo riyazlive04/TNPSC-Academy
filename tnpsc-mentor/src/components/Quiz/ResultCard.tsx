@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
-import { LETTERS, displayOption, displayExplanation, whyWrongFor } from '../../types'
+import { optionLetters, displayOption, displayExplanation, whyWrongFor } from '../../types'
 import { Bookmark, Check, X, MinusCircle, Clock, ThumbsUp, ThumbsDown } from 'lucide-react'
 import { useT } from '../../lib/i18n'
 import { topicName } from '../../lib/constants'
@@ -119,7 +119,7 @@ export default function ResultCard({
       {showExplanation ? (
         <>
           <div className="flex flex-col gap-1">
-            {LETTERS.map((letter) => {
+            {optionLetters(question).map((letter) => {
               const isCorrect = question.correct_answer === letter
               const isChosenWrong =
                 answer?.selected_answer === letter && !correct

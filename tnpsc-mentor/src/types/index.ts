@@ -42,7 +42,10 @@ export type Category = 'pyq' | 'samacheer' | 'current_affairs' | 'aptitude' | 'o
 // The five question styles testable in the Subject Practice flow.
 export type SubjectQType = 'chronological' | 'match' | 'assertion_reason' | 'statements' | 'direct'
 export type GroupType = 'Group1' | 'Group2_2A' | 'Group4_VAO'
-export type AnswerLetter = 'A' | 'B' | 'C' | 'D'
+// Most banks are 4-option (A–D). A few imported sets (e.g. the IndiaBix analogy
+// reasoning bank) carry a 5th option E — `option_e` is null on every 4-option
+// row, and optionLetters() only surfaces E when that row actually has it.
+export type AnswerLetter = 'A' | 'B' | 'C' | 'D' | 'E'
 export type Difficulty = 'easy' | 'medium' | 'hard'
 // Role hierarchy: superadmin ⊃ admin ⊃ user. A superadmin inherits every admin
 // ability (the DB `is_admin()` check is widened to include it) and additionally
@@ -59,7 +62,9 @@ export interface Question {
   ca_year?: number
   ca_type?: 'topic_wise' | 'month_wise'
   ca_topic?: string
-  aptitude_type?: 'numerics' | 'reasoning'
+  // numerics/reasoning are the practice-bank types; data_interpretation +
+  // general_studies come from the GOV (TNPSC Group I Mains) bank.
+  aptitude_type?: 'numerics' | 'reasoning' | 'data_interpretation' | 'general_studies'
   aptitude_topic?: string
   subject?: string
   // Broad unit/section grouping above topic. Used by the "Outer" subject banks
@@ -70,6 +75,9 @@ export interface Question {
   question_type?: string
   // Short provenance marker (e.g. 'TU') - rendered as a small badge when set.
   source_tag?: string | null
+  // Whether the question is shown to students. false = hidden from quizzes/
+  // revision but still visible in the admin bank. Only populated on admin reads.
+  active?: boolean
   question_text: string
   // Ordered public URLs of figures that belong to the question stem (diagrams
   // for dice/seating/figure-counting items). Hosted in the Supabase Storage
@@ -79,6 +87,9 @@ export interface Question {
   option_b: string
   option_c: string
   option_d: string
+  // Optional 5th option — present only on 5-option imports (analogy reasoning
+  // bank). Null/absent on every standard 4-option question.
+  option_e?: string | null
   // Answer/explanation columns are NOT delivered to the client during a quiz
   // (they're stripped server-side). They're only populated for the admin bank
   // and merged in after a result is graded - hence optional.
@@ -99,6 +110,7 @@ export interface Question {
   option_b_ta?: string | null
   option_c_ta?: string | null
   option_d_ta?: string | null
+  option_e_ta?: string | null
   explanation_ta?: string | null
 }
 
@@ -351,8 +363,18 @@ export interface ResultPayload {
   revision?: RevisionInfo
 }
 
-// Letter helpers for mapping option index <-> letter
+// The four options every bank has. Use optionLetters(q) when rendering so a
+// 5th option (E) is included only for the questions that actually carry one.
 export const LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D']
+
+/**
+ * The answer letters to render for a specific question: always A–D, plus E when
+ * the question has non-empty `option_e`. This keeps standard 4-option questions
+ * from showing a blank fifth choice while letting 5-option items render in full.
+ */
+export function optionLetters(q: Question): AnswerLetter[] {
+  return q.option_e != null && String(q.option_e).trim() !== '' ? [...LETTERS, 'E'] : LETTERS
+}
 
 export function optionText(q: Question, letter: AnswerLetter): string {
   switch (letter) {
@@ -364,6 +386,8 @@ export function optionText(q: Question, letter: AnswerLetter): string {
       return q.option_c
     case 'D':
       return q.option_d
+    case 'E':
+      return q.option_e ?? ''
   }
 }
 
@@ -377,6 +401,8 @@ function optionTextTa(q: Question, letter: AnswerLetter): string | null | undefi
       return q.option_c_ta
     case 'D':
       return q.option_d_ta
+    case 'E':
+      return q.option_e_ta
   }
 }
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { api, tokens, isApiConfigured, ApiError, type DeviceSession } from '../lib/api'
+import { api, tokens, isApiConfigured, canTryRefresh, ApiError, type DeviceSession } from '../lib/api'
 import { useLanguageStore } from './languageStore'
 import type { Profile, UserRole } from '../types'
 
@@ -76,7 +76,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   init: async () => {
     if (get().initialized) return
     set({ initialized: true })
-    if (!isApiConfigured || !tokens.access) {
+    // Boot if we have an access token OR (on web) a possible HttpOnly refresh
+    // cookie — api.auth.me() triggers a transparent cookie-based refresh when the
+    // access token is absent/expired, so a returning web user stays signed in
+    // without the refresh token ever being readable by JS.
+    if (!isApiConfigured || (!tokens.access && !canTryRefresh())) {
       set({ loading: false })
       return
     }

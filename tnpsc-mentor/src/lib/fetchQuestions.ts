@@ -73,6 +73,15 @@ export async function deleteAdminQuestion(id: string): Promise<void> {
   await api.adminDeleteQuestion(id)
 }
 
+/**
+ * Enable/disable a question for students via the is_admin()-gated
+ * `admin_set_question_active` RPC. Returns the updated row (with its new
+ * `active` flag) so the caller can patch its local list.
+ */
+export async function setAdminQuestionActive(id: string, active: boolean): Promise<Question> {
+  return api.adminSetQuestionActive(id, active)
+}
+
 /** Resolve one language-neutral label segment against a language. */
 function resolveSeg(seg: QuizLabelSeg, lang: Lang | null): string {
   if (typeof seg === 'string') return seg

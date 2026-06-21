@@ -41,6 +41,10 @@ export function isAllowedOrigin(origin?: string): boolean {
 
 export const config = {
   port: Number(process.env.PORT ?? 4000),
+  // Drives refresh-token cookie security: in production the cookie is cross-site
+  // (Vercel → Render) so it must be Secure + SameSite=None; in dev it's served
+  // over http on same-site localhost, so SameSite=Lax without Secure.
+  isProd: (process.env.NODE_ENV ?? 'development') === 'production',
   corsOrigins,
   supabaseUrl: required('SUPABASE_URL'),
   supabaseAnonKey: required('SUPABASE_ANON_KEY'),

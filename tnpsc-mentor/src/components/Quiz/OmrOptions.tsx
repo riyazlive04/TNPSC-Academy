@@ -1,5 +1,5 @@
 import type { AnswerLetter, Question, DisplayLang } from '../../types'
-import { LETTERS, displayOption } from '../../types'
+import { optionLetters, displayOption } from '../../types'
 
 interface OmrOptionsProps {
   question: Question
@@ -26,13 +26,14 @@ export default function OmrOptions({
   onSelect,
   disabled = false,
 }: OmrOptionsProps) {
-  const texts = LETTERS.map((l) => displayOption(question, l, lang))
+  const letters = optionLetters(question)
+  const texts = letters.map((l) => displayOption(question, l, lang))
   const hasText = texts.some((t) => t && t.trim().length > 0)
   if (!hasText) return null
 
   return (
     <div className="mt-4 flex flex-col gap-2">
-      {LETTERS.map((letter, i) => {
+      {letters.map((letter, i) => {
         const on = selected === letter
         return (
           <button

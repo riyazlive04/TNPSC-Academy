@@ -8,6 +8,9 @@ import { LETTERS } from '../../types'
 
 const CATEGORIES: Category[] = ['pyq', 'samacheer', 'current_affairs', 'aptitude']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
+// Editor shows an optional 5th option E (used by the analogy reasoning bank).
+// A–D stay required; E is saved only when filled in.
+const EDIT_LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D', 'E']
 
 interface QuestionEditorProps {
   /** The question being edited; null/undefined means "create new". */
@@ -44,12 +47,14 @@ function buildInitialForm(initial?: Question | null, config?: QuizConfig | null)
     option_b: s((q as Question).option_b),
     option_c: s((q as Question).option_c),
     option_d: s((q as Question).option_d),
+    option_e: s((q as Question).option_e),
     explanation: s((q as Question).explanation),
     question_text_ta: s((q as Question).question_text_ta),
     option_a_ta: s((q as Question).option_a_ta),
     option_b_ta: s((q as Question).option_b_ta),
     option_c_ta: s((q as Question).option_c_ta),
     option_d_ta: s((q as Question).option_d_ta),
+    option_e_ta: s((q as Question).option_e_ta),
     explanation_ta: s((q as Question).explanation_ta),
   }
 }
@@ -65,7 +70,7 @@ export default function QuestionEditor({
   const [correct, setCorrect] = useState<AnswerLetter>(initial?.correct_answer ?? 'A')
   const [why, setWhy] = useState<Record<string, string>>(() => {
     const w = initial?.why_wrong ?? {}
-    return { A: w.A ?? '', B: w.B ?? '', C: w.C ?? '', D: w.D ?? '' }
+    return { A: w.A ?? '', B: w.B ?? '', C: w.C ?? '', D: w.D ?? '', E: w.E ?? '' }
   })
   const [showClassification, setShowClassification] = useState(isNew)
   const [showTamil, setShowTamil] = useState(false)
@@ -87,9 +92,12 @@ export default function QuestionEditor({
       return
     }
 
-    // Only keep why-wrong reasons for letters that are actually wrong.
+    const hasE = !!form.option_e.trim()
+    // Only keep why-wrong reasons for letters that are actually wrong (E only
+    // when the optional 5th option is filled in).
     const whyWrong: Partial<Record<AnswerLetter, string>> = {}
-    for (const l of LETTERS) {
+    for (const l of EDIT_LETTERS) {
+      if (l === 'E' && !hasE) continue
       if (l !== correct && why[l]?.trim()) whyWrong[l] = why[l].trim()
     }
 
@@ -116,6 +124,7 @@ export default function QuestionEditor({
         option_b: form.option_b.trim(),
         option_c: form.option_c.trim(),
         option_d: form.option_d.trim(),
+        option_e: form.option_e.trim() || null,
         correct_answer: correct,
         explanation: form.explanation.trim(),
         why_wrong: Object.keys(whyWrong).length ? whyWrong : null,
@@ -124,6 +133,7 @@ export default function QuestionEditor({
         option_b_ta: form.option_b_ta.trim() || null,
         option_c_ta: form.option_c_ta.trim() || null,
         option_d_ta: form.option_d_ta.trim() || null,
+        option_e_ta: form.option_e_ta.trim() || null,
         explanation_ta: form.explanation_ta.trim() || null,
       })
       onSaved(saved, isNew)
@@ -180,7 +190,7 @@ export default function QuestionEditor({
         <TextArea label="Question text *" value={form.question_text} onChange={set('question_text')} rows={3} />
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {LETTERS.map((l) => (
+          {EDIT_LETTERS.map((l) => (
             <div key={l}>
               <div className="mb-1 flex items-center gap-2">
                 <button
@@ -195,7 +205,9 @@ export default function QuestionEditor({
                   {l}
                 </button>
                 <span className="font-heading text-xs font-semibold uppercase text-ink2">
-                  Option {l} {correct === l && <span className="text-green-600">· correct</span>}
+                  Option {l}
+                  {l === 'E' && <span className="text-ink2/60"> · optional</span>}
+                  {correct === l && <span className="text-green-600"> · correct</span>}
                 </span>
               </div>
               <input
@@ -203,7 +215,7 @@ export default function QuestionEditor({
                 onChange={(e) => set(`option_${l.toLowerCase()}`)(e.target.value)}
                 className={INPUT_CLS}
               />
-              {l !== correct && (
+              {l !== correct && (l !== 'E' || form.option_e.trim()) && (
                 <input
                   value={why[l]}
                   onChange={(e) => setWhy((w) => ({ ...w, [l]: e.target.value }))}
@@ -228,7 +240,7 @@ export default function QuestionEditor({
           >
             <TextArea label="Question (Tamil)" value={form.question_text_ta} onChange={set('question_text_ta')} rows={2} />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              {LETTERS.map((l) => (
+              {EDIT_LETTERS.map((l) => (
                 <Field
                   key={l}
                   label={`Option ${l} (Tamil)`}

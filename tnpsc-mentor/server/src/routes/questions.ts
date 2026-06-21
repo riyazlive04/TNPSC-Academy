@@ -12,8 +12,8 @@ const QUIZ_COLS = [
   'ca_month', 'ca_year', 'ca_type', 'ca_topic',
   'aptitude_type', 'aptitude_topic', 'subject', 'topic',
   'question_type', 'external_id', 'difficulty',
-  'question_text', 'option_a', 'option_b', 'option_c', 'option_d',
-  'question_text_ta', 'option_a_ta', 'option_b_ta', 'option_c_ta', 'option_d_ta',
+  'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e',
+  'question_text_ta', 'option_a_ta', 'option_b_ta', 'option_c_ta', 'option_d_ta', 'option_e_ta',
 ].join(', ')
 
 // Fisher-Yates shuffle (mutates a copy).

@@ -9,13 +9,21 @@ services:
     runtime: node
     rootDir: server
     plan: free
-    buildCommand: npm install && npm run build
+    # --include=dev is REQUIRED: with NODE_ENV=production npm skips devDependencies,
+    # but the build (tsc) needs typescript + @types/*. This forces them in for the
+    # build while NODE_ENV=production still applies at runtime (for the auth cookie).
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
         value: 20.18.1
+      # Required: makes the web refresh-token cookie Secure + SameSite=None so it
+      # works cross-site (Vercel frontend → Render API). Without it the cookie
+      # falls back to SameSite=Lax and the browser won't send it cross-site.
+      - key: NODE_ENV
+        value: production
       # Comma-separated allowed browser origins. Set to your Vercel URL(s), e.g.
       #   https://tnpsc-mentor.vercel.app
       - key: CORS_ORIGIN

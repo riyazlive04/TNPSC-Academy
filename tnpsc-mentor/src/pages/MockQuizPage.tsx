@@ -15,7 +15,7 @@ import { submitTest } from '../lib/submitTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { useT } from '../lib/i18n'
-import { LETTERS, displayOption } from '../types'
+import { optionLetters, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
 
 /** Loose structural match so resuming a refreshed mock reuses the same session. */
@@ -31,7 +31,7 @@ function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
 
 /** True when a question carries any answer-option text (option_a..d / _ta). */
 function hasOptions(q: Question, lang: DisplayLang): boolean {
-  return LETTERS.some((l) => {
+  return optionLetters(q).some((l) => {
     const txt = displayOption(q, l, lang)
     return Boolean(txt && txt.trim())
   })
@@ -589,7 +589,7 @@ export default function MockQuizPage() {
                     <OmrOptions question={q} lang={lang} selected={sel} onSelect={(l) => setAnswer(q, l)} />
                   ) : (
                     <div className="mt-4">
-                      <OmrBubbles selected={sel} onSelect={(l) => setAnswer(q, l)} />
+                      <OmrBubbles selected={sel} onSelect={(l) => setAnswer(q, l)} letters={optionLetters(q)} />
                     </div>
                   )}
                 </div>

@@ -1,5 +1,5 @@
 import type { AnswerLetter, DisplayLang, Question } from '../../types'
-import { LETTERS, displayOption, displayExplanation } from '../../types'
+import { optionLetters, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
 import QuestionFigures from './QuestionFigures'
 import QuestionStem from './QuestionStem'
@@ -103,7 +103,7 @@ export default function QuestionCard({
       <QuestionFigures images={question.images} className="mb-5" />
 
       <div className={`flex flex-col ${bare ? 'gap-2.5' : 'gap-3'}`}>
-        {LETTERS.map((letter) => {
+        {optionLetters(question).map((letter) => {
           const isCorrect = reveal && question.correct_answer === letter
           const isChosenWrong =
             reveal && selected === letter && question.correct_answer !== letter
