@@ -137,9 +137,18 @@ router.post(
 )
 
 // ─── POST /api/payments/verify ───────────────────────────────────────────────
-// Verify the Checkout callback signature and mark the payment `paid`. The
-// signature is HMAC_SHA256(order_id + "|" + payment_id, KEY_SECRET) — only a
-// genuine Razorpay success yields a match, so the client can't forge a `paid`.
+// Verify the Checkout callback and mark the payment `paid`. Three independent
+// gates, each of which alone blocks a forged/replayed/tampered credit:
+//   1. Idempotency — a `paid` order is TERMINAL: re-posting any triple against it
+//      is a no-op success, so the credit can't be replayed and (critically) the
+//      row can never be flipped back to `failed` (state-downgrade attack).
+//   2. Signature — HMAC_SHA256(order_id|payment_id, KEY_SECRET), constant-time:
+//      only a genuine Razorpay success matches, so the client can't forge a pay.
+//   3. Server-side confirmation — we fetch the payment from Razorpay and assert
+//      it's captured, belongs to THIS order, and paid the EXACT recorded amount,
+//      so a valid signature for a mismatched/under-paid payment can't slip through.
+// The final UPDATE is guarded on `status='created'` so concurrent/duplicate valid
+// calls credit at most once.
 router.post(
   '/verify',
   requireAuth,
@@ -155,7 +164,7 @@ router.post(
     // another user's order id.
     const { data: row, error: lookupErr } = await supabaseAdmin
       .from('payments')
-      .select('id, user_id, status')
+      .select('id, user_id, status, amount')
       .eq('razorpay_order_id', orderId)
       .single()
     if (lookupErr) return sendDbError(res, lookupErr)
@@ -163,26 +172,65 @@ router.post(
       return res.status(404).json({ error: 'Order not found.' })
     }
 
+    // Gate 1 — idempotent & replay/downgrade-safe: a paid order never changes.
+    if (row.status === 'paid') return res.json({ verified: true })
+
+    // Helper: record a terminal failure ONLY if the row is still pending, so a
+    // bad/late call can never overwrite an already-resolved row.
+    const markFailed = () =>
+      supabaseAdmin
+        .from('payments')
+        .update({ status: 'failed', razorpay_payment_id: paymentId, razorpay_signature: signature })
+        .eq('id', row.id)
+        .eq('status', 'created')
+
+    // Gate 2 — cryptographic signature (primary forgery control).
     const expected = crypto
       .createHmac('sha256', config.razorpayKeySecret)
       .update(`${orderId}|${paymentId}`)
       .digest('hex')
-    // Constant-time compare to avoid leaking the signature via timing.
-    const ok =
+    const sigOk =
       expected.length === signature.length &&
       crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+    if (!sigOk) {
+      await markFailed()
+      return res.status(400).json({ error: 'Signature verification failed.', verified: false })
+    }
 
+    // Gate 3 — confirm the real payment with Razorpay: right order, exact amount,
+    // and actually captured/authorised. Best-effort on transient API errors: a
+    // Razorpay outage falls back to the (cryptographically sufficient) signature
+    // rather than failing a genuine payment, but a definitive MISMATCH is fatal.
+    try {
+      const pay = await rzp!.payments.fetch(paymentId)
+      const amountPaid = Number(pay.amount)
+      const settled = pay.status === 'captured' || pay.status === 'authorized'
+      if (pay.order_id !== orderId || amountPaid !== Number(row.amount) || !settled) {
+        console.error('[verify] payment/order mismatch', {
+          orderId,
+          paymentId,
+          expectedAmount: row.amount,
+          got: { order: pay.order_id, amount: pay.amount, status: pay.status },
+        })
+        await markFailed()
+        return res.status(400).json({ error: 'Payment could not be verified.', verified: false })
+      }
+    } catch (e) {
+      console.error(
+        '[verify] Razorpay fetch failed; falling back to signature-only',
+        (e as Error).message
+      )
+    }
+
+    // Credit — guarded on `created` so concurrent/duplicate valid calls (and any
+    // replay that raced past gate 1) transition the row to `paid` at most once.
     const { error: updErr } = await supabaseAdmin
       .from('payments')
-      .update({
-        status: ok ? 'paid' : 'failed',
-        razorpay_payment_id: paymentId,
-        razorpay_signature: signature,
-      })
+      .update({ status: 'paid', razorpay_payment_id: paymentId, razorpay_signature: signature })
       .eq('id', row.id)
+      .eq('status', 'created')
     if (updErr) return sendDbError(res, updErr)
 
-    if (!ok) return res.status(400).json({ error: 'Signature verification failed.', verified: false })
     res.json({ verified: true })
   })
 )

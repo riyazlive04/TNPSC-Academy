@@ -40,7 +40,11 @@ router.post(
   '/enqueue',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const ids: string[] = Array.isArray(req.body?.questionIds) ? req.body.questionIds : []
+    // Only accept string ids, and cap the batch so a single request can't bloat
+    // the deck / stress the DB with an oversized array (self-DoS bound).
+    const ids: string[] = Array.isArray(req.body?.questionIds)
+      ? req.body.questionIds.filter((x: unknown) => typeof x === 'string').slice(0, 500)
+      : []
     if (ids.length === 0) return res.json({ ok: true })
     const nowIso = new Date().toISOString()
     const rows = ids.map((qid) => ({

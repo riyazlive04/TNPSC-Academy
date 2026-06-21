@@ -14,6 +14,31 @@ const IDLE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const now = () => new Date().toISOString()
 const ttlSince = () => new Date(Date.now() - IDLE_TTL_MS).toISOString()
 
+/**
+ * Extract the GoTrue `session_id` claim from a Supabase access token. The token is
+ * minted and signed by Supabase, so — unlike the `device_id` the browser sends —
+ * the caller cannot forge or reuse this value: it identifies the ACTUAL auth
+ * session, so the device cap binds to real sessions, not a client string. Decode
+ * only (no signature check): the caller has already verified the token (we either
+ * just minted it, or requireAuth validated it via getUser). Returns '' for a
+ * malformed token or one predating session_id claims (→ caller falls back).
+ */
+export function sessionIdFromToken(accessToken: string | undefined | null): string {
+  if (!accessToken) return ''
+  try {
+    const payload = accessToken.split('.')[1]
+    if (!payload) return ''
+    const json = Buffer.from(
+      payload.replace(/-/g, '+').replace(/_/g, '/'),
+      'base64'
+    ).toString('utf8')
+    const claims = JSON.parse(json) as { session_id?: unknown }
+    return typeof claims.session_id === 'string' ? claims.session_id : ''
+  } catch {
+    return ''
+  }
+}
+
 /** Best-effort friendly label from a User-Agent ("Chrome on Windows"). */
 export function deviceLabel(ua?: string): string | null {
   if (!ua) return null
@@ -148,10 +173,21 @@ export interface DeviceSession {
   label: string | null
   created_at: string
   last_seen_at: string
+  /** True for the row matching the requester's own session (set by listSessions
+   * when a current session id is supplied). Lets the UI mark "this device" and
+   * exclude it from the sign-out-others list without trusting a client value. */
+  current?: boolean
 }
 
-/** Active sessions for the manage-devices screen, newest activity first. */
-export async function listSessions(userId: string): Promise<DeviceSession[]> {
+/**
+ * Active sessions for the manage-devices screen, newest activity first.
+ * When `currentSessionId` (the GoTrue session_id, now stored in `device_id`) is
+ * supplied, the matching row is flagged `current: true`.
+ */
+export async function listSessions(
+  userId: string,
+  currentSessionId?: string
+): Promise<DeviceSession[]> {
   const { data } = await supabaseAdmin
     .from('user_sessions')
     .select('id, device_id, label, created_at, last_seen_at')
@@ -159,5 +195,8 @@ export async function listSessions(userId: string): Promise<DeviceSession[]> {
     .is('revoked_at', null)
     .gte('last_seen_at', ttlSince())
     .order('last_seen_at', { ascending: false })
-  return (data ?? []) as DeviceSession[]
+  return (data ?? []).map((d) => ({
+    ...(d as DeviceSession),
+    current: !!currentSessionId && (d as DeviceSession).device_id === currentSessionId,
+  }))
 }

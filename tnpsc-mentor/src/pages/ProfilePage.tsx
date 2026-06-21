@@ -21,7 +21,6 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
-import { getDeviceId } from '../lib/device'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -422,7 +421,6 @@ function DevicesSection() {
   const { t } = useT()
   const [sessions, setSessions] = useState<DeviceSession[] | null>(null)
   const [revoking, setRevoking] = useState<string | null>(null)
-  const thisDevice = getDeviceId()
 
   useEffect(() => {
     let cancelled = false
@@ -448,7 +446,7 @@ function DevicesSection() {
     }
   }
 
-  const others = (sessions ?? []).filter((s) => s.device_id !== thisDevice)
+  const others = (sessions ?? []).filter((s) => !s.current)
 
   return (
     <div className="card p-5">
@@ -465,7 +463,7 @@ function DevicesSection() {
       ) : (
         <ul className="flex flex-col gap-2">
           {sessions.map((s) => {
-            const current = s.device_id === thisDevice
+            const current = !!s.current
             return (
               <li
                 key={s.id}

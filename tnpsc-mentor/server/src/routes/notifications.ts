@@ -161,7 +161,11 @@ router.post(
   '/read',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const ids: string[] = Array.isArray(req.body?.ids) ? req.body.ids.filter((x: unknown) => typeof x === 'string') : []
+    // Cap the batch: the feed never returns more than ~50 items, so a larger
+    // array is abuse — bound it so one request can't write unbounded rows.
+    const ids: string[] = Array.isArray(req.body?.ids)
+      ? req.body.ids.filter((x: unknown) => typeof x === 'string').slice(0, 100)
+      : []
     if (ids.length === 0) return res.json({ ok: true })
     const rowsToInsert = ids.map((notification_id) => ({ user_id: req.userId, notification_id }))
     const { error } = await supabaseAdmin

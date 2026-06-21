@@ -10,7 +10,11 @@ import type { AnswerLetter, Category } from '../types'
 
 export const CATEGORIES: Category[] = ['pyq', 'samacheer', 'current_affairs', 'aptitude', 'outer']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
-const LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D']
+// A–D are required on every row; E is optional (only the 5-option analogy bank
+// uses it). REQUIRED_LETTERS drives the "option is empty" check; ALL_LETTERS
+// drives correct-answer validation and per-option why_wrong assembly.
+const REQUIRED_LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D']
+const ALL_LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D', 'E']
 
 /** Canonical import columns. Required ones are marked in the docs / template. */
 export interface ImportRow {
@@ -24,6 +28,8 @@ export interface ImportRow {
   option_b: string
   option_c: string
   option_d: string
+  // Optional 5th option (analogy reasoning bank). Blank/absent on 4-option rows.
+  option_e?: string
   correct_answer: string
   explanation?: string
   subject?: string
@@ -49,6 +55,7 @@ export interface ImportRow {
   option_b_ta?: string
   option_c_ta?: string
   option_d_ta?: string
+  option_e_ta?: string
   explanation_ta?: string
   // Per-option "why wrong" - accepted as separate CSV columns or a JSON object.
   why_wrong_a?: string
@@ -171,11 +178,14 @@ export function validateRows(raw: Record<string, unknown>[]): {
     if (!CATEGORIES.includes(category as Category))
       rowErrs.push(`category "${str(r.category)}" must be one of ${CATEGORIES.join(', ')}`)
     if (!str(r.question_text)) rowErrs.push('question_text is empty')
-    for (const l of LETTERS) {
+    for (const l of REQUIRED_LETTERS) {
       if (!str(r[`option_${l.toLowerCase()}`])) rowErrs.push(`option_${l.toLowerCase()} is empty`)
     }
-    if (!LETTERS.includes(correct as AnswerLetter))
-      rowErrs.push(`correct_answer "${str(r.correct_answer)}" must be A, B, C or D`)
+    const hasE = !!str(r.option_e)
+    if (!ALL_LETTERS.includes(correct as AnswerLetter))
+      rowErrs.push(`correct_answer "${str(r.correct_answer)}" must be A, B, C, D or E`)
+    if (correct === 'E' && !hasE)
+      rowErrs.push('correct_answer is E but option_e is empty')
 
     const standard = str(r.standard)
     if (standard && ![6, 7, 8, 9, 10].includes(Number(standard)))
@@ -192,14 +202,16 @@ export function validateRows(raw: Record<string, unknown>[]): {
     // Assemble why_wrong from per-letter columns or a provided object.
     const why: Record<string, string> = {}
     const provided = (r.why_wrong as Record<string, string> | undefined) ?? {}
-    for (const l of LETTERS) {
+    for (const l of ALL_LETTERS) {
+      if (l === 'E' && !hasE) continue
       const v = str(r[`why_wrong_${l.toLowerCase()}`]) || str(provided[l])
       if (l !== correct && v) why[l] = v
     }
     // Tamil rationale (object form only).
     const whyTa: Record<string, string> = {}
     const providedTa = (r.why_wrong_ta as Record<string, string> | undefined) ?? {}
-    for (const l of LETTERS) {
+    for (const l of ALL_LETTERS) {
+      if (l === 'E' && !hasE) continue
       const v = str(providedTa[l])
       if (l !== correct && v) whyTa[l] = v
     }
@@ -211,6 +223,7 @@ export function validateRows(raw: Record<string, unknown>[]): {
       option_b: str(r.option_b),
       option_c: str(r.option_c),
       option_d: str(r.option_d),
+      option_e: str(r.option_e),
       correct_answer: correct,
       explanation: str(r.explanation),
       subject,
@@ -235,6 +248,7 @@ export function validateRows(raw: Record<string, unknown>[]): {
       option_b_ta: str(r.option_b_ta),
       option_c_ta: str(r.option_c_ta),
       option_d_ta: str(r.option_d_ta),
+      option_e_ta: str(r.option_e_ta),
       explanation_ta: str(r.explanation_ta),
       why_wrong: Object.keys(why).length ? why : null,
       why_wrong_ta: Object.keys(whyTa).length ? whyTa : null,

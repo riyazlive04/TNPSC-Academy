@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import type { DisplayLang, Question } from '../types'
-import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../types'
+import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 
 /**
  * Explanation-sheet PDF generator that renders each question as real HTML and
@@ -48,7 +48,7 @@ const esc = (s: string) =>
 
 /** Build the inner HTML for one question block (question, options, explanation). */
 function questionBlockHtml(q: Question, index: number, lang: DisplayLang): string {
-  const optionRows = LETTERS.map((letter) => {
+  const optionRows = optionLetters(q).map((letter) => {
     const text = displayOption(q, letter, lang)
     if (!text) return ''
     const isCorrect = q.correct_answer === letter

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
-import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../types'
+import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
 import { useT } from '../lib/i18n'
 
@@ -108,7 +108,7 @@ export default function BookmarksPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  {LETTERS.map((letter) => {
+                  {optionLetters(q).map((letter) => {
                     const isCorrect = q.correct_answer === letter
                     return (
                       <div

@@ -10,7 +10,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { api, type ReportStatus, type ReportedQuestion } from '../../lib/api'
-import { LETTERS, displayOption, displayQuestion, displayExplanation } from '../../types'
+import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../../types'
 import type { Question } from '../../types'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
@@ -186,7 +186,7 @@ function ReportCard({
             {displayQuestion(q, lang)}
           </p>
           <div className="mb-3 flex flex-col gap-1.5">
-            {LETTERS.map((letter) => {
+            {optionLetters(q).map((letter) => {
               const isCorrect = q.correct_answer === letter
               return (
                 <div

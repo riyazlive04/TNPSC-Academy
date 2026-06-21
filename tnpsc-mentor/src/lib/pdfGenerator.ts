@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf'
 import type { DisplayLang, Question } from '../types'
-import { LETTERS, displayQuestion, displayOption, displayExplanation } from '../types'
+import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 
 // Palette mirrors the app's violet theme (src/index.css --c-* tokens) so the
 // exported PDF feels like a printed extension of the UI.
@@ -184,7 +184,7 @@ export async function generateQuestionBankPdf({
     // Options — correct one sits on a mint pill with a check mark
     doc.setFontSize(10)
     const optLineH = 13
-    LETTERS.forEach((letter) => {
+    optionLetters(q).forEach((letter) => {
       const optText = displayOption(q, letter, effLang)
       if (!optText) return
       const isCorrect = q.correct_answer === letter

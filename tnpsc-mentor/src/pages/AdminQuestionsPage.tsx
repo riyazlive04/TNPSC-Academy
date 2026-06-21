@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
   ArrowLeft,
+  Eye,
+  EyeOff,
   FileDown,
   Loader2,
   Pencil,
@@ -18,9 +20,9 @@ import ConfirmDialog from '../components/UI/ConfirmDialog'
 import QuestionEditor from '../components/Admin/QuestionEditor'
 import BulkImportPanel from '../components/Admin/BulkImportPanel'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
-import { LETTERS, displayOption, displayQuestion, displayExplanation } from '../types'
+import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import type { Question, QuizConfig } from '../types'
-import { describeConfig, deleteAdminQuestion, fetchAdminQuestions } from '../lib/fetchQuestions'
+import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { generateQuestionBankPdf } from '../lib/pdfGenerator'
 import { OUTER_SUBJECTS } from '../lib/constants'
 import { useAuth } from '../hooks/useAuth'
@@ -52,6 +54,7 @@ export default function AdminQuestionsPage() {
   const [editor, setEditor] = useState<EditorState>(null)
   const [showImport, setShowImport] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState<Question | null>(null)
   const [actionError, setActionError] = useState('')
   const [downloading, setDownloading] = useState(false)
@@ -77,6 +80,21 @@ export default function AdminQuestionsPage() {
   const handleSaved = (q: Question, isNew: boolean) => {
     setQuestions((prev) => (isNew ? [q, ...prev] : prev.map((x) => (x.id === q.id ? q : x))))
     setEditor(null)
+  }
+
+  // Enable/disable a question for students (toggles active). Inactive questions
+  // stay in this admin list but are hidden from quizzes/revision.
+  const handleToggleActive = async (q: Question) => {
+    setTogglingId(q.id)
+    setActionError('')
+    try {
+      const updated = await setAdminQuestionActive(q.id, !(q.active ?? true))
+      setQuestions((prev) => prev.map((x) => (x.id === q.id ? { ...x, active: updated.active } : x)))
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'Could not update the question.')
+    } finally {
+      setTogglingId(null)
+    }
   }
 
   const handleDelete = async () => {
@@ -269,14 +287,47 @@ export default function AdminQuestionsPage() {
 
         {!loading && !error && filtered.length > 0 && (
           <div className="flex flex-col gap-4">
-            {filtered.map((q, i) => (
-              <article key={q.id} className="rounded-2xl border border-line bg-card p-4 shadow-card sm:p-5">
+            {filtered.map((q, i) => {
+              const isActive = q.active ?? true
+              return (
+              <article
+                key={q.id}
+                className={[
+                  'rounded-2xl border bg-card p-4 shadow-card sm:p-5',
+                  isActive ? 'border-line' : 'border-coral/40 bg-coralsoft/30',
+                ].join(' ')}
+              >
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
                     <span className="mr-1 text-secondary">{i + 1}.</span>
+                    {!isActive && (
+                      <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 align-middle font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                        <EyeOff size={11} /> Hidden
+                      </span>
+                    )}
                     {displayQuestion(q, lang)}
                   </p>
                   <div className="flex flex-shrink-0 gap-1">
+                    <button
+                      onClick={() => handleToggleActive(q)}
+                      disabled={togglingId === q.id}
+                      className={[
+                        'grid h-8 w-8 place-items-center rounded-lg transition active:scale-90 focus-ring disabled:opacity-50',
+                        isActive
+                          ? 'text-mint hover:bg-mintsoft'
+                          : 'text-ink2/50 hover:bg-ink/5 hover:text-ink2',
+                      ].join(' ')}
+                      aria-label={isActive ? 'Disable (hide from students)' : 'Enable (show to students)'}
+                      title={isActive ? 'Shown to students — click to hide' : 'Hidden from students — click to show'}
+                    >
+                      {togglingId === q.id ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : isActive ? (
+                        <Eye size={16} />
+                      ) : (
+                        <EyeOff size={16} />
+                      )}
+                    </button>
                     <button
                       onClick={() => setEditor({ mode: 'edit', question: q })}
                       className="icon-btn h-8 w-8"
@@ -300,7 +351,7 @@ export default function AdminQuestionsPage() {
                 </div>
                 <QuestionFigures images={q.images} className="mb-3" />
                 <div className="flex flex-col gap-1.5">
-                  {LETTERS.map((letter) => {
+                  {optionLetters(q).map((letter) => {
                     const isCorrect = q.correct_answer === letter
                     return (
                       <div
@@ -338,15 +389,22 @@ export default function AdminQuestionsPage() {
                     </p>
                   </div>
                 )}
-                {(q.difficulty || q.topic || q.year) && (
+                {(q.difficulty || q.topic || q.year || q.source_tag) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {q.difficulty && <Tag>{q.difficulty}</Tag>}
                     {q.topic && <Tag>{q.topic}</Tag>}
                     {q.year && <Tag>{q.year}</Tag>}
+                    {/* Provenance marker — admin/superadmin only (never sent to students). */}
+                    {q.source_tag && (
+                      <span className="inline-flex items-center rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary">
+                        {q.source_tag}
+                      </span>
+                    )}
                   </div>
                 )}
               </article>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

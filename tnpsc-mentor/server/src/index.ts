@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { config, isAllowedOrigin } from './config.js'
@@ -34,12 +35,16 @@ app.use(
     // Supports exact origins and `*` wildcards (Vercel preview URLs change every
     // deploy). An origin that isn't allowed simply gets no CORS headers → the
     // browser blocks it, which is the intended behaviour.
-    // No `credentials: true`: auth is via Authorization: Bearer headers, not
-    // cookies, so allowing credentials would needlessly widen the attack surface.
     origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
+    // The WEB client holds its refresh token in an HttpOnly cookie, so credentialed
+    // requests must be allowed. cors echoes the exact (allowed) Origin and sets
+    // Access-Control-Allow-Credentials — it never uses `*` with credentials. The
+    // native app keeps using a Bearer token and doesn't rely on the cookie.
+    credentials: true,
   })
 )
 app.use(express.json({ limit: '2mb' }))
+app.use(cookieParser())
 
 // Gentle global rate limit; auth endpoints get a stricter one below.
 app.use(
