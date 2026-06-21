@@ -17,6 +17,7 @@ import YellowBadge from '../components/UI/YellowBadge'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
 import QuestionEditor from '../components/Admin/QuestionEditor'
 import BulkImportPanel from '../components/Admin/BulkImportPanel'
+import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { LETTERS, displayOption, displayQuestion, displayExplanation } from '../types'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions } from '../lib/fetchQuestions'
@@ -297,6 +298,7 @@ export default function AdminQuestionsPage() {
                     </button>
                   </div>
                 </div>
+                <QuestionFigures images={q.images} className="mb-3" />
                 <div className="flex flex-col gap-1.5">
                   {LETTERS.map((letter) => {
                     const isCorrect = q.correct_answer === letter
