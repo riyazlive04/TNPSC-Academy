@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Smartphone, Monitor, ShieldAlert, LogOut } from 'lucide-react'
 import Spinner from '../UI/Spinner'
+import { useFocusTrap } from '../UI/useFocusTrap'
 import { useT, type StringKey } from '../../lib/i18n'
 import type { DeviceSession } from '../../lib/api'
 
@@ -9,6 +10,8 @@ interface DeviceLimitModalProps {
   devices: DeviceSession[]
   /** session id currently being signed out (shows a spinner / disables the list). */
   busyId: string | null
+  /** Error to surface inside the modal (e.g. a failed sign-out attempt). */
+  error?: string
   onSignOut: (sessionId: string) => void
   onClose: () => void
 }
@@ -39,10 +42,13 @@ export default function DeviceLimitModal({
   open,
   devices,
   busyId,
+  error,
   onSignOut,
   onClose,
 }: DeviceLimitModalProps) {
   const { t } = useT()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(open, dialogRef)
 
   useEffect(() => {
     if (!open) return
@@ -62,11 +68,13 @@ export default function DeviceLimitModal({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="device-limit-title"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card"
+        className="w-full max-w-md animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card outline-none"
       >
         <div className="mb-5 flex flex-col items-center text-center">
           <span className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-coralsoft text-coral">
@@ -111,6 +119,15 @@ export default function DeviceLimitModal({
             )
           })}
         </ul>
+
+        {error && (
+          <div
+            role="alert"
+            className="mt-4 animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+          >
+            {error}
+          </div>
+        )}
 
         <button
           onClick={onClose}

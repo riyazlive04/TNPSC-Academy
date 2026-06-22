@@ -8,6 +8,7 @@ import { api } from './api'
 /** Web Push needs a service worker, the Push API, and the Notification API. */
 export function isPushSupported(): boolean {
   return (
+    typeof window !== 'undefined' &&
     typeof navigator !== 'undefined' &&
     'serviceWorker' in navigator &&
     'PushManager' in window &&

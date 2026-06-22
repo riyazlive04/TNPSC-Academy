@@ -2,11 +2,22 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore, selectProfileNeedsOnboarding } from '../store/authStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 import { api } from '../lib/api'
 import { postAuthDestination } from '../lib/authRouting'
 import AuthShell from '../components/Auth/AuthShell'
 import Spinner from '../components/UI/Spinner'
 import { useT } from '../lib/i18n'
+
+/**
+ * Validates a 10-digit Indian mobile number. Accepts an optional +91 / 91 / 0
+ * prefix and incidental spaces/hyphens, then requires exactly ten digits
+ * starting 6-9 (the valid Indian mobile range).
+ */
+function isValidIndianMobile(raw: string): boolean {
+  const cleaned = raw.replace(/[\s\-()]/g, '')
+  return /^(?:\+91|91|0)?[6-9]\d{9}$/.test(cleaned)
+}
 
 /**
  * Post-signup onboarding for Google users, who arrive with only name + email.
@@ -40,11 +51,16 @@ export default function CompleteProfilePage() {
     setTouched(true)
     setError('')
     if (!phone.trim()) return setError(t('errPhoneRequired'))
+    // TODO i18n: no errPhoneInvalid key in src/lib/i18n.ts (owned elsewhere).
+    if (!isValidIndianMobile(phone))
+      return setError('Please enter a valid 10-digit mobile number.')
 
     setSaving(true)
     try {
       await api.updateProfile({ phone: phone.trim(), gender: gender || null, target_group: group })
       await fetchProfile()
+      // New Google account just finished profile setup — arm the first-run tour.
+      useOnboardingStore.getState().arm()
       navigate(postAuthDestination(), { replace: true })
     } catch {
       setError(t('errServerUnreachable'))
@@ -73,11 +89,13 @@ export default function CompleteProfilePage() {
               type="tel"
               autoComplete="tel"
               className={`input-soft ${
-                touched && !phone.trim() ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''
+                touched && !isValidIndianMobile(phone)
+                  ? 'animate-shake border-coral/60 focus:ring-coral/20'
+                  : ''
               }`}
               placeholder="10-digit mobile"
               value={phone}
-              aria-invalid={(touched && !phone.trim()) || undefined}
+              aria-invalid={(touched && !isValidIndianMobile(phone)) || undefined}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>

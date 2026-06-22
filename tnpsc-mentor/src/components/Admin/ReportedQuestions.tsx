@@ -89,7 +89,7 @@ export default function ReportedQuestions() {
               key={id}
               onClick={() => setTab(id)}
               aria-current={active}
-              className={`press flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 font-heading text-sm font-medium transition-all duration-200 ${
+              className={`press flex flex-shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 font-heading text-sm font-medium transition-all duration-200 lg:flex-1 ${
                 active ? 'bg-card text-brand shadow-pill' : 'text-ink2 hover:text-ink'
               }`}
             >

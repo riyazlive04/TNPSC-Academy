@@ -45,6 +45,7 @@ const ThirukuralQuizPage = lazy(() => import('./pages/ThirukuralQuizPage'))
 const DailyPage = lazy(() => import('./pages/DailyPage'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 
 /** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
 const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
@@ -134,8 +135,8 @@ function AnimatedRoutes() {
 
   const routes = (
     <Routes location={location}>
-      {/* Root is auth-aware: logged-in users go to the app, everyone else to
-          login. The marketing landing page is no longer in the flow. */}
+      {/* Root is auth-aware: logged-in users go straight to the app, logged-out
+          web visitors see the public marketing/APK-download landing page. */}
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -173,14 +174,15 @@ function AnimatedRoutes() {
   )
 }
 
-/** Root path "/": send authenticated users into the app, others to login.
- * Waits for the initial session bootstrap so a logged-in user isn't flashed the
- * login screen on a hard refresh. */
+/** Root path "/": send authenticated users straight into the app; show the
+ * public landing page to everyone else. Waits for the initial session bootstrap
+ * so a logged-in user isn't flashed the landing page on a hard refresh. */
 function RootRedirect() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
   if (loading) return <PageLoader />
-  return <Navigate to={user ? '/test-arena' : '/login'} replace />
+  if (user) return <Navigate to="/test-arena" replace />
+  return <LandingPage />
 }
 
 /** Full-screen fallback shown while a route's lazy chunk is being fetched. */

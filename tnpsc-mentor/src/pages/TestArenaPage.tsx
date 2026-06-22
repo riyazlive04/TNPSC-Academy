@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
+import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
 import IconTile, { type Tint } from '../components/UI/IconTile'
@@ -29,6 +30,8 @@ import { computeXp, levelInfo } from '../lib/game'
 import { unlockedBadgeIds, type GameStats } from '../lib/achievements'
 import { GROUP_SUBJECTS } from '../lib/constants'
 import { useProgressStore } from '../store/progressStore'
+import { useOnboardingStore } from '../store/onboardingStore'
+import { toast } from '../store/toastStore'
 import { tapScaleSubtle } from '../lib/motion'
 import type { GroupType } from '../types'
 import { useT, type StringKey } from '../lib/i18n'
@@ -95,6 +98,18 @@ export default function TestArenaPage() {
   const [thirukuralOpen, setThirukuralOpen] = useState(false)
   const [dailyKural, setDailyKural] = useState<Kural | null>(null)
 
+  // First-run guided tour — shown ONLY to a freshly created account. Signup arms
+  // `pending`; the dashboard consumes it once here and opens the spotlight tour.
+  // Existing users never had it armed, so it never fires for them. Admins skip
+  // the aspirant layer entirely.
+  const onboardingPending = useOnboardingStore((s) => s.pending)
+  const onboardingOpen = useOnboardingStore((s) => s.open)
+  const startOnboarding = useOnboardingStore((s) => s.start)
+  const finishOnboarding = useOnboardingStore((s) => s.finish)
+  useEffect(() => {
+    if (!isAdmin && onboardingPending) startOnboarding()
+  }, [isAdmin, onboardingPending, startOnboarding])
+
   // Load the kural bank once and pick today's couplet for the header. The modal
   // shares the same module-level cache, so opening it makes no extra request.
   useEffect(() => {
@@ -102,7 +117,11 @@ export default function TestArenaPage() {
     let cancelled = false
     loadKurals()
       .then((all) => !cancelled && setDailyKural(kuralOfDay(all) ?? null))
-      .catch(() => {})
+      .catch(() => {
+        // Decorative header content; leave it absent (safe fallback) rather than
+        // crash, but keep a console trail for diagnosis.
+        if (!cancelled) setDailyKural(null)
+      })
     return () => {
       cancelled = true
     }
@@ -122,11 +141,15 @@ export default function TestArenaPage() {
         setHabit(h)
         setAnalytics(a)
       })
-      .catch(() => {})
+      .catch(() => {
+        // Dashboard stats failed to load - keep the page usable (null state) and
+        // tell the user quietly rather than silently swallowing the failure.
+        if (!cancelled) toast.error(t('couldNotLoad'))
+      })
     return () => {
       cancelled = true
     }
-  }, [user, isAdmin, profile?.daily_goal, profile?.exam_date])
+  }, [user, isAdmin, profile?.daily_goal, profile?.exam_date, t])
 
   const firstName = profile?.full_name?.split(' ')[0]
   const lvl = levelInfo(
@@ -237,17 +260,20 @@ export default function TestArenaPage() {
           )}
         </header>
 
-        {/* The one gradient hero — the single elevated element on the screen. */}
-        <Hero
-          icon={featured.icon}
-          title={t(featured.titleKey)}
-          subtitle={featured.subtitle}
-          cta={t('start')}
-          onClick={() => navigate(featured.to)}
-        />
+        {/* The one gradient hero — the single elevated element on the screen.
+            data-tour anchors the onboarding spotlight to the mock-test card. */}
+        <div data-tour="mock">
+          <Hero
+            icon={featured.icon}
+            title={t(featured.titleKey)}
+            subtitle={featured.subtitle}
+            cta={t('start')}
+            onClick={() => navigate(featured.to)}
+          />
+        </div>
 
         {/* Practice — subjects as a hairline-divided list, not a card grid. */}
-        <section className="space-y-2">
+        <section className="space-y-2" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
           <List>
             {restCards.map((card, i) => (
@@ -280,7 +306,7 @@ export default function TestArenaPage() {
         <PremiumCard dismissible />
 
         {/* Keep going — study-loop quick links, also a list. */}
-        <section className="space-y-2">
+        <section className="space-y-2" data-tour="progress">
           <SectionHeader title={t('keepGoingShort')} className="px-1" />
           <List>
             <ListRow
@@ -310,6 +336,8 @@ export default function TestArenaPage() {
         onClose={() => setThirukuralOpen(false)}
         initialKuralNo={dailyKural?.kural_no}
       />
+
+      <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} />
     </AppLayout>
   )
 }

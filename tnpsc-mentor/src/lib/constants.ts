@@ -158,9 +158,28 @@ export const TOPIC_NAME_TA: Record<string, string> = {
   More: 'மேலும்',
   // ── Aptitude · Numerics ──
   'AP, GP and Special Series': 'கூட்டுத்தொடர், பெருக்குத்தொடர் & சிறப்புத் தொடர்கள்',
+  // Area and Volume drill-down: the group, its three sections, and the shapes
+  // (stored in `unit`) that form the final picker level. See AV_SECTION_SHAPES.
+  'Area and Volume': 'பரப்பளவு மற்றும் கன அளவு',
   'Perimeter, Circumference & Diameter': 'சுற்றளவு, பரிதி & விட்டம்',
   '2D - Area': '2D - பரப்பளவு',
   '3D - Volume & Surface Area': '3D - கன அளவு & புறப்பரப்பு',
+  Circle: 'வட்டம்',
+  Square: 'சதுரம்',
+  Rectangle: 'செவ்வகம்',
+  Triangle: 'முக்கோணம்',
+  Parallelogram: 'இணைகரம்',
+  Rhombus: 'சாய்சதுரம்',
+  Trapezium: 'சரிவகம்',
+  Quadrilateral: 'நாற்கரம்',
+  Cube: 'கனசதுரம்',
+  Cuboid: 'கனசெவ்வகம்',
+  Sphere: 'கோளம்',
+  Hemisphere: 'அரைக்கோளம்',
+  Cylinder: 'உருளை',
+  Cone: 'கூம்பு',
+  Frustum: 'கூம்பு வெட்டுரு',
+  'Combined Solids': 'கூட்டுத் திண்மங்கள்',
   'Average, Mean Median Mode': 'சராசரி, இடைநிலை, முகடு',
   'Compound Interest': 'கூட்டு வட்டி',
   'LCM and HCF': 'மீ.சி.ம மற்றும் மீ.பொ.வ',
@@ -604,9 +623,7 @@ export const NUMERICS_TOPICS: string[] = [
   'Percentage',
   'Ratio and Proportion',
   'LCM & HCF',
-  'Perimeter, Circumference & Diameter',
-  '2D - Area',
-  '3D - Volume & Surface Area',
+  'Area and Volume',
   'Simple Interest & Compound Interest',
   'Time and Work',
   'A.P & G.P',
@@ -624,6 +641,83 @@ export const REASONING_TOPICS: string[] = [
   'Puzzles',
   'No of Figures',
   'Mathematical Operators',
+]
+
+// ─── Aptitude · Area and Volume drill-down ──────────────────────────────────
+// "Area and Volume" is a single row in the Numerics topic list that expands
+// into three SECTIONS, each of which expands into SHAPES. The three sections
+// ARE the `aptitude_topic` values in the DB; the shape is stored in the
+// question's `unit` column (so a test is scoped by aptitude_topic + unit). The
+// per-section shape lists below drive the final picker level and its order.
+export const AREA_VOLUME_GROUP = 'Area and Volume'
+export const AV_SECTIONS = [
+  'Perimeter, Circumference & Diameter',
+  '2D - Area',
+  '3D - Volume & Surface Area',
+] as const
+export type AvSection = (typeof AV_SECTIONS)[number]
+// A topic belongs to the Area-and-Volume group iff it's one of the sections.
+export const isAreaVolumeSection = (topic: string): topic is AvSection =>
+  (AV_SECTIONS as readonly string[]).includes(topic)
+export const AV_SECTION_SHAPES: Record<AvSection, string[]> = {
+  'Perimeter, Circumference & Diameter': ['Circle', 'Square', 'Rectangle', 'Triangle'],
+  '2D - Area': [
+    'Circle',
+    'Square',
+    'Rectangle',
+    'Triangle',
+    'Parallelogram',
+    'Rhombus',
+    'Trapezium',
+    'Quadrilateral',
+  ],
+  '3D - Volume & Surface Area': [
+    'Cube',
+    'Cuboid',
+    'Sphere',
+    'Hemisphere',
+    'Cylinder',
+    'Cone',
+    'Frustum',
+    'Combined Solids',
+  ],
+}
+
+// Canonical aptitude topic taxonomy as stored in the DB (`aptitude_topic`),
+// shared by the practice and PYQ aptitude pickers and used for display ORDER.
+// The three Area-and-Volume sections collapse into the single AREA_VOLUME_GROUP
+// row (which then drills into sections → shapes). A picker shows only the
+// entries that have a non-zero count, so banks missing a topic simply omit it.
+export const APT_NUMERICS_DB_TOPICS: string[] = [
+  'Simplification',
+  'Profit And Loss',
+  'Percentage',
+  'Ratio And Proportion',
+  'LCM and HCF',
+  AREA_VOLUME_GROUP,
+  'Simple Interest',
+  'Compound Interest',
+  'Simple and Compound Interest',
+  'Time and Work',
+  'Time, Work , Speed And Distance',
+  'AP, GP and Special Series',
+  'Average, Mean Median Mode',
+  'Probability',
+  'Surds And Indices',
+]
+export const APT_REASONING_DB_TOPICS: string[] = [
+  'Number Series',
+  'Alphabet Series',
+  'Analogy',
+  'Coding Decoding',
+  'Mathematical Operators',
+  'Dice Problems',
+  'No Of Figures',
+  'Puzzles',
+  'Seating Arrangement',
+  'Clock Problems',
+  'Date Problems',
+  'Direction Based',
 ]
 
 // ─── Current Affairs ────────────────────────────────────────────────────────

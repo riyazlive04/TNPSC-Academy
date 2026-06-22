@@ -67,6 +67,45 @@ const STRINGS = {
   langBothDesc: { en: 'Bilingual interface', ta: 'இருமொழி இடைமுகம்' },
   continueBtn: { en: 'Continue', ta: 'தொடரவும்' },
 
+  // ─── Onboarding tour (first-run guided walkthrough, new accounts only) ─────
+  onbNext: { en: 'Next', ta: 'அடுத்து' },
+  onbSkip: { en: 'Skip tour', ta: 'சுற்றுப்பயணத்தைத் தவிர்' },
+  onbGetStarted: { en: 'Get started', ta: 'தொடங்குவோம்' },
+  onbStepOf: { en: 'of', ta: '/' },
+  onbStartExploring: { en: 'Start exploring', ta: 'ஆராயத் தொடங்கு' },
+  onbWelcomeTitle: { en: 'Welcome to TNPSC Mentor', ta: 'TNPSC வழிகாட்டிக்கு வரவேற்கிறோம்' },
+  onbWelcomeBody: {
+    en: "Let's take a quick 30-second tour of how to prepare here. Tap Next to begin.",
+    ta: "இங்கே எப்படித் தயாராவது என்பதை விரைவான 30 வினாடிச் சுற்றுப்பயணத்தில் பார்ப்போம். தொடங்க 'அடுத்து' என்பதைத் தட்டவும்.",
+  },
+  onbMockTitle: { en: 'Start with a mock test', ta: 'மாதிரித் தேர்வுடன் தொடங்குங்கள்' },
+  onbMockBody: {
+    en: 'This is your mock test — a full-length, timed Group exam with negative marking, just like the real hall. Tap it anytime to begin.',
+    ta: 'இது உங்கள் மாதிரித் தேர்வு — எதிர்மறை மதிப்பெண்களுடன் கூடிய முழு நீள, நேரக் குரூப் தேர்வு, உண்மையான தேர்வரங்கம் போலவே. தொடங்க எப்போது வேண்டுமானாலும் தட்டவும்.',
+  },
+  onbPracticeTitle: { en: 'Practice your way', ta: 'உங்கள் வழியில் பயிற்சி செய்யுங்கள்' },
+  onbPracticeBody: {
+    en: 'Here you drill by subject and topic, revisit previous-year papers, sharpen aptitude and follow current affairs.',
+    ta: 'இங்கே பாடம் மற்றும் தலைப்பு வாரியாகப் பயிற்சி செய்யலாம், முந்தைய ஆண்டு வினாத்தாள்களைப் பார்க்கலாம், திறனாய்வை மேம்படுத்தலாம், நடப்பு நிகழ்வுகளைப் பின்தொடரலாம்.',
+  },
+  onbProgressTitle: { en: 'Revise & track progress', ta: 'மீள்பார்வை & முன்னேற்றம்' },
+  onbProgressBody: {
+    en: 'Weak topics are saved as smart revisions, and Insights show your accuracy, strengths and focus areas.',
+    ta: 'பலவீனமான தலைப்புகள் திறன்மிகு மீள்பார்வைகளாகச் சேமிக்கப்படும், மேலும் பகுப்பாய்வு உங்கள் துல்லியம், பலங்கள் மற்றும் கவனப் பகுதிகளைக் காட்டும்.',
+  },
+  onbLangTitle: { en: 'Tamil, English or both', ta: 'தமிழ், ஆங்கிலம் அல்லது இரண்டும்' },
+  onbLangBody: {
+    en: 'Tap here to switch language anytime — and the icon beside it toggles light and dark mode.',
+    ta: 'மொழியை எப்போது வேண்டுமானாலும் மாற்ற இங்கே தட்டவும் — அதன் அருகிலுள்ள ஐகான் ஒளி/இருண்ட பயன்முறையை மாற்றும்.',
+  },
+  onbFinishTitle: { en: "You're all set!", ta: 'நீங்கள் தயார்!' },
+  onbFinishBody: {
+    en: 'Start exploring, or explore at your own pace. All the best for your exam!',
+    ta: 'ஆராயத் தொடங்குங்கள், அல்லது உங்கள் விருப்பப்படி ஆராயுங்கள். உங்கள் தேர்வுக்கு வாழ்த்துக்கள்!',
+  },
+  howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
+  howItWorksSub: { en: 'Replay the app tour', ta: 'செயலி சுற்றுப்பயணத்தை மீண்டும் பார்க்க' },
+
   // Test Arena
   testArena: { en: 'Test Arena', ta: 'தேர்வு அரங்கம்' },
   welcome: { en: 'Welcome', ta: 'வரவேற்கிறோம்' },
@@ -169,6 +208,7 @@ const STRINGS = {
   // PYQ Aptitude type selector (PYQ Aptitude → Numerics / Reasoning)
   pyqAptitudeBadge: { en: 'Aptitude - Previous Year Questions', ta: 'திறனாய்வு - முந்தைய ஆண்டு வினாக்கள்' },
   pyqAptitudePickType: { en: 'Select a Type', ta: 'ஒரு வகையைத் தேர்ந்தெடுக்கவும்' },
+  pyqAptitudePickTopic: { en: 'Select a Topic', ta: 'ஒரு தலைப்பைத் தேர்ந்தெடுக்கவும்' },
   pyqAptitudePickTypeSub: {
     en: 'Numerics or reasoning? Pick a style to begin an Aptitude test.',
     ta: 'எண் கணிதமா அல்லது பகுத்தறிவா? திறனாய்வுத் தேர்வைத் தொடங்க ஒரு வகையைத் தேர்ந்தெடுக்கவும்.',
@@ -617,8 +657,8 @@ const STRINGS = {
   // Premium banner
   premiumBadge: { en: 'Premium', ta: 'பிரீமியம்' },
   premiumTitle: {
-    en: 'Go Premium — crack TNPSC faster',
-    ta: 'பிரீமியம் பெறுங்கள் — TNPSC-ஐ விரைவாக வெல்லுங்கள்',
+    en: 'Go Premium — prepare faster',
+    ta: 'பிரீமியம் பெறுங்கள் — வேகமாக தயாராகுங்கள்',
   },
   premiumValidity: { en: 'Group 1 · 3-month plan', ta: 'குரூப் 1 · 3-மாத திட்டம்' },
   premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
@@ -698,6 +738,7 @@ const STRINGS = {
 
   // ─── Notifications ────────────────────────────────────────────────────────
   notifications: { en: 'Notifications', ta: 'அறிவிப்புகள்' },
+  unread: { en: 'unread', ta: 'படிக்காதவை' },
   noNotifications: { en: 'No notifications yet.', ta: 'இன்னும் அறிவிப்புகள் இல்லை.' },
   markAllRead: { en: 'Mark all as read', ta: 'அனைத்தையும் படித்ததாகக் குறி' },
   enableDeviceNotifications: {
@@ -825,6 +866,7 @@ const STRINGS = {
     ta: 'நன்றி! ஒவ்வொரு 3 மாதங்களுக்கு ஒருமுறை மீண்டும் கருத்து தெரிவிக்கலாம்.',
   },
 
+  backToTop: { en: 'Back to top', ta: 'மேலே செல்ல' },
   // ─── Superadmin console ───────────────────────────────────────────────────
   superadmin: { en: 'Super Admin', ta: 'மேலாண்மை நிர்வாகி' },
   superadminConsole: { en: 'Super Admin Console', ta: 'மேலாண்மை நிர்வாகக் கட்டுப்பாடு' },

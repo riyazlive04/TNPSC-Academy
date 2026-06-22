@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Star, X } from 'lucide-react'
 import Spinner from '../UI/Spinner'
+import { useFocusTrap } from '../UI/useFocusTrap'
 import { api, ApiError } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
@@ -23,6 +24,9 @@ export default function FeedbackModal({ open, onClose, onSubmitted }: FeedbackMo
   const [hover, setHover] = useState(0)
   const [message, setMessage] = useState('')
   const [saving, setSaving] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  // Trap Tab focus within the dialog and restore it to the opener on close.
+  useFocusTrap(open, dialogRef)
 
   // Reset each time it opens, and wire Escape-to-close.
   useEffect(() => {
@@ -74,11 +78,13 @@ export default function FeedbackModal({ open, onClose, onSubmitted }: FeedbackMo
       role="presentation"
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="feedback-title"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card"
+        className="w-full max-w-md animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card outline-none"
       >
         <div className="mb-4 flex items-start justify-between">
           <div>

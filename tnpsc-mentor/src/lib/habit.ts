@@ -13,8 +13,20 @@ export interface HabitState {
   last30: { date: string; questions: number }[]
 }
 
+// All day boundaries are computed in IST (UTC+5:30) so streaks and the daily
+// reward agree, and so they line up with how aspirants experience "today" (the
+// server's activity_date is also India-local). Shifting the instant by the IST
+// offset and then reading the UTC calendar fields yields the IST calendar day.
+const IST_OFFSET_MS = (5 * 60 + 30) * 60 * 1000
+
 function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  return new Date(d.getTime() + IST_OFFSET_MS).toISOString().slice(0, 10)
+}
+
+/** Today's date as YYYY-MM-DD in IST. The single source of truth for day
+ *  boundaries across the habit layer and the daily-reward ledger. */
+export function todayIso(): string {
+  return isoDate(new Date())
 }
 
 export function daysBetween(a: string, b: string): number {
@@ -34,12 +46,12 @@ export async function recordActivity(userId: string, questions: number, tests = 
 }
 
 /** Compute the current consecutive-day streak ending today or yesterday. */
-function computeStreak(dates: Set<string>): number {
+export function computeStreak(dates: Set<string>): number {
   let streak = 0
   const cursor = new Date()
-  // Walk the cursor in UTC so it matches isoDate() (toISOString → UTC) and the
-  // server's activity_date (Postgres current_date). Mixing local getDate()/
-  // setDate() with a UTC date string miscounts streaks near midnight off-UTC.
+  // Step the cursor by whole UTC days (a constant 24h shift) while reading each
+  // day via isoDate(), which renders the IST calendar day. This keeps the walk
+  // aligned to IST midnights regardless of the runtime's local zone.
   // Allow today to be missing (streak continues from yesterday until today ends).
   if (!dates.has(isoDate(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1)
   while (dates.has(isoDate(cursor))) {
@@ -73,7 +85,7 @@ export async function fetchHabit(
     dailyGoal,
     goalMetToday: false,
     examDate,
-    daysToExam: examDate ? daysBetween(isoDate(new Date()), examDate) : null,
+    daysToExam: examDate ? daysBetween(todayIso(), examDate) : null,
     last30: [],
   }
   try {
@@ -82,7 +94,7 @@ export async function fetchHabit(
 
     const dateSet = new Set(rows.map((r) => r.activity_date))
     const sorted = [...dateSet].sort()
-    const today = isoDate(new Date())
+    const today = todayIso()
     const questionsToday = rows.find((r) => r.activity_date === today)?.questions ?? 0
 
     return {

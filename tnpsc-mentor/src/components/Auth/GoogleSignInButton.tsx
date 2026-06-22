@@ -116,6 +116,8 @@ export default function GoogleSignInButton({
         // Picker succeeded but Google returned no ID token — surface it instead
         // of silently dropping back to the login screen.
         setBusy(false)
+        // TODO i18n: diagnostic (OAuth misconfig) message; no key in
+        // src/lib/i18n.ts (owned elsewhere). Kept as a clear English fallback.
         onError('Google returned no ID token. Check the Android OAuth client (package + SHA-1) is in the same project as the web client.')
         return
       }

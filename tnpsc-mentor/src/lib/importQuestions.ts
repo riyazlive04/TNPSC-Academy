@@ -163,6 +163,9 @@ export function validateRows(raw: Record<string, unknown>[]): {
 } {
   const valid: Record<string, unknown>[] = []
   const errors: RowError[] = []
+  // Track external_ids seen so far so a duplicate within this batch is rejected
+  // (a re-import of the same qid twice would otherwise insert two copies).
+  const seenExternalIds = new Set<string>()
 
   raw.forEach((r, i) => {
     const rowNum = i + 2 // +1 for 0-index, +1 for the header line
@@ -193,6 +196,21 @@ export function validateRows(raw: Record<string, unknown>[]): {
     const difficulty = str(r.difficulty).toLowerCase()
     if (difficulty && !DIFFICULTIES.includes(difficulty))
       rowErrs.push('difficulty must be easy, medium or hard')
+
+    // Year fields, when present, must be whole numbers (a "2o24" typo would
+    // otherwise sail through and corrupt the bank).
+    const year = str(r.year)
+    if (year && !/^\d+$/.test(year)) rowErrs.push(`year "${year}" must be numeric`)
+    const caYear = str(r.ca_year)
+    if (caYear && !/^\d+$/.test(caYear)) rowErrs.push(`ca_year "${caYear}" must be numeric`)
+
+    // Duplicate external_id within this batch (accepts qid or external_id).
+    const externalId = str(r.external_id) || str(r.qid)
+    if (externalId) {
+      if (seenExternalIds.has(externalId))
+        rowErrs.push(`duplicate external_id "${externalId}" in this batch`)
+      else seenExternalIds.add(externalId)
+    }
 
     if (rowErrs.length) {
       errors.push({ row: rowNum, message: rowErrs.join('; ') })

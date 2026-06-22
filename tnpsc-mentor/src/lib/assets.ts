@@ -27,18 +27,12 @@ const SUBJECT_ASSETS: Record<string, SubjectAsset> = {
   'History and INM': {
     tip: 'Build a timeline of the Indian freedom movement - link each event to its leaders, sessions and acts. Dates + cause→effect win marks.',
     tipTa: 'இந்திய சுதந்திரப் போராட்டத்தின் கால வரிசையை உருவாக்குங்கள் - ஒவ்வொரு நிகழ்வையும் தலைவர்கள், மாநாடுகள், சட்டங்களுடன் இணைக்கவும்.',
-    links: [
-      { label: 'NCERT History textbooks (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   Polity: {
     tip: 'Anchor on the Constitution: Parts, key Articles, Fundamental Rights vs DPSP, and the amendment process. Practise Article-number recall.',
     tipTa: 'அரசியலமைப்பை அடிப்படையாகக் கொள்ளுங்கள்: பகுதிகள், முக்கிய சட்டப்பிரிவுகள், அடிப்படை உரிமைகள் vs வழிகாட்டு நெறிமுறைகள், திருத்த நடைமுறை.',
-    links: [
-      { label: 'NCERT Political Science (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   'History Culture Heritage of TN': {
     tip: 'Focus on Tamil dynasties (Chola, Chera, Pandya, Pallava), Sangam literature, temples, and TN social-reform movements.',
@@ -53,42 +47,27 @@ const SUBJECT_ASSETS: Record<string, SubjectAsset> = {
   Biology: {
     tip: 'Master human physiology systems, plant biology, nutrition/diseases and ecology. Diagrams + labelled parts retain best.',
     tipTa: 'மனித உடலியக்க அமைப்புகள், தாவரவியல், ஊட்டச்சத்து/நோய்கள், சூழலியலில் தேர்ச்சி பெறுங்கள்.',
-    links: [
-      { label: 'NCERT Biology (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   Physics: {
     tip: 'Revise units & measurement, motion, light, electricity, and modern physics. Practise formula-based numericals daily.',
     tipTa: 'அலகுகள் & அளவீடு, இயக்கம், ஒளி, மின்சாரம், நவீன இயற்பியலை மீள்பார்வை செய்யுங்கள். தினமும் சூத்திரக் கணக்குகளைப் பயிற்சி செய்யுங்கள்.',
-    links: [
-      { label: 'NCERT Physics (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   Chemistry: {
     tip: 'Focus on periodic table trends, acids/bases/salts, metals & non-metals, and everyday chemistry. Learn common compounds & uses.',
     tipTa: 'தனிம வரிசை போக்குகள், அமிலம்/காரம்/உப்பு, உலோகங்கள் & அலோகங்கள், அன்றாட வேதியியலில் கவனம் செலுத்துங்கள்.',
-    links: [
-      { label: 'NCERT Chemistry (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   'Indian Economy': {
     tip: 'Cover planning, banking & RBI, budget/taxation, agriculture, and key indicators (GDP, inflation). Connect schemes to outcomes.',
     tipTa: 'திட்டமிடல், வங்கி & ரிசர்வ் வங்கி, பட்ஜெட்/வரிவிதிப்பு, விவசாயம், முக்கிய குறியீடுகள் (GDP, பணவீக்கம்) ஆகியவற்றைக் கற்றுக்கொள்ளுங்கள்.',
-    links: [
-      { label: 'NCERT Economics (free PDF)', url: 'https://ncert.nic.in/textbook.php', kind: 'textbook' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   'Current Affairs': {
     tip: 'Make a daily 15-minute habit: national + TN news, awards, sports, schemes and appointments. Revise monthly digests before the exam.',
     tipTa: 'தினமும் 15 நிமிட பழக்கம்: தேசிய + தமிழக செய்திகள், விருதுகள், விளையாட்டு, திட்டங்கள், நியமனங்கள்.',
-    links: [
-      { label: 'PIB (Press Information Bureau)', url: 'https://pib.gov.in/', kind: 'reference' },
-      ...COMMON,
-    ],
+    links: COMMON,
   },
   Aptitude: {
     tip: 'Drill one topic a day, learn shortcuts, and time every set. Speed comes from spaced repetition of solved patterns.',

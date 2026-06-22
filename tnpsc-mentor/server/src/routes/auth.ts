@@ -9,6 +9,7 @@ import {
   touchSession,
   revokeSession,
   revokeSessionById,
+  revokeSessionByDeviceId,
   listSessions,
   deviceLabel,
   sessionIdFromToken,
@@ -170,6 +171,7 @@ router.post(
     const { blocked } = await registerLoginSession(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
+      deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
@@ -210,6 +212,7 @@ router.post(
     const { blocked } = await registerLoginSession(
       userId,
       deviceKey(data.session.access_token, req),
+      deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
@@ -268,6 +271,7 @@ router.post(
     await registerLoginSession(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
+      deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
     setRtCookie(res, data.session.refresh_token)
@@ -306,6 +310,7 @@ router.post(
     const { blocked } = await registerLoginSession(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
+      deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
     if (blocked) {
@@ -330,8 +335,12 @@ router.post(
       patch.full_name = meta.full_name ?? meta.name
     }
     if (!existing?.email && data.user.email) patch.email = data.user.email
-    if (!existing?.avatar_url && (meta.avatar_url || meta.picture)) {
-      patch.avatar_url = meta.avatar_url ?? meta.picture
+    // Avatar RE-SYNCS on every Google login (unlike name/email, which are set once
+    // so a user's in-app edits survive): keep the photo tracking their current
+    // Google picture. Only write when it actually changed, to skip a no-op update.
+    const googlePic = (meta.avatar_url ?? meta.picture) as string | undefined
+    if (googlePic && googlePic !== existing?.avatar_url) {
+      patch.avatar_url = googlePic
     }
     if (Object.keys(patch).length > 0) {
       const { error: enrichError } = await supabaseAdmin
@@ -391,6 +400,7 @@ router.post(
     const { revoked } = await touchSession(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
+      deviceId(req),
       deviceLabel(req.headers['user-agent'])
     )
     if (revoked) {
@@ -461,9 +471,20 @@ router.post(
     // Bind to the token's session_id (fall back to the client device_id for legacy
     // sessions) so logout revokes the same row login created.
     const key = sessionIdFromToken(token) || deviceId(req)
+    let revoked = false
     if (token && key) {
       const { data } = await supabaseAdmin.auth.getUser(token)
-      if (data.user) await revokeSession(data.user.id, key)
+      if (data.user) {
+        await revokeSession(data.user.id, key)
+        revoked = true
+      }
+    }
+    // If the access token was already expired (getUser failed) we couldn't resolve
+    // the owner above, so the slot would leak. Fall back to revoking directly by
+    // the supplied session key — the caller possesses it, which is enough to free
+    // its own row — so an expired-token logout still releases the device slot.
+    if (!revoked && key) {
+      await revokeSessionByDeviceId(key)
     }
     // Drop the web refresh-token cookie so the browser can't silently re-auth.
     clearRtCookie(res)

@@ -65,6 +65,11 @@ router.post(
   asyncH(async (req: AuthedRequest, res) => {
     const rows = req.body?.rows
     if (!Array.isArray(rows)) return res.status(400).json({ error: 'rows[] is required' })
+    // Cap the chunk size — the importer should page large files; an unbounded
+    // array would balloon RPC work/memory in one request.
+    if (rows.length > 500) {
+      return res.status(400).json({ error: 'Too many rows (max 500 per request).' })
+    }
     const { data, error } = await req.db!.rpc('admin_bulk_insert_questions', { p: rows })
     if (error) return sendDbError(res, error)
     res.json({ result: data ?? null })

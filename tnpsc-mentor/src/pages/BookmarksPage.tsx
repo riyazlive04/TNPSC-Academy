@@ -109,7 +109,7 @@ export default function BookmarksPage() {
 
                 <div className="flex flex-col gap-1.5">
                   {optionLetters(q).map((letter) => {
-                    const isCorrect = q.correct_answer === letter
+                    const isCorrect = q.correct_answer != null && q.correct_answer === letter
                     return (
                       <div
                         key={letter}

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Loader2, Search, X } from 'lucide-react'
 import { List, ListRow } from '../UI/ListRow'
+import { useFocusTrap } from '../UI/useFocusTrap'
 import {
   loadKurals,
   groupByAdhigaram,
@@ -35,6 +36,9 @@ export default function ThirukuralModal({
   const [paal, setPaal] = useState<number | 'all'>('all')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<number | null>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  // Trap Tab focus within the dialog and restore it to the opener on close.
+  useFocusTrap(open, dialogRef)
 
   const showTa = lang !== 'en'
 
@@ -91,11 +95,13 @@ export default function ThirukuralModal({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={t('thirukuralTitle')}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="flex h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-line bg-card shadow-card animate-sheetIn sm:h-[85vh] sm:rounded-3xl"
+        className="flex h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-line bg-card shadow-card outline-none animate-sheetIn sm:h-[85vh] sm:rounded-3xl"
       >
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-line px-4 py-3.5 sm:px-6">

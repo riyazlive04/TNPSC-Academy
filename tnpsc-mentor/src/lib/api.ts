@@ -85,11 +85,30 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * Thrown by request() when the session is gone (refresh failed/unavailable on a
+ * 401). Distinct so callers can tell "you're signed out" apart from a raw 401
+ * and never act on a half-cleared session — tokens are cleared exactly once
+ * inside the shared refresh path, not per concurrent caller.
+ */
+export class UnauthenticatedError extends Error {
+  readonly code = 'unauthenticated'
+  constructor(message = 'Session expired. Please sign in again.') {
+    super(message)
+    this.name = 'UnauthenticatedError'
+  }
+}
+
 // Single in-flight refresh shared across concurrent 401s.
 let refreshing: Promise<boolean> | null = null
 
 async function doRefresh(): Promise<boolean> {
-  if (!canTryRefresh()) return false
+  if (!canTryRefresh()) {
+    // No way to recover this session — clear once, here, so concurrent callers
+    // all observe the same cleared state rather than each clearing the tokens.
+    tokens.clear()
+    return false
+  }
   try {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',
@@ -101,11 +120,15 @@ async function doRefresh(): Promise<boolean> {
         isNative ? { refresh_token: tokens.refresh, device_id: getDeviceId() } : { device_id: getDeviceId() }
       ),
     })
-    if (!res.ok) return false
+    if (!res.ok) {
+      tokens.clear()
+      return false
+    }
     const data = (await res.json()) as SessionResponse
     tokens.set(data.access_token, data.refresh_token)
     return true
   } catch {
+    tokens.clear()
     return false
   }
 }
@@ -146,12 +169,15 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
 
   let res = await send()
 
-  // Transparent one-shot refresh on expiry.
-  if (res.status === 401 && auth && canTryRefresh()) {
+  // Transparent one-shot refresh on expiry. Concurrent 401s share the single
+  // in-flight refresh; the shared doRefresh() clears tokens exactly once on
+  // failure, and we surface a distinct UnauthenticatedError so no caller acts on
+  // a half-cleared session.
+  if (res.status === 401 && auth) {
     if (!refreshing) refreshing = doRefresh().finally(() => (refreshing = null))
     const ok = await refreshing
     if (ok) res = await send()
-    else tokens.clear()
+    else throw new UnauthenticatedError()
   }
 
   if (res.status === 204) return undefined as T
@@ -544,6 +570,20 @@ export const api = {
       })
       return data.feedback
     },
+    /** A user's active device sessions (where they're signed in). */
+    async userSessions(userId: string): Promise<DeviceSession[]> {
+      const data = await request<{ sessions: DeviceSession[] }>(
+        `/api/superadmin/users/${userId}/sessions`
+      )
+      return data.sessions
+    },
+    /** Remotely sign a user out of one device (frees a slot; device logs out on next refresh). */
+    async revokeUserSession(userId: string, id: string): Promise<void> {
+      await request('/api/superadmin/users/sessions/revoke', {
+        method: 'POST',
+        body: { userId, id },
+      })
+    },
   },
 
   // ─── Feedback (student-submitted) ────────────────────────────────────────
@@ -841,6 +881,7 @@ export interface AdminUserRow {
   id: string
   full_name: string | null
   email: string | null
+  avatar_url: string | null
   role: UserRole
   created_at: string
   tests_taken: number

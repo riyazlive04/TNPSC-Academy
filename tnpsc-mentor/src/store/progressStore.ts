@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { todayIso } from '../lib/habit'
 
 // Tracks what the user has already been congratulated for, so the reward
 // overlay only fires on genuinely NEW level-ups / badge unlocks (never a flood).
@@ -39,10 +40,11 @@ interface ProgressState {
    */
   claim: (badgeIds: string[], level: number) => Rewards
   /**
-   * Award the daily-challenge reward at most once per calendar day. `today` is
-   * a YYYY-MM-DD string (caller's local day). Idempotent within the day.
+   * Award the daily-challenge reward at most once per calendar day. The day
+   * boundary is always IST (via todayIso()) so it agrees with the streak logic;
+   * an explicit `today` may be passed in tests. Idempotent within the day.
    */
-  claimDaily: (today: string) => DailyClaim
+  claimDaily: (today?: string) => DailyClaim
 }
 
 export const useProgressStore = create<ProgressState>()(
@@ -78,13 +80,17 @@ export const useProgressStore = create<ProgressState>()(
       },
 
       claimDaily: (today) => {
+        // Normalise to the IST day so the reward and the streak share one
+        // boundary, ignoring any caller-local string that may differ near
+        // midnight off-IST.
+        const day = today ?? todayIso()
         const { lastDailyDate, dailyRewardPoints } = get()
-        if (lastDailyDate === today) {
+        if (lastDailyDate === day) {
           // Already rewarded today - no double-dipping.
           return { granted: false, points: 0, total: dailyRewardPoints }
         }
         const total = dailyRewardPoints + DAILY_REWARD_POINTS
-        set({ lastDailyDate: today, dailyRewardPoints: total })
+        set({ lastDailyDate: day, dailyRewardPoints: total })
         return { granted: true, points: DAILY_REWARD_POINTS, total }
       },
     }),

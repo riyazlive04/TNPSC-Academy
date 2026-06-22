@@ -23,7 +23,6 @@ import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
-import { generateQuestionBankPdf } from '../lib/pdfGenerator'
 import { OUTER_SUBJECTS } from '../lib/constants'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
@@ -136,7 +135,7 @@ export default function AdminQuestionsPage() {
         const data = await fetchAdminQuestions(activeConfig)
         if (!cancelled) setQuestions(data)
       } catch {
-        if (!cancelled) setError('Could not load questions. Check Supabase config and try again.')
+        if (!cancelled) setError(t('loadQuestionsError'))
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -153,11 +152,11 @@ export default function AdminQuestionsPage() {
     if (!term) return questions
     return questions.filter(
       (q) =>
-        q.question_text.toLowerCase().includes(term) ||
-        q.option_a.toLowerCase().includes(term) ||
-        q.option_b.toLowerCase().includes(term) ||
-        q.option_c.toLowerCase().includes(term) ||
-        q.option_d.toLowerCase().includes(term) ||
+        (q.question_text ?? '').toLowerCase().includes(term) ||
+        (q.option_a ?? '').toLowerCase().includes(term) ||
+        (q.option_b ?? '').toLowerCase().includes(term) ||
+        (q.option_c ?? '').toLowerCase().includes(term) ||
+        (q.option_d ?? '').toLowerCase().includes(term) ||
         (q.explanation ?? '').toLowerCase().includes(term)
     )
   }, [questions, search])
@@ -170,6 +169,8 @@ export default function AdminQuestionsPage() {
       const label = isOuter
         ? `Outer Questions${subject ? ` · ${subject}` : ''}`
         : describeConfig(activeConfig, lang)
+      // Lazy-load the heavy jspdf/html2canvas chunk only on demand.
+      const { generateQuestionBankPdf } = await import('../lib/pdfGenerator')
       await generateQuestionBankPdf({ questions: filtered, label, lang })
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Could not generate the PDF.')
@@ -352,7 +353,7 @@ export default function AdminQuestionsPage() {
                 <QuestionFigures images={q.images} className="mb-3" />
                 <div className="flex flex-col gap-1.5">
                   {optionLetters(q).map((letter) => {
-                    const isCorrect = q.correct_answer === letter
+                    const isCorrect = q.correct_answer != null && q.correct_answer === letter
                     return (
                       <div
                         key={letter}

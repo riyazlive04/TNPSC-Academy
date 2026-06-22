@@ -124,7 +124,12 @@ create index if not exists idx_sessions_user on test_sessions(user_id);
 create table if not exists test_answers (
   id uuid default uuid_generate_v4() primary key,
   session_id uuid references test_sessions(id) on delete cascade,
-  question_id uuid references questions(id),
+  -- SET NULL (not RESTRICT/CASCADE): deleting a question must not be blocked by,
+  -- nor wipe, a user's answer history. The row keeps is_correct/selected_answer
+  -- so past session scores stay intact; only the link to the deleted question
+  -- content is severed. (Plain `references` defaults to NO ACTION = RESTRICT,
+  -- which previously made every answered question undeletable.)
+  question_id uuid references questions(id) on delete set null,
   selected_answer text check (selected_answer in ('A', 'B', 'C', 'D')),
   is_correct boolean,
   time_spent_seconds float default 0,

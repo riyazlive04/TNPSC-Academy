@@ -24,8 +24,15 @@ import {
   Megaphone,
   Send,
   Flag,
+  MonitorSmartphone,
+  Smartphone,
+  Tablet,
+  Monitor,
+  LogOut,
+  X,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
+import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
@@ -41,6 +48,7 @@ import {
   type AdminNotification,
   type NotificationAudience,
   type NotificationKind,
+  type DeviceSession,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
@@ -86,7 +94,7 @@ export default function SuperAdminPage() {
                 key={id}
                 onClick={() => setTab(id)}
                 aria-current={active}
-                className={`press flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 font-heading text-sm font-medium transition-all duration-200 ${
+                className={`press flex flex-shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 font-heading text-sm font-medium transition-all duration-200 lg:flex-1 ${
                   active ? 'bg-card text-brand shadow-pill' : 'text-ink2 hover:text-ink'
                 }`}
               >
@@ -125,8 +133,13 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 }
 
 function SkeletonGrid() {
+  const { t } = useT()
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    <div
+      role="status"
+      aria-label={t('loading')}
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+    >
       {Array.from({ length: 8 }).map((_, i) => (
         <div key={i} className="card p-4">
           <div className="skeleton mb-3 h-9 w-9 rounded-lg" />
@@ -431,6 +444,7 @@ function UsersTab() {
   const [saving, setSaving] = useState(false)
   const [revokeTarget, setRevokeTarget] = useState<AdminUserRow | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null)
+  const [devicesTarget, setDevicesTarget] = useState<AdminUserRow | null>(null)
   const [busy, setBusy] = useState(false)
 
   const load = () => {
@@ -538,9 +552,11 @@ function UsersTab() {
               style={{ '--i': i } as React.CSSProperties}
               className="card stagger-item flex flex-wrap items-center gap-3 p-3.5 sm:flex-nowrap"
             >
-              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-sm font-bold uppercase text-brand">
-                {(u.full_name ?? u.email ?? '?').charAt(0)}
-              </span>
+              <Avatar
+                src={u.avatar_url}
+                name={u.full_name ?? u.email}
+                className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-sm font-bold uppercase text-brand"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate font-heading text-sm font-semibold text-ink">
@@ -581,6 +597,14 @@ function UsersTab() {
                   <ShieldOff size={16} />
                 </button>
               )}
+              <button
+                onClick={() => setDevicesTarget(u)}
+                aria-label={`Devices - ${u.email}`}
+                title="Devices / sessions"
+                className="focus-ring grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg border border-line bg-card text-ink2 transition hover:border-brand/40 hover:text-brand"
+              >
+                <MonitorSmartphone size={16} />
+              </button>
               <button
                 onClick={() => setDeleteTarget(u)}
                 aria-label={`${t('deleteUser')} - ${u.email}`}
@@ -629,6 +653,161 @@ function UsersTab() {
         onConfirm={confirmDelete}
         onCancel={() => !busy && setDeleteTarget(null)}
       />
+
+      {devicesTarget && (
+        <DevicesModal user={devicesTarget} onClose={() => setDevicesTarget(null)} />
+      )}
+    </div>
+  )
+}
+
+// ─── Devices / sessions (where a user is signed in) ──────────────────────────────
+// Admin-only tooling: kept in English, matching the rest of the console.
+
+/** "x min ago"-style label for a last-seen timestamp. */
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const min = Math.floor(diff / 60_000)
+  if (min < 1) return 'active now'
+  if (min < 60) return `${min} min ago`
+  const hr = Math.floor(min / 60)
+  if (hr < 24) return `${hr} hr ago`
+  const day = Math.floor(hr / 24)
+  return `${day} day${day === 1 ? '' : 's'} ago`
+}
+
+/** Pick a device icon + type label from the User-Agent–derived session label. */
+function deviceKind(label: string | null): { Icon: typeof Monitor; type: string } {
+  if (label && /iPad|Tablet/i.test(label)) return { Icon: Tablet, type: 'Tablet' }
+  if (label && /iPhone|iPod|Android|Mobile/i.test(label)) return { Icon: Smartphone, type: 'Mobile' }
+  return { Icon: Monitor, type: 'Desktop' }
+}
+
+function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => void }) {
+  const [sessions, setSessions] = useState<DeviceSession[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.superadmin
+      .userSessions(user.id)
+      .then(setSessions)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [user.id])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !busyId) onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [busyId, onClose])
+
+  const signOut = async (id: string) => {
+    setBusyId(id)
+    try {
+      await api.superadmin.revokeUserSession(user.id, id)
+      setSessions((prev) => prev.filter((s) => s.id !== id))
+      toast.success('Signed out of that device.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not sign out that device.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm animate-fadeInFast"
+      onClick={() => !busyId && onClose()}
+      role="presentation"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Device sessions"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card"
+      >
+        <div className="mb-4 flex items-start gap-3">
+          <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+            <MonitorSmartphone size={20} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-heading text-base font-semibold text-ink">Where they're signed in</h2>
+            <p className="truncate font-body text-xs text-ink2">{user.email}</p>
+          </div>
+          <button
+            onClick={() => !busyId && onClose()}
+            aria-label="Close"
+            className="focus-ring grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="skeleton h-16 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <AlertTriangle size={26} className="text-coral" />
+            <p className="font-body text-sm text-ink2">Could not load sessions.</p>
+            <button onClick={load} className="btn-soft press px-4 py-2 text-sm">
+              <RefreshCw size={14} /> Retry
+            </button>
+          </div>
+        ) : sessions.length === 0 ? (
+          <p className="py-10 text-center font-body text-sm text-ink2">
+            No active sessions — this user isn't signed in on any device.
+          </p>
+        ) : (
+          <ul className="space-y-2.5">
+            {sessions.map((s) => {
+              const { Icon, type } = deviceKind(s.label)
+              const busy = busyId === s.id
+              return (
+                <li key={s.id} className="rounded-card border border-line bg-surface p-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-tint text-ink2">
+                      <Icon size={19} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-heading text-sm font-semibold text-ink">
+                        {s.label || 'Unknown device'}
+                        <span className="ml-1.5 font-body text-[10px] uppercase tracking-wide text-ink2">
+                          {type}
+                        </span>
+                      </p>
+                      <p className="mt-0.5 font-body text-xs text-ink2">
+                        Last active {relativeTime(s.last_seen_at)} · since{' '}
+                        {new Date(s.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => signOut(s.id)}
+                      disabled={!!busyId}
+                      title="Sign out this device"
+                      className="focus-ring inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-coral transition hover:border-coral/40 hover:bg-coral/5 disabled:opacity-50"
+                    >
+                      {busy ? <Spinner size={14} /> : <LogOut size={14} />}
+                      Sign out
+                    </button>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }
@@ -1006,7 +1185,7 @@ function CouponsTab() {
                   type="button"
                   onClick={() => toggleActive(c)}
                   disabled={busyId === c.id}
-                  className="focus-ring rounded-lg border border-line px-2.5 py-1.5 font-heading text-xs font-semibold text-ink transition hover:border-brand/40 disabled:opacity-50"
+                  className="focus-ring inline-flex min-h-9 items-center rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink transition hover:border-brand/40 disabled:opacity-50"
                 >
                   {c.active ? 'Pause' : 'Activate'}
                 </button>
@@ -1015,7 +1194,7 @@ function CouponsTab() {
                   onClick={() => setPendingDelete(c)}
                   disabled={busyId === c.id}
                   aria-label="Delete coupon"
-                  className="focus-ring rounded-lg border border-line p-1.5 text-coral transition hover:border-coral/40 disabled:opacity-50"
+                  className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-coral transition hover:border-coral/40 disabled:opacity-50"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -1284,7 +1463,7 @@ function NotificationsTab() {
                   type="button"
                   onClick={() => setPendingDelete(n)}
                   aria-label="Delete notification"
-                  className="focus-ring rounded-lg border border-line p-1.5 text-coral transition hover:border-coral/40"
+                  className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-coral transition hover:border-coral/40"
                 >
                   <Trash2 size={15} />
                 </button>

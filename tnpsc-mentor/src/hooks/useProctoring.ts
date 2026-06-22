@@ -61,26 +61,44 @@ export function useProctoring(opts: {
   idxRef.current = questionIndex
   const autoRef = useRef(onAutoSubmit)
   autoRef.current = onAutoSubmit
+  // Last tab-switch timestamp, so a blur + visibilitychange from one tab switch
+  // counts only once (the two events fire back-to-back).
+  const lastTabSwitchRef = useRef(0)
 
   const recordViolation = useCallback(
     (type: Violation['type']) => {
       if (doneRef.current) return
+      // Compute the next length up front, then fire side effects OUTSIDE the
+      // state updater. React may invoke the updater twice (StrictMode), so any
+      // toast/auto-submit inside it would double-fire.
+      let crossedThreshold = false
       setViolations((prev) => {
         const next = [
           ...prev,
           { type, at: Date.now() - startedAtRef.current, questionIndex: idxRef.current },
         ]
-        setViolationToast(t('violationWarning'))
-        toastTimers.current.push(window.setTimeout(() => setViolationToast(''), 4000))
-        if (next.length >= maxViolations && !doneRef.current) {
-          doneRef.current = true
-          autoRef.current()
-        }
+        if (next.length >= maxViolations && !doneRef.current) crossedThreshold = true
         return next
       })
+
+      setViolationToast(t('violationWarning'))
+      toastTimers.current.push(window.setTimeout(() => setViolationToast(''), 4000))
+      if (crossedThreshold && !doneRef.current) {
+        doneRef.current = true
+        autoRef.current()
+      }
     },
     [t, maxViolations]
   )
+
+  // Record a tab switch at most once per short window, collapsing the
+  // blur+visibilitychange pair that a single switch emits.
+  const recordTabSwitch = useCallback(() => {
+    const now = Date.now()
+    if (now - lastTabSwitchRef.current < 500) return
+    lastTabSwitchRef.current = now
+    recordViolation('tab_switch')
+  }, [recordViolation])
 
   const reEnterFullscreen = useCallback(() => {
     void enterFullscreen()
@@ -95,9 +113,14 @@ export function useProctoring(opts: {
       if (!fs) recordViolation('fullscreen_exit')
     }
     const onVisibility = () => {
-      if (document.hidden) recordViolation('tab_switch')
+      if (document.hidden) recordTabSwitch()
     }
-    const onBlur = () => recordViolation('tab_switch')
+    // A bare window blur fires for in-page focus loss too (autofill dropdowns,
+    // alert()/print dialogs), so only treat it as a tab switch when the document
+    // is actually hidden. recordTabSwitch() dedupes it against visibilitychange.
+    const onBlur = () => {
+      if (document.hidden) recordTabSwitch()
+    }
     const blockCopy = (e: Event) => {
       e.preventDefault()
       recordViolation('copy_paste')
@@ -155,7 +178,7 @@ export function useProctoring(opts: {
       toastTimers.current.forEach((id) => window.clearTimeout(id))
       toastTimers.current = []
     }
-  }, [active, recordViolation, fsSupported])
+  }, [active, recordViolation, recordTabSwitch, fsSupported])
 
   return { violations, violationToast, notFullscreen, fsSupported, reEnterFullscreen }
 }

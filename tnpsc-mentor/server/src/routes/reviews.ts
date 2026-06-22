@@ -4,6 +4,11 @@ import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 
 const router = Router()
 
+/** Validate a UUID so a malformed id can't reach the RPC as a bad cast. */
+function isUuid(s: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+}
+
 // ─── GET /api/reviews/due?limit=30 ───────────────────────────────────────────
 // Spaced-repetition items due now (no answers — revealed only on grade).
 router.get(
@@ -71,6 +76,9 @@ router.post(
     const { itemId, selected } = req.body ?? {}
     if (!itemId || !selected) {
       return res.status(400).json({ error: 'itemId and selected are required' })
+    }
+    if (typeof itemId !== 'string' || !isUuid(itemId)) {
+      return res.status(400).json({ error: 'Invalid itemId.' })
     }
     const { data, error } = await req.db!.rpc('grade_review', {
       p_item_id: itemId,

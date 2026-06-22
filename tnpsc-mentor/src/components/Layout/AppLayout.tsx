@@ -4,10 +4,13 @@ import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag } from '
 import { useAuth } from '../../hooks/useAuth'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
+import { useOnboardingStore } from '../../store/onboardingStore'
 import { api } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import Avatar from '../UI/Avatar'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
+import BackToTopButton from './BackToTopButton'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -65,6 +68,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const setLang = useLanguageStore((s) => s.setLang)
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const toggleTheme = useThemeStore((s) => s.toggle)
+  // The first-run tour owns the screen for new accounts — don't let the periodic
+  // feedback prompt pop over it.
+  const tourActive = useOnboardingStore((s) => s.open || s.pending)
 
   // Admins/superadmins manage content; learners get the study tabs.
   const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
@@ -97,11 +103,11 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // a gentle, delayed prompt on the home screen; closing or submitting it stamps
   // the 3-month window so it won't reappear. Admins are exempt.
   useEffect(() => {
-    if (feedbackGiven || !user || isAdmin) return
+    if (feedbackGiven || !user || isAdmin || tourActive) return
     if (location.pathname !== '/test-arena') return
     const id = window.setTimeout(() => setFeedbackOpen(true), 2500)
     return () => window.clearTimeout(id)
-  }, [feedbackGiven, user, isAdmin, location.pathname])
+  }, [feedbackGiven, user, isAdmin, tourActive, location.pathname])
 
   const cycleLang = () => {
     const next = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length]
@@ -116,7 +122,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
       : location.pathname.startsWith(to)
 
   return (
-    <div className="min-h-dvh overflow-x-hidden bg-canvas bg-brand-radial">
+    <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial">
       {!bare && (
         <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
@@ -163,6 +169,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
             <div className="flex flex-shrink-0 items-center gap-2">
               <button
                 onClick={cycleLang}
+                data-tour="lang"
                 title={t('chooseLanguage')}
                 aria-label={`${t('chooseLanguage')} (${LANG_LABEL[lang]})`}
                 className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
@@ -207,13 +214,19 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 title={t('profile')}
                 aria-label={t('profile')}
                 className={[
-                  'grid h-9 w-9 place-items-center rounded-lg transition focus-ring active:scale-90',
+                  'grid h-9 w-9 place-items-center overflow-hidden rounded-lg transition focus-ring active:scale-90',
                   location.pathname.startsWith('/profile')
                     ? 'bg-brand text-white'
                     : 'text-ink2 hover:bg-brand-soft hover:text-brand-dark',
                 ].join(' ')}
               >
-                <User size={18} />
+                <Avatar
+                  src={profile?.avatar_url}
+                  name={profile?.full_name}
+                  className="grid h-full w-full place-items-center rounded-lg"
+                >
+                  <User size={18} />
+                </Avatar>
               </button>
             </div>
           </div>
@@ -221,6 +234,10 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
       )}
 
       <main className={bare ? '' : 'pb-24 lg:pb-10'}>{children}</main>
+
+      {/* Admin/superadmin consoles are long, scroll-heavy pages - give content
+          managers a quick jump back to the header/tabs. */}
+      {!bare && isAdmin && <BackToTopButton />}
 
       {!bare && (
         <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card lg:hidden">
