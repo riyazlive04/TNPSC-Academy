@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
+import { supabaseAdmin } from '../supabase.js'
 
 const router = Router()
 
@@ -62,6 +63,59 @@ router.post(
     })
     if (error) return sendDbError(res, error)
     res.json({ user: data })
+  })
+)
+
+// ─── POST /api/superadmin/users/revoke-premium ───────────────────────────────
+// Withdraw a user's premium: flips their paid payment rows to 'revoked', which
+// the premium computation (status = 'paid') then excludes. Returns the count.
+router.post(
+  '/users/revoke-premium',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId } = req.body ?? {}
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' })
+    }
+    const { data, error } = await req.db!.rpc('superadmin_revoke_premium', {
+      p_user: userId,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ revoked: Number(data ?? 0) })
+  })
+)
+
+// ─── POST /api/superadmin/users/delete ───────────────────────────────────────
+// Hard-delete a user: removes the auth account (GoTrue admin API), which
+// cascades the profile + every user-owned row. Guards prevent deleting yourself
+// or any superadmin (demote them first) — both are easy ways to lock the
+// platform out of administration.
+router.post(
+  '/users/delete',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId } = req.body ?? {}
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' })
+    }
+    if (userId === req.userId) {
+      return res.status(400).json({ error: 'You cannot delete your own account.' })
+    }
+
+    // Don't let a superadmin be deleted out from under the console.
+    const { data: target, error: lookupErr } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
+    if (lookupErr || !target) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+    if (target.role === 'superadmin') {
+      return res.status(400).json({ error: 'Demote this superadmin before deleting.' })
+    }
+
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    if (error) return res.status(500).json({ error: error.message })
+    res.json({ deleted: true })
   })
 )
 

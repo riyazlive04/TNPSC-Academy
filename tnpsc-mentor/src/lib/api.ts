@@ -525,6 +525,18 @@ export const api = {
     async setRole(userId: string, role: UserRole): Promise<void> {
       await request('/api/superadmin/users/role', { method: 'POST', body: { userId, role } })
     },
+    /** Withdraw a user's premium (revokes their paid payment rows). Returns the count revoked. */
+    async revokePremium(userId: string): Promise<number> {
+      const data = await request<{ revoked: number }>('/api/superadmin/users/revoke-premium', {
+        method: 'POST',
+        body: { userId },
+      })
+      return data.revoked
+    },
+    /** Hard-delete a user account and all their data. Irreversible. */
+    async deleteUser(userId: string): Promise<void> {
+      await request('/api/superadmin/users/delete', { method: 'POST', body: { userId } })
+    },
     async feedback(limit = 100): Promise<FeedbackRow[]> {
       const data = await request<{ feedback: FeedbackRow[] }>('/api/superadmin/feedback', {
         query: { limit },
@@ -832,6 +844,8 @@ export interface AdminUserRow {
   created_at: string
   tests_taken: number
   last_active: string | null
+  premium: boolean
+  premium_until: string | null
 }
 
 export interface FeedbackRow {

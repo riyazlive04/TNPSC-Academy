@@ -15,6 +15,8 @@ import {
   Plus,
   Copy,
   Trash2,
+  ShieldOff,
+  Crown,
   IndianRupee,
   TrendingUp,
   Wallet,
@@ -427,6 +429,9 @@ function UsersTab() {
   const [loading, setLoading] = useState(true)
   const [pending, setPending] = useState<{ user: AdminUserRow; role: UserRole } | null>(null)
   const [saving, setSaving] = useState(false)
+  const [revokeTarget, setRevokeTarget] = useState<AdminUserRow | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null)
+  const [busy, setBusy] = useState(false)
 
   const load = () => {
     setLoading(true)
@@ -463,6 +468,40 @@ function UsersTab() {
       toast.error(e instanceof Error ? e.message : t('roleUpdateFailed'))
     } finally {
       setSaving(false)
+    }
+  }
+
+  const confirmRevoke = async () => {
+    if (!revokeTarget) return
+    setBusy(true)
+    try {
+      await api.superadmin.revokePremium(revokeTarget.id)
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === revokeTarget.id ? { ...u, premium: false, premium_until: null } : u
+        )
+      )
+      toast.success(t('premiumRevoked'))
+      setRevokeTarget(null)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t('revokeFailed'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+    setBusy(true)
+    try {
+      await api.superadmin.deleteUser(deleteTarget.id)
+      setUsers((prev) => prev.filter((u) => u.id !== deleteTarget.id))
+      toast.success(t('userDeleted'))
+      setDeleteTarget(null)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : t('deleteUserFailed'))
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -503,9 +542,17 @@ function UsersTab() {
                 {(u.full_name ?? u.email ?? '?').charAt(0)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-heading text-sm font-semibold text-ink">
-                  {u.full_name || '-'}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {u.full_name || '-'}
+                  </p>
+                  {u.premium && (
+                    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
+                      <Crown size={11} />
+                      {t('premiumBadge')}
+                    </span>
+                  )}
+                </div>
                 <p className="truncate font-body text-xs text-ink2">{u.email}</p>
               </div>
               <div className="hidden text-center sm:block">
@@ -524,6 +571,24 @@ function UsersTab() {
                   </option>
                 ))}
               </select>
+              {u.premium && (
+                <button
+                  onClick={() => setRevokeTarget(u)}
+                  aria-label={`${t('revokePremium')} - ${u.email}`}
+                  title={t('revokePremium')}
+                  className="focus-ring grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg border border-line bg-card text-amber-500 transition hover:border-amber-400/50 hover:bg-amber-400/10"
+                >
+                  <ShieldOff size={16} />
+                </button>
+              )}
+              <button
+                onClick={() => setDeleteTarget(u)}
+                aria-label={`${t('deleteUser')} - ${u.email}`}
+                title={t('deleteUser')}
+                className="focus-ring grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg border border-line bg-card text-rose-500 transition hover:border-rose-400/50 hover:bg-rose-400/10"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           ))}
         </div>
@@ -539,6 +604,30 @@ function UsersTab() {
         busy={saving}
         onConfirm={confirmRoleChange}
         onCancel={() => !saving && setPending(null)}
+      />
+
+      <ConfirmDialog
+        open={!!revokeTarget}
+        title={t('revokePremiumTitle')}
+        message={`${revokeTarget?.email ?? ''}. ${t('revokePremiumMsg')}`}
+        confirmLabel={t('revoke')}
+        cancelLabel={t('back')}
+        tone="danger"
+        busy={busy}
+        onConfirm={confirmRevoke}
+        onCancel={() => !busy && setRevokeTarget(null)}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={t('deleteUserTitle')}
+        message={`${deleteTarget?.email ?? ''}. ${t('deleteUserMsg')}`}
+        confirmLabel={t('delete')}
+        cancelLabel={t('back')}
+        tone="danger"
+        busy={busy}
+        onConfirm={confirmDelete}
+        onCancel={() => !busy && setDeleteTarget(null)}
       />
     </div>
   )

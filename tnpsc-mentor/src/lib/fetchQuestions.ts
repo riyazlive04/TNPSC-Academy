@@ -31,6 +31,13 @@ export async function fetchQuestionsForConfig(
   const limit = config.mock
     ? (config.mockQuestionCount ?? 50)
     : (config.questionCount ?? DEFAULT_QUESTIONS)
+  // Thirukkural is a bundled, client-side bank — build the list locally instead
+  // of hitting the server question pipeline. Dynamically imported so its large
+  // question JSON only loads for Thirukkural quizzes, never for other sections.
+  if (config.category === 'thirukural') {
+    const { buildThirukuralQuestions } = await import('./thirukuralQuiz')
+    return buildThirukuralQuestions(config, limit)
+  }
   return api.quizQuestions({ ...config, limit } as QuizConfig)
 }
 

@@ -249,6 +249,18 @@ export default function TestArenaPage() {
                 subtitle={card.subtitle}
               />
             ))}
+            {/* Thirukkural quiz — a self-contained bilingual practice bank. */}
+            <ListRow
+              onClick={() => navigate('/test-arena/thirukural')}
+              style={{ '--i': restCards.length } as React.CSSProperties}
+              leading={
+                <IconTile tint="green">
+                  <ScrollText size={19} />
+                </IconTile>
+              }
+              title={t('tkQuizTitle')}
+              subtitle={t('tkQuizSub')}
+            />
           </List>
         </section>
 
