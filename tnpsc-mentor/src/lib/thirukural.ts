@@ -60,6 +60,37 @@ export function kuralOfDay(kurals: Kural[], date: Date = new Date()): Kural | un
   return kurals[idx]
 }
 
+/**
+ * Split an English couplet translation into its two display lines, so the banner
+ * can show it as a couplet (line 1 above line 2) like the Tamil.
+ *
+ * `translation_en` marks the break between the couplet's two lines in one of two
+ * ways: an explicit run of 2+ spaces (~1/3 of kurals), or simply by starting the
+ * second line with a capital. We honour the explicit marker when present;
+ * otherwise we fall back to the word boundary nearest the midpoint, preferring a
+ * capitalised second-line start. Validated against the explicit-marker rows at
+ * ~99%. Returns a single element when the text is too short to split.
+ */
+export function splitCoupletEn(text: string): [string] | [string, string] {
+  const raw = (text ?? '').trim()
+  const dbl = raw.match(/\s{2,}/)
+  if (dbl && dbl.index !== undefined && dbl.index > 0) {
+    return [raw.slice(0, dbl.index).trim(), raw.slice(dbl.index + dbl[0].length).trim()]
+  }
+  const words = raw.split(/\s+/)
+  if (words.length < 2) return [raw]
+  const mid = raw.length / 2
+  let capIdx = -1, capDist = Infinity, anyIdx = 1, anyDist = Infinity, pos = 0
+  for (let i = 0; i < words.length - 1; i++) {
+    pos += words[i].length + 1
+    const d = Math.abs(pos - mid)
+    if (d < anyDist) { anyDist = d; anyIdx = i + 1 }
+    if (/^['"(]?[A-Z]/.test(words[i + 1]) && d < capDist) { capDist = d; capIdx = i + 1 }
+  }
+  const idx = capIdx > 0 ? capIdx : anyIdx
+  return [words.slice(0, idx).join(' '), words.slice(idx).join(' ')]
+}
+
 /** Group a (possibly filtered) kural list into chapters, preserving order. */
 export function groupByAdhigaram(kurals: Kural[]): Adhigaram[] {
   const byNo = new Map<number, Adhigaram>()

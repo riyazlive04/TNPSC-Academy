@@ -158,7 +158,9 @@ export const TOPIC_NAME_TA: Record<string, string> = {
   More: 'மேலும்',
   // ── Aptitude · Numerics ──
   'AP, GP and Special Series': 'கூட்டுத்தொடர், பெருக்குத்தொடர் & சிறப்புத் தொடர்கள்',
-  'Area And Volume': 'பரப்பளவு மற்றும் கன அளவு',
+  'Perimeter, Circumference & Diameter': 'சுற்றளவு, பரிதி & விட்டம்',
+  '2D - Area': '2D - பரப்பளவு',
+  '3D - Volume & Surface Area': '3D - கன அளவு & புறப்பரப்பு',
   'Average, Mean Median Mode': 'சராசரி, இடைநிலை, முகடு',
   'Compound Interest': 'கூட்டு வட்டி',
   'LCM and HCF': 'மீ.சி.ம மற்றும் மீ.பொ.வ',
@@ -504,6 +506,57 @@ export const SUBJECT_TOPIC_GROUPS: Record<string, TopicGroup[]> = {
   ],
 }
 
+// ─── History → chronological period split ───────────────────────────────────
+// The "History" subject bank is large and chronological, so Subject Practice
+// first asks the student to pick a PERIOD (Ancient / Medieval / Modern); the
+// topic step then shows only that period's topics. Mirrors the PYQ History
+// period selector (HistoryPeriodsPage), which scopes via the `unit` column —
+// here the period is derived purely from the topic, so no DB change is needed.
+export const HISTORY_SUBJECT = 'History'
+export type HistoryPeriod = 'ancient' | 'medieval' | 'modern'
+export const HISTORY_PERIOD_ORDER: HistoryPeriod[] = ['ancient', 'medieval', 'modern']
+
+// Each History topic belongs to exactly one period. The split follows the
+// syllabus order in SUBJECT_TOPIC_ORDER['History']: prehistory → southern
+// dynasties (ancient), coming of Islam → Mughals (medieval), Europeans →
+// freedom struggle (modern).
+export const HISTORY_PERIOD_TOPICS: Record<HistoryPeriod, string[]> = {
+  ancient: [
+    'The Pre-Historic Period',
+    'Indus Valley Civilization (2500 - 1800 BC)',
+    'The Vedic Period- the Aryans',
+    'Growth of Jainism and Buddhism',
+    'The Mauryan Empire (321 - 289 BC)',
+    'Post - Mauryan Period',
+    'The Gupta Dynasty (AD 320 - 550)',
+    'The Vardhanas (AD 550 - 647)',
+    'The Southern Dynasties',
+  ],
+  medieval: [
+    'The Coming of Islam',
+    'Regional Powers during Mughal Period',
+    'The Mughal Dynasty (1526 - 1540 and 1555 - 1857)',
+  ],
+  modern: [
+    'The Coming of The Europeans',
+    'British East India Company And The British Rule',
+    'Social And Religious Movements In The Nineteenth Century',
+    'Viceroys of India',
+    'Indian Freedom Struggle',
+    'Other Topics',
+  ],
+}
+
+// The period a History topic belongs to. Unmapped topics fall to 'modern' so a
+// newly-added topic is never hidden from every period (it surfaces under Modern
+// until it's explicitly placed above).
+export function historyPeriodForTopic(topic: string): HistoryPeriod {
+  for (const p of HISTORY_PERIOD_ORDER) {
+    if (HISTORY_PERIOD_TOPICS[p].includes(topic)) return p
+  }
+  return 'modern'
+}
+
 // Split `topics` into the configured sub-groups (preserving the incoming order
 // within each group). Topics not in any group are collected under a trailing
 // "More" heading so nothing is ever dropped. Returns a single null-headed group
@@ -551,7 +604,9 @@ export const NUMERICS_TOPICS: string[] = [
   'Percentage',
   'Ratio and Proportion',
   'LCM & HCF',
-  'Area and Volume',
+  'Perimeter, Circumference & Diameter',
+  '2D - Area',
+  '3D - Volume & Surface Area',
   'Simple Interest & Compound Interest',
   'Time and Work',
   'A.P & G.P',
