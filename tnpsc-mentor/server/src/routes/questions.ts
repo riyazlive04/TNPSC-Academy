@@ -266,9 +266,27 @@ router.post(
   '/topic-counts',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { category = 'subject', subject, standard, aptitude_type } = req.body ?? {}
+    const { category = 'subject', subject, standard, aptitude_type, ca_month } = req.body ?? {}
     const known = ['aptitude', 'samacheer', 'pyq', 'subject', 'current_affairs']
     if (!known.includes(category)) return res.json({ counts: {} })
+
+    // Current Affairs scoped to a single month: the RPC has no ca_month param,
+    // but a month is a small bank (~120 rows), so group it directly. Topics live
+    // in `topic` for month_wise rows (ca_topic null), mirroring the fallback below.
+    if (category === 'current_affairs' && ca_month) {
+      const { data: rows, error } = await req.db!
+        .from('questions')
+        .select('topic, ca_topic')
+        .eq('category', 'current_affairs')
+        .eq('ca_month', ca_month)
+      if (error) return sendDbError(res, error)
+      const counts: Record<string, number> = {}
+      for (const r of (rows ?? []) as { topic: string | null; ca_topic: string | null }[]) {
+        const v = r.topic ?? r.ca_topic
+        if (v) counts[v] = (counts[v] ?? 0) + 1
+      }
+      return res.json({ counts })
+    }
 
     const { data, error } = await req.db!.rpc('question_topic_counts', {
       p_config: {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays } from 'lucide-react'
+import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
@@ -109,12 +109,64 @@ export default function CurrentAffairsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view])
 
-  const handleMonth = (label: string) => {
+  // Month drill-in: selecting a month opens a sub-step where the user picks
+  // "All topics" or one specific topic within that month.
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
+  const [monthTopicCounts, setMonthTopicCounts] = useState<Record<string, number> | null>(null)
+  const [loadingMonthTopics, setLoadingMonthTopics] = useState(false)
+
+  useEffect(() => {
+    if (!selectedMonth) return
+    let cancelled = false
+    setMonthTopicCounts(null)
+    setLoadingMonthTopics(true)
+    api
+      .topicCounts({ category: 'current_affairs', ca_month: selectedMonth })
+      .then((m) => {
+        if (!cancelled) setMonthTopicCounts(m)
+      })
+      .catch(() => {
+        if (!cancelled) setMonthTopicCounts({})
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingMonthTopics(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [selectedMonth])
+
+  // Tapping a month opens its topic sub-step rather than starting the test.
+  const handleMonth = (label: string) => setSelectedMonth(label)
+
+  // Total questions in the selected month (for the "All Topics" hero count).
+  const monthTotal = selectedMonth
+    ? monthCounts?.[selectedMonth] ??
+      (monthTopicCounts ? Object.values(monthTopicCounts).reduce((a, b) => a + b, 0) : undefined)
+    : undefined
+
+  // "All topics" for the month — the original whole-month behaviour. Pass the
+  // already-known count as availableCount so the instructions slider shows it
+  // instantly (no /count round-trip), like Subject Practice does.
+  const startMonthAll = (label: string) => {
     startTest({
       category: 'current_affairs',
       ca_type: 'month_wise',
       ca_month: label,
+      availableCount: monthTotal,
       labelParts: [{ t: 'currentAffairsBadge' }, label],
+    })
+  }
+
+  // A specific topic within the month (filters on both ca_month and topic).
+  const startMonthTopic = (label: string, topic: string) => {
+    startTest({
+      category: 'current_affairs',
+      ca_type: 'month_wise',
+      ca_month: label,
+      topic,
+      availableCount: monthTopicCounts?.[topic],
+      labelParts: [{ t: 'currentAffairsBadge' }, label, { topic }],
     })
   }
 
@@ -122,12 +174,103 @@ export default function CurrentAffairsPage() {
     startTest({
       category: 'current_affairs',
       topic,
+      availableCount: topicCounts?.[topic],
       labelParts: [{ t: 'currentAffairsBadge' }, { topic }],
     })
   }
 
   return (
     <PickerPage badge={t('currentAffairsBadge')}>
+      {selectedMonth ? (
+        /* Month detail — choose All Topics or a specific topic within the month */
+        <section className="animate-fadeIn">
+          <button
+            onClick={() => setSelectedMonth(null)}
+            className="focus-ring -ml-1 mb-4 inline-flex items-center gap-1.5 rounded-lg px-1.5 py-1 font-heading text-sm font-semibold text-muted transition-colors hover:text-ink"
+          >
+            <ArrowLeft size={16} />
+            {selectedMonth}
+          </button>
+          <h3 className="tamil mb-2 font-heading text-sm font-bold uppercase tracking-widest text-muted">
+            {t('selectTopic')}
+          </h3>
+          {loadingMonthTopics ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={28} className="animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* All topics — the highlighted shortcut (matches other sections) */}
+              <button
+                onClick={() => startMonthAll(selectedMonth)}
+                className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
+              >
+                <span
+                  className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
+                  style={{ backgroundSize: '18px 18px' }}
+                />
+                <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+                  <Shuffle size={20} />
+                </span>
+                <span className="relative min-w-0 flex-1">
+                  <span className="block font-heading text-base font-semibold text-white">
+                    {t('allTopics')}
+                  </span>
+                  <span className="tamil block font-body text-xs text-white/70">
+                    {t('allTopicsSub')}
+                    {monthTotal != null && monthTotal > 0 && (
+                      <>
+                        {' · '}
+                        <span className="font-heading font-semibold tabular-nums text-white/90">
+                          {monthTotal.toLocaleString()}
+                        </span>{' '}
+                        {t('questionsCount')}
+                      </>
+                    )}
+                  </span>
+                </span>
+                <ChevronRight
+                  size={18}
+                  className="relative flex-shrink-0 text-white/50 transition group-hover:translate-x-0.5 group-hover:text-white"
+                />
+              </button>
+
+              {/* Specific topics in this month */}
+              <List>
+                {Object.keys(monthTopicCounts ?? {})
+                  .sort()
+                  .map((topic, i) => {
+                    const n = monthTopicCounts?.[topic]
+                    return (
+                      <ListRow
+                        key={topic}
+                        onClick={() => startMonthTopic(selectedMonth, topic)}
+                        style={{ '--i': i } as React.CSSProperties}
+                        leading={
+                          <IconTile tint="green">
+                            <Newspaper size={18} />
+                          </IconTile>
+                        }
+                        title={topicName(topic, lang)}
+                        subtitle={
+                          n != null ? (
+                            <span className="flex items-baseline gap-1">
+                              <span className="font-heading font-bold tabular-nums text-primary">
+                                {n.toLocaleString()}
+                              </span>
+                              <span>{t('questionsCount')}</span>
+                            </span>
+                          ) : undefined
+                        }
+                      />
+                    )
+                  })}
+              </List>
+            </div>
+          )}
+        </section>
+      ) : (
+      <>
       {/* Weekly revision - a quick consolidation drill across the CA pool */}
       <button
         onClick={startWeeklyRevision}
@@ -249,6 +392,8 @@ export default function CurrentAffairsPage() {
             </List>
           )}
         </section>
+      )}
+      </>
       )}
     </PickerPage>
   )

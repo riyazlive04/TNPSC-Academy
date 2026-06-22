@@ -322,6 +322,7 @@ export const api = {
     subject?: string
     standard?: number | null
     aptitude_type?: string
+    ca_month?: string
   }): Promise<Record<string, number>> {
     const data = await request<{ counts: Record<string, number> }>('/api/questions/topic-counts', {
       method: 'POST',

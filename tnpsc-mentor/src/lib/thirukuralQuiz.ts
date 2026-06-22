@@ -189,19 +189,42 @@ export function tkInline(b: TkBilingual | undefined, lang: DisplayLang): string 
 // the "List I / List II" text format that QuestionStem parses into side-by-side
 // lists, so they render exactly like the subject-bank match questions.
 
+/**
+ * Render a couplet as its two metrical lines. Tamil stores them separated by a
+ * "/"; English concatenates them with sentence punctuation immediately followed
+ * by a capital (no space). Either way we break it into two lines and drop the
+ * slash, so it reads as the printed couplet (≈4 words / ≈3 words).
+ */
+function coupletToLines(text: string): string {
+  if (text.includes('/')) {
+    return text
+      .split('/')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join('\n')
+  }
+  // Break once at the first "<punct><Capital>" boundary (the line join).
+  return text.replace(/([.,;:?!])(?=[A-Z])/, '$1\n')
+}
+
+/** Single-line couplet (slash removed) — for the compact match list items. */
+function coupletInline(text: string): string {
+  return text.replace(/\s*\/\s*/g, ' ').trim()
+}
+
 /** Build the question stem + couplet(s) for one language. */
 function stemText(q: TkQuestion, lang: 'en' | 'ta'): string {
   const pick = (b: TkBilingual) => (lang === 'ta' ? b.ta || b.en : b.en)
   const lines: string[] = [pick(q.stem)]
   if (q.format === 'match_the_following' && q.left && q.right) {
     lines.push('', 'List I')
-    for (const [k, v] of Object.entries(q.left)) lines.push(`(${k}) ${pick(v)}`)
+    for (const [k, v] of Object.entries(q.left)) lines.push(`(${k}) ${coupletInline(pick(v))}`)
     lines.push('List II')
     for (const [k, v] of Object.entries(q.right)) lines.push(`${k}. ${pick(v)}`)
   } else if (q.couplet) {
-    lines.push('', pick(q.couplet))
+    lines.push('', coupletToLines(pick(q.couplet)))
   } else if (q.couplets) {
-    q.couplets.forEach((c, i) => lines.push('', `(${i + 1}) ${pick(c)}`))
+    q.couplets.forEach((c, i) => lines.push('', `(${i + 1})`, coupletToLines(pick(c))))
   }
   return lines.join('\n')
 }

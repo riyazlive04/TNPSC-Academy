@@ -16,7 +16,7 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
-import { loadKurals, kuralOfDay, type Kural } from '../lib/thirukural'
+import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
@@ -210,7 +210,9 @@ export default function TestArenaPage() {
               </span>
               {lang !== 'en' && (
                 <p className="tamil mt-2 font-display text-[16px] font-semibold leading-relaxed text-ink">
-                  {dailyKural.line1_ta} {dailyKural.line2_ta}
+                  {/* Couplet structure: line 1 (4 words) above line 2 (3 words). */}
+                  <span className="block">{dailyKural.line1_ta}</span>
+                  <span className="block">{dailyKural.line2_ta}</span>
                 </p>
               )}
               {lang !== 'ta' && (
@@ -219,7 +221,16 @@ export default function TestArenaPage() {
                     lang === 'en' ? 'mt-2 not-italic' : 'mt-1 italic'
                   }`}
                 >
-                  {lang === 'en' ? dailyKural.translation_en : dailyKural.transliteration}
+                  {lang === 'en' ? (
+                    // English translation as a two-line couplet, mirroring the Tamil.
+                    splitCoupletEn(dailyKural.translation_en).map((line, i) => (
+                      <span key={i} className="block">
+                        {line}
+                      </span>
+                    ))
+                  ) : (
+                    dailyKural.transliteration
+                  )}
                 </p>
               )}
             </button>

@@ -9,6 +9,7 @@ import {
   Leaf,
   Globe2,
   Landmark,
+  Castle,
   Flag,
   Scale,
   TrendingUp,
@@ -34,10 +35,14 @@ import {
   SUBJECT_PRACTICE_ORDER,
   SUBJECT_TOPIC_ORDER,
   SUBJECT_TOPIC_GROUPS,
+  HISTORY_SUBJECT,
+  HISTORY_PERIOD_ORDER,
+  historyPeriodForTopic,
   bySyllabusOrder,
   groupTopics,
   subjectName,
   topicName,
+  type HistoryPeriod,
 } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
@@ -55,7 +60,21 @@ const QTYPES: { key: SubjectQType | null; labelKey: StringKey; icon: LucideIcon 
 ]
 
 const ALL_TOPICS = '__all__'
-type Step = 'subject' | 'topic' | 'type'
+type Step = 'subject' | 'period' | 'topic' | 'type'
+
+// History → period selector (Ancient / Medieval / Modern), in chronological
+// order. Shown only when the chosen subject is History; choosing a period
+// filters the topic step to that period's topics. Mirrors HistoryPeriodsPage.
+const HISTORY_PERIODS: {
+  unit: HistoryPeriod
+  titleKey: StringKey
+  subKey: StringKey
+  icon: LucideIcon
+}[] = [
+  { unit: 'ancient', titleKey: 'periodAncient', subKey: 'periodAncientSub', icon: Landmark },
+  { unit: 'medieval', titleKey: 'periodMedieval', subKey: 'periodMedievalSub', icon: Castle },
+  { unit: 'modern', titleKey: 'periodModern', subKey: 'periodModernSub', icon: Flag },
+]
 
 // ─── Per-subject visuals ─────────────────────────────────────────────────────
 // Subjects are matched to an icon by keyword (the bank uses slightly different
@@ -98,6 +117,7 @@ export default function SubjectPracticePage() {
     subjectsCache ?? []
   )
   const [subject, setSubject] = useState<string | null>(null)
+  const [period, setPeriod] = useState<HistoryPeriod | null>(null) // History only
   const [topic, setTopic] = useState<string | null>(null) // null = none; ALL_TOPICS = all
 
   const [topics, setTopics] = useState<string[]>([])
@@ -205,16 +225,40 @@ export default function SubjectPracticePage() {
     }
   }, [subject, topic])
 
-  const topicGroups = useMemo(
-    () => groupTopics(topics, subject ? SUBJECT_TOPIC_GROUPS[subject] : undefined),
-    [topics, subject]
+  // Under a History period, the topic step shows only that period's topics (the
+  // period IS the grouping, so drop the subject's sub-headings); otherwise the
+  // full topic list with its configured groups.
+  const periodTopics = useMemo(
+    () => (period ? topics.filter((tp) => historyPeriodForTopic(tp) === period) : topics),
+    [topics, period]
   )
+  const topicGroups = useMemo(
+    () =>
+      groupTopics(periodTopics, period ? undefined : subject ? SUBJECT_TOPIC_GROUPS[subject] : undefined),
+    [periodTopics, subject, period]
+  )
+
+  // Per-period question totals (sum of the period's topic counts), shown on the
+  // period cards. Derived from the same counts the topic step already fetches.
+  const periodCounts = useMemo(() => {
+    const acc: Record<HistoryPeriod, number> = { ancient: 0, medieval: 0, modern: 0 }
+    for (const [tp, n] of Object.entries(topicCounts)) acc[historyPeriodForTopic(tp)] += n
+    return acc
+  }, [topicCounts])
 
   // ─── Step transitions ──────────────────────────────────────────────────────
   const chooseSubject = (s: string) => {
     setSubject(s)
+    setPeriod(null)
     setTopic(null)
     setCounts({})
+    // History funnels through the period selector first; every other subject
+    // goes straight to its topic list.
+    setStep(s === HISTORY_SUBJECT ? 'period' : 'topic')
+  }
+  const choosePeriod = (p: HistoryPeriod) => {
+    setPeriod(p)
+    setTopic(null)
     setStep('topic')
   }
   const chooseTopic = (tp: string) => {
@@ -224,7 +268,16 @@ export default function SubjectPracticePage() {
   const back = () => {
     if (step === 'type') return setStep('topic')
     if (step === 'topic') {
+      if (period) {
+        setTopic(null)
+        return setStep('period')
+      }
       setSubject(null)
+      return setStep('subject')
+    }
+    if (step === 'period') {
+      setSubject(null)
+      setPeriod(null)
       return setStep('subject')
     }
     navigate('/test-arena')
@@ -233,12 +286,13 @@ export default function SubjectPracticePage() {
   const handleType = (qtype: SubjectQType | null, labelKey: StringKey) => {
     if (!subject || !topic) return
     const isAll = topic === ALL_TOPICS
+    const periodSeg = period ? [{ t: HISTORY_PERIODS.find((p) => p.unit === period)!.titleKey }] : []
     startTest({
       category: 'subject',
       subject,
       topic: isAll ? undefined : topic,
       question_type: qtype ?? undefined,
-      labelParts: [{ subject }, isAll ? { t: 'allTopics' } : { topic }, { t: labelKey }],
+      labelParts: [{ subject }, ...periodSeg, isAll ? { t: 'allTopics' } : { topic }, { t: labelKey }],
       availableCount: totalForType(qtype),
     })
   }
@@ -249,13 +303,21 @@ export default function SubjectPracticePage() {
   }
 
   const heading =
-    step === 'subject' ? t('pickSubject') : step === 'topic' ? t('pickTopic') : t('pickType')
+    step === 'subject'
+      ? t('pickSubject')
+      : step === 'period'
+        ? t('historyPickPeriod')
+        : step === 'topic'
+          ? t('pickTopic')
+          : t('pickType')
   const hint =
     step === 'subject'
       ? t('subjectStepHint')
-      : step === 'topic'
-        ? t('topicStepHint')
-        : t('typeStepHint')
+      : step === 'period'
+        ? t('subjectPeriodHint')
+        : step === 'topic'
+          ? t('topicStepHint')
+          : t('typeStepHint')
 
   return (
     <AppLayout>
@@ -272,10 +334,13 @@ export default function SubjectPracticePage() {
             step={step}
             subject={subject}
             subjectLabel={subject ? subjectName(subject, lang) : ''}
+            period={period}
+            periodLabel={period ? t(HISTORY_PERIODS.find((p) => p.unit === period)!.titleKey) : ''}
             topic={topic}
             topicLabel={topic && topic !== ALL_TOPICS ? topicName(topic, lang) : ''}
             allTopicsLabel={t('allTopics')}
-            onSubject={() => subject && (setStep('subject'), setSubject(null))}
+            onSubject={() => subject && (setStep('subject'), setSubject(null), setPeriod(null))}
+            onPeriod={() => setStep('period')}
             onTopic={() => setStep('topic')}
           />
         </div>
@@ -304,6 +369,17 @@ export default function SubjectPracticePage() {
             />
           )}
 
+          {step === 'period' && (
+            <PeriodStep
+              periods={HISTORY_PERIODS}
+              counts={periodCounts}
+              countsReady={Object.keys(topicCounts).length > 0}
+              label={(k) => t(k)}
+              questionsWord={t('questionsCount')}
+              onPick={choosePeriod}
+            />
+          )}
+
           {step === 'topic' && (
             <TopicStep
               loading={loadingTopics}
@@ -316,6 +392,9 @@ export default function SubjectPracticePage() {
               allTopicsSub={t('allTopicsSub')}
               topicLabel={(tp) => topicName(tp, lang)}
               onPick={chooseTopic}
+              // A period already scopes the test; the whole-subject "All Topics"
+              // shortcut would break that scope, so hide it under a period.
+              showAllTopics={!period}
             />
           )}
 
@@ -338,38 +417,50 @@ function Breadcrumb({
   step,
   subject,
   subjectLabel,
+  period,
+  periodLabel,
   topic,
   topicLabel,
   allTopicsLabel,
   onSubject,
+  onPeriod,
   onTopic,
 }: {
   step: Step
   subject: string | null
   subjectLabel: string
+  period: HistoryPeriod | null
+  periodLabel: string
   topic: string | null
   topicLabel: string
   allTopicsLabel: string
   onSubject: () => void
+  onPeriod: () => void
   onTopic: () => void
 }) {
   if (step === 'subject' || !subject) return <span />
   const topicText = topic === ALL_TOPICS ? allTopicsLabel : topicLabel
+  const chipCls =
+    'max-w-[8rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80'
+  const sep = <ChevronRight size={13} className="flex-shrink-0 text-ink2/40" />
   return (
     <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
-      <button
-        onClick={onSubject}
-        className="max-w-[8rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80"
-      >
+      <button onClick={onSubject} className={chipCls}>
         {subjectLabel}
       </button>
+      {/* Period chip (History only), shown once we're past the period step. */}
+      {period && periodLabel && (step === 'topic' || step === 'type') && (
+        <>
+          {sep}
+          <button onClick={onPeriod} className={chipCls}>
+            {periodLabel}
+          </button>
+        </>
+      )}
       {step === 'type' && topicText && (
         <>
-          <ChevronRight size={13} className="flex-shrink-0 text-ink2/40" />
-          <button
-            onClick={onTopic}
-            className="max-w-[8rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80"
-          >
+          {sep}
+          <button onClick={onTopic} className={chipCls}>
             {topicText}
           </button>
         </>
@@ -427,6 +518,61 @@ function SubjectStep({
   )
 }
 
+// ─── History period selection (Ancient / Medieval / Modern) ─────────────────
+// Shown only for the History subject, between the subject and topic steps. Each
+// row carries the period's total question count (sum of its topics' counts).
+function PeriodStep({
+  periods,
+  counts,
+  countsReady,
+  label,
+  questionsWord,
+  onPick,
+}: {
+  periods: { unit: HistoryPeriod; titleKey: StringKey; subKey: StringKey; icon: LucideIcon }[]
+  counts: Record<HistoryPeriod, number>
+  countsReady: boolean
+  label: (k: StringKey) => string
+  questionsWord: string
+  onPick: (p: HistoryPeriod) => void
+}) {
+  return (
+    <List>
+      {periods.map(({ unit, titleKey, subKey, icon: Icon }, i) => {
+        const n = counts[unit] ?? 0
+        return (
+          <ListRow
+            // The three periods always exist; only disable one once counts have
+            // loaded and it's genuinely empty.
+            key={unit}
+            disabled={countsReady && n === 0}
+            onClick={() => onPick(unit)}
+            style={{ '--i': i } as React.CSSProperties}
+            leading={
+              <IconTile tint="violet">
+                <Icon size={19} strokeWidth={2} />
+              </IconTile>
+            }
+            title={label(titleKey)}
+            subtitle={label(subKey)}
+            trailing={
+              <span className="flex flex-shrink-0 items-center gap-2">
+                {countsReady && (
+                  <span className="font-heading text-sm font-semibold text-primary">
+                    {n}{' '}
+                    <span className="font-body text-xs font-normal text-muted">{questionsWord}</span>
+                  </span>
+                )}
+                <ChevronRight size={18} className="text-muted/40" />
+              </span>
+            }
+          />
+        )
+      })}
+    </List>
+  )
+}
+
 // ─── Step 2: topic selection (All Topics hero + grouped rows) ────────────────
 function TopicStep({
   loading,
@@ -439,6 +585,7 @@ function TopicStep({
   allTopicsSub,
   topicLabel,
   onPick,
+  showAllTopics = true,
 }: {
   loading: boolean
   error: string
@@ -450,6 +597,7 @@ function TopicStep({
   allTopicsSub: string
   topicLabel: (tp: string) => string
   onPick: (tp: string) => void
+  showAllTopics?: boolean
 }) {
   if (loading) return <CenterSpinner />
   if (error) return <ErrorText text={error} />
@@ -458,7 +606,8 @@ function TopicStep({
 
   return (
     <div className="space-y-6">
-      {/* All Topics - the highlighted shortcut */}
+      {/* All Topics - the highlighted shortcut (hidden when scoped to a period) */}
+      {showAllTopics && (
       <button
         onClick={() => onPick(ALL_TOPICS)}
         className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
@@ -492,6 +641,7 @@ function TopicStep({
           className="relative flex-shrink-0 text-white/50 transition group-hover:translate-x-0.5 group-hover:text-white"
         />
       </button>
+      )}
 
       {/* Topic rows, grouped into syllabus sections when configured */}
       {groups.map((g, gi) => (

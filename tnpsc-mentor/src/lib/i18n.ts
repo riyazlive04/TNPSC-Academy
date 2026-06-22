@@ -139,6 +139,10 @@ const STRINGS = {
   periodAncientSub: { en: 'Prehistory · Indus Valley · Sangam · Mauryas · Guptas', ta: 'தொல்பழங்காலம் · சிந்து சமவெளி · சங்கம் · மௌரியர் · குப்தர்' },
   periodMedievalSub: { en: 'Delhi Sultanate · Mughals · Vijayanagara · Bhakti', ta: 'டெல்லி சுல்தானியம் · முகலாயர் · விஜயநகரம் · பக்தி' },
   periodModernSub: { en: 'Europeans · British Raj · Freedom Struggle', ta: 'ஐரோப்பியர் · பிரிட்டிஷ் ஆட்சி · சுதந்திரப் போராட்டம்' },
+  subjectPeriodHint: {
+    en: 'Pick a period, then choose a topic within it.',
+    ta: 'ஒரு காலகட்டத்தைத் தேர்ந்தெடுத்து, அதில் உள்ள ஒரு தலைப்பைத் தேர்வு செய்யவும்.',
+  },
   questionsCount: { en: 'questions', ta: 'வினாக்கள்' },
 
   // Steps / selectors
@@ -156,6 +160,7 @@ const STRINGS = {
   step1Category: { en: 'Step 1 - Select Category', ta: 'படி 1 - பிரிவைத் தேர்ந்தெடுக்கவும்' },
   step2Topic: { en: 'Step 2 - Select Topic', ta: 'படி 2 - தலைப்பைத் தேர்ந்தெடுக்கவும்' },
   selectMonth: { en: 'Select Month', ta: 'மாதத்தைத் தேர்ந்தெடுக்கவும்' },
+  selectTopic: { en: 'Select Topic', ta: 'தலைப்பைத் தேர்ந்தெடுக்கவும்' },
   topicWise: { en: 'Topic Wise', ta: 'தலைப்பு வாரியாக' },
   monthWise: { en: 'Month Wise', ta: 'மாத வாரியாக' },
   numerics: { en: 'Numerics', ta: 'எண் கணிதம்' },
