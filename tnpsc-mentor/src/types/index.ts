@@ -38,7 +38,16 @@ export interface Kural {
   urai_mu_karunanidhi: string
 }
 
-export type Category = 'pyq' | 'samacheer' | 'current_affairs' | 'aptitude' | 'outer' | 'subject'
+export type Category =
+  | 'pyq'
+  | 'samacheer'
+  | 'current_affairs'
+  | 'aptitude'
+  | 'outer'
+  | 'subject'
+  // Thirukkural quiz — a client-side bank (questions bundled with the app and
+  // graded in the browser); it never touches the server question pipeline.
+  | 'thirukural'
 // The five question styles testable in the Subject Practice flow.
 export type SubjectQType = 'chronological' | 'match' | 'assertion_reason' | 'statements' | 'direct'
 export type GroupType = 'Group1' | 'Group2_2A' | 'Group4_VAO'
@@ -307,6 +316,10 @@ export interface QuizConfig {
   revision?: boolean
   /** The revision_topics row id, threaded back through submit so a pass clears it. */
   revisionId?: string
+  /** Thirukkural quiz: the chosen adhigaram number (omitted = all chapters). */
+  tkAdhigaram?: number
+  /** Thirukkural quiz: the chosen question format (omitted = mixed). */
+  tkFormat?: string
 }
 
 // ─── Mock-test blueprint (group-exam patterns) ──────────────────────────────

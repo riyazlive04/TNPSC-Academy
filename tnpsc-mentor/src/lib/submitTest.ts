@@ -33,6 +33,12 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
   // Accurate wall-clock time (survives refresh; no off-by-one).
   const timeTaken = Math.max(0, Math.round((Date.now() - startedAt) / 1000))
 
+  // Thirukkural is a client-side bank — grade in the browser (the questions
+  // already carry their correct_answer) instead of calling the server grader.
+  if (config.category === 'thirukural') {
+    return gradeLocally(input, timeTaken)
+  }
+
   // One entry per shown question (null selected_answer = skipped) so the server
   // can grade attendance and enqueue unattempted questions for revision.
   const pAnswers = questions.map((q) => {
@@ -114,5 +120,52 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     timeTakenSeconds: timeTaken,
     sessionId: result.session_id,
     revision: result.revision,
+  }
+}
+
+/**
+ * Grades a Thirukkural test entirely client-side. The bundled questions already
+ * include `correct_answer`, so there's no server round-trip — we build the same
+ * ResultPayload shape the Result page consumes (with answers always "unlocked"
+ * so the review and explanations show).
+ */
+function gradeLocally(input: SubmitTestInput, timeTaken: number): ResultPayload {
+  const { config, questions, answers, flags, timeLimitSeconds } = input
+
+  let attempted = 0
+  let correct = 0
+  const gradedAnswers: Record<string, TestAnswer> = {}
+  for (const q of questions) {
+    const a = answers[q.id]
+    const selected = a?.selected_answer ?? null
+    if (!selected) continue
+    attempted++
+    const isCorrect = selected === q.correct_answer
+    if (isCorrect) correct++
+    gradedAnswers[q.id] = {
+      question_id: q.id,
+      selected_answer: selected,
+      is_correct: isCorrect,
+      time_spent_seconds: a?.time_spent_seconds ?? 0,
+      flagged: flags[q.id] ?? false,
+    }
+  }
+
+  const total = questions.length
+  const scorePercentage = total > 0 ? Math.round((correct / total) * 100) : 0
+  const fullyAttended = total > 0 && attempted === total
+
+  return {
+    config,
+    questions, // already carry correct_answer for the review
+    answers: gradedAnswers,
+    totalQuestions: total,
+    attempted,
+    correct,
+    scorePercentage,
+    pdfUnlocked: fullyAttended,
+    passed80: scorePercentage >= 80,
+    timeLimitSeconds,
+    timeTakenSeconds: timeTaken,
   }
 }
