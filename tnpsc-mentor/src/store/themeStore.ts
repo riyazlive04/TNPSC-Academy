@@ -44,6 +44,11 @@ interface ThemeState {
 
 const initialMode = readMode()
 
+// Guard against stacking matchMedia listeners when init() is called more than
+// once (StrictMode double-mount, re-login). We register the OS-change handler at
+// most once for the app's lifetime.
+let mqListenerRegistered = false
+
 export const useThemeStore = create<ThemeState>((set, get) => ({
   mode: initialMode,
   resolved: resolve(initialMode),
@@ -67,6 +72,8 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     const resolved = resolve(get().mode)
     apply(resolved)
     set({ resolved })
+    if (mqListenerRegistered || typeof window === 'undefined') return
+    mqListenerRegistered = true
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     mq.addEventListener?.('change', () => {
       if (get().mode !== 'system') return

@@ -175,7 +175,7 @@ function SubjectExamTab() {
     api
       .subjects()
       .then((s) => !cancelled && setSubjects(s))
-      .catch(() => !cancelled && setError('Could not load subjects. Please try again.'))
+      .catch(() => !cancelled && setError(t('couldNotLoad')))
       .finally(() => !cancelled && setLoadingSubjects(false))
     return () => {
       cancelled = true
@@ -192,7 +192,7 @@ function SubjectExamTab() {
     api
       .distinctTopics({ category: 'subject', subject })
       .then((tp) => !cancelled && setTopics(tp))
-      .catch(() => !cancelled && setError('Could not load topics. Please try again.'))
+      .catch(() => !cancelled && setError(t('couldNotLoad')))
       .finally(() => !cancelled && setLoadingTopics(false))
     return () => {
       cancelled = true

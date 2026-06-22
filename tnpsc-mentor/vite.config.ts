@@ -26,9 +26,9 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // jsPDF + its html2canvas/dompurify deps are only needed on the
-          // result page — split them out of the main bundle.
-          pdf: ['jspdf'],
+          // jsPDF + html2canvas are only needed on the result page —
+          // split them out of the main bundle.
+          pdf: ['jspdf', 'html2canvas'],
           vendor: ['react', 'react-dom', 'react-router-dom', 'zustand'],
         },
       },

@@ -4,6 +4,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 import { api } from '../lib/api'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
@@ -12,6 +13,17 @@ import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
 import { useT, type StringKey } from '../lib/i18n'
+
+/**
+ * Validates a 10-digit Indian mobile number. Accepts an optional +91 / 91 / 0
+ * prefix and incidental spaces, hyphens or brackets, then requires exactly ten
+ * digits starting 6-9 (the valid Indian mobile range).
+ */
+function isValidIndianMobile(raw: string): boolean {
+  const cleaned = raw.replace(/[\s\-()]/g, '')
+  const m = cleaned.match(/^(?:\+91|91|0)?([6-9]\d{9})$/)
+  return Boolean(m)
+}
 
 const GENDERS: { value: string; labelKey: StringKey }[] = [
   { value: 'male', labelKey: 'genderMale' },
@@ -70,6 +82,9 @@ export default function RegisterPage() {
     if (!form.email.trim()) return setError(t('errEmailRequired'))
     if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
     if (!form.phone.trim()) return setError(t('errPhoneRequired'))
+    // TODO i18n: no errPhoneInvalid key in src/lib/i18n.ts (owned elsewhere).
+    if (!isValidIndianMobile(form.phone))
+      return setError('Please enter a valid 10-digit mobile number.')
     if (form.password.length < 6) return setError(t('errPasswordShort'))
     if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
 
@@ -89,6 +104,10 @@ export default function RegisterPage() {
       setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
+
+    // Brand-new account — arm the first-run guided tour so it fires once when the
+    // user first reaches the dashboard (now, or after email confirmation).
+    useOnboardingStore.getState().arm()
 
     // Apply the language chosen at signup right away (drives the UI), persist it
     // to the profile when the account is live, and skip the language screen.
@@ -137,7 +156,7 @@ export default function RegisterPage() {
             onChange={(v) => update('phone', v)}
             placeholder="10-digit mobile"
             autoComplete="tel"
-            invalid={touched && !form.phone.trim()}
+            invalid={touched && !!form.phone && !isValidIndianMobile(form.phone)}
           />
 
           <div>
@@ -158,7 +177,7 @@ export default function RegisterPage() {
             {/* Password strength meter - animates as the user types. */}
             {form.password.length > 0 && (
               <div className="mt-2 flex items-center gap-2">
-                <div className="flex h-1.5 flex-1 gap-1">
+                <div aria-hidden="true" className="flex h-1.5 flex-1 gap-1">
                   {[0, 1, 2, 3].map((i) => (
                     <span
                       key={i}

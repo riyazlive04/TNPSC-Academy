@@ -1,4 +1,5 @@
 import { api } from './api'
+import { ATTENDANCE_GATE } from '../store/quizStore'
 import type {
   GradedResult,
   Question,
@@ -153,7 +154,9 @@ function gradeLocally(input: SubmitTestInput, timeTaken: number): ResultPayload 
 
   const total = questions.length
   const scorePercentage = total > 0 ? Math.round((correct / total) * 100) : 0
-  const fullyAttended = total > 0 && attempted === total
+  // Match the server grader: explanations/PDF unlock at the shared attendance
+  // gate (>=25% attempted), not only on a full-attendance run.
+  const unlocked = total > 0 && attempted / total >= ATTENDANCE_GATE
 
   return {
     config,
@@ -163,7 +166,7 @@ function gradeLocally(input: SubmitTestInput, timeTaken: number): ResultPayload 
     attempted,
     correct,
     scorePercentage,
-    pdfUnlocked: fullyAttended,
+    pdfUnlocked: unlocked,
     passed80: scorePercentage >= 80,
     timeLimitSeconds,
     timeTakenSeconds: timeTaken,

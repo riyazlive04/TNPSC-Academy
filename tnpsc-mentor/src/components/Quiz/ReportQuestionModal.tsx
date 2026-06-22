@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AlertCircle, Pause, X } from 'lucide-react'
 import { useT } from '../../lib/i18n'
+import { useFocusTrap } from '../UI/useFocusTrap'
 
 /**
  * "Mark this question for correction" feedback box, shown when a student reports
@@ -20,16 +21,42 @@ export default function ReportQuestionModal({
 }) {
   const { t } = useT()
   const [reason, setReason] = useState('')
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // The component is mounted only while open, so the trap is always active here.
+  useFocusTrap(true, dialogRef)
+
+  useEffect(() => {
+    // Land focus in the textarea (the trap's default would be the close button).
+    textareaRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/60 px-4 backdrop-blur-sm">
-      <div className="card w-full max-w-md p-5">
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-ink/60 px-4 backdrop-blur-sm"
+      onClick={onCancel}
+      role="presentation"
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="report-modal-title"
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="card w-full max-w-md p-5 outline-none"
+      >
         <div className="mb-3 flex items-start gap-3">
           <span className="mt-0.5 shrink-0 text-coral">
             <AlertCircle size={20} />
           </span>
           <div className="min-w-0 flex-1">
-            <h3 className="tamil font-heading text-base font-bold text-ink">
+            <h3 id="report-modal-title" className="tamil font-heading text-base font-bold text-ink">
               {t('reportModalTitle')}
               {questionNumber != null && (
                 <span className="text-ink2"> · {t('question')} {questionNumber}</span>
@@ -49,11 +76,11 @@ export default function ReportQuestionModal({
         </div>
 
         <textarea
+          ref={textareaRef}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={3}
           maxLength={500}
-          autoFocus
           placeholder={t('reportReasonPlaceholder')}
           className="tamil w-full resize-none rounded-xl border border-line bg-card px-3 py-2.5 font-body text-sm text-ink outline-none focus:border-brand-ring focus:ring-2 focus:ring-brand/25"
         />

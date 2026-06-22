@@ -27,7 +27,6 @@ import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
 import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
-import { generateExplanationPdf } from '../lib/explanationPdf'
 import { exitFullscreen } from '../lib/proctor'
 import { formatDuration, msUntil } from '../lib/revisionTime'
 import { useAuth } from '../hooks/useAuth'
@@ -141,8 +140,8 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
       // Daily-challenge reward - granted at most once per calendar day.
       let daily: DailyReward | null = null
       if (payload.config.daily) {
-        const today = new Date().toISOString().slice(0, 10)
-        const dc = claimDaily(today)
+        // Omit the date so the store uses its IST day-boundary, matching the streak logic.
+        const dc = claimDaily()
         if (dc.granted) daily = { points: dc.points, streak: h.currentStreak }
       }
 
@@ -207,6 +206,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
     if (!premium) return promptUpgrade()
     setDownloadingPdf(true)
     try {
+      // Lazy-load the heavy jspdf/html2canvas chunk only when the user actually
+      // exports - keeps it out of the result page's initial bundle.
+      const { generateExplanationPdf } = await import('../lib/explanationPdf')
       await generateExplanationPdf({
         questions,
         label,

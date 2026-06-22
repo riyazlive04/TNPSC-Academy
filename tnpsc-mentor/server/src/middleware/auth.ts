@@ -40,15 +40,27 @@ export async function requireAuth(
   next()
 }
 
-/** Look up the authenticated user's role once (null if missing/unknown). */
+// Short-TTL role cache: requireAdmin/requireSuperadmin run on every admin
+// request, each costing a profiles round-trip. Caching the role for a few
+// seconds avoids that without meaningfully delaying a role revocation taking
+// effect (the DB RPCs are is_admin()/is_superadmin()-gated regardless).
+const ROLE_TTL_MS = 30_000
+const roleCache = new Map<string, { role: string | null; expires: number }>()
+
+/** Look up the authenticated user's role (null if missing/unknown), cached ~30s. */
 async function roleOf(userId: string): Promise<string | null> {
+  const cached = roleCache.get(userId)
+  if (cached && cached.expires > Date.now()) return cached.role
+
   const { data, error } = await supabaseAdmin
     .from('profiles')
     .select('role')
     .eq('id', userId)
     .single()
-  if (error) return null
-  return (data?.role as string) ?? null
+  if (error) return null // transient errors aren't cached (retry next request)
+  const role = (data?.role as string) ?? null
+  roleCache.set(userId, { role, expires: Date.now() + ROLE_TTL_MS })
+  return role
 }
 
 /**

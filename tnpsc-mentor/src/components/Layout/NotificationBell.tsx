@@ -83,12 +83,17 @@ export default function NotificationBell() {
       <button
         onClick={() => setOpen((o) => !o)}
         title={t('notifications')}
-        aria-label={t('notifications')}
+        aria-label={
+          unread > 0 ? `${t('notifications')} (${unread} ${t('unread')})` : t('notifications')
+        }
         className="relative grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90"
       >
         {unread > 0 ? <BellRing size={18} /> : <Bell size={18} />}
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-[10px] font-bold text-white">
+          <span
+            aria-hidden="true"
+            className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-[10px] font-bold text-white"
+          >
             {unread > 9 ? '9+' : unread}
           </span>
         )}

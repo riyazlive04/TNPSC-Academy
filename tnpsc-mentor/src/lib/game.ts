@@ -39,11 +39,15 @@ export function titleForLevel(level: number): string {
 }
 
 /** Resolve a lifetime XP total into level + progress. */
+// Hard ceiling on the level walk so a corrupted/huge XP value can't spin the
+// loop forever. At a 1.35x span growth this is far beyond any reachable level.
+const MAX_LEVEL = 999
+
 export function levelInfo(xp: number): LevelInfo {
   let level = 1
   let acc = 0
   let span = 100
-  while (xp >= acc + span) {
+  while (xp >= acc + span && level < MAX_LEVEL) {
     acc += span
     level += 1
     span = Math.round(span * 1.35)

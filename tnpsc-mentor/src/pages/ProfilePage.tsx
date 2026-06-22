@@ -18,8 +18,10 @@ import {
   ChevronRight,
   Pencil,
   Check,
+  Compass,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
+import Avatar from '../components/UI/Avatar'
 import PremiumCard from '../components/UI/PremiumCard'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -32,6 +34,7 @@ import type { GroupType } from '../types'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 import { api, type DeviceSession } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -57,6 +60,14 @@ export default function ProfilePage() {
   const { t } = useT()
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
+
+  // Replay the first-run welcome tour. The tour modal lives on the dashboard, so
+  // open it in the store and navigate there to show it.
+  const replayTour = useOnboardingStore((s) => s.replay)
+  const startTour = () => {
+    replayTour()
+    navigate('/test-arena')
+  }
 
   // Change the account's language preference: update the UI instantly (local
   // store) and persist to the profile (best-effort — survives across devices).
@@ -110,12 +121,16 @@ export default function ProfilePage() {
         setAnalytics(a)
         setHabit(h)
       })
-      .catch(() => {})
+      .catch(() => {
+        // Stats failed to load - the page still renders with safe zero defaults
+        // (see the GameStats fallbacks below); surface the failure quietly.
+        if (!cancelled) toast.error(t('couldNotLoad'))
+      })
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
-  }, [user, profile?.daily_goal, profile?.exam_date])
+  }, [user, profile?.daily_goal, profile?.exam_date, t])
 
   const group = (profile?.target_group as GroupType) || 'Group1'
   const totalSubjects = (GROUP_SUBJECTS[group] ?? []).length
@@ -171,9 +186,13 @@ export default function ProfilePage() {
                 className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
                 style={{ backgroundSize: '18px 18px' }}
               />
-              <span className="relative grid h-16 w-16 flex-shrink-0 place-items-center rounded-2xl bg-white/15 font-heading text-2xl font-bold text-white ring-1 ring-white/20">
+              <Avatar
+                src={profile?.avatar_url}
+                name={name}
+                className="relative grid h-16 w-16 flex-shrink-0 place-items-center rounded-2xl bg-white/15 font-heading text-2xl font-bold text-white ring-1 ring-white/20"
+              >
                 {initial}
-              </span>
+              </Avatar>
               <div className="relative min-w-0 flex-1">
                 <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-white">
                   {name}
@@ -318,6 +337,26 @@ export default function ProfilePage() {
               </span>
               <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
             </button>
+
+            {/* How it works — replay the first-run welcome tour. Aspirant-only
+                (admins don't use the onboarding/gamification layer). */}
+            {!isAdmin && (
+              <button
+                onClick={startTour}
+                className="flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/40"
+              >
+                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+                  <Compass size={16} />
+                </span>
+                <span className="flex-1">
+                  <span className="tamil block font-display text-sm font-semibold text-ink">
+                    {t('howItWorks')}
+                  </span>
+                  <span className="tamil block font-body text-xs text-ink2">{t('howItWorksSub')}</span>
+                </span>
+                <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
+              </button>
+            )}
 
             {/* Devices — manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />

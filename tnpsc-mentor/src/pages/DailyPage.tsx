@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
 import { useProgressStore } from '../store/progressStore'
+import { toast } from '../store/toastStore'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
 
@@ -27,11 +28,15 @@ export default function DailyPage() {
     let cancelled = false
     fetchHabit(user.id, profile?.daily_goal ?? 20, profile?.exam_date ?? null)
       .then((h) => !cancelled && setHabit(h))
-      .catch(() => {})
+      .catch(() => {
+        // Streak/habit strip failed to load - it falls back to 0 safely; surface
+        // the failure quietly instead of swallowing it.
+        if (!cancelled) toast.error(t('couldNotLoad'))
+      })
     return () => {
       cancelled = true
     }
-  }, [user, profile?.daily_goal, profile?.exam_date])
+  }, [user, profile?.daily_goal, profile?.exam_date, t])
 
   const start = () => {
     const config: QuizConfig = {

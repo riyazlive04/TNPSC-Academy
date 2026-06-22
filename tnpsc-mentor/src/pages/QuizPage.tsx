@@ -75,6 +75,8 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [empty, setEmpty] = useState(false)
+  // Bumped by the Retry button to re-run the load effect after a load failure.
+  const [reloadKey, setReloadKey] = useState(0)
 
   // 15-second minimum tracking for the current question
   const [secondsOnQuestion, setSecondsOnQuestion] = useState(0)
@@ -107,9 +109,19 @@ export default function QuizPage() {
     let cancelled = false
 
     // Resume: the persisted store already holds a matching, unfinished test.
+    // Guard against a corrupt/truncated persisted set: it must be non-empty and
+    // never larger than the config's requested count (which is an upper cap on
+    // the fetched pool). A mismatch means we'd grade the wrong set — discard it
+    // and re-fetch a fresh test instead.
     const persisted = useQuizStore.getState()
+    const expectedCap = config.mock
+      ? (config.mockQuestionCount ?? 50)
+      : (config.questionCount ?? undefined)
+    const persistedCount = persisted.questions.length
+    const countLooksValid =
+      persistedCount > 0 && (expectedCap == null || persistedCount <= expectedCap)
     const canResume =
-      persisted.questions.length > 0 &&
+      countLooksValid &&
       persisted.config != null &&
       sameConfig(persisted.config, config)
     if (canResume) {
@@ -117,6 +129,9 @@ export default function QuizPage() {
       setLoading(false)
       return
     }
+    // A stale/partial persisted session that can't be trusted — clear it so the
+    // loader below starts a clean test rather than resuming a broken one.
+    if (persisted.questions.length > 0 && !canResume) persisted.reset()
 
     const load = async () => {
       setLoading(true)
@@ -145,7 +160,7 @@ export default function QuizPage() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [reloadKey])
 
   // ── Global countdown timer (auto-submit at 0) ──
   useEffect(() => {
@@ -164,6 +179,21 @@ export default function QuizPage() {
     return () => clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, empty, loadError, reportOpen])
+
+  // ── Warn before an accidental browser back / refresh of an in-progress test ──
+  // Mirrors MockQuizPage: once the test is loaded and not yet submitted, leaving
+  // would lose progress, so prompt the native "leave site?" confirmation.
+  const inProgress = !loading && !empty && !loadError && total > 0
+  useEffect(() => {
+    if (!inProgress) return
+    const beforeUnload = (e: BeforeUnloadEvent) => {
+      if (submittedRef.current) return
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', beforeUnload)
+    return () => window.removeEventListener('beforeunload', beforeUnload)
+  }, [inProgress])
 
   // ── Per-question elapsed timer (resets on navigation) ──
   useEffect(() => {
@@ -377,9 +407,17 @@ export default function QuizPage() {
       <CenteredMessage>
         <AlertTriangle size={36} className="text-coral" />
         <p className="max-w-sm text-center font-body text-ink2">{loadError}</p>
-        <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
-          {t('backToTestArena')}
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button onClick={() => setReloadKey((k) => k + 1)} className="btn-brand px-6 py-2.5">
+            {t('retry')}
+          </button>
+          <button
+            onClick={() => navigate('/test-arena')}
+            className="rounded-full border border-line px-6 py-2.5 font-heading text-sm font-semibold text-ink2 transition hover:border-brand-ring"
+          >
+            {t('backToTestArena')}
+          </button>
+        </div>
       </CenteredMessage>
     )
   }
@@ -391,9 +429,17 @@ export default function QuizPage() {
         <p className="max-w-sm text-center font-body text-ink2">
           {t('noQuestionsLong')}
         </p>
-        <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-2.5">
-          {t('backToTestArena')}
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button onClick={() => setReloadKey((k) => k + 1)} className="btn-brand px-6 py-2.5">
+            {t('retry')}
+          </button>
+          <button
+            onClick={() => navigate('/test-arena')}
+            className="rounded-full border border-line px-6 py-2.5 font-heading text-sm font-semibold text-ink2 transition hover:border-brand-ring"
+          >
+            {t('backToTestArena')}
+          </button>
+        </div>
       </CenteredMessage>
     )
   }

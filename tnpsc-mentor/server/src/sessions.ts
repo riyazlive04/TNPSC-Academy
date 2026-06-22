@@ -39,7 +39,16 @@ export function sessionIdFromToken(accessToken: string | undefined | null): stri
   }
 }
 
-/** Best-effort friendly label from a User-Agent ("Chrome on Windows"). */
+/**
+ * Best-effort friendly label from a User-Agent ("Chrome on iPhone").
+ *
+ * The OS check distinguishes iPad / iPhone / iPod / Android individually (the old
+ * label lumped them all into "iOS"/"Android"), so the device list can tell a
+ * tablet from a phone. One inherent limit we can't beat server-side: iPadOS 13+
+ * Safari masquerades as a desktop ("Macintosh") by default, so most iPads report
+ * as "Safari on Mac" — only the rare iPad that keeps the legacy "iPad" UA token
+ * is detected as a tablet here.
+ */
 export function deviceLabel(ua?: string): string | null {
   if (!ua) return null
   const browser = /edg/i.test(ua)
@@ -51,17 +60,23 @@ export function deviceLabel(ua?: string): string | null {
         : /safari/i.test(ua)
           ? 'Safari'
           : 'Browser'
-  const os = /windows/i.test(ua)
-    ? 'Windows'
-    : /android/i.test(ua)
-      ? 'Android'
-      : /iphone|ipad|ios/i.test(ua)
-        ? 'iOS'
-        : /macintosh|mac os/i.test(ua)
-          ? 'macOS'
-          : /linux/i.test(ua)
-            ? 'Linux'
-            : ''
+  const os = /ipad/i.test(ua)
+    ? 'iPad'
+    : /iphone/i.test(ua)
+      ? 'iPhone'
+      : /ipod/i.test(ua)
+        ? 'iPod'
+        : /android/i.test(ua)
+          ? 'Android'
+          : /windows/i.test(ua)
+            ? 'Windows'
+            : /cros/i.test(ua)
+              ? 'ChromeOS'
+              : /macintosh|mac os/i.test(ua)
+                ? 'Mac'
+                : /linux/i.test(ua)
+                  ? 'Linux'
+                  : ''
   return os ? `${browser} on ${os}` : browser
 }
 
@@ -79,41 +94,105 @@ async function activeCount(userId: string, excludeDeviceId?: string): Promise<nu
 }
 
 /**
+ * Revoke a browser's OWN earlier active sessions before it claims a new slot.
+ *
+ * Every login mints a fresh GoTrue `session_id` (our `sessionKey`), so a user who
+ * just closes the tab without signing out leaves a stale active row behind. The
+ * next login from the SAME browser would otherwise count as a brand-new device
+ * and — after two — trip the cap on a single browser (the exact "you're logged in
+ * elsewhere but it's the same browser" bug). Matching on the stable client
+ * `device_id` the browser sends collapses those repeat logins into one slot, so
+ * the limit counts DISTINCT devices, not accumulated login sessions. No-op when
+ * the client sent no stable id (legacy build / private-mode storage blocked).
+ */
+async function revokeSameDevice(
+  userId: string,
+  clientDeviceId: string,
+  keepSessionKey: string
+): Promise<void> {
+  if (!clientDeviceId) return
+  await supabaseAdmin
+    .from('user_sessions')
+    .update({ revoked_at: now() })
+    .eq('user_id', userId)
+    .eq('client_device_id', clientDeviceId)
+    .neq('device_id', keepSessionKey)
+    .is('revoked_at', null)
+}
+
+/**
  * Register a device at LOGIN. Returns `{ blocked: true }` when the account already
  * has MAX_DEVICES active sessions on OTHER devices. The same device re-logging in
- * always reuses its slot. A missing deviceId (legacy client) is never blocked.
+ * always reuses its slot. A missing sessionKey (legacy client) is never blocked.
+ *
+ * `sessionKey` is the unforgeable GoTrue session_id (stored in device_id), kept as
+ * the cap-binding key. `clientDeviceId` is the browser's stable localStorage id,
+ * recorded so repeat logins from one browser dedupe to a single slot.
  */
 export async function registerLoginSession(
   userId: string,
-  deviceId: string,
+  sessionKey: string,
+  clientDeviceId: string,
   label: string | null
 ): Promise<{ blocked: boolean }> {
-  if (!deviceId) return { blocked: false }
+  if (!sessionKey) return { blocked: false }
+
+  // Free any slot this same browser is still holding from an earlier login, so a
+  // re-login here replaces it instead of stacking a second "device".
+  await revokeSameDevice(userId, clientDeviceId, sessionKey)
 
   const { data: existing } = await supabaseAdmin
     .from('user_sessions')
     .select('id, revoked_at')
     .eq('user_id', userId)
-    .eq('device_id', deviceId)
+    .eq('device_id', sessionKey)
     .maybeSingle()
 
-  // This device already holds an active slot → just heartbeat.
+  // This session already holds an active slot → just heartbeat.
   if (existing && !existing.revoked_at) {
     await supabaseAdmin
       .from('user_sessions')
-      .update({ last_seen_at: now(), label })
+      .update({ last_seen_at: now(), label, client_device_id: clientDeviceId || null })
       .eq('id', existing.id)
     return { blocked: false }
   }
 
   // New (or previously revoked) device → enforce the limit against other devices.
-  if ((await activeCount(userId, deviceId)) >= MAX_DEVICES) return { blocked: true }
+  // NOTE: this check-then-act is NOT atomic. Two simultaneous logins on two new
+  // devices can both read activeCount < MAX_DEVICES and both insert, briefly
+  // overshooting the cap. There is no SECURITY DEFINER registration RPC to defer
+  // to, and supabase-js can't express a conditional insert in one round-trip, so
+  // we tighten with a post-insert re-check: after claiming the slot we recount
+  // OTHER active devices and, if the account is now over the cap (another login
+  // raced us), we roll our own row back and report blocked. This collapses the
+  // window to a brief over-count that self-heals instead of a durable breach.
+  if ((await activeCount(userId, sessionKey)) >= MAX_DEVICES) return { blocked: true }
 
   // Reactivate a revoked row or insert a fresh one.
   await supabaseAdmin.from('user_sessions').upsert(
-    { user_id: userId, device_id: deviceId, label, last_seen_at: now(), created_at: now(), revoked_at: null },
+    {
+      user_id: userId,
+      device_id: sessionKey,
+      client_device_id: clientDeviceId || null,
+      label,
+      last_seen_at: now(),
+      created_at: now(),
+      revoked_at: null,
+    },
     { onConflict: 'user_id,device_id' }
   )
+
+  // Re-check after the write: if a concurrent login pushed OTHER devices to the
+  // cap while we were inserting, undo our own claim so we don't exceed MAX_DEVICES.
+  if ((await activeCount(userId, sessionKey)) >= MAX_DEVICES) {
+    await supabaseAdmin
+      .from('user_sessions')
+      .update({ revoked_at: now() })
+      .eq('user_id', userId)
+      .eq('device_id', sessionKey)
+      .is('revoked_at', null)
+    return { blocked: true }
+  }
   return { blocked: false }
 }
 
@@ -126,23 +205,29 @@ export async function registerLoginSession(
  */
 export async function touchSession(
   userId: string,
-  deviceId: string,
+  sessionKey: string,
+  clientDeviceId: string,
   label: string | null
 ): Promise<{ revoked: boolean }> {
-  if (!deviceId) return { revoked: false }
+  if (!sessionKey) return { revoked: false }
   const { data: existing } = await supabaseAdmin
     .from('user_sessions')
     .select('id, revoked_at')
     .eq('user_id', userId)
-    .eq('device_id', deviceId)
+    .eq('device_id', sessionKey)
     .maybeSingle()
   if (existing?.revoked_at) return { revoked: true }
+  // Persisting client_device_id here backfills it onto rows that predate the
+  // column, so a browser's stale duplicate slots can be deduped on the next login.
   if (existing) {
-    await supabaseAdmin.from('user_sessions').update({ last_seen_at: now(), label }).eq('id', existing.id)
+    await supabaseAdmin
+      .from('user_sessions')
+      .update({ last_seen_at: now(), label, client_device_id: clientDeviceId || null })
+      .eq('id', existing.id)
   } else {
     await supabaseAdmin
       .from('user_sessions')
-      .insert({ user_id: userId, device_id: deviceId, label, last_seen_at: now() })
+      .insert({ user_id: userId, device_id: sessionKey, client_device_id: clientDeviceId || null, label, last_seen_at: now() })
   }
   return { revoked: false }
 }
@@ -154,6 +239,22 @@ export async function revokeSession(userId: string, deviceId: string): Promise<v
     .from('user_sessions')
     .update({ revoked_at: now() })
     .eq('user_id', userId)
+    .eq('device_id', deviceId)
+    .is('revoked_at', null)
+}
+
+/**
+ * Revoke a session by its device_id WITHOUT a userId. Used by logout when the
+ * access token is already expired (getUser fails), so we can't resolve the owner
+ * — but the caller possesses the device's session key, which is enough to free
+ * that one slot. The match is on the exact device_id (the unforgeable session_id
+ * for modern clients), so it can only revoke the row that key owns.
+ */
+export async function revokeSessionByDeviceId(deviceId: string): Promise<void> {
+  if (!deviceId) return
+  await supabaseAdmin
+    .from('user_sessions')
+    .update({ revoked_at: now() })
     .eq('device_id', deviceId)
     .is('revoked_at', null)
 }

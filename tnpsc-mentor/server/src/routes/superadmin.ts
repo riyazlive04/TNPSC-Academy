@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { listSessions, revokeSessionById } from '../sessions.js'
 
 const router = Router()
 
@@ -116,6 +117,43 @@ router.post(
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
     if (error) return res.status(500).json({ error: error.message })
     res.json({ deleted: true })
+  })
+)
+
+// ─── GET /api/superadmin/users/:userId/sessions ──────────────────────────────
+// A user's active device sessions (where they're signed in) for the console's
+// "Devices" view. Reuses listSessions (service-role read; filters revoked +
+// idle-expired rows). The raw device_id / session key is stripped — the console
+// only needs the opaque row `id` (to sign out) plus display fields.
+router.get(
+  '/users/:userId/sessions',
+  asyncH(async (req: AuthedRequest, res) => {
+    const userId = String(req.params.userId)
+    if (!userId) return res.status(400).json({ error: 'userId is required' })
+    const list = await listSessions(userId)
+    const sessions = list.map((d) => ({
+      id: d.id,
+      label: d.label,
+      created_at: d.created_at,
+      last_seen_at: d.last_seen_at,
+    }))
+    res.json({ sessions })
+  })
+)
+
+// ─── POST /api/superadmin/users/sessions/revoke ──────────────────────────────
+// Remotely sign a user out of one device. revokeSessionById is scoped to the
+// (userId, id) pair, so a mismatched id is a no-op rather than a cross-account
+// sign-out. The device logs out on its next token refresh.
+router.post(
+  '/users/sessions/revoke',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId, id } = req.body ?? {}
+    if (!userId || !id) {
+      return res.status(400).json({ error: 'userId and id are required' })
+    }
+    await revokeSessionById(String(userId), String(id))
+    res.json({ ok: true })
   })
 )
 

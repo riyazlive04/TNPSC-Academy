@@ -13,6 +13,10 @@ import {
 
 const router = Router()
 
+// Upper bound on a single submission's answers[] — no real test is this long, so
+// a larger array is abuse. Bounds RPC work and memory per request.
+const MAX_ANSWERS = 500
+
 // ─── POST /api/tests/submit ──────────────────────────────────────────────────
 // Server-graded test submission. The DB function is the sole grader and only
 // reveals answers/explanations when the 80% attendance gate is met.
@@ -23,6 +27,13 @@ router.post(
     const { session, answers } = req.body ?? {}
     if (!session || !Array.isArray(answers)) {
       return res.status(400).json({ error: 'session and answers[] are required' })
+    }
+    if (answers.length > MAX_ANSWERS) {
+      return res.status(400).json({ error: `Too many answers (max ${MAX_ANSWERS}).` })
+    }
+    // Every entry must carry a string question_id before we forward to the grader.
+    if (!answers.every((a) => a && typeof (a as { question_id?: unknown }).question_id === 'string')) {
+      return res.status(400).json({ error: 'Each answer must include a string question_id.' })
     }
     const { data, error } = await req.db!.rpc('submit_test', {
       p_session: session,

@@ -11,8 +11,8 @@ import { useT } from '../../lib/i18n'
 // Single source of truth for the 3-month plan. `PRICE_PAISE` is what the order is
 // created for (₹1 = 100 paise); the MRP is shown struck-through. When the
 // monetisation model firms up, derive these from a server-side plan instead.
-export const PREMIUM_MRP_RUPEES = 1899
-export const PREMIUM_PRICE_RUPEES = 1399
+export const PREMIUM_MRP_RUPEES = 1699
+export const PREMIUM_PRICE_RUPEES = 1699
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
 
@@ -199,22 +199,19 @@ export default function PremiumCard({
                 </span>
               </>
             ) : (
-              <>
-                <span className="font-body text-base text-ink2 line-through">
-                  ₹{PREMIUM_MRP_RUPEES}
-                </span>
-                <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                  ₹{PREMIUM_PRICE_RUPEES}
-                </span>
-              </>
+              <span className="font-display text-3xl font-bold tracking-tight text-ink">
+                ₹{PREMIUM_PRICE_RUPEES}
+              </span>
             )}
             {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
           </div>
-          <span className="tamil inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
-            {applied
-              ? `${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`
-              : `${t('premiumFlatSave')} ₹${SAVINGS}`}
-          </span>
+          {(applied || SAVINGS > 0) && (
+            <span className="tamil inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+              {applied
+                ? `${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`
+                : `${t('premiumFlatSave')} ₹${SAVINGS}`}
+            </span>
+          )}
 
           {/* Coupon row */}
           {applied ? (

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import Spinner from './Spinner'
+import { useFocusTrap } from './useFocusTrap'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -32,9 +33,14 @@ export default function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const confirmRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  // Trap Tab focus within the dialog and restore it on close.
+  useFocusTrap(open, dialogRef)
 
   useEffect(() => {
     if (!open) return
+    // Prefer the confirm button for initial focus (overrides the trap's default
+    // first-focusable, which would be Cancel).
     confirmRef.current?.focus()
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !busy) onCancel()
@@ -52,12 +58,14 @@ export default function ConfirmDialog({
       role="presentation"
     >
       <div
+        ref={dialogRef}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby="confirm-msg"
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card"
+        className="w-full max-w-sm animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card outline-none"
       >
         <div className="mb-4 flex flex-col items-center text-center">
           <span

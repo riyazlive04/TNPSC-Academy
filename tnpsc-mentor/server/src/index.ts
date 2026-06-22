@@ -87,7 +87,14 @@ app.use(
   ) => {
     // eslint-disable-next-line no-console
     console.error('[api error]', err)
-    res.status(500).json({ error: 'Internal server error' })
+    // Honour an explicit status on the error (e.g. a 4xx thrown by a handler);
+    // default to 500. For a genuine 5xx we still hide internals behind a generic
+    // message, but a 4xx may carry a client-safe message.
+    const raw = (err as { status?: unknown; statusCode?: unknown }).status ??
+      (err as { statusCode?: unknown }).statusCode
+    const status = typeof raw === 'number' && raw >= 400 && raw <= 599 ? raw : 500
+    const message = status >= 500 ? 'Internal server error' : (err.message || 'Request error')
+    res.status(status).json({ error: message })
   }
 )
 

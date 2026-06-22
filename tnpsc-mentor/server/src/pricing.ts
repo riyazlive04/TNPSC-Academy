@@ -10,6 +10,14 @@ export const PREMIUM_PRICE_PAISE = 139900 // ₹1,399
 export const MIN_CHARGE_PAISE = 100
 
 /**
+ * Premium entitlement window. Premium is a 3-MONTH plan, so a paid order older
+ * than this has lapsed. Single source of truth shared by the entitlement check
+ * (payments.ts) and the premium-audience resolution (notifications.ts) so the
+ * two can never drift.
+ */
+export const PREMIUM_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 3 months
+
+/**
  * Trusted base amount for an order. For a known plan we use the server price and
  * ignore the client amount entirely; for the generic contribution path we accept
  * the client amount, clamped to a sane range.

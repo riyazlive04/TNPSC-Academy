@@ -31,6 +31,7 @@ returns table (
   id uuid,
   full_name text,
   email text,
+  avatar_url text,
   role text,
   created_at timestamptz,
   tests_taken bigint,
@@ -53,6 +54,7 @@ begin
     p.id,
     p.full_name,
     p.email,
+    p.avatar_url,
     p.role,
     p.created_at,
     (select count(*) from public.test_sessions ts

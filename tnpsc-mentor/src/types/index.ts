@@ -472,10 +472,13 @@ export interface ParsedMatch {
 const MATCH_ITEM = /^\(?\s*([ivxlcdm]{1,4}|[IVXLCDM]{1,4}|[A-Za-z]{1,2}|\d{1,2}|[அ-ஔ])\s*[).]\s*(.+)$/
 
 // A single line that pairs a List I item with a List II item side-by-side,
-// separated by a pipe or a run of spaces, e.g. "(a) Corn    1. Cotyledon" or
-// "A. s subshell | 1. 6". Captures: I-label, I-text, II-label, II-text.
+// separated by a pipe, a run of spaces, or a dash, e.g. "(a) Corn    1. Cotyledon",
+// "A. s subshell | 1. 6", or "A. Karikala - 1. Pandya" (the subject bank's combined
+// layout). Captures: I-label, I-text, II-label, II-text. The required "<digit>)." /
+// "<digit>." after the separator keeps a bare dash from splitting hyphenated item
+// text (e.g. "Heart-lung machine"), since that dash isn't followed by a number label.
 const MATCH_COMBINED =
-  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,})\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
+  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,}|[-–—])\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
 
 /** A line that is a prompt/instruction ("Match the following…"), not a header. */
 const isMatchPrompt = (s: string): boolean =>
@@ -525,7 +528,10 @@ function parseCombinedMatch(lines: string[]): ParsedMatch | null {
   let hI = '',
     hII = ''
   if (headerLine >= 0) {
-    const parts = lines[headerLine].split(/\s*\|\s*|\s{2,}/).map((s) => s.trim()).filter(Boolean)
+    const parts = lines[headerLine]
+      .split(/\s*\|\s*|\s{2,}|\s+[-–—]\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
     hI = parts[0] ?? lines[headerLine]
     hII = parts[1] ?? ''
   }

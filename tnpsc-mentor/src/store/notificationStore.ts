@@ -36,11 +36,18 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     }
   },
   markAllRead: async () => {
-    const unreadIds = get().items.filter((i) => !i.read).map((i) => i.id)
+    const prevItems = get().items
+    const prevUnread = get().unread
+    const unreadIds = prevItems.filter((i) => !i.read).map((i) => i.id)
     if (unreadIds.length === 0) return
-    // Optimistic: clear the badge immediately, then persist.
+    // Optimistic: clear the badge immediately, then persist. Roll back to the
+    // prior unread state if the network call fails so the badge stays truthful.
     set((s) => ({ items: s.items.map((i) => ({ ...i, read: true })), unread: 0 }))
-    await api.notifications.markRead(unreadIds).catch(() => {})
+    try {
+      await api.notifications.markRead(unreadIds)
+    } catch {
+      set({ items: prevItems, unread: prevUnread })
+    }
   },
 }))
 

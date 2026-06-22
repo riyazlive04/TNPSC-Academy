@@ -31,6 +31,7 @@ import IconTile from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
+import { toast } from '../store/toastStore'
 import {
   SUBJECT_PRACTICE_ORDER,
   SUBJECT_TOPIC_ORDER,
@@ -195,7 +196,11 @@ export default function SubjectPracticePage() {
         topicCountsCache.set(subject, c)
         setTopicCounts(c)
       })
-      .catch(() => {})
+      .catch(() => {
+        // Per-topic counts are decorative; the topic list still works without
+        // them. Keep the empty fallback but surface the failure quietly.
+        if (!cancelled) toast.error(t('couldNotLoad'))
+      })
     return () => {
       cancelled = true
     }

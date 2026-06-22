@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Target } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
@@ -21,6 +21,15 @@ export default function SetupPage() {
   const [goal, setGoal] = useState(profile?.daily_goal ?? 20)
   const [saving, setSaving] = useState(false)
 
+  // Avoid a setState-after-unmount warning if the user navigates away mid-save.
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (!user) return
@@ -31,6 +40,7 @@ export default function SetupPage() {
       daily_goal: Number(goal) || 20,
     })
     await fetchProfile()
+    if (!mountedRef.current) return
     setSaving(false)
     navigate('/test-arena', { replace: true })
   }

@@ -14,6 +14,7 @@
     "jsx": "react-jsx",
 
     "strict": true,
+    // TODO: enable once unused vars cleaned up
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,

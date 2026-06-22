@@ -28,6 +28,9 @@ export default function LoginPage() {
   // currently being signed out.
   const [devices, setDevices] = useState<DeviceSession[] | null>(null)
   const [busyDeviceId, setBusyDeviceId] = useState<string | null>(null)
+  // Error shown INSIDE the device-limit modal (so a failed sign-out keeps the
+  // modal open with its message, instead of closing and stranding the error).
+  const [deviceError, setDeviceError] = useState('')
 
   // After login the destination (console / onboarding / deep link / arena) is
   // resolved by the shared post-auth router from the freshly-loaded profile.
@@ -67,7 +70,7 @@ export default function LoginPage() {
   // Sign out the chosen device and sign in here, then continue to the app.
   const handleSignOutDevice = async (sessionId: string) => {
     setBusyDeviceId(sessionId)
-    setError('')
+    setDeviceError('')
     const res = await replaceDevice(email, password, sessionId)
     setBusyDeviceId(null)
 
@@ -77,9 +80,10 @@ export default function LoginPage() {
       return
     }
     if (res.error) {
-      setDevices(null)
+      // Keep the modal open and show the failure inside it, rather than closing
+      // it and stranding the error behind the (now-dismissed) sheet.
       const f = friendlyAuthError(res.error)
-      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+      setDeviceError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
     setDevices(null)
@@ -184,8 +188,12 @@ export default function LoginPage() {
         open={devices !== null}
         devices={devices ?? []}
         busyId={busyDeviceId}
+        error={deviceError}
         onSignOut={handleSignOutDevice}
-        onClose={() => setDevices(null)}
+        onClose={() => {
+          setDevices(null)
+          setDeviceError('')
+        }}
       />
     </AuthShell>
   )

@@ -4,6 +4,7 @@ import { config, pushEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { PREMIUM_VALIDITY_MS } from '../pricing.js'
 
 const router = Router()
 
@@ -12,13 +13,12 @@ if (pushEnabled) {
   webpush.setVapidDetails(config.vapidSubject, config.vapidPublicKey, config.vapidPrivateKey)
 }
 
-const YEAR_MS = 365 * 24 * 60 * 60 * 1000
-
 // ─── Audience helpers ────────────────────────────────────────────────────────
-/** user_ids with an active (paid, <1yr) premium_annual order — the 'premium'
- *  audience. Mirrors the entitlement rule in payments. */
+/** user_ids with an active (paid, within the validity window) premium_annual
+ *  order — the 'premium' audience. Mirrors the entitlement rule in payments
+ *  exactly via the shared PREMIUM_VALIDITY_MS so the two can't drift. */
 async function premiumUserIds(): Promise<Set<string>> {
-  const since = new Date(Date.now() - YEAR_MS).toISOString()
+  const since = new Date(Date.now() - PREMIUM_VALIDITY_MS).toISOString()
   const { data } = await supabaseAdmin
     .from('payments')
     .select('user_id, notes')
@@ -79,18 +79,33 @@ router.post(
     if (!endpoint || !p256dh || !auth) {
       return res.status(400).json({ error: 'Invalid push subscription.' })
     }
-    // Upsert on endpoint so re-subscribing the same device doesn't duplicate, and
-    // a device that changed hands gets reassigned to the current user.
-    const { error } = await supabaseAdmin.from('push_subscriptions').upsert(
-      {
-        user_id: req.userId,
-        endpoint,
-        p256dh,
-        auth,
-        user_agent: String(req.headers['user-agent'] ?? '').slice(0, 300),
-      },
-      { onConflict: 'endpoint' }
-    )
+    // Anti-hijack: a plain upsert on `endpoint` would let any authenticated user
+    // reassign another user's endpoint to themselves (silencing the victim). The
+    // composite (user_id, endpoint) uniqueness can't be relied on here, so instead
+    // we scope by ownership: look up the existing row for this endpoint and only
+    // write when it's UNOWNED or already owned by the caller. An endpoint owned by
+    // a different user is left untouched (no reassignment).
+    const agent = String(req.headers['user-agent'] ?? '').slice(0, 300)
+    const { data: existing } = await supabaseAdmin
+      .from('push_subscriptions')
+      .select('id, user_id')
+      .eq('endpoint', endpoint)
+      .maybeSingle()
+
+    if (existing && existing.user_id !== req.userId) {
+      // Endpoint belongs to someone else — refuse to reassign it.
+      return res.status(409).json({ error: 'This subscription is registered to another account.' })
+    }
+
+    const { error } = existing
+      ? await supabaseAdmin
+          .from('push_subscriptions')
+          .update({ p256dh, auth, user_agent: agent })
+          .eq('id', existing.id)
+          .eq('user_id', req.userId!) // belt-and-braces: never touch another user's row
+      : await supabaseAdmin
+          .from('push_subscriptions')
+          .insert({ user_id: req.userId, endpoint, p256dh, auth, user_agent: agent })
     if (error) return sendDbError(res, error)
     res.json({ ok: true })
   })

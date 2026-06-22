@@ -1,10 +1,28 @@
 import { Router } from 'express'
+import { rateLimit } from 'express-rate-limit'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { baseAmountForPlan, MIN_CHARGE_PAISE } from '../pricing.js'
 
 const router = Router()
+
+/** Validate a UUID (v4-ish) so a malformed :id can't reach the DB as a bad cast. */
+function isUuid(s: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+}
+
+/** Tight per-user (fallback per-IP) limiter for coupon attempts — stops brute-
+ * forcing valid codes through /validate (and the coupon path in /order). */
+export const couponLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 20,
+  keyGenerator: (req) => (req as AuthedRequest).userId || req.ip || 'anon',
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many coupon attempts. Please wait a few minutes and try again.' },
+})
 
 // ─── Coupon record shape (DB row) ────────────────────────────────────────────
 export interface CouponRow {
@@ -31,14 +49,16 @@ export type CouponEval =
  * thing) so the rules can never drift between preview and charge.
  */
 export async function evaluateCoupon(rawCode: string, baseAmount: number): Promise<CouponEval> {
-  const code = String(rawCode ?? '').trim()
+  const code = String(rawCode ?? '').trim().toUpperCase()
   if (!code) return { ok: false, reason: 'Enter a coupon code.' }
 
-  // Codes are stored UPPERCASE; match case-insensitively (no % / _ in our codes).
+  // Codes are stored UPPERCASE (normalizeCode on create/edit), so match exactly
+  // on the uppercased input. ilike() would treat %/_ in the input as wildcards
+  // — an injection vector — so an exact eq() is both safer and correct here.
   const { data: coupon, error } = await supabaseAdmin
     .from('coupons')
     .select('*')
-    .ilike('code', code)
+    .eq('code', code)
     .maybeSingle<CouponRow>()
   if (error) return { ok: false, reason: 'Could not check that coupon.' }
   if (!coupon) return { ok: false, reason: 'Invalid coupon code.' }
@@ -116,6 +136,7 @@ function optInt(v: unknown): number | null {
 router.post(
   '/validate',
   requireAuth,
+  couponLimiter,
   asyncH(async (req: AuthedRequest, res) => {
     const base = baseAmountForPlan(req.body?.plan, Number(req.body?.amount))
     const ev = await evaluateCoupon(String(req.body?.code ?? ''), base)
@@ -232,6 +253,7 @@ router.patch(
   '/:id',
   ...admin,
   asyncH(async (req: AuthedRequest, res) => {
+    if (!isUuid(req.params.id)) return res.status(400).json({ error: 'Invalid coupon id.' })
     const patch: Record<string, unknown> = {}
     const b = req.body ?? {}
 
@@ -289,9 +311,17 @@ router.delete(
   '/:id',
   ...admin,
   asyncH(async (req: AuthedRequest, res) => {
-    const { error } = await supabaseAdmin.from('coupons').delete().eq('id', req.params.id)
+    if (!isUuid(req.params.id)) return res.status(400).json({ error: 'Invalid coupon id.' })
+    // .select() returns the deleted rows so we can tell "deleted" from "no match"
+    // — a bare delete reports success even when nothing was removed.
+    const { data, error } = await supabaseAdmin
+      .from('coupons')
+      .delete()
+      .eq('id', req.params.id)
+      .select('id')
     if (error) return sendDbError(res, error)
-    res.json({ deleted: true })
+    if (!data || data.length === 0) return res.status(404).json({ error: 'Coupon not found.' })
+    res.json({ deleted: true, count: data.length })
   })
 )
 

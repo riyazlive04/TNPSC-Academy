@@ -35,7 +35,7 @@ export default function SamacheerPage() {
         })
         if (!cancelled) setTopics(distinct)
       } catch {
-        if (!cancelled) setError('Could not load topics from the database. Please try again.')
+        if (!cancelled) setError(t('couldNotLoad'))
       } finally {
         if (!cancelled) setLoading(false)
       }

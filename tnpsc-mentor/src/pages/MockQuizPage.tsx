@@ -55,6 +55,8 @@ export default function MockQuizPage() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [empty, setEmpty] = useState(false)
+  // Bumped by the Retry button to re-run the load effect after a load failure.
+  const [reloadKey, setReloadKey] = useState(0)
 
   const [index, setIndex] = useState(0)
   const [page, setPage] = useState(() => useMockQuizStore.getState().page)
@@ -121,6 +123,8 @@ export default function MockQuizPage() {
     }
 
     setLoading(true)
+    setLoadError('')
+    setEmpty(false)
     ;(async () => {
       try {
         const qs =
@@ -148,7 +152,7 @@ export default function MockQuizPage() {
           setPage(0)
         }
       } catch {
-        if (!cancelled) setLoadError('Could not load the test. Please try again.')
+        if (!cancelled) setLoadError(t('loadQuestionsError'))
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -157,7 +161,7 @@ export default function MockQuizPage() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [reloadKey])
 
   const total = questions.length
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
@@ -219,11 +223,13 @@ export default function MockQuizPage() {
         navigate('/result', { state: { ...payload, violations: violationsRef.current, autoSubmitted: auto } })
       } catch {
         submittedRef.current = false
-        setSubmitError('Could not submit your test. Check your connection and try again.')
+        // TODO i18n: no dedicated key in src/lib/i18n.ts (owned elsewhere);
+        // reuse the closest existing key for the connection-failure message.
+        setSubmitError(t('loadQuestionsError'))
         setSubmitting(false)
       }
     },
-    [answers, marked, questions, config, navigate]
+    [answers, marked, questions, config, navigate, t]
   )
 
   // ── Countdown timer (auto-submit at zero, warn at 30/10/5 min) ──
@@ -429,11 +435,22 @@ export default function MockQuizPage() {
       <CenteredScreen>
         <AlertTriangle size={36} className="text-coral" />
         <p className="mt-3 max-w-sm text-center font-body text-sm text-ink2">
-          {empty ? 'No questions are available for this selection yet.' : loadError}
+          {empty ? t('noQuestionsLong') : loadError}
         </p>
-        <button onClick={() => navigate('/mock')} className="btn-brand mt-5">
-          {t('mockTests')}
-        </button>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {/* Only a transient load failure is retryable; an empty pool isn't. */}
+          {!empty && (
+            <button onClick={() => setReloadKey((k) => k + 1)} className="btn-brand">
+              {t('retry')}
+            </button>
+          )}
+          <button
+            onClick={() => navigate('/mock')}
+            className={empty ? 'btn-brand' : 'rounded-full border border-line px-5 py-2.5 font-heading text-sm font-semibold text-ink2 transition hover:border-brand-ring'}
+          >
+            {t('mockTests')}
+          </button>
+        </div>
       </CenteredScreen>
     )
   }
@@ -601,10 +618,6 @@ export default function MockQuizPage() {
           {/* Pagination - only in the full (unfiltered) view */}
           {!showFlaggedOnly && <Paginator page={page} pageCount={pageCount} onJump={setPage} t={t} />}
 
-          {submitError && (
-            <p className="mt-3 text-center font-body text-sm text-coral">{submitError}</p>
-          )}
-
           <div className="mt-4 flex items-stretch gap-2">
             {/* Flagged-only filter: collapses the sheet to just the flagged questions. */}
             <button
@@ -705,6 +718,25 @@ export default function MockQuizPage() {
           onSubmit={submitReport}
           onCancel={resumeAfterReport}
         />
+      )}
+
+      {/* Submit failure recovery - a prominent, always-visible banner so a failed
+          (especially auto-) submit at 0:00 never leaves the student stuck with no
+          way forward. Offers an immediate Retry Submit. */}
+      {submitError && (
+        <div
+          role="alert"
+          className="fixed inset-x-0 bottom-0 z-[60] flex flex-col items-center gap-3 border-t border-coral/30 bg-coral/95 px-4 py-4 text-center text-white shadow-card sm:flex-row sm:justify-center"
+        >
+          <p className="font-heading text-sm font-semibold">{submitError}</p>
+          <button
+            onClick={() => doSubmit(true)}
+            disabled={submitting}
+            className="inline-flex items-center justify-center gap-2 rounded-pill bg-white px-5 py-2.5 font-heading text-sm font-bold text-coral transition hover:brightness-95 disabled:opacity-60"
+          >
+            {submitting ? <Loader2 size={16} className="animate-spin" /> : t('retrySubmit')}
+          </button>
+        </div>
       )}
 
       {/* Anti-capture shield - blanks the screen on focus loss / PrintScreen. */}

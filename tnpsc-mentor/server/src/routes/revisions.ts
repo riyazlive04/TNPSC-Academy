@@ -5,6 +5,11 @@ import { recordSeen } from '../lib/seen.js'
 
 const router = Router()
 
+/** Validate a UUID so a malformed :id can't reach the RPC as a bad cast. */
+function isUuid(s: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+}
+
 // Default number of questions in a revision re-test (the learner doesn't pick a
 // count here — it's a focused retry). Clamped so a hand-crafted ?count can't ask
 // for a huge or zero-length test.
@@ -107,6 +112,7 @@ router.post(
   '/:id/dismiss',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
+    if (!isUuid(req.params.id)) return res.status(400).json({ error: 'Invalid revision id.' })
     const { data, error } = await req.db!.rpc('dismiss_revision_topic', {
       p_id: req.params.id,
     })

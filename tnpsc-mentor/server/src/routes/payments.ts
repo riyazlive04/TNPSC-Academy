@@ -5,8 +5,8 @@ import { config, razorpayEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
-import { baseAmountForPlan } from '../pricing.js'
-import { evaluateCoupon } from './coupons.js'
+import { baseAmountForPlan, PREMIUM_VALIDITY_MS } from '../pricing.js'
+import { evaluateCoupon, couponLimiter } from './coupons.js'
 import { notifyAdmins } from '../notify.js'
 
 const router = Router()
@@ -35,6 +35,7 @@ router.use((_req, res, next) => {
 router.post(
   '/order',
   requireAuth,
+  couponLimiter,
   asyncH(async (req: AuthedRequest, res) => {
     const currency = typeof req.body?.currency === 'string' ? req.body.currency : 'INR'
     const notes: Record<string, string> = {
@@ -42,11 +43,19 @@ router.post(
       ...(req.body?.notes && typeof req.body.notes === 'object' ? req.body.notes : {}),
     }
 
+    // Resolve the plan SERVER-SIDE: only a plan pricing.ts recognizes is honoured
+    // — anything else is the generic contribution path (plan stripped). We then
+    // overwrite notes.plan with this validated value so entitlement (GET /premium)
+    // can never be driven by an arbitrary client-supplied notes.plan string.
+    const plan: string | null = req.body?.notes?.plan === 'premium_annual' ? 'premium_annual' : null
+    if (plan) notes.plan = plan
+    else delete notes.plan
+
     // Base price is the SERVER's responsibility: for a known plan we use the
     // server price and ignore the client amount; otherwise the clamped client
     // amount (the flexible-contribution path). This is the price a coupon
     // discounts — the browser can never send a pre-discounted number.
-    const base = baseAmountForPlan(notes.plan, Number(req.body?.amount))
+    const base = baseAmountForPlan(plan ?? undefined, Number(req.body?.amount))
 
     // Optional coupon. Validated + applied server-side so the discount can't be
     // forged; an invalid/expired/exhausted code fails the order with a clear msg.
@@ -198,9 +207,10 @@ router.post(
     }
 
     // Gate 3 — confirm the real payment with Razorpay: right order, exact amount,
-    // and actually captured/authorised. Best-effort on transient API errors: a
-    // Razorpay outage falls back to the (cryptographically sufficient) signature
-    // rather than failing a genuine payment, but a definitive MISMATCH is fatal.
+    // and actually captured/authorised. A definitive MISMATCH is fatal (mark
+    // failed). A FETCH failure (Razorpay outage) is NON-final: we must not credit
+    // on signature alone — the row stays `created` (untouched) and we return a
+    // retryable 503 so the client can re-verify once Razorpay is reachable again.
     try {
       const pay = await rzp!.payments.fetch(paymentId)
       const amountPaid = Number(pay.amount)
@@ -216,10 +226,15 @@ router.post(
         return res.status(400).json({ error: 'Payment could not be verified.', verified: false })
       }
     } catch (e) {
-      console.error(
-        '[verify] Razorpay fetch failed; falling back to signature-only',
-        (e as Error).message
-      )
+      // Do NOT fall through to crediting: skipping the amount/capture check on a
+      // fetch error would let a valid signature for an under-paid/uncaptured
+      // payment slip through. Leave the row pending and ask the client to retry.
+      console.error('[verify] Razorpay fetch failed; cannot confirm payment', (e as Error).message)
+      return res.status(503).json({
+        error: 'Could not confirm the payment right now. Please retry in a moment.',
+        verified: false,
+        retryable: true,
+      })
     }
 
     // Credit — guarded on `created` so concurrent/duplicate valid calls (and any
@@ -241,8 +256,8 @@ router.post(
 // 90 days — a payment older than that has lapsed. Entitlement is computed, never
 // stored as a flag, so it stays correct without a separate sync step. Returns
 // the expiry too. (The `premium_annual` plan id is retained for ledger continuity
-// even though the validity is now 3 months.)
-const PREMIUM_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 3 months
+// even though the validity is now 3 months.) PREMIUM_VALIDITY_MS is shared from
+// pricing.ts so this window can never drift from the premium-audience logic.
 router.get(
   '/premium',
   requireAuth,
