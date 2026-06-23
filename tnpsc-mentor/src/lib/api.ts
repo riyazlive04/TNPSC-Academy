@@ -215,6 +215,20 @@ export interface DeviceSession {
   current?: boolean
 }
 
+/** An uploaded Android build (superadmin App tab + version history). */
+export interface AppRelease {
+  id: string
+  version_name: string
+  file_name: string
+  file_size: number
+  notes: string | null
+  created_at: string
+  url: string
+}
+
+/** The current build the public landing page links to (no `id`). */
+export type LatestRelease = Omit<AppRelease, 'id'>
+
 export const api = {
   auth: {
     async login(email: string, password: string): Promise<SessionResponse> {
@@ -626,6 +640,53 @@ export const api = {
         method: 'POST',
         body: { userId, id },
       })
+    },
+  },
+
+  // ─── App / APK releases ──────────────────────────────────────────────────
+  // `latest` is public (the landing page reads it); list/upload/remove are
+  // superadmin-only (the server enforces the role).
+  appReleases: {
+    /** Public: the current build (or null when none uploaded). Used by the landing page. */
+    async latest(): Promise<LatestRelease | null> {
+      const data = await request<{ release: LatestRelease | null }>('/api/app/latest', {
+        auth: false,
+      })
+      return data.release
+    },
+    /** Superadmin: full version history, newest first. */
+    async list(): Promise<AppRelease[]> {
+      const data = await request<{ releases: AppRelease[] }>('/api/superadmin/apk')
+      return data.releases
+    },
+    /**
+     * Superadmin: upload a new .apk. Sent as the raw request body (not JSON), so
+     * this bypasses the shared request() helper; version + notes ride in the
+     * query string and the filename in a header.
+     */
+    async upload(file: File, versionName: string, notes: string): Promise<AppRelease> {
+      const qs = new URLSearchParams({ version: versionName })
+      if (notes) qs.set('notes', notes)
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/vnd.android.package-archive',
+        'x-file-name': file.name,
+      }
+      if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`
+      const res = await fetch(`${API_URL}/api/superadmin/apk?${qs.toString()}`, {
+        method: 'POST',
+        headers,
+        credentials: CREDENTIALS,
+        body: file,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      }
+      return (data as { release: AppRelease }).release
+    },
+    /** Superadmin: delete a release (deleting the current one rolls back to the previous). */
+    async remove(id: string): Promise<void> {
+      await request(`/api/superadmin/apk/${id}`, { method: 'DELETE' })
     },
   },
 

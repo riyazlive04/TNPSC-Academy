@@ -918,6 +918,7 @@ const STRINGS = {
     ta: 'மாணவர்கள் திருத்தத்திற்காகக் குறித்த வினாக்கள்',
   },
   couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
+  appTab: { en: 'App', ta: 'ஆப்' },
   revenueTab: { en: 'Revenue', ta: 'வருவாய்' },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },

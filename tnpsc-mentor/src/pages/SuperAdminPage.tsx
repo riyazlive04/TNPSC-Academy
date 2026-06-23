@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Users as UsersIcon,
   Activity,
@@ -26,6 +26,7 @@ import {
   Flag,
   BookOpen,
   Download,
+  UploadCloud,
   MonitorSmartphone,
   Smartphone,
   Tablet,
@@ -51,12 +52,13 @@ import {
   type NotificationAudience,
   type NotificationKind,
   type DeviceSession,
+  type AppRelease,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
 import type { UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -71,6 +73,7 @@ export default function SuperAdminPage() {
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
     { id: 'reports', label: 'reportsTab', icon: Flag },
     { id: 'notes', label: 'notesTab', icon: BookOpen },
+    { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
   return (
@@ -116,6 +119,7 @@ export default function SuperAdminPage() {
           {tab === 'feedback' && <FeedbackTab />}
           {tab === 'reports' && <ReportedQuestions />}
           {tab === 'notes' && <StudyNotesTab />}
+          {tab === 'app' && <AppReleasesTab />}
         </div>
       </div>
     </AppLayout>
@@ -1574,6 +1578,231 @@ function StudyNotesTab() {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── App / APK releases ───────────────────────────────────────────────────────
+// Upload a new Android build; the newest upload is what the public landing page
+// links to. Keeps full history so a bad build can be deleted to roll back to the
+// previous one. Admin tooling — kept in English, matching the rest of the console.
+function formatBytes(bytes: number): string {
+  if (!bytes) return '0 B'
+  const mb = bytes / (1024 * 1024)
+  if (mb >= 1) return `${mb.toFixed(1)} MB`
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`
+}
+
+function AppReleasesTab() {
+  const [releases, setReleases] = useState<AppRelease[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [version, setVersion] = useState('')
+  const [notes, setNotes] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<AppRelease | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.appReleases
+      .list()
+      .then(setReleases)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (uploading) return
+    const v = version.trim()
+    if (!v) return toast.error('Enter a version name (e.g. 1.0.3).')
+    if (!file) return toast.error('Choose an .apk file to upload.')
+    if (!/\.apk$/i.test(file.name)) return toast.error('Only .apk files are accepted.')
+
+    setUploading(true)
+    try {
+      const rel = await api.appReleases.upload(file, v, notes.trim())
+      setReleases((prev) => [rel, ...prev])
+      setVersion('')
+      setNotes('')
+      setFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+      toast.success(`Version ${rel.version_name} is live — students can download it now.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    setBusyId(pendingDelete.id)
+    try {
+      await api.appReleases.remove(pendingDelete.id)
+      setReleases((prev) => prev.filter((r) => r.id !== pendingDelete.id))
+      toast.success('Release deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete the release.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Intro */}
+      <div className="card flex items-start gap-3 p-4">
+        <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <UploadCloud size={20} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">App build (Android APK)</h2>
+          <p className="font-body text-xs text-ink2">
+            Upload a new <code>.apk</code> and it instantly becomes the build the landing-page
+            download button serves — no redeploy needed. The newest upload is live; older ones are
+            kept so you can delete a bad build and roll back.
+          </p>
+        </div>
+      </div>
+
+      {/* Upload form */}
+      <form onSubmit={submit} className="card space-y-4 p-5">
+        <h2 className="flex items-center gap-2 font-heading text-sm font-semibold text-ink">
+          <Plus size={16} className="text-brand" /> Upload a new build
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Version name *">
+            <input
+              className={COUPON_INPUT}
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+              placeholder="e.g. 1.0.3"
+              spellCheck={false}
+            />
+          </Field>
+          <Field label="APK file *">
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".apk,application/vnd.android.package-archive"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="focus-ring w-full rounded-lg border border-line bg-card px-3 py-2 font-body text-sm text-ink outline-none transition file:mr-3 file:rounded-md file:border-0 file:bg-brand-soft file:px-3 file:py-1.5 file:font-heading file:text-xs file:font-semibold file:text-brand hover:border-brand/40"
+            />
+          </Field>
+        </div>
+        <Field label="Release notes (optional)">
+          <textarea
+            className={COUPON_INPUT + ' min-h-[70px] resize-y'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="What changed in this build…"
+            maxLength={500}
+          />
+        </Field>
+        {file && (
+          <p className="font-body text-xs text-ink2">
+            Selected: <span className="font-heading text-ink">{file.name}</span> ·{' '}
+            {formatBytes(file.size)}
+          </p>
+        )}
+        <button type="submit" disabled={uploading} className="btn-brand press disabled:opacity-60">
+          {uploading ? <Spinner size={16} /> : <UploadCloud size={16} />}
+          {uploading ? 'Uploading…' : 'Upload & publish'}
+        </button>
+      </form>
+
+      {/* History */}
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skeleton h-20 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <ErrorState onRetry={load} />
+      ) : releases.length === 0 ? (
+        <p className="py-12 text-center font-body text-ink2">
+          No builds uploaded yet — the download button stays disabled until you publish one.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {releases.map((r, i) => {
+            const isCurrent = i === 0
+            return (
+              <div
+                key={r.id}
+                style={{ '--i': i } as React.CSSProperties}
+                className={`card stagger-item flex flex-wrap items-center gap-3 p-3.5 ${
+                  isCurrent ? 'ring-1 ring-brand/30' : 'opacity-80'
+                }`}
+              >
+                <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <Smartphone size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate font-heading text-sm font-bold text-ink">
+                      v{r.version_name}
+                    </p>
+                    {isCurrent && (
+                      <span className="rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                        Live
+                      </span>
+                    )}
+                  </div>
+                  <p className="truncate font-body text-xs text-ink2">
+                    {formatBytes(r.file_size)} · {new Date(r.created_at).toLocaleString()}
+                    {r.notes ? ` · ${r.notes}` : ''}
+                  </p>
+                </div>
+                <a
+                  href={r.url}
+                  download
+                  className="focus-ring inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink transition hover:border-brand/40"
+                >
+                  <Download size={14} /> Download
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setPendingDelete(r)}
+                  disabled={busyId === r.id}
+                  aria-label="Delete release"
+                  className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-coral transition hover:border-coral/40 disabled:opacity-50"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete this build?"
+        message={
+          pendingDelete
+            ? `Delete v${pendingDelete.version_name}? ${
+                releases[0]?.id === pendingDelete.id
+                  ? 'It is the live build — the previous version becomes live again.'
+                  : 'This removes it from history.'
+              }`
+            : ''
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={busyId === pendingDelete?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }
