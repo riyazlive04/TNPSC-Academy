@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import {
   Download,
@@ -34,14 +34,24 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
+import { api } from '../lib/api'
 
 // ─── Open items (founder to supply before launch) ────────────────────────────
 // Replace these placeholders with the real hosted values. Everything else on
 // the page is launch-ready.
-const APK_DOWNLOAD_URL = '/downloads/tnpsc-mentor.apk' // TODO: point at the hosted .apk
+// The landing page is served on the main domain, so it reaches the API (on the
+// app subdomain) via its absolute URL. The newest uploaded APK is resolved at
+// runtime from /api/app/latest; this stable endpoint is the fallback link.
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
+const APK_DOWNLOAD_FALLBACK = `${API_BASE}/api/app/download`
+
+// Current APK download URL (direct CDN link), or null when no build is published
+// yet → the download buttons render disabled. Provided by LandingPage after it
+// fetches the latest release.
+const ApkUrlContext = createContext<string | null>(null)
 // Sign-in from the landing page goes to the hosted web app, not the in-page
 // router (the app lives on its own subdomain).
-const APP_URL = 'https://app.tnpscmentors.in'
+const APP_URL = 'https://tnpscacademy1.vercel.app/'
 const APP_LOGIN_URL = `${APP_URL}/login`
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 const SUPPORT_PHONE = '+91 96777 79808' // TODO: real WhatsApp/support number
@@ -373,6 +383,19 @@ export default function LandingPage() {
   const [lang, setLang] = useState<Lang>('ta')
   const reduce = useReducedMotion()
 
+  // Resolve the current APK. Start optimistic on the stable endpoint (so a
+  // transient API hiccup never hides the button), then prefer the direct CDN URL
+  // once known — or disable the button (null) if no build has been published.
+  const [apkUrl, setApkUrl] = useState<string | null>(APK_DOWNLOAD_FALLBACK)
+  useEffect(() => {
+    api.appReleases
+      .latest()
+      .then((r) => setApkUrl(r ? r.url : null))
+      .catch(() => {
+        /* keep the optimistic fallback link */
+      })
+  }, [])
+
   // Hide the header while scrolling down, reveal it the moment the user scrolls
   // up (or returns near the top) - more screen for content, CTA always one flick
   // away. Works with Lenis since it drives native window scroll.
@@ -415,6 +438,7 @@ export default function LandingPage() {
   const t = (key: keyof typeof T) => T[key][lang]
 
   return (
+    <ApkUrlContext.Provider value={apkUrl}>
     <div id="top" className="min-h-screen overflow-x-clip bg-canvas pb-24 sm:pb-0">
       {/* ─── Top bar ──────────────────────────────────────────────────────── */}
       <header
@@ -741,14 +765,20 @@ export default function LandingPage() {
                 <p className="mt-2 flex-1 font-body text-[14px] leading-relaxed text-ink2">{p[lang].d}</p>
                 <div className="mt-5">
                   {action === 'download' ? (
-                    <a
-                      href={APK_DOWNLOAD_URL}
-                      download
-                      onClick={() => trackEvent('download_click')}
-                      className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
-                    >
-                      <Download size={15} /> {t('download')}
-                    </a>
+                    apkUrl ? (
+                      <a
+                        href={apkUrl}
+                        download
+                        onClick={() => trackEvent('download_click')}
+                        className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
+                      >
+                        <Download size={15} /> {t('download')}
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-ink2/50">
+                        <Download size={15} /> {t('download')}
+                      </span>
+                    )
                   ) : (
                     <a
                       href={APP_URL}
@@ -907,6 +937,7 @@ export default function LandingPage() {
         </div>
       </div>
     </div>
+    </ApkUrlContext.Provider>
   )
 }
 
@@ -936,9 +967,22 @@ function DownloadButton({
     : size === 'lg'
       ? `${base} group w-full px-7 py-4 text-base sm:w-auto`
       : `${base} group w-full px-6 py-3.5 text-base sm:w-auto`
+
+  const apkUrl = useContext(ApkUrlContext)
+
+  // No build published yet → show a disabled, non-clickable button.
+  if (!apkUrl) {
+    return (
+      <span className={`${cls} cursor-not-allowed opacity-50`} aria-disabled="true">
+        <Download size={compact ? 16 : 18} />
+        {label}
+      </span>
+    )
+  }
+
   return (
     <a
-      href={APK_DOWNLOAD_URL}
+      href={apkUrl}
       download
       onClick={() => trackEvent('download_click')}
       className={cls}

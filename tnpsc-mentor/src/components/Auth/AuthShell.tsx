@@ -9,7 +9,7 @@ interface AuthShellProps {
   children: ReactNode
 }
 
-const CHIP_KEYS: StringKey[] = ['chipPyq', 'chipSamacheer', 'chipCa', 'chipAptitude']
+const CHIP_KEYS: StringKey[] = ['chipPyq', 'chipCa', 'chipAptitude']
 
 const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
 const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']

@@ -1,8 +1,9 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { listSessions, revokeSessionById } from '../sessions.js'
+import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
 
 const router = Router()
 
@@ -154,6 +155,125 @@ router.post(
     }
     await revokeSessionById(String(userId), String(id))
     res.json({ ok: true })
+  })
+)
+
+// ─── App / APK releases ──────────────────────────────────────────────────────
+// Superadmins upload the Android build here; the newest upload is what the
+// public /api/app/* endpoints serve. See server/src/lib/appReleases.ts.
+
+const APK_MIME = 'application/vnd.android.package-archive'
+const MAX_APK_BYTES = 150 * 1024 * 1024 // 150 MB — generous headroom over a ~5 MB build.
+
+/** Shape a DB row for the client, attaching the public download URL. */
+function withUrl(r: ReleaseRow) {
+  return {
+    id: r.id,
+    version_name: r.version_name,
+    file_name: r.file_name,
+    file_size: r.file_size,
+    notes: r.notes,
+    created_at: r.created_at,
+    url: apkPublicUrl(r.storage_path),
+  }
+}
+
+// ─── GET /api/superadmin/apk ─────────────────────────────────────────────────
+// Full version history, newest first.
+router.get(
+  '/apk',
+  asyncH(async (_req: AuthedRequest, res) => {
+    const { data, error } = await supabaseAdmin
+      .from('app_releases')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) return sendDbError(res, error)
+    res.json({ releases: (data as ReleaseRow[]).map(withUrl) })
+  })
+)
+
+// ─── POST /api/superadmin/apk?version=&notes= ────────────────────────────────
+// The .apk binary is the raw request body (Content-Type ignored). express.raw
+// buffers it for THIS route only — the global JSON parser skips it because the
+// body isn't application/json. Version + notes ride in the query string and the
+// original filename in the x-file-name header.
+router.post(
+  '/apk',
+  express.raw({ type: () => true, limit: '160mb' }),
+  asyncH(async (req: AuthedRequest, res) => {
+    const versionName = String(req.query.version ?? '').trim()
+    const notes = String(req.query.notes ?? '').trim() || null
+    const rawName = String(req.headers['x-file-name'] ?? '').trim()
+
+    if (!versionName) {
+      return res.status(400).json({ error: 'A version name is required.' })
+    }
+    const body = req.body
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      return res.status(400).json({ error: 'No file was uploaded.' })
+    }
+    if (body.length > MAX_APK_BYTES) {
+      return res.status(413).json({ error: 'That file is too large (max 150 MB).' })
+    }
+    if (rawName && !/\.apk$/i.test(rawName)) {
+      return res.status(400).json({ error: 'Only .apk files are accepted.' })
+    }
+
+    // Clean version → safe filename so the cross-origin download gets a tidy name
+    // (e.g. TNPSC-Mentor-1.0.3.apk). A timestamp folder keeps every upload unique.
+    const safeVersion = versionName.replace(/[^a-zA-Z0-9.\-_]/g, '-')
+    const fileName = `TNPSC-Mentor-${safeVersion}.apk`
+    const storagePath = `releases/${Date.now()}/${fileName}`
+
+    const { error: upErr } = await supabaseAdmin.storage
+      .from(APK_BUCKET)
+      .upload(storagePath, body, { contentType: APK_MIME, upsert: false })
+    if (upErr) {
+      console.error('[apk upload]', upErr)
+      return res.status(502).json({ error: 'Upload to storage failed. Please try again.' })
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('app_releases')
+      .insert({
+        version_name: versionName,
+        file_name: fileName,
+        storage_path: storagePath,
+        file_size: body.length,
+        notes,
+        created_by: req.userId ?? null,
+      })
+      .select('*')
+      .single()
+    if (error) {
+      // Roll back the orphaned object so a failed insert doesn't leave a dangling file.
+      await supabaseAdmin.storage.from(APK_BUCKET).remove([storagePath])
+      return sendDbError(res, error)
+    }
+
+    res.status(201).json({ release: withUrl(data as ReleaseRow) })
+  })
+)
+
+// ─── DELETE /api/superadmin/apk/:id ──────────────────────────────────────────
+// Remove a release (deletes the row + its stored binary). Deleting the current
+// build promotes the previous one — i.e. a one-click rollback.
+router.delete(
+  '/apk/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = String(req.params.id)
+    const { data: row, error: lookupErr } = await supabaseAdmin
+      .from('app_releases')
+      .select('storage_path')
+      .eq('id', id)
+      .maybeSingle()
+    if (lookupErr) return sendDbError(res, lookupErr)
+    if (!row) return res.status(404).json({ error: 'Release not found.' })
+
+    await supabaseAdmin.storage.from(APK_BUCKET).remove([(row as ReleaseRow).storage_path])
+    const { error } = await supabaseAdmin.from('app_releases').delete().eq('id', id)
+    if (error) return sendDbError(res, error)
+    res.json({ deleted: true })
   })
 )
 
