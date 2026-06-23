@@ -68,7 +68,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const setLang = useLanguageStore((s) => s.setLang)
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const toggleTheme = useThemeStore((s) => s.toggle)
-  // The first-run tour owns the screen for new accounts — don't let the periodic
+  // The first-run tour owns the screen for new accounts - don't let the periodic
   // feedback prompt pop over it.
   const tourActive = useOnboardingStore((s) => s.open || s.pending)
 
@@ -134,7 +134,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 த
               </span>
               <span className="font-heading text-base font-semibold tracking-tight text-ink">
-                TNPSC <span className="text-brand">Mentor</span>
+                TNPSC <span className="text-brand">Mentors</span>
               </span>
             </button>
 
@@ -288,7 +288,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
       <FeedbackModal
         open={feedbackOpen}
         onClose={() => {
-          // Showing it once is enough — stamp the 3-month window on close so it
+          // Showing it once is enough - stamp the 3-month window on close so it
           // won't surface again (whether or not the user submitted).
           setFeedbackOpen(false)
           markFeedbackGiven()

@@ -1,4 +1,4 @@
-# TNPSC Mentor — Question Bank Export
+# TNPSC Mentors — Question Bank Export
 
 Total: **7243** questions across **4** categories. Each category is a separate document; every question lists its source link.
 

@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — admin enable/disable a single question
+-- TNPSC Mentors — admin enable/disable a single question
 -- ----------------------------------------------------------------------------
 -- One-click toggle of questions.active for admins/superadmins:
 --   active = true  -> shown to students (quizzes + spaced revision)

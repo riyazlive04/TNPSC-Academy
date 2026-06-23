@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — student "mark this question for correction" reports
+-- TNPSC Mentors — student "mark this question for correction" reports
 -- ----------------------------------------------------------------------------
 -- During a test (mock or practice) a student can flag a question that looks
 -- wrong — bad answer key, typo, broken option — so admins can review and fix

@@ -23,7 +23,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     // eslint-disable-next-line no-console
-    console.error('[TNPSC Mentor] Unhandled UI error:', error, info.componentStack)
+    console.error('[TNPSC Mentors] Unhandled UI error:', error, info.componentStack)
     this.setState({ componentStack: info.componentStack ?? null })
   }
 
@@ -61,7 +61,7 @@ export function ErrorScreen({
       setCopied(true)
       window.setTimeout(() => setCopied(false), 2000)
     } catch {
-      /* clipboard unavailable — no-op */
+      /* clipboard unavailable - no-op */
     }
   }
 

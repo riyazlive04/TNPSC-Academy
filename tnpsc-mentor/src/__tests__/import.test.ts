@@ -4,7 +4,7 @@ import { parseImportText, validateRows } from '../lib/importQuestions'
 const HEADER =
   'category,question_text,option_a,option_b,option_c,option_d,correct_answer'
 
-describe('parseImportText — CSV', () => {
+describe('parseImportText - CSV', () => {
   it('parses a simple row into a keyed object', () => {
     const csv = `${HEADER}\npyq,What?,A1,B1,C1,D1,A`
     const { rows, parseError } = parseImportText('q.csv', csv)
@@ -41,7 +41,7 @@ describe('parseImportText — CSV', () => {
   })
 })
 
-describe('parseImportText — JSON', () => {
+describe('parseImportText - JSON', () => {
   it('parses a JSON array', () => {
     const json = JSON.stringify([{ category: 'aptitude', question_text: 'x' }])
     const { rows, parseError } = parseImportText('q.json', json)

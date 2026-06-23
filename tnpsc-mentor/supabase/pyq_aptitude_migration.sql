@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Move the AllYears aptitude import into PYQ → Aptitude (Group 1)
+-- TNPSC Mentors — Move the AllYears aptitude import into PYQ → Aptitude (Group 1)
 -- ----------------------------------------------------------------------------
 -- The 151 imported rows were loaded as category='aptitude'. The product intent
 -- is the Previous-Year-Paper "Aptitude" subject under Group 1, with a

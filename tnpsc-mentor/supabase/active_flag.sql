@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Soft-hide support (active flag)
+-- TNPSC Mentors — Soft-hide support (active flag)
 -- ----------------------------------------------------------------------------
 -- Adds questions.active so rows can be hidden from quizzes/revision without
 -- deleting them (preserves test_answers / review_items / history).

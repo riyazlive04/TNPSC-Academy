@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf'
+import { savePdfDoc } from './savePdf'
 import type { DisplayLang, Question } from '../types'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 
@@ -21,7 +22,7 @@ const WHITE: RGB = [255, 255, 255]
 //
 // IMPORTANT: must be a font that covers BOTH Tamil AND Latin. Noto Sans Tamil
 // has no Latin glyphs, and jsPDF (no complex-script fallback) silently drops the
-// rest of a string at the first missing glyph — so every Tamil string with an
+// rest of a string at the first missing glyph - so every Tamil string with an
 // embedded Latin token (FIDE, ATP, US, names, the "en / ta" bilingual options)
 // got truncated mid-line. Hind Madurai (OFL) covers Tamil + Latin + digits.
 const TAMIL_FONT_URL =
@@ -50,7 +51,7 @@ async function loadTamilFontB64(): Promise<string | null> {
   return tamilFontB64
 }
 
-/** jsPDF's GState (opacity) isn't in the type defs — access it loosely. */
+/** jsPDF's GState (opacity) isn't in the type defs - access it loosely. */
 function setOpacity(doc: jsPDF, opacity: number) {
   const g = doc as unknown as {
     GState?: new (o: { opacity: number }) => unknown
@@ -165,7 +166,7 @@ export async function generateQuestionBankPdf({
     const qLineH = 15
     ensureSpace(qLines.length * qLineH + 46)
 
-    // Number badge — violet rounded square with white "Qn"
+    // Number badge - violet rounded square with white "Qn"
     const badgeY = y - 11
     doc.setFillColor(...VIOLET)
     doc.roundedRect(margin, badgeY, gutter - 10, 19, 4, 4, 'F')
@@ -181,7 +182,7 @@ export async function generateQuestionBankPdf({
     doc.text(qLines, colX, y)
     y += qLines.length * qLineH + 6
 
-    // Options — correct one sits on a mint pill with a check mark
+    // Options - correct one sits on a mint pill with a check mark
     doc.setFontSize(10)
     const optLineH = 13
     optionLetters(q).forEach((letter) => {
@@ -210,7 +211,7 @@ export async function generateQuestionBankPdf({
       y += blockH
     })
 
-    // Explanation — violet-tinted card with a left accent bar
+    // Explanation - violet-tinted card with a left accent bar
     const explanation = displayExplanation(q, effLang)
     if (explanation) {
       y += 6
@@ -260,7 +261,7 @@ export async function generateQuestionBankPdf({
   }
 
   const safe = (title + '_' + label).replace(/[^a-z0-9]+/gi, '_').slice(0, 60)
-  doc.save(`TNPSC_Mentor_${safe || 'QuestionBank'}.pdf`)
+  await savePdfDoc(doc, `TNPSC_Mentors_${safe || 'QuestionBank'}.pdf`)
 }
 
 /** Faint diagonal watermark tiled across the page. */
@@ -294,6 +295,6 @@ function drawFooter(
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8)
   doc.setTextColor(...GREY)
-  doc.text('TNPSC Mentor  ·  Prepare smart. Score high.', margin, y)
+  doc.text('TNPSC Mentors  ·  Prepare smart. Score high.', margin, y)
   doc.text(`Page ${page} of ${total}`, pageW - margin, y, { align: 'right' })
 }

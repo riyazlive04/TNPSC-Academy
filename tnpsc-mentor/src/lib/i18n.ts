@@ -38,8 +38,19 @@ const STRINGS = {
   downloadExplanations: { en: 'Download explanations (PDF)', ta: 'விளக்கங்களைப் பதிவிறக்கு (PDF)' },
   preparingPdf: { en: 'Preparing PDF…', ta: 'PDF தயாராகிறது…' },
   pdfWhenComplete: {
-    en: 'Attempt all the questions to unlock the full explanation PDF.',
-    ta: 'முழு விளக்க PDF-ஐப் பெற அனைத்து வினாக்களுக்கும் பதிலளிக்கவும்.',
+    en: 'Attempt at least 80% of the questions to unlock the explanation PDF.',
+    ta: 'விளக்க PDF-ஐப் பெற குறைந்தது 80% வினாக்களுக்குப் பதிலளிக்கவும்.',
+  },
+  // Free users can download a limited number of explanation PDFs; premium is
+  // unlimited. {n} is rendered separately before this label in the UI.
+  freeDownloadsLeft: { en: 'free PDF downloads left', ta: 'இலவச PDF பதிவிறக்கங்கள் மீதம்' },
+  pdfFreeLimitReached: {
+    en: "You've used all your free PDF downloads. Upgrade to Premium for unlimited downloads.",
+    ta: 'உங்கள் இலவச PDF பதிவிறக்கங்கள் அனைத்தையும் பயன்படுத்திவிட்டீர்கள். வரம்பற்ற பதிவிறக்கங்களுக்கு பிரீமியத்திற்கு மேம்படுத்தவும்.',
+  },
+  pdfUpgradeForMore: {
+    en: 'Upgrade to Premium for unlimited PDFs',
+    ta: 'வரம்பற்ற PDF-களுக்கு பிரீமியத்திற்கு மேம்படுத்தவும்',
   },
   loading: { en: 'Loading…', ta: 'ஏற்றுகிறது…' },
   correctMark: { en: 'Correct', ta: 'சரியானது' },
@@ -73,15 +84,15 @@ const STRINGS = {
   onbGetStarted: { en: 'Get started', ta: 'தொடங்குவோம்' },
   onbStepOf: { en: 'of', ta: '/' },
   onbStartExploring: { en: 'Start exploring', ta: 'ஆராயத் தொடங்கு' },
-  onbWelcomeTitle: { en: 'Welcome to TNPSC Mentor', ta: 'TNPSC வழிகாட்டிக்கு வரவேற்கிறோம்' },
+  onbWelcomeTitle: { en: 'Welcome to TNPSC Mentors', ta: 'TNPSC வழிகாட்டிக்கு வரவேற்கிறோம்' },
   onbWelcomeBody: {
     en: "Let's take a quick 30-second tour of how to prepare here. Tap Next to begin.",
     ta: "இங்கே எப்படித் தயாராவது என்பதை விரைவான 30 வினாடிச் சுற்றுப்பயணத்தில் பார்ப்போம். தொடங்க 'அடுத்து' என்பதைத் தட்டவும்.",
   },
   onbMockTitle: { en: 'Start with a mock test', ta: 'மாதிரித் தேர்வுடன் தொடங்குங்கள்' },
   onbMockBody: {
-    en: 'This is your mock test — a full-length, timed Group exam with negative marking, just like the real hall. Tap it anytime to begin.',
-    ta: 'இது உங்கள் மாதிரித் தேர்வு — எதிர்மறை மதிப்பெண்களுடன் கூடிய முழு நீள, நேரக் குரூப் தேர்வு, உண்மையான தேர்வரங்கம் போலவே. தொடங்க எப்போது வேண்டுமானாலும் தட்டவும்.',
+    en: 'This is your mock test - a full-length, timed Group exam with negative marking, just like the real hall. Tap it anytime to begin.',
+    ta: 'இது உங்கள் மாதிரித் தேர்வு - எதிர்மறை மதிப்பெண்களுடன் கூடிய முழு நீள, நேரக் குரூப் தேர்வு, உண்மையான தேர்வரங்கம் போலவே. தொடங்க எப்போது வேண்டுமானாலும் தட்டவும்.',
   },
   onbPracticeTitle: { en: 'Practice your way', ta: 'உங்கள் வழியில் பயிற்சி செய்யுங்கள்' },
   onbPracticeBody: {
@@ -95,8 +106,8 @@ const STRINGS = {
   },
   onbLangTitle: { en: 'Tamil, English or both', ta: 'தமிழ், ஆங்கிலம் அல்லது இரண்டும்' },
   onbLangBody: {
-    en: 'Tap here to switch language anytime — and the icon beside it toggles light and dark mode.',
-    ta: 'மொழியை எப்போது வேண்டுமானாலும் மாற்ற இங்கே தட்டவும் — அதன் அருகிலுள்ள ஐகான் ஒளி/இருண்ட பயன்முறையை மாற்றும்.',
+    en: 'Tap here to switch language anytime - and the icon beside it toggles light and dark mode.',
+    ta: 'மொழியை எப்போது வேண்டுமானாலும் மாற்ற இங்கே தட்டவும் - அதன் அருகிலுள்ள ஐகான் ஒளி/இருண்ட பயன்முறையை மாற்றும்.',
   },
   onbFinishTitle: { en: "You're all set!", ta: 'நீங்கள் தயார்!' },
   onbFinishBody: {
@@ -229,12 +240,12 @@ const STRINGS = {
   explanation: { en: 'Explanation', ta: 'விளக்கம்' },
   preparingTest: { en: 'Preparing your test…', ta: 'உங்கள் தேர்வு தயாராகிறது…' },
   min15: {
-    en: 'Hold on — please read the question before moving on.',
-    ta: 'பொறுங்கள் — தொடரும் முன் வினாவை வாசியுங்கள்.',
+    en: 'Hold on - please read the question before moving on.',
+    ta: 'பொறுங்கள் - தொடரும் முன் வினாவை வாசியுங்கள்.',
   },
   readCarefully: {
-    en: 'This is a long question — read it carefully before answering.',
-    ta: 'இது நீளமான வினா — பதிலளிக்கும் முன் கவனமாக வாசியுங்கள்.',
+    en: 'This is a long question - read it carefully before answering.',
+    ta: 'இது நீளமான வினா - பதிலளிக்கும் முன் கவனமாக வாசியுங்கள்.',
   },
   waitSeconds: {
     en: 'You can continue in',
@@ -311,7 +322,7 @@ const STRINGS = {
   testComplete: { en: 'Test Complete', ta: 'தேர்வு முடிந்தது' },
   scoreLabel: { en: 'Score', ta: 'மதிப்பெண்' },
   verdictGreat: { en: 'Excellent work!', ta: 'அருமையான செயல்பாடு!' },
-  verdictGood: { en: 'Well done — keep it up', ta: 'நன்று — தொடருங்கள்' },
+  verdictGood: { en: 'Well done - keep it up', ta: 'நன்று - தொடருங்கள்' },
   verdictKeepGoing: { en: 'Keep practising', ta: 'பயிற்சியைத் தொடருங்கள்' },
   accuracy: { en: 'Accuracy', ta: 'துல்லியம்' },
   // Home dashboard stat strip + section labels
@@ -356,7 +367,7 @@ const STRINGS = {
   },
   learnThis: { en: 'Learn this', ta: 'இதைக் கற்க' },
   studyTip: { en: 'Study Tip', ta: 'படிப்புக் குறிப்பு' },
-  resources: { en: 'Free resources', ta: 'இலவச வளங்கள்' },
+  resources: { en: 'Study resources', ta: 'படிப்பு வளங்கள்' },
   overallAccuracy: { en: 'Overall Accuracy', ta: 'ஒட்டுமொத்த துல்லியம்' },
   performanceTrend: { en: 'Performance Trend', ta: 'செயல்திறன் போக்கு' },
   recentTests: { en: 'Recent tests', ta: 'சமீபத்திய தேர்வுகள்' },
@@ -389,8 +400,8 @@ const STRINGS = {
   revUnlocksIn: { en: 'Unlocks in', ta: 'திறக்க' },
   revUnlocksAt: { en: 'Unlocks', ta: 'திறக்கும்' },
   revStudyHint: {
-    en: 'Revise this topic before re-testing. Sleep hours (11pm–7am) are not counted.',
-    ta: 'மீண்டும் தேர்வு எழுதும் முன் இந்தத் தலைப்பை மீள்பார்க்கவும். தூக்க நேரம் (இரவு 11 – காலை 7) கணக்கிடப்படாது.',
+    en: 'Revise this topic before re-testing. Sleep hours (11pm-7am) are not counted.',
+    ta: 'மீண்டும் தேர்வு எழுதும் முன் இந்தத் தலைப்பை மீள்பார்க்கவும். தூக்க நேரம் (இரவு 11 - காலை 7) கணக்கிடப்படாது.',
   },
   revDismiss: { en: 'Remove', ta: 'அகற்று' },
   revDismissTitle: { en: 'Remove this revision?', ta: 'இந்த மீள்பார்வையை அகற்றவா?' },
@@ -402,12 +413,12 @@ const STRINGS = {
   revBest: { en: 'Best', ta: 'சிறந்தது' },
   revLast: { en: 'Last', ta: 'கடைசி' },
   revTopicEmpty: {
-    en: 'No topics to revise yet. Score 40% or below on a topic test and it lands here — study first, then retry with fresh questions.',
-    ta: 'மீள்பார்க்க தலைப்புகள் இல்லை. ஒரு தலைப்புத் தேர்வில் 40% அல்லது அதற்குக் கீழ் பெற்றால் அது இங்கே வரும் — முதலில் படியுங்கள், பிறகு புதிய வினாக்களுடன் மீண்டும் முயற்சிக்கவும்.',
+    en: 'No topics to revise yet. Score 40% or below on a topic test and it lands here - study first, then retry with fresh questions.',
+    ta: 'மீள்பார்க்க தலைப்புகள் இல்லை. ஒரு தலைப்புத் தேர்வில் 40% அல்லது அதற்குக் கீழ் பெற்றால் அது இங்கே வரும் - முதலில் படியுங்கள், பிறகு புதிய வினாக்களுடன் மீண்டும் முயற்சிக்கவும்.',
   },
   revStudyFirstToast: {
-    en: 'Study this topic first — the test is still locked.',
-    ta: 'முதலில் இந்தத் தலைப்பைப் படியுங்கள் — தேர்வு இன்னும் பூட்டப்பட்டுள்ளது.',
+    en: 'Study this topic first - the test is still locked.',
+    ta: 'முதலில் இந்தத் தலைப்பைப் படியுங்கள் - தேர்வு இன்னும் பூட்டப்பட்டுள்ளது.',
   },
   // Analytics
   revAnalyticsTitle: { en: 'Your revision progress', ta: 'உங்கள் மீள்பார்வை முன்னேற்றம்' },
@@ -426,14 +437,14 @@ const STRINGS = {
     ta: 'மேம்பட இந்தத் தலைப்பை மீள்பார்க்கவும். படிப்பு நேரத்திற்குப் பிறகு உங்கள் மீள்தேர்வு திறக்கும்',
   },
   revSavedSleep: {
-    en: 'sleep hours (11pm–7am) are not counted.',
-    ta: 'தூக்க நேரம் (இரவு 11 – காலை 7) கணக்கிடப்படாது.',
+    en: 'sleep hours (11pm-7am) are not counted.',
+    ta: 'தூக்க நேரம் (இரவு 11 - காலை 7) கணக்கிடப்படாது.',
   },
   revGoToRevision: { en: 'Go to Revisions', ta: 'மீள்பார்வைக்குச் செல்' },
   revClearedNoticeTitle: { en: 'Revision cleared!', ta: 'மீள்பார்வை முடிந்தது!' },
   revClearedNoticeBody: {
-    en: "Great — you passed this topic's re-test. It has been removed from your revisions.",
-    ta: 'அருமை — இந்தத் தலைப்பின் மீள்தேர்வில் வெற்றி பெற்றீர்கள். இது உங்கள் மீள்பார்வையிலிருந்து அகற்றப்பட்டது.',
+    en: "Great - you passed this topic's re-test. It has been removed from your revisions.",
+    ta: 'அருமை - இந்தத் தலைப்பின் மீள்தேர்வில் வெற்றி பெற்றீர்கள். இது உங்கள் மீள்பார்வையிலிருந்து அகற்றப்பட்டது.',
   },
   // Relative-time units (compact)
   revDays: { en: 'd', ta: 'நா' },
@@ -524,10 +535,10 @@ const STRINGS = {
     ta: 'பதிலளிக்கப்பட்டு, மதிப்பாய்வுக்கும் குறிக்கப்பட்டது.',
   },
   flagMeaning: {
-    en: 'Tap the flag on any question to mark it for review — its palette tile turns violet (amber if you have also answered it). Flagged questions are still graded normally; the flag is just a personal reminder to come back to them before submitting.',
-    ta: 'எந்த வினாவையும் மதிப்பாய்வுக்குக் குறிக்க அதன் கொடியைத் தட்டவும் — அதன் பலகக் கட்டம் ஊதா நிறமாகும் (பதிலளித்திருந்தால் அம்பர் நிறம்). குறிக்கப்பட்ட வினாக்கள் வழக்கம் போலவே மதிப்பிடப்படும்; சமர்ப்பிக்கும் முன் மீண்டும் பார்ப்பதற்கான தனிப்பட்ட நினைவூட்டல் மட்டுமே இந்தக் கொடி.',
+    en: 'Tap the flag on any question to mark it for review - its palette tile turns violet (amber if you have also answered it). Flagged questions are still graded normally; the flag is just a personal reminder to come back to them before submitting.',
+    ta: 'எந்த வினாவையும் மதிப்பாய்வுக்குக் குறிக்க அதன் கொடியைத் தட்டவும் - அதன் பலகக் கட்டம் ஊதா நிறமாகும் (பதிலளித்திருந்தால் அம்பர் நிறம்). குறிக்கப்பட்ட வினாக்கள் வழக்கம் போலவே மதிப்பிடப்படும்; சமர்ப்பிக்கும் முன் மீண்டும் பார்ப்பதற்கான தனிப்பட்ட நினைவூட்டல் மட்டுமே இந்தக் கொடி.',
   },
-  // Mark-a-question-for-correction (report) — student-facing
+  // Mark-a-question-for-correction (report) - student-facing
   reportError: { en: 'Report error', ta: 'பிழையைப் புகாரளி' },
   reportedLabel: { en: 'Reported', ta: 'புகாரளிக்கப்பட்டது' },
   reportQuestionAria: {
@@ -535,14 +546,14 @@ const STRINGS = {
     ta: 'இந்த வினாவைத் திருத்தத்திற்குக் குறிக்கவும்',
   },
   reportQuestionDone: {
-    en: 'Thanks — flagged for our team to review. This does not affect your score.',
-    ta: 'நன்றி — எங்கள் குழு பரிசீலிக்கக் குறிக்கப்பட்டது. இது உங்கள் மதிப்பெண்ணைப் பாதிக்காது.',
+    en: 'Thanks - flagged for our team to review. This does not affect your score.',
+    ta: 'நன்றி - எங்கள் குழு பரிசீலிக்கக் குறிக்கப்பட்டது. இது உங்கள் மதிப்பெண்ணைப் பாதிக்காது.',
   },
   reportQuestionUndone: { en: 'Report removed.', ta: 'புகார் அகற்றப்பட்டது.' },
   reportModalTitle: { en: 'Report a problem with this question', ta: 'இந்த வினாவில் உள்ள சிக்கலைப் புகாரளி' },
   reportModalHint: {
-    en: 'Tell us what looks wrong — a bad answer key, a typo, a broken option. The exam timer is paused while this box is open.',
-    ta: 'என்ன தவறாகத் தெரிகிறது என்று கூறுங்கள் — தவறான விடை, எழுத்துப் பிழை, குறையுள்ள விருப்பம். இந்தப் பெட்டி திறந்திருக்கும்போது தேர்வு நேரம் இடைநிறுத்தப்படும்.',
+    en: 'Tell us what looks wrong - a bad answer key, a typo, a broken option. The exam timer is paused while this box is open.',
+    ta: 'என்ன தவறாகத் தெரிகிறது என்று கூறுங்கள் - தவறான விடை, எழுத்துப் பிழை, குறையுள்ள விருப்பம். இந்தப் பெட்டி திறந்திருக்கும்போது தேர்வு நேரம் இடைநிறுத்தப்படும்.',
   },
   reportReasonPlaceholder: {
     en: "e.g. The answer key looks wrong, or option C has a typo (optional)",
@@ -552,7 +563,7 @@ const STRINGS = {
   timerPaused: { en: 'Timer paused', ta: 'நேரம் இடைநிறுத்தப்பட்டது' },
   instrReport: {
     en: 'Spot a wrong answer key, a typo, or a broken question? Tap "Report error" on it and our team will review and fix it. Reporting never affects your score.',
-    ta: 'தவறான விடை, எழுத்துப் பிழை, அல்லது குறையுள்ள வினாவைக் கண்டால் அதில் "பிழையைப் புகாரளி" என்பதைத் தட்டவும் — எங்கள் குழு அதைப் பரிசீலித்துத் திருத்தும். புகாரளிப்பது உங்கள் மதிப்பெண்ணை ஒருபோதும் பாதிக்காது.',
+    ta: 'தவறான விடை, எழுத்துப் பிழை, அல்லது குறையுள்ள வினாவைக் கண்டால் அதில் "பிழையைப் புகாரளி" என்பதைத் தட்டவும் - எங்கள் குழு அதைப் பரிசீலித்துத் திருத்தும். புகாரளிப்பது உங்கள் மதிப்பெண்ணை ஒருபோதும் பாதிக்காது.',
   },
   // Pre-quiz setup (practice quizzes)
   numQuestions: { en: 'Number of Questions', ta: 'வினாக்களின் எண்ணிக்கை' },
@@ -564,9 +575,9 @@ const STRINGS = {
   recommendedTimeHint: { en: '≈1 minute per question', ta: 'ஒரு வினாவுக்கு ≈1 நிமிடம்' },
   applyRecommended: { en: 'Use', ta: 'பயன்படுத்து' },
   // In-test low-time warning banner (shown visibly in the final minute)
-  timeWarn60: { en: 'Less than 1 minute left — wrap up your answers.', ta: '1 நிமிடத்திற்கும் குறைவே — உங்கள் பதில்களை முடிக்கவும்.' },
+  timeWarn60: { en: 'Less than 1 minute left - wrap up your answers.', ta: '1 நிமிடத்திற்கும் குறைவே - உங்கள் பதில்களை முடிக்கவும்.' },
   timeWarn30: { en: 'Only 30 seconds left!', ta: '30 வினாடிகள் மட்டுமே!' },
-  timeWarn10: { en: 'Time is almost up — submitting soon!', ta: 'நேரம் முடிய உள்ளது — விரைவில் சமர்ப்பிக்கப்படும்!' },
+  timeWarn10: { en: 'Time is almost up - submitting soon!', ta: 'நேரம் முடிய உள்ளது - விரைவில் சமர்ப்பிக்கப்படும்!' },
 
   // OMR interface
   notVisited: { en: 'Not Visited', ta: 'பார்க்கப்படவில்லை' },
@@ -642,7 +653,7 @@ const STRINGS = {
   genderOther: { en: 'Do not prefer', ta: 'தெரிவிக்க விரும்பவில்லை' },
   genderSaveFailed: { en: 'Could not save gender. Please try again.', ta: 'பாலினத்தை சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
   askedInYear: { en: 'Asked in', ta: 'கேட்கப்பட்ட ஆண்டு' },
-  pdfPremiumOnly: { en: 'Download PDF — upgrade to Premium', ta: 'PDF பதிவிறக்க — பிரீமியத்திற்கு மேம்படுத்தவும்' },
+  pdfPremiumOnly: { en: 'Download PDF - upgrade to Premium', ta: 'PDF பதிவிறக்க - பிரீமியத்திற்கு மேம்படுத்தவும்' },
   pdfPremiumPrompt: {
     en: 'Downloading the explanation PDF is a Premium feature. Upgrade to unlock it.',
     ta: 'விளக்க PDF பதிவிறக்கம் ஒரு பிரீமியம் வசதி. திறக்க மேம்படுத்தவும்.',
@@ -650,15 +661,15 @@ const STRINGS = {
   explHelpful: { en: 'Was this explanation helpful?', ta: 'இந்த விளக்கம் பயனுள்ளதாக இருந்ததா?' },
   explThanks: { en: 'Thanks for your feedback!', ta: 'உங்கள் கருத்துக்கு நன்றி!' },
   explFlagged: {
-    en: 'Thanks — we’ll improve this explanation.',
-    ta: 'நன்றி — இந்த விளக்கத்தை மேம்படுத்துவோம்.',
+    en: 'Thanks - we’ll improve this explanation.',
+    ta: 'நன்றி - இந்த விளக்கத்தை மேம்படுத்துவோம்.',
   },
 
   // Premium banner
   premiumBadge: { en: 'Premium', ta: 'பிரீமியம்' },
   premiumTitle: {
-    en: 'Go Premium — prepare faster',
-    ta: 'பிரீமியம் பெறுங்கள் — வேகமாக தயாராகுங்கள்',
+    en: 'Go Premium - prepare faster',
+    ta: 'பிரீமியம் பெறுங்கள் - வேகமாக தயாராகுங்கள்',
   },
   premiumValidity: { en: 'Group 1 · 3-month plan', ta: 'குரூப் 1 · 3-மாத திட்டம்' },
   premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
@@ -667,12 +678,12 @@ const STRINGS = {
     ta: '5 மாதிரித் தேர்வுகள் (2 எப்போது வேண்டுமானாலும் + அறிவிப்புக்குப் பின் 3)',
   },
   premiumPerk3: {
-    en: 'Previous-year papers — last 5 years',
-    ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் — கடந்த 5 ஆண்டுகள்',
+    en: 'Previous-year papers - last 5 years',
+    ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் - கடந்த 5 ஆண்டுகள்',
   },
   premiumPerk4: {
-    en: 'Current Affairs (Aug 2025 – Jun 2026)',
-    ta: 'நடப்பு நிகழ்வுகள் (ஆக 2025 – ஜூன் 2026)',
+    en: 'Current Affairs (Aug 2025 - Jun 2026)',
+    ta: 'நடப்பு நிகழ்வுகள் (ஆக 2025 - ஜூன் 2026)',
   },
   // Bonus benefits, shown as a separate "extras" block on the premium banner.
   premiumBonusTitle: { en: 'Bonus with Premium', ta: 'பிரீமியத்துடன் போனஸ்' },
@@ -686,7 +697,6 @@ const STRINGS = {
     en: 'Face the exam with confidence',
     ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்',
   },
-  premiumBonus5: { en: '1 exam kit', ta: '1 தேர்வு கிட்' },
   premiumPerYear: { en: '/ 3 months', ta: '/ 3 மாதம்' },
   premiumFlatSave: { en: 'Flat save', ta: 'சேமிப்பு' },
   premiumYouSave: { en: 'You save', ta: 'நீங்கள் சேமிக்கிறீர்கள்' },
@@ -695,11 +705,11 @@ const STRINGS = {
   premiumApply: { en: 'Apply', ta: 'பயன்படுத்து' },
   premiumRemoveCoupon: { en: 'Remove coupon', ta: 'கூப்பனை அகற்று' },
   premiumGet: { en: 'Get Premium', ta: 'பிரீமியம் பெறு' },
-  premiumGetFree: { en: 'Unlock Premium — Free', ta: 'பிரீமியத்தை இலவசமாகத் திற' },
-  premiumFree: { en: 'FREE', ta: 'இலவசம்' },
+  premiumGetFree: { en: 'Unlock Premium - ₹0', ta: 'பிரீமியத்தை ₹0-க்கு திற' },
+  premiumFree: { en: '₹0', ta: '₹0' },
   premiumThanks: {
-    en: 'Welcome to Premium — thank you!',
-    ta: 'பிரீமியத்திற்கு வரவேற்கிறோம் — நன்றி!',
+    en: 'Welcome to Premium - thank you!',
+    ta: 'பிரீமியத்திற்கு வரவேற்கிறோம் - நன்றி!',
   },
   examDate: { en: 'Exam Date', ta: 'தேர்வு தேதி' },
   dailyGoalQ: { en: 'Daily question goal', ta: 'தினசரி வினா இலக்கு' },
@@ -782,12 +792,34 @@ const STRINGS = {
   creatingAccount: { en: 'Creating account…', ta: 'கணக்கை உருவாக்குகிறது…' },
   alreadyRegistered: { en: 'Already registered?', ta: 'ஏற்கனவே பதிவு செய்துள்ளீர்களா?' },
   orDivider: { en: 'or', ta: 'அல்லது' },
+  // Phone-OTP login (alternate sign-in)
+  tabPassword: { en: 'Password', ta: 'கடவுச்சொல்' },
+  tabPhone: { en: 'Phone OTP', ta: 'தொலைபேசி OTP' },
+  mobileNumber: { en: 'Mobile number', ta: 'கைபேசி எண்' },
+  sendOtp: { en: 'Send OTP', ta: 'OTP அனுப்பு' },
+  sendingOtp: { en: 'Sending…', ta: 'அனுப்புகிறது…' },
+  enterOtp: { en: 'Enter the 6-digit code', ta: '6-இலக்க குறியீட்டை உள்ளிடவும்' },
+  otpSentTo: { en: 'We sent a code to', ta: 'குறியீட்டை அனுப்பியுள்ளோம்:' },
+  verifyAndSignIn: { en: 'Verify & sign in', ta: 'சரிபார்த்து உள்நுழை' },
+  verifyingOtp: { en: 'Verifying…', ta: 'சரிபார்க்கிறது…' },
+  resendOtp: { en: 'Resend code', ta: 'மீண்டும் அனுப்பு' },
+  changeNumber: { en: 'Change number', ta: 'எண்ணை மாற்று' },
+  otpResent: { en: 'A new code has been sent.', ta: 'புதிய குறியீடு அனுப்பப்பட்டது.' },
+  errMobileInvalid: {
+    en: 'Please enter a valid 10-digit mobile number.',
+    ta: 'சரியான 10-இலக்க கைபேசி எண்ணை உள்ளிடவும்.',
+  },
+  errOtpRequired: { en: 'Please enter the code.', ta: 'குறியீட்டை உள்ளிடவும்.' },
+  otpNotRegistered: {
+    en: 'No account found with this number. Please sign up, or sign in with email.',
+    ta: 'இந்த எண்ணுடன் கணக்கு இல்லை. பதிவு செய்யவும் அல்லது மின்னஞ்சல் மூலம் உள்நுழையவும்.',
+  },
   googleSignInFailed: {
     en: "Couldn't sign in with Google. Please try again.",
     ta: 'Google மூலம் உள்நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
   },
   // Complete-profile onboarding (Google signups land here to add the details
-  // Google doesn't provide — phone + target group).
+  // Google doesn't provide - phone + target group).
   completeProfileTitle: { en: 'Almost there', ta: 'கிட்டத்தட்ட முடிந்தது' },
   completeProfileSub: {
     en: 'Just a couple more details to set up your preparation.',
@@ -849,7 +881,7 @@ const STRINGS = {
   sendFeedback: { en: 'Send feedback', ta: 'கருத்தைச் சமர்ப்பி' },
   feedbackTitle: { en: 'How are we doing?', ta: 'நாங்கள் எப்படிச் செயல்படுகிறோம்?' },
   feedbackHint: {
-    en: 'Your rating helps us improve TNPSC Mentor.',
+    en: 'Your rating helps us improve TNPSC Mentors.',
     ta: 'உங்கள் மதிப்பீடு TNPSC வழிகாட்டியை மேம்படுத்த உதவுகிறது.',
   },
   feedbackPlaceholder: {
@@ -878,6 +910,7 @@ const STRINGS = {
   users: { en: 'Users', ta: 'பயனர்கள்' },
   feedbackTab: { en: 'Feedback', ta: 'கருத்துகள்' },
   reportsTab: { en: 'Reports', ta: 'புகார்கள்' },
+  notesTab: { en: 'Notes', ta: 'குறிப்புகள்' },
   reports: { en: 'Reports', ta: 'புகார்கள்' },
   reportedQuestions: { en: 'Reported Questions', ta: 'புகாரளிக்கப்பட்ட வினாக்கள்' },
   reportedQuestionsSub: {
@@ -984,8 +1017,8 @@ const STRINGS = {
   tkReady: { en: 'Ready to start', ta: 'தொடங்கத் தயார்' },
   tkGuidelines: { en: 'Guidelines', ta: 'வழிமுறைகள்' },
   tkGuideNav: {
-    en: 'Use Prev / Next to move between questions — you can change an answer anytime before submitting.',
-    ta: 'வினாக்களுக்கு இடையே நகர முந்தைய / அடுத்து பயன்படுத்தவும் — சமர்ப்பிக்கும் முன் எப்போது வேண்டுமானாலும் விடையை மாற்றலாம்.',
+    en: 'Use Prev / Next to move between questions - you can change an answer anytime before submitting.',
+    ta: 'வினாக்களுக்கு இடையே நகர முந்தைய / அடுத்து பயன்படுத்தவும் - சமர்ப்பிக்கும் முன் எப்போது வேண்டுமானாலும் விடையை மாற்றலாம்.',
   },
   tkGuideReview: {
     en: 'Your score and the correct answers are shown right after you submit.',

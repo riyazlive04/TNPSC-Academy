@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Supabase schema
+-- TNPSC Mentors — Supabase schema
 -- ----------------------------------------------------------------------------
 -- IMPORTANT: after running this, also run `supabase/secure.sql`. It hides the
 -- answer columns from the client and adds the grading/fetch RPCs the app calls.

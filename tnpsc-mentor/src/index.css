@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Copy-protection (native app) ─────────────────────────────────────────
+ * `.no-copy` is added to <html> only inside the installed app (see
+ * lib/copyGuard.ts). It disables text selection + the long-press selection
+ * handles everywhere, while real form fields keep normal editing so login,
+ * search and answer entry still work. */
+html.no-copy,
+html.no-copy * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+html.no-copy input,
+html.no-copy textarea,
+html.no-copy [contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 /* ─── Theme tokens ─────────────────────────────────────────────────────────
  * Colours are stored as "R G B" channel triplets so Tailwind can apply opacity
  * (rgb(var(--c-brand) / 0.3)). :root = light theme; .dark (toggled on <html> by
@@ -16,31 +34,31 @@
 
   /* Bolder pass: deeper/saturated violet, punchier coral, crisper text and
    * slightly deeper tints so tiles read with confidence (less pastel). */
-  --c-brand: 110 79 232; /* #6E4FE8 vivid violet — buttons, active, progress */
+  --c-brand: 110 79 232; /* #6E4FE8 vivid violet - buttons, active, progress */
   --c-brand-dark: 100 70 224; /* gradient mid */
   --c-brand-deep: 91 61 214; /* #5B3DD6 gradient end, pressed/hover */
-  --c-brand-soft: 230 225 251; /* #E6E1FB violet tint — chips / icon tiles */
+  --c-brand-soft: 230 225 251; /* #E6E1FB violet tint - chips / icon tiles */
   --c-brand-ring: 179 166 242; /* focus ring */
 
-  --c-canvas: 244 241 249; /* page background — soft lavender */
+  --c-canvas: 244 241 249; /* page background - soft lavender */
   --c-card: 255 255 255; /* #FFFFFF cards, sheets */
-  --c-ink: 34 30 58; /* #221E3A primary text — deeper for contrast */
-  --c-ink2: 110 105 134; /* #6E6986 muted text — crisper, less washed */
+  --c-ink: 34 30 58; /* #221E3A primary text - deeper for contrast */
+  --c-ink2: 110 105 134; /* #6E6986 muted text - crisper, less washed */
   --c-line: 231 227 240; /* #E7E3F0 hairline dividers */
   --c-tint: 230 225 251; /* neutral violet fill (= tint-violet) */
   --c-shadow: 88 72 200; /* violet elevation base */
 
   --c-secondary: 138 92 240; /* #8A5CF0 hero gradient start */
 
-  --c-accentwarm: 255 107 74; /* #FF6B4A accent — punchier coral */
+  --c-accentwarm: 255 107 74; /* #FF6B4A accent - punchier coral */
   --c-accentwarm-soft: 255 227 219; /* #FFE3DB tint-coral */
   --c-gold: 245 158 11;
   --c-gold-soft: 253 240 217; /* #FDF0D9 */
   --c-mint: 0 178 140; /* #00B28C correct */
   --c-mint-soft: 221 242 234; /* #DDF2EA tint-green */
-  --c-coral: 255 91 91; /* #FF5B5B wrong — bolder red */
+  --c-coral: 255 91 91; /* #FF5B5B wrong - bolder red */
   --c-coral-soft: 253 230 230;
-  --c-sky: 59 130 217; /* #3B82D9 tint-blue icon — bolder */
+  --c-sky: 59 130 217; /* #3B82D9 tint-blue icon - bolder */
   --c-sky-soft: 223 235 250; /* #DFEBFA tint-blue */
   --c-streak: 255 107 74; /* accent */
   --c-streak-soft: 255 227 219;
@@ -55,7 +73,7 @@
   --c-tint-green: 221 242 234; /* #DDF2EA */
   --c-tint-green-icon: 16 168 132; /* #10A884 */
 
-  /* Elevation — soft, large-blur in light mode (switched off in .dark). */
+  /* Elevation - soft, large-blur in light mode (switched off in .dark). */
   --shadow-pill: 0 2px 8px rgb(var(--c-shadow) / 0.06);
   --shadow-card: 0 12px 28px rgb(var(--c-shadow) / 0.08);
   --shadow-soft: 0 12px 28px rgb(var(--c-shadow) / 0.08);
@@ -76,10 +94,10 @@
   --c-brand-soft: 42 35 78; /* #2A234E dark violet tile */
   --c-brand-ring: 110 90 190;
 
-  --c-canvas: 22 19 34; /* #161322 page background — deeper */
+  --c-canvas: 22 19 34; /* #161322 page background - deeper */
   --c-card: 36 31 54; /* #241F36 raised surface */
   --c-ink: 237 234 248; /* light text */
-  --c-ink2: 168 162 188; /* #A8A2BC muted light text — brighter */
+  --c-ink2: 168 162 188; /* #A8A2BC muted light text - brighter */
   --c-line: 52 46 73; /* #342E49 dark hairline */
   --c-tint: 42 35 78; /* tint-violet dark */
   --c-shadow: 0 0 0;
@@ -109,7 +127,7 @@
   --c-tint-green: 22 52 44;
   --c-tint-green-icon: 43 184 154;
 
-  /* No elevation shadows in dark mode — borders carry depth instead. */
+  /* No elevation shadows in dark mode - borders carry depth instead. */
   --shadow-pill: none;
   --shadow-card: none;
   --shadow-soft: none;
@@ -195,7 +213,7 @@ h4,
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  /* A loading spinner is a functional status indicator, not decoration — keep it
+  /* A loading spinner is a functional status indicator, not decoration - keep it
    * spinning even under reduced-motion, otherwise it freezes and looks broken
    * (e.g. on desktops/browsers that have "reduce motion" enabled). */
   .animate-spin {
@@ -250,7 +268,7 @@ h4,
 }
 
 @layer utilities {
-  /* Dynamic viewport — iOS Safari's URL bar changes the visible height, so
+  /* Dynamic viewport - iOS Safari's URL bar changes the visible height, so
    * `100dvh` avoids the content jumping that `100vh` causes. */
   .min-h-dvh {
     min-height: 100vh;
@@ -275,14 +293,14 @@ h4,
     @apply rounded-card border border-line bg-card shadow-soft;
   }
 
-  /* Pastel icon tile — soft square behind an icon (design-system.md §1).
+  /* Pastel icon tile - soft square behind an icon (design-system.md §1).
    * Pair with a tint-* bg and the matching strong icon colour, e.g.
    * `<div class="tile bg-tint-coral"><Icon class="text-accent"/></div>`. */
   .tile {
     @apply grid h-14 w-14 place-items-center rounded-tile;
   }
 
-  /* The signature violet hero panel — generous radius + soft glow. */
+  /* The signature violet hero panel - generous radius + soft glow. */
   .hero-panel {
     @apply relative overflow-hidden rounded-hero bg-brand-gradient text-white shadow-hero;
   }

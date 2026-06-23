@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Surface avatar_url in the superadmin user list
+-- TNPSC Mentors — Surface avatar_url in the superadmin user list
 -- ----------------------------------------------------------------------------
 -- Adds the Google profile photo (profiles.avatar_url) to superadmin_list_users so
 -- the console's Users tab can show each user's photo. CREATE OR REPLACE can't add

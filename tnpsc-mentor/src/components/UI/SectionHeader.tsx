@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 // ─── SectionHeader ──────────────────────────────────────────────────────────
 // Groups content with a type label + whitespace instead of a card box
 // (design-system.md: "Grouping via space + section labels + hairline"). The
-// optional action is the only place coral appears here — a "See all"-style link.
+// optional action is the only place coral appears here - a "See all"-style link.
 
 export default function SectionHeader({
   title,

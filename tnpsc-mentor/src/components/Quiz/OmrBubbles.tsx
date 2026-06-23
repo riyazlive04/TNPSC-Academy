@@ -5,7 +5,7 @@ interface OmrBubblesProps {
   selected: AnswerLetter | null
   onSelect: (letter: AnswerLetter) => void
   disabled?: boolean
-  /** Which letters to show; defaults to A–D. Pass optionLetters(q) for 5-option items. */
+  /** Which letters to show; defaults to A-D. Pass optionLetters(q) for 5-option items. */
   letters?: AnswerLetter[]
 }
 

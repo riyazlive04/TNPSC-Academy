@@ -1,4 +1,4 @@
-# TNPSC Mentor — API server
+# TNPSC Mentors — API server
 
 The Express + TypeScript API layer. It is now the **single trusted client** in
 front of the Supabase Postgres database: the browser talks only to this server,

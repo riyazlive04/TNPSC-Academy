@@ -1,6 +1,6 @@
 # Question Import Format
 
-How to import your prepared question batch into TNPSC Mentor. Two paths, **same
+How to import your prepared question batch into TNPSC Mentors. Two paths, **same
 column format**:
 
 - **In-app** (no setup): Admin → Question Bank → **Import** → upload a `.csv` or

@@ -2,7 +2,7 @@
 // Inside the Android app the WebView loads from https://localhost, where Google
 // Identity Services refuses to run (embedded-webview + unauthorized origin). The
 // native plugin runs the real Google account picker and hands back an ID token
-// whose audience is our WEB client ID — the exact token shape the server accepts.
+// whose audience is our WEB client ID - the exact token shape the server accepts.
 
 import { Capacitor } from '@capacitor/core'
 
@@ -16,7 +16,7 @@ export function isNativeApp(): boolean {
   return Capacitor.isNativePlatform()
 }
 
-// The plugin's Android `load()` is empty — it only builds the sign-in client in
+// The plugin's Android `load()` is empty - it only builds the sign-in client in
 // `initialize()`. Calling `signIn()` before that NPEs and crashes the app, so we
 // always initialize once first.
 let initialized = false

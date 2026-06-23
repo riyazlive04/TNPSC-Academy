@@ -117,7 +117,7 @@ export default function ReportedQuestions() {
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <CheckCircle2 size={30} className="text-mint" />
           <p className="font-body text-ink2">
-            {tab === 'open' ? 'No open reports — all clear.' : `No ${tab} reports.`}
+            {tab === 'open' ? 'No open reports - all clear.' : `No ${tab} reports.`}
           </p>
         </div>
       ) : (

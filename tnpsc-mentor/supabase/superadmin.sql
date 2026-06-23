@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Superadmin role, platform metrics, user management & feedback
+-- TNPSC Mentors — Superadmin role, platform metrics, user management & feedback
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql + secure.sql. Introduces a 3rd role tier (superadmin)
 -- that INHERITS every admin ability (is_admin() is widened) and additionally

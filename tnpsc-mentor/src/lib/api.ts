@@ -32,6 +32,14 @@ const CREDENTIALS: RequestCredentials = isNative ? 'same-origin' : 'include'
 export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
 
 /**
+ * Whether to show the "Sign in with phone" (OTP) tab. The server independently
+ * gates the OTP endpoints on its MSG91 credentials; this build flag just hides
+ * the UI until phone login is actually live. Set VITE_OTP_LOGIN=true to enable.
+ */
+export const isPhoneOtpConfigured =
+  String(import.meta.env.VITE_OTP_LOGIN ?? '').toLowerCase() === 'true'
+
+/**
  * Fire-and-forget ping to /api/health. The API runs on Render's free plan, which
  * spins the container down after ~15 min idle and takes 30-60s to cold-start.
  * Calling this on app mount starts that wake-up in parallel with the rest of the
@@ -56,7 +64,7 @@ export const tokens = {
   },
   set(access: string, refresh: string) {
     localStorage.setItem(ACCESS_KEY, access)
-    // Web NEVER persists the refresh token in JS-readable storage — the server's
+    // Web NEVER persists the refresh token in JS-readable storage - the server's
     // HttpOnly cookie holds it. Only native (no cross-site cookie) stores it.
     if (isNative) localStorage.setItem(REFRESH_KEY, refresh)
   },
@@ -88,7 +96,7 @@ export class ApiError extends Error {
 /**
  * Thrown by request() when the session is gone (refresh failed/unavailable on a
  * 401). Distinct so callers can tell "you're signed out" apart from a raw 401
- * and never act on a half-cleared session — tokens are cleared exactly once
+ * and never act on a half-cleared session - tokens are cleared exactly once
  * inside the shared refresh path, not per concurrent caller.
  */
 export class UnauthenticatedError extends Error {
@@ -104,7 +112,7 @@ let refreshing: Promise<boolean> | null = null
 
 async function doRefresh(): Promise<boolean> {
   if (!canTryRefresh()) {
-    // No way to recover this session — clear once, here, so concurrent callers
+    // No way to recover this session - clear once, here, so concurrent callers
     // all observe the same cleared state rather than each clearing the tokens.
     tokens.clear()
     return false
@@ -114,7 +122,7 @@ async function doRefresh(): Promise<boolean> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: CREDENTIALS,
-      // Native sends its stored refresh token; web sends none — the HttpOnly
+      // Native sends its stored refresh token; web sends none - the HttpOnly
       // cookie carries it automatically with credentials: 'include'.
       body: JSON.stringify(
         isNative ? { refresh_token: tokens.refresh, device_id: getDeviceId() } : { device_id: getDeviceId() }
@@ -267,12 +275,39 @@ export const api = {
         body: { email, redirectTo },
       })
     },
+    // ─── Phone-OTP login (alternate to email/password) ───────────────────────
+    /** Send a login code to a registered phone. Throws ApiError(404,
+     * 'phone_not_registered') when no account owns the number. */
+    async otpSend(phone: string): Promise<{ ok: true }> {
+      return request('/api/auth/otp/send', { method: 'POST', auth: false, body: { phone } })
+    },
+    /** Verify the code and sign in (mints the same session the password flow does). */
+    async otpVerify(phone: string, otp: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/otp/verify', {
+        method: 'POST',
+        auth: false,
+        body: { phone, otp, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
+    /** After an OTP `device_limit` block: sign out the chosen device and finish
+     * signing in using the short-lived ticket (no fresh OTP needed). */
+    async otpReplaceDevice(ticket: string, sessionId: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/otp/replace-device', {
+        method: 'POST',
+        auth: false,
+        body: { ticket, session_id: sessionId, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
     async me(): Promise<{ user: { id: string }; profile: Profile | null }> {
       return request('/api/auth/me')
     },
     async logout() {
       // Revoke this device's session server-side (frees a slot for the 2-device
-      // limit), then drop tokens locally. Best-effort — never block sign-out.
+      // limit), then drop tokens locally. Best-effort - never block sign-out.
       try {
         await request('/api/auth/logout', { method: 'POST', body: { device_id: getDeviceId() } })
       } catch {
@@ -313,6 +348,14 @@ export const api = {
   },
   async abandonTest(session: Record<string, unknown>): Promise<void> {
     await request('/api/tests/abandon', { method: 'POST', body: { session } })
+  },
+  /** The signed-in user's explanation-PDF download allowance (premium = unlimited). */
+  async pdfQuota(): Promise<PdfQuota> {
+    return request<PdfQuota>('/api/tests/pdf-quota')
+  },
+  /** Reserve one PDF download slot. `allowed:false` means the free cap is used up. */
+  async recordPdfDownload(): Promise<PdfDownloadResult> {
+    return request<PdfDownloadResult>('/api/tests/pdf-download', { method: 'POST' })
   },
   async distinctTopics(params: {
     category: string
@@ -761,6 +804,21 @@ export interface PremiumStatus {
   until: string | null
 }
 
+/** Explanation-PDF download allowance. Premium users are unlimited (remaining
+ *  is null); free users get `cap` downloads in total. */
+export interface PdfQuota {
+  premium: boolean
+  used: number
+  cap: number
+  /** Remaining free downloads, or null when unlimited (premium). */
+  remaining: number | null
+}
+
+/** Result of reserving a download slot. `allowed:false` → free cap exhausted. */
+export interface PdfDownloadResult extends PdfQuota {
+  allowed: boolean
+}
+
 // ─── Coupon shapes ─────────────────────────────────────────────────────────────
 export type DiscountType = 'flat' | 'percent'
 
@@ -824,7 +882,7 @@ export interface RazorpayOrder {
 
 /**
  * Order-creation result. A coupon that fully covers the price yields `free`
- * (the server already recorded a paid ₹0 row — no Razorpay order to open);
+ * (the server already recorded a paid ₹0 row - no Razorpay order to open);
  * otherwise a real Razorpay order + public key for Checkout.
  */
 export type CreateOrderResponse =
@@ -912,7 +970,7 @@ export interface ReportedQuestion {
   reasons: string[]
   first_reported: string
   last_reported: string
-  /** Effective triage state — reopens automatically on a fresh report. */
+  /** Effective triage state - reopens automatically on a fresh report. */
   status: ReportStatus
   /** Admin triage note, if any. */
   note: string | null

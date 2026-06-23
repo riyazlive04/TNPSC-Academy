@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Superadmin: hard-delete a user (cascade everything)
+-- TNPSC Mentors — Superadmin: hard-delete a user (cascade everything)
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql. The server deletes the account via the GoTrue admin API
 -- (supabaseAdmin.auth.admin.deleteUser), which removes the auth.users row. Every

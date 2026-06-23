@@ -10,20 +10,41 @@ import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
 import { postAuthDestination } from '../lib/authRouting'
-import type { DeviceSession } from '../lib/api'
+import { isPhoneOtpConfigured, type DeviceSession } from '../lib/api'
 import { useT } from '../lib/i18n'
+
+/** 10-digit Indian mobile, accepting an optional +91/91/0 prefix and spacing. */
+function isValidIndianMobile(raw: string): boolean {
+  return /^(?:\+91|91|0)?[6-9]\d{9}$/.test(raw.replace(/[\s\-()]/g, ''))
+}
+
+type Mode = 'password' | 'phone'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signIn, replaceDevice } = useAuth()
+  const { signIn, replaceDevice, sendOtp, verifyOtp, replaceDeviceOtp } = useAuth()
   const { t } = useT()
+
+  // Which sign-in method is active. The phone tab only appears when OTP login is
+  // enabled for this build (server independently gates the endpoints).
+  const [mode, setMode] = useState<Mode>('password')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  // Phone-OTP flow.
+  const [phone, setPhone] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpStep, setOtpStep] = useState<'phone' | 'code'>('phone')
+  const [otpInfo, setOtpInfo] = useState('')
+  // Ticket returned with an OTP device-limit block — lets the device replace
+  // finish without a fresh code.
+  const [otpTicket, setOtpTicket] = useState<string | null>(null)
+
   // Device-limit flow: the active devices to choose from, and which one is
   // currently being signed out.
   const [devices, setDevices] = useState<DeviceSession[] | null>(null)
@@ -39,6 +60,7 @@ export default function LoginPage() {
   const emailInvalid = touched && !isValidEmail(email)
   const passwordInvalid = touched && !password
 
+  // ─── Password sign-in ──────────────────────────────────────────────────────
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setTouched(true)
@@ -52,8 +74,6 @@ export default function LoginPage() {
     const res = await signIn(email, password)
     setLoading(false)
 
-    // Account already on the max number of devices → show them so the user can
-    // sign one out and continue here.
     if (res.deviceLimit) {
       setDevices(res.devices ?? [])
       return
@@ -63,31 +83,97 @@ export default function LoginPage() {
       setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
-
     navigate(postAuthDestination(fromPath), { replace: true })
   }
 
-  // Sign out the chosen device and sign in here, then continue to the app.
-  const handleSignOutDevice = async (sessionId: string) => {
-    setBusyDeviceId(sessionId)
-    setDeviceError('')
-    const res = await replaceDevice(email, password, sessionId)
-    setBusyDeviceId(null)
+  // ─── Phone-OTP: request a code ─────────────────────────────────────────────
+  const handleSendOtp = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setOtpInfo('')
+    if (!isValidIndianMobile(phone)) return setError(t('errMobileInvalid'))
+
+    setLoading(true)
+    const res = await sendOtp(phone.trim())
+    setLoading(false)
+
+    if (res.notRegistered) return setError(t('otpNotRegistered'))
+    if (res.error) {
+      const f = friendlyAuthError(res.error)
+      return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+    }
+    setOtp('')
+    setOtpStep('code')
+  }
+
+  // ─── Phone-OTP: resend ─────────────────────────────────────────────────────
+  const handleResendOtp = async () => {
+    setError('')
+    setOtpInfo('')
+    setLoading(true)
+    const res = await sendOtp(phone.trim())
+    setLoading(false)
+    if (res.error) {
+      const f = friendlyAuthError(res.error)
+      return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+    }
+    setOtpInfo(t('otpResent'))
+  }
+
+  // ─── Phone-OTP: verify + sign in ───────────────────────────────────────────
+  const handleVerifyOtp = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    if (!otp.trim()) return setError(t('errOtpRequired'))
+
+    setLoading(true)
+    const res = await verifyOtp(phone.trim(), otp.trim())
+    setLoading(false)
 
     if (res.deviceLimit) {
-      // Still over the limit (rare race) — refresh the list and let them retry.
+      setOtpTicket(res.ticket ?? null)
       setDevices(res.devices ?? [])
       return
     }
     if (res.error) {
-      // Keep the modal open and show the failure inside it, rather than closing
-      // it and stranding the error behind the (now-dismissed) sheet.
+      const f = friendlyAuthError(res.error)
+      return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+    }
+    navigate(postAuthDestination(fromPath), { replace: true })
+  }
+
+  // Sign out the chosen device and sign in here, then continue to the app. The
+  // re-auth differs by method: password re-sends the credentials; OTP uses the
+  // one-time ticket from the block (the code was already spent).
+  const handleSignOutDevice = async (sessionId: string) => {
+    setBusyDeviceId(sessionId)
+    setDeviceError('')
+    const res =
+      mode === 'phone' && otpTicket
+        ? await replaceDeviceOtp(otpTicket, sessionId)
+        : await replaceDevice(email, password, sessionId)
+    setBusyDeviceId(null)
+
+    if (res.deviceLimit) {
+      // Still over the limit (rare race) - refresh the list/ticket and let them retry.
+      if (mode === 'phone') setOtpTicket(res.ticket ?? null)
+      setDevices(res.devices ?? [])
+      return
+    }
+    if (res.error) {
       const f = friendlyAuthError(res.error)
       setDeviceError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
     }
     setDevices(null)
     navigate(postAuthDestination(fromPath), { replace: true })
+  }
+
+  const switchMode = (next: Mode) => {
+    setMode(next)
+    setError('')
+    setOtpInfo('')
+    setTouched(false)
   }
 
   return (
@@ -98,72 +184,218 @@ export default function LoginPage() {
         </h2>
         <p className="mb-7 text-center font-body text-sm text-ink2">{t('signInToContinue')}</p>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-          <div>
-            <label
-              htmlFor="login-email"
-              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
-            >
-              {t('email')}
-            </label>
-            <div className="relative">
-              <input
-                id="login-email"
-                type="email"
-                autoComplete="email"
-                className={`input-soft pr-10 ${emailInvalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
-                placeholder="aspirant@email.com"
-                value={email}
-                aria-invalid={emailInvalid || undefined}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              {isValidEmail(email) && (
-                <Check
-                  size={16}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-correct"
-                />
-              )}
-            </div>
+        {/* Method toggle — only when phone-OTP login is enabled for this build. */}
+        {isPhoneOtpConfigured && (
+          <div className="mb-6 grid grid-cols-2 gap-1 rounded-card bg-surface p-1">
+            {(['password', 'phone'] as Mode[]).map((m) => {
+              const active = mode === m
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => switchMode(m)}
+                  aria-pressed={active}
+                  className={[
+                    'rounded-card px-3 py-2 font-heading text-sm font-semibold transition-all',
+                    active ? 'bg-card text-ink shadow-soft' : 'text-ink2 hover:text-ink',
+                  ].join(' ')}
+                >
+                  {t(m === 'password' ? 'tabPassword' : 'tabPhone')}
+                </button>
+              )
+            })}
           </div>
+        )}
 
-          <div>
-            <div className="mb-1.5 flex items-center justify-between gap-3">
+        {mode === 'password' && (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+            <div>
               <label
-                htmlFor="login-password"
-                className="font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+                htmlFor="login-email"
+                className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
               >
-                {t('password')}
+                {t('email')}
               </label>
-              {/* Inline "Forgot?" in the coral accent, as in the reference */}
-              <Link
-                to="/forgot-password"
-                className="focus-ring rounded font-heading text-xs font-semibold text-accent transition hover:opacity-80"
+              <div className="relative">
+                <input
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
+                  className={`input-soft pr-10 ${emailInvalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
+                  placeholder="aspirant@email.com"
+                  value={email}
+                  aria-invalid={emailInvalid || undefined}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                {isValidEmail(email) && (
+                  <Check
+                    size={16}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-correct"
+                  />
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-1.5 flex items-center justify-between gap-3">
+                <label
+                  htmlFor="login-password"
+                  className="font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+                >
+                  {t('password')}
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="focus-ring rounded font-heading text-xs font-semibold text-accent transition hover:opacity-80"
+                >
+                  {t('forgotPassword')}
+                </Link>
+              </div>
+              <PasswordInput
+                id="login-password"
+                value={password}
+                onChange={setPassword}
+                invalid={passwordInvalid}
+              />
+            </div>
+
+            {error && (
+              <div
+                role="alert"
+                className="animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
               >
-                {t('forgotPassword')}
-              </Link>
-            </div>
-            <PasswordInput
-              id="login-password"
-              value={password}
-              onChange={setPassword}
-              invalid={passwordInvalid}
-            />
-          </div>
+                {error}
+              </div>
+            )}
 
-          {error && (
-            <div
-              role="alert"
-              className="animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
             >
-              {error}
-            </div>
-          )}
+              {loading && <Spinner size={18} />}
+              {loading ? t('signingIn') : t('signIn')}
+            </button>
+          </form>
+        )}
 
-          <button type="submit" disabled={loading} className="btn-brand press mt-2 w-full px-6 py-3.5 text-base">
-            {loading && <Spinner size={18} />}
-            {loading ? t('signingIn') : t('signIn')}
-          </button>
-        </form>
+        {mode === 'phone' && (
+          <>
+            {otpStep === 'phone' ? (
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-4" noValidate>
+                <div>
+                  <label
+                    htmlFor="login-phone"
+                    className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+                  >
+                    {t('mobileNumber')}
+                  </label>
+                  <input
+                    id="login-phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    className="input-soft"
+                    placeholder="10-digit mobile"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                </div>
+
+                {error && (
+                  <div
+                    role="alert"
+                    className="animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+                  >
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+                >
+                  {loading && <Spinner size={18} />}
+                  {loading ? t('sendingOtp') : t('sendOtp')}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4" noValidate>
+                <p className="text-center font-body text-sm text-ink2">
+                  {t('otpSentTo')} <span className="font-semibold text-ink">{phone.trim()}</span>
+                </p>
+                <div>
+                  <label
+                    htmlFor="login-otp"
+                    className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+                  >
+                    {t('enterOtp')}
+                  </label>
+                  <input
+                    id="login-otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    className="input-soft text-center text-lg tracking-[0.5em]"
+                    placeholder="••••••"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  />
+                </div>
+
+                {error && (
+                  <div
+                    role="alert"
+                    className="animate-slideDown rounded-card bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+                  >
+                    {error}
+                  </div>
+                )}
+                {otpInfo && (
+                  <div
+                    role="status"
+                    className="animate-slideDown rounded-card bg-mintsoft px-4 py-3 text-center font-body text-sm font-medium text-mint"
+                  >
+                    {otpInfo}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+                >
+                  {loading && <Spinner size={18} />}
+                  {loading ? t('verifyingOtp') : t('verifyAndSignIn')}
+                </button>
+
+                <div className="flex items-center justify-between font-heading text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOtpStep('phone')
+                      setError('')
+                      setOtpInfo('')
+                    }}
+                    className="focus-ring rounded text-ink2 transition hover:text-ink"
+                  >
+                    {t('changeNumber')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={loading}
+                    className="focus-ring rounded text-accent transition hover:opacity-80 disabled:opacity-50"
+                  >
+                    {t('resendOtp')}
+                  </button>
+                </div>
+              </form>
+            )}
+          </>
+        )}
 
         {/* Google + "create account" grouped together at the foot of the card. */}
         {isGoogleConfigured && (

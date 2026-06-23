@@ -60,7 +60,7 @@ export default function QuizInstructionsPage() {
   }, [config, navigate])
 
   // Resolve the available-question count so the slider spans the full real pool
-  // (no artificial cap — the aspirant can practise every question in the topic).
+  // (no artificial cap - the aspirant can practise every question in the topic).
   // When the picker page already passed the count (config.availableCount), use
   // it directly and skip the network round-trip; otherwise fetch it.
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function QuizInstructionsPage() {
 
   const begin = async () => {
     if (!agreed || noQuestions) return
-    // Regular practice tests are NOT proctored — no fullscreen, no violation
+    // Regular practice tests are NOT proctored - no fullscreen, no violation
     // tracking. Proctoring is reserved for the Mock Test flow only.
     navigate('/quiz', {
       state: {
@@ -238,7 +238,7 @@ export default function QuizInstructionsPage() {
           <Rule icon={<ListChecks size={18} />} text={t('instrQuizNav')} />
           <Rule icon={<Copy size={18} />} text={t('instrNoCopy')} />
           <Rule icon={<AlertTriangle size={18} />} text={t('instrViolations')} />
-          {/* Report-a-problem — highlighted so aspirants notice it's available. */}
+          {/* Report-a-problem - highlighted so aspirants notice it's available. */}
           <div className="flex items-start gap-3 rounded-xl border border-accentwarm/30 bg-accentwarmsoft p-3.5">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-accentwarm" />
             <p className="tamil font-body text-sm text-ink">{t('instrReport')}</p>

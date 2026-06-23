@@ -15,10 +15,10 @@ interface OptionButtonProps {
 }
 
 /**
- * A single answer option as a clean, flat selectable row labelled A-D — the
+ * A single answer option as a clean, flat selectable row labelled A-D - the
  * quiz focus mode's core control (design-system.md "Minimal typographic = the
  * quiz flow"). No shadow; a hairline border that firms up on selection. States
- * follow the spec — tinted fill + coloured border + coloured marker, and ALWAYS
+ * follow the spec - tinted fill + coloured border + coloured marker, and ALWAYS
  * a check/cross icon (never colour alone), which also reads correctly in dark.
  */
 export default function OptionButton({

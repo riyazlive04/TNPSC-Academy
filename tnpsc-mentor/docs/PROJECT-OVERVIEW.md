@@ -1,4 +1,4 @@
-# TNPSC Mentor — Project Overview (read-me-first)
+# TNPSC Mentors — Project Overview (read-me-first)
 
 _Last updated: 2026-06-11. A single-page mental model of the whole project so you
 can pick up any thread quickly._

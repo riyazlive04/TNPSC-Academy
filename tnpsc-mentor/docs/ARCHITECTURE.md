@@ -1,4 +1,4 @@
-# TNPSC Mentor — File Structure & Architecture
+# TNPSC Mentors — File Structure & Architecture
 
 > A bilingual (English / Tamil) TNPSC exam-preparation app. React + TypeScript SPA
 > on the frontend, an Express API in the middle, and Supabase (Postgres + Auth) as

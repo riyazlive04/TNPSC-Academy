@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Bookmarks (save questions to study later)
+-- TNPSC Mentors — Bookmarks (save questions to study later)
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql + secure.sql. Users can save any question and review it
 -- later (with the answer + explanation revealed — these are deliberate study

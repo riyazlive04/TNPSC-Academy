@@ -159,7 +159,7 @@ def main():
         by_cat[q.get("category") or "uncategorised"].append(q)
 
     index = [
-        "# TNPSC Mentor — Question Bank Export",
+        "# TNPSC Mentors — Question Bank Export",
         "",
         f"Total: **{len(rows)}** questions across **{len(by_cat)}** categories. "
         "Each category is a separate document; every question lists its source link.",

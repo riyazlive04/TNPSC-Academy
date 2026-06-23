@@ -7,7 +7,7 @@ import { useFocusTrap } from '../UI/useFocusTrap'
  * "Mark this question for correction" feedback box, shown when a student reports
  * a question mid-test. While it is open the caller pauses the exam timer (see
  * `reportPaused` in MockQuizPage / QuizPage) so writing a report never eats into
- * exam time. The reason is optional — submitting blank still files the report.
+ * exam time. The reason is optional - submitting blank still files the report.
  */
 export default function ReportQuestionModal({
   questionNumber,

@@ -60,7 +60,7 @@ export default function TopicRevisionSection() {
     } catch (e) {
       if (e instanceof ApiError && e.status === 423) {
         toast.info(t('revStudyFirstToast'))
-        load() // refresh — its unlock time just hasn't arrived
+        load() // refresh - its unlock time just hasn't arrived
       } else {
         toast.error(t('loadQuestionsError'))
       }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import {
   Download,
   ShieldCheck,
@@ -8,7 +8,6 @@ import {
   Timer,
   Newspaper,
   CalendarDays,
-  Package,
   Check,
   ChevronDown,
   Sun,
@@ -17,7 +16,6 @@ import {
   Mail,
   Phone,
   ArrowRight,
-  Wallet,
   TrendingUp,
   ListChecks,
   Lock,
@@ -30,6 +28,9 @@ import {
   ChevronRight,
   Zap,
   BarChart3,
+  Smartphone,
+  Laptop,
+  Tablet,
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
@@ -43,10 +44,12 @@ const APK_DOWNLOAD_URL = '/downloads/tnpsc-mentor.apk' // TODO: point at the hos
 const APP_URL = 'https://app.tnpscmentors.in'
 const APP_LOGIN_URL = `${APP_URL}/login`
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
-const SUPPORT_PHONE = '+91 00000 00000' // TODO: real WhatsApp/support number
-const SUPPORT_PHONE_TEL = '+910000000000' // TODO: tel:/wa.me digits
-const PRIVACY_URL = '#' // TODO: privacy policy URL
-const REFUND_URL = '#' // TODO: refund policy URL (in-app Razorpay payments)
+const SUPPORT_PHONE = '+91 96777 79808' // TODO: real WhatsApp/support number
+const SUPPORT_PHONE_TEL = '+91 96777 79808' // TODO: tel:/wa.me digits
+const PRIVACY_URL = '/privacy'
+const GUIDELINES_URL = '/guidelines'
+const PAYMENT_URL = '/payment-policy'
+const REFUND_URL = '/refund-policy'
 
 // ─── Analytics hook ──────────────────────────────────────────────────────────
 // The page's only KPI is install-rate, so every download fires this. Wired to
@@ -60,142 +63,170 @@ function trackEvent(name: string) {
     w.dataLayer?.push({ event: name })
     w.gtag?.('event', name)
   } catch {
-    /* analytics not configured yet — ignore */
+    /* analytics not configured yet - ignore */
   }
 }
 
 type Lang = 'ta' | 'en'
 
+// Hero on-load entrance: children rise + fade in sequence (premium, restrained).
+const heroStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+}
+const heroItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
+}
+
 // ─── Bilingual copy ──────────────────────────────────────────────────────────
 // English is the locked offer copy (spec §3). Tamil is natural/spoken, keeping
 // the English terms aspirants actually use (Group 1, mock test, PYQ, Aptitude,
-// ₹1,399, APK, Play Store). Have a native speaker review before launch.
+// ₹1,699, APK, Play Store). Have a native speaker review before launch.
 const T = {
   // Header / global
   signIn: { ta: 'உள்நுழைய', en: 'Sign in' },
-  download: { ta: 'Free app download பண்ணுங்க', en: 'Download free app' },
+  download: { ta: 'App download பண்ணுங்க', en: 'Download the app' },
 
   // Hero
   heroTitle: {
-    ta: 'Group 1 தேர்வுக்கு தயாராகுங்க — தாமதம் வேண்டாம், இன்னைக்கே ஆரம்பிங்க.',
-    en: 'Get ready for Group 1 exam - Don\'t delay start today.',
+    ta: 'TNPSC Group Exams தேர்வுக்கு தயாராகுங்க - தாமதம் வேண்டாம், இன்னைக்கே ஆரம்பிங்க.',
+    en: 'Get ready for TNPSC Group exams - Don\'t delay start today.',
   },
   heroSub: {
-    ta: 'உண்மையான past papers, Aptitude, exam-hall mock test எல்லாத்தையும் practice பண்ணுங்க. Free-ஆ download பண்ணி நீங்களே பாருங்க — முழுசா தமிழ் & English-ல.',
-    en: 'Practice with real past papers, Aptitude, and exam-hall mocks. Download free and try it yourself — fully in Tamil and English.',
+    ta: 'கடந்த 5 ஆண்டு TNPSC PYQs, திறனறிவு, மாதிரி தேர்வு எல்லாத்தையும் practice பண்ணுங்க. Download பண்ணி நீங்களே try பண்ணுங்க - முழுசா தமிழ் & English-ல.',
+    en: 'Practice with Last 5 year PYQs, Aptitude, and Mock test. Download and try it yourself - fully in Tamil and English.',
   },
   heroTrust: {
-    ta: 'Free-ஆ ஆரம்பிங்க · Download-க்கு பணம் இல்ல · எந்த Android phone-லயும் வேலை செய்யும்',
-    en: 'Free to start · No payment to download · Works on any Android phone',
+    ta: 'Download-க்கு பணம் இல்ல · இன்னைக்கே ஆரம்பிங்க · எந்த Android phone-லயும் வேலை செய்யும்',
+    en: 'No payment to download · Start today · Works on any Android phone',
   },
   heroEyebrow: {
-    ta: 'TNPSC Group 1 · Prelims தயாரிப்பு',
-    en: 'TNPSC Group 1 · Prelims preparation',
+    ta: 'TNPSC Group Exams · Prelims தயாரிப்பு',
+    en: 'TNPSC Group Exams · Prelims preparation',
   },
   trustBilingual: { ta: 'தமிழ் & English', en: 'Tamil & English' },
   trustGraded: { ta: 'Server-graded', en: 'Server-graded' },
-  trustFree: { ta: 'Free-ஆ ஆரம்பிங்க', en: 'Free to start' },
+  trustFree: { ta: 'செலவில்லா அனுபவம்', en: 'No-cost experience' },
   // Floating product chips on the phone mockup
   chipGraded: { ta: 'நேர்மையான score', en: 'Honest scoring' },
   chipBilingual: { ta: 'முழுமையா இருமொழி', en: 'Fully bilingual' },
 
-  // Section 2 — dream / cost of inaction
+  // Section 2 - dream / cost of inaction
   s2Title: {
-    ta: 'ஒரு Group 1 பதவி உங்க குடும்பத்தோட வாழ்க்கையையே மாத்தும். 2 மார்க்-ல தவறவிட்டா, இன்னொரு முழு வருஷமே போயிடும்.',
-    en: "A Group 1 post changes your family's life. Missing it by 2 marks costs you another whole year.",
+    ta: 'ஒரு அரசு வேலை உங்க குடும்பத்தோட வாழ்க்கையையே மாத்தும். 2 மார்க்-ல தவறவிட்டா, இன்னொரு முழு வருட மே போயிடும்.',
+    en: "A Government Job changes your family's life. Missing it by 2 marks costs you another whole year.",
   },
   s2Body: {
-    ta: 'Deputy Collector. DSP. உங்க குடும்பம் பெருமையா சொல்ற அந்த பதவி. அந்த கனவு இன்னும் 11 வாரம் தான். அந்த 11 வாரம் நீங்க பயன்படுத்தினாலும், இல்லாட்டியும் கடந்து போயிடும். கேள்வி ஒண்ணு தான் — சரியான கேள்விகளை practice பண்றீங்களா, இல்ல சிதறிய notes-ல தொலைஞ்சு போறீங்களா?',
-    en: 'Deputy Collector. DSP. The post your family says your name with pride. That dream is 11 weeks away — and those 11 weeks pass whether you use them or not. The only question is whether you spend them practising the right questions, or lost in scattered notes.',
+    ta: 'Deputy Collector, DSP & SRO. உங்க ஊரே பெருமைப்படும் ஒரு பதவி.\n“தேர்வுக்கு முன்னாடி இருக்க நேரம், நீங்க சரியா பயன்படுத்தினாலும் இல்லாட்டியும் கடந்து போயிடும்.” கேள்வி ஒண்ணு தான் - சரியான கேள்விகளை practice பண்றீங்களா, இல்ல சிதறிய notes-ல தொலைஞ்சு போறீங்களா?',
+    en: 'Deputy Collector, DSP, SRO. The kind of post that your whole town is proud of.\n“The time before the exam passes whether you use it well or not.” The only question is whether you spend it practising the right questions, or lost in scattered notes.',
   },
   s2ChipDream: { ta: 'கனவு: Deputy Collector / DSP', en: 'The dream: Deputy Collector / DSP' },
-  s2ChipCost: { ta: 'விலை: 2 மார்க் = 1 வருஷம்', en: 'The cost: 2 marks = 1 year' },
+  s2ChipCost: { ta: 'விலை: 2 மார்க் = 1 வருட ம்', en: 'The cost: 2 marks = 1 year' },
 
-  // Section 3 — free vs inside
+  // Section 3 - starter vs inside
   s3Title: {
-    ta: 'இன்னைக்கே free-ஆ ஆரம்பிங்க — பணம் கட்டுறதுக்கு முன்னாடியே உள்ள இருக்கறதெல்லாம் பாருங்க.',
-    en: 'Start free today — see everything inside before you ever pay.',
+    ta: 'இன்றே தொடங்குங்கள்! கட்டணம் செலுத்தும் முன், செயலியின் அனைத்து சிறப்பு அம்சங்களையும் ஆராய்ந்து பாருங்கள்.',
+    en: 'Download the app now - explore what you get when you pay, before the actual payment!',
   },
-  freeTitle: { ta: 'Free (இப்பவே download)', en: 'Free (download now)' },
+  freeTitle: { ta: 'Starter ( கட்டணம் இல்லை )', en: 'Starter ( Cost free )' },
   premiumTitle: {
-    ta: 'App-க்குள்ள — Group 1 Prelims Kit (₹1,399, எப்பவும் unlock பண்ணலாம்)',
-    en: "Inside the app — Group 1 Prelims Kit (₹1,399, unlock anytime)",
+    ta: 'App-க்குள்ள - TNPSC Premium Prelims Kit (₹1,699, எப்பவும் unlock பண்ணலாம்)',
+    en: "Inside the application - TNPSC Premium Prelims Kit (₹1,699, unlock anytime)",
   },
   premiumCaption: {
-    ta: 'எல்லாத்தையும் உள்ள பாருங்க — பிடிச்சா மட்டும் upgrade பண்ணுங்க.',
-    en: 'See it all inside — upgrade only if you love it.',
+    ta: 'Serious-ஆ TNPSC Group exams எழுதுறீங்கனா, இந்த Prelims Kit-ஐ unlock பண்ணி full fledge-ஆ தயாராகுங்க.',
+    en: 'Serious about TNPSC Group exams? Unlock the Prelims Kit and prepare with everything you need.',
   },
 
-  // Section 4 — PAM
+  // Section 4 - PAM
   s4Title: {
-    ta: 'PAM Method: Past papers → Aptitude → Mocks.',
-    en: 'The PAM Method: Past papers → Aptitude → Mocks.',
+    ta: 'PAM Method: Previous year question paper → Aptitude → Mocks.',
+    en: 'The PAM Method: Previous year question paper → Aptitude → Mocks.',
   },
 
-  // Section 5 — why free / why cheaper
+  // Section 5 - why cheaper than coaching
   s5Title: {
-    ta: 'Free-ஆ ஆரம்பிங்க. அப்புறம் ₹1,399-க்கு upgrade பண்ணுங்க — coaching centre மாதிரி ₹15,000 இல்ல.',
-    en: 'Start free. Upgrade later for ₹1,399 — not ₹15,000 like coaching centres.',
+    ta: 'இன்னைக்கே ஆரம்பிங்க. அப்புறம் ₹1,699-க்கு upgrade பண்ணுங்க - coaching centre மாதிரி ₹15,000 இல்ல.',
+    en: 'Start today. Upgrade later for ₹1,699 - not ₹15,000 like coaching centres.',
   },
   s5Body: {
-    ta: "Building வாடகை இல்ல. Fixed batch timing இல்ல. ஊருக்கு போயிட்டு வர பயணம் இல்ல. ஒரே தடவ உருவாக்கி, தமிழ்நாட்டுல இருக்கற எல்லா aspirant-க்கும் கொடுக்குறோம் — அந்த சேமிப்பை நேரா உங்களுக்கே தர்றோம். இதான் அந்த 'catch'.",
-    en: 'No building rent. No fixed batch timings. No travel across town. We built it once and serve it to every aspirant in Tamil Nadu — and pass the savings straight to you. That is the whole catch.',
+    ta: "Building வாடகை இல்ல. Fixed batch timing இல்ல. ஊருக்கு போயிட்டு வர பயணம் இல்ல. ஒரே தடவ உருவாக்கி, தமிழ்நாட்டுல இருக்கற எல்லா aspirant-க்கும் கொடுக்குறோம் - அந்த சேமிப்பை நேரா உங்களுக்கே தர்றோம். இதான் அந்த 'catch'.",
+    en: 'No fixed batch timings. No travel across town. We built it once and serve it to every aspirant in Tamil Nadu - and pass the savings straight to you. That is the whole catch.',
   },
 
-  // Section 6 — install
+  // Section 6 - install
   s6Title: {
-    ta: '30 second-ல install பண்ணலாம் — எப்படினு இதோ.',
-    en: "Install in 30 seconds — here's exactly how.",
+    ta: '30 second-ல install பண்ணலாம் - எப்படின்னா  இப்படி!',
+    en: "Install in 30 seconds - here's exactly how.",
   },
   s6Reassure: {
     ta: 'Play Store-ல இன்னும் வராத app-க்கு இந்த warning சகஜம். விரைவில் நாங்க Play Store-ல வந்துடுவோம். உங்க download பாதுகாப்பானது.',
     en: "This warning is normal for apps not yet on the Play Store. We'll be on the Play Store soon. Your download is safe.",
   },
 
-  // Section 7 — FAQ
-  faqTitle: { ta: 'அடிக்கடி கேட்கப்படும் கேள்விகள்', en: 'Frequently asked questions' },
+  // Platforms - study on any device
+  platTitle: { ta: 'எந்த device-லயும் படிக்கலாம் ', en: 'Study on any device' },
+  platSubtitle: {
+    ta: 'Phone, tablet, laptop - எல்லாத்துலயும் ஒரே account, ஒரே progress.',
+    en: 'Phone, tablet or laptop - one account, your progress everywhere.',
+  },
+  openWeb: { ta: 'Web app-ஐ திறங்க', en: 'Open web app' },
 
-  // Section 8 — final CTA
+  // Section 7 - FAQ
+  faqEyebrow: { ta: 'கேள்வி-பதில்', en: 'FAQ' },
+  faqTitle: { ta: 'அடிக்கடி கேட்கப்படும் கேள்விகள்', en: 'Frequently asked questions' },
+  faqSubtitle: {
+    ta: 'Download, payment, மற்றும் access பத்தி தெரிஞ்சுக்கணுமா? இப்படி  பதில்கள்.',
+    en: 'Everything about downloading, payment and access - answered.',
+  },
+  faqStillTitle: { ta: 'இன்னும் சந்தேகமா?', en: 'Still have questions?' },
+  faqStillSub: {
+    ta: 'நேரடியா எங்களை தொடர்பு கொள்ளுங்க - விரைவா பதில் தர்றோம்.',
+    en: 'Reach us directly - we reply fast.',
+  },
+
+  // Section 8 - final CTA
   s8Title: {
-    ta: 'இன்னைக்கே free-ஆ ஆரம்பிங்க.',
-    en: 'Start free today.',
+    ta: 'இன்னைக்கே ஆரம்பிங்க.',
+    en: 'Start today.',
   },
   s8Sub: {
-    ta: 'Group 1 prelims-க்கான practice, mock test, PYQ — எல்லாம் ஒரே இடத்துல.',
-    en: 'Practice, mocks and PYQ for Group 1 prelims — all in one place.',
+    ta: 'TNPSC Group prelims-க்கான practice, mock test, PYQ - எல்லாம் ஒரே இடத்துல.',
+    en: 'Practice, mocks and PYQ for TNPSC Group prelims - all in one place.',
   },
 
   // Footer
   footerTagline: {
-    ta: 'TNPSC Group 1 prelims-க்கான தயாரிப்பு — தமிழ் & English-ல.',
-    en: 'TNPSC Group 1 prelims preparation — in Tamil and English.',
+    ta: 'TNPSC Exam prelims-க்கான தயாரிப்பு - தமிழ் & English-ல.',
+    en: 'TNPSC Exam prelims preparation - in Tamil and English.',
   },
   footerSupport: { ta: 'உதவி', en: 'Support' },
   footerPrivacy: { ta: 'தனியுரிமை கொள்கை', en: 'Privacy policy' },
-  footerRefund: { ta: 'பணம் திரும்ப கொள்கை', en: 'Refund policy' },
+  footerGuidelines: { ta: 'வழிகாட்டுதல்கள்', en: 'Guidelines' },
+  footerPayment: { ta: 'கட்டண கொள்கை', en: 'Payment policy' },
+  footerRefund: { ta: 'பணம் திரும்ப & ரத்து கொள்கை', en: 'Return & cancellation' },
   footerDisclaimer: {
     ta: 'Tamil Nadu Public Service Commission-உடன் தொடர்பில்லை.',
     en: 'Not affiliated with the Tamil Nadu Public Service Commission.',
   },
-  stickyHint: { ta: 'Free · Group 1', en: 'Free · Group 1' },
+  stickyHint: { ta: 'TNPSC · Group 1', en: 'TNPSC · Group 1' },
 } as const
 
 const FREE_ITEMS: { ta: string; en: string }[] = [
-  { ta: 'Subject / topic வாரியா practice', en: 'Subject / topic-wise practice' },
-  { ta: '3 tests', en: '3 tests' },
-  { ta: '1 mock test', en: '1 mock test' },
-  { ta: 'திரையிலேயே விளக்கங்கள் (PDF இல்ல)', en: 'On-screen explanations (no PDF)' },
+  { ta: '3 தேர்வுகள் வரையில் -  உங்களுடைய விருப்ப பாடம் அல்லது தலைப்புகளில் ', en: 'Upto 3 tests in subject or topics of your choice' },
+  { ta: 'ஒரு முழு மாதிரி தேர்வு (200 வினாக்கள்)', en: '1 mock test(200 questions)' },
+  { ta: 'திரையிலேயே வினாக்களுக்கு விளக்கங்களை  பார்த்துக்கொள்ளலாம் PDF Download செய்துகொள்ளலாம்', en: 'On-screen explanations for questions' },
 ]
 
 const PREMIUM_ITEMS: { ta: string; en: string }[] = [
-  { ta: 'கடந்த 5 வருஷ Group 1 PYQ, முழு விளக்கத்தோட', en: "Last 5 years' Group 1 PYQ, fully solved" },
-  { ta: 'Unlimited tests, எந்த subject/topic வேணாலும்', en: 'Unlimited tests, any subject/topic' },
-  { ta: '5 proctored mock tests (உண்மையான exam-hall feel)', en: '5 proctored mock tests (real exam-hall feel)' },
-  { ta: 'ஜூலை–ஆகஸ்ட் current affairs', en: 'July–August current affairs' },
+  { ta: 'கடந்த 5 வருட TNPSC PYQ, முழு விளக்கத்தோடு ', en: "Last 5 years TNPSC PYQ, fully solved" },
+  { ta: 'Unlimited tests attempts, எந்த subject/topic வேணாலும்', en: 'Unlimited test attempts on any subject/topic' },
+  { ta: ' 5 மாதிரி தேர்வு', en: ' 5 மாதிரி தேர்வு' },
+  { ta: 'ஆகஸ்ட் 2025 முதல் ஜூலை 2026 வரையிலான நடப்பு நிகழ்வுகள்', en: 'August 2025 to July 2026 current affairs' },
   { ta: '45 நாள் revision plan', en: '45-day revision plan' },
-  { ta: 'Aptitude formula sheet', en: 'Aptitude formula sheet' },
+  { ta: 'Formula & Infographic pdf\'s', en: 'Formula and Infographic pdf\s' },
   { ta: 'PYQ trend report', en: 'PYQ trend report' },
-  { ta: '1 physical exam kit, உங்க வீட்டுக்கே post பண்றோம்', en: '1 physical exam kit, posted to your home' },
   { ta: 'Prelims வரைக்கும் valid · ஒரே payment · subscription இல்ல', en: 'Valid till the prelims · one payment · no subscription' },
 ]
 
@@ -203,7 +234,7 @@ const PREMIUM_ITEMS: { ta: string; en: string }[] = [
 // design-system.md gives four pastel tile tints; we use them semantically so the
 // page reads as a system, not a rainbow: violet = core/app, coral = aspiration &
 // key numbers, blue = practice/learning, green = free/safe. Each pairs a soft
-// tile bg with the matching strong icon colour (red-green safe — always an icon).
+// tile bg with the matching strong icon colour (red-green safe - always an icon).
 const TINTS = [
   { bg: 'bg-tint-violet', fg: 'text-brand' },
   { bg: 'bg-tint-coral', fg: 'text-accent' },
@@ -219,39 +250,78 @@ const PAM_CARDS: {
 }[] = [
   {
     icon: FileText,
-    tint: TINTS[2], // blue — learning
-    ta: { t: 'Past papers', d: 'Pattern புரியற வரைக்கும் கடந்த 5 வருஷத்தை drill பண்ணுங்க.' },
-    en: { t: 'Past papers', d: 'Drill the last 5 years until the patterns are obvious.' },
+    tint: TINTS[2], // blue - learning
+    ta: { t: 'Previous year question paper', d: 'Pattern புரியற வரைக்கும் கடந்த 5 வருட த்தை drill பண்ணுங்க.' },
+    en: { t: 'Previous year question paper', d: 'Drill the last 5 years until the patterns are obvious.' },
   },
   {
     icon: Calculator,
-    tint: TINTS[1], // coral — the scoreable marks
-    ta: { t: 'Aptitude', d: 'சுலபமா score பண்ணக்கூடிய அந்த 10 மார்க்கை master பண்ணுங்க.' },
-    en: { t: 'Aptitude', d: 'Master the easiest, most scoreable 10 marks.' },
+    tint: TINTS[1], // coral - the scoreable marks
+    ta: { t: 'Aptitude', d: 'சுலபமா score பண்ணக்கூடிய அந்த 25 மார்க்கை master பண்ணுங்க.' },
+    en: { t: 'Aptitude', d: 'Master the easiest, most scoreable 25 marks.' },
   },
   {
     icon: Timer,
-    tint: TINTS[0], // violet — exam-hall mocks
-    ta: { t: 'Mocks', d: 'Exam pressure சகஜமா ஆகற வரைக்கும் real, timed, proctored mock எழுதுங்க.' },
-    en: { t: 'Mocks', d: 'Sit real, timed, proctored mocks until exam pressure feels normal.' },
+    tint: TINTS[0], // violet - exam-hall mocks
+    ta: { t: 'Mocks', d: 'மாதிரி தேர்வுகளை இங்கே  பயிற்சி செய்யுங்கள். தேர்வு நேர பதட்டத்தை/பயத்தை வெல்லுங்கள்!' },
+    en: { t: 'Mocks', d: 'Practice realtime mock test here. Defeat your exam fear.' },
   },
 ]
 
-const PREMIUM_ICONS = [FileText, ListChecks, Timer, Newspaper, CalendarDays, Calculator, TrendingUp, Package, ShieldCheck]
+const PREMIUM_ICONS = [FileText, ListChecks, Timer, Newspaper, CalendarDays, Calculator, TrendingUp, ShieldCheck]
 
 const INSTALL_STEPS: { ta: string; en: string }[] = [
-  { ta: 'Download free app-ஐ tap பண்ணுங்க.', en: 'Tap Download free app.' },
+  { ta: 'App download-ஐ tap பண்ணுங்க.', en: 'Tap Download the app.' },
   {
-    ta: "Android 'unknown source'னு காட்டலாம் — Settings → உங்க browser-க்கு allow பண்ணுங்க.",
-    en: 'Android may say "unknown source" — tap Settings → allow for your browser.',
+    ta: "Android 'unknown source'னு காட்டலாம் - Settings → உங்க browser-க்கு allow பண்ணுங்க.",
+    en: 'Android may say "unknown source" - tap Settings → allow for your browser.',
   },
-  { ta: 'App-ஐ திறந்து free-ஆ practice ஆரம்பிங்க.', en: 'Open the app and start practising free.' },
+  { ta: 'App-ஐ திறந்து practice ஆரம்பிங்க.', en: 'Open the app and start practising.' },
+]
+
+// How to access on each device. `action`: 'download' shows the APK button,
+// 'web' shows an "Open web app" link to the hosted app subdomain.
+const PLATFORMS: {
+  icon: typeof Smartphone
+  tint: (typeof TINTS)[number]
+  action: 'download' | 'web'
+  ta: { t: string; d: string }
+  en: { t: string; d: string }
+}[] = [
+  {
+    icon: Smartphone,
+    tint: TINTS[3], // green
+    action: 'download',
+    ta: { t: 'Android phone', d: 'இந்த page-ல APK download பண்ணி install பண்ணுங்க - 30 second-ல தயார்.' },
+    en: { t: 'Android phone', d: 'Download the APK on this page and install - ready in 30 seconds, works offline too.' },
+  },
+  {
+    icon: Smartphone,
+    tint: TINTS[1], // coral
+    action: 'web',
+    ta: { t: 'iPhone', d: 'iOS app விரைவில். இப்போதைக்கு Safari Browser-ல app.tnpscmentors.in திறந்து "Add to Home Screen" பண்ணுங்க - app மாதிரியே வேலை செய்யும்.' },
+    en: { t: 'iPhone', d: 'iOS app is coming soon. For now open app.tnpscmentors.in in Safari and "Add to Home Screen" - it behaves just like the app.' },
+  },
+  {
+    icon: Laptop,
+    tint: TINTS[2], // blue
+    action: 'web',
+    ta: { t: 'Laptop & Desktop', d: 'Chrome, Edge அல்லது எந்த browser-லயும் app.tnpscmentors.in திறங்க - பெரிய திரையில முழு அனுபவம்.' },
+    en: { t: 'Laptop & Desktop', d: 'Open app.tnpscmentors.in in Chrome, Edge or any browser - the full experience on a big screen.' },
+  },
+  {
+    icon: Tablet,
+    tint: TINTS[0], // violet
+    action: 'download',
+    ta: { t: 'Tablet', d: 'Android tablet-ல APK install பண்ணுங்க; iPad-ல browser-ல திறங்க. அதிக இடத்துல படிக்க வசதி.' },
+    en: { t: 'Tablet', d: 'Android tablet: install the APK. iPad: open it in your browser. More room to read and practise.' },
+  },
 ]
 
 const FAQS: { ta: { q: string; a: string }; en: { q: string; a: string } }[] = [
   {
-    ta: { q: 'உண்மையாவே free-ஆ download பண்ணலாமா?', a: 'ஆமா. பணம் எதுவும் இல்லாம download பண்ணி free tier-ஐ use பண்ணலாம்.' },
-    en: { q: 'Is it really free to download?', a: 'Yes. Download and use the free tier with no payment.' },
+    ta: { q: 'Download பண்ண என்ன செலவு?', a: 'Download-க்கு செலவு இல்ல - app-க்குள்ள upgrade பண்ணா மட்டும் தான் பணம். Starter tier-ஐ பணம் இல்லாம use பண்ணலாம்.' },
+    en: { q: 'What does it cost to download?', a: 'Nothing to download - you only pay if you choose to upgrade inside the app. The starter tier needs no payment.' },
   },
   {
     ta: { q: 'Install பண்ண பணம் கட்டணுமா?', a: 'இல்ல. நீங்க upgrade பண்ண விரும்பினா மட்டும், app-க்குள்ள தான் payment.' },
@@ -259,44 +329,37 @@ const FAQS: { ta: { q: string; a: string }; en: { q: string; a: string } }[] = [
   },
   {
     ta: {
-      q: 'Free vs Paid — என்னென்ன?',
-      a: 'Free: subject/topic practice, 3 tests, 1 mock, திரையில விளக்கம். Paid (₹1,399 kit): 5 வருஷ PYQ விளக்கத்தோட, unlimited tests, 5 proctored mock, current affairs, 45 நாள் plan, formula sheet, trend report, மேலும் வீட்டுக்கு physical kit.',
+      q: 'Starter vs Paid - என்னென்ன?',
+      a: 'Starter: subject/topic practice, 3 tests, 1 mock, திரையில விளக்கம். Paid : 5 வருட  PYQ விளக்கத்தோட, unlimited tests, 5 மாதிரி தேர்வு, current affairs, 45 நாள் plan, formula sheet, மேலும் PYQ trend report.',
     },
     en: {
-      q: "What's free vs paid?",
-      a: 'Free: subject/topic practice, 3 tests, 1 mock and on-screen explanations. Paid (₹1,399 kit): 5 years of PYQ solved, unlimited tests, 5 proctored mocks, current affairs, a 45-day plan, formula sheet, trend report and a physical kit posted home.',
+      q: "What's in the starter vs paid?",
+      a: 'Starter: subject/topic practice, 3 tests, 1 mock and on-screen explanations. Paid : 5 years of PYQ solved, unlimited tests, 5 proctored mocks, current affairs, a 45-day plan, formula sheet and a PYQ trend report.',
     },
   },
   {
     ta: {
       q: 'APK பாதுகாப்பானதா?',
-      a: 'ஆமா. App இன்னும் Play Store-ல வரல (எங்க DUNS verification நடந்துட்டிருக்கு), அதனால Android ஒரு சாதாரண sideload warning காட்டும். Download பாதுகாப்பானது.',
+      a: 'ஆமா. App இன்னும் Play Store-ல வரல (எங்க verification நடந்துட்டிருக்கு), அதனால Android ஒரு சாதாரண sideload warning காட்டும். Download பாதுகாப்பானது.',
     },
     en: {
       q: 'Is the APK safe?',
-      a: "Yes. The app simply isn't on the Play Store yet (our DUNS verification is in progress), so Android shows a standard sideload warning. The download itself is safe.",
+      a: "Yes. The app simply isn't on the Play Store yet (our verification is in progress), so Android shows a standard sideload warning. The download itself is safe.",
     },
   },
   {
-    ta: { q: 'Physical exam kit-ல என்ன இருக்கும்?', a: '[Founder உறுதி செய்ய வேண்டியது — kit உள்ளடக்கம் விரைவில்.]' },
-    en: { q: "What's in the physical exam kit?", a: '[Founder to confirm — kit contents coming soon.]' },
-  },
-  {
-    ta: { q: 'தமிழ்-ல இருக்கா?', a: 'முழுசா இருமொழி — தமிழ் & English, எப்பவும் மாத்திக்கலாம்.' },
-    en: { q: 'Is it in Tamil?', a: 'Fully bilingual — Tamil and English, switch anytime.' },
+    ta: { q: 'தமிழ்-ல இருக்கா?', a: 'முழுசா இருமொழி - தமிழ் & English, எப்பவும் மாத்திக்கலாம்.' },
+    en: { q: 'Is it in Tamil?', a: 'Fully bilingual - Tamil and English, switch anytime.' },
   },
   {
     ta: { q: 'Upgrade பண்ணா எப்படி pay பண்றது?', a: 'App-க்குள்ள UPI அல்லது card மூலமா (Razorpay).' },
     en: { q: 'How do I pay if I upgrade?', a: 'Inside the app via UPI or card (Razorpay).' },
   },
   {
-    ta: { q: 'எந்த phone-ல வேலை செய்யும்?', a: 'எந்த Android phone-லயும். (iOS: விரைவில் — [status placeholder].)' },
-    en: { q: 'Which phones work?', a: 'Any Android phone. (iOS: coming soon — [status placeholder].)' },
+    ta: { q: 'எந்த phone-ல வேலை செய்யும்?', a: 'எந்த Android phone-லயும். (iOS: விரைவில்.)' },
+    en: { q: 'Which phones work?', a: 'Any Android phone. (iOS: coming soon.)' },
   },
-  {
-    ta: { q: 'எவ்வளவு நாள் access இருக்கும்?', a: 'Prelims தேர்வு வரைக்கும்.' },
-    en: { q: 'How long is access valid?', a: 'Till the prelims exam.' },
-  },
+  // 
 ]
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -308,29 +371,66 @@ export default function LandingPage() {
 
   // Default to Tamil for TN traffic (spec §6).
   const [lang, setLang] = useState<Lang>('ta')
+  const reduce = useReducedMotion()
+
+  // Hide the header while scrolling down, reveal it the moment the user scrolls
+  // up (or returns near the top) - more screen for content, CTA always one flick
+  // away. Works with Lenis since it drives native window scroll.
+  const [navHidden, setNavHidden] = useState(false)
+  useEffect(() => {
+    // Headroom / auto-hiding header. Smooth scroll (Lenis) advances only a few px
+    // per event, so we must NOT reset the reference every tick - that kept the
+    // per-event delta tiny and the reveal never fired. Instead pin `ref` and let
+    // movement accumulate; once it passes the threshold in either direction we
+    // act and re-pin. Near the top the header is always shown.
+    const THRESHOLD = 6
+    let ref = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      if (y <= 80) {
+        setNavHidden(false)
+        ref = y
+        return
+      }
+      const diff = y - ref
+      if (diff > THRESHOLD) {
+        setNavHidden(true) // scrolled down enough -> hide
+        ref = y
+      } else if (diff < -THRESHOLD) {
+        setNavHidden(false) // scrolled up enough -> reveal
+        ref = y
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     document.title =
       lang === 'ta'
-        ? 'TNPSC Group 1 — Free-ஆ ஆரம்பிங்க'
-        : 'TNPSC Group 1 — Start free'
+        ? 'TNPSC Group Exams - இன்னைக்கே ஆரம்பிங்க'
+        : 'TNPSC Group Exams - Start today'
   }, [lang])
 
   const t = (key: keyof typeof T) => T[key][lang]
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-canvas pb-24 sm:pb-0">
+    <div id="top" className="min-h-screen overflow-x-clip bg-canvas pb-24 sm:pb-0">
       {/* ─── Top bar ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
+      <header
+        className={`sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur transition-transform duration-300 ease-out ${
+          navHidden ? '-translate-y-full' : 'translate-y-0'
+        }`}
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white">
+          <a href="#top" className="group flex items-center gap-2.5">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white transition-transform duration-200 group-hover:scale-105 group-active:scale-95">
               த
             </span>
             <span className="font-heading text-base font-semibold tracking-tight text-ink">
-              TNPSC <span className="text-brand">Mentor</span>
+              TNPSC <span className="text-brand">Mentors</span>
             </span>
-          </div>
+          </a>
 
           <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Language toggle (spec §6) */}
@@ -353,16 +453,13 @@ export default function LandingPage() {
 
             <button
               onClick={toggleTheme}
-              className="icon-btn h-9 w-9"
+              className="icon-btn h-9 w-9 transition-transform duration-300 hover:rotate-45"
               aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {resolved === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <a
-              href={isAuthed ? APP_URL : APP_LOGIN_URL}
-              className="hidden rounded-xl px-3 py-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand-dark sm:inline-flex"
-            >
+            <a href={isAuthed ? APP_URL : APP_LOGIN_URL} className="btn-soft px-3.5 py-2 text-sm">
               {isAuthed ? 'Dashboard' : t('signIn')}
             </a>
           </div>
@@ -371,7 +468,7 @@ export default function LandingPage() {
 
       {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
-        {/* Soft gradient-mesh backdrop — restrained, premium (Linear/Stripe-style). */}
+        {/* Soft gradient-mesh backdrop - restrained, premium (Linear/Stripe-style). */}
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand/25 blur-[120px]" />
           <div className="absolute -right-24 top-10 h-80 w-80 rounded-full bg-accent/20 blur-[120px]" />
@@ -380,22 +477,32 @@ export default function LandingPage() {
 
         <div className="mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16 lg:pt-24">
           <div className="grid items-center gap-12 lg:grid-cols-[1.05fr,0.95fr]">
-            <div className="min-w-0 text-center lg:text-left">
-              <span className="inline-flex items-center gap-2 rounded-full border border-line bg-card/70 px-3.5 py-1.5 font-heading text-xs font-semibold text-brand-dark shadow-pill backdrop-blur">
-                <Sparkles size={14} className="text-accent" />
-                {t('heroEyebrow')}
-              </span>
-              <h1 className="mt-6 font-heading text-[2rem] font-extrabold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-[3.4rem]">
+            <motion.div
+              className="min-w-0 text-center lg:text-left"
+              initial={reduce ? false : 'hidden'}
+              animate={reduce ? false : 'show'}
+              variants={heroStagger}
+            >
+              <motion.h1
+                variants={heroItem}
+                className="font-heading text-[1.7rem] font-bold leading-[1.25] tracking-tight text-ink [text-wrap:balance] sm:text-[2.25rem] sm:leading-[1.22] lg:text-[2.7rem] lg:leading-[1.2]"
+              >
                 {t('heroTitle')}
-              </h1>
-              <p className="mx-auto mt-5 max-w-2xl font-body text-base leading-relaxed text-ink2 sm:text-lg lg:mx-0">
+              </motion.h1>
+              <motion.p
+                variants={heroItem}
+                className="mx-auto mt-4 max-w-xl font-body text-[15px] leading-relaxed text-ink2 sm:text-base lg:mx-0"
+              >
                 {t('heroSub')}
-              </p>
-              <div className="mt-8 flex justify-center lg:justify-start">
+              </motion.p>
+              <motion.div variants={heroItem} className="mt-8 flex justify-center lg:justify-start">
                 <DownloadButton label={t('download')} size="lg" />
-              </div>
-              {/* Trust row — concrete, no hype */}
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 lg:justify-start">
+              </motion.div>
+              {/* Trust row - concrete, no hype */}
+              <motion.div
+                variants={heroItem}
+                className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 lg:justify-start"
+              >
                 {[
                   { Icon: Globe, fg: 'text-sky', label: t('trustBilingual') },
                   { Icon: ShieldCheck, fg: 'text-correct', label: t('trustGraded') },
@@ -405,15 +512,20 @@ export default function LandingPage() {
                     <Icon size={15} className={fg} /> {label}
                   </span>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
-            {/* Product shot — the app inside a crafted iPhone frame. */}
+            {/* Product shot - the app inside a crafted iPhone frame. */}
             <div className="relative min-w-0">
-              <PhoneMockup lang={lang} />
+              <PhoneMockup />
 
-              {/* floating glass chips (desktop) */}
-              <div className="absolute -left-6 top-4 hidden animate-floaty rounded-2xl border border-line bg-card/80 p-3 shadow-card backdrop-blur lg:flex lg:items-center lg:gap-2.5">
+              {/* floating glass chips (desktop) - looping bob via framer-motion so
+                  it keeps animating regardless of the reduced-motion setting. */}
+              <motion.div
+                animate={{ y: [0, -9, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -left-6 top-4 hidden rounded-2xl border border-line bg-card/80 p-3 shadow-card backdrop-blur lg:flex lg:items-center lg:gap-2.5"
+              >
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-tint-green text-correct">
                   <ShieldCheck size={18} />
                 </span>
@@ -421,10 +533,11 @@ export default function LandingPage() {
                   <p className="font-heading text-sm font-semibold text-ink">{t('chipGraded')}</p>
                   <p className="font-body text-xs text-ink2">Server-graded</p>
                 </div>
-              </div>
-              <div
-                className="absolute -right-6 bottom-24 hidden animate-floaty rounded-2xl border border-line bg-card/80 p-3 shadow-card backdrop-blur lg:flex lg:items-center lg:gap-2.5"
-                style={{ animationDelay: '1.2s' }}
+              </motion.div>
+              <motion.div
+                animate={{ y: [0, -9, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+                className="absolute -right-6 bottom-24 hidden rounded-2xl border border-line bg-card/80 p-3 shadow-card backdrop-blur lg:flex lg:items-center lg:gap-2.5"
               >
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-tint-violet text-brand">
                   <Globe size={18} />
@@ -433,17 +546,17 @@ export default function LandingPage() {
                   <p className="font-heading text-sm font-semibold text-ink">{t('chipBilingual')}</p>
                   <p className="font-body text-xs text-ink2">தமிழ் / EN</p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── Section 2 — dream vs cost of inaction ────────────────────────── */}
+      {/* ─── Section 2 - dream vs cost of inaction ────────────────────────── */}
       <Reveal>
         <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 sm:py-24">
           <div className="card relative overflow-hidden p-8 text-center sm:p-12">
-            {/* coral accent rail — emotional, "cost" tone */}
+            {/* coral accent rail - emotional, "cost" tone */}
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand via-accent to-brand" />
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-tile bg-tint-coral text-accent">
               <Target size={26} />
@@ -451,8 +564,20 @@ export default function LandingPage() {
             <h2 className="mt-6 font-heading text-2xl font-bold leading-snug tracking-tight text-ink sm:text-4xl">
               {t('s2Title')}
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl font-body text-base leading-relaxed text-ink2 sm:text-lg">
-              {t('s2Body')}
+            <p className="mx-auto mt-6 max-w-2xl whitespace-pre-line font-body text-base leading-relaxed text-ink2 sm:text-lg">
+              {(() => {
+                const s = t('s2Body')
+                const open = s.indexOf('“')
+                const close = s.indexOf('”')
+                if (open === -1 || close === -1) return s
+                return (
+                  <>
+                    {s.slice(0, open)}
+                    <strong className="font-semibold text-ink">{s.slice(open, close + 1)}</strong>
+                    {s.slice(close + 1)}
+                  </>
+                )
+              })()}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <span className="inline-flex items-center gap-2 rounded-pill bg-tint-violet px-4 py-2 font-heading text-sm font-semibold text-brand">
@@ -462,22 +587,25 @@ export default function LandingPage() {
                 <TriangleAlert size={15} /> {t('s2ChipCost')}
               </span>
             </div>
+            <div className="mt-8 flex justify-center">
+              <DownloadButton label={t('download')} size="lg" />
+            </div>
           </div>
         </section>
       </Reveal>
 
-      {/* ─── Section 3 — free vs inside ───────────────────────────────────── */}
+      {/* ─── Section 3 - starter vs inside ────────────────────────────────── */}
       <section className="border-y border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <Reveal>
-            <h2 className="mx-auto max-w-3xl text-center font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
+            <h2 className="mx-auto max-w-3xl text-center font-heading text-2xl font-bold leading-[1.35] tracking-tight text-ink sm:text-4xl sm:leading-[1.3]">
               {t('s3Title')}
             </h2>
           </Reveal>
           <div className="mt-12 grid items-start gap-5 lg:grid-cols-2">
-            {/* Free — the hook. Green = free & safe, the immediate reward. */}
+            {/* Free - the hook. Green = free & safe, the immediate reward. */}
             <Reveal>
-              <div className="card relative h-full overflow-hidden p-7 ring-1 ring-correct/20">
+              <div className="card interactive relative h-full overflow-hidden p-7 ring-1 ring-correct/20">
                 <div className="absolute inset-x-0 top-0 h-1 bg-correct" />
                 <span className="inline-flex items-center gap-2 rounded-full bg-tint-green px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-correct">
                   <Check size={13} /> {t('freeTitle')}
@@ -498,13 +626,13 @@ export default function LandingPage() {
               </div>
             </Reveal>
 
-            {/* Inside the app — framed as "when you're ready", never a checkout.
+            {/* Inside the app - framed as "when you're ready", never a checkout.
                 Gold = achievement / the premium kit (design-system accent of value). */}
             <Reveal>
-              <div className="card relative h-full overflow-hidden border-brand/30 p-7">
+              <div className="card interactive relative h-full overflow-hidden border-brand/30 p-7">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gold" />
                 <span className="inline-flex items-center gap-2 rounded-full bg-goldsoft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-gold">
-                  <Lock size={13} /> ₹1,399 · Prelims Kit
+                  <Lock size={13} /> ₹1,699 · Premium Prelims Kit
                 </span>
                 <h3 className="mt-4 font-heading text-base font-semibold text-ink">{t('premiumTitle')}</h3>
                 <ul className="mt-5 space-y-3">
@@ -528,7 +656,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Section 4 — PAM method ───────────────────────────────────────── */}
+      {/* ─── Section 4 - PAM method ───────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <Reveal>
           <h2 className="mx-auto max-w-3xl text-center font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
@@ -538,12 +666,12 @@ export default function LandingPage() {
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {PAM_CARDS.map(({ icon: Icon, tint, ...card }, i) => (
             <Reveal key={i} delay={i * 0.06}>
-              <div className="card interactive h-full p-7">
+              <div className="card interactive group h-full p-7">
                 <div className="flex items-center gap-3">
-                  <span className={`grid h-12 w-12 place-items-center rounded-tile ${tint.bg} ${tint.fg}`}>
+                  <span className={`grid h-12 w-12 place-items-center rounded-tile ${tint.bg} ${tint.fg} transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}>
                     <Icon size={24} />
                   </span>
-                  <span className="font-heading text-3xl font-bold text-line">P{i + 1}</span>
+                  <span className="font-heading text-3xl font-bold text-line transition-colors group-hover:text-brand/30">P{i + 1}</span>
                 </div>
                 <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{card[lang].t}</h3>
                 <p className="mt-2 font-body text-[15px] leading-relaxed text-ink2">{card[lang].d}</p>
@@ -553,39 +681,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Section 5 — why free / why cheaper ───────────────────────────── */}
-      <Reveal>
-        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-          <div className="hero-panel grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
-            <div className="pointer-events-none absolute inset-0 bg-hero-grid [background-size:18px_18px]" />
-            <div className="relative min-w-0">
-              <span className="inline-flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-                <Wallet size={14} /> {lang === 'ta' ? 'விலை ஒப்பீடு' : 'Price comparison'}
-              </span>
-              <h2 className="mt-3 font-heading text-2xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
-                {t('s5Title')}
-              </h2>
-              {/* Price contrast — the value at a glance */}
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                <span className="rounded-2xl bg-white/15 px-4 py-2.5 font-heading text-3xl font-bold text-white">
-                  ₹1,399
-                </span>
-                <span className="font-heading text-xl font-semibold text-white/50 line-through decoration-accent decoration-2">
-                  ₹15,000
-                </span>
-                <span className="rounded-full bg-accent px-3 py-1.5 font-heading text-xs font-bold text-white shadow-warm">
-                  {lang === 'ta' ? '~90% குறைவு' : '~90% less'}
-                </span>
-              </div>
-            </div>
-            <p className="relative min-w-0 font-body text-base leading-relaxed text-white/80">
-              {t('s5Body')}
-            </p>
-          </div>
-        </section>
-      </Reveal>
-
-      {/* ─── Section 6 — install (friction killer) ────────────────────────── */}
+      {/* ─── Section 6 - install (friction killer) ────────────────────────── */}
       <section className="border-y border-line bg-card">
         <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6">
           <Reveal>
@@ -598,8 +694,8 @@ export default function LandingPage() {
               const tint = TINTS[i % TINTS.length]
               return (
                 <Reveal key={i} delay={i * 0.06}>
-                  <div className="card interactive h-full p-6">
-                    <span className={`grid h-11 w-11 place-items-center rounded-tile ${tint.bg} ${tint.fg} font-heading text-lg font-bold`}>
+                  <div className="card interactive group h-full p-6">
+                    <span className={`grid h-11 w-11 place-items-center rounded-tile ${tint.bg} ${tint.fg} font-heading text-lg font-bold transition-transform duration-300 group-hover:scale-110`}>
                       {i + 1}
                     </span>
                     <p className="mt-4 font-body text-[15px] leading-relaxed text-ink">{step[lang]}</p>
@@ -622,32 +718,94 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Section 7 — FAQ ──────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 py-20 sm:px-6">
+      {/* ─── Platforms - study on any device ──────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <Reveal>
-          <h2 className="text-center font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
-            {t('faqTitle')}
-          </h2>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
+              {t('platTitle')}
+            </h2>
+            <p className="mx-auto mt-4 font-body text-base leading-relaxed text-ink2">
+              {t('platSubtitle')}
+            </p>
+          </div>
         </Reveal>
-        <div className="mt-10 space-y-3">
-          {FAQS.map((faq, i) => (
-            <Reveal key={i} delay={Math.min(i * 0.03, 0.15)}>
-              <details className="group card overflow-hidden p-0">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-heading text-[15px] font-semibold text-ink focus-ring">
-                  {faq[lang].q}
-                  <ChevronDown
-                    size={18}
-                    className="flex-shrink-0 text-ink2 transition-transform group-open:rotate-180"
-                  />
-                </summary>
-                <p className="px-5 pb-4 font-body text-[15px] leading-relaxed text-ink2">{faq[lang].a}</p>
-              </details>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {PLATFORMS.map(({ icon: Icon, tint, action, ...p }, i) => (
+            <Reveal key={p.en.t} delay={i * 0.06}>
+              <div className="card interactive group flex h-full flex-col p-6">
+                <span className={`grid h-12 w-12 place-items-center rounded-tile ${tint.bg} ${tint.fg} transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}>
+                  <Icon size={24} />
+                </span>
+                <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{p[lang].t}</h3>
+                <p className="mt-2 flex-1 font-body text-[14px] leading-relaxed text-ink2">{p[lang].d}</p>
+                <div className="mt-5">
+                  {action === 'download' ? (
+                    <a
+                      href={APK_DOWNLOAD_URL}
+                      download
+                      onClick={() => trackEvent('download_click')}
+                      className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
+                    >
+                      <Download size={15} /> {t('download')}
+                    </a>
+                  ) : (
+                    <a
+                      href={APP_URL}
+                      className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
+                    >
+                      <Globe size={15} /> {t('openWeb')} <ArrowRight size={15} />
+                    </a>
+                  )}
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* ─── Section 8 — final CTA ────────────────────────────────────────── */}
+      {/* ─── Section 7 - FAQ ──────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr,1.15fr] lg:gap-14">
+          {/* Left - sticky intro + support card */}
+          <Reveal>
+            <div className="lg:sticky lg:top-24">
+              <span className="inline-flex items-center gap-2 rounded-full bg-tint-violet px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-brand">
+                <Sparkles size={13} /> {t('faqEyebrow')}
+              </span>
+              <h2 className="mt-4 font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
+                {t('faqTitle')}
+              </h2>
+              <p className="mt-4 max-w-sm font-body text-base leading-relaxed text-ink2">
+                {t('faqSubtitle')}
+              </p>
+
+              <div className="mt-7 rounded-card border border-line bg-card p-5 shadow-soft">
+                <p className="font-heading text-base font-semibold text-ink">{t('faqStillTitle')}</p>
+                <p className="mt-1 font-body text-sm text-ink2">{t('faqStillSub')}</p>
+                <div className="mt-4 flex flex-wrap gap-2.5">
+                  <a
+                    href={`https://wa.me/${SUPPORT_PHONE_TEL.replace(/[^0-9]/g, '')}`}
+                    className="btn-soft px-4 py-2.5 text-sm"
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="btn-ghost px-4 py-2.5 text-sm">
+                    <Mail size={16} /> Email
+                  </a>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Right - single-open accordion */}
+          <Reveal delay={0.08}>
+            <FaqList items={FAQS.map((f) => f[lang])} />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ─── Section 8 - final CTA ────────────────────────────────────────── */}
       <Reveal>
         <section className="mx-auto max-w-5xl px-4 pb-24 sm:px-6">
           <div className="hero-panel p-10 text-center sm:p-14">
@@ -666,7 +824,7 @@ export default function LandingPage() {
         </section>
       </Reveal>
 
-      {/* ─── Section 9 — footer ───────────────────────────────────────────── */}
+      {/* ─── Section 9 - footer ───────────────────────────────────────────── */}
       <footer className="border-t border-line bg-card">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
@@ -676,7 +834,7 @@ export default function LandingPage() {
                   த
                 </span>
                 <span className="font-heading text-sm font-semibold text-ink">
-                  TNPSC <span className="text-brand">Mentor</span>
+                  TNPSC <span className="text-brand">Mentors</span>
                 </span>
               </div>
               <p className="mt-3 font-body text-sm leading-relaxed text-ink2">{t('footerTagline')}</p>
@@ -707,15 +865,32 @@ export default function LandingPage() {
               <a href={PRIVACY_URL} className="text-ink transition hover:text-brand-dark">
                 {t('footerPrivacy')}
               </a>
+              <a href={GUIDELINES_URL} className="text-ink transition hover:text-brand-dark">
+                {t('footerGuidelines')}
+              </a>
+              <a href={PAYMENT_URL} className="text-ink transition hover:text-brand-dark">
+                {t('footerPayment')}
+              </a>
               <a href={REFUND_URL} className="text-ink transition hover:text-brand-dark">
                 {t('footerRefund')}
               </a>
             </div>
           </div>
 
-          <p className="mt-8 border-t border-line pt-6 font-body text-xs text-ink2">
-            © {2026} TNPSC Mentor · {t('footerDisclaimer')}
-          </p>
+          <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 font-body text-xs text-ink2 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {2026} TNPSC Mentors · {t('footerDisclaimer')}</p>
+            <p>
+              Collaborated with{' '}
+              <a
+                href="https://sirahdigital.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-heading font-semibold text-brand transition hover:text-brand-dark"
+              >
+                Sirah Digital
+              </a>
+            </p>
+          </div>
         </div>
       </footer>
 
@@ -751,16 +926,16 @@ function DownloadButton({
   tone?: 'onDark'
 }) {
   // On the violet hero panels the gradient button disappears, so render a solid
-  // high-contrast white pill there instead — keeps "download" the boldest thing.
+  // high-contrast white pill there instead - keeps "download" the boldest thing.
   const base =
     tone === 'onDark'
       ? 'btn bg-white text-brand-dark hover:brightness-95'
       : 'btn-brand'
   const cls = compact
-    ? `${base} px-4 py-2.5 text-sm whitespace-nowrap`
+    ? `${base} group px-4 py-2.5 text-sm whitespace-nowrap`
     : size === 'lg'
-      ? `${base} w-full px-7 py-4 text-base sm:w-auto`
-      : `${base} w-full px-6 py-3.5 text-base sm:w-auto`
+      ? `${base} group w-full px-7 py-4 text-base sm:w-auto`
+      : `${base} group w-full px-6 py-3.5 text-base sm:w-auto`
   return (
     <a
       href={APK_DOWNLOAD_URL}
@@ -768,9 +943,18 @@ function DownloadButton({
       onClick={() => trackEvent('download_click')}
       className={cls}
     >
-      <Download size={compact ? 16 : 18} />
+      {/* download icon dips down on hover, like a file landing */}
+      <Download
+        size={compact ? 16 : 18}
+        className="transition-transform duration-200 group-hover:translate-y-0.5"
+      />
       {label}
-      {!compact && <ArrowRight size={18} className="hidden sm:inline" />}
+      {!compact && (
+        <ArrowRight
+          size={18}
+          className="hidden transition-transform duration-200 group-hover:translate-x-1 sm:inline"
+        />
+      )}
     </a>
   )
 }
@@ -798,110 +982,327 @@ function Reveal({
   )
 }
 
-/** Crafted iPhone device frame (dynamic island, side buttons, soft glow) holding
- * a real-looking app screen. A product shot like top app landing pages use —
- * built from the design tokens so it matches the actual app and re-themes. */
-function PhoneMockup({ lang }: { lang: Lang }) {
+/** Single-open accordion with a numbered badge and smooth height animation.
+ * Honours prefers-reduced-motion (instant open/close). */
+function FaqList({ items }: { items: { q: string; a: string }[] }) {
+  const [open, setOpen] = useState<number | null>(0)
   const reduce = useReducedMotion()
-  const inner = (
-    <div className="relative mx-auto w-[270px] sm:w-[300px]">
-      {/* ambient glow behind the device */}
-      <div className="absolute inset-0 -z-10 scale-110 rounded-[3rem] bg-brand/30 blur-3xl" />
-      {/* bezel */}
-      <div className="relative rounded-[2.8rem] bg-[#0e0d14] p-2.5 shadow-[0_30px_60px_-15px_rgba(20,12,60,0.45)] ring-1 ring-black/20">
-        {/* screen */}
-        <div className="relative overflow-hidden rounded-[2.2rem] bg-canvas">
-          {/* dynamic island */}
-          <div className="absolute left-1/2 top-2 z-20 h-5 w-[5.5rem] -translate-x-1/2 rounded-full bg-black" />
-          <AppScreen lang={lang} />
-          {/* glass sheen */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10" />
-        </div>
-      </div>
-      {/* side buttons */}
-      <div className="absolute -left-[3px] top-28 h-14 w-[3px] rounded-l bg-[#0e0d14]" />
-      <div className="absolute -right-[3px] top-36 h-16 w-[3px] rounded-r bg-[#0e0d14]" />
+  return (
+    <div className="space-y-3">
+      {items.map((f, i) => {
+        const isOpen = open === i
+        return (
+          <div
+            key={i}
+            className={`card overflow-hidden transition-shadow duration-200 ${
+              isOpen ? 'shadow-card ring-1 ring-brand/30' : ''
+            }`}
+          >
+            <button
+              onClick={() => setOpen(isOpen ? null : i)}
+              aria-expanded={isOpen}
+              className="flex w-full items-center gap-3 px-5 py-4 text-left focus-ring"
+            >
+              <span
+                className={`grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg font-heading text-xs font-bold transition-colors ${
+                  isOpen ? 'bg-brand-gradient text-white' : 'bg-brand-soft text-brand'
+                }`}
+              >
+                {i + 1}
+              </span>
+              <span className="min-w-0 flex-1 font-heading text-[15px] font-semibold text-ink">
+                {f.q}
+              </span>
+              <ChevronDown
+                size={18}
+                className={`flex-shrink-0 transition-transform duration-200 ${
+                  isOpen ? 'rotate-180 text-brand' : 'text-ink2'
+                }`}
+              />
+            </button>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  initial={reduce ? false : { height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                  transition={{ duration: reduce ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden"
+                >
+                  <p className="px-5 pb-4 pl-[3.75rem] font-body text-[15px] leading-relaxed text-ink2">
+                    {f.a}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )
+      })}
     </div>
   )
-  if (reduce) return inner
+}
+
+/** Crafted iPhone device frame (dynamic island, side buttons, soft glow) holding
+ * a real-looking app screen. A product shot like top app landing pages use -
+ * built from the design tokens so it matches the actual app and re-themes. */
+/** Phase of the looping demo for one question. */
+type DemoPhase = 'read' | 'pick' | 'reveal'
+
+/** Scenes the hero auto-plays, like a product GIF — but coded, so it stays crisp,
+ * lightweight, theme-aware and bilingual. Each scene carries both languages so the
+ * loop alternates TA/EN (sells "fully bilingual") and reduced-motion can render the
+ * page's own language. Answers are factually correct (it's an exam-prep app). */
+const DEMO_SCENES: Array<{
+  subject: string
+  qNum: number
+  progress: number
+  demoLang: Lang
+  correct: number
+  q: Record<Lang, string>
+  options: Record<Lang, string[]>
+  expl: Record<Lang, string>
+}> = [
+  {
+    subject: 'Polity',
+    qNum: 3,
+    progress: 28,
+    demoLang: 'ta',
+    correct: 0,
+    q: { ta: 'மக்களவையை யார் கலைக்க முடியும்?', en: 'Who can dissolve the Lok Sabha?' },
+    options: {
+      ta: ['ஜனாதிபதி', 'பிரதமர்', 'சபாநாயகர்', 'தலைமை நீதிபதி'],
+      en: ['The President', 'The Prime Minister', 'The Speaker', 'The Chief Justice'],
+    },
+    expl: {
+      ta: 'சரி · server-graded · ஒவ்வொரு கேள்விக்கும் விளக்கம்.',
+      en: 'Correct · server-graded · explained every question.',
+    },
+  },
+  {
+    subject: 'History',
+    qNum: 4,
+    progress: 36,
+    demoLang: 'en',
+    correct: 0,
+    q: {
+      ta: 'வெள்ளையனே வெளியேறு இயக்கம் எந்த ஆண்டில் தொடங்கப்பட்டது?',
+      en: 'In which year was the Quit India Movement launched?',
+    },
+    options: {
+      ta: ['1942', '1930', '1919', '1947'],
+      en: ['1942', '1930', '1919', '1947'],
+    },
+    expl: {
+      ta: 'சரி · server-graded · ஒவ்வொரு கேள்விக்கும் விளக்கம்.',
+      en: 'Correct · server-graded · explained every question.',
+    },
+  },
+  {
+    subject: 'Geography',
+    qNum: 5,
+    progress: 44,
+    demoLang: 'ta',
+    correct: 0,
+    q: { ta: 'பஞ்சாபின் தலைநகரம் எது?', en: 'What is the capital of Punjab?' },
+    options: {
+      ta: ['சண்டிகர்', 'அமிர்தசரஸ்', 'லூதியானா', 'பாட்டியாலா'],
+      en: ['Chandigarh', 'Amritsar', 'Ludhiana', 'Patiala'],
+    },
+    expl: {
+      ta: 'சரி · server-graded · ஒவ்வொரு கேள்விக்கும் விளக்கம்.',
+      en: 'Correct · server-graded · explained every question.',
+    },
+  },
+]
+
+function PhoneMockup() {
+  // Drive a looping product demo: each scene plays read → tap → reveal, then
+  // advances the question; the loop also alternates TA/EN. This is the hero's
+  // autoplaying "GIF", so it runs regardless of the reduced-motion setting.
+  const [scene, setScene] = useState(0)
+  const [phase, setPhase] = useState<DemoPhase>('read')
+
+  useEffect(() => {
+    setPhase('read')
+    const toPick = window.setTimeout(() => setPhase('pick'), 1100)
+    const toReveal = window.setTimeout(() => setPhase('reveal'), 1700)
+    const toNext = window.setTimeout(() => setScene((s) => (s + 1) % DEMO_SCENES.length), 3500)
+    return () => {
+      window.clearTimeout(toPick)
+      window.clearTimeout(toReveal)
+      window.clearTimeout(toNext)
+    }
+  }, [scene])
+
+  const active = DEMO_SCENES[scene]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 24, rotate: -1 }}
       animate={{ opacity: 1, y: 0, rotate: 0 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -6, rotate: -1, scale: 1.015 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      {inner}
+      <div className="relative mx-auto w-[270px] sm:w-[300px]">
+        {/* ambient glow behind the device */}
+        <div className="absolute inset-0 -z-10 scale-110 rounded-[3rem] bg-brand/30 blur-3xl" />
+        {/* bezel */}
+        <div className="relative rounded-[2.8rem] bg-[#0e0d14] p-2.5 shadow-[0_30px_60px_-15px_rgba(20,12,60,0.45)] ring-1 ring-black/20">
+          {/* screen */}
+          <div className="relative overflow-hidden rounded-[2.2rem] bg-canvas">
+            {/* dynamic island */}
+            <div className="absolute left-1/2 top-2 z-20 h-5 w-[5.5rem] -translate-x-1/2 rounded-full bg-black" />
+            <AppScreen scene={active} lang={active.demoLang} phase={phase} sceneKey={scene} />
+            {/* glass sheen */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-transparent to-white/10" />
+          </div>
+        </div>
+        {/* side buttons */}
+        <div className="absolute -left-[3px] top-28 h-14 w-[3px] rounded-l bg-[#0e0d14]" />
+        <div className="absolute -right-[3px] top-36 h-16 w-[3px] rounded-r bg-[#0e0d14]" />
+      </div>
     </motion.div>
   )
 }
 
-/** Faux in-app screen — the signature practice/mock view with OMR options and a
- * server-graded result, rendered with the same tokens as the real app. */
-function AppScreen({ lang }: { lang: Lang }) {
-  const tt = (ta: string, en: string) => (lang === 'ta' ? ta : en)
-  const options =
-    lang === 'ta'
-      ? ['ஜனாதிபதி', 'பிரதமர்', 'சபாநாயகர்', 'தலைமை நீதிபதி']
-      : ['The President', 'The Prime Minister', 'The Speaker', 'The Chief Justice']
+/** A text node that softly fades + lifts in whenever its content/language changes —
+ * the smooth swap that makes the looping mockup feel alive. */
+function MorphText({
+  swap,
+  delay = 0,
+  className,
+  children,
+}: {
+  swap: string | number
+  delay?: number
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <motion.span
+      key={swap}
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1], delay }}
+      className={className}
+    >
+      {children}
+    </motion.span>
+  )
+}
+
+/** Faux in-app screen - the signature practice/mock view, driven by the demo phase:
+ * options sit idle, the correct one gets a "tap" press, then reveals green with the
+ * server-graded explanation; progress + question number advance per scene. */
+function AppScreen({
+  scene,
+  lang,
+  phase,
+  sceneKey,
+}: {
+  scene: (typeof DEMO_SCENES)[number]
+  lang: Lang
+  phase: DemoPhase
+  sceneKey: number
+}) {
+  const swap = `${sceneKey}-${lang}`
+  const revealed = phase === 'reveal'
+  const fill = revealed ? scene.progress : Math.max(0, scene.progress - 6)
   return (
     <div className="flex h-[564px] flex-col px-3.5 pt-9 pb-2">
       {/* app header */}
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-bold text-brand">
-          <FileText size={12} /> Polity
+          <FileText size={12} /> {scene.subject}
         </span>
-        <span className="font-heading text-[11px] font-semibold text-ink2">Q 3 / 50</span>
+        <span className="font-heading text-[11px] font-semibold text-ink2">Q {scene.qNum} / 50</span>
         <Bookmark size={15} className="text-ink2" />
       </div>
       {/* progress */}
       <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-brand-soft">
-        <div className="h-full w-[28%] rounded-full bg-brand-gradient" />
+        <div
+          className="h-full rounded-full bg-brand-gradient transition-[width] duration-700 ease-out"
+          style={{ width: `${fill}%` }}
+        />
       </div>
 
       {/* question */}
-      <p className="mt-4 font-heading text-[15px] font-bold leading-snug text-ink">
-        {tt('மக்களவையை யார் கலைக்க முடியும்?', 'Who can dissolve the Lok Sabha?')}
+      <p className="mt-4 min-h-[2.5rem] font-heading text-[15px] font-bold leading-snug text-ink">
+        <MorphText swap={`q-${swap}`} className="block">
+          {scene.q[lang]}
+        </MorphText>
       </p>
 
       {/* OMR options */}
       <div className="mt-3 space-y-2">
-        {options.map((opt, i) => {
-          const correct = i === 0
+        {scene.options[lang].map((opt, i) => {
+          const isCorrect = i === scene.correct
+          // per-option visual state across the read → pick → reveal phases
+          const state =
+            isCorrect && revealed ? 'correct' : isCorrect && phase === 'pick' ? 'pressed' : 'idle'
           return (
-            <div
-              key={opt}
+            <motion.div
+              key={i}
+              animate={{ scale: state === 'pressed' ? 0.975 : 1 }}
+              transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
               className={`flex items-center gap-2.5 rounded-xl border px-2.5 py-2 ${
-                correct
+                state === 'correct'
                   ? 'border-correct/40 bg-tint-green'
-                  : 'border-line bg-card'
+                  : state === 'pressed'
+                    ? 'border-brand/40 bg-brand-soft ring-2 ring-brand/25'
+                    : 'border-line bg-card'
               }`}
             >
               <span
                 className={`grid h-6 w-6 flex-shrink-0 place-items-center rounded-full font-heading text-[11px] font-bold ${
-                  correct ? 'bg-correct text-white' : 'bg-brand-soft text-brand'
+                  state === 'correct'
+                    ? 'bg-correct text-white'
+                    : state === 'pressed'
+                      ? 'bg-brand text-white'
+                      : 'bg-brand-soft text-brand'
                 }`}
               >
-                {correct ? <Check size={13} /> : String.fromCharCode(65 + i)}
+                {state === 'correct' ? <Check size={13} /> : String.fromCharCode(65 + i)}
               </span>
-              <span className={`font-body text-[12.5px] ${correct ? 'font-semibold text-ink' : 'text-ink2'}`}>
-                {opt}
+              <span
+                className={`font-body text-[12.5px] ${
+                  state === 'idle' ? 'text-ink2' : 'font-semibold text-ink'
+                }`}
+              >
+                <MorphText swap={`o${i}-${swap}`} delay={0.03 * (i + 1)}>
+                  {opt}
+                </MorphText>
               </span>
-            </div>
+            </motion.div>
           )
         })}
       </div>
 
-      {/* explanation / graded chip */}
-      <div className="mt-3 flex items-start gap-2 rounded-xl bg-tint-green px-2.5 py-2">
-        <ShieldCheck size={14} className="mt-0.5 flex-shrink-0 text-correct" />
-        <p className="font-body text-[11.5px] leading-snug text-ink">
-          {tt('சரி · server-graded · ஒவ்வொரு கேள்விக்கும் விளக்கம்.', 'Correct · server-graded · explained every question.')}
-        </p>
+      {/* explanation / graded chip — fades in only once the answer is revealed
+          (space is reserved so the device height never jumps). */}
+      <div className="mt-3 min-h-[2.75rem]">
+        <motion.div
+          animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 4 }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-start gap-2 rounded-xl bg-tint-green px-2.5 py-2"
+        >
+          <ShieldCheck size={14} className="mt-0.5 flex-shrink-0 text-correct" />
+          <p className="font-body text-[11.5px] leading-snug text-ink">
+            <MorphText swap={`e-${swap}`} className="block">
+              {scene.expl[lang]}
+            </MorphText>
+          </p>
+        </motion.div>
       </div>
 
       <div className="mt-auto pt-3">
-        <div className="flex items-center justify-center gap-1.5 rounded-pill bg-brand-gradient py-2.5 font-heading text-[13px] font-semibold text-white">
-          {tt('அடுத்தது', 'Next')} <ChevronRight size={15} />
+        <div
+          className={`flex items-center justify-center gap-1.5 rounded-pill py-2.5 font-heading text-[13px] font-semibold transition-colors duration-300 ${
+            revealed ? 'bg-brand-gradient text-white' : 'bg-brand-soft text-brand/60'
+          }`}
+        >
+          <MorphText swap={`n-${swap}`}>{lang === 'ta' ? 'அடுத்தது' : 'Next'}</MorphText>
+          <ChevronRight size={15} />
         </div>
         {/* bottom nav */}
         <div className="mt-3 flex items-center justify-around border-t border-line pt-2.5">

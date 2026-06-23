@@ -10,7 +10,7 @@ import type { AnswerLetter, Category } from '../types'
 
 export const CATEGORIES: Category[] = ['pyq', 'samacheer', 'current_affairs', 'aptitude', 'outer']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
-// A–D are required on every row; E is optional (only the 5-option analogy bank
+// A-D are required on every row; E is optional (only the 5-option analogy bank
 // uses it). REQUIRED_LETTERS drives the "option is empty" check; ALL_LETTERS
 // drives correct-answer validation and per-option why_wrong assembly.
 const REQUIRED_LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D']

@@ -1,4 +1,4 @@
-# Deploying TNPSC Mentor to Hostinger
+# Deploying TNPSC Mentors to Hostinger
 
 The backend (Supabase Cloud) is already live, so deployment = uploading the
 static frontend build. The build is in **`dist/`** and is also zipped as

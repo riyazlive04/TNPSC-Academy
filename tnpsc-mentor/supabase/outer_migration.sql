@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — "Outer" question bank support
+-- TNPSC Mentors — "Outer" question bank support
 -- ----------------------------------------------------------------------------
 -- The subject question banks (schema/*.json) carry "Type": "outer" and a
 -- subject-level category (botany, chemistry, …). We model these as a new

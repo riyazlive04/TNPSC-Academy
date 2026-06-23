@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
-import { config, isAllowedOrigin, googleEnabled } from '../config.js'
+import { config, isAllowedOrigin, googleEnabled, msg91Enabled } from '../config.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import {
   registerLoginSession,
@@ -15,6 +15,8 @@ import {
   sessionIdFromToken,
   type DeviceSession,
 } from '../sessions.js'
+import { normalizeMobile, sendOtp, verifyOtp } from '../lib/msg91.js'
+import { issueOtpTicket, verifyOtpTicket } from '../lib/otpTicket.js'
 
 const router = Router()
 
@@ -115,6 +117,40 @@ const tokenLimiter = rateLimit({
   legacyHeaders: false,
   validate: false,
   message: { error: 'Too many requests. Please slow down.' },
+})
+
+/** Key OTP limits on the targeted phone + client IP — same rationale as
+ * emailIpKey: throttle hammering ONE number across IPs and one IP fanning out
+ * across numbers. */
+function phoneIpKey(req: Request): string {
+  const phone =
+    typeof req.body?.phone === 'string' ? normalizeMobile(req.body.phone) : ''
+  return `${phone}|${req.ip}`
+}
+
+/** OTP sends per phone+IP. Every send costs an SMS and risks inbox spam, so this
+ * is tight — counts success and failure alike. */
+const otpSendLimiter = rateLimit({
+  windowMs: 30 * 60_000,
+  max: 5,
+  keyGenerator: phoneIpKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many OTP requests. Please wait a while and try again.' },
+})
+
+/** OTP verification attempts per phone+IP — bounds code-guessing. Successful
+ * verifications are skipped so a real user is never locked out by signing in. */
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 10,
+  keyGenerator: phoneIpKey,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many attempts. Please request a new code.' },
 })
 
 /** Device list for the PRE-AUTH device-limit screen. Strips the raw device_id —
@@ -525,6 +561,176 @@ router.post(
     if (!id) return res.status(400).json({ error: 'Session id required' })
     await revokeSessionById(req.userId!, id)
     res.json({ ok: true })
+  })
+)
+
+// ─── Phone-OTP login (alternate to email/password) ───────────────────────────
+// Identity stays in Supabase: a phone-OTP login proves the user owns the number
+// on their profile, then we mint the SAME GoTrue session the password flow
+// returns (via an admin magic-link token), so the device cap, refresh cookie and
+// every downstream RLS rule behave identically. MSG91 owns the OTP itself.
+
+/**
+ * Resolve the single account that owns a phone number. Matches the bare 10-digit
+ * form plus the +91/91/0 variants the signup form accepts, so rows stored in any
+ * of those shapes still resolve. Returns the AUTH email (the magic-link source of
+ * truth), not profiles.email which can be stale/empty.
+ */
+async function findUserByPhone(
+  tenDigit: string
+): Promise<{ userId: string; email: string } | { error: 'not_found' | 'ambiguous' }> {
+  const variants = [tenDigit, `+91${tenDigit}`, `91${tenDigit}`, `0${tenDigit}`]
+  const { data } = await supabaseAdmin.from('profiles').select('id').in('phone', variants)
+  if (!data || data.length === 0) return { error: 'not_found' }
+  // More than one account on a number is ambiguous — we can't safely pick one, so
+  // fall back to email sign-in rather than guess.
+  if (data.length > 1) return { error: 'ambiguous' }
+  const userId = data[0].id as string
+  const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(userId)
+  const email = userRes?.user?.email ?? ''
+  if (!email) return { error: 'not_found' }
+  return { userId, email }
+}
+
+/**
+ * Mint a real GoTrue session for an existing user WITHOUT a password: generate a
+ * magic-link token server-side (admin.generateLink does NOT email anything) and
+ * immediately exchange it for a session. Caller must have already proven identity
+ * (a verified OTP, or a valid OTP ticket). Returns null on any failure.
+ */
+async function mintSessionForEmail(email: string) {
+  const { data: link, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+    type: 'magiclink',
+    email,
+  })
+  const hashed = link?.properties?.hashed_token
+  if (linkErr || !hashed) return null
+  const { data: verified, error: verErr } = await supabaseAuthClient.auth.verifyOtp({
+    type: 'magiclink',
+    token_hash: hashed,
+  })
+  if (verErr || !verified.session) return null
+  return verified.session
+}
+
+// ─── POST /api/auth/otp/send ─────────────────────────────────────────────────
+// Send a login code — but ONLY to a number that already owns an account. That
+// gives the user a clear "no account" signal AND stops the endpoint being abused
+// to spray SMS at arbitrary numbers (each send costs money).
+router.post(
+  '/otp/send',
+  otpSendLimiter,
+  asyncH(async (req, res) => {
+    if (!msg91Enabled) return res.status(503).json({ error: 'Phone sign-in is not configured' })
+    const phone = normalizeMobile(typeof req.body?.phone === 'string' ? req.body.phone : '')
+    if (!phone) return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
+
+    const found = await findUserByPhone(phone)
+    if ('error' in found) {
+      if (found.error === 'ambiguous') {
+        return res.status(409).json({
+          error: 'This number is linked to more than one account. Please sign in with email.',
+        })
+      }
+      // Distinct code so the UI can nudge the user to sign up / use email.
+      return res.status(404).json({ error: 'phone_not_registered' })
+    }
+    const result = await sendOtp(phone)
+    if (!result.ok) {
+      console.error('[otp/send] MSG91 send failed', phone, result.message)
+      return res.status(502).json({ error: 'Could not send the code right now. Please try again.' })
+    }
+    res.json({ ok: true })
+  })
+)
+
+// ─── POST /api/auth/otp/verify ───────────────────────────────────────────────
+// Verify the code with MSG91, mint the session, enforce the 2-device limit. On a
+// device-limit block we return a short-lived ticket so the client can replace a
+// device without re-sending the (now-spent) OTP.
+router.post(
+  '/otp/verify',
+  otpVerifyLimiter,
+  asyncH(async (req, res) => {
+    if (!msg91Enabled) return res.status(503).json({ error: 'Phone sign-in is not configured' })
+    const phone = normalizeMobile(typeof req.body?.phone === 'string' ? req.body.phone : '')
+    const otp = typeof req.body?.otp === 'string' ? req.body.otp.trim() : ''
+    if (!phone || !otp) return res.status(400).json({ error: 'Phone and code are required' })
+
+    const found = await findUserByPhone(phone)
+    if ('error' in found) return res.status(404).json({ error: 'phone_not_registered' })
+
+    const check = await verifyOtp(phone, otp)
+    if (!check.ok) return res.status(401).json({ error: 'Invalid or expired code' })
+
+    const session = await mintSessionForEmail(found.email)
+    if (!session) {
+      console.error('[otp/verify] session mint failed', found.userId)
+      return res.status(500).json({ error: 'Could not complete sign in. Please try again.' })
+    }
+
+    const { blocked } = await registerLoginSession(
+      session.user.id,
+      deviceKey(session.access_token, req),
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = publicDevices(await listSessions(session.user.id))
+      // Ticket lets /otp/replace-device finish without a fresh OTP (already spent).
+      return res
+        .status(403)
+        .json({ error: 'device_limit', devices, ticket: issueOtpTicket(session.user.id) })
+    }
+    setRtCookie(res, session.refresh_token)
+    res.json(await sessionPayload(session))
+  })
+)
+
+// ─── POST /api/auth/otp/replace-device ───────────────────────────────────────
+// Reached after an OTP-login device_limit block: the user chose a device to sign
+// out. We trust the short-lived ticket (proof the OTP just succeeded) instead of
+// a fresh code, revoke the chosen session, then claim this device's slot.
+router.post(
+  '/otp/replace-device',
+  otpVerifyLimiter,
+  asyncH(async (req, res) => {
+    if (!msg91Enabled) return res.status(503).json({ error: 'Phone sign-in is not configured' })
+    const ticket = typeof req.body?.ticket === 'string' ? req.body.ticket : ''
+    const sessionId = typeof req.body?.session_id === 'string' ? req.body.session_id : ''
+    if (!ticket || !sessionId) {
+      return res.status(400).json({ error: 'Missing ticket or session_id' })
+    }
+    const userId = verifyOtpTicket(ticket)
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ error: 'Your sign-in window expired. Please request a new code.' })
+    }
+    const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const email = userRes?.user?.email
+    if (!email) return res.status(404).json({ error: 'Account not found' })
+
+    // revokeSessionById is scoped to userId, so a forged session_id is a no-op.
+    await revokeSessionById(userId, sessionId)
+    const session = await mintSessionForEmail(email)
+    if (!session) {
+      return res.status(500).json({ error: 'Could not complete sign in. Please try again.' })
+    }
+    const { blocked } = await registerLoginSession(
+      session.user.id,
+      deviceKey(session.access_token, req),
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = publicDevices(await listSessions(session.user.id))
+      return res
+        .status(403)
+        .json({ error: 'device_limit', devices, ticket: issueOtpTicket(session.user.id) })
+    }
+    setRtCookie(res, session.refresh_token)
+    res.json(await sessionPayload(session))
   })
 )
 

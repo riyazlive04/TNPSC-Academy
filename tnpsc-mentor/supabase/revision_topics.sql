@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Topic Revision (study-gate + similar-question re-tests)
+-- TNPSC Mentors — Topic Revision (study-gate + similar-question re-tests)
 -- ----------------------------------------------------------------------------
 -- A topic-level revision layer that sits ON TOP of the per-question SRS deck
 -- (review_items). When a learner finishes a topic test below the pass mark, the

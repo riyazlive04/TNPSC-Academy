@@ -22,7 +22,6 @@ const BONUS_KEYS = [
   'premiumBonus2',
   'premiumBonus3',
   'premiumBonus4',
-  'premiumBonus5',
 ] as const
 
 /** A valid, applied coupon (the success branch of CouponValidation). */
@@ -38,7 +37,7 @@ function rupees(paise: number): string {
  * Premium upsell card. Shows the struck MRP and the flat 3-month price, lets a
  * customer apply a promoter coupon (validated server-side), and runs the Razorpay
  * checkout (tagged `plan: premium_annual` so the ledger records *what* was bought
- * — the final price is always recomputed on the server from the coupon).
+ * - the final price is always recomputed on the server from the coupon).
  */
 export default function PremiumCard({
   className = '',
@@ -54,7 +53,7 @@ export default function PremiumCard({
   const { premium, loaded, refresh, markPremium } = usePremiumStore()
 
   // In-memory dismissal: closing hides the card for the current view only. It is
-  // intentionally NOT persisted — a page reload remounts this component and the
+  // intentionally NOT persisted - a page reload remounts this component and the
   // upsell shows again.
   const [dismissed, setDismissed] = useState(false)
   const dismiss = () => setDismissed(true)
@@ -65,7 +64,7 @@ export default function PremiumCard({
   const [applied, setApplied] = useState<AppliedCoupon | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
 
-  // Check entitlement once on mount (the store dedupes — only the first card to
+  // Check entitlement once on mount (the store dedupes - only the first card to
   // mount triggers the request; subsequent reads are instant from the store).
   useEffect(() => {
     if (!loaded) refresh()
@@ -106,7 +105,7 @@ export default function PremiumCard({
       const result = await startCheckout({
         amount: PREMIUM_PRICE_PAISE,
         profile,
-        description: 'TNPSC Mentor Premium — 3 months',
+        description: 'TNPSC Mentors Premium - 3 months',
         notes: { plan: 'premium_annual' },
         couponCode: applied?.code,
       })
@@ -133,7 +132,7 @@ export default function PremiumCard({
     <div
       className={`card relative overflow-hidden p-6 pl-7 ${className}`}
     >
-      {/* Coral accent stripe — premium gets its own identity, distinct from the
+      {/* Coral accent stripe - premium gets its own identity, distinct from the
           violet app chrome, without another heavy gradient panel. */}
       <span className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-accentwarm" />
 
@@ -170,7 +169,7 @@ export default function PremiumCard({
             ))}
           </ul>
 
-          {/* Bonus benefits — a distinct extras block under the core perks. */}
+          {/* Bonus benefits - a distinct extras block under the core perks. */}
           <div className="mt-4 rounded-field border border-accentwarm/25 bg-accentwarmsoft/60 p-3">
             <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-accentwarm">
               <Gift size={13} /> {t('premiumBonusTitle')}

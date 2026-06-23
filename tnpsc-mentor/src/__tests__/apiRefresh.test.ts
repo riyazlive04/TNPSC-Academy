@@ -29,7 +29,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('api request() — single-flight refresh', () => {
+describe('api request() - single-flight refresh', () => {
   it('coalesces N concurrent 401s into exactly ONE refresh call, then retries', async () => {
     let refreshCalls = 0
     const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
@@ -49,7 +49,7 @@ describe('api request() — single-flight refresh', () => {
     })
     vi.stubGlobal('fetch', fetchMock)
 
-    // Fire several auth'd calls at once — all hit the same in-flight refresh.
+    // Fire several auth'd calls at once - all hit the same in-flight refresh.
     const results = await Promise.all([
       api.reviewCount(),
       api.reviewCount(),

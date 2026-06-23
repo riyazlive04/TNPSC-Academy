@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — "don't show the same question twice" (per-user seen ledger)
+-- TNPSC Mentors — "don't show the same question twice" (per-user seen ledger)
 -- ----------------------------------------------------------------------------
 -- Every question served to a learner (practice quiz, subject/group mock, or a
 -- revision re-test) is recorded here. The question-sampling RPCs then order

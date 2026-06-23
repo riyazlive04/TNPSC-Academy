@@ -319,7 +319,7 @@ export default function AdminQuestionsPage() {
                           : 'text-ink2/50 hover:bg-ink/5 hover:text-ink2',
                       ].join(' ')}
                       aria-label={isActive ? 'Disable (hide from students)' : 'Enable (show to students)'}
-                      title={isActive ? 'Shown to students — click to hide' : 'Hidden from students — click to show'}
+                      title={isActive ? 'Shown to students - click to hide' : 'Hidden from students - click to show'}
                     >
                       {togglingId === q.id ? (
                         <Loader2 size={16} className="animate-spin" />
@@ -395,7 +395,7 @@ export default function AdminQuestionsPage() {
                     {q.difficulty && <Tag>{q.difficulty}</Tag>}
                     {q.topic && <Tag>{q.topic}</Tag>}
                     {q.year && <Tag>{q.year}</Tag>}
-                    {/* Provenance marker — admin/superadmin only (never sent to students). */}
+                    {/* Provenance marker - admin/superadmin only (never sent to students). */}
                     {q.source_tag && (
                       <span className="inline-flex items-center rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary">
                         {q.source_tag}

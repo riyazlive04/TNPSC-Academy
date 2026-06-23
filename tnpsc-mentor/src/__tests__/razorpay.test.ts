@@ -10,7 +10,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('startCheckout — free (100% coupon) branch', () => {
+describe('startCheckout - free (100% coupon) branch', () => {
   it('short-circuits to status "paid" when the order is free (no SDK needed)', async () => {
     const orderSpy = vi
       .spyOn(api.payments, 'createOrder')

@@ -1,13 +1,13 @@
-# Terms and Conditions — TNPSC Mentor
+# Terms and Conditions — TNPSC Mentors
 
 **Last updated:** 19 June 2026
 
-> **Important:** This is a drafting template grounded in how the TNPSC Mentor
+> **Important:** This is a drafting template grounded in how the TNPSC Mentors
 > application actually works. It is **not legal advice**. Have it reviewed by a
 > qualified advocate before you publish it, and fill in every value marked `[…]`.
 
 These Terms and Conditions ("**Terms**") govern your access to and use of the
-**TNPSC Mentor** mobile/web application, website and related services
+**TNPSC Mentors** mobile/web application, website and related services
 (together, the "**Service**"), operated by **[Legal entity name, e.g. Sirah
 Digital]** ("**we**", "**us**", "**our**"), having its registered office at
 **[registered address]**.
@@ -43,7 +43,7 @@ of India.
 
 ## 3. Independence — No Affiliation with TNPSC or Government
 
-3.1 **TNPSC Mentor is an independent, private exam-preparation platform. It is
+3.1 **TNPSC Mentors is an independent, private exam-preparation platform. It is
 NOT affiliated with, endorsed by, sponsored by, or connected to the Tamil Nadu
 Public Service Commission (TNPSC), the Government of Tamil Nadu, the Government
 of India, or any official examination authority.**
@@ -113,12 +113,13 @@ limits and expiry, are non-transferable, have no cash value, and may be
 withdrawn at any time. We are the final authority on the validity of a code and
 the final price.
 
-6.6 **Refunds.** `[State your refund policy clearly — required for compliance.]`
-For example: *Premium grants immediate access to digital content and is
-generally non-refundable once activated, except where required by applicable
-law or in case of a duplicate/failed-but-charged transaction, which will be
-reviewed and refunded to the original payment method within `[X]` business
-days.* Refund requests: **[support@sirahdigital.in]**.
+6.6 **Refunds.** Premium grants immediate access to digital content. You may
+request a refund within **48 hours** of the purchase (payment) time; eligible
+requests are refunded in full to the original payment method. After this
+48-hour window the purchase is non-refundable, except where required by
+applicable law or in the case of a duplicate or failed-but-charged
+transaction. Approved refunds are processed to the original payment method
+within **5–7 business days**. Refund requests: **support@sirahdigital.in**.
 
 6.7 **Failed/disputed payments.** We may suspend Premium if a payment is
 reversed, charged back or found fraudulent.

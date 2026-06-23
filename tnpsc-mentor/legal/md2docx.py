@@ -1,4 +1,4 @@
-"""Minimal Markdown -> .docx converter for the TNPSC Mentor legal docs.
+"""Minimal Markdown -> .docx converter for the TNPSC Mentors legal docs.
 
 Handles: # / ## / ### headings, blockquotes (>), bullet lists (-),
 horizontal rules (---), and inline **bold**, `code`, and [text](url) links.

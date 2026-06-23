@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Superadmin: revoke a user's payment / premium entitlement
+-- TNPSC Mentors — Superadmin: revoke a user's payment / premium entitlement
 -- ----------------------------------------------------------------------------
 -- Run AFTER payments.sql + superadmin.sql. Adds a 'revoked' payment status,
 -- surfaces each user's premium state in the superadmin user list, and adds a

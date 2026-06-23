@@ -14,7 +14,7 @@ import { useT } from '../../lib/i18n'
 /**
  * The Thirukkural popup. Opened from the dashboard "Thirukkural" link. A single
  * box that holds BOTH views: a searchable, paal-filtered, chapter-grouped list,
- * and — once a kural is tapped — its full detail (couplet, transliteration,
+ * and - once a kural is tapped - its full detail (couplet, transliteration,
  * translations, classical Tamil commentaries) with prev/next. Back returns to
  * the list; Escape backs out one level then closes. All content follows the
  * chosen language (Tamil / English / bilingual).
@@ -242,7 +242,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
 
   return (
     <dl className="divide-y divide-line">
-      {/* KURAL — Tamil verse and/or romanised verse */}
+      {/* KURAL - Tamil verse and/or romanised verse */}
       <DetailRow label={ta ? 'குறள்' : 'Kural'} labelTamil={ta}>
         {showTa && (
           <p className="tamil font-display text-[17px] font-bold leading-relaxed text-ink sm:text-[19px]">
@@ -281,7 +281,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
         <BiValue ta={k.adhigaram_ta} en={k.adhigaram_en} lang={lang} />
       </DetailRow>
 
-      {/* பொருள் — Kalaignar's Tamil explanation (ta/both) */}
+      {/* பொருள் - Kalaignar's Tamil explanation (ta/both) */}
       {showTa && (
         <DetailRow label="பொருள்" labelTamil>
           <p className="tamil font-body text-[15px] leading-relaxed text-ink">
@@ -290,7 +290,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
         </DetailRow>
       )}
 
-      {/* Meaning — English (en/both) */}
+      {/* Meaning - English (en/both) */}
       {showEn && (
         <DetailRow label="Meaning">
           <p className="font-body text-[15px] leading-relaxed text-muted">{k.explanation_en}</p>

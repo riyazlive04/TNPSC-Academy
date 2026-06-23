@@ -105,7 +105,7 @@ export default function RegisterPage() {
       return
     }
 
-    // Brand-new account — arm the first-run guided tour so it fires once when the
+    // Brand-new account - arm the first-run guided tour so it fires once when the
     // user first reaches the dashboard (now, or after email confirmation).
     useOnboardingStore.getState().arm()
 

@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Fix the false "logged in on another device" lock-out
+-- TNPSC Mentors — Fix the false "logged in on another device" lock-out
 -- ----------------------------------------------------------------------------
 -- The device cap bound to the GoTrue session_id, which is minted fresh on EVERY
 -- login. A user who closed the tab without signing out (or whose refresh chain

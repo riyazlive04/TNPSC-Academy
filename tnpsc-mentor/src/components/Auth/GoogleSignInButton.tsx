@@ -5,13 +5,14 @@ import { useAuth } from '../../hooks/useAuth'
 import { postAuthDestination } from '../../lib/authRouting'
 import { useT } from '../../lib/i18n'
 import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
+import { useThemeStore } from '../../store/themeStore'
 
 // Public OAuth Web Client ID (safe to ship to the browser). When unset the
 // component renders nothing, so the rest of auth works without Google.
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GSI_SRC = 'https://accounts.google.com/gsi/client'
 
-/** True when a Google Client ID is configured — host pages use this to hide the
+/** True when a Google Client ID is configured - host pages use this to hide the
  * "or" divider too, so it never appears stranded above an absent button. */
 export const isGoogleConfigured = Boolean(CLIENT_ID)
 
@@ -74,9 +75,15 @@ export default function GoogleSignInButton({
   const navigate = useNavigate()
   const { signInWithGoogle } = useAuth()
   const { t } = useT()
+  // Re-render Google's widget with its dark variant when the app is in dark mode,
+  // otherwise the official button stays glaring white on a dark surface.
+  const resolved = useThemeStore((s) => s.resolved)
+  const resolvedRef = useRef(resolved)
+  resolvedRef.current = resolved
+  const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
   // Drives a full-screen overlay while the ID token is exchanged for a session
-  // and the next page loads — without it the page looks frozen ("lag") between
+  // and the next page loads - without it the page looks frozen ("lag") between
   // picking the Google account and the profile/onboarding screen appearing.
   const [busy, setBusy] = useState(false)
 
@@ -113,7 +120,7 @@ export default function GoogleSignInButton({
       setBusy(true)
       const idToken = await nativeGoogleIdToken()
       if (!idToken) {
-        // Picker succeeded but Google returned no ID token — surface it instead
+        // Picker succeeded but Google returned no ID token - surface it instead
         // of silently dropping back to the login screen.
         setBusy(false)
         // TODO i18n: diagnostic (OAuth misconfig) message; no key in
@@ -135,21 +142,25 @@ export default function GoogleSignInButton({
     if (!CLIENT_ID || isNativeApp()) return
     let cancelled = false
     let ro: ResizeObserver | undefined
-    // GIS only takes a fixed pixel width — a hardcoded one overflows narrow
-    // phones. Size it to the container instead (clamped to GIS's 200–400 range)
+    // GIS only takes a fixed pixel width - a hardcoded one overflows narrow
+    // phones. Size it to the container instead (clamped to GIS's 200-400 range)
     // and re-render on resize so it stays inside the card. The width guard stops
     // the ResizeObserver from looping on the button's own height changes.
     let lastWidth = 0
+    let lastTheme = ''
     const renderButton = () => {
       const el = containerRef.current
       if (!el || !window.google) return
       const avail = Math.floor(el.clientWidth || 300)
       const width = Math.min(400, Math.max(200, avail))
-      if (Math.abs(width - lastWidth) < 2) return
+      // Google's GIS themes: 'outline' (light) / 'filled_black' (dark surface).
+      const theme = resolvedRef.current === 'dark' ? 'filled_black' : 'outline'
+      if (Math.abs(width - lastWidth) < 2 && theme === lastTheme) return
       lastWidth = width
+      lastTheme = theme
       el.innerHTML = ''
       window.google.accounts.id.renderButton(el, {
-        theme: 'outline',
+        theme,
         size: 'large',
         width,
         text,
@@ -157,6 +168,7 @@ export default function GoogleSignInButton({
         logo_alignment: 'center',
       })
     }
+    renderRef.current = renderButton
     loadGsi()
       .then(() => {
         if (cancelled || !window.google || !containerRef.current) return
@@ -178,6 +190,11 @@ export default function GoogleSignInButton({
     // Mount-once: deps are read via refs so the widget isn't re-created per render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Re-render Google's widget when the theme flips so its variant matches.
+  useEffect(() => {
+    renderRef.current()
+  }, [resolved])
 
   if (!CLIENT_ID) return null
 

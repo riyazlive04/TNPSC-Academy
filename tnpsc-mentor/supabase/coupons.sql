@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Promoter / affiliate coupon codes
+-- TNPSC Mentors — Promoter / affiliate coupon codes
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql + payments.sql. A coupon belongs to a named promoter and
 -- gives a flat-₹ or percentage discount at Razorpay checkout. The SAME code is

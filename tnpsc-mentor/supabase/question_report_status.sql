@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Admin triage surface for student question reports
+-- TNPSC Mentors — Admin triage surface for student question reports
 -- ----------------------------------------------------------------------------
 -- Run AFTER question_reports.sql + superadmin.sql. Students write to
 -- `question_reports` (one row per user per question — see question_reports.sql).

@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — widen aptitude_type for the GOV bank
+-- TNPSC Mentors — widen aptitude_type for the GOV bank
 -- ----------------------------------------------------------------------------
 -- The GOV (TNPSC Group I Mains) aptitude bank adds two question families beyond
 -- numerics/reasoning: 'data_interpretation' and 'general_studies'. Widen the

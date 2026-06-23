@@ -1,4 +1,4 @@
-# TNPSC Mentor — Security Audit
+# TNPSC Mentors — Security Audit
 
 _Date: 2026-06-21 · Scope: Express API (`server/`), React/Capacitor client (`src/`),
 Supabase SQL (`supabase/`), payments, secrets, dependencies._

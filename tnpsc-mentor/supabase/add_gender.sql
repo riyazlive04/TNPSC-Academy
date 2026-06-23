@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — add `gender` to profiles
+-- TNPSC Mentors — add `gender` to profiles
 -- ----------------------------------------------------------------------------
 -- Collected at onboarding and shown on the profile. Nullable (existing users
 -- and opt-outs); constrained to a small known set. Idempotent.

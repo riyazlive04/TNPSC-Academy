@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Revenue / founder metrics (superadmin console)
+-- TNPSC Mentors — Revenue / founder metrics (superadmin console)
 -- ----------------------------------------------------------------------------
 -- Run AFTER payments.sql + coupons.sql + superadmin.sql. One jsonb payload for
 -- the Revenue tab, computed straight off the trusted `payments` ledger (only
