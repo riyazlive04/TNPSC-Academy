@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 // ─── IconTile ───────────────────────────────────────────────────────────────
-// The small pastel tile that sits at the *start of a row* — never a large
+// The small pastel tile that sits at the *start of a row* - never a large
 // category card (design-system.md: tints are ≈38px icon tiles inside rows). Each
 // tint pairs a soft background with its matching strong icon colour.
 

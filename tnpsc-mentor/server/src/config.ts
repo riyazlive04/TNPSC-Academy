@@ -67,6 +67,19 @@ export const config = {
   vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? '',
   vapidPrivateKey: process.env.VAPID_PRIVATE_KEY ?? '',
   vapidSubject: process.env.VAPID_SUBJECT ?? 'mailto:support@sirahdigital.in',
+  // ─── MSG91 phone-OTP login (optional) ──────────────────────────────────────
+  // Server-side OTP via MSG91's OTP API: the backend asks MSG91 to send + verify
+  // the code; MSG91 owns code generation/expiry and the DLT-registered template.
+  // When AUTH_KEY or TEMPLATE_ID is unset the OTP endpoints return 503 and the
+  // frontend hides the "Sign in with phone" tab. The auth key is server-only.
+  msg91AuthKey: process.env.MSG91_AUTH_KEY ?? '',
+  msg91OtpTemplateId: process.env.MSG91_OTP_TEMPLATE_ID ?? '',
+  // Optional approved DLT sender id; MSG91 falls back to the template's sender
+  // when unset.
+  msg91SenderId: process.env.MSG91_SENDER_ID ?? '',
+  // Country code prefixed to the 10-digit Indian mobile before calling MSG91,
+  // which wants the full international number with no leading '+'.
+  msg91CountryCode: process.env.MSG91_COUNTRY_CODE ?? '91',
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -77,3 +90,6 @@ export const googleEnabled = Boolean(config.googleClientId)
 
 /** True when VAPID keys are present — gates Web Push (in-app feed works regardless). */
 export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateKey)
+
+/** True when MSG91 OTP credentials are present — gates phone-OTP login. */
+export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTemplateId)

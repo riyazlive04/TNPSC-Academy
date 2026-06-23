@@ -56,7 +56,7 @@ export default function AuthShell({ children }: AuthShellProps) {
             <span className="grid h-11 w-11 place-items-center rounded-tile bg-white/15 text-lg font-semibold ring-1 ring-white/20">
               த
             </span>
-            <span className="font-heading text-lg font-semibold tracking-tight">TNPSC Mentor</span>
+            <span className="font-heading text-lg font-semibold tracking-tight">TNPSC Mentors</span>
           </div>
         </div>
         <div className="relative max-w-sm animate-slideUp">
@@ -87,7 +87,7 @@ export default function AuthShell({ children }: AuthShellProps) {
               த
             </span>
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
-              TNPSC Mentor
+              TNPSC Mentors
             </h1>
           </div>
           {children}

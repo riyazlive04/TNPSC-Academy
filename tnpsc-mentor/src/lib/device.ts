@@ -7,7 +7,7 @@ const KEY = 'tnpsc:device_id'
 
 // Cache the id for the lifetime of the page. When localStorage is unavailable
 // (private mode / blocked storage) BOTH reads and writes throw, so without this
-// cache every call would mint a fresh UUID — tripping the 2-device login cap and
+// cache every call would mint a fresh UUID - tripping the 2-device login cap and
 // locking the user out. The cache keeps one stable id per session regardless.
 let cachedId = ''
 
@@ -18,7 +18,7 @@ export function getDeviceId(): string {
   try {
     id = localStorage.getItem(KEY) ?? ''
   } catch {
-    /* storage blocked — fall through to a volatile id */
+    /* storage blocked - fall through to a volatile id */
   }
   if (!id) {
     id =
@@ -28,7 +28,7 @@ export function getDeviceId(): string {
     try {
       localStorage.setItem(KEY, id)
     } catch {
-      /* ignore — the module-level cache keeps it stable for this session */
+      /* ignore - the module-level cache keeps it stable for this session */
     }
   }
   cachedId = id

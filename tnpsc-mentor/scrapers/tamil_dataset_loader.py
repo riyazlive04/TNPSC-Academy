@@ -2,7 +2,7 @@
 Loads real Tamil TNPSC MCQs from the Hugging Face dataset
 `snegha24/Tamil_tnpscExam` (516 previous-year questions, Tamil text + 4 Tamil
 options + answer index). No OCR/translation — these are genuine Tamil exam
-questions pulled straight from past papers.
+questions pulled straight from Previous year question paper.
 
 Fetched via the HF datasets-server REST API (no `datasets`/`pyarrow` install
 needed). Mapped into our `questions` schema as Tamil-language PYQ rows:

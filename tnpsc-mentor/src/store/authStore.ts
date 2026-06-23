@@ -4,12 +4,15 @@ import { useLanguageStore } from './languageStore'
 import type { Profile, UserRole } from '../types'
 
 /** Result of a sign-in attempt. `deviceLimit` means the account is already on
- * the max number of devices — `devices` carries them so the UI can offer to
+ * the max number of devices - `devices` carries them so the UI can offer to
  * sign one out. */
 export interface SignInResult {
   error: string | null
   deviceLimit?: boolean
   devices?: DeviceSession[]
+  /** Present only on an OTP-login device-limit block — proves the just-verified
+   * OTP so the device replace can finish without a fresh code. */
+  ticket?: string
 }
 
 /** Pull the device list off a `device_limit` 403, or null if it's a different error. */
@@ -22,6 +25,15 @@ function deviceLimitFrom(e: unknown): DeviceSession[] | null {
     return ((e.data as { devices?: DeviceSession[] }).devices ?? []) as DeviceSession[]
   }
   return null
+}
+
+/** Pull the OTP replace-ticket off a `device_limit` 403, if the server sent one. */
+function otpTicketFrom(e: unknown): string | undefined {
+  if (e instanceof ApiError && e.status === 403) {
+    const t = (e.data as { ticket?: string })?.ticket
+    return typeof t === 'string' ? t : undefined
+  }
+  return undefined
 }
 
 /** Adopt the account's saved language so the preference follows the user across
@@ -51,6 +63,13 @@ export interface AuthState {
   signInWithGoogle: (idToken: string) => Promise<SignInResult>
   /** Sign out one existing device (by session id) and sign in here. */
   replaceDevice: (email: string, password: string, sessionId: string) => Promise<SignInResult>
+  /** Phone-OTP: request a code for a registered number. `notRegistered` flags a
+   * number with no account so the UI can point the user to sign up. */
+  sendOtp: (phone: string) => Promise<{ error: string | null; notRegistered?: boolean }>
+  /** Phone-OTP: verify the code and sign in. */
+  verifyOtp: (phone: string, otp: string) => Promise<SignInResult>
+  /** Phone-OTP: after a device-limit block, sign out a device and finish via ticket. */
+  replaceDeviceOtp: (ticket: string, sessionId: string) => Promise<SignInResult>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -77,7 +96,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (get().initialized) return
     set({ initialized: true })
     // Boot if we have an access token OR (on web) a possible HttpOnly refresh
-    // cookie — api.auth.me() triggers a transparent cookie-based refresh when the
+    // cookie - api.auth.me() triggers a transparent cookie-based refresh when the
     // access token is absent/expired, so a returning web user stays signed in
     // without the refresh token ever being readable by JS.
     if (!isApiConfigured || (!tokens.access && !canTryRefresh())) {
@@ -142,6 +161,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
+  sendOtp: async (phone) => {
+    try {
+      await api.auth.otpSend(phone)
+      return { error: null }
+    } catch (e) {
+      if (
+        e instanceof ApiError &&
+        e.status === 404 &&
+        (e.data as { error?: string })?.error === 'phone_not_registered'
+      ) {
+        return { error: null, notRegistered: true }
+      }
+      return { error: e instanceof Error ? e.message : 'Could not send code' }
+    }
+  },
+
+  verifyOtp: async (phone, otp) => {
+    try {
+      const { user, profile } = await api.auth.otpVerify(phone, otp)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices, ticket: otpTicketFrom(e) }
+      return { error: e instanceof Error ? e.message : 'Sign in failed' }
+    }
+  },
+
+  replaceDeviceOtp: async (ticket, sessionId) => {
+    try {
+      const { user, profile } = await api.auth.otpReplaceDevice(ticket, sessionId)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices, ticket: otpTicketFrom(e) }
+      return { error: e instanceof Error ? e.message : 'Could not switch device' }
+    }
+  },
+
   signUp: async (params) => {
     try {
       const res = await api.auth.register({ ...params, email: params.email.trim() })
@@ -191,7 +252,7 @@ export function selectIsSuperAdmin(s: AuthState): boolean {
   return s.profile?.role === 'superadmin'
 }
 
-// A Google signup arrives with only name/email — no phone. Such aspirants are
+// A Google signup arrives with only name/email - no phone. Such aspirants are
 // routed through /complete-profile until phone is filled. (Target group is no
 // longer collected; a default is applied server-side.) Admins and superadmins
 // are seeded directly and skip this onboarding gate.

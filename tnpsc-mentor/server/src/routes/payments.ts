@@ -5,7 +5,8 @@ import { config, razorpayEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
-import { baseAmountForPlan, PREMIUM_VALIDITY_MS } from '../pricing.js'
+import { baseAmountForPlan } from '../pricing.js'
+import { premiumEntitlement } from '../lib/premium.js'
 import { evaluateCoupon, couponLimiter } from './coupons.js'
 import { notifyAdmins } from '../notify.js'
 
@@ -262,21 +263,11 @@ router.get(
   '/premium',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const since = new Date(Date.now() - PREMIUM_VALIDITY_MS).toISOString()
-    const { data, error } = await req.db!
-      .from('payments')
-      .select('created_at, notes')
-      .eq('status', 'paid')
-      .gte('created_at', since)
-      .order('created_at', { ascending: false })
-    if (error) return sendDbError(res, error)
-
-    const latest = (data ?? []).find(
-      (r) => (r.notes as { plan?: string } | null)?.plan === 'premium_annual'
-    )
-    if (!latest) return res.json({ premium: false, until: null })
-    const until = new Date(new Date(latest.created_at).getTime() + PREMIUM_VALIDITY_MS).toISOString()
-    res.json({ premium: true, until })
+    try {
+      res.json(await premiumEntitlement(req.db!))
+    } catch (e) {
+      return sendDbError(res, e as Parameters<typeof sendDbError>[1])
+    }
   })
 )
 

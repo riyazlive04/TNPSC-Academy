@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — admin_list_questions: respect group_type + active
+-- TNPSC Mentors — admin_list_questions: respect group_type + active
 -- ----------------------------------------------------------------------------
 -- The admin question-bank view previously ignored group_type and showed hidden
 -- (active=false) rows, so PYQ · Group 1 · Aptitude returned 500 (capped) old

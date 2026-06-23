@@ -21,7 +21,7 @@ function isValidIndianMobile(raw: string): boolean {
 
 /**
  * Post-signup onboarding for Google users, who arrive with only name + email.
- * Collects the one detail Google doesn't provide — phone — then routes onward
+ * Collects the one detail Google doesn't provide - phone - then routes onward
  * (language screen / arena). Email/password signups already supply it, so the
  * gate in ProtectedRoute never sends them here. A default target group is still
  * submitted to keep group-derived logic working, but it isn't shown to the user.
@@ -35,7 +35,7 @@ export default function CompleteProfilePage() {
 
   const [phone, setPhone] = useState(profile?.phone ?? '')
   const [gender, setGender] = useState(profile?.gender ?? '')
-  // Default group, submitted but not shown — keeps group-derived logic working.
+  // Default group, submitted but not shown - keeps group-derived logic working.
   const group = profile?.target_group ?? 'Group1'
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
@@ -59,7 +59,7 @@ export default function CompleteProfilePage() {
     try {
       await api.updateProfile({ phone: phone.trim(), gender: gender || null, target_group: group })
       await fetchProfile()
-      // New Google account just finished profile setup — arm the first-run tour.
+      // New Google account just finished profile setup - arm the first-run tour.
       useOnboardingStore.getState().arm()
       navigate(postAuthDestination(), { replace: true })
     } catch {

@@ -57,7 +57,7 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
     return <Navigate to="/login" replace state={{ from: location }} />
   }
 
-  // Fresh Google signups lack a phone / target group — funnel them through the
+  // Fresh Google signups lack a phone / target group - funnel them through the
   // onboarding screen before any app page (the screen itself is exempt).
   if (needsOnboarding && location.pathname !== '/complete-profile') {
     return <Navigate to="/complete-profile" replace />

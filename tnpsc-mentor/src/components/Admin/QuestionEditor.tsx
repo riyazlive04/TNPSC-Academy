@@ -9,7 +9,7 @@ import { LETTERS } from '../../types'
 const CATEGORIES: Category[] = ['pyq', 'samacheer', 'current_affairs', 'aptitude']
 const DIFFICULTIES = ['easy', 'medium', 'hard']
 // Editor shows an optional 5th option E (used by the analogy reasoning bank).
-// A–D stay required; E is saved only when filled in.
+// A-D stay required; E is saved only when filled in.
 const EDIT_LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D', 'E']
 
 interface QuestionEditorProps {

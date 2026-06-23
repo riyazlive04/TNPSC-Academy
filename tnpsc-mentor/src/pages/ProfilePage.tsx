@@ -39,7 +39,7 @@ import { api, type DeviceSession } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 
 // Each language is shown in its OWN script (English in English, Tamil in Tamil)
-// regardless of the active UI language — the standard language-picker pattern.
+// regardless of the active UI language - the standard language-picker pattern.
 const LANG_OPTIONS: { id: Lang; label: string }[] = [
   { id: 'en', label: 'English' },
   { id: 'ta', label: 'தமிழ்' },
@@ -70,14 +70,14 @@ export default function ProfilePage() {
   }
 
   // Change the account's language preference: update the UI instantly (local
-  // store) and persist to the profile (best-effort — survives across devices).
+  // store) and persist to the profile (best-effort - survives across devices).
   const changeLanguage = (next: Lang) => {
     if (next === lang) return
     setLang(next)
     api.updateProfile({ language: next }).catch(() => {})
   }
 
-  // Gender — editable here. Optimistic chip highlight, persisted to the profile
+  // Gender - editable here. Optimistic chip highlight, persisted to the profile
   // and synced back into the auth store (best-effort; reverts on failure).
   const refreshProfile = useAuthStore((s) => s.fetchProfile)
   const [genderSel, setGenderSel] = useState(profile?.gender ?? '')
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <div className="card divide-y divide-line">
-                {/* Gender — read-only value by default; chips appear (right-aligned)
+                {/* Gender - read-only value by default; chips appear (right-aligned)
                     in edit mode and save on selection. */}
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
@@ -276,7 +276,7 @@ export default function ProfilePage() {
                 {profile?.phone && (
                   <DetailRow icon={<ShieldCheck size={16} />} label={t('phone')} value={profile.phone} />
                 )}
-                {/* Language preference — read-only value by default; chips appear
+                {/* Language preference - read-only value by default; chips appear
                     (right-aligned) in edit mode. Each language shown in its own script. */}
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
@@ -311,25 +311,25 @@ export default function ProfilePage() {
                 {t('statsOverview')}
               </h2>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <StatCard icon={<ClipboardCheck size={18} />} value={String(stats.tests)} labelKey="testsTaken" />
-                <StatCard icon={<ListChecks size={18} />} value={String(stats.questions)} labelKey="totalQuestions" />
-                <StatCard icon={<Crosshair size={18} />} value={`${Math.round(stats.avgAccuracy)}%`} labelKey="avgAccuracy" />
-                <StatCard icon={<Trophy size={18} />} value={String(stats.bestScore)} labelKey="bestScore" />
-                <StatCard icon={<Clock size={18} />} value={`${stats.minutes} min`} labelKey="timeSpent" />
-                <StatCard icon={<Award size={18} />} value={`${earned}/${badges.length}`} labelKey="achievements" />
+                <StatCard i={0} icon={<ClipboardCheck size={18} />} value={String(stats.tests)} labelKey="testsTaken" />
+                <StatCard i={1} icon={<ListChecks size={18} />} value={String(stats.questions)} labelKey="totalQuestions" />
+                <StatCard i={2} icon={<Crosshair size={18} />} value={`${Math.round(stats.avgAccuracy)}%`} labelKey="avgAccuracy" />
+                <StatCard i={3} icon={<Trophy size={18} />} value={String(stats.bestScore)} labelKey="bestScore" />
+                <StatCard i={4} icon={<Clock size={18} />} value={`${stats.minutes} min`} labelKey="timeSpent" />
+                <StatCard i={5} icon={<Award size={18} />} value={`${earned}/${badges.length}`} labelKey="achievements" />
               </div>
             </div>
 
-            {/* Premium upsell - 3-month plan (₹1899 → ₹1399) */}
+            {/* Premium upsell - 3-month plan (₹1,699) */}
             <PremiumCard />
 
-            {/* Saved Questions — moved here from the top bar so the toolbar stays
+            {/* Saved Questions - moved here from the top bar so the toolbar stays
                 to language · theme · profile. */}
             <button
               onClick={() => navigate('/bookmarks')}
-              className="flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/40"
+              className="group interactive flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left hover:border-primary/40"
             >
-              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
                 <Bookmark size={16} />
               </span>
               <span className="tamil flex-1 font-display text-sm font-semibold text-ink">
@@ -338,14 +338,14 @@ export default function ProfilePage() {
               <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
             </button>
 
-            {/* How it works — replay the first-run welcome tour. Aspirant-only
+            {/* How it works - replay the first-run welcome tour. Aspirant-only
                 (admins don't use the onboarding/gamification layer). */}
             {!isAdmin && (
               <button
                 onClick={startTour}
-                className="flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left transition-colors hover:border-primary/40"
+                className="group interactive flex w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3.5 text-left hover:border-primary/40"
               >
-                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+                <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
                   <Compass size={16} />
                 </span>
                 <span className="flex-1">
@@ -358,7 +358,7 @@ export default function ProfilePage() {
               </button>
             )}
 
-            {/* Devices — manage the 2-device limit (sign out a lost/old device) */}
+            {/* Devices - manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />
 
             {/* Sign out */}
@@ -374,7 +374,7 @@ export default function ProfilePage() {
   )
 }
 
-// App version — bump on release (kept in one place so the footer always matches).
+// App version - bump on release (kept in one place so the footer always matches).
 const APP_VERSION = '1.0.0'
 
 /**
@@ -390,7 +390,7 @@ function AppFooter() {
           த
         </span>
         <span className="font-display text-sm font-semibold tracking-tight text-ink">
-          TNPSC <span className="text-primary">Mentor</span>
+          TNPSC <span className="text-primary">Mentors</span>
         </span>
       </div>
 
@@ -453,7 +453,7 @@ function relTime(iso: string): string {
 
 /**
  * Manage the account's active device sessions (the 2-device limit). Lists each
- * active device, marks the current one, and lets the user sign out the others —
+ * active device, marks the current one, and lets the user sign out the others -
  * the self-service escape hatch if a lost/old device is holding a slot.
  */
 function DevicesSection() {
@@ -479,7 +479,7 @@ function DevicesSection() {
       setSessions((s) => (s ?? []).filter((x) => x.id !== id))
       toast.success(t('devicesSignedOut'))
     } catch {
-      /* ignore — list will reconcile on next load */
+      /* ignore - list will reconcile on next load */
     } finally {
       setRevoking(null)
     }
@@ -575,15 +575,23 @@ function StatCard({
   icon,
   value,
   labelKey,
+  i = 0,
 }: {
   icon: React.ReactNode
   value: string
   labelKey: StringKey
+  /** Position in the grid - drives the staggered entrance delay. */
+  i?: number
 }) {
   const { t } = useT()
   return (
-    <div className="card flex flex-col gap-2 p-4">
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-soft text-brand">{icon}</span>
+    <div
+      style={{ '--i': i } as React.CSSProperties}
+      className="card stagger-item interactive group flex flex-col gap-2 p-4"
+    >
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-soft text-brand transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
+        {icon}
+      </span>
       <div className="font-heading text-xl font-semibold leading-none text-ink">{value}</div>
       <div className="tamil truncate font-body text-[11px] uppercase tracking-wide text-ink2">
         {t(labelKey)}

@@ -11,7 +11,7 @@ interface MascotProps {
 }
 
 /**
- * "Sipi" - TNPSC Mentor's study-buddy mascot. A friendly purple droplet whose
+ * "Sipi" - TNPSC Mentors' study-buddy mascot. A friendly purple droplet whose
  * face + arms react to context: celebrating a great score, thinking on a hard
  * question, waving hello on the dashboard, or cheering you on in revision.
  * Pure inline SVG so it scales crisply and ships with zero assets.
@@ -43,7 +43,7 @@ export default function Mascot({
       height={(size * 132) / 120}
       className={[float ? 'animate-floaty' : '', className].join(' ')}
       role="img"
-      aria-label="TNPSC Mentor mascot"
+      aria-label="TNPSC Mentors mascot"
     >
       <defs>
         <linearGradient id={bodyGrad} x1="0" y1="0" x2="0" y2="1">

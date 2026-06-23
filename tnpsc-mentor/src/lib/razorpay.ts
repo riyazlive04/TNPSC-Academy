@@ -75,7 +75,7 @@ export interface CheckoutParams {
 }
 
 /**
- * Run the full checkout flow and resolve with the outcome. Never throws — every
+ * Run the full checkout flow and resolve with the outcome. Never throws - every
  * failure path resolves to a `failed`/`dismissed` result so callers can toast.
  */
 export async function startCheckout(params: CheckoutParams): Promise<CheckoutResult> {
@@ -103,7 +103,7 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
       amount: order.amount,
       currency: order.currency,
       order_id: order.id,
-      name: 'TNPSC Mentor',
+      name: 'TNPSC Mentors',
       description: params.description ?? 'Payment',
       prefill: {
         name: params.profile?.full_name ?? undefined,

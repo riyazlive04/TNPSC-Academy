@@ -1,7 +1,7 @@
 // ─── Thirukkural quiz data layer ────────────────────────────────────────────
 // A self-contained, client-side practice bank for the Thirukkural quiz section.
 // Unlike the main question banks (Supabase-backed, server-graded), these 288
-// bilingual questions ship with their answers inline and are graded locally —
+// bilingual questions ship with their answers inline and are graded locally -
 // they're reference-style practice, not a proctored test. The data is bundled
 // (lazy chunk) from src/data/thirukkuralQuestions.json, generated from
 // Thirukural/Thirukkural_Question_Bank_v2.json.
@@ -35,7 +35,7 @@ export interface TkQuestion {
   adhigaram_en: string | null
   adhigaram_ta: string | null
   adhigaram_no: number | null
-  /** The paal (section) the chapter sits under — null for match items. */
+  /** The paal (section) the chapter sits under - null for match items. */
   paal_en: string | null
   paal_ta: string | null
   /** The kural number this question is built on (null for match items). */
@@ -46,9 +46,9 @@ export interface TkQuestion {
   couplet?: TkBilingual
   /** Two-verse synthesis: the pair of couplets being compared. */
   couplets?: TkBilingual[]
-  /** Match: the lettered couplets (a–d). */
+  /** Match: the lettered couplets (a-d). */
   left?: Record<string, TkBilingual>
-  /** Match: the numbered chapters (1–4). */
+  /** Match: the numbered chapters (1-4). */
   right?: Record<string, TkBilingual>
   options: Record<TkLetter, TkBilingual>
 }
@@ -70,8 +70,8 @@ export interface TkChapter {
   ta: string
 }
 
-/** A chapter row for the adhigaram picker — name, paal, question count, and the
- *  span of kural numbers it covers (e.g. 71–80). */
+/** A chapter row for the adhigaram picker - name, paal, question count, and the
+ *  span of kural numbers it covers (e.g. 71-80). */
 export interface TkAdhigaram {
   no: number
   en: string
@@ -86,7 +86,7 @@ export interface TkAdhigaram {
   range: [number, number] | null
 }
 
-/** All adhigarams that have questions, sorted by adhigaram number — the data for
+/** All adhigarams that have questions, sorted by adhigaram number - the data for
  *  the first (chapter) branch of the quiz. */
 export function adhigaramList(): TkAdhigaram[] {
   const byNo = new Map<number, TkQuestion[]>()
@@ -113,7 +113,7 @@ export function adhigaramList(): TkAdhigaram[] {
   return out.sort((a, b) => a.no - b.no)
 }
 
-/** The question types present for a chapter (or across all), with their counts —
+/** The question types present for a chapter (or across all), with their counts -
  *  the data for the second (question-type) branch. */
 export function formatsFor(chapterNo: number | 'all'): { format: TkFormat; count: number }[] {
   return TK_FORMATS.map(({ format }) => ({
@@ -125,7 +125,7 @@ export function formatsFor(chapterNo: number | 'all'): { format: TkFormat; count
 /**
  * The distinct chapters present among questions matching `format` (or all
  * formats), sorted by adhigaram number. Match questions carry no single chapter,
- * so they contribute none — they're only reachable via "All chapters".
+ * so they contribute none - they're only reachable via "All chapters".
  */
 export function chaptersFor(format: TkFormat | 'all'): TkChapter[] {
   const byNo = new Map<number, TkChapter>()
@@ -155,7 +155,7 @@ export function filterQuestions(
   )
 }
 
-/** A Fisher–Yates shuffle of up to `count` questions from the pool. */
+/** A Fisher-Yates shuffle of up to `count` questions from the pool. */
 export function sampleQuestions(pool: TkQuestion[], count: number): TkQuestion[] {
   const arr = [...pool]
   for (let i = arr.length - 1; i > 0; i--) {
@@ -174,7 +174,7 @@ export function tkText(b: TkBilingual | undefined, lang: DisplayLang): string {
   return b.en
 }
 
-/** Inline bilingual (EN / TA) — used for short option text. */
+/** Inline bilingual (EN / TA) - used for short option text. */
 export function tkInline(b: TkBilingual | undefined, lang: DisplayLang): string {
   if (!b) return ''
   if (lang === 'ta') return b.ta || b.en
@@ -207,7 +207,7 @@ function coupletToLines(text: string): string {
   return text.replace(/([.,;:?!])(?=[A-Z])/, '$1\n')
 }
 
-/** Single-line couplet (slash removed) — for the compact match list items. */
+/** Single-line couplet (slash removed) - for the compact match list items. */
 function coupletInline(text: string): string {
   return text.replace(/\s*\/\s*/g, ' ').trim()
 }
@@ -268,7 +268,7 @@ export function isThirukuralConfig(config: QuizConfig): boolean {
 }
 
 /**
- * The randomised question list for a Thirukkural quiz config — the client-side
+ * The randomised question list for a Thirukkural quiz config - the client-side
  * equivalent of fetchQuestionsForConfig's server call. Filters by the chosen
  * chapter (tkAdhigaram) and format (tkFormat), shuffles, and caps at `limit`.
  */

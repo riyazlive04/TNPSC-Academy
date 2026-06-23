@@ -100,14 +100,14 @@ export default function MockInstructionsPage() {
           <Rule icon={<Clock size={18} />} text={t('instrTimer')} />
           <Rule icon={<FileText size={18} />} text={t('instrPalette')} />
           <Rule icon={<Copy size={18} />} text={t('instrNoCopy')} />
-          {/* Report-a-problem — highlighted so aspirants notice it's available. */}
+          {/* Report-a-problem - highlighted so aspirants notice it's available. */}
           <div className="flex items-start gap-3 rounded-xl border border-accentwarm/30 bg-accentwarmsoft p-3.5">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-accentwarm" />
             <p className="tamil font-body text-sm text-ink">{t('instrReport')}</p>
           </div>
         </div>
 
-        {/* Answer-sheet (OMR) colour guide — mirrors the palette in MockQuizPage. */}
+        {/* Answer-sheet (OMR) colour guide - mirrors the palette in MockQuizPage. */}
         <div className="rounded-card border border-line bg-card mb-6 p-5">
           <h3 className="mb-4 font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
             {t('omrColourGuide')}
@@ -123,7 +123,7 @@ export default function MockInstructionsPage() {
                 </span>
                 <p className="tamil min-w-0 flex-1 font-body text-sm text-ink">
                   <span className="font-heading font-semibold text-ink">{t(label)}</span>
-                  <span className="text-ink2"> — {t(desc)}</span>
+                  <span className="text-ink2"> - {t(desc)}</span>
                 </p>
               </div>
             ))}

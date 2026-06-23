@@ -1,4 +1,4 @@
-# Privacy Policy — TNPSC Mentor
+# Privacy Policy — TNPSC Mentors
 
 **Last updated:** 19 June 2026
 
@@ -10,7 +10,7 @@
 
 This Privacy Policy explains how **[Legal entity name, e.g. Sirah Digital]**
 ("**we**", "**us**", "**our**") collects, uses, shares and protects your
-personal data when you use the **TNPSC Mentor** application and related services
+personal data when you use the **TNPSC Mentors** application and related services
 (the "**Service**"). It should be read with our
 [Terms and Conditions](./TERMS_AND_CONDITIONS.md).
 

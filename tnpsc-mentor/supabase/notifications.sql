@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Notifications (Web Push + in-app feed)
+-- TNPSC Mentors — Notifications (Web Push + in-app feed)
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql. Three tables:
 --   • push_subscriptions — a user's browser Web Push endpoints (one per device).

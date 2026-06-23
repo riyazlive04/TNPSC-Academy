@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — add profiles.language
+-- TNPSC Mentors — add profiles.language
 -- ----------------------------------------------------------------------------
 -- The app stores the user's UI language preference on the profile so it follows
 -- them across devices (see Profile.language / DisplayLang = 'en' | 'ta' | 'both'),

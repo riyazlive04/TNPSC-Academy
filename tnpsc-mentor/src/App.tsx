@@ -6,6 +6,8 @@ import { Compass, Home } from 'lucide-react'
 import { useAuthStore } from './store/authStore'
 import { useThemeStore } from './store/themeStore'
 import { warmApi } from './lib/api'
+import { isNativeApp } from './lib/nativeAuth'
+import { installCopyGuard } from './lib/copyGuard'
 import { pageVariants, pageTransition } from './lib/motion'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
@@ -46,6 +48,7 @@ const DailyPage = lazy(() => import('./pages/DailyPage'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
+const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
 /** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
 const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
@@ -89,6 +92,8 @@ export default function App() {
     useThemeStore.getState().init()
     warmApi()
     init()
+    // Block copy/cut/paste/long-press selection app-wide in the installed app.
+    installCopyGuard()
   }, [init])
 
   // Warm the chunks for the most-likely next screens during browser idle time,
@@ -142,6 +147,12 @@ function AnimatedRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
+      {/* Public policy pages (linked from the landing footer) */}
+      <Route path="/privacy" element={<PolicyPage slug="privacy" />} />
+      <Route path="/guidelines" element={<PolicyPage slug="guidelines" />} />
+      <Route path="/payment-policy" element={<PolicyPage slug="payment" />} />
+      <Route path="/refund-policy" element={<PolicyPage slug="refund" />} />
+
       {/* Protected */}
       {PROTECTED_ROUTES.map(({ path, element, role }) => (
         <Route
@@ -175,13 +186,19 @@ function AnimatedRoutes() {
 }
 
 /** Root path "/": send authenticated users straight into the app; show the
- * public landing page to everyone else. Waits for the initial session bootstrap
- * so a logged-in user isn't flashed the landing page on a hard refresh. */
+ * public landing page to logged-out web visitors. Waits for the initial session
+ * bootstrap so a logged-in user isn't flashed the landing page on a hard refresh.
+ *
+ * The landing page is the public marketing / APK-download page - it makes no
+ * sense inside the installed app, so the native build skips it entirely and
+ * sends logged-out users straight to the login screen. (LandingPage is lazily
+ * imported, so its chunk is never even fetched in the APK.) */
 function RootRedirect() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
   if (loading) return <PageLoader />
   if (user) return <Navigate to="/test-arena" replace />
+  if (isNativeApp()) return <Navigate to="/login" replace />
   return <LandingPage />
 }
 

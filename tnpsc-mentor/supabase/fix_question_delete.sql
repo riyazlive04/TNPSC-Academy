@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Make questions deletable again
+-- TNPSC Mentors — Make questions deletable again
 -- ----------------------------------------------------------------------------
 -- test_answers.question_id was created with a plain `references questions(id)`,
 -- which defaults to ON DELETE NO ACTION (RESTRICT). That meant any question that

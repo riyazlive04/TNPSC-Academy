@@ -57,7 +57,7 @@ export default function BookmarksPage() {
         <header className="mb-6 mt-4">
           <h1 className="font-display text-[22px] font-bold tracking-tight text-ink">Saved Questions</h1>
           <p className="mt-1 font-body text-sm text-muted">
-            Questions you bookmarked for revision — answers and explanations included.
+            Questions you bookmarked for revision - answers and explanations included.
           </p>
         </header>
 

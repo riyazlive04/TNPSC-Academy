@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Admin question-editor write RPCs
+-- TNPSC Mentors — Admin question-editor write RPCs
 -- ----------------------------------------------------------------------------
 -- Run this AFTER schema.sql and secure.sql. It adds the only two write paths
 -- the in-app Admin question editor uses. Both are SECURITY DEFINER and gated by

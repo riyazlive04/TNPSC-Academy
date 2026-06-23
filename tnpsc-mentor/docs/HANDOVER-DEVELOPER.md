@@ -1,4 +1,4 @@
-# TNPSC Mentor — Developer Handover
+# TNPSC Mentors — Developer Handover
 
 A bilingual (English/Tamil) TNPSC exam-prep web app: a large, subject-tagged
 question bank, auto-graded mock tests, AI-written explanations with per-option

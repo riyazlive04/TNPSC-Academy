@@ -1,4 +1,4 @@
-# TNPSC Mentor — Client Overview
+# TNPSC Mentors — Client Overview
 
 A bilingual (English / Tamil) TNPSC exam-preparation app with a large, well-organised
 question bank, auto-graded tests, written explanations for every question, progress

@@ -5,7 +5,7 @@ import type { StringKey } from '../lib/i18n'
 /**
  * A language-neutral piece of a test heading. Producers emit these instead of a
  * baked string so describeConfig() can resolve them against the CURRENT language
- * at render time — the heading then follows the EN/தமிழ்/both toggle live,
+ * at render time - the heading then follows the EN/தமிழ்/both toggle live,
  * instead of freezing whichever language was active when the test was set up.
  */
 export type QuizLabelSeg =
@@ -45,14 +45,14 @@ export type Category =
   | 'aptitude'
   | 'outer'
   | 'subject'
-  // Thirukkural quiz — a client-side bank (questions bundled with the app and
+  // Thirukkural quiz - a client-side bank (questions bundled with the app and
   // graded in the browser); it never touches the server question pipeline.
   | 'thirukural'
 // The five question styles testable in the Subject Practice flow.
 export type SubjectQType = 'chronological' | 'match' | 'assertion_reason' | 'statements' | 'direct'
 export type GroupType = 'Group1' | 'Group2_2A' | 'Group4_VAO'
-// Most banks are 4-option (A–D). A few imported sets (e.g. the IndiaBix analogy
-// reasoning bank) carry a 5th option E — `option_e` is null on every 4-option
+// Most banks are 4-option (A-D). A few imported sets (e.g. the IndiaBix analogy
+// reasoning bank) carry a 5th option E - `option_e` is null on every 4-option
 // row, and optionLetters() only surfaces E when that row actually has it.
 export type AnswerLetter = 'A' | 'B' | 'C' | 'D' | 'E'
 export type Difficulty = 'easy' | 'medium' | 'hard'
@@ -96,7 +96,7 @@ export interface Question {
   option_b: string
   option_c: string
   option_d: string
-  // Optional 5th option — present only on 5-option imports (analogy reasoning
+  // Optional 5th option - present only on 5-option imports (analogy reasoning
   // bank). Null/absent on every standard 4-option question.
   option_e?: string | null
   // Answer/explanation columns are NOT delivered to the client during a quiz
@@ -353,7 +353,7 @@ export interface Profile {
   /** Preferred UI language. Account-bound so it follows the user across devices
    * and is set ONCE at onboarding; changeable later from the Profile page. */
   language?: DisplayLang | null
-  /** Profile picture URL — set from Google on Google sign-in; null otherwise. */
+  /** Profile picture URL - set from Google on Google sign-in; null otherwise. */
   avatar_url?: string | null
 }
 
@@ -381,7 +381,7 @@ export interface ResultPayload {
 export const LETTERS: AnswerLetter[] = ['A', 'B', 'C', 'D']
 
 /**
- * The answer letters to render for a specific question: always A–D, plus E when
+ * The answer letters to render for a specific question: always A-D, plus E when
  * the question has non-empty `option_e`. This keeps standard 4-option questions
  * from showing a blank fifth choice while letting 5-option items render in full.
  */
@@ -478,7 +478,7 @@ const MATCH_ITEM = /^\(?\s*([ivxlcdm]{1,4}|[IVXLCDM]{1,4}|[A-Za-z]{1,2}|\d{1,2}|
 // "<digit>." after the separator keeps a bare dash from splitting hyphenated item
 // text (e.g. "Heart-lung machine"), since that dash isn't followed by a number label.
 const MATCH_COMBINED =
-  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,}|[-–—])\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
+  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,}|[---])\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
 
 /** A line that is a prompt/instruction ("Match the following…"), not a header. */
 const isMatchPrompt = (s: string): boolean =>
@@ -529,7 +529,7 @@ function parseCombinedMatch(lines: string[]): ParsedMatch | null {
     hII = ''
   if (headerLine >= 0) {
     const parts = lines[headerLine]
-      .split(/\s*\|\s*|\s{2,}|\s+[-–—]\s+/)
+      .split(/\s*\|\s*|\s{2,}|\s+[---]\s+/)
       .map((s) => s.trim())
       .filter(Boolean)
     hI = parts[0] ?? lines[headerLine]
@@ -619,11 +619,11 @@ export function displayOption(q: Question, letter: AnswerLetter, lang: DisplayLa
 /** Explanation with the same fallback. */
 /**
  * Strip a leading correctness marker ("Correct." / "சரி.") that prefixes many
- * stored explanations — it's redundant since the option is already shown as the
+ * stored explanations - it's redundant since the option is already shown as the
  * answer, and reads awkwardly under the "Explanation:" label.
  */
 function stripCorrectPrefix(text: string): string {
-  return text.replace(/^\s*(correct|சரி)\s*[.:\-–—]\s*/i, '')
+  return text.replace(/^\s*(correct|சரி)\s*[.:\---]\s*/i, '')
 }
 
 export function displayExplanation(q: Question, lang: DisplayLang): string {

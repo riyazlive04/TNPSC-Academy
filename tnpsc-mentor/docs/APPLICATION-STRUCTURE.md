@@ -1,6 +1,6 @@
-# TNPSC Mentor — Application Structure, Workflow & Details
+# TNPSC Mentors — Application Structure, Workflow & Details
 
-A reference guide to how the TNPSC Mentor exam-prep web app is organised, how data
+A reference guide to how the TNPSC Mentors exam-prep web app is organised, how data
 flows through it, and how its main user journeys work end to end.
 
 > Companion docs: [`README.md`](../README.md) (quick start), [`PROJECT-OVERVIEW.md`](PROJECT-OVERVIEW.md),

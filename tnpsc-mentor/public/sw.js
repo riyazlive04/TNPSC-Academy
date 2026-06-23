@@ -1,4 +1,4 @@
-/* TNPSC Mentor — Web Push service worker.
+/* TNPSC Mentors — Web Push service worker.
  *
  * Deliberately minimal: it handles ONLY push delivery and notification clicks.
  * It does not intercept fetch / cache anything, so it can't interfere with the
@@ -16,9 +16,9 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data ? event.data.json() : {}
   } catch (e) {
-    data = { title: 'TNPSC Mentor', body: event.data ? event.data.text() : '' }
+    data = { title: 'TNPSC Mentors', body: event.data ? event.data.text() : '' }
   }
-  const title = data.title || 'TNPSC Mentor'
+  const title = data.title || 'TNPSC Mentors'
   const options = {
     body: data.body || '',
     icon: '/favicon.svg',

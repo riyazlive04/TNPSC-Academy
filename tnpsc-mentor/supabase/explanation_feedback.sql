@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — per-explanation thumbs up/down
+-- TNPSC Mentors — per-explanation thumbs up/down
 -- ----------------------------------------------------------------------------
 -- While reviewing answers, a student can rate each explanation. A thumbs-down
 -- flags an explanation that "needs work". One vote per user per question

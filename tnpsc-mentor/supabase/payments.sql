@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Payments (Razorpay)
+-- TNPSC Mentors — Payments (Razorpay)
 -- ----------------------------------------------------------------------------
 -- Run AFTER schema.sql. Records every Razorpay order/payment so we have a
 -- trusted, server-written ledger. Deliberately model-agnostic: it does NOT

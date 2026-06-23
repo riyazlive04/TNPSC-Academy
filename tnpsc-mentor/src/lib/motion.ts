@@ -1,6 +1,6 @@
 // ─── Motion tokens ──────────────────────────────────────────────────────────
 // The single source of truth for animation timing across the app. Everything
-// that moves — route transitions, list entrances, press feedback, reveals —
+// that moves - route transitions, list entrances, press feedback, reveals -
 // pulls its duration/easing from here so motion feels like one system, not a
 // pile of ad-hoc timings. (design-system.md "Make it feel like an app".)
 //
@@ -15,13 +15,13 @@ export const DURATION = {
   page: 0.4,
 } as const
 
-/** Standard easing — symmetric in/out (cubic-bezier(0.4, 0, 0.2, 1)). */
+/** Standard easing - symmetric in/out (cubic-bezier(0.4, 0, 0.2, 1)). */
 export const EASE_STANDARD = [0.4, 0, 0.2, 1] as const
-/** Ease-out — for elements entering the screen. */
+/** Ease-out - for elements entering the screen. */
 export const EASE_OUT = [0, 0, 0.2, 1] as const
 
 // ─── Route transition ───────────────────────────────────────────────────────
-// A restrained cross-fade with a small vertical drift — enough to read as
+// A restrained cross-fade with a small vertical drift - enough to read as
 // "native screen change" without sliding the whole shell around.
 export const pageVariants = {
   initial: { opacity: 0, y: 8 },

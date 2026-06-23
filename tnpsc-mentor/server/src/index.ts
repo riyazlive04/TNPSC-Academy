@@ -100,5 +100,5 @@ app.use(
 
 app.listen(config.port, () => {
   // eslint-disable-next-line no-console
-  console.log(`TNPSC Mentor API listening on http://localhost:${config.port}`)
+  console.log(`TNPSC Mentors API listening on http://localhost:${config.port}`)
 })

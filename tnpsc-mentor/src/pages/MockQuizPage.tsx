@@ -13,6 +13,7 @@ import { describeConfig } from '../lib/fetchQuestions'
 import { exitFullscreen } from '../lib/proctor'
 import { submitTest } from '../lib/submitTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
+import { useScreenSecure } from '../hooks/useScreenSecure'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { useT } from '../lib/i18n'
 import { optionLetters, displayOption } from '../types'
@@ -168,8 +169,8 @@ export default function MockQuizPage() {
   const pageStart = page * PAGE_SIZE
 
   // Absolute indices of flagged questions (across every page), and the indices
-  // the OMR sheet actually renders: the whole current page, or — when the
-  // "flagged only" filter is on — just the flagged ones.
+  // the OMR sheet actually renders: the whole current page, or - when the
+  // "flagged only" filter is on - just the flagged ones.
   const flaggedIndices = useMemo(
     () =>
       questions.reduce<number[]>((acc, q, i) => {
@@ -270,6 +271,8 @@ export default function MockQuizPage() {
   // Shared engine; mirrors QuizPage. Its synchronous done-latch prevents rapid
   // violations from double-submitting, and it clears its own toast timers.
   const proctorActive = !loading && !empty && !loadError && total > 0
+  // Block OS screenshots/recording (native app) while the mock test is on screen.
+  useScreenSecure(proctorActive)
   const { violations, violationToast, notFullscreen, fsSupported, reEnterFullscreen } =
     useProctoring({
       active: proctorActive,

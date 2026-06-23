@@ -1,6 +1,6 @@
 // ─── Thirukural data layer ──────────────────────────────────────────────────
 // The 1330 kurals live in the `public.thirukural` table and are served by the
-// API (GET /api/thirukural) — read-only reference content with no per-user
+// API (GET /api/thirukural) - read-only reference content with no per-user
 // state. We fetch the full set once and cache it at module scope, so navigating
 // between the list and a detail view never re-fetches.
 
@@ -47,7 +47,7 @@ export function getCachedKural(no: number): Kural | undefined {
 }
 
 /**
- * The "Kural of the day" — a deterministic pick that's stable for a whole
+ * The "Kural of the day" - a deterministic pick that's stable for a whole
  * calendar day and advances by one each day, cycling through all 1330. Keyed on
  * the local date (not the clock), so it doesn't change as the day goes on.
  */

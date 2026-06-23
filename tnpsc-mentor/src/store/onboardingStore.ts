@@ -12,7 +12,7 @@ import { persist } from 'zustand/middleware'
 interface OnboardingState {
   /** Set at account creation; the dashboard shows the tour once, then clears it. */
   pending: boolean
-  /** Transient — whether the tour overlay is currently visible. */
+  /** Transient - whether the tour overlay is currently visible. */
   open: boolean
   /** Mark a newly created account so the tour fires on first dashboard view. */
   arm: () => void
@@ -20,7 +20,7 @@ interface OnboardingState {
   start: () => void
   /** Re-open the tour manually (e.g. from the profile's "How it works" row). */
   replay: () => void
-  /** Finish or skip — close the overlay. */
+  /** Finish or skip - close the overlay. */
   finish: () => void
 }
 

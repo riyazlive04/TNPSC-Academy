@@ -16,7 +16,7 @@ Vercel and Render both deploy from a Git repo. From this folder:
 ```bash
 git init
 git add -A
-git commit -m "TNPSC Mentor — deploy"
+git commit -m "TNPSC Mentors — deploy"
 git branch -M main
 git remote add origin https://github.com/<you>/tnpsc-mentor.git
 git push -u origin main

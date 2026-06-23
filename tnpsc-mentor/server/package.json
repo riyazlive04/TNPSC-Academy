@@ -2,7 +2,7 @@
   "name": "tnpsc-mentor-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Express API layer for TNPSC Mentor — the single trusted client in front of the Supabase Postgres backend.",
+  "description": "Express API layer for TNPSC Mentors — the single trusted client in front of the Supabase Postgres backend.",
   "type": "module",
   "main": "dist/index.js",
   "engines": {

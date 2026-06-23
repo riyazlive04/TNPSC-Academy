@@ -51,7 +51,7 @@ export const safeLocalStorage: StateStorage = {
       // Still won't fit (storage full of unrelated data, or unavailable). Give
       // up rather than crash; resume-after-refresh just won't be available.
       // eslint-disable-next-line no-console
-      console.warn(`[TNPSC Mentor] Could not persist "${name}" - storage full; resume disabled for this session.`)
+      console.warn(`[TNPSC Mentors] Could not persist "${name}" - storage full; resume disabled for this session.`)
     }
   },
 

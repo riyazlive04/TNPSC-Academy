@@ -5,7 +5,7 @@ import type { Lang } from '../store/languageStore'
 import type { AnswerLetter, Question, QuizConfig, QuizLabelSeg } from '../types'
 
 // Fallback question count when a config doesn't specify one (e.g. a direct quiz
-// start that skips the setup screen). NOT an upper cap — practice quizzes may
+// start that skips the setup screen). NOT an upper cap - practice quizzes may
 // use the full available pool for the chosen topic.
 export const DEFAULT_QUESTIONS = 100
 
@@ -31,7 +31,7 @@ export async function fetchQuestionsForConfig(
   const limit = config.mock
     ? (config.mockQuestionCount ?? 50)
     : (config.questionCount ?? DEFAULT_QUESTIONS)
-  // Thirukkural is a bundled, client-side bank — build the list locally instead
+  // Thirukkural is a bundled, client-side bank - build the list locally instead
   // of hitting the server question pipeline. Dynamically imported so its large
   // question JSON only loads for Thirukkural quizzes, never for other sections.
   if (config.category === 'thirukural') {

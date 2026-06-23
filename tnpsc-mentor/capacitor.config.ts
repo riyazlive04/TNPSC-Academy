@@ -8,7 +8,7 @@ const GOOGLE_WEB_CLIENT_ID =
 
 const config: CapacitorConfig = {
   appId: 'com.tnpscmentor.app',
-  appName: 'TNPSC Mentor',
+  appName: 'TNPSC Mentors',
   webDir: 'dist',
   android: {
     allowMixedContent: false,

@@ -1,4 +1,4 @@
-# Render Blueprint for the TNPSC Mentor API (Express + Supabase).
+# Render Blueprint for the TNPSC Mentors API (Express + Supabase).
 # Deploy: Render Dashboard → New → Blueprint → pick this repo. Render reads this
 # file, creates the web service, and then prompts for the secret env vars below
 # (the ones marked `sync: false`). PORT is injected by Render automatically — the

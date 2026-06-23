@@ -8,7 +8,7 @@ import type { Tint } from '../components/UI/IconTile'
 
 interface Opt {
   id: Lang
-  /** Short script badge shown in the tint tile (no emoji — design-system.md). */
+  /** Short script badge shown in the tint tile (no emoji - design-system.md). */
   badge: string
   tint: Tint
   titleKey: 'langEnglish' | 'langTamil' | 'langBoth'

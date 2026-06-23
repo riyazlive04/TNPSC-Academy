@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import Lenis from 'lenis'
 
-// Routes that run their own immersive scroll behaviour — the proctored quiz and
+// Routes that run their own immersive scroll behaviour - the proctored quiz and
 // mock engines go fullscreen and track scroll for the per-question view, so we
 // leave native scrolling in place there rather than risk Lenis fighting it.
 const IMMERSIVE_PATHS = ['/quiz', '/mock/quiz']
@@ -26,7 +26,7 @@ export default function SmoothScroll() {
     if (immersive || reduceMotion) return
 
     const lenis = new Lenis({
-      duration: 1.05, // weight of the inertia — higher = more glide
+      duration: 1.05, // weight of the inertia - higher = more glide
       smoothWheel: true,
       touchMultiplier: 1.6,
     })

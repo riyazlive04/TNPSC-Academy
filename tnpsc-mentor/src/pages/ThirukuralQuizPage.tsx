@@ -37,7 +37,7 @@ const FORMAT_META: Record<TkFormat | 'all', { labelKey: StringKey; icon: React.R
 }
 
 /**
- * Thirukkural quiz picker — chapter (adhigaram) then question type. Choosing a
+ * Thirukkural quiz picker - chapter (adhigaram) then question type. Choosing a
  * type hands off to the SAME pre-test instructions → quiz → result flow every
  * other section uses; the questions are served from the bundled bank (see
  * fetchQuestionsForConfig / submitTest, which special-case category 'thirukural').
@@ -132,7 +132,7 @@ export default function ThirukuralQuizPage() {
         <div key={step} className="animate-fadeInFast">
           {step === 'adhigaram' && (
             <div className="space-y-6">
-              {/* All chapters — the highlighted shortcut */}
+              {/* All chapters - the highlighted shortcut */}
               <button
                 onClick={() => chooseAdhigaram('all')}
                 className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
@@ -185,7 +185,7 @@ export default function ThirukuralQuizPage() {
                           {a.range && (
                             <span className="text-muted/70">
                               {' · '}
-                              {a.range[0]}–{a.range[1]}
+                              {a.range[0]}-{a.range[1]}
                             </span>
                           )}
                         </span>
@@ -199,7 +199,7 @@ export default function ThirukuralQuizPage() {
 
           {step === 'type' && (
             <div className="space-y-3">
-              {/* Mixed — recommended, highlighted */}
+              {/* Mixed - recommended, highlighted */}
               <button
                 onClick={() => startFormat('all')}
                 className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"
@@ -239,7 +239,7 @@ export default function ThirukuralQuizPage() {
                     title={t(FORMAT_META[f.format].labelKey)}
                     trailing={
                       <span className="flex-shrink-0 font-heading text-sm font-semibold text-muted">
-                        {f.count > 0 ? f.count : '—'}
+                        {f.count > 0 ? f.count : '-'}
                       </span>
                     }
                   />

@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * One Thirukkural question. Every format gets a styled "verse block" above the
- * standard A–D option list — fill-in-the-blank shows the couplet (with its blank
+ * standard A-D option list - fill-in-the-blank shows the couplet (with its blank
  * inline) exactly the way "match the following" lays its two lists out, so the
  * two special formats read consistently. Options reuse the shared OptionButton.
  */
@@ -51,7 +51,7 @@ export default function ThirukuralQuestionCard({ q, lang, selected, onSelect, re
             : q.stem.en}
       </p>
 
-      {/* Verse block(s) — the format-specific presentation. */}
+      {/* Verse block(s) - the format-specific presentation. */}
       {q.couplet && (
         <VerseBlock couplet={q.couplet} lang={lang} label={t('tkVerse')} className="mb-5" />
       )}

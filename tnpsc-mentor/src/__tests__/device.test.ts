@@ -5,7 +5,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-// A localStorage whose every operation throws — the private/blocked-storage mode
+// A localStorage whose every operation throws - the private/blocked-storage mode
 // that previously made getDeviceId() mint a fresh UUID per call (device-cap
 // lockout). The module-level cache must keep the id stable across calls instead.
 const throwingStorage = {

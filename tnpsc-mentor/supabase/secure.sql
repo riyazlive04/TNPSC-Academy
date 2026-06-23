@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Security & integrity migration
+-- TNPSC Mentors — Security & integrity migration
 -- ----------------------------------------------------------------------------
 -- Run this AFTER schema.sql. It closes the "answers shipped to the browser"
 -- leak and moves grading to the server so scores can't be forged.

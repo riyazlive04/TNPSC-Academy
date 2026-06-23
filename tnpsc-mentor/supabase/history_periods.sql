@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — History period filter (ancient / medieval / modern)
+-- TNPSC Mentors — History period filter (ancient / medieval / modern)
 -- ----------------------------------------------------------------------------
 -- The PYQ History bank (category='pyq', subject='History and INM') is tagged
 -- with a historical PERIOD in `questions.unit` (see server/load-history-periods

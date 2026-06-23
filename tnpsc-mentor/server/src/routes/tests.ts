@@ -1,6 +1,9 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { supabaseAdmin } from '../supabase.js'
+import { FREE_PDF_DOWNLOADS } from '../pricing.js'
+import { premiumEntitlement } from '../lib/premium.js'
 import {
   REVISION_PASS_MARK,
   buildLabel,
@@ -129,6 +132,63 @@ async function applyRevision(
 
   return null
 }
+
+// Premium check that never blocks the free path: a ledger read error fails
+// CLOSED (treated as free, so the cap applies) rather than handing out unlimited
+// downloads. Mirrors how the client treats a premium-status error.
+async function isPremium(req: AuthedRequest): Promise<boolean> {
+  try {
+    return (await premiumEntitlement(req.db!)).premium
+  } catch {
+    return false
+  }
+}
+
+// ─── GET /api/tests/pdf-quota ────────────────────────────────────────────────
+// The caller's explanation-PDF download allowance. Premium → unlimited
+// (remaining = null); free → FREE_PDF_DOWNLOADS total minus what they've used.
+router.get(
+  '/pdf-quota',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    if (await isPremium(req)) {
+      return res.json({ premium: true, used: 0, cap: FREE_PDF_DOWNLOADS, remaining: null })
+    }
+    // Read via the service role (same pattern as payments.ts) so it doesn't
+    // depend on profiles-SELECT RLS for the caller's own row.
+    const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .select('pdf_downloads')
+      .eq('id', req.userId!)
+      .single()
+    if (error) return sendDbError(res, error)
+    const used = Number(data?.pdf_downloads ?? 0)
+    res.json({
+      premium: false,
+      used,
+      cap: FREE_PDF_DOWNLOADS,
+      remaining: Math.max(FREE_PDF_DOWNLOADS - used, 0),
+    })
+  })
+)
+
+// ─── POST /api/tests/pdf-download ─────────────────────────────────────────────
+// Reserve one download slot, called right before the client generates the PDF.
+// Premium → always allowed and uncounted. Free → atomic increment-under-cap;
+// `allowed:false` once the cap is reached (the client then nudges to upgrade).
+router.post(
+  '/pdf-download',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    if (await isPremium(req)) {
+      return res.json({ allowed: true, premium: true, used: 0, cap: FREE_PDF_DOWNLOADS, remaining: null })
+    }
+    const { data, error } = await req.db!.rpc('record_pdf_download', { p_cap: FREE_PDF_DOWNLOADS })
+    if (error) return sendDbError(res, error)
+    const r = data as { allowed: boolean; used: number; remaining: number }
+    res.json({ ...r, premium: false, cap: FREE_PDF_DOWNLOADS })
+  })
+)
 
 // ─── POST /api/tests/abandon ─────────────────────────────────────────────────
 // Records a test that was exited mid-way (status = 'abandoned').

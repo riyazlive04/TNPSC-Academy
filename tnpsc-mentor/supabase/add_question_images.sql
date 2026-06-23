@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — add per-question figure support
+-- TNPSC Mentors — add per-question figure support
 -- ----------------------------------------------------------------------------
 -- Adds an `images` column holding an ordered JSON array of public image URLs
 -- (hosted in the Supabase Storage bucket `question-images`). The column is

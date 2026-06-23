@@ -73,7 +73,7 @@ export function parseSolution(text: string): ParsedSolution {
     if (m) {
       answerLetter = m[1].toUpperCase() as AnswerLetter
       line = line.replace(OPTION_RE, '').trim()
-      line = line.replace(/[→⇒\-–—]\s*$/, '').trim()
+      line = line.replace(/[→⇒\---]\s*$/, '').trim()
       if (!line) continue
     }
 

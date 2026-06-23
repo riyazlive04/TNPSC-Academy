@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — add an 'admin' audience to notifications
+-- TNPSC Mentors — add an 'admin' audience to notifications
 -- ----------------------------------------------------------------------------
 -- Lets the server file in-app alerts aimed only at admins/superadmins (e.g. a
 -- passive "free Premium activated" alert when a 100%-discount coupon is redeemed).

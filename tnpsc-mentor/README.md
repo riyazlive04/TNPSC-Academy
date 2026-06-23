@@ -96,7 +96,7 @@ subscription, or per-item purchases with no change to the recording layer.
   (see [`server/.env.example`](server/.env.example)). The secret never leaves
   the server; the browser only ever receives the public key id. With the keys
   unset, the `/api/payments/*` routes return `503` and the app runs normally.
-- **Try it:** the Profile page has a "Support TNPSC Mentor" button that runs the
+- **Try it:** the Profile page has a "Support TNPSC Mentors" button that runs the
   full flow. Use Razorpay's test card `4111 1111 1111 1111`, any future expiry,
   any CVV.
 

@@ -5,7 +5,7 @@ import { tapScale } from '../../lib/motion'
 
 // ─── List + ListRow ─────────────────────────────────────────────────────────
 // The backbone of the calm, list-led skeleton (≈80% of the app). Rows sit
-// directly on the surface and are separated by a single hairline — no card, no
+// directly on the surface and are separated by a single hairline - no card, no
 // shadow. Wrap rows in <List> to get the dividers; each <ListRow> is a tappable
 // destination with an optional leading IconTile and a trailing chevron/value.
 

@@ -24,6 +24,8 @@ import {
   Megaphone,
   Send,
   Flag,
+  BookOpen,
+  Download,
   MonitorSmartphone,
   Smartphone,
   Tablet,
@@ -54,7 +56,7 @@ import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
 import type { UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -68,6 +70,7 @@ export default function SuperAdminPage() {
     { id: 'notifications', label: 'notificationsTab', icon: Bell },
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
     { id: 'reports', label: 'reportsTab', icon: Flag },
+    { id: 'notes', label: 'notesTab', icon: BookOpen },
   ]
 
   return (
@@ -112,6 +115,7 @@ export default function SuperAdminPage() {
           {tab === 'notifications' && <NotificationsTab />}
           {tab === 'feedback' && <FeedbackTab />}
           {tab === 'reports' && <ReportedQuestions />}
+          {tab === 'notes' && <StudyNotesTab />}
         </div>
       </div>
     </AppLayout>
@@ -403,7 +407,7 @@ function RevenueChart({ data }: { data: { month: string; revenue: number }[] }) 
   const allZero = data.every((d) => d.revenue === 0)
   return (
     <div className="card p-5">
-      <h2 className="mb-4 font-heading text-sm font-semibold text-ink">Revenue — last 12 months</h2>
+      <h2 className="mb-4 font-heading text-sm font-semibold text-ink">Revenue - last 12 months</h2>
       {allZero ? (
         <p className="py-6 text-center font-body text-sm text-ink2">No revenue recorded yet.</p>
       ) : (
@@ -676,7 +680,7 @@ function relativeTime(iso: string): string {
   return `${day} day${day === 1 ? '' : 's'} ago`
 }
 
-/** Pick a device icon + type label from the User-Agent–derived session label. */
+/** Pick a device icon + type label from the User-Agent-derived session label. */
 function deviceKind(label: string | null): { Icon: typeof Monitor; type: string } {
   if (label && /iPad|Tablet/i.test(label)) return { Icon: Tablet, type: 'Tablet' }
   if (label && /iPhone|iPod|Android|Mobile/i.test(label)) return { Icon: Smartphone, type: 'Mobile' }
@@ -767,7 +771,7 @@ function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => vo
           </div>
         ) : sessions.length === 0 ? (
           <p className="py-10 text-center font-body text-sm text-ink2">
-            No active sessions — this user isn't signed in on any device.
+            No active sessions - this user isn't signed in on any device.
           </p>
         ) : (
           <ul className="space-y-2.5">
@@ -1056,7 +1060,7 @@ function CouponsTab() {
               placeholder="e.g. Riyaz"
             />
           </Field>
-          <Field label="Code (optional — auto-generated)">
+          <Field label="Code (optional - auto-generated)">
             <input
               className={COUPON_INPUT}
               value={form.code}
@@ -1131,7 +1135,7 @@ function CouponsTab() {
       ) : error ? (
         <ErrorState onRetry={load} />
       ) : list.length === 0 ? (
-        <p className="py-12 text-center font-body text-ink2">No coupons yet — create one above.</p>
+        <p className="py-12 text-center font-body text-ink2">No coupons yet - create one above.</p>
       ) : (
         <div className="space-y-2">
           {list.map((c, i) => (
@@ -1226,7 +1230,7 @@ function CouponsTab() {
 const AUDIENCE_OPTIONS: { value: NotificationAudience; label: string }[] = [
   { value: 'all', label: 'All users' },
   { value: 'premium', label: 'Premium users' },
-  { value: 'free', label: 'Free users' },
+  { value: 'free', label: 'Starter users' },
   { value: 'group', label: 'By target group' },
 ]
 
@@ -1483,6 +1487,93 @@ function NotificationsTab() {
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       />
+    </div>
+  )
+}
+
+// ─── Study Notes ──────────────────────────────────────────────────────────────
+// Recreates the "quick notes" infographics as bilingual TNPSC Mentors PDFs with a
+// faint "TNPSC Mentors" background watermark. One PDF per topic, generated
+// client-side on demand (the heavy jspdf/html2canvas chunk is lazy-loaded).
+function StudyNotesTab() {
+  const { t } = useT()
+  const [notes, setNotes] = useState<import('../lib/studyNotesPdf').StudyNote[]>([])
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  // Lazy-load the content (kept out of the main bundle alongside the generator).
+  useEffect(() => {
+    import('../lib/studyNotesData').then((m) => setNotes(m.STUDY_NOTES))
+  }, [])
+
+  const download = async (note: import('../lib/studyNotesPdf').StudyNote) => {
+    setBusyId(note.id)
+    try {
+      const { generateStudyNotePdf } = await import('../lib/studyNotesPdf')
+      await generateStudyNotePdf(note)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not generate the PDF.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="card flex items-start gap-3 p-4">
+        <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <BookOpen size={20} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">{t('notesTab')}</h2>
+          <p className="font-body text-xs text-ink2">
+            Download bilingual (English + தமிழ்) study notes as branded PDFs with a TNPSC Mentors
+            watermark.
+          </p>
+        </div>
+      </div>
+
+      {notes.length === 0 ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton h-20 w-full" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {notes.map((note, i) => (
+            <div
+              key={note.id}
+              style={{ '--i': i } as React.CSSProperties}
+              className="card stagger-item flex items-center gap-3 p-3.5"
+            >
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-goldsoft text-gold">
+                <BookOpen size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-heading text-sm font-semibold text-ink">
+                  {note.title.en}
+                  {note.period ? (
+                    <span className="ml-1.5 font-body text-xs text-ink2">{note.period}</span>
+                  ) : null}
+                </p>
+                <p className="tamil truncate font-body text-xs text-ink2">
+                  {note.title.ta} · {note.entries.length}{' '}
+                  {note.entries.length === 1 ? 'entry' : 'entries'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => download(note)}
+                disabled={busyId === note.id}
+                className="press focus-ring inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-line bg-card px-3.5 py-2 font-heading text-xs font-semibold text-ink transition hover:border-brand-ring disabled:opacity-50"
+              >
+                {busyId === note.id ? <Spinner size={14} /> : <Download size={14} />}
+                PDF
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

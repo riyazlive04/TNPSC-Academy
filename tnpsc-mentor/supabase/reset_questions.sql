@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Purge the old (mock/scraped) question bank
+-- TNPSC Mentors — Purge the old (mock/scraped) question bank
 -- ----------------------------------------------------------------------------
 -- Run this in the Supabase SQL Editor AFTER you have imported the real question
 -- batch and verified it looks correct. Pick ONE strategy below.

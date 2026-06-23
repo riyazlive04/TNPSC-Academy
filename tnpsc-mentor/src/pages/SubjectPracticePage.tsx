@@ -751,7 +751,7 @@ function TypeStep({
               title={label(labelKey)}
               trailing={
                 <span className="flex-shrink-0 font-heading text-sm font-semibold text-muted">
-                  {n > 0 ? n : '—'}
+                  {n > 0 ? n : '-'}
                 </span>
               }
             />

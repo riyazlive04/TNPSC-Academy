@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — Subject Practice bank (rewritten content) + provenance tag
+-- TNPSC Mentors — Subject Practice bank (rewritten content) + provenance tag
 -- ----------------------------------------------------------------------------
 -- The new student-facing "Subject Practice" flow stores the 13 academic
 -- subjects (History, Botany, Polity, …) under category='subject', drilled by

@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Sparkles, Compass, X } from 'lucide-react'
 import { useT, type StringKey } from '../../lib/i18n'
 
 /**
- * First-run GUIDED tour — shown only to freshly created accounts. Rather than a
+ * First-run GUIDED tour - shown only to freshly created accounts. Rather than a
  * passive slideshow, it dims the real dashboard and spotlights the actual
  * controls one at a time (the mock-test hero, the practice list, the
  * revision/insights links, the language toggle), pointing the new aspirant at
@@ -118,7 +118,7 @@ export default function OnboardingTour({
 
   return (
     <div className="fixed inset-0 z-[70] animate-fadeInFast" role="dialog" aria-modal="true" aria-label={t('howItWorks')}>
-      {/* Click-blocker — swallows page interaction so the tour drives the flow. */}
+      {/* Click-blocker - swallows page interaction so the tour drives the flow. */}
       <div className="absolute inset-0" />
 
       {/* Spotlight: a transparent box at the target with a huge outer shadow that

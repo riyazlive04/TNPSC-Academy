@@ -25,6 +25,7 @@ import { api } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
+import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
 import { useT } from '../lib/i18n'
 import type { AnswerLetter, QuizConfig } from '../types'
@@ -111,7 +112,7 @@ export default function QuizPage() {
     // Resume: the persisted store already holds a matching, unfinished test.
     // Guard against a corrupt/truncated persisted set: it must be non-empty and
     // never larger than the config's requested count (which is an upper cap on
-    // the fetched pool). A mismatch means we'd grade the wrong set — discard it
+    // the fetched pool). A mismatch means we'd grade the wrong set - discard it
     // and re-fetch a fresh test instead.
     const persisted = useQuizStore.getState()
     const expectedCap = config.mock
@@ -129,7 +130,7 @@ export default function QuizPage() {
       setLoading(false)
       return
     }
-    // A stale/partial persisted session that can't be trusted — clear it so the
+    // A stale/partial persisted session that can't be trusted - clear it so the
     // loader below starts a clean test rather than resuming a broken one.
     if (persisted.questions.length > 0 && !canResume) persisted.reset()
 
@@ -377,7 +378,11 @@ export default function QuizPage() {
 
   // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
   const proctored = !!config?.proctored
-  const proctorActive = proctored && !loading && !empty && !loadError && total > 0
+  const testActive = !loading && !empty && !loadError && total > 0
+  const proctorActive = proctored && testActive
+  // Block OS screenshots/recording (native app) for the whole time a test is on
+  // screen, proctored or not.
+  useScreenSecure(testActive)
   const { violations, violationToast, notFullscreen, fsSupported, reEnterFullscreen } =
     useProctoring({
       active: proctorActive,
@@ -656,9 +661,9 @@ export default function QuizPage() {
             </button>
           </div>
 
-          {/* Next / Submit — warm rose CTA (per the quiz mockup), distinct from
+          {/* Next / Submit - warm rose CTA (per the quiz mockup), distinct from
               the violet progress/selection so the primary action always pops. */}
-          {/* The single filled primary pill — the only filled button on the
+          {/* The single filled primary pill - the only filled button on the
               screen (design-system.md). Token gradient, not a hardcoded colour. */}
           {isLast ? (
             <button

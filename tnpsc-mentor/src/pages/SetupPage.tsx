@@ -15,7 +15,7 @@ export default function SetupPage() {
   const fetchProfile = useAuthStore((s) => s.fetchProfile)
   const { t } = useT()
 
-  // Default group, submitted but not shown — keeps group-derived logic working.
+  // Default group, submitted but not shown - keeps group-derived logic working.
   const group = profile?.target_group ?? 'Group1'
   const [examDate, setExamDate] = useState(profile?.exam_date ?? '')
   const [goal, setGoal] = useState(profile?.daily_goal ?? 20)

@@ -34,7 +34,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
   // Accurate wall-clock time (survives refresh; no off-by-one).
   const timeTaken = Math.max(0, Math.round((Date.now() - startedAt) / 1000))
 
-  // Thirukkural is a client-side bank — grade in the browser (the questions
+  // Thirukkural is a client-side bank - grade in the browser (the questions
   // already carry their correct_answer) instead of calling the server grader.
   if (config.category === 'thirukural') {
     return gradeLocally(input, timeTaken)
@@ -67,7 +67,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     ca_topic: config.ca_topic ?? null,
     aptitude_type: config.aptitude_type ?? null,
     aptitude_topic: config.aptitude_topic ?? null,
-    // When set, this test is a revision re-attempt — a pass clears that row.
+    // When set, this test is a revision re-attempt - a pass clears that row.
     revision_id: config.revisionId ?? null,
     total_questions: questions.length,
     time_limit_seconds: timeLimitSeconds,
@@ -126,7 +126,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
 
 /**
  * Grades a Thirukkural test entirely client-side. The bundled questions already
- * include `correct_answer`, so there's no server round-trip — we build the same
+ * include `correct_answer`, so there's no server round-trip - we build the same
  * ResultPayload shape the Result page consumes (with answers always "unlocked"
  * so the review and explanations show).
  */

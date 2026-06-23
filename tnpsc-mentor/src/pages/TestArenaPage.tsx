@@ -44,7 +44,7 @@ interface ArenaCard {
   tint: Tint
 }
 
-// Each category carries a tint for its in-row IconTile (design-system.md §1) —
+// Each category carries a tint for its in-row IconTile (design-system.md §1) -
 // a small tinted square, never a large category card. The first entry (Mock) is
 // promoted to the single gradient hero; the rest render as a hairline list.
 const CARDS: ArenaCard[] = [
@@ -98,7 +98,7 @@ export default function TestArenaPage() {
   const [thirukuralOpen, setThirukuralOpen] = useState(false)
   const [dailyKural, setDailyKural] = useState<Kural | null>(null)
 
-  // First-run guided tour — shown ONLY to a freshly created account. Signup arms
+  // First-run guided tour - shown ONLY to a freshly created account. Signup arms
   // `pending`; the dashboard consumes it once here and opens the spotlight tour.
   // Existing users never had it armed, so it never fires for them. Admins skip
   // the aspirant layer entirely.
@@ -200,7 +200,7 @@ export default function TestArenaPage() {
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
-        {/* Greeting — bare on the surface. Hierarchy from type + space, no box. */}
+        {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
         <header className="px-1">
           <p className="font-body text-[13px] text-muted">{t('welcomeBack')}</p>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -216,7 +216,7 @@ export default function TestArenaPage() {
               </span>
             )}
           </div>
-          {/* Kural of the day — the actual couplet, rotating daily. Tapping it
+          {/* Kural of the day - the actual couplet, rotating daily. Tapping it
               opens the box straight at this kural's full detail. */}
           {dailyKural && (
             <button
@@ -260,7 +260,7 @@ export default function TestArenaPage() {
           )}
         </header>
 
-        {/* The one gradient hero — the single elevated element on the screen.
+        {/* The one gradient hero - the single elevated element on the screen.
             data-tour anchors the onboarding spotlight to the mock-test card. */}
         <div data-tour="mock">
           <Hero
@@ -272,7 +272,7 @@ export default function TestArenaPage() {
           />
         </div>
 
-        {/* Practice — subjects as a hairline-divided list, not a card grid. */}
+        {/* Practice - subjects as a hairline-divided list, not a card grid. */}
         <section className="space-y-2" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
           <List>
@@ -286,7 +286,7 @@ export default function TestArenaPage() {
                 subtitle={card.subtitle}
               />
             ))}
-            {/* Thirukkural quiz — a self-contained bilingual practice bank. */}
+            {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
             <ListRow
               onClick={() => navigate('/test-arena/thirukural')}
               style={{ '--i': restCards.length } as React.CSSProperties}
@@ -301,11 +301,11 @@ export default function TestArenaPage() {
           </List>
         </section>
 
-        {/* Premium upsell — the one deliberately distinct surface (its own coral
+        {/* Premium upsell - the one deliberately distinct surface (its own coral
             identity), kept as a self-contained monetisation unit. */}
         <PremiumCard dismissible />
 
-        {/* Keep going — study-loop quick links, also a list. */}
+        {/* Keep going - study-loop quick links, also a list. */}
         <section className="space-y-2" data-tour="progress">
           <SectionHeader title={t('keepGoingShort')} className="px-1" />
           <List>
@@ -342,7 +342,7 @@ export default function TestArenaPage() {
   )
 }
 
-/** The single gradient hero — the only elevated/shadowed element on a screen
+/** The single gradient hero - the only elevated/shadowed element on a screen
  * (design-system.md elevation budget). Full-bleed brand gradient, dotted
  * overlay, white "Start" pill. Tactile press via motion. */
 function Hero({
@@ -405,7 +405,7 @@ function AdminDashboard({
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
-        {/* Admin greeting — bare, role-aware, no gamification, no gradient panel. */}
+        {/* Admin greeting - bare, role-aware, no gamification, no gradient panel. */}
         <header className="px-1">
           <span className="inline-flex items-center gap-1.5 font-display text-[13px] font-bold uppercase tracking-wide text-accent">
             <ShieldCheck size={14} /> {isSuperAdmin ? t('superadmin') : t('admin')}
@@ -427,7 +427,7 @@ function AdminDashboard({
           />
         )}
 
-        {/* Question bank management — a list, not a card grid. */}
+        {/* Question bank management - a list, not a card grid. */}
         <section className="space-y-2">
           <SectionHeader title={t('manageBank')} className="px-1" />
           <p className="px-1 font-body text-[13px] text-muted">{t('pickCategoryAdmin')}</p>

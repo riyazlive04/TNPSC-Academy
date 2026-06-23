@@ -1,5 +1,5 @@
 -- ============================================================================
--- TNPSC Mentor — 5th answer option (E) support
+-- TNPSC Mentors — 5th answer option (E) support
 -- ----------------------------------------------------------------------------
 -- Adds questions.option_e / option_e_ta so 5-option items (the IndiaBix analogy
 -- reasoning bank) can be stored and served. Every existing 4-option row keeps

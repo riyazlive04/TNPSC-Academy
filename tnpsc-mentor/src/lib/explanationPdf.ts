@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
+import { savePdfDoc } from './savePdf'
 import type { DisplayLang, Question } from '../types'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 
@@ -10,7 +11,7 @@ import { optionLetters, displayQuestion, displayOption, displayExplanation } fro
  * WHY: jsPDF has no complex-script shaping, so Tamil vowel signs (ெ/ே/ை, the
  * ◌ு/◌ூ ligatures) come out scrambled. The browser DOES shape Tamil correctly
  * (it's the same engine rendering the app UI), so we let it lay the text out and
- * just capture the pixels. Runs 100% client-side — no server cost at scale.
+ * just capture the pixels. Runs 100% client-side - no server cost at scale.
  *
  * Each question is captured as its OWN image so pagination never cuts a question
  * mid-line: we measure each block and start a new page when it won't fit.
@@ -119,7 +120,7 @@ export async function generateExplanationPdf({
   const contentW = pageW - margin * 2
   const footerSafe = pageH - 40
 
-  // JPEG (not PNG) keeps the file small — a 2-question PNG export was ~13 MB;
+  // JPEG (not PNG) keeps the file small - a 2-question PNG export was ~13 MB;
   // JPEG q0.85 is ~0.6 MB with no visible loss on text/UI.
   const toJpeg = (c: HTMLCanvasElement) => c.toDataURL('image/jpeg', 0.85)
 
@@ -136,7 +137,7 @@ export async function generateExplanationPdf({
 
   // Cover (HTML so a Tamil sub-title shapes correctly).
   const cover = await htmlToCanvas(coverHtml(title, label, questions.length))
-  // Cover spans full width incl. the colored band — bleed it to the page edges.
+  // Cover spans full width incl. the colored band - bleed it to the page edges.
   const coverHPt = (cover.height / cover.width) * pageW
   doc.addImage(toJpeg(cover), 'JPEG', 0, 0, pageW, coverHPt)
   y = coverHPt + 10
@@ -174,10 +175,10 @@ export async function generateExplanationPdf({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...GREY)
-    doc.text('TNPSC Mentor  ·  Prepare smart. Score high.', margin, fy)
+    doc.text('TNPSC Mentors  ·  Prepare smart. Score high.', margin, fy)
     doc.text(`Page ${p} of ${total}`, pageW - margin, fy, { align: 'right' })
   }
 
   const safe = (title + '_' + label).replace(/[^a-z0-9]+/gi, '_').slice(0, 60)
-  doc.save(`TNPSC_Mentor_${safe || 'ExplanationSheet'}.pdf`)
+  await savePdfDoc(doc, `TNPSC_Mentors_${safe || 'ExplanationSheet'}.pdf`)
 }

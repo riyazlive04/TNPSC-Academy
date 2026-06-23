@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 // ─── StatStrip ──────────────────────────────────────────────────────────────
-// An inline run of metrics separated by hairline dividers — replaces the row of
+// An inline run of metrics separated by hairline dividers - replaces the row of
 // little metric boxes (design-system.md Home: "an inline stat strip … separated
 // by hairlines, no metric boxes"). Coral is reserved for the one number that
 // matters (e.g. the streak), via `accent`.

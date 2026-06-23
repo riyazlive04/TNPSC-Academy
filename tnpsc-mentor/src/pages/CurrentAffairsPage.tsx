@@ -145,7 +145,7 @@ export default function CurrentAffairsPage() {
       (monthTopicCounts ? Object.values(monthTopicCounts).reduce((a, b) => a + b, 0) : undefined)
     : undefined
 
-  // "All topics" for the month — the original whole-month behaviour. Pass the
+  // "All topics" for the month - the original whole-month behaviour. Pass the
   // already-known count as availableCount so the instructions slider shows it
   // instantly (no /count round-trip), like Subject Practice does.
   const startMonthAll = (label: string) => {
@@ -182,7 +182,7 @@ export default function CurrentAffairsPage() {
   return (
     <PickerPage badge={t('currentAffairsBadge')}>
       {selectedMonth ? (
-        /* Month detail — choose All Topics or a specific topic within the month */
+        /* Month detail - choose All Topics or a specific topic within the month */
         <section className="animate-fadeIn">
           <button
             onClick={() => setSelectedMonth(null)}
@@ -200,7 +200,7 @@ export default function CurrentAffairsPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* All topics — the highlighted shortcut (matches other sections) */}
+              {/* All topics - the highlighted shortcut (matches other sections) */}
               <button
                 onClick={() => startMonthAll(selectedMonth)}
                 className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left"

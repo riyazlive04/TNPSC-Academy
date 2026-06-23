@@ -5,7 +5,7 @@ Scraper for TNPSC Thervu Pettagam — Monthly Quiz Documents
 
 Extracts bilingual (English + Tamil) current-affairs MCQs from the
 Monthly Quiz Document PDFs and writes them to thervupettagam_questions.json
-in the schema expected by the TNPSC Mentor app DB.
+in the schema expected by the TNPSC Mentors app DB.
 
 Stack: python3 + requests + PyMuPDF (fitz).
 """

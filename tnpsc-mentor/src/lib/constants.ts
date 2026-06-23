@@ -218,8 +218,8 @@ export const TOPIC_NAME_TA: Record<string, string> = {
   'Tamil Nadu': 'தமிழ்நாடு',
 }
 
-/** A topic (or sub-group heading) in the chosen language. Unknown topics — e.g.
- *  PYQ's per-question labels — return unchanged. */
+/** A topic (or sub-group heading) in the chosen language. Unknown topics - e.g.
+ *  PYQ's per-question labels - return unchanged. */
 export function topicName(name: string, lang: Lang | null): string {
   const ta = TOPIC_NAME_TA[name]
   if (!ta) return name
@@ -529,7 +529,7 @@ export const SUBJECT_TOPIC_GROUPS: Record<string, TopicGroup[]> = {
 // The "History" subject bank is large and chronological, so Subject Practice
 // first asks the student to pick a PERIOD (Ancient / Medieval / Modern); the
 // topic step then shows only that period's topics. Mirrors the PYQ History
-// period selector (HistoryPeriodsPage), which scopes via the `unit` column —
+// period selector (HistoryPeriodsPage), which scopes via the `unit` column -
 // here the period is derived purely from the topic, so no DB change is needed.
 export const HISTORY_SUBJECT = 'History'
 export type HistoryPeriod = 'ancient' | 'medieval' | 'modern'
@@ -786,7 +786,7 @@ export const MOCK_BLUEPRINTS: MockBlueprint[] = [
       { label: 'Aptitude', count: 10 },
     ],
   },
-  // Group 2 / 2A Prelims and Group 4 & VAO are intentionally not offered — the
+  // Group 2 / 2A Prelims and Group 4 & VAO are intentionally not offered - the
   // app currently ships Group 1 only. (Their server-side GROUP_SLOTS remain, so
   // these can be re-enabled by restoring the blueprint entries.)
 ]
