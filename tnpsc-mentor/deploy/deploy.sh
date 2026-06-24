@@ -12,7 +12,10 @@ WEB_ROOT="/var/www/tnpsc"
 
 echo "==> Building frontend (Vite)…"
 cd "$APP_DIR"
-npm ci
+# --omit=optional skips the native mobile packages (@capacitor/android, the
+# Capacitor CLI and asset generator). They live in optionalDependencies and are
+# only needed to build the Android APK - the web/SPA build never imports them.
+npm ci --omit=optional
 npm run build                       # outputs to dist/
 
 echo "==> Publishing SPA to $WEB_ROOT…"
