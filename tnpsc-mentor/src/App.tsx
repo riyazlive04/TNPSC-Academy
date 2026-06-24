@@ -12,6 +12,7 @@ import { pageVariants, pageTransition } from './lib/motion'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
+import UpdatePrompt from './components/UpdatePrompt'
 import Toaster from './components/UI/Toaster'
 import Spinner from './components/UI/Spinner'
 
@@ -125,6 +126,7 @@ export default function App() {
     <Suspense fallback={<PageLoader />}>
       <AnimatedRoutes />
     </Suspense>
+    <UpdatePrompt />
     <Toaster />
     </>
   )
