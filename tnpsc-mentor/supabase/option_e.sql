@@ -222,6 +222,13 @@ grant execute on function public.get_due_reviews(int)                           
 grant execute on function public.subject_mock_questions(text, text, text, int)   to authenticated;
 grant execute on function public.mock_slot_questions(jsonb, int)                 to authenticated;
 
+-- The new option columns also need a COLUMN-LEVEL select grant: `questions` uses
+-- per-column grants (answer columns withheld), so option_e/option_e_ta were NOT
+-- readable by `authenticated`. The read RPCs above are SECURITY DEFINER so they
+-- return them regardless — but any DIRECT select(...) of these columns (e.g. the
+-- fixed Full Mock Exam fetch) hits 42501 without this grant.
+grant select (option_e, option_e_ta) on public.questions to authenticated;
+
 -- ─── 8. Admin write RPCs: persist option_e / option_e_ta ────────────────────
 -- Return types are unchanged (questions / jsonb), so CREATE OR REPLACE is fine.
 create or replace function public.admin_upsert_question(p jsonb)

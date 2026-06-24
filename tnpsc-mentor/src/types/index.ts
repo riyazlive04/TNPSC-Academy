@@ -309,9 +309,11 @@ export interface QuizConfig {
    * exam from a single subject/topic drill.
    */
   proctored?: boolean
-  mockKind?: 'group' | 'subject'
+  mockKind?: 'group' | 'subject' | 'exam'
   /** Which TNPSC group blueprint a group mock follows (2024/2025 pattern). */
   mockGroup?: GroupType
+  /** A fixed full mock exam id ('exam1'..'exam6') when mockKind === 'exam'. */
+  mockExamId?: string
   /** Set when this quiz is a revision re-test (gates similar-question fetch). */
   revision?: boolean
   /** The revision_topics row id, threaded back through submit so a pass clears it. */
@@ -338,6 +340,40 @@ export interface MockBlueprint {
   durationMinutes: number
   negativeMark: number
   slots: MockSlot[]
+}
+
+// ─── Full mock exams (fixed, named papers; tier + admin-enabled gated) ───────
+
+/** One exam as seen by a student: access state + attempts already used. */
+export interface MockExam {
+  id: string
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  tier: 'free' | 'paid'
+  /** True when the user can't start it yet (paid exam, not premium). */
+  locked: boolean
+  lockReason: 'premium' | null
+  attemptsUsed: number
+  attemptsMax: number
+}
+
+/** One exam row in the superadmin console (all exams, incl. disabled). */
+export interface MockExamAdmin {
+  id: string
+  mock_set: number
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  tier: 'free' | 'paid'
+  enabled: boolean
+  sort_order: number
+  /** Questions actually loaded for this set (should be total_questions). */
+  loaded_questions: number
 }
 
 export interface Profile {

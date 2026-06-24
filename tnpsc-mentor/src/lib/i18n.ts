@@ -35,6 +35,7 @@ const STRINGS = {
   chipSamacheer: { en: 'Samacheer', ta: 'சமச்சீர்' },
   chipCa: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
   chipAptitude: { en: 'Aptitude', ta: 'திறனாய்வு' },
+  chipSubject: { en: 'Subject Wise', ta: 'பாடம் வாரியாக' },
   downloadExplanations: { en: 'Download explanations (PDF)', ta: 'விளக்கங்களைப் பதிவிறக்கு (PDF)' },
   preparingPdf: { en: 'Preparing PDF…', ta: 'PDF தயாராகிறது…' },
   pdfWhenComplete: {
@@ -458,9 +459,22 @@ const STRINGS = {
   negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
   startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
 
-  // Mock test - group exam vs subject/topic
+  // Mock test - group exam vs subject/topic vs full mock exams
   mockGroupExam: { en: 'Group Exam', ta: 'குரூப் தேர்வு' },
   mockSubjectExam: { en: 'Subject / Topic', ta: 'பாடம் / தலைப்பு' },
+  mockFullExams: { en: 'Mock Exams', ta: 'மாதிரித் தேர்வுகள்' },
+  mockFullSub: {
+    en: 'Full-length 200-question mock papers. Each can be attempted twice.',
+    ta: '200 வினாக்கள் கொண்ட முழு நீள மாதிரித் தேர்வுகள். ஒவ்வொன்றையும் இருமுறை எழுதலாம்.',
+  },
+  mockExamsEmpty: { en: 'No mock exams are available yet.', ta: 'இன்னும் மாதிரித் தேர்வுகள் எதுவும் இல்லை.' },
+  premiumOnly: { en: 'Premium', ta: 'பிரீமியம்' },
+  examLocked: {
+    en: 'Upgrade to Premium to unlock this exam',
+    ta: 'இந்தத் தேர்வைத் திறக்க பிரீமியத்திற்கு மேம்படுத்துங்கள்',
+  },
+  examCompleted: { en: 'Completed', ta: 'முடிந்தது' },
+  attemptWord: { en: 'Attempt', ta: 'முயற்சி' },
   mockGroupSub: {
     en: 'Full-length exam following the 2024/2025 TNPSC pattern',
     ta: '2024/2025 TNPSC முறையைப் பின்பற்றும் முழு நீளத் தேர்வு',
@@ -920,6 +934,12 @@ const STRINGS = {
   couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
   appTab: { en: 'App', ta: 'ஆப்' },
   revenueTab: { en: 'Revenue', ta: 'வருவாய்' },
+  mockExamsTab: { en: 'Mock Exams', ta: 'மாதிரித் தேர்வுகள்' },
+  mockSectionsTitle: { en: 'Mock Test sections', ta: 'மாதிரித் தேர்வு பிரிவுகள்' },
+  mockSectionsSub: {
+    en: 'Show or hide the Group Exam and Subject/Topic tabs for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் குரூப் தேர்வு மற்றும் பாடம்/தலைப்பு தாவல்களைக் காட்டு அல்லது மறை.',
+  },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },

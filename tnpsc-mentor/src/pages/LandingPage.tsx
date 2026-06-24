@@ -31,6 +31,7 @@ import {
   Smartphone,
   Laptop,
   Tablet,
+  Languages,
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
@@ -53,6 +54,7 @@ const ApkUrlContext = createContext<string | null>(null)
 // router (the app lives on its own subdomain).
 const APP_URL = 'https://app.tnpscmentors.in'
 const APP_LOGIN_URL = `${APP_URL}/login`
+const APP_REGISTER_URL = `${APP_URL}/register`
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 const SUPPORT_PHONE = '+91 96777 79808' // TODO: real WhatsApp/support number
 const SUPPORT_PHONE_TEL = '+91 96777 79808' // TODO: tel:/wa.me digits
@@ -96,6 +98,7 @@ const heroItem = {
 const T = {
   // Header / global
   signIn: { ta: 'உள்நுழைய', en: 'Sign in' },
+  signUp: { ta: 'பதிவு செய்', en: 'Sign up' },
   download: { ta: 'App download பண்ணுங்க', en: 'Download the app' },
 
   // Hero
@@ -182,6 +185,7 @@ const T = {
     en: 'Phone, tablet or laptop - one account, your progress everywhere.',
   },
   openWeb: { ta: 'Web app-ஐ திறங்க', en: 'Open web app' },
+  openWebShort: { ta: 'Web app', en: 'Web app' },
 
   // Section 7 - FAQ
   faqEyebrow: { ta: 'கேள்வி-பதில்', en: 'FAQ' },
@@ -447,18 +451,28 @@ export default function LandingPage() {
         }`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <a href="#top" className="group flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white transition-transform duration-200 group-hover:scale-105 group-active:scale-95">
-              த
-            </span>
-            <span className="font-heading text-base font-semibold tracking-tight text-ink">
+          <a href="#top" className="group flex shrink-0 items-center gap-2.5">
+            <img
+              src="/logo-mark.png"
+              alt="TNPSC Mentors"
+              className="h-9 w-9 shrink-0 object-contain transition-transform duration-200 group-hover:scale-105 group-active:scale-95"
+            />
+            <span className="hidden whitespace-nowrap font-heading text-base font-semibold tracking-tight text-ink sm:inline">
               TNPSC <span className="text-brand">Mentors</span>
             </span>
           </a>
 
           <div className="flex items-center gap-1.5 sm:gap-3">
-            {/* Language toggle (spec §6) */}
-            <div className="seg-wrap" role="group" aria-label="Language">
+            {/* Language toggle (spec §6). Phones get a compact single-tap toggle so
+                the auth CTAs always fit; sm+ gets the full segmented control. */}
+            <button
+              onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
+              className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-tint px-2.5 py-2 font-heading text-sm font-medium text-ink2 sm:hidden"
+              aria-label={lang === 'ta' ? 'Switch to English' : 'தமிழுக்கு மாற்று'}
+            >
+              <Languages size={15} /> {lang === 'ta' ? 'EN' : 'த'}
+            </button>
+            <div className="seg-wrap hidden sm:inline-flex" role="group" aria-label="Language">
               <button
                 onClick={() => setLang('ta')}
                 className={`seg ${lang === 'ta' ? 'seg-active' : ''}`}
@@ -475,17 +489,36 @@ export default function LandingPage() {
               </button>
             </div>
 
+            {/* Theme toggle hides on the tightest phones so the auth buttons stay
+                visible; available from sm up. */}
             <button
               onClick={toggleTheme}
-              className="icon-btn h-9 w-9 transition-transform duration-300 hover:rotate-45"
+              className="icon-btn hidden h-9 w-9 transition-transform duration-300 hover:rotate-45 sm:grid"
               aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {resolved === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <a href={isAuthed ? APP_URL : APP_LOGIN_URL} className="btn-soft px-3.5 py-2 text-sm">
-              {isAuthed ? 'Dashboard' : t('signIn')}
-            </a>
+            {isAuthed ? (
+              <a href={APP_URL} className="btn-soft shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2">
+                Dashboard
+              </a>
+            ) : (
+              <>
+                <a
+                  href={APP_LOGIN_URL}
+                  className="btn-soft shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2"
+                >
+                  {t('signIn')}
+                </a>
+                <a
+                  href={APP_REGISTER_URL}
+                  className="btn-brand shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2"
+                >
+                  {t('signUp')}
+                </a>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -781,7 +814,7 @@ export default function LandingPage() {
                     )
                   ) : (
                     <a
-                      href={APP_URL}
+                      href={isAuthed ? APP_URL : APP_LOGIN_URL}
                       className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
                     >
                       <Globe size={15} /> {t('openWeb')} <ArrowRight size={15} />
@@ -860,9 +893,7 @@ export default function LandingPage() {
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 max-w-sm">
               <div className="flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-gradient font-heading text-xs font-bold text-white">
-                  த
-                </span>
+                <img src="/logo-mark.png" alt="" className="h-8 w-8 object-contain" />
                 <span className="font-heading text-sm font-semibold text-ink">
                   TNPSC <span className="text-brand">Mentors</span>
                 </span>
@@ -924,15 +955,17 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* ─── Sticky mobile download bar (always-visible CTA) ──────────────── */}
+      {/* ─── Sticky mobile CTA bar (always-visible) ───────────────────────────
+          Two functional actions: open the hosted web app (→ /login) or download
+          the Android APK. */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card/95 px-4 py-3 pb-safe backdrop-blur sm:hidden">
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-heading text-sm font-semibold text-ink">
-              TNPSC <span className="text-brand">Group 1</span>
-            </p>
-            <p className="truncate font-body text-xs text-ink2">{t('stickyHint')}</p>
-          </div>
+        <div className="flex items-center gap-2.5">
+          <a
+            href={isAuthed ? APP_URL : APP_LOGIN_URL}
+            className="btn-ghost group flex-1 justify-center whitespace-nowrap px-3 py-2.5 text-sm"
+          >
+            <Globe size={16} /> {t('openWebShort')}
+          </a>
           <DownloadButton label={t('download')} compact />
         </div>
       </div>

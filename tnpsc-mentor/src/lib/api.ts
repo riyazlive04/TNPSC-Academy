@@ -5,6 +5,8 @@
 
 import type {
   Kural,
+  MockExam,
+  MockExamAdmin,
   Profile,
   Question,
   QuizConfig,
@@ -462,6 +464,32 @@ export const api = {
     })
     return data.questions
   },
+  /** Full mock exams visible to this user (enabled only) + lock/attempt state. */
+  async mockExams(): Promise<{ exams: MockExam[]; premium: boolean }> {
+    return request<{ exams: MockExam[]; premium: boolean }>('/api/questions/mock-exams')
+  },
+  /** The fixed question set for one exam. Server re-checks tier/enabled/attempts. */
+  async mockExamQuestions(examId: string): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/mock-exam', {
+      method: 'POST',
+      body: { exam_id: examId },
+    })
+    return data.questions
+  },
+  /** Record a completed exam attempt (counts toward the per-exam attempt cap). */
+  async recordMockExamAttempt(p: {
+    exam_id: string
+    session_id?: string | null
+    score?: number
+    total?: number
+  }): Promise<void> {
+    await request('/api/questions/mock-exam/attempt', { method: 'POST', body: p })
+  },
+  /** Public client-facing feature flags (e.g. which Mock Test sections show). */
+  async appSettings(): Promise<AppSettings> {
+    const data = await request<{ settings: AppSettings }>('/api/app/settings', { auth: false })
+    return data.settings
+  },
 
   // ─── Analytics ─────────────────────────────────────────────────────────────
   async analytics(): Promise<{ sessions: unknown[]; answers: unknown[] }> {
@@ -651,6 +679,37 @@ export const api = {
         method: 'POST',
         body: { userId, id },
       })
+    },
+    /** All full mock exams (incl. disabled), with loaded-question counts. */
+    async mockExams(): Promise<MockExamAdmin[]> {
+      const data = await request<{ exams: MockExamAdmin[] }>('/api/superadmin/mock-exams')
+      return data.exams
+    },
+    /** Patch an exam's gating/metadata. Only the supplied fields change. */
+    async setMockExam(
+      id: string,
+      patch: Partial<{
+        enabled: boolean
+        tier: 'free' | 'paid'
+        title: string
+        duration_seconds: number
+        negative_mark: number
+      }>
+    ): Promise<MockExamAdmin> {
+      const data = await request<{ exam: MockExamAdmin }>(`/api/superadmin/mock-exams/${id}`, {
+        method: 'POST',
+        body: patch,
+      })
+      return data.exam
+    },
+    /** All app-settings rows as a raw key→value map. */
+    async settings(): Promise<Record<string, unknown>> {
+      const data = await request<{ settings: Record<string, unknown> }>('/api/superadmin/settings')
+      return data.settings
+    },
+    /** Upsert one app setting (key must be server-side allow-listed). */
+    async setSetting(key: string, value: unknown): Promise<void> {
+      await request('/api/superadmin/settings', { method: 'POST', body: { key, value } })
     },
   },
 
@@ -874,6 +933,14 @@ export interface PremiumStatus {
   premium: boolean
   /** ISO expiry of the active premium year, or null when not premium. */
   until: string | null
+}
+
+/** Public, superadmin-controlled feature flags (defaults applied server-side). */
+export interface AppSettings {
+  /** Show the random-sampled Group Exam mock tab. */
+  mock_group_enabled: boolean
+  /** Show the Subject / Topic mock tab. */
+  mock_subject_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

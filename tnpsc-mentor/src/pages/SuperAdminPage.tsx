@@ -32,6 +32,8 @@ import {
   Tablet,
   Monitor,
   LogOut,
+  ClipboardList,
+  Clock,
   X,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
@@ -56,9 +58,9 @@ import {
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { toast } from '../store/toastStore'
-import type { UserRole } from '../types'
+import type { MockExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -73,6 +75,7 @@ export default function SuperAdminPage() {
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
     { id: 'reports', label: 'reportsTab', icon: Flag },
     { id: 'notes', label: 'notesTab', icon: BookOpen },
+    { id: 'mockexams', label: 'mockExamsTab', icon: ClipboardList },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
@@ -119,6 +122,7 @@ export default function SuperAdminPage() {
           {tab === 'feedback' && <FeedbackTab />}
           {tab === 'reports' && <ReportedQuestions />}
           {tab === 'notes' && <StudyNotesTab />}
+          {tab === 'mockexams' && <MockExamsTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
       </div>
@@ -815,6 +819,201 @@ function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => vo
             })}
           </ul>
         )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Mock exams (full, named papers) ─────────────────────────────────────────
+function MockExamsTab() {
+  const { t } = useT()
+  const [exams, setExams] = useState<MockExamAdmin[]>([])
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  // Mock Test section visibility flags (app_settings) — superadmin can hide the
+  // random-sampled Group Exam and Subject/Topic tabs for all students.
+  const [groupOn, setGroupOn] = useState(false)
+  const [subjectOn, setSubjectOn] = useState(false)
+  const [savingKey, setSavingKey] = useState<string | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    Promise.all([api.superadmin.mockExams(), api.superadmin.settings()])
+      .then(([ex, settings]) => {
+        setExams(ex)
+        setGroupOn(Boolean(settings.mock_group_enabled))
+        setSubjectOn(Boolean(settings.mock_subject_enabled))
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const toggleSetting = async (key: 'mock_group_enabled' | 'mock_subject_enabled', next: boolean) => {
+    setSavingKey(key)
+    // Optimistic; revert on failure.
+    if (key === 'mock_group_enabled') setGroupOn(next)
+    else setSubjectOn(next)
+    try {
+      await api.superadmin.setSetting(key, next)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      if (key === 'mock_group_enabled') setGroupOn(!next)
+      else setSubjectOn(!next)
+    } finally {
+      setSavingKey(null)
+    }
+  }
+
+  const patch = async (
+    id: string,
+    p: Partial<{ enabled: boolean; tier: 'free' | 'paid'; duration_seconds: number }>
+  ) => {
+    setSavingId(id)
+    try {
+      const updated = await api.superadmin.setMockExam(id, p)
+      setExams((xs) => xs.map((e) => (e.id === id ? { ...e, ...updated } : e)))
+    } catch {
+      toast.error(t('couldNotLoad'))
+    } finally {
+      setSavingId(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="skeleton h-24 w-full" />
+        ))}
+      </div>
+    )
+  }
+  if (error) return <ErrorState onRetry={load} />
+
+  const enabledCount = exams.filter((e) => e.enabled).length
+
+  return (
+    <div>
+      <div className="card mb-4 flex items-center justify-between p-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-soft text-brand">
+            <ClipboardList size={20} />
+          </span>
+          <div>
+            <p className="font-heading text-xl font-semibold text-ink">
+              {enabledCount}/{exams.length}
+            </p>
+            <p className="font-body text-xs text-ink2">{t('mockExamsTab')} · enabled</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Section visibility — hide/show the random-sampled mock tabs for students */}
+      <div className="card mb-4 p-4">
+        <p className="mb-1 font-heading text-sm font-semibold text-ink">{t('mockSectionsTitle')}</p>
+        <p className="mb-3 font-body text-xs text-ink2">{t('mockSectionsSub')}</p>
+        <div className="space-y-2.5">
+          {(
+            [
+              { key: 'mock_group_enabled', label: t('mockGroupExam'), on: groupOn },
+              { key: 'mock_subject_enabled', label: t('mockSubjectExam'), on: subjectOn },
+            ] as const
+          ).map(({ key, label, on }) => (
+            <div key={key} className="flex items-center justify-between gap-3">
+              <span className="tamil font-body text-sm text-ink">{label}</span>
+              <button
+                disabled={savingKey === key}
+                onClick={() => toggleSetting(key, !on)}
+                aria-pressed={on}
+                className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+                  on ? 'bg-correct' : 'bg-ink2/30'
+                } disabled:opacity-50`}
+              >
+                <span
+                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                    on ? 'left-6' : 'left-1'
+                  }`}
+                />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        {exams.map((e) => {
+          const minutes = Math.round(e.duration_seconds / 60)
+          const short = e.loaded_questions !== e.total_questions
+          const busy = savingId === e.id
+          return (
+            <div key={e.id} className="card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="tamil font-heading text-sm font-semibold text-ink">{e.title}</p>
+                  <p className="font-body text-xs text-ink2">
+                    {e.loaded_questions}/{e.total_questions} questions
+                    {short && <span className="text-wrong"> · mismatch</span>}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {/* Tier selector */}
+                  <div className="flex overflow-hidden rounded-lg border border-line">
+                    {(['free', 'paid'] as const).map((tr) => (
+                      <button
+                        key={tr}
+                        disabled={busy || e.tier === tr}
+                        onClick={() => patch(e.id, { tier: tr })}
+                        className={`px-3 py-1.5 font-heading text-xs font-medium capitalize transition-colors ${
+                          e.tier === tr ? 'bg-brand text-white' : 'bg-card text-ink2 hover:text-ink'
+                        } disabled:cursor-default`}
+                      >
+                        {tr}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Duration (minutes) */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">
+                    <Clock size={14} className="text-ink2" />
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={minutes}
+                      disabled={busy}
+                      onBlur={(ev) => {
+                        const m = Math.trunc(Number(ev.target.value))
+                        if (m > 0 && m !== minutes) patch(e.id, { duration_seconds: m * 60 })
+                      }}
+                      className="w-14 bg-transparent font-heading text-sm text-ink outline-none"
+                    />
+                    <span className="font-body text-xs text-ink2">{t('minutesUnit')}</span>
+                  </label>
+
+                  {/* Enabled toggle */}
+                  <button
+                    disabled={busy}
+                    onClick={() => patch(e.id, { enabled: !e.enabled })}
+                    aria-pressed={e.enabled}
+                    className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+                      e.enabled ? 'bg-correct' : 'bg-ink2/30'
+                    } disabled:opacity-50`}
+                  >
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                        e.enabled ? 'left-6' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

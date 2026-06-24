@@ -48,7 +48,7 @@ const ROLE_TTL_MS = 30_000
 const roleCache = new Map<string, { role: string | null; expires: number }>()
 
 /** Look up the authenticated user's role (null if missing/unknown), cached ~30s. */
-async function roleOf(userId: string): Promise<string | null> {
+export async function roleOf(userId: string): Promise<string | null> {
   const cached = roleCache.get(userId)
   if (cached && cached.expires > Date.now()) return cached.role
 

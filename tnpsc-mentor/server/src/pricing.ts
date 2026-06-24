@@ -25,6 +25,13 @@ export const PREMIUM_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 3 months
 export const FREE_PDF_DOWNLOADS = 3
 
 /**
+ * Each user may attempt a given full mock exam at most this many times. Enforced
+ * server-side at exam start (POST /mock-exam) by counting completed submissions
+ * in mock_exam_attempts; the picker UI mirrors it for display only.
+ */
+export const MAX_MOCK_EXAM_ATTEMPTS = 2
+
+/**
  * Trusted base amount for an order. For a known plan we use the server price and
  * ignore the client amount entirely; for the generic contribution path we accept
  * the client amount, clamped to a sane range.
