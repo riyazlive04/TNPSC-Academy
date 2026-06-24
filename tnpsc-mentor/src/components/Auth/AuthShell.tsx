@@ -90,6 +90,17 @@ export default function AuthShell({ children }: AuthShellProps) {
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
               TNPSC Mentors
             </h1>
+            {/* Subjects section - shown on mobile too (the desktop hero is hidden here). */}
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {CHIP_KEYS.map((key) => (
+                <span
+                  key={key}
+                  className="tamil rounded-full bg-brand-soft px-3 py-1 font-heading text-[11px] font-semibold text-brand-dark"
+                >
+                  {t(key)}
+                </span>
+              ))}
+            </div>
           </div>
           {children}
         </div>

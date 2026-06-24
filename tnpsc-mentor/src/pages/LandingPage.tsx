@@ -51,7 +51,7 @@ const APK_DOWNLOAD_FALLBACK = `${API_BASE}/api/app/download`
 const ApkUrlContext = createContext<string | null>(null)
 // Sign-in from the landing page goes to the hosted web app, not the in-page
 // router (the app lives on its own subdomain).
-const APP_URL = 'https://tnpscacademy1.vercel.app/'
+const APP_URL = 'https://app.tnpscmentors.in'
 const APP_LOGIN_URL = `${APP_URL}/login`
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 const SUPPORT_PHONE = '+91 96777 79808' // TODO: real WhatsApp/support number
@@ -232,7 +232,7 @@ const FREE_ITEMS: { ta: string; en: string }[] = [
 const PREMIUM_ITEMS: { ta: string; en: string }[] = [
   { ta: 'கடந்த 5 வருட TNPSC PYQ, முழு விளக்கத்தோடு ', en: "Last 5 years TNPSC PYQ, fully solved" },
   { ta: 'Unlimited tests attempts, எந்த subject/topic வேணாலும்', en: 'Unlimited test attempts on any subject/topic' },
-  { ta: ' 5 மாதிரி தேர்வு', en: ' 5 மாதிரி தேர்வு' },
+  { ta: ' 5 மாதிரி தேர்வு(2 Attempt)', en: ' 5 Mock Tests(2 Attempt)' },
   { ta: 'ஆகஸ்ட் 2025 முதல் ஜூலை 2026 வரையிலான நடப்பு நிகழ்வுகள்', en: 'August 2025 to July 2026 current affairs' },
   { ta: '45 நாள் revision plan', en: '45-day revision plan' },
   { ta: 'Formula & Infographic pdf\'s', en: 'Formula and Infographic pdf\s' },
