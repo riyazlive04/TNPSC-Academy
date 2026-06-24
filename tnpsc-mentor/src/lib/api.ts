@@ -282,6 +282,17 @@ export const api = {
       tokens.set(data.access_token, data.refresh_token)
       return data
     },
+    /** After a Google `device_limit` block: sign out the chosen device and finish
+     * signing in by re-verifying the same Google ID token (still valid for ~1h). */
+    async googleReplaceDevice(idToken: string, sessionId: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/google/replace-device', {
+        method: 'POST',
+        auth: false,
+        body: { idToken, session_id: sessionId, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
     async forgotPassword(email: string, redirectTo?: string): Promise<void> {
       await request('/api/auth/forgot-password', {
         method: 'POST',

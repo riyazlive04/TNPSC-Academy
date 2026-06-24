@@ -70,6 +70,9 @@ export interface AuthState {
   verifyOtp: (phone: string, otp: string) => Promise<SignInResult>
   /** Phone-OTP: after a device-limit block, sign out a device and finish via ticket. */
   replaceDeviceOtp: (ticket: string, sessionId: string) => Promise<SignInResult>
+  /** Google: after a device-limit block, sign out a device and finish by
+   * re-verifying the same Google ID token. */
+  replaceDeviceGoogle: (idToken: string, sessionId: string) => Promise<SignInResult>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
@@ -151,6 +154,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   replaceDevice: async (email, password, sessionId) => {
     try {
       const { user, profile } = await api.auth.replaceDevice(email.trim(), password, sessionId)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices }
+      return { error: e instanceof Error ? e.message : 'Could not switch device' }
+    }
+  },
+
+  replaceDeviceGoogle: async (idToken, sessionId) => {
+    try {
+      const { user, profile } = await api.auth.googleReplaceDevice(idToken, sessionId)
       applyProfileLanguage(profile)
       set({ user, profile })
       return { error: null }

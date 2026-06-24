@@ -53,8 +53,10 @@ export default function AuthShell({ children }: AuthShellProps) {
         <div className="absolute inset-0 bg-hero-grid [background-size:22px_22px] opacity-60" />
         <div className="relative animate-slideDown">
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-tile bg-white/15 text-lg font-semibold ring-1 ring-white/20">
-              த
+            {/* On the violet hero the logo needs a light backing to read; a clean
+                white chip (not a letter tile) keeps it on-brand. */}
+            <span className="grid h-11 w-11 place-items-center rounded-tile bg-white p-1.5 ring-1 ring-white/25">
+              <img src="/logo-mark.png" alt="" className="h-full w-full object-contain" />
             </span>
             <span className="font-heading text-lg font-semibold tracking-tight">TNPSC Mentors</span>
           </div>
@@ -83,9 +85,8 @@ export default function AuthShell({ children }: AuthShellProps) {
       <div className="flex min-h-dvh min-w-0 items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
         <div className="w-full min-w-0 max-w-md animate-fadeIn">
           <div className="mb-7 flex flex-col items-center text-center lg:hidden">
-            <span className="mb-3 grid h-12 w-12 place-items-center rounded-tile bg-brand-gradient text-xl font-semibold text-white shadow-brand">
-              த
-            </span>
+            {/* Clean logo mark - no surrounding tile/box; reads on light & dark. */}
+            <img src="/logo-mark.png" alt="TNPSC Mentors" className="mb-2 h-20 w-20 object-contain" />
             <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
               TNPSC Mentors
             </h1>

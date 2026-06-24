@@ -6,6 +6,8 @@ import { postAuthDestination } from '../../lib/authRouting'
 import { useT } from '../../lib/i18n'
 import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
 import { useThemeStore } from '../../store/themeStore'
+import DeviceLimitModal from './DeviceLimitModal'
+import type { DeviceSession } from '../../lib/api'
 
 // Public OAuth Web Client ID (safe to ship to the browser). When unset the
 // component renders nothing, so the rest of auth works without Google.
@@ -73,7 +75,7 @@ export default function GoogleSignInButton({
   text = 'continue_with',
 }: GoogleSignInButtonProps) {
   const navigate = useNavigate()
-  const { signInWithGoogle } = useAuth()
+  const { signInWithGoogle, replaceDeviceGoogle } = useAuth()
   const { t } = useT()
   // Re-render Google's widget with its dark variant when the app is in dark mode,
   // otherwise the official button stays glaring white on a dark surface.
@@ -86,6 +88,13 @@ export default function GoogleSignInButton({
   // and the next page loads - without it the page looks frozen ("lag") between
   // picking the Google account and the profile/onboarding screen appearing.
   const [busy, setBusy] = useState(false)
+  // Device-limit state: when the account is already on the max devices we keep
+  // the just-issued Google ID token (re-verifiable for ~1h) and the active device
+  // list so the modal can sign one out and finish signing in here - the same
+  // recovery the password/OTP flows offer.
+  const [deviceLimit, setDeviceLimit] = useState<{ idToken: string; devices: DeviceSession[] } | null>(null)
+  const [signingOutId, setSigningOutId] = useState<string | null>(null)
+  const [modalError, setModalError] = useState('')
 
   // GIS registers its callback ONCE; keep the latest deps in a ref so that single
   // callback always sees fresh props/handlers without re-initialising the widget.
@@ -94,12 +103,13 @@ export default function GoogleSignInButton({
     setBusy(true)
     onStart?.()
     const res = await signInWithGoogle(credential)
-    // The account is already on the max number of devices. Google sign-in has no
-    // password to drive the replace-device modal, so surface a clear message
-    // instead of navigating with no session (which silently bounced to login).
+    // The account is already on the max number of devices. Open the same
+    // replace-device modal the password/OTP flows use; ownership is re-proven by
+    // re-verifying this Google ID token when a device is signed out.
     if (res.deviceLimit) {
       setBusy(false)
-      onError(t('errDeviceLimit'))
+      setModalError('')
+      setDeviceLimit({ idToken: credential, devices: res.devices ?? [] })
       return
     }
     if (res.error) {
@@ -112,6 +122,30 @@ export default function GoogleSignInButton({
   }
   const errorRef = useRef(onError)
   errorRef.current = onError
+
+  // Sign out the chosen device, then finish signing in here by re-verifying the
+  // stored Google ID token. Keep the modal open (refreshing its list) if the
+  // account is somehow still over the limit; surface failures inside the modal.
+  const onSignOutDevice = async (sessionId: string) => {
+    if (!deviceLimit || signingOutId) return
+    setSigningOutId(sessionId)
+    setModalError('')
+    const res = await replaceDeviceGoogle(deviceLimit.idToken, sessionId)
+    if (res.deviceLimit) {
+      setSigningOutId(null)
+      setDeviceLimit({ idToken: deviceLimit.idToken, devices: res.devices ?? [] })
+      return
+    }
+    if (res.error) {
+      setSigningOutId(null)
+      setModalError(res.error)
+      return
+    }
+    setSigningOutId(null)
+    setDeviceLimit(null)
+    setBusy(true) // overlay through navigation
+    navigate(postAuthDestination(fromPath), { replace: true })
+  }
 
   // Inside the Capacitor app, drive the account picker through the native plugin
   // instead of GIS (which can't run in the WebView). Same downstream handler.
@@ -254,6 +288,18 @@ export default function GoogleSignInButton({
           </div>
         </div>
       )}
+      <DeviceLimitModal
+        open={!!deviceLimit}
+        devices={deviceLimit?.devices ?? []}
+        busyId={signingOutId}
+        error={modalError}
+        onSignOut={onSignOutDevice}
+        onClose={() => {
+          if (signingOutId) return
+          setDeviceLimit(null)
+          setModalError('')
+        }}
+      />
     </>
   )
 }

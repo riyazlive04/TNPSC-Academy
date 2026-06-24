@@ -22,6 +22,7 @@ export function useAuth() {
   const sendOtp = useAuthStore((s) => s.sendOtp)
   const verifyOtp = useAuthStore((s) => s.verifyOtp)
   const replaceDeviceOtp = useAuthStore((s) => s.replaceDeviceOtp)
+  const replaceDeviceGoogle = useAuthStore((s) => s.replaceDeviceGoogle)
   const signUp = useAuthStore((s) => s.signUp)
   const signOut = useAuthStore((s) => s.signOut)
   const resetPassword = useAuthStore((s) => s.resetPassword)
@@ -39,6 +40,7 @@ export function useAuth() {
     sendOtp,
     verifyOtp,
     replaceDeviceOtp,
+    replaceDeviceGoogle,
     signUp,
     signOut,
     resetPassword,
