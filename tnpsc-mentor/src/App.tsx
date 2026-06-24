@@ -13,6 +13,7 @@ import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
+import BackButtonGuard from './components/BackButtonGuard'
 import Toaster from './components/UI/Toaster'
 import Spinner from './components/UI/Spinner'
 
@@ -127,6 +128,7 @@ export default function App() {
       <AnimatedRoutes />
     </Suspense>
     <UpdatePrompt />
+    <BackButtonGuard />
     <Toaster />
     </>
   )

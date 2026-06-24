@@ -1,5 +1,6 @@
 import { api } from './api'
 import { ATTENDANCE_GATE } from '../store/quizStore'
+import { recordTestCompleted } from './testProgress'
 import type {
   GradedResult,
   Question,
@@ -37,6 +38,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
   // Thirukkural is a client-side bank - grade in the browser (the questions
   // already carry their correct_answer) instead of calling the server grader.
   if (config.category === 'thirukural') {
+    recordTestCompleted()
     return gradeLocally(input, timeTaken)
   }
 
@@ -76,6 +78,10 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
 
   const result = (await api.submitTest(pSession, pAnswers)) as SubmitResult
   if (!result) throw new Error('No response from grader')
+
+  // Count this finished test so the periodic feedback prompt only surfaces once
+  // the user has actually completed a test or two (never on first app open).
+  recordTestCompleted()
 
   // Full mock exam: record this completed attempt so the server can enforce the
   // per-exam attempt cap. Best-effort — a failure here must not block the result.
