@@ -238,6 +238,19 @@ const STRINGS = {
   flag: { en: 'Flag', ta: 'குறி' },
   submitTest: { en: 'Submit Test', ta: 'தேர்வைச் சமர்ப்பி' },
   quit: { en: 'Quit', ta: 'வெளியேறு' },
+  leaveAppTitle: { en: 'Leave the app?', ta: 'ஆப்-ஐ விட்டு வெளியேறவா?' },
+  leaveAppBody: {
+    en: 'Are you sure you want to exit TNPSC Mentors?',
+    ta: 'TNPSC Mentors-ல் இருந்து வெளியேற விரும்புகிறீர்களா?',
+  },
+  leaveAppConfirm: { en: 'Yes, exit', ta: 'ஆம், வெளியேறு' },
+  stay: { en: 'Stay', ta: 'இரு' },
+  abandonTestTitle: { en: 'Leave this test?', ta: 'இந்த தேர்வை விட்டு வெளியேறவா?' },
+  abandonTestBody: {
+    en: "Your progress will be lost and the test won't be graded.",
+    ta: 'உங்கள் முன்னேற்றம் இழக்கப்படும், தேர்வு மதிப்பிடப்படாது.',
+  },
+  abandonTestConfirm: { en: 'Yes, leave', ta: 'ஆம், வெளியேறு' },
   explanation: { en: 'Explanation', ta: 'விளக்கம்' },
   preparingTest: { en: 'Preparing your test…', ta: 'உங்கள் தேர்வு தயாராகிறது…' },
   min15: {

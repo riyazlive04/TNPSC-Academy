@@ -7,6 +7,7 @@ import { useThemeStore } from '../../store/themeStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
 import { api } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import { getTestsCompleted, TESTS_BEFORE_FEEDBACK } from '../../lib/testProgress'
 import Avatar from '../UI/Avatar'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
@@ -102,9 +103,13 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // Feedback is no longer a toolbar button. Instead it surfaces ONCE per user as
   // a gentle, delayed prompt on the home screen; closing or submitting it stamps
   // the 3-month window so it won't reappear. Admins are exempt.
+  //
+  // It must never pop the moment the app opens: we only ask once the user has
+  // finished a test or two (TESTS_BEFORE_FEEDBACK), so the request feels earned.
   useEffect(() => {
     if (feedbackGiven || !user || isAdmin || tourActive) return
     if (location.pathname !== '/test-arena') return
+    if (getTestsCompleted(user.id) < TESTS_BEFORE_FEEDBACK) return
     const id = window.setTimeout(() => setFeedbackOpen(true), 2500)
     return () => window.clearTimeout(id)
   }, [feedbackGiven, user, isAdmin, tourActive, location.pathname])
