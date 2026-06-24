@@ -32,6 +32,9 @@ import {
   Laptop,
   Tablet,
   Languages,
+  Instagram,
+  Youtube,
+  Facebook,
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
@@ -62,6 +65,11 @@ const PRIVACY_URL = '/privacy'
 const GUIDELINES_URL = '/guidelines'
 const PAYMENT_URL = '/payment-policy'
 const REFUND_URL = '/refund-policy'
+// Social channels (shown in the footer). Mapped by the actual domain, not the
+// label the link was sent with.
+const INSTAGRAM_URL = 'https://www.instagram.com/mentorstnpsc/?hl=en'
+const YOUTUBE_URL = 'https://www.youtube.com/@TNPSCMentors4you'
+const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61591260240425&sk=about'
 
 // ─── Analytics hook ──────────────────────────────────────────────────────────
 // The page's only KPI is install-rate, so every download fires this. Wired to
@@ -899,6 +907,26 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="mt-3 font-body text-sm leading-relaxed text-ink2">{t('footerTagline')}</p>
+              {/* Social channels */}
+              <div className="mt-4 flex items-center gap-2.5">
+                {[
+                  { href: INSTAGRAM_URL, Icon: Instagram, label: 'Instagram' },
+                  { href: YOUTUBE_URL, Icon: Youtube, label: 'YouTube' },
+                  { href: FACEBOOK_URL, Icon: Facebook, label: 'Facebook' },
+                ].map(({ href, Icon, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    title={label}
+                    className="grid h-9 w-9 place-items-center rounded-lg border border-line text-ink2 transition hover:border-brand/40 hover:bg-brand-soft hover:text-brand-dark"
+                  >
+                    <Icon size={17} />
+                  </a>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-col gap-3 font-body text-sm">
