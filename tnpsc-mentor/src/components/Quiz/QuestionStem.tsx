@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react'
-import type { Question, DisplayLang, ParsedMatch, MatchList } from '../../types'
+import { Fragment, type ReactNode } from 'react'
+import type { Question, DisplayLang, ParsedMatch, MatchItem } from '../../types'
 import { displayQuestion, parseMatchQuestion, formatMatchLabel } from '../../types'
 
 interface QuestionStemProps {
@@ -60,6 +60,8 @@ function MatchBlock({
   prefix?: ReactNode
 }) {
   const { preamble, listI, listII, trailing } = parsed
+  const hasHeader = Boolean(listI.header || listII.header)
+  const rowCount = Math.max(listI.items.length, listII.items.length)
   return (
     <div>
       {(preamble || prefix) && (
@@ -68,12 +70,30 @@ function MatchBlock({
           {preamble}
         </p>
       )}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <ListColumn list={listI} />
-        <ListColumn list={listII} />
+      {/* One shared grid (not two independent columns) so each List I item and
+          its List II counterpart sit on the same grid row and stay vertically
+          aligned even when either text wraps to a different number of lines. The
+          center border-l reads as two columns within a single card. */}
+      <div className="overflow-hidden rounded-xl border border-line bg-tint/40">
+        <div className="grid grid-cols-2">
+          {hasHeader && (
+            <>
+              <HeaderCell>{listI.header}</HeaderCell>
+              <HeaderCell className="border-l border-line">{listII.header}</HeaderCell>
+            </>
+          )}
+          {Array.from({ length: rowCount }).map((_, r) => (
+            <Fragment key={r}>
+              <ItemCell item={listI.items[r]} topBorder={hasHeader || r > 0} />
+              <ItemCell
+                item={listII.items[r]}
+                topBorder={hasHeader || r > 0}
+                className="border-l border-line"
+              />
+            </Fragment>
+          ))}
+        </div>
       </div>
-      {/* grid-cols-2 keeps List I / List II side-by-side at every width; columns
-          shrink (min-w-0) and text wraps instead of overflowing on phones. */}
       {trailing && (
         <p className="tamil mt-3 text-sm font-medium text-navytext/70">{trailing}</p>
       )}
@@ -81,27 +101,39 @@ function MatchBlock({
   )
 }
 
-function ListColumn({ list }: { list: MatchList }) {
+function HeaderCell({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className="min-w-0 rounded-xl border border-line bg-tint/40 p-2.5 sm:p-4">
-      {list.header && (
-        <p className="tamil mb-2 font-heading text-sm font-bold text-secondary sm:text-base">
-          {list.header}
-        </p>
+    <p
+      className={`tamil border-b border-line p-2.5 font-heading text-sm font-bold text-secondary sm:p-4 sm:text-base ${className}`}
+    >
+      {children}
+    </p>
+  )
+}
+
+function ItemCell({
+  item,
+  topBorder,
+  className = '',
+}: {
+  item?: MatchItem
+  topBorder: boolean
+  className?: string
+}) {
+  return (
+    <div
+      className={`tamil flex gap-1.5 p-2.5 text-sm leading-relaxed text-navytext sm:gap-2 sm:p-4 sm:text-base ${
+        topBorder ? 'border-t border-line' : ''
+      } ${className}`}
+    >
+      {item && (
+        <>
+          <span className="font-heading font-bold text-navytext/70">
+            {formatMatchLabel(item.label)}
+          </span>
+          <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{item.text}</span>
+        </>
       )}
-      <ul className="flex flex-col gap-2">
-        {list.items.map((item) => (
-          <li
-            key={item.label}
-            className="tamil flex gap-1.5 text-sm leading-relaxed text-navytext sm:gap-2 sm:text-base"
-          >
-            <span className="font-heading font-bold text-navytext/70">
-              {formatMatchLabel(item.label)}
-            </span>
-            <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{item.text}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }
