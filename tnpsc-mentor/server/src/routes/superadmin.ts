@@ -4,6 +4,7 @@ import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middlewar
 import { supabaseAdmin } from '../supabase.js'
 import { listSessions, revokeSessionById } from '../sessions.js'
 import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
+import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
 
 const router = Router()
 
@@ -285,6 +286,85 @@ router.get(
     const { data, error } = await req.db!.rpc('list_app_feedback', { p_limit: limit })
     if (error) return sendDbError(res, error)
     res.json({ feedback: data ?? [] })
+  })
+)
+
+// ─── GET /api/superadmin/mock-exams ──────────────────────────────────────────
+// All exams (incl. disabled), each with the count of questions actually loaded
+// for its mock_set, so the console can warn if a set is empty/short.
+router.get(
+  '/mock-exams',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data: exams, error } = await req.db!
+      .from('mock_exams')
+      .select(
+        'id, mock_set, title, title_ta, total_questions, duration_seconds, negative_mark, tier, enabled, sort_order'
+      )
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    const { data: rows, error: cErr } = await req.db!
+      .from('questions')
+      .select('mock_set')
+      .eq('category', 'mock')
+    if (cErr) return sendDbError(res, cErr)
+    const loaded: Record<number, number> = {}
+    for (const r of (rows ?? []) as { mock_set: number }[]) {
+      loaded[r.mock_set] = (loaded[r.mock_set] ?? 0) + 1
+    }
+
+    const result = ((exams ?? []) as { mock_set: number }[]).map((e) => ({
+      ...e,
+      loaded_questions: loaded[e.mock_set] ?? 0,
+    }))
+    res.json({ exams: result })
+  })
+)
+
+// ─── POST /api/superadmin/mock-exams/:id ─────────────────────────────────────
+// Patch an exam's gating/metadata via the is_admin()-gated RPC. Only the fields
+// present in the body are changed (the RPC treats null as "leave unchanged").
+router.post(
+  '/mock-exams/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { enabled, tier, title, duration_seconds, negative_mark } = req.body ?? {}
+    if (tier != null && tier !== 'free' && tier !== 'paid') {
+      return res.status(400).json({ error: `Invalid tier: ${tier}` })
+    }
+    const { data, error } = await req.db!.rpc('admin_set_mock_exam', {
+      p_id: req.params.id,
+      p_enabled: typeof enabled === 'boolean' ? enabled : null,
+      p_tier: tier ?? null,
+      p_title: title ?? null,
+      p_duration_seconds:
+        duration_seconds == null ? null : Math.trunc(Number(duration_seconds)),
+      p_negative_mark: negative_mark == null ? null : Number(negative_mark),
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ exam: data })
+  })
+)
+
+// ─── GET /api/superadmin/settings ────────────────────────────────────────────
+// All app-settings rows as a raw key→value map.
+router.get(
+  '/settings',
+  asyncH(async (_req: AuthedRequest, res) => {
+    res.json({ settings: await readAllSettings() })
+  })
+)
+
+// ─── POST /api/superadmin/settings ───────────────────────────────────────────
+// Upsert one setting. Key must be in the writable allow-list.
+router.post(
+  '/settings',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { key, value } = req.body ?? {}
+    if (!key || !WRITABLE_SETTING_KEYS.includes(String(key))) {
+      return res.status(400).json({ error: `Unknown setting key: ${key}` })
+    }
+    const stored = await writeSetting(String(key), value)
+    res.json({ key, value: stored })
   })
 )
 

@@ -1,15 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, FileText, Layers, Loader2, Minus, Plus, Trophy } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Clock, FileText, Layers, ListChecks, Lock, Loader2, Minus, Plus, Trophy } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
+import PremiumCard from '../components/UI/PremiumCard'
 import { api } from '../lib/api'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
 import { useT, type StringKey } from '../lib/i18n'
-import type { Difficulty, MockBlueprint, QuizConfig } from '../types'
+import type { Difficulty, MockBlueprint, MockExam, QuizConfig } from '../types'
 
-type Tab = 'group' | 'subject'
+type Tab = 'group' | 'subject' | 'exam'
 
 const ALL_TOPICS = '__all__'
 
@@ -30,10 +31,53 @@ const DIFFICULTIES: { key: Difficulty | null; labelKey: 'diffMixed' | 'diffEasy'
   { key: 'hard', labelKey: 'diffHard' },
 ]
 
+const TAB_META: { id: Tab; labelKey: StringKey; icon: typeof Trophy }[] = [
+  { id: 'group', labelKey: 'mockGroupExam', icon: Trophy },
+  { id: 'subject', labelKey: 'mockSubjectExam', icon: Layers },
+  { id: 'exam', labelKey: 'mockFullExams', icon: ListChecks },
+]
+
 export default function MockTestPage() {
   const navigate = useNavigate()
   const { t } = useT()
-  const [tab, setTab] = useState<Tab>('group')
+
+  // Which sections to show is superadmin-controlled (app settings). The Full Mock
+  // Exams tab is always available; Group Exam and Subject/Topic are gated. While
+  // settings load we assume the gated tabs are hidden to avoid a flash.
+  const [groupOn, setGroupOn] = useState(false)
+  const [subjectOn, setSubjectOn] = useState(false)
+  const [settingsLoaded, setSettingsLoaded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .appSettings()
+      .then((s) => {
+        if (cancelled) return
+        setGroupOn(s.mock_group_enabled)
+        setSubjectOn(s.mock_subject_enabled)
+      })
+      .catch(() => {})
+      .finally(() => !cancelled && setSettingsLoaded(true))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const visibleTabs = useMemo(
+    () =>
+      TAB_META.filter(
+        (tb) =>
+          tb.id === 'exam' || (tb.id === 'group' && groupOn) || (tb.id === 'subject' && subjectOn)
+      ),
+    [groupOn, subjectOn]
+  )
+
+  // Default to the first visible tab; re-home if the current tab gets hidden.
+  const [tab, setTab] = useState<Tab>('exam')
+  useEffect(() => {
+    if (!visibleTabs.some((tb) => tb.id === tab)) setTab(visibleTabs[0]?.id ?? 'exam')
+  }, [visibleTabs, tab])
 
   return (
     <AppLayout>
@@ -52,25 +96,28 @@ export default function MockTestPage() {
           <p className="tamil mt-1 font-body text-[15px] text-muted">{t('fullLength')}</p>
         </header>
 
-        {/* Tab switch - segmented control */}
-        <div className="mb-8 flex justify-center">
-          <div className="seg-wrap">
-            <button
-              onClick={() => setTab('group')}
-              className={['seg inline-flex items-center gap-1.5', tab === 'group' ? 'seg-active' : ''].join(' ')}
-            >
-              <Trophy size={15} /> {t('mockGroupExam')}
-            </button>
-            <button
-              onClick={() => setTab('subject')}
-              className={['seg inline-flex items-center gap-1.5', tab === 'subject' ? 'seg-active' : ''].join(' ')}
-            >
-              <Layers size={15} /> {t('mockSubjectExam')}
-            </button>
+        {/* Tab switch - segmented control (only when more than one section shows) */}
+        {settingsLoaded && visibleTabs.length > 1 && (
+          <div className="mb-8 flex justify-center">
+            <div className="seg-wrap">
+              {visibleTabs.map(({ id, labelKey, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className={['seg inline-flex items-center gap-1.5', tab === id ? 'seg-active' : ''].join(' ')}
+                >
+                  <Icon size={15} /> {t(labelKey)}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+        {/* Keep spacing consistent when only the Full Mock Exams tab is shown. */}
+        {settingsLoaded && visibleTabs.length <= 1 && <div className="mb-8" />}
 
-        {tab === 'group' ? <GroupExamTab /> : <SubjectExamTab />}
+        {tab === 'group' && groupOn && <GroupExamTab />}
+        {tab === 'subject' && subjectOn && <SubjectExamTab />}
+        {tab === 'exam' && <FullMockExamTab />}
       </div>
     </AppLayout>
   )
@@ -359,6 +406,135 @@ function SubjectExamTab() {
           <button onClick={launch} className="btn-brand btn-lg px-10">
             {t('startExam')}
           </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Full mock exams tab (fixed, named 200-Q papers) ──────────────────────────
+
+function FullMockExamTab() {
+  const navigate = useNavigate()
+  const { t, lang } = useT()
+
+  const [exams, setExams] = useState<MockExam[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .mockExams()
+      .then((r) => !cancelled && setExams(r.exams))
+      .catch(() => !cancelled && setError(t('couldNotLoad')))
+      .finally(() => !cancelled && setLoading(false))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const launch = (e: MockExam) => {
+    const config: QuizConfig = {
+      category: 'pyq', // grading is category-agnostic; the engine uses the fetched rows
+      proctored: true,
+      mock: true,
+      mockKind: 'exam',
+      mockExamId: e.id,
+      mockQuestionCount: e.total_questions,
+      mockDurationSeconds: e.duration_seconds,
+      negativeMark: e.negative_mark,
+      label: `${t('mockTest')} · ${lang === 'ta' && e.title_ta ? e.title_ta : e.title}`,
+    }
+    navigate('/mock/instructions', { state: config })
+  }
+
+  const anyLocked = exams.some((e) => e.locked)
+
+  return (
+    <div className="animate-fadeIn">
+      <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('mockFullSub')}</p>
+
+      {loading && (
+        <div className="flex justify-center py-10">
+          <Loader2 size={28} className="animate-spin text-brand" />
+        </div>
+      )}
+
+      {!loading && error && <p className="text-center font-body text-sm text-wrong">{error}</p>}
+
+      {!loading && !error && exams.length === 0 && (
+        <p className="tamil text-center font-body text-sm text-ink2">{t('mockExamsEmpty')}</p>
+      )}
+
+      {!loading && !error && exams.length > 0 && (
+        <div className="space-y-3">
+          {exams.map((e) => {
+            const title = lang === 'ta' && e.title_ta ? e.title_ta : e.title
+            const minutes = Math.round(e.duration_seconds / 60)
+            const exhausted = e.attemptsUsed >= e.attemptsMax
+            const disabled = e.locked || exhausted
+            return (
+              <div
+                key={e.id}
+                className={[
+                  'rounded-card border border-line bg-card p-4 sm:p-5',
+                  disabled ? 'opacity-80' : '',
+                ].join(' ')}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="tamil truncate font-heading text-base font-semibold text-ink">
+                        {title}
+                      </h3>
+                      {e.locked && (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-[11px] font-semibold text-accentwarm">
+                          <Lock size={11} /> {t('premiumOnly')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                      <Tag>
+                        <FileText size={12} /> {e.total_questions} Q
+                      </Tag>
+                      <Tag>
+                        <Clock size={12} /> {minutes} {t('minutesUnit')}
+                      </Tag>
+                      <span className="inline-flex items-center gap-1 font-body text-[11px] text-ink2">
+                        {exhausted ? (
+                          <>
+                            <CheckCircle2 size={12} className="text-correct" /> {t('examCompleted')}
+                          </>
+                        ) : (
+                          `${t('attemptWord')} ${e.attemptsUsed}/${e.attemptsMax}`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => !disabled && launch(e)}
+                    disabled={disabled}
+                    className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {exhausted ? t('examCompleted') : t('startExam')}
+                  </button>
+                </div>
+                {e.locked && (
+                  <p className="tamil mt-3 border-t border-line pt-3 font-body text-xs text-ink2">
+                    {t('examLocked')}
+                  </p>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* When at least one exam is paywalled, surface the upgrade card. */}
+      {!loading && anyLocked && (
+        <div className="mt-6">
+          <PremiumCard />
         </div>
       )}
     </div>

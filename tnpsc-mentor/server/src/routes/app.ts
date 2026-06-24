@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncH } from '../util.js'
 import { apkPublicUrl, currentRelease } from '../lib/appReleases.js'
+import { readPublicSettings } from '../lib/settings.js'
 
 // Public (unauthenticated) app-distribution routes. The landing page — served on
 // a different origin (main domain) than this API (app subdomain) — calls these
@@ -37,6 +38,16 @@ router.get(
     const r = await currentRelease()
     if (!r) return res.status(404).json({ error: 'No app build is available yet.' })
     res.redirect(302, apkPublicUrl(r.storage_path))
+  })
+)
+
+// ─── GET /api/app/settings ───────────────────────────────────────────────────
+// Public, client-facing feature flags (e.g. which Mock Test sections are shown).
+// Defaults are applied server-side so the client always gets a complete object.
+router.get(
+  '/settings',
+  asyncH(async (_req, res) => {
+    res.json({ settings: await readPublicSettings() })
   })
 )
 

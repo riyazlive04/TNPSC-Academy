@@ -106,6 +106,9 @@ as $$
     -- 'outer' is an admin-only subject bank: keep it out of student tests.
     -- It only surfaces when a config explicitly asks for category='outer'.
     and (q.category <> 'outer' or cfg.category = 'outer')
+    -- 'mock' is the fixed full-exam bank, served only by /api/questions/mock-exam.
+    -- Never let it leak into the general sampler (esp. unscoped mock pools).
+    and q.category <> 'mock'
     and case when cfg.mock
       then (not cfg.scope_to_category or q.category = cfg.category)
       else q.category = cfg.category
@@ -471,6 +474,9 @@ as $$
   where
     q.active
     and (q.category <> 'outer' or cfg.category = 'outer')
+    -- 'mock' is the fixed full-exam bank, served only by /api/questions/mock-exam.
+    -- Never let it leak into the general sampler (esp. unscoped mock pools).
+    and q.category <> 'mock'
     and case when cfg.mock
       then (not cfg.scope_to_category or q.category = cfg.category)
       else q.category = cfg.category

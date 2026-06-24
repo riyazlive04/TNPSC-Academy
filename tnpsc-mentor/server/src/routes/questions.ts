@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
-import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
+import { premiumEntitlement } from '../lib/premium.js'
+import { MAX_MOCK_EXAM_ATTEMPTS } from '../pricing.js'
 
 const router = Router()
 
@@ -545,6 +547,171 @@ router.post(
     const questions = shuffle((rows ?? []) as unknown as Record<string, unknown>[]).slice(0, n)
     void recordSeen(req, questions as { id?: string }[])
     res.json({ questions })
+  })
+)
+
+// ─── Full mock exams (fixed, named 200-Q papers) ─────────────────────────────
+// Distinct from /mock-group (randomly sampled): each exam is a fixed bank of
+// rows tagged category='mock' + mock_set. Access is gated by tier (free/paid),
+// the admin `enabled` flag, and a per-user attempt cap (MAX_MOCK_EXAM_ATTEMPTS).
+
+interface MockExamRow {
+  id: string
+  mock_set: number
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  tier: 'free' | 'paid'
+  enabled: boolean
+  sort_order: number
+}
+
+/** Admins/superadmins bypass the premium + attempt gates so they can preview any exam. */
+async function isStaff(req: AuthedRequest): Promise<boolean> {
+  const role = await roleOf(req.userId!)
+  return role === 'admin' || role === 'superadmin'
+}
+
+/** Count this user's recorded attempts per exam (RLS scopes rows to the user). */
+async function attemptCounts(req: AuthedRequest): Promise<Record<string, number>> {
+  const { data, error } = await req.db!.from('mock_exam_attempts').select('exam_id')
+  if (error) throw error
+  const counts: Record<string, number> = {}
+  for (const r of (data ?? []) as { exam_id: string }[]) {
+    counts[r.exam_id] = (counts[r.exam_id] ?? 0) + 1
+  }
+  return counts
+}
+
+// ─── GET /api/questions/mock-exams ───────────────────────────────────────────
+// The exams visible to this user (enabled only), annotated with lock state and
+// attempts used. Premium is derived from the payment ledger (never trusted from
+// the client); paid exams show locked=true for non-premium users.
+router.get(
+  '/mock-exams',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!
+      .from('mock_exams')
+      .select(
+        'id, mock_set, title, title_ta, total_questions, duration_seconds, negative_mark, tier, enabled, sort_order'
+      )
+      .eq('enabled', true)
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    // Staff (admin/superadmin) preview every exam as unlocked and uncapped.
+    const staff = await isStaff(req)
+    let premium = staff
+    if (!premium) {
+      try {
+        premium = (await premiumEntitlement(req.db!)).premium
+      } catch {
+        premium = false // fail closed: treat as free if the ledger is unreachable
+      }
+    }
+    const counts = await attemptCounts(req)
+
+    const exams = ((data ?? []) as MockExamRow[]).map((e) => {
+      const locked = e.tier === 'paid' && !premium
+      return {
+        id: e.id,
+        title: e.title,
+        title_ta: e.title_ta,
+        total_questions: e.total_questions,
+        duration_seconds: e.duration_seconds,
+        negative_mark: Number(e.negative_mark),
+        tier: e.tier,
+        locked,
+        lockReason: locked ? 'premium' : null,
+        attemptsUsed: staff ? 0 : counts[e.id] ?? 0,
+        attemptsMax: MAX_MOCK_EXAM_ATTEMPTS,
+      }
+    })
+    res.json({ exams, premium })
+  })
+)
+
+// ─── POST /api/questions/mock-exam ───────────────────────────────────────────
+// Returns the fixed question set for one exam, in paper order. Re-checks every
+// gate server-side (enabled, tier/premium, attempt cap) — the picker UI is only
+// a hint. Answer columns never appear (column grants + QUIZ_COLS).
+router.post(
+  '/mock-exam',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const examId = String((req.body ?? {}).exam_id ?? '')
+    if (!examId) return res.status(400).json({ error: 'exam_id is required' })
+
+    const { data: exam, error: examErr } = await req.db!
+      .from('mock_exams')
+      .select('id, mock_set, tier, enabled')
+      .eq('id', examId)
+      .maybeSingle()
+    if (examErr) return sendDbError(res, examErr)
+    if (!exam || !(exam as MockExamRow).enabled) {
+      return res.status(404).json({ error: 'Exam not found' })
+    }
+
+    // Staff (admin/superadmin) bypass premium + attempt gates to preview exams.
+    const staff = await isStaff(req)
+
+    if (!staff && (exam as MockExamRow).tier === 'paid') {
+      let premium = false
+      try {
+        premium = (await premiumEntitlement(req.db!)).premium
+      } catch {
+        premium = false
+      }
+      if (!premium) return res.status(403).json({ error: 'premium_required' })
+    }
+
+    if (!staff) {
+      const counts = await attemptCounts(req)
+      if ((counts[examId] ?? 0) >= MAX_MOCK_EXAM_ATTEMPTS) {
+        return res.status(403).json({ error: 'attempt_limit_reached' })
+      }
+    }
+
+    const { data, error } = await req.db!
+      .from('questions')
+      .select(QUIZ_COLS)
+      .eq('category', 'mock')
+      .eq('mock_set', (exam as MockExamRow).mock_set)
+    if (error) return sendDbError(res, error)
+    // Shuffle so each attempt presents the questions in a fresh, mixed order
+    // (the client persists this order for resume, so it stays stable mid-exam).
+    res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
+  })
+)
+
+// ─── POST /api/questions/mock-exam/attempt ───────────────────────────────────
+// Records a completed attempt (called from the client after the server grader
+// returns). This is what the start gate counts. Best-effort: a missing exam or a
+// cap overflow is ignored rather than failing the result screen.
+router.post(
+  '/mock-exam/attempt',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { exam_id, session_id, score, total } = req.body ?? {}
+    if (!exam_id) return res.status(400).json({ error: 'exam_id is required' })
+
+    const counts = await attemptCounts(req)
+    if ((counts[String(exam_id)] ?? 0) >= MAX_MOCK_EXAM_ATTEMPTS) {
+      return res.json({ ok: true, recorded: false })
+    }
+
+    const { error } = await req.db!.from('mock_exam_attempts').insert({
+      user_id: req.userId!,
+      exam_id: String(exam_id),
+      session_id: session_id ?? null,
+      score: score == null ? null : Number(score),
+      total: total == null ? null : Math.trunc(Number(total)),
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true, recorded: true })
   })
 )
 

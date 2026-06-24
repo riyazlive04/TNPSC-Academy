@@ -74,7 +74,7 @@ function questionBlockHtml(q: Question, index: number, lang: DisplayLang): strin
 
   return `<div style="padding:14px 4px;border-bottom:1px solid ${LINE}">
     <div style="display:flex;gap:10px;align-items:flex-start">
-      <span style="flex:0 0 auto;background:${VIOLET};color:#fff;font-weight:700;font-size:11px;border-radius:5px;padding:2px 7px">Q${index + 1}</span>
+      <span style="flex:0 0 auto;box-sizing:border-box;display:inline-block;min-width:24px;height:20px;line-height:20px;text-align:center;padding:0 6px;background:${VIOLET};color:#fff;font-weight:700;font-size:11px;border-radius:5px">Q${index + 1}</span>
       <div style="font-weight:700;color:${INK};font-size:15px;line-height:1.5;white-space:pre-line">${esc(displayQuestion(q, lang))}</div>
     </div>
     <div style="margin-top:8px">${optionRows}</div>
@@ -101,6 +101,43 @@ async function htmlToCanvas(html: string): Promise<HTMLCanvasElement> {
   document.body.appendChild(host)
   try {
     return await html2canvas(host, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
+  } finally {
+    document.body.removeChild(host)
+  }
+}
+
+// How many question blocks to rasterise in a single html2canvas pass. Capturing
+// one block at a time means N html2canvas calls (each clones + lays out + rasters
+// the DOM) - crippling for a 200-Q mock. Batching cuts that ~CHUNK-fold while we
+// still slice each block out of the batch canvas, so per-question pagination is
+// unchanged. Kept modest so the batch canvas stays well under the browser's max
+// canvas height (≈32k px): ~12 blocks × ~180css px × scale 2 ≈ 4.3k px.
+const CHUNK = 12
+
+/**
+ * Rasterise several question blocks in ONE html2canvas pass, then split the
+ * result into one canvas per block (cropped by each block's measured box). This
+ * is the perf-critical path for long mocks - far fewer html2canvas invocations
+ * for identical output. Returns canvases in input order.
+ */
+async function renderQuestionChunk(blocks: string[]): Promise<HTMLCanvasElement[]> {
+  const host = document.createElement('div')
+  host.style.cssText = `position:fixed;left:-99999px;top:0;width:${RENDER_W}px;background:#fff;font-family:${FONT_STACK}`
+  host.innerHTML = blocks.map((b) => `<div data-pdf-q>${b}</div>`).join('')
+  document.body.appendChild(host)
+  try {
+    const full = await html2canvas(host, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
+    const scale = full.width / host.offsetWidth // device scale actually applied (≈2)
+    const children = Array.from(host.querySelectorAll<HTMLElement>('[data-pdf-q]'))
+    return children.map((el) => {
+      const sy = Math.max(0, Math.round(el.offsetTop * scale))
+      const sh = Math.min(full.height - sy, Math.round(el.offsetHeight * scale))
+      const c = document.createElement('canvas')
+      c.width = full.width
+      c.height = sh
+      c.getContext('2d')!.drawImage(full, 0, sy, full.width, sh, 0, 0, full.width, sh)
+      return c
+    })
   } finally {
     document.body.removeChild(host)
   }
@@ -142,10 +179,14 @@ export async function generateExplanationPdf({
   doc.addImage(toJpeg(cover), 'JPEG', 0, 0, pageW, coverHPt)
   y = coverHPt + 10
 
-  // Each question as its own atomic image.
-  for (let i = 0; i < questions.length; i++) {
-    const canvas = await htmlToCanvas(questionBlockHtml(questions[i], i, lang))
-    placeCanvas(canvas)
+  // Each question is still placed as its own atomic image (so pagination never
+  // cuts a question mid-line), but we rasterise CHUNK at a time and slice them
+  // apart - far fewer html2canvas passes than one-per-question on a 200-Q mock.
+  for (let start = 0; start < questions.length; start += CHUNK) {
+    const slice = questions.slice(start, start + CHUNK)
+    const blocks = slice.map((q, j) => questionBlockHtml(q, start + j, lang))
+    const canvases = await renderQuestionChunk(blocks)
+    for (const canvas of canvases) placeCanvas(canvas)
   }
 
   // Watermark + footer on every page (Latin only → safe in jsPDF's Helvetica).

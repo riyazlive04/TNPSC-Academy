@@ -24,6 +24,7 @@ function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
   return (
     a.mockKind === b.mockKind &&
     a.mockGroup === b.mockGroup &&
+    a.mockExamId === b.mockExamId &&
     a.subject === b.subject &&
     a.topic === b.topic &&
     a.difficulty === b.difficulty
@@ -129,14 +130,16 @@ export default function MockQuizPage() {
     ;(async () => {
       try {
         const qs =
-          config.mockKind === 'group'
-            ? await api.mockGroupQuestions(config.mockGroup as string)
-            : await api.subjectMockQuestions({
-                subject: config.subject,
-                topic: config.topic,
-                difficulty: config.difficulty,
-                count: config.mockQuestionCount ?? 50,
-              })
+          config.mockKind === 'exam'
+            ? await api.mockExamQuestions(config.mockExamId as string)
+            : config.mockKind === 'group'
+              ? await api.mockGroupQuestions(config.mockGroup as string)
+              : await api.subjectMockQuestions({
+                  subject: config.subject,
+                  topic: config.topic,
+                  difficulty: config.difficulty,
+                  count: config.mockQuestionCount ?? 50,
+                })
         if (cancelled) return
         if (!qs.length) {
           setEmpty(true)

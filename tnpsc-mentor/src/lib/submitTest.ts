@@ -77,6 +77,19 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
   const result = (await api.submitTest(pSession, pAnswers)) as SubmitResult
   if (!result) throw new Error('No response from grader')
 
+  // Full mock exam: record this completed attempt so the server can enforce the
+  // per-exam attempt cap. Best-effort — a failure here must not block the result.
+  if (config.mockKind === 'exam' && config.mockExamId) {
+    void api
+      .recordMockExamAttempt({
+        exam_id: config.mockExamId,
+        session_id: result.session_id ?? null,
+        score: result.score_percentage,
+        total: result.total,
+      })
+      .catch(() => {})
+  }
+
   // Merge graded correctness (+ gated explanations) back onto the questions.
   const byId = new Map<string, GradedResult>(
     result.results.map((r) => [r.question_id, r])
