@@ -49,9 +49,7 @@ export default function LanguageScreen() {
     <div className="flex min-h-dvh items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
       <div className="w-full max-w-md animate-fadeIn">
         <div className="mb-7 flex flex-col items-center text-center">
-          <span className="mb-3 grid h-12 w-12 place-items-center rounded-tile bg-brand-gradient text-xl font-semibold text-white shadow-brand">
-            த
-          </span>
+          <img src="/logo-mark.png" alt="" className="mb-3 h-16 w-16 object-contain" />
           <h2 className="font-display text-2xl font-bold tracking-tight text-ink">
             {t('chooseLanguage')}
           </h2>

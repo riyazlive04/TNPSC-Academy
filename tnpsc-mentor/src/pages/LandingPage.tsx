@@ -956,6 +956,9 @@ function DownloadButton({
   compact?: boolean
   tone?: 'onDark'
 }) {
+  // Resolve the live APK URL from context (set once the latest build is found),
+  // falling back to the stable redirect endpoint so the button always links.
+  const apkUrl = useContext(ApkUrlContext) ?? APK_DOWNLOAD_FALLBACK
   // On the violet hero panels the gradient button disappears, so render a solid
   // high-contrast white pill there instead - keeps "download" the boldest thing.
   const base =
@@ -967,19 +970,6 @@ function DownloadButton({
     : size === 'lg'
       ? `${base} group w-full px-7 py-4 text-base sm:w-auto`
       : `${base} group w-full px-6 py-3.5 text-base sm:w-auto`
-
-  const apkUrl = useContext(ApkUrlContext)
-
-  // No build published yet → show a disabled, non-clickable button.
-  if (!apkUrl) {
-    return (
-      <span className={`${cls} cursor-not-allowed opacity-50`} aria-disabled="true">
-        <Download size={compact ? 16 : 18} />
-        {label}
-      </span>
-    )
-  }
-
   return (
     <a
       href={apkUrl}

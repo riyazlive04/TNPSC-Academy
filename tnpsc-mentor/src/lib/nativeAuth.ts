@@ -36,6 +36,16 @@ export async function nativeGoogleIdToken(): Promise<string | null> {
     })
     initialized = true
   }
+  // Force the account chooser to appear every time. Without this the plugin
+  // silently returns the last-used Google account (no picker), which traps a
+  // user on an account that's already at the device limit with no way to pick a
+  // different one. Signing out of the plugin's cached account first makes
+  // signIn() show the chooser. Best-effort - ignore if there's nothing to clear.
+  try {
+    await GoogleAuth.signOut()
+  } catch {
+    /* not signed in yet - nothing to clear */
+  }
   const user = await GoogleAuth.signIn()
   const idToken = user?.authentication?.idToken
   return idToken ?? null

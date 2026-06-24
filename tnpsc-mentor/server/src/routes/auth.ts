@@ -408,6 +408,50 @@ router.post(
   })
 )
 
+// ─── POST /api/auth/google/replace-device ────────────────────────────────────
+// Reached after a Google-login `device_limit` block: the user picked a device to
+// sign out. Google sign-in has no password, so ownership is re-proven by
+// re-verifying the same ID token (a Google ID token stays valid for ~1 hour and
+// can be verified more than once). We revoke the chosen session, then claim this
+// device's slot — mirroring /login/replace-device.
+router.post(
+  '/google/replace-device',
+  tokenLimiter,
+  asyncH(async (req, res) => {
+    if (!googleEnabled) {
+      return res.status(503).json({ error: 'Google sign-in is not configured' })
+    }
+    const { idToken, session_id, nonce } = req.body ?? {}
+    if (!idToken || !session_id) {
+      return res.status(400).json({ error: 'Missing Google credential or session_id' })
+    }
+    const { data, error } = await supabaseAuthClient.auth.signInWithIdToken({
+      provider: 'google',
+      token: String(idToken),
+      ...(nonce ? { nonce: String(nonce) } : {}),
+    })
+    if (error || !data.session || !data.user) {
+      return res.status(401).json({ error: 'Google sign-in failed' })
+    }
+    const userId = data.session.user.id
+    // revokeSessionById is scoped to userId, so a forged session_id from another
+    // account is a no-op rather than a cross-account sign-out.
+    await revokeSessionById(userId, String(session_id))
+    const { blocked } = await registerLoginSession(
+      userId,
+      deviceKey(data.session.access_token, req),
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = publicDevices(await listSessions(userId))
+      return res.status(403).json({ error: 'device_limit', devices })
+    }
+    setRtCookie(res, data.session.refresh_token)
+    res.json(await sessionPayload(data.session))
+  })
+)
+
 // ─── POST /api/auth/refresh ──────────────────────────────────────────────────
 router.post(
   '/refresh',

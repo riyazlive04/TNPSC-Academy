@@ -130,9 +130,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               onClick={() => navigate('/test-arena')}
               className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white">
-                த
-              </span>
+              <img src="/logo-mark.png" alt="" className="h-9 w-9 flex-shrink-0 object-contain" />
               <span className="font-heading text-base font-semibold tracking-tight text-ink">
                 TNPSC <span className="text-brand">Mentors</span>
               </span>
