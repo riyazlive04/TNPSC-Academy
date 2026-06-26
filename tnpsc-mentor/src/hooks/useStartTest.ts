@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import type { QuizConfig } from '../types'
 import { useAuth } from './useAuth'
+import { trackStartTest } from '../lib/tracking'
 
 /**
  * Returns a function that begins a test session for a given config. Regular
@@ -14,6 +15,7 @@ export function useStartTest() {
   const { isAdmin } = useAuth()
 
   return (config: QuizConfig) => {
+    trackStartTest({ category: config.category, subject: config.subject, topic: config.topic })
     const target = isAdmin ? '/admin/questions' : '/quiz/instructions'
     navigate(target, { state: config })
   }

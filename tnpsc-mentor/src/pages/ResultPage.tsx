@@ -28,6 +28,7 @@ import { isHiddenBadge } from '../lib/features'
 import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
 import { exitFullscreen } from '../lib/proctor'
+import { trackViewResult } from '../lib/tracking'
 import { formatDuration, msUntil } from '../lib/revisionTime'
 import { useAuth } from '../hooks/useAuth'
 import { api, isApiConfigured, type PdfQuota } from '../lib/api'
@@ -76,6 +77,18 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   const claim = useProgressStore((s) => s.claim)
   const claimDaily = useProgressStore((s) => s.claimDaily)
   const payload = previewPayload ?? (location.state as ResultPayload | null)
+
+  // Report the result view to analytics once per finished test. Skipped for the
+  // admin preview (no real payload / not a genuine attempt).
+  useEffect(() => {
+    if (previewPayload || !payload) return
+    trackViewResult({
+      category: payload.config?.category,
+      scorePercentage: payload.scorePercentage,
+      passed: payload.passed80,
+    })
+    // Fire only when a distinct test's result is shown.
+  }, [previewPayload, payload?.sessionId, payload?.scorePercentage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())

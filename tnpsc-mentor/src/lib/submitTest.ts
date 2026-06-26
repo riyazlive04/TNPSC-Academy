@@ -1,6 +1,7 @@
 import { api } from './api'
 import { ATTENDANCE_GATE } from '../store/quizStore'
 import { recordTestCompleted } from './testProgress'
+import { trackSubmitTest } from './tracking'
 import type {
   GradedResult,
   Question,
@@ -39,7 +40,15 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
   // already carry their correct_answer) instead of calling the server grader.
   if (config.category === 'thirukural') {
     recordTestCompleted()
-    return gradeLocally(input, timeTaken)
+    const local = gradeLocally(input, timeTaken)
+    trackSubmitTest({
+      category: config.category,
+      subject: config.subject,
+      totalQuestions: local.totalQuestions,
+      attempted: local.attempted,
+      scorePercentage: local.scorePercentage,
+    })
+    return local
   }
 
   // One entry per shown question (null selected_answer = skipped) so the server
@@ -78,6 +87,14 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
 
   const result = (await api.submitTest(pSession, pAnswers)) as SubmitResult
   if (!result) throw new Error('No response from grader')
+
+  trackSubmitTest({
+    category: config.category,
+    subject: config.subject,
+    totalQuestions: result.total,
+    attempted: result.attempted,
+    scorePercentage: result.score_percentage,
+  })
 
   // Count this finished test so the periodic feedback prompt only surfaces once
   // the user has actually completed a test or two (never on first app open).

@@ -5,6 +5,7 @@
 // "paid" is only ever set server-side after that verification.
 
 import { api } from './api'
+import { trackPurchase } from './tracking'
 import type { Profile } from '../types'
 
 const CHECKOUT_SRC = 'https://checkout.razorpay.com/v1/checkout.js'
@@ -116,6 +117,16 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
       handler: async (resp) => {
         try {
           const { verified } = await api.payments.verify(resp)
+          if (verified) {
+            // order.amount is in paise; report rupees as the conversion value.
+            // The Razorpay payment id is the unique transaction id GA4 dedupes on.
+            trackPurchase({
+              transactionId: resp.razorpay_payment_id,
+              value: order.amount / 100,
+              currency: order.currency,
+              description: params.description,
+            })
+          }
           resolve(verified ? { status: 'paid' } : { status: 'failed', error: 'Verification failed.' })
         } catch (e) {
           resolve({ status: 'failed', error: e instanceof Error ? e.message : 'Verification failed.' })
