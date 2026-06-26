@@ -39,6 +39,7 @@ import {
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
 import { api } from '../lib/api'
+import { trackApkDownload } from '../lib/tracking'
 
 // ─── Open items (founder to supply before launch) ────────────────────────────
 // Replace these placeholders with the real hosted values. Everything else on
@@ -72,19 +73,10 @@ const YOUTUBE_URL = 'https://www.youtube.com/@TNPSCMentors4you'
 const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61591260240425&sk=about'
 
 // ─── Analytics hook ──────────────────────────────────────────────────────────
-// The page's only KPI is install-rate, so every download fires this. Wired to
-// gtag / dataLayer if present; a no-op otherwise.
-function trackEvent(name: string) {
-  try {
-    const w = window as unknown as {
-      dataLayer?: unknown[]
-      gtag?: (...args: unknown[]) => void
-    }
-    w.dataLayer?.push({ event: name })
-    w.gtag?.('event', name)
-  } catch {
-    /* analytics not configured yet - ignore */
-  }
+// The page's only KPI is install-rate, so every download fires this. Delegates to
+// the shared GTM dataLayer wrapper (lib/tracking) so APK downloads land in GA4.
+function trackEvent(source: string) {
+  trackApkDownload(source)
 }
 
 type Lang = 'ta' | 'en'

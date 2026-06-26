@@ -8,6 +8,7 @@ import { useThemeStore } from './store/themeStore'
 import { warmApi } from './lib/api'
 import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
+import { trackPageView } from './lib/tracking'
 import { pageVariants, pageTransition } from './lib/motion'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import ScrollToTop from './components/ScrollToTop'
@@ -141,6 +142,13 @@ export default function App() {
 function AnimatedRoutes() {
   const location = useLocation()
   const reduce = useReducedMotion()
+
+  // SPA page-view tracking: GTM/GA4/Meta only fire a pageview on the initial
+  // HTML load, so every client-side route change here must be reported by hand.
+  // Keyed on the full path+search so each navigation pushes exactly one event.
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
 
   const routes = (
     <Routes location={location}>
