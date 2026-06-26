@@ -212,3 +212,20 @@ export function trackApkDownload(source: string): void {
   track('apk_download', { source })
   metaTrackCustom('APKDownload', { source })
 }
+
+/** A study material file was downloaded from the Materials hub / Profile videos. */
+export function trackDownloadMaterial(params: {
+  id: string
+  title?: string | null
+  kind?: string | null
+}): void {
+  track('download_material', {
+    material_id: params.id,
+    material_title: params.title ?? undefined,
+    material_kind: params.kind ?? undefined,
+  })
+  metaTrackCustom('DownloadMaterial', {
+    material_id: params.id,
+    material_kind: params.kind ?? undefined,
+  })
+}
