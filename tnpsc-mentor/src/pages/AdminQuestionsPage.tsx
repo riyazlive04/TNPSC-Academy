@@ -23,7 +23,7 @@ import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
-import { OUTER_SUBJECTS } from '../lib/constants'
+import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
 
@@ -44,12 +44,18 @@ export default function AdminQuestionsPage() {
   // The "Outer" bank is browsed subject-by-subject (each subject can hold
   // thousands of rows), so we expose per-subject chips and refetch on change.
   const isOuter = config?.category === 'outer'
+  // The PYQ bank is browsed the same way (subject chips, server-side refetch),
+  // plus client-side Year and Difficulty filters - PYQ rows carry a `year`
+  // (2019-2025) which is the defining "previous year" dimension.
+  const isPyq = config?.category === 'pyq'
 
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [subject, setSubject] = useState<string | undefined>(config?.subject)
+  const [yearFilter, setYearFilter] = useState<number | null>(null)
+  const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null)
   const [editor, setEditor] = useState<EditorState>(null)
   const [showImport, setShowImport] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -147,19 +153,41 @@ export default function AdminQuestionsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subject])
 
+  // Switch the browsed subject (triggers a server-side refetch) and clear the
+  // client-side Year/Difficulty filters so the new subject isn't shown empty.
+  const selectSubject = (s: string | undefined) => {
+    setSubject(s)
+    setYearFilter(null)
+    setDifficultyFilter(null)
+  }
+
+  // Year/difficulty options derived from what's actually loaded, so the chips
+  // only offer values present in this bank (newest year first).
+  const yearOptions = useMemo(() => {
+    const ys = questions.map((q) => q.year).filter((y): y is number => typeof y === 'number')
+    return [...new Set(ys)].sort((a, b) => b - a)
+  }, [questions])
+  const difficultyOptions = useMemo(() => {
+    const ds = questions.map((q) => q.difficulty).filter((d): d is NonNullable<typeof d> => !!d)
+    return [...new Set(ds)]
+  }, [questions])
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return questions
-    return questions.filter(
-      (q) =>
+    return questions.filter((q) => {
+      if (yearFilter != null && q.year !== yearFilter) return false
+      if (difficultyFilter != null && q.difficulty !== difficultyFilter) return false
+      if (!term) return true
+      return (
         (q.question_text ?? '').toLowerCase().includes(term) ||
         (q.option_a ?? '').toLowerCase().includes(term) ||
         (q.option_b ?? '').toLowerCase().includes(term) ||
         (q.option_c ?? '').toLowerCase().includes(term) ||
         (q.option_d ?? '').toLowerCase().includes(term) ||
         (q.explanation ?? '').toLowerCase().includes(term)
-    )
-  }, [questions, search])
+      )
+    })
+  }, [questions, search, yearFilter, difficultyFilter])
 
   const handleDownloadPdf = async () => {
     if (!filtered.length || !activeConfig) return
@@ -168,7 +196,9 @@ export default function AdminQuestionsPage() {
     try {
       const label = isOuter
         ? `Outer Questions${subject ? ` · ${subject}` : ''}`
-        : describeConfig(activeConfig, lang)
+        : isPyq
+          ? `PYQ${subject ? ` · ${subjectName(subject, lang)}` : ''}${yearFilter ? ` · ${yearFilter}` : ''}`
+          : describeConfig(activeConfig, lang)
       // Lazy-load the heavy jspdf/html2canvas chunk only on demand.
       const { generateQuestionBankPdf } = await import('../lib/pdfGenerator')
       await generateQuestionBankPdf({ questions: filtered, label, lang })
@@ -236,22 +266,74 @@ export default function AdminQuestionsPage() {
             {/* Outer bank: per-subject chips (each refetches that subject). */}
             {isOuter && (
               <div className="mx-auto mt-3 flex max-w-xl flex-wrap justify-center gap-1.5">
-                <SubjectChip label="All" active={!subject} onClick={() => setSubject(undefined)} />
+                <SubjectChip label="All" active={!subject} onClick={() => selectSubject(undefined)} />
                 {OUTER_SUBJECTS.map((s) => (
                   <SubjectChip
                     key={s}
                     label={s}
                     active={subject === s}
-                    onClick={() => setSubject(s)}
+                    onClick={() => selectSubject(s)}
                   />
                 ))}
+              </div>
+            )}
+
+            {/* PYQ bank: subject chips (refetch) + Year/Difficulty filters. */}
+            {isPyq && (
+              <div className="mx-auto mt-3 flex max-w-xl flex-col items-center gap-2">
+                <div className="flex flex-wrap justify-center gap-1.5">
+                  <SubjectChip label="All" active={!subject} onClick={() => selectSubject(undefined)} />
+                  {PYQ_SUBJECTS.map((s) => (
+                    <SubjectChip
+                      key={s}
+                      label={subjectName(s, lang)}
+                      active={subject === s}
+                      onClick={() => selectSubject(s)}
+                    />
+                  ))}
+                </div>
+                {(yearOptions.length > 0 || difficultyOptions.length > 1) && (
+                  <div className="flex flex-wrap items-center justify-center gap-1.5">
+                    {yearOptions.length > 0 && (
+                      <>
+                        <SubjectChip
+                          label="All years"
+                          active={yearFilter == null}
+                          onClick={() => setYearFilter(null)}
+                        />
+                        {yearOptions.map((y) => (
+                          <SubjectChip
+                            key={y}
+                            label={String(y)}
+                            active={yearFilter === y}
+                            onClick={() => setYearFilter(y)}
+                          />
+                        ))}
+                      </>
+                    )}
+                    {/* Difficulty chips only when the bank actually mixes levels. */}
+                    {difficultyOptions.length > 1 && (
+                      <>
+                        <span className="mx-1 h-4 w-px bg-line" aria-hidden />
+                        {difficultyOptions.map((d) => (
+                          <SubjectChip
+                            key={d}
+                            label={d.charAt(0).toUpperCase() + d.slice(1)}
+                            active={difficultyFilter === d}
+                            onClick={() => setDifficultyFilter(difficultyFilter === d ? null : d)}
+                          />
+                        ))}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             <p className="mt-2 text-center font-body text-xs text-ink2">
               {filtered.length} of {questions.length} question
               {questions.length === 1 ? '' : 's'}
-              {isOuter && questions.length >= 500 && ' (showing first 500)'}
+              {(isOuter || isPyq) && questions.length >= 500 && ' (showing first 500)'}
             </p>
             {actionError && (
               <p className="mt-2 text-center font-body text-xs font-medium text-coral">
@@ -282,6 +364,15 @@ export default function AdminQuestionsPage() {
             <AlertTriangle size={32} className="text-brand" />
             <p className="max-w-sm font-body text-ink2">
               No questions found for this selection yet.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && questions.length > 0 && filtered.length === 0 && (
+          <div className="flex flex-col items-center gap-3 py-12 text-center">
+            <Search size={28} className="text-ink2/50" />
+            <p className="max-w-sm font-body text-ink2">
+              No questions match the current search or filters.
             </p>
           </div>
         )}

@@ -35,6 +35,13 @@ import {
   ClipboardList,
   Clock,
   X,
+  Library,
+  Video,
+  FileText,
+  Image as ImageIcon,
+  Upload,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -55,12 +62,16 @@ import {
   type NotificationKind,
   type DeviceSession,
   type AppRelease,
+  type Material,
+  type MaterialKind,
+  type MaterialPlacement,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
+import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'materials'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -76,6 +87,7 @@ export default function SuperAdminPage() {
     { id: 'reports', label: 'reportsTab', icon: Flag },
     { id: 'notes', label: 'notesTab', icon: BookOpen },
     { id: 'mockexams', label: 'mockExamsTab', icon: ClipboardList },
+    { id: 'materials', label: 'materialsTab', icon: Library },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
@@ -123,6 +135,7 @@ export default function SuperAdminPage() {
           {tab === 'reports' && <ReportedQuestions />}
           {tab === 'notes' && <StudyNotesTab />}
           {tab === 'mockexams' && <MockExamsTab />}
+          {tab === 'materials' && <MaterialsTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
       </div>
@@ -1999,6 +2012,354 @@ function AppReleasesTab() {
         cancelLabel="Cancel"
         tone="danger"
         busy={busyId === pendingDelete?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+    </div>
+  )
+}
+
+// ─── Materials hub (videos, images, PDFs, documents) ───────────────────────────
+const MATERIAL_KIND_ICON: Record<MaterialKind, typeof Video> = {
+  video: Video,
+  image: ImageIcon,
+  pdf: FileText,
+  document: FileText,
+}
+
+const EMPTY_VIDEO_FORM = {
+  title: '',
+  title_ta: '',
+  url: '',
+  description: '',
+  placement: 'materials' as MaterialPlacement,
+  sort_order: '0',
+}
+const EMPTY_FILE_FORM = {
+  title: '',
+  title_ta: '',
+  description: '',
+  downloadable: false,
+  sort_order: '0',
+}
+
+function MaterialsTab() {
+  const [sub, setSub] = useState<'video' | 'file'>('video')
+  const [vform, setVform] = useState(EMPTY_VIDEO_FORM)
+  const [fform, setFform] = useState(EMPTY_FILE_FORM)
+  const [file, setFile] = useState<File | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [list, setList] = useState<Material[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Material | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.materials
+      .adminList()
+      .then(setList)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const submitVideo = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (saving) return
+    const title = vform.title.trim()
+    if (!title) return toast.error('A title is required.')
+    if (!vform.url.trim()) return toast.error('Paste a YouTube link.')
+    setSaving(true)
+    try {
+      const m = await api.materials.createVideo({
+        title,
+        title_ta: vform.title_ta.trim() || null,
+        url: vform.url.trim(),
+        description: vform.description.trim() || null,
+        placement: vform.placement,
+        sort_order: Number(vform.sort_order) || 0,
+      })
+      setList((prev) => [m, ...prev])
+      setVform(EMPTY_VIDEO_FORM)
+      toast.success('Video added.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not add the video.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const submitFile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (saving) return
+    const title = fform.title.trim()
+    if (!title) return toast.error('A title is required.')
+    if (!file) return toast.error('Choose a file to upload.')
+    setSaving(true)
+    try {
+      const m = await api.materials.uploadFile(file, {
+        title,
+        title_ta: fform.title_ta.trim() || null,
+        description: fform.description.trim() || null,
+        downloadable: fform.downloadable,
+        sort_order: Number(fform.sort_order) || 0,
+      })
+      setList((prev) => [m, ...prev])
+      setFform(EMPTY_FILE_FORM)
+      setFile(null)
+      toast.success('File uploaded.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Patch one material in place (toggle active / downloadable / placement).
+  const patch = async (m: Material, body: Parameters<typeof api.materials.update>[1]) => {
+    setBusyId(m.id)
+    try {
+      const updated = await api.materials.update(m.id, body)
+      setList((prev) => prev.map((x) => (x.id === m.id ? updated : x)))
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    try {
+      await api.materials.remove(pendingDelete.id)
+      setList((prev) => prev.filter((x) => x.id !== pendingDelete.id))
+      toast.success('Deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete.')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Sub-tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setSub('video')}
+          className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
+            sub === 'video' ? 'bg-brand text-white shadow-brand' : 'bg-tint text-ink2 hover:text-ink'
+          }`}
+        >
+          <Video size={15} /> Add Video
+        </button>
+        <button
+          onClick={() => setSub('file')}
+          className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
+            sub === 'file' ? 'bg-brand text-white shadow-brand' : 'bg-tint text-ink2 hover:text-ink'
+          }`}
+        >
+          <Upload size={15} /> Upload File
+        </button>
+      </div>
+
+      {/* Add video */}
+      {sub === 'video' && (
+        <form onSubmit={submitVideo} className="card space-y-4 p-5">
+          <div className="flex items-start gap-2">
+            <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+              <Video size={18} />
+            </span>
+            <div>
+              <h2 className="font-heading text-sm font-semibold text-ink">Connect a YouTube video</h2>
+              <p className="font-body text-xs text-ink2">
+                Paste any YouTube link. Choose whether it appears in the Materials tab or on the Profile screen.
+              </p>
+            </div>
+          </div>
+          <Field label="Title *">
+            <input className={COUPON_INPUT} value={vform.title} onChange={(e) => setVform((f) => ({ ...f, title: e.target.value }))} placeholder="e.g. Indian Polity — Crash Course" maxLength={160} />
+          </Field>
+          <Field label="Tamil title (optional)">
+            <input className={COUPON_INPUT} value={vform.title_ta} onChange={(e) => setVform((f) => ({ ...f, title_ta: e.target.value }))} maxLength={160} />
+          </Field>
+          <Field label="YouTube link *">
+            <input className={COUPON_INPUT} value={vform.url} onChange={(e) => setVform((f) => ({ ...f, url: e.target.value }))} placeholder="https://www.youtube.com/watch?v=…" />
+          </Field>
+          <Field label="Description (optional)">
+            <textarea className={COUPON_INPUT + ' min-h-[64px] resize-y'} value={vform.description} onChange={(e) => setVform((f) => ({ ...f, description: e.target.value }))} maxLength={500} />
+          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Show in">
+              <select className={COUPON_INPUT} value={vform.placement} onChange={(e) => setVform((f) => ({ ...f, placement: e.target.value as MaterialPlacement }))}>
+                <option value="materials">Materials tab</option>
+                <option value="profile">Profile screen</option>
+              </select>
+            </Field>
+            <Field label="Sort order">
+              <input type="number" className={COUPON_INPUT} value={vform.sort_order} onChange={(e) => setVform((f) => ({ ...f, sort_order: e.target.value }))} />
+            </Field>
+          </div>
+          <button type="submit" disabled={saving} className="btn-brand press disabled:opacity-60">
+            {saving ? <Spinner size={16} /> : <Plus size={16} />} Add video
+          </button>
+        </form>
+      )}
+
+      {/* Upload file */}
+      {sub === 'file' && (
+        <form onSubmit={submitFile} className="card space-y-4 p-5">
+          <div className="flex items-start gap-2">
+            <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+              <Upload size={18} />
+            </span>
+            <div>
+              <h2 className="font-heading text-sm font-semibold text-ink">Upload an image, PDF or document</h2>
+              <p className="font-body text-xs text-ink2">
+                Appears in the Materials tab. Up to 50 MB. Turn on "Allow download" if students may save it.
+              </p>
+            </div>
+          </div>
+          <Field label="Title *">
+            <input className={COUPON_INPUT} value={fform.title} onChange={(e) => setFform((f) => ({ ...f, title: e.target.value }))} placeholder="e.g. Polity mind-map (infographic)" maxLength={160} />
+          </Field>
+          <Field label="Tamil title (optional)">
+            <input className={COUPON_INPUT} value={fform.title_ta} onChange={(e) => setFform((f) => ({ ...f, title_ta: e.target.value }))} maxLength={160} />
+          </Field>
+          <Field label="Description (optional)">
+            <textarea className={COUPON_INPUT + ' min-h-[64px] resize-y'} value={fform.description} onChange={(e) => setFform((f) => ({ ...f, description: e.target.value }))} maxLength={500} />
+          </Field>
+          <Field label="File * (image, PDF, doc/ppt/xls, txt)">
+            <input
+              type="file"
+              accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="block w-full text-sm text-ink2 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-4 file:py-2 file:font-heading file:text-sm file:font-semibold file:text-white hover:file:opacity-90"
+            />
+          </Field>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex items-center gap-2.5 rounded-lg border border-line px-3 py-2.5">
+              <input type="checkbox" checked={fform.downloadable} onChange={(e) => setFform((f) => ({ ...f, downloadable: e.target.checked }))} className="h-4 w-4 accent-brand" />
+              <span className="font-body text-sm text-ink">Allow download</span>
+            </label>
+            <Field label="Sort order">
+              <input type="number" className={COUPON_INPUT} value={fform.sort_order} onChange={(e) => setFform((f) => ({ ...f, sort_order: e.target.value }))} />
+            </Field>
+          </div>
+          <button type="submit" disabled={saving} className="btn-brand press disabled:opacity-60">
+            {saving ? <Spinner size={16} /> : <Upload size={16} />} Upload
+          </button>
+        </form>
+      )}
+
+      {/* Library */}
+      <div>
+        <h2 className="mb-3 font-heading text-sm font-semibold text-ink">All materials</h2>
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton h-16 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <ErrorState onRetry={load} />
+        ) : list.length === 0 ? (
+          <p className="py-10 text-center font-body text-ink2">Nothing added yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {list.map((m, i) => {
+              const Icon = MATERIAL_KIND_ICON[m.kind]
+              const isFile = m.kind !== 'video'
+              return (
+                <div key={m.id} style={{ '--i': i } as React.CSSProperties} className="card stagger-item flex items-center gap-3 p-3">
+                  {/* Thumb / icon */}
+                  <div className="relative grid h-12 w-20 flex-shrink-0 place-items-center overflow-hidden rounded-lg bg-tint-violet text-primary">
+                    {m.kind === 'video' && m.youtube_id ? (
+                      <img src={youtubeThumb(m.youtube_id)} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Icon size={20} />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="tamil truncate font-heading text-sm font-semibold text-ink">{m.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                        {kindLabel(m.kind)}
+                      </span>
+                      <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                        {m.placement === 'profile' ? 'Profile' : 'Materials'}
+                      </span>
+                      {isFile && m.downloadable && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                          <Download size={10} /> Download
+                        </span>
+                      )}
+                      {!m.active && (
+                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                          Hidden
+                        </span>
+                      )}
+                      {m.file_size > 0 && <span className="font-body text-[11px] text-ink2">{formatFileSize(m.file_size)}</span>}
+                    </div>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex flex-shrink-0 items-center gap-1">
+                    {m.kind === 'video' && (
+                      <button
+                        onClick={() => patch(m, { placement: m.placement === 'profile' ? 'materials' : 'profile' })}
+                        disabled={busyId === m.id}
+                        className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink disabled:opacity-50"
+                        title={m.placement === 'profile' ? 'Move to Materials tab' : 'Move to Profile screen'}
+                      >
+                        {m.placement === 'profile' ? <Library size={15} /> : <UsersIcon size={15} />}
+                      </button>
+                    )}
+                    {isFile && (
+                      <button
+                        onClick={() => patch(m, { downloadable: !m.downloadable })}
+                        disabled={busyId === m.id}
+                        className={`grid h-8 w-8 place-items-center rounded-lg transition disabled:opacity-50 ${
+                          m.downloadable ? 'text-mint hover:bg-mintsoft' : 'text-ink2 hover:bg-tint hover:text-ink'
+                        }`}
+                        title={m.downloadable ? 'Download enabled — click to disable' : 'Download disabled — click to enable'}
+                      >
+                        <Download size={15} />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => patch(m, { active: !m.active })}
+                      disabled={busyId === m.id}
+                      className={`grid h-8 w-8 place-items-center rounded-lg transition disabled:opacity-50 ${
+                        m.active ? 'text-mint hover:bg-mintsoft' : 'text-ink2 hover:bg-tint hover:text-ink'
+                      }`}
+                      title={m.active ? 'Visible — click to hide' : 'Hidden — click to show'}
+                    >
+                      {m.active ? <Eye size={15} /> : <EyeOff size={15} />}
+                    </button>
+                    <button
+                      onClick={() => setPendingDelete(m)}
+                      className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral"
+                      title="Delete"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete material?"
+        message="This removes it for all users. Uploaded files are deleted from storage too."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
       />

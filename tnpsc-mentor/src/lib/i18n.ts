@@ -151,6 +151,27 @@ const STRINGS = {
 
   // Section badges
   pyqBadge: { en: 'Previous Year Question Paper', ta: 'முந்தைய ஆண்டு வினாத்தாள்' },
+
+  // PYQ group chooser (Group 1 vs Group 2 / 2A) + Group 2 section flow
+  pyqChooseGroup: { en: 'Choose a Group', ta: 'குழுவைத் தேர்ந்தெடுக்கவும்' },
+  pyqChooseGroupHint: {
+    en: 'Pick which exam’s previous-year questions to practise.',
+    ta: 'எந்தத் தேர்வின் முந்தைய ஆண்டு வினாக்களைப் பயிற்சி செய்வது எனத் தேர்ந்தெடுக்கவும்.',
+  },
+  group1Pyq: { en: 'Group 1 PYQ', ta: 'குரூப் 1 முந்தைய ஆண்டு வினாக்கள்' },
+  group1PyqSub: { en: 'General Studies, subject-wise (2019–2025)', ta: 'பொதுப் படிப்பு, பாட வாரியாக (2019–2025)' },
+  group2Pyq: { en: 'Group 2 / 2A Prelims PYQ', ta: 'குரூப் 2 / 2A முதனிலை வினாக்கள்' },
+  group2PyqSub: { en: 'Prelims · Aptitude, English, Tamil & GS', ta: 'முதனிலை · திறனாய்வு, ஆங்கிலம், தமிழ் & பொது அறிவு' },
+  pyq2Badge: { en: 'Group 2 / 2A Prelims - Previous Year Questions', ta: 'குரூப் 2 / 2A முதனிலை - முந்தைய ஆண்டு வினாக்கள்' },
+  pyq2PickSection: { en: 'Pick a Section', ta: 'ஒரு பிரிவைத் தேர்ந்தெடுக்கவும்' },
+  pyq2SectionHint: {
+    en: 'Choose a paper to begin a Group 2 / 2A test.',
+    ta: 'குரூப் 2 / 2A தேர்வைத் தொடங்க ஒரு தாளைத் தேர்ந்தெடுக்கவும்.',
+  },
+  pyq2AllQuestions: { en: 'All Questions', ta: 'அனைத்து வினாக்கள்' },
+  pyq2AllQuestionsSub: { en: 'Mix every sub-type', ta: 'அனைத்து உட்பிரிவுகளையும் கலந்து' },
+  allYears: { en: 'All Years', ta: 'அனைத்து ஆண்டுகள்' },
+  filterByYear: { en: 'Exam Year', ta: 'தேர்வு ஆண்டு' },
   samacheerBadge: { en: 'Samacheer Based', ta: 'சமச்சீர் அடிப்படையில்' },
   currentAffairsBadge: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
   aptitudeBadge: { en: 'Aptitude', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு' },
@@ -946,6 +967,38 @@ const STRINGS = {
   },
   couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
   appTab: { en: 'App', ta: 'ஆப்' },
+  materialsTab: { en: 'Materials', ta: 'பொருட்கள்' },
+  close: { en: 'Close', ta: 'மூடு' },
+  // ─── Materials / Infographics hub ───────────────────────────────────────
+  materials: { en: 'Materials', ta: 'கல்விப் பொருட்கள்' },
+  materialsTitle: { en: 'Study Materials', ta: 'கல்விப் பொருட்கள்' },
+  materialsSubtitle: {
+    en: 'Videos, infographics, notes and documents shared by your mentors',
+    ta: 'உங்கள் வழிகாட்டிகள் பகிர்ந்த வீடியோக்கள், விளக்கப்படங்கள், குறிப்புகள் மற்றும் ஆவணங்கள்',
+  },
+  materialsEmpty: {
+    en: 'No materials shared yet. Check back soon!',
+    ta: 'இதுவரை பொருட்கள் எதுவும் பகிரப்படவில்லை. விரைவில் மீண்டும் பாருங்கள்!',
+  },
+  materialsAllTypes: { en: 'All', ta: 'அனைத்தும்' },
+  typeVideo: { en: 'Videos', ta: 'வீடியோக்கள்' },
+  typeImage: { en: 'Images', ta: 'படங்கள்' },
+  typePdf: { en: 'PDFs', ta: 'PDF கோப்புகள்' },
+  typeDocument: { en: 'Documents', ta: 'ஆவணங்கள்' },
+  videoLessons: { en: 'Video Lessons', ta: 'வீடியோ பாடங்கள்' },
+  videoLessonsSub: {
+    en: 'Short videos handpicked by your mentors',
+    ta: 'உங்கள் வழிகாட்டிகள் தேர்ந்தெடுத்த குறும் வீடியோக்கள்',
+  },
+  materialOpen: { en: 'Open', ta: 'திற' },
+  materialOpenYoutube: { en: 'Open on YouTube', ta: 'YouTube-இல் திற' },
+  materialDownload: { en: 'Download', ta: 'பதிவிறக்கு' },
+  materialDocHint: {
+    en: 'Preview is not available for this file type — open or download it instead.',
+    ta: 'இந்தக் கோப்பு வகைக்கு முன்னோட்டம் இல்லை — அதைத் திறக்கவும் அல்லது பதிவிறக்கவும்.',
+  },
+  materialOpenFailed: { en: 'Could not open this material.', ta: 'இந்தப் பொருளைத் திறக்க முடியவில்லை.' },
+  materialDownloadFailed: { en: 'Could not download this material.', ta: 'இந்தப் பொருளைப் பதிவிறக்க முடியவில்லை.' },
   revenueTab: { en: 'Revenue', ta: 'வருவாய்' },
   mockExamsTab: { en: 'Mock Exams', ta: 'மாதிரித் தேர்வுகள்' },
   mockSectionsTitle: { en: 'Mock Test sections', ta: 'மாதிரித் தேர்வு பிரிவுகள்' },

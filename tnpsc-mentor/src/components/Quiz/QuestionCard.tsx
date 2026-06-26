@@ -112,6 +112,7 @@ export default function QuestionCard({
               key={letter}
               letter={letter}
               text={displayOption(question, letter, lang)}
+              image={question.option_images?.[letter]}
               selected={!reveal && selected === letter}
               onSelect={() => onSelect(letter)}
               disabled={disabled}
