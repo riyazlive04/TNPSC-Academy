@@ -5,6 +5,7 @@ import { api, type Material } from '../../lib/api'
 import { materialTitle, youtubeEmbed, youtubeWatch } from '../../lib/materials'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
+import { trackDownloadMaterial } from '../../lib/tracking'
 
 /**
  * Full-screen viewer for one material. Videos embed the YouTube player; images
@@ -70,6 +71,7 @@ export default function MaterialViewer({ material, onClose }: { material: Materi
       document.body.appendChild(a)
       a.click()
       a.remove()
+      trackDownloadMaterial({ id: material.id, title: material.title, kind: material.kind })
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('materialDownloadFailed'))
     } finally {
