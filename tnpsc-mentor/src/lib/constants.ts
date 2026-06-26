@@ -27,6 +27,8 @@ export const SUBJECT_NAME_TA: Record<string, string> = {
   English: 'ஆங்கிலம்',
   'Current Affairs': 'நடப்பு நிகழ்வுகள்',
   Aptitude: 'திறனாய்வு மற்றும் மனக்கணக்கு',
+  // Group 2 PYQ section name (the other three sections reuse keys above).
+  'General Studies': 'பொது அறிவு',
 }
 
 /** A subject name in the chosen language: Tamil for 'ta', "EN / TA" for 'both',
@@ -80,6 +82,25 @@ export const TOPIC_NAME_TA: Record<string, string> = {
   'Government Schemes': 'அரசுத் திட்டங்கள்',
   Grammar: 'இலக்கணம்',
   'Grammar and Comprehension': 'இலக்கணம் மற்றும் விளக்கம்',
+  // ── Group 2 PYQ sub-types (English / Tamil skill areas + GS subjects) ──
+  Vocabulary: 'சொல்லறிவு',
+  Literature: 'இலக்கியம்',
+  Comprehension: 'பத்தியுணர்வு',
+  'Author & Work': 'ஆசிரியர் & நூல்',
+  'Language History': 'மொழி வரலாறு',
+  'Tamil GK': 'தமிழ் பொது அறிவு',
+  Economics: 'பொருளியல்',
+  Culture: 'பண்பாடு',
+  'Development Administration': 'வளர்ச்சி நிர்வாகம்',
+  'Current Affairs & GK': 'நடப்பு நிகழ்வுகள் & பொது அறிவு',
+  // GS sub-types that double as subject names (mirrored from SUBJECT_NAME_TA so
+  // topicName() resolves them on the Group 2 General Studies section page).
+  History: 'வரலாறு',
+  Polity: 'அரசியலமைப்பு',
+  Geography: 'புவியியல்',
+  Biology: 'உயிரியல்',
+  Physics: 'இயற்பியல்',
+  Chemistry: 'வேதியியல்',
   'Growth of Jainism and Buddhism': 'சமணம் மற்றும் பௌத்தத்தின் வளர்ச்சி',
   'Health and Hygiene': 'சுகாதாரம் மற்றும் தூய்மை',
   'History of Tamil society': 'தமிழ்ச் சமூகத்தின் வரலாறு',
@@ -275,6 +296,47 @@ export const PYQ_SUBJECTS: string[] = [
   'Indian Economy',
   'Aptitude',
 ]
+
+// ─── Group 2 / 2A Previous-Year Questions (category='pyq2') ──────────────────
+// A self-contained bank: `subject` is the SECTION, `topic` the SUB-TYPE, and
+// `aptitude_type` ('numerics' | 'reasoning') splits the Aptitude section. The
+// picker drills: Group 2 → section → (All + sub-types) with an exam-year filter.
+export type Pyq2Section = 'Aptitude' | 'English' | 'Tamil' | 'General Studies'
+
+export const PYQ2_SECTIONS: Pyq2Section[] = ['Aptitude', 'English', 'Tamil', 'General Studies']
+
+// Exam years present in the bank, newest first. A year with no questions for the
+// current section is disabled at render time (its count is 0).
+export const PYQ2_YEARS: number[] = [2025, 2024, 2022, 2018, 2017, 2016, 2014]
+
+// Sub-type (topic) display order per section. Aptitude is split by aptitude_type
+// instead of topic, so it isn't listed here.
+export const PYQ2_SECTION_TOPICS: Record<Exclude<Pyq2Section, 'Aptitude'>, string[]> = {
+  English: ['Grammar', 'Vocabulary', 'Literature', 'Comprehension'],
+  Tamil: ['Grammar', 'Vocabulary', 'Literature', 'Author & Work', 'Language History', 'Tamil GK'],
+  'General Studies': [
+    'History',
+    'Polity',
+    'Geography',
+    'Economics',
+    'Culture',
+    'Development Administration',
+    'Biology',
+    'Physics',
+    'Chemistry',
+    'Current Affairs & GK',
+  ],
+}
+
+// URL slug ↔ section (the section page route param). Kept short + lowercase.
+export const PYQ2_SECTION_SLUGS: Record<string, Pyq2Section> = {
+  aptitude: 'Aptitude',
+  english: 'English',
+  tamil: 'Tamil',
+  'general-studies': 'General Studies',
+}
+export const pyq2SectionSlug = (s: Pyq2Section): string =>
+  Object.keys(PYQ2_SECTION_SLUGS).find((k) => PYQ2_SECTION_SLUGS[k] === s) ?? 'aptitude'
 
 // Per-group subject availability. Group 1 = full GS; Group 2/4 add the
 // General Tamil / General English qualifying papers.

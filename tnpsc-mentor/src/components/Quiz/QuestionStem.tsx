@@ -17,7 +17,12 @@ interface QuestionStemProps {
  * vertically; everything else renders as the usual pre-wrapped paragraph.
  */
 export default function QuestionStem({ question, lang, textClassName, prefix }: QuestionStemProps) {
-  if (question.question_type === 'match') {
+  // Render List I / List II side-by-side for two-list match questions. We try
+  // this when the question is tagged 'match', and for the whole Group 2 PYQ bank
+  // (category='pyq2') where match tagging is uneven — the parser is the gate: it
+  // returns null for non-matches, so we safely fall back to the plain layout
+  // (single-list "which pair is correct?" items stay as a normal list).
+  if (question.question_type === 'match' || question.category === 'pyq2') {
     // Parse each language's raw text independently (bilingual 'both' would
     // otherwise concatenate two match blocks into one unparseable blob).
     const en = question.question_text

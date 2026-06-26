@@ -419,6 +419,8 @@ export const api = {
     standard?: number | null
     aptitude_type?: string
     ca_month?: string
+    /** Group 2 PYQ: restrict the per-topic counts to one exam year. */
+    year?: number
   }): Promise<Record<string, number>> {
     const data = await request<{ counts: Record<string, number> }>('/api/questions/topic-counts', {
       method: 'POST',
@@ -760,6 +762,73 @@ export const api = {
     },
   },
 
+  // ─── Materials (study material hub: videos, images, PDFs, documents) ──────
+  materials: {
+    /** Active items for a placement: 'materials' (nav tab) or 'profile' screen. */
+    async list(placement: MaterialPlacement = 'materials'): Promise<Material[]> {
+      const data = await request<{ materials: Material[] }>(`/api/materials?placement=${placement}`)
+      return data.materials
+    },
+    /** A short-lived signed URL for an uploaded file. 'download' is gated server-side. */
+    async fileUrl(id: string, mode: 'view' | 'download' = 'view'): Promise<string> {
+      const data = await request<{ url: string }>(`/api/materials/${id}/file?mode=${mode}`)
+      return data.url
+    },
+    /** Superadmin: every item (active or hidden), all placements. */
+    async adminList(): Promise<Material[]> {
+      const data = await request<{ materials: Material[] }>('/api/materials/admin')
+      return data.materials
+    },
+    /** Superadmin: add a YouTube video. */
+    async createVideo(input: {
+      title: string
+      title_ta?: string | null
+      url: string
+      description?: string | null
+      placement: MaterialPlacement
+      sort_order?: number
+    }): Promise<Material> {
+      const data = await request<{ material: Material }>('/api/materials/video', { method: 'POST', body: input })
+      return data.material
+    },
+    /**
+     * Superadmin: upload an image/PDF/document. Sent as the raw body (not JSON),
+     * so it bypasses request(); metadata rides in the query string and the
+     * filename in a header — same shape as the APK upload.
+     */
+    async uploadFile(
+      file: File,
+      meta: { title: string; title_ta?: string | null; description?: string | null; downloadable: boolean; sort_order?: number }
+    ): Promise<Material> {
+      const qs = new URLSearchParams({ title: meta.title, downloadable: String(meta.downloadable) })
+      if (meta.title_ta) qs.set('title_ta', meta.title_ta)
+      if (meta.description) qs.set('description', meta.description)
+      if (meta.sort_order != null) qs.set('sort_order', String(meta.sort_order))
+      const headers: Record<string, string> = {
+        'Content-Type': file.type || 'application/octet-stream',
+        'x-file-name': file.name,
+      }
+      if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`
+      const res = await fetch(`${API_URL}/api/materials/file?${qs.toString()}`, {
+        method: 'POST',
+        headers,
+        credentials: CREDENTIALS,
+        body: file,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      return (data as { material: Material }).material
+    },
+    /** Superadmin: edit fields / toggle active+downloadable / change placement / reorder. */
+    async update(id: string, patch: Partial<MaterialPatch>): Promise<Material> {
+      const data = await request<{ material: Material }>(`/api/materials/${id}`, { method: 'PATCH', body: patch })
+      return data.material
+    },
+    async remove(id: string): Promise<void> {
+      await request(`/api/materials/${id}`, { method: 'DELETE' })
+    },
+  },
+
   // ─── Feedback (student-submitted) ────────────────────────────────────────
   feedback: {
     async submit(rating: number, message: string, page: string): Promise<void> {
@@ -889,6 +958,40 @@ export const api = {
       await request(`/api/notifications/${id}`, { method: 'DELETE' })
     },
   },
+}
+
+// ─── Material shapes ────────────────────────────────────────────────────────────
+export type MaterialKind = 'video' | 'image' | 'pdf' | 'document'
+export type MaterialPlacement = 'materials' | 'profile'
+
+/** One curated study-material item (metadata only — file URLs are minted on demand). */
+export interface Material {
+  id: string
+  kind: MaterialKind
+  placement: MaterialPlacement
+  title: string
+  title_ta: string | null
+  description: string | null
+  youtube_id: string | null
+  file_name: string | null
+  file_size: number
+  mime_type: string | null
+  downloadable: boolean
+  active: boolean
+  sort_order: number
+  created_at: string
+}
+
+/** Editable fields accepted by the PATCH endpoint. */
+export interface MaterialPatch {
+  title: string
+  title_ta: string | null
+  description: string | null
+  placement: MaterialPlacement
+  active: boolean
+  downloadable: boolean
+  sort_order: number
+  url: string
 }
 
 // ─── Notification shapes ────────────────────────────────────────────────────────
