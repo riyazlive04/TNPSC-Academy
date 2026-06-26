@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag } from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useHasMaterials } from '../../hooks/useHasMaterials'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
@@ -36,6 +37,7 @@ function withinFeedbackWindow(key: string | null): boolean {
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
+  { to: '/materials', icon: Library, key: 'materials' as const, short: 'materials' as const },
   { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
   { to: '/profile', icon: User, key: 'profile' as const, short: 'profile' as const },
 ]
@@ -73,8 +75,12 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // feedback prompt pop over it.
   const tourActive = useOnboardingStore((s) => s.open || s.pending)
 
-  // Admins/superadmins manage content; learners get the study tabs.
-  const nav = isAdmin ? ADMIN_NAV : LEARNER_NAV
+  // Admins/superadmins manage content; learners get the study tabs. The
+  // Materials tab is shown only once a material has been published (no empty tab).
+  const hasMaterials = useHasMaterials()
+  const nav = isAdmin
+    ? ADMIN_NAV
+    : LEARNER_NAV.filter((item) => item.to !== '/materials' || hasMaterials)
 
   // Badge: number of open student question-reports awaiting triage (admins only).
   const [openReports, setOpenReports] = useState(0)

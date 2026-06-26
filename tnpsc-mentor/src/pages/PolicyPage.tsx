@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, ShieldCheck, BookOpen, CreditCard, RotateCcw } from 'lucide-react'
 
 // ─── Policy content ──────────────────────────────────────────────────────────
-// Plain-English legal/policy copy for the public site. These are practical
-// templates grounded in how the app actually works (one-time ₹1,699 Group 1
-// kit, Razorpay UPI/card, digital content, no subscription). Have a lawyer/CA
-// review and fill the [bracketed] placeholders before relying on them.
+// Plain-English legal/policy copy for the public site, grounded in how the app
+// actually works (one-time ₹1,699 Group 1 kit, Razorpay UPI/card, digital
+// content, no subscription). Reviewed and verified by an advocate on
+// 24 June 2026; bracketed placeholders have been finalised.
 
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 const SUPPORT_PHONE = '+91 96777 79808'
-const LAST_UPDATED = '[DD Month 2026]'
+const LAST_UPDATED = '24 June 2026'
 
 type Block =
   | { h: string; p: string[] }
@@ -193,7 +193,7 @@ const REFUND: Policy = {
         'Duplicate payment - you were charged more than once for the same Kit.',
         'Payment deducted but access not granted, and we cannot activate it within a reasonable time.',
         'A failed or erroneous transaction caused an incorrect charge.',
-        'A significant, reproducible technical fault prevents access to the core paid content and our team cannot resolve it within [7] days of you reporting it.',
+        'A significant, reproducible technical fault prevents access to the core paid content and our team cannot resolve it within 7 days of you reporting it.',
       ],
     },
     {
@@ -207,12 +207,12 @@ const REFUND: Policy = {
     },
     {
       h: '4. Refund window',
-      p: ['Eligible requests must be raised within [7] days of the transaction date.'],
+      p: ['Eligible requests must be raised within 7 days of the transaction date.'],
     },
     {
       h: '5. How to request',
       p: [
-        `Email ${SUPPORT_EMAIL} (or WhatsApp ${SUPPORT_PHONE}) with your registered name, the email/phone used, the Razorpay payment/order ID, date and amount, and the reason. We aim to decide within [7] business days.`,
+        `Email ${SUPPORT_EMAIL} (or WhatsApp ${SUPPORT_PHONE}) with your registered name, the email/phone used, the Razorpay payment/order ID, date and amount, and the reason. We aim to decide within 7 business days.`,
       ],
     },
     {
@@ -348,8 +348,7 @@ export default function PolicyPage({ slug }: { slug: string }) {
             · {SUPPORT_PHONE}
           </p>
           <p className="mt-3 font-body text-xs italic text-ink2">
-            This document is provided for transparency and is not legal advice. Bracketed items are
-            placeholders to be finalised before launch.
+            Reviewed and verified by an advocate on 24 June 2026.
           </p>
         </div>
 

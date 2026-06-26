@@ -35,6 +35,7 @@ import {
   Instagram,
   Youtube,
   Facebook,
+  X,
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
@@ -53,6 +54,10 @@ const APK_DOWNLOAD_FALLBACK = `${API_BASE}/api/app/download`
 // yet → the download buttons render disabled. Provided by LandingPage after it
 // fetches the latest release.
 const ApkUrlContext = createContext<string | null>(null)
+// Opens the pre-install notice modal (the Google Play Protect warning users will
+// hit when sideloading) before the APK actually downloads. Every download CTA on
+// the page routes its click through this so nobody is surprised by the warning.
+const DownloadIntentContext = createContext<() => void>(() => {})
 // Sign-in from the landing page goes to the hosted web app, not the in-page
 // router (the app lives on its own subdomain).
 const APP_URL = 'https://app.tnpscmentors.in'
@@ -108,6 +113,9 @@ const T = {
   signIn: { ta: 'உள்நுழைய', en: 'Sign in' },
   signUp: { ta: 'பதிவு செய்', en: 'Sign up' },
   download: { ta: 'App download பண்ணுங்க', en: 'Download the app' },
+  // Primary CTA while we promote the hosted web app (APK download paused). The
+  // Platforms section still offers the APK; everywhere else routes here.
+  webCta: { ta: 'Web app-ல try பண்ணுங்க', en: 'Try the web app' },
 
   // Hero
   heroTitle: {
@@ -185,6 +193,34 @@ const T = {
     ta: 'Play Store-ல இன்னும் வராத app-க்கு இந்த warning சகஜம். விரைவில் நாங்க Play Store-ல வந்துடுவோம். உங்க download பாதுகாப்பானது.',
     en: "This warning is normal for apps not yet on the Play Store. We'll be on the Play Store soon. Your download is safe.",
   },
+
+  // Pre-install notice modal - shown the moment a download CTA is tapped, so the
+  // Google Play Protect warning never comes as a surprise.
+  dlModalTitle: {
+    ta: 'Install பண்றதுக்கு முன்ன - ஒரு சின்ன heads-up',
+    en: 'Before you install - a quick heads-up',
+  },
+  dlModalIntro: {
+    ta: 'App இன்னும் Play Store-ல வரல, அதனால Google Play Protect இந்த மாதிரி ஒரு warning காட்டலாம்:',
+    en: "The app isn't on the Play Store yet, so Google Play Protect may show a warning like this:",
+  },
+  dlModalQuote: {
+    ta: '"Unsafe app blocked" அல்லது "App not allowed"',
+    en: '"Unsafe app blocked" or "App not allowed"',
+  },
+  dlModalFix: {
+    ta: 'பயப்படாதீங்க - "More details" (மேலும் விவரங்கள்) tap பண்ணி, "Install anyway" (எப்படியும் install பண்ணு) தேர்ந்தெடுங்க.',
+    en: 'Don\'t worry - just tap "More details", then choose "Install anyway".',
+  },
+  dlModalReassure: {
+    ta: 'உங்க download 100% பாதுகாப்பானது. விரைவில் நாங்க Play Store-ல வந்துடுவோம்.',
+    en: "Your download is 100% safe. We'll be on the Play Store soon.",
+  },
+  dlModalProceed: {
+    ta: 'புரிஞ்சது - Download பண்ணு',
+    en: 'Got it - download now',
+  },
+  dlModalCancel: { ta: 'பின்னாடி', en: 'Not now' },
 
   // Platforms - study on any device
   platTitle: { ta: 'எந்த device-லயும் படிக்கலாம் ', en: 'Study on any device' },
@@ -408,6 +444,10 @@ export default function LandingPage() {
       })
   }, [])
 
+  // Pre-install notice: opened by any download CTA, dismissed once the user
+  // proceeds (the actual <a download> lives inside the modal).
+  const [showInstallNotice, setShowInstallNotice] = useState(false)
+
   // Hide the header while scrolling down, reveal it the moment the user scrolls
   // up (or returns near the top) - more screen for content, CTA always one flick
   // away. Works with Lenis since it drives native window scroll.
@@ -451,6 +491,7 @@ export default function LandingPage() {
 
   return (
     <ApkUrlContext.Provider value={apkUrl}>
+    <DownloadIntentContext.Provider value={() => setShowInstallNotice(true)}>
     <div id="top" className="min-h-screen overflow-x-clip bg-canvas pb-24 sm:pb-0">
       {/* ─── Top bar ──────────────────────────────────────────────────────── */}
       <header
@@ -561,7 +602,7 @@ export default function LandingPage() {
                 {t('heroSub')}
               </motion.p>
               <motion.div variants={heroItem} className="mt-8 flex justify-center lg:justify-start">
-                <DownloadButton label={t('download')} size="lg" />
+                <WebAppButton label={t('webCta')} size="lg" />
               </motion.div>
               {/* Trust row - concrete, no hype */}
               <motion.div
@@ -653,7 +694,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="mt-8 flex justify-center">
-              <DownloadButton label={t('download')} size="lg" />
+              <WebAppButton label={t('webCta')} size="lg" />
             </div>
           </div>
         </section>
@@ -686,7 +727,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <div className="mt-7">
-                  <DownloadButton label={t('download')} />
+                  <WebAppButton label={t('webCta')} />
                 </div>
               </div>
             </Reveal>
@@ -807,14 +848,13 @@ export default function LandingPage() {
                 <div className="mt-5">
                   {action === 'download' ? (
                     apkUrl ? (
-                      <a
-                        href={apkUrl}
-                        download
-                        onClick={() => trackEvent('download_click')}
+                      <button
+                        type="button"
+                        onClick={() => setShowInstallNotice(true)}
                         className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-brand transition hover:gap-2.5 hover:text-brand-dark"
                       >
                         <Download size={15} /> {t('download')}
-                      </a>
+                      </button>
                     ) : (
                       <span className="inline-flex items-center gap-1.5 font-heading text-sm font-semibold text-ink2/50">
                         <Download size={15} /> {t('download')}
@@ -887,7 +927,7 @@ export default function LandingPage() {
               </h2>
               <p className="mx-auto mt-3 max-w-xl font-body text-base text-white/75">{t('s8Sub')}</p>
               <div className="mt-8 flex justify-center">
-                <DownloadButton label={t('download')} size="lg" tone="onDark" />
+                <WebAppButton label={t('webCta')} size="lg" tone="onDark" />
               </div>
               <p className="mt-4 font-body text-sm text-white/70">{t('heroTrust')}</p>
             </div>
@@ -984,28 +1024,38 @@ export default function LandingPage() {
       </footer>
 
       {/* ─── Sticky mobile CTA bar (always-visible) ───────────────────────────
-          Two functional actions: open the hosted web app (→ /login) or download
-          the Android APK. */}
+          One action while we promote the web app: open the hosted web app
+          (register for new visitors, the app once signed in). */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card/95 px-4 py-3 pb-safe backdrop-blur sm:hidden">
-        <div className="flex items-center gap-2.5">
-          <a
-            href={isAuthed ? APP_URL : APP_LOGIN_URL}
-            className="btn-ghost group flex-1 justify-center whitespace-nowrap px-3 py-2.5 text-sm"
-          >
-            <Globe size={16} /> {t('openWebShort')}
-          </a>
-          <DownloadButton label={t('download')} compact />
-        </div>
+        <a
+          href={isAuthed ? APP_URL : APP_REGISTER_URL}
+          onClick={() => trackEvent('webapp_click')}
+          className="btn-brand group w-full justify-center whitespace-nowrap px-4 py-3 text-sm"
+        >
+          <Globe size={16} /> {t('webCta')}
+        </a>
       </div>
+
+      {/* Pre-install notice (Play Protect warning) - the gateway to the actual
+          download. */}
+      <InstallNoticeModal
+        open={showInstallNotice}
+        onClose={() => setShowInstallNotice(false)}
+        apkUrl={apkUrl}
+        t={t}
+        reduce={Boolean(reduce)}
+      />
     </div>
+    </DownloadIntentContext.Provider>
     </ApkUrlContext.Provider>
   )
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** The one and only call to action. Renders an <a download> so the browser
- * downloads the hosted APK, and fires the install-rate KPI on every tap. */
+/** The one and only call to action. Opens the pre-install notice modal (so the
+ * Play Protect warning is never a surprise); the actual <a download> that fires
+ * the install-rate KPI lives inside that modal. */
 function DownloadButton({
   label,
   size,
@@ -1017,9 +1067,7 @@ function DownloadButton({
   compact?: boolean
   tone?: 'onDark'
 }) {
-  // Resolve the live APK URL from context (set once the latest build is found),
-  // falling back to the stable redirect endpoint so the button always links.
-  const apkUrl = useContext(ApkUrlContext) ?? APK_DOWNLOAD_FALLBACK
+  const openNotice = useContext(DownloadIntentContext)
   // On the violet hero panels the gradient button disappears, so render a solid
   // high-contrast white pill there instead - keeps "download" the boldest thing.
   const base =
@@ -1032,12 +1080,7 @@ function DownloadButton({
       ? `${base} group w-full px-7 py-4 text-base sm:w-auto`
       : `${base} group w-full px-6 py-3.5 text-base sm:w-auto`
   return (
-    <a
-      href={apkUrl}
-      download
-      onClick={() => trackEvent('download_click')}
-      className={cls}
-    >
+    <button type="button" onClick={openNotice} className={cls}>
       {/* download icon dips down on hover, like a file landing */}
       <Download
         size={compact ? 16 : 18}
@@ -1050,7 +1093,161 @@ function DownloadButton({
           className="hidden transition-transform duration-200 group-hover:translate-x-1 sm:inline"
         />
       )}
+    </button>
+  )
+}
+
+/** Web-app CTA — the primary call to action while we promote the hosted web app
+ * (APK download paused for now; still offered in the Platforms section). Opens
+ * the web app: register for new visitors, the app itself once signed in. Mirrors
+ * DownloadButton's sizing/tone props so swapping it in leaves the layout intact. */
+function WebAppButton({
+  label,
+  size,
+  compact,
+  tone,
+}: {
+  label: string
+  size?: 'lg'
+  compact?: boolean
+  tone?: 'onDark'
+}) {
+  const isAuthed = useAuthStore((s) => Boolean(s.user))
+  const href = isAuthed ? APP_URL : APP_REGISTER_URL
+  // On violet hero panels the gradient button vanishes, so use a solid white pill.
+  const base =
+    tone === 'onDark'
+      ? 'btn bg-white text-brand-dark hover:brightness-95'
+      : 'btn-brand'
+  const cls = compact
+    ? `${base} group px-4 py-2.5 text-sm whitespace-nowrap`
+    : size === 'lg'
+      ? `${base} group w-full px-7 py-4 text-base sm:w-auto`
+      : `${base} group w-full px-6 py-3.5 text-base sm:w-auto`
+  return (
+    <a href={href} onClick={() => trackEvent('webapp_click')} className={cls}>
+      <Globe size={compact ? 16 : 18} />
+      {label}
+      {!compact && (
+        <ArrowRight
+          size={18}
+          className="hidden transition-transform duration-200 group-hover:translate-x-1 sm:inline"
+        />
+      )}
     </a>
+  )
+}
+
+/** Pre-install notice. Surfaces the exact Google Play Protect warning a user
+ * will hit when sideloading, plus the one-tap way past it, then proceeds to the
+ * actual APK download. Routed through by every download CTA on the page. */
+function InstallNoticeModal({
+  open,
+  onClose,
+  apkUrl,
+  t,
+  reduce,
+}: {
+  open: boolean
+  onClose: () => void
+  apkUrl: string | null
+  t: (key: keyof typeof T) => string
+  reduce: boolean
+}) {
+  // Lock body scroll while the modal is up, and allow Esc to dismiss.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [open, onClose])
+
+  const href = apkUrl ?? APK_DOWNLOAD_FALLBACK
+  const ease = [0, 0, 0.2, 1] as const
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-4 backdrop-blur-sm sm:items-center"
+          initial={reduce ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('dlModalTitle')}
+        >
+          <motion.div
+            className="relative w-full max-w-md rounded-card border border-line bg-card p-6 shadow-xl"
+            initial={reduce ? false : { opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
+            transition={{ duration: 0.25, ease }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t('dlModalCancel')}
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
+            >
+              <X size={18} />
+            </button>
+
+            <span className="grid h-12 w-12 place-items-center rounded-tile bg-tint-violet text-brand">
+              <Smartphone size={24} />
+            </span>
+            <h3 className="mt-4 pr-8 font-heading text-xl font-bold text-ink">
+              {t('dlModalTitle')}
+            </h3>
+            <p className="mt-3 font-body text-[15px] leading-relaxed text-ink2">
+              {t('dlModalIntro')}
+            </p>
+
+            {/* The verbatim warning the user is about to see - shown plainly as
+                a quoted snippet, not a danger alert, so it stays reassuring. */}
+            <div className="mt-3 rounded-card border border-line bg-tint px-4 py-2.5">
+              <p className="font-body text-sm leading-relaxed text-ink2">
+                {t('dlModalQuote')}
+              </p>
+            </div>
+
+            <p className="mt-3 font-body text-[15px] leading-relaxed text-ink">
+              {t('dlModalFix')}
+            </p>
+            <div className="mt-3 flex items-start gap-2.5 rounded-card border border-correct/25 bg-tint-green px-4 py-3">
+              <ShieldCheck size={16} className="mt-0.5 flex-shrink-0 text-correct" />
+              <p className="font-body text-sm leading-relaxed text-ink2">
+                {t('dlModalReassure')}
+              </p>
+            </div>
+
+            <a
+              href={href}
+              download
+              onClick={() => {
+                trackEvent('download_click')
+                onClose()
+              }}
+              className="btn-brand group mt-5 w-full justify-center px-6 py-3.5 text-base"
+            >
+              <Download
+                size={18}
+                className="transition-transform duration-200 group-hover:translate-y-0.5"
+              />
+              {t('dlModalProceed')}
+            </a>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 

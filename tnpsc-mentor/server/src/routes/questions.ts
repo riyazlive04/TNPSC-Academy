@@ -199,6 +199,7 @@ router.post(
     if (config.ca_topic) q = q.eq('ca_topic', config.ca_topic)
     if (config.aptitude_type) q = q.eq('aptitude_type', config.aptitude_type)
     if (config.aptitude_topic) q = q.eq('aptitude_topic', config.aptitude_topic)
+    if (config.year != null) q = q.eq('year', config.year)
     const { count, error: e2 } = await q
     if (e2) return sendDbError(res, e2)
     res.json({ count: count ?? 0 })
@@ -268,8 +269,8 @@ router.post(
   '/topic-counts',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { category = 'subject', subject, standard, aptitude_type, ca_month } = req.body ?? {}
-    const known = ['aptitude', 'samacheer', 'pyq', 'subject', 'current_affairs']
+    const { category = 'subject', subject, standard, aptitude_type, ca_month, year } = req.body ?? {}
+    const known = ['aptitude', 'samacheer', 'pyq', 'pyq2', 'subject', 'current_affairs']
     if (!known.includes(category)) return res.json({ counts: {} })
 
     // Current Affairs scoped to a single month: the RPC has no ca_month param,
@@ -296,6 +297,7 @@ router.post(
         subject: subject ?? null,
         standard: standard ?? null,
         aptitude_type: aptitude_type ?? null,
+        year: year ?? null,
       },
     })
     if (!error) {
@@ -318,6 +320,7 @@ router.post(
     if (subject) q = q.eq('subject', subject)
     if (category === 'samacheer' && standard != null) q = q.eq('standard', standard)
     if (category === 'aptitude' && aptitude_type) q = q.eq('aptitude_type', aptitude_type)
+    if (year != null) q = q.eq('year', year)
     const { data: rows, error: e2 } = await q
     if (e2) return sendDbError(res, e2)
     const counts: Record<string, number> = {}

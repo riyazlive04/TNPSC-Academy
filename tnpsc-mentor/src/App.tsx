@@ -26,7 +26,10 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'))
 const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
+const PyqGroupChooserPage = lazy(() => import('./pages/PyqGroupChooserPage'))
 const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
+const PyqGroup2Page = lazy(() => import('./pages/PyqGroup2Page'))
+const PyqGroup2SectionPage = lazy(() => import('./pages/PyqGroup2SectionPage'))
 const HistoryPeriodsPage = lazy(() => import('./pages/HistoryPeriodsPage'))
 const PyqAptitudePage = lazy(() => import('./pages/PyqAptitudePage'))
 const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
@@ -40,6 +43,7 @@ const AdminReportsPage = lazy(() => import('./pages/AdminReportsPage'))
 const ResultPage = lazy(() => import('./pages/ResultPage'))
 const InsightsPage = lazy(() => import('./pages/InsightsPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const MaterialsPage = lazy(() => import('./pages/MaterialsPage'))
 const RevisionPage = lazy(() => import('./pages/RevisionPage'))
 const MockTestPage = lazy(() => import('./pages/MockTestPage'))
 const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
@@ -57,7 +61,10 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/complete-profile', element: <CompleteProfilePage /> },
   { path: '/language', element: <LanguageScreen /> },
   { path: '/test-arena', element: <TestArenaPage /> },
-  { path: '/test-arena/pyq', element: <PreviousYearPage /> },
+  { path: '/test-arena/pyq', element: <PyqGroupChooserPage /> },
+  { path: '/test-arena/pyq/group1', element: <PreviousYearPage /> },
+  { path: '/test-arena/pyq/group2', element: <PyqGroup2Page /> },
+  { path: '/test-arena/pyq/group2/:section', element: <PyqGroup2SectionPage /> },
   { path: '/test-arena/pyq/history', element: <HistoryPeriodsPage /> },
   { path: '/test-arena/pyq/aptitude', element: <PyqAptitudePage /> },
   { path: '/test-arena/subjects', element: <SubjectPracticePage /> },
@@ -74,6 +81,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/result', element: <ResultPage /> },
   { path: '/insights', element: <InsightsPage /> },
   { path: '/profile', element: <ProfilePage /> },
+  { path: '/materials', element: <MaterialsPage /> },
   { path: '/revision', element: <RevisionPage /> },
   { path: '/mock', element: <MockTestPage /> },
   { path: '/mock/instructions', element: <MockInstructionsPage /> },

@@ -23,6 +23,7 @@ import {
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
 import PremiumCard from '../components/UI/PremiumCard'
+import ProfileVideos from '../components/Profile/ProfileVideos'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -357,6 +358,10 @@ export default function ProfilePage() {
                 <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
               </button>
             )}
+
+            {/* Video lessons - superadmin-assigned videos (placement='profile').
+                Renders nothing until videos are added. */}
+            <ProfileVideos />
 
             {/* Devices - manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />
