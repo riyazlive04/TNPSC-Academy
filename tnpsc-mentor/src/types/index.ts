@@ -40,6 +40,8 @@ export interface Kural {
 
 export type Category =
   | 'pyq'
+  // Group 2 / 2A previous-year bank (separate from the Group 1 'pyq' bank).
+  | 'pyq2'
   | 'samacheer'
   | 'current_affairs'
   | 'aptitude'
@@ -96,6 +98,10 @@ export interface Question {
   option_b: string
   option_c: string
   option_d: string
+  // Per-option figures (letter → public image URL) for image-option questions
+  // (e.g. non-verbal "pick the next figure"). When a letter has one, its option
+  // button renders the figure; letters without one fall back to their text.
+  option_images?: Partial<Record<AnswerLetter, string>> | null
   // Optional 5th option - present only on 5-option imports (analogy reasoning
   // bank). Null/absent on every standard 4-option question.
   option_e?: string | null
@@ -258,6 +264,8 @@ export interface QuizConfig {
    * 'modern' (the 214 History PYQs are tagged this way).
    */
   unit?: string
+  /** Group 2 PYQ: scope a test to one exam year (omit for "All years"). */
+  year?: number
   /** Subject Practice: restrict to one question style (omit for "Mixed"). */
   question_type?: SubjectQType
   /** Difficulty filter (easy/medium/hard) - used by subject/topic mock tests. */
@@ -501,71 +509,178 @@ export interface ParsedMatch {
   trailing: string
 }
 
-// An item line: optional "(", a short label, a closing ")" or ".", then the
-// item text. The label tells us which list it belongs to - letters → List I,
-// numbers → List II. Roman numerals (i, ii, iii, iv…) are allowed up to 4 chars
-// so List I items labelled (i)-(iv) aren't truncated.
+// Real questions label their two lists in many ways: List I = (a)-(d) with List
+// II = 1-4, the reverse (1-4 with List II = (p)-(s)/(A)-(D)), "Column A/B", Tamil
+// "பட்டியல்/நிரல்/பத்தி", items one-per-line or several inline on one row, and
+// sometimes a side-by-side "(a) X    1. Y" layout. parseMatchQuestion therefore
+// tries (1) a header-anchored pass - find the two list headers and take whatever
+// labelled items sit under each, regardless of label family - then (2) the
+// side-by-side single-line layout, then (3) the older letter-run/number-run
+// heuristic. The first pass that yields two lists of >=2 items wins; everything
+// else falls back to plain text.
+
+// A label token inside an item: roman (ii-iv), a single letter, 1-2 digits, or a
+// Tamil vowel. Single letter (not {1,2}) so a word like "Ma" can't look like one.
+const MATCH_LABEL = String.raw`[ivxlcdm]{2,4}|[IVXLCDM]{2,4}|[A-Za-z]|\d{1,2}|[அ-ஔ]`
+
+// Matches each "(label) text" item on a line. An item ends where the next one
+// begins - a parenthesised label after a single space ("(a) X (b) Y") or a bare
+// label after two+ spaces ("1. X  2. Y") - so multiple inline items split apart
+// while a parenthesised word inside the text (e.g. "(steered)") does not.
+const MATCH_ITEM_G = new RegExp(
+  String.raw`\(?\s*(${MATCH_LABEL})\s*[).]\s+(.+?)(?=\s+\(\s*(?:${MATCH_LABEL})\s*\)|\s{2,}\(?\s*(?:${MATCH_LABEL})\s*[).]\s|$)`,
+  'g',
+)
+
+// Single item line (run-based fallback): letters → List I, numbers → List II.
 const MATCH_ITEM = /^\(?\s*([ivxlcdm]{1,4}|[IVXLCDM]{1,4}|[A-Za-z]{1,2}|\d{1,2}|[அ-ஔ])\s*[).]\s*(.+)$/
 
-// A single line that pairs a List I item with a List II item side-by-side,
-// separated by a pipe, a run of spaces, or a dash, e.g. "(a) Corn    1. Cotyledon",
-// "A. s subshell | 1. 6", or "A. Karikala - 1. Pandya" (the subject bank's combined
-// layout). Captures: I-label, I-text, II-label, II-text. The required "<digit>)." /
-// "<digit>." after the separator keeps a bare dash from splitting hyphenated item
-// text (e.g. "Heart-lung machine"), since that dash isn't followed by a number label.
-const MATCH_COMBINED =
-  /^\(?\s*([A-Za-z]{1,4}|[அ-ஔ])\s*[).]\s+(.+?)\s*(?:\||\s{2,}|[---])\s*\(?\s*(\d{1,2})\s*[).]\s+(.+?)\s*$/
+// Header words that introduce a list, in English and Tamil. "List II" is tried
+// before "List I" via the (II|I|…) alternation so the longer token wins; "A"/"B"
+// cover "Column A"/"Column B" (mapped to List I/List II).
+const LIST_KEYWORDS = String.raw`List|Column|பட்டியல்|நெடுவரிசை|நிரல்|பத்தி`
+const MATCH_HEADER = new RegExp(String.raw`^(${LIST_KEYWORDS})\s*[-–]?\s*(II|I|2|1|A|B)\b(.*)$`, 'i')
 
 /** A line that is a prompt/instruction ("Match the following…"), not a header. */
 const isMatchPrompt = (s: string): boolean =>
   /\b(match|following|select|correct|codes|given below|use:|பொருத்த|தேர்ந்தெடு)\b/i.test(s)
 
-interface ClassifiedLine {
+// A line enumerating answer codes ("(A) 1-P, 2-Q, 3-R, 4-S") rather than a list
+// item - we stop collecting List II items once we reach it.
+const isMatchCodeLine = (s: string): boolean =>
+  /[A-Za-z0-9]\s*[-–—]\s*[A-Za-z0-9]\s*[,;]/.test(s) ||
+  /(\b[A-Za-z0-9]\s*[-–—]\s*[A-Za-z0-9]\b[^A-Za-z0-9]*){3,}/.test(s)
+
+interface ParsedHeader {
+  which: 'I' | 'II'
+  /** Original header for display, e.g. "List I", "Column A", "பட்டியல் II (City)". */
   label: string
-  text: string
-  kind: 'alpha' | 'num'
+  /** Inline item text trailing the header, e.g. the "(A) Maltose …" after "List I:". */
+  rest: string
 }
-function classifyMatchLine(line: string): ClassifiedLine | null {
-  const m = line.match(MATCH_ITEM)
+function parseListHeader(line: string): ParsedHeader | null {
+  const m = line.match(MATCH_HEADER)
   if (!m) return null
-  const label = m[1]
-  return { label, text: m[2].trim(), kind: /^\d+$/.test(label) ? 'num' : 'alpha' }
+  const tok = m[2].toUpperCase()
+  const which = tok === 'II' || tok === '2' || tok === 'B' ? 'II' : 'I'
+  let rest = (m[3] ?? '').replace(/^\s*:\s*/, '')
+  // A parenthesised annotation right after the header ("List I (Person)") - but
+  // not a lone item label like "(A)", which the {1,40} length guard excludes.
+  let annotation = ''
+  const am = rest.match(/^\(([A-Za-z][^)]{1,40})\)\s*:?\s*(.*)$/)
+  if (am) {
+    annotation = am[1].trim()
+    rest = am[2]
+  }
+  const label = `${m[1]} ${m[2]}`.replace(/\s+/g, ' ') + (annotation ? ` (${annotation})` : '')
+  return { which, label, rest: rest.trim() }
+}
+
+function extractMatchItems(text: string): MatchItem[] {
+  const items: MatchItem[] = []
+  let m: RegExpExecArray | null
+  MATCH_ITEM_G.lastIndex = 0
+  while ((m = MATCH_ITEM_G.exec(text))) items.push({ label: m[1], text: m[2].trim() })
+  return items
+}
+
+// Collect the labelled items for one list: any leftover text on the header line,
+// then following lines until an answer-code line or a non-item (prose) line.
+function collectMatchRegion(leftover: string, lines: string[], from: number, to: number): MatchItem[] {
+  const items: MatchItem[] = []
+  if (leftover.trim()) items.push(...extractMatchItems(leftover.trim()))
+  for (let i = from; i < to; i++) {
+    const ln = lines[i]
+    if (!ln) continue
+    if (isMatchCodeLine(ln)) break
+    const got = extractMatchItems(ln)
+    if (got.length) items.push(...got)
+    else if (items.length) break // a prose line after the items ends the list
+  }
+  return items
 }
 
 /**
- * Parse the side-by-side layout where each line carries one List I item and its
- * List II counterpart (split by a pipe or 2+ spaces). Returns null when fewer
- * than two such rows are present or the List II labels aren't distinct.
+ * Primary pass: two list headers ("List I"/"List II", "Column A"/"Column B",
+ * Tamil equivalents) each followed by >=2 labelled items, regardless of whether a
+ * list uses letters, numbers, P-S or Tamil labels.
  */
-function parseCombinedMatch(lines: string[]): ParsedMatch | null {
+function parseHeaderAnchoredMatch(lines: string[]): ParsedMatch | null {
+  let iI = -1
+  let iII = -1
+  let hI: ParsedHeader | undefined
+  let hII: ParsedHeader | undefined
+  for (let i = 0; i < lines.length; i++) {
+    const h = parseListHeader(lines[i])
+    if (!h) continue
+    if (h.which === 'I' && iI < 0) {
+      iI = i
+      hI = h
+    } else if (h.which === 'II' && iII < 0) {
+      iII = i
+      hII = h
+    }
+  }
+  if (iI < 0 || iII < 0 || iII <= iI || !hI || !hII) return null
+  const listI = collectMatchRegion(hI.rest, lines, iI + 1, iII)
+  let end = lines.length
+  for (let i = iII + 1; i < lines.length; i++) {
+    if (isMatchCodeLine(lines[i])) {
+      end = i
+      break
+    }
+  }
+  const listII = collectMatchRegion(hII.rest, lines, iII + 1, end)
+  if (listI.length < 2 || listII.length < 2) return null
+  return {
+    preamble: lines.slice(0, iI).join(' ').trim(),
+    listI: { header: hI.label, items: listI },
+    listII: { header: hII.label, items: listII },
+    trailing: '',
+  }
+}
+
+/**
+ * Side-by-side pass: each line carries a List I item and its List II counterpart,
+ * split by a pipe, 2+ spaces or a spaced dash - e.g. "(a) Corn    1. Cotyledon"
+ * or "1. Scheme - a. Purpose". `reversed` handles the number-then-letter order.
+ * The required label-with-")"/"." after the separator stops a hyphen inside item
+ * text (e.g. "Heart-lung machine") from splitting the line. Returns null when
+ * fewer than two rows match or the List II labels aren't distinct.
+ */
+function parseSideBySideMatch(lines: string[], reversed: boolean): ParsedMatch | null {
+  const l1 = reversed ? String.raw`\d{1,2}` : String.raw`[A-Za-z]{1,4}|[அ-ஔ]`
+  const l2 = reversed ? String.raw`[A-Za-z]{1,2}|[அ-ஔ]` : String.raw`\d{1,2}`
+  const re = new RegExp(
+    String.raw`^\(?\s*(${l1})\s*[).]\s+(.+?)\s*(?:\||\s{2,}|\s[-–—]\s)\s*\(?\s*(${l2})\s*[).]\s+(.+?)\s*$`,
+  )
   const rowIdx: number[] = []
   const listI: MatchItem[] = []
   const listII: MatchItem[] = []
   for (let idx = 0; idx < lines.length; idx++) {
-    const m = lines[idx].match(MATCH_COMBINED)
+    const m = lines[idx].match(re)
     if (!m) continue
     rowIdx.push(idx)
     listI.push({ label: m[1], text: m[2].trim() })
     listII.push({ label: m[3], text: m[4].trim() })
   }
   if (listI.length < 2) return null
-  // List II labels must be distinct - guards against matching stray punctuation.
-  const nums = listII.map((i) => i.label)
-  if (new Set(nums).size !== nums.length) return null
+  const labels = listII.map((i) => i.label)
+  if (new Set(labels).size !== labels.length) return null
 
   const first = rowIdx[0]
   const last = rowIdx[rowIdx.length - 1]
   // A header is the line directly above the first row, when it isn't a row or a
   // prompt sentence. Split it into the two column headers.
   let headerLine = -1
-  if (first > 0 && !lines[first - 1].match(MATCH_COMBINED) && !isMatchPrompt(lines[first - 1])) {
+  if (first > 0 && !lines[first - 1].match(re) && !isMatchPrompt(lines[first - 1])) {
     headerLine = first - 1
   }
-  let hI = '',
-    hII = ''
+  let hI = ''
+  let hII = ''
   if (headerLine >= 0) {
     const parts = lines[headerLine]
-      .split(/\s*\|\s*|\s{2,}|\s+[---]\s+/)
+      .split(/\s*\|\s*|\s{2,}|\s+[-–—]\s+/)
       .map((s) => s.trim())
       .filter(Boolean)
     hI = parts[0] ?? lines[headerLine]
@@ -580,31 +695,33 @@ function parseCombinedMatch(lines: string[]): ParsedMatch | null {
   }
 }
 
+interface ClassifiedLine {
+  label: string
+  text: string
+  kind: 'alpha' | 'num'
+}
+function classifyMatchLine(line: string): ClassifiedLine | null {
+  const m = line.match(MATCH_ITEM)
+  if (!m) return null
+  const label = m[1]
+  return { label, text: m[2].trim(), kind: /^\d+$/.test(label) ? 'num' : 'alpha' }
+}
+
 /**
- * Parse a "Match the following" question body into its two lists. List I is the
- * first run of letter-labelled items ((a)-(d) or A-D); List II is the following
- * run of number-labelled items (1-4). Each list's header is the plain line just
- * above it - works for "List I/List II", "Schedule/Subject", "Extremity/Place",
- * etc. Returns null when the text isn't a recognisable two-list match (callers
- * then fall back to plain text). Operates on a single language's raw text - for
- * bilingual display, call once per language string.
+ * Fallback pass for header-less bodies: List I is the first contiguous run of
+ * letter-labelled items ((a)-(d)/A-D), List II the following run of
+ * number-labelled items (1-4). Each list's header is the plain line just above
+ * it ("Schedule"/"Subject"); a full prompt sentence is the preamble, not a header.
  */
-export function parseMatchQuestion(text: string | null | undefined): ParsedMatch | null {
-  if (!text) return null
-  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean)
-  // First try the side-by-side single-line layout (List I + List II on one row).
-  const combined = parseCombinedMatch(lines)
-  if (combined) return combined
+function parseRunBasedMatch(lines: string[]): ParsedMatch | null {
   if (lines.length < 5) return null
   const cls = lines.map(classifyMatchLine)
 
-  // List I = first contiguous run of letter-labelled items.
   const i1 = cls.findIndex((c) => c?.kind === 'alpha')
   if (i1 < 0) return null
   let i1end = i1
   while (i1end + 1 < cls.length && cls[i1end + 1]?.kind === 'alpha') i1end++
 
-  // List II = first contiguous run of number-labelled items after List I.
   let i2 = -1
   for (let k = i1end + 1; k < cls.length; k++) {
     if (cls[k]?.kind === 'num') {
@@ -622,9 +739,6 @@ export function parseMatchQuestion(text: string | null | undefined): ParsedMatch
   const listIIItems = toItems(i2, i2end)
   if (listIItems.length < 2 || listIIItems.length < 2) return null
 
-  // A list's header is the short plain line immediately above its first item
-  // (e.g. 'List I', 'Schedule'). A full prompt sentence ('Match the following…')
-  // is the preamble, not a header.
   const headerAbove = (start: number): number =>
     start > 0 && !cls[start - 1] && !isMatchPrompt(lines[start - 1]) ? start - 1 : -1
   const hI = headerAbove(i1)
@@ -636,6 +750,24 @@ export function parseMatchQuestion(text: string | null | undefined): ParsedMatch
     listII: { header: hII >= 0 ? lines[hII] : '', items: listIIItems },
     trailing: lines.slice(i2end + 1).join(' ').trim(),
   }
+}
+
+/**
+ * Parse a "Match the following" question body into its two lists, trying the
+ * header-anchored, side-by-side and run-based passes in turn. Returns null when
+ * the text isn't a recognisable two-list match (callers then fall back to plain
+ * text). Operates on a single language's raw text - for bilingual display, call
+ * once per language string.
+ */
+export function parseMatchQuestion(text: string | null | undefined): ParsedMatch | null {
+  if (!text) return null
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean)
+  return (
+    parseHeaderAnchoredMatch(lines) ||
+    parseSideBySideMatch(lines, false) ||
+    parseSideBySideMatch(lines, true) ||
+    parseRunBasedMatch(lines)
+  )
 }
 
 /** Format a parsed match label for display: letters as "(a)", numbers as "1.". */

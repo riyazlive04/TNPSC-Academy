@@ -1,7 +1,14 @@
 import { jsPDF } from 'jspdf'
 import { savePdfDoc } from './savePdf'
-import type { DisplayLang, Question } from '../types'
-import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
+import type { DisplayLang, Question, ParsedMatch, MatchItem } from '../types'
+import {
+  optionLetters,
+  displayQuestion,
+  displayOption,
+  displayExplanation,
+  parseMatchQuestion,
+  formatMatchLabel,
+} from '../types'
 
 // Palette mirrors the app's violet theme (src/index.css --c-* tokens) so the
 // exported PDF feels like a printed extension of the UI.
@@ -156,15 +163,107 @@ export async function generateQuestionBankPdf({
   doc.line(margin, y, pageW - margin, y)
   y += 22
 
+  // Draws a "Match List I with List II" stem as a real two-column table (the
+  // printed-exam layout). Returns false when the question isn't a parseable
+  // match, so the caller falls back to plain wrapped text. Borders are drawn
+  // row-by-row so a long table paginates cleanly. Mutates the outer `y`.
+  const drawMatchStem = (q: Question): boolean => {
+    if (q.question_type !== 'match') return false
+    const en = q.question_text
+    const ta = q.question_text_ta?.trim() || null
+    const texts = effLang === 'ta' ? [ta ?? en] : effLang === 'both' ? [en, ...(ta ? [ta] : [])] : [en]
+    const parsed = texts.map(parseMatchQuestion)
+    if (!parsed.every(Boolean)) return false
+
+    const padX = 6
+    const padY = 5
+    const lineH = 12
+    const half = colW / 2
+    const cellW = half - padX * 2
+
+    for (const p of parsed as ParsedMatch[]) {
+      // Preamble (the "Match the following…" prompt) as bold wrapped text.
+      if (p.preamble) {
+        doc.setFont(bodyFont, 'bold')
+        doc.setFontSize(11.5)
+        doc.setTextColor(...INK)
+        const pl = doc.splitTextToSize(p.preamble, colW)
+        ensureSpace(pl.length * 15 + 6)
+        doc.text(pl, colX, y)
+        y += pl.length * 15 + 6
+      }
+
+      // Build the rows: an optional header row, then one row per list pair.
+      const rows: { left: string; right: string; header?: boolean }[] = []
+      if (p.listI.header || p.listII.header) {
+        rows.push({ left: p.listI.header, right: p.listII.header, header: true })
+      }
+      const cellText = (item?: MatchItem) => (item ? `${formatMatchLabel(item.label)} ${item.text}` : '')
+      const n = Math.max(p.listI.items.length, p.listII.items.length)
+      for (let r = 0; r < n; r++) {
+        rows.push({ left: cellText(p.listI.items[r]), right: cellText(p.listII.items[r]) })
+      }
+
+      rows.forEach((row) => {
+        doc.setFont(bodyFont, row.header ? 'bold' : 'normal')
+        doc.setFontSize(10)
+        const ll = doc.splitTextToSize(row.left, cellW)
+        const rl = doc.splitTextToSize(row.right, cellW)
+        const rowH = Math.max(ll.length, rl.length, 1) * lineH + padY * 2
+        ensureSpace(rowH + 2)
+        const top = y
+        // Header row gets a faint violet fill.
+        if (row.header) {
+          doc.setFillColor(...VIOLET_SOFT)
+          doc.rect(colX, top, colW, rowH, 'F')
+        }
+        // Cell text.
+        doc.setTextColor(...(row.header ? VIOLET_DEEP : INK))
+        const baseline = top + padY + 9
+        doc.text(ll, colX + padX, baseline)
+        doc.text(rl, colX + half + padX, baseline)
+        // Grid lines: top edge + the three verticals for this row's height.
+        doc.setDrawColor(...LINE)
+        doc.setLineWidth(0.6)
+        doc.line(colX, top, colX + colW, top) // row top
+        doc.line(colX, top, colX, top + rowH) // left
+        doc.line(colX + half, top, colX + half, top + rowH) // centre divider
+        doc.line(colX + colW, top, colX + colW, top + rowH) // right
+        y = top + rowH
+      })
+      // Close the table with a bottom edge.
+      doc.setDrawColor(...LINE)
+      doc.setLineWidth(0.6)
+      doc.line(colX, y, colX + colW, y)
+
+      // Trailing prompt ("Select the correct match.") in small grey text.
+      if (p.trailing) {
+        y += 6
+        doc.setFont(bodyFont, 'normal')
+        doc.setFontSize(9.5)
+        doc.setTextColor(...GREY)
+        const tl = doc.splitTextToSize(p.trailing, colW)
+        ensureSpace(tl.length * 12 + 4)
+        doc.text(tl, colX, y)
+        y += tl.length * 12
+      }
+      y += 8 // gap between bilingual blocks / before options
+    }
+    return true
+  }
+
   // ── Questions ────────────────────────────────────────────────────────────
   questions.forEach((q, idx) => {
     // Measure the question text so the whole header (badge + text) can move to a
     // new page together rather than orphaning the badge.
     doc.setFont(bodyFont, 'bold')
     doc.setFontSize(11.5)
+    const isMatch = q.question_type === 'match'
     const qLines = doc.splitTextToSize(displayQuestion(q, effLang), colW)
     const qLineH = 15
-    ensureSpace(qLines.length * qLineH + 46)
+    // For a match table, reserve enough for the badge + first couple of rows;
+    // the table itself paginates row-by-row after that.
+    ensureSpace(isMatch ? 80 : qLines.length * qLineH + 46)
 
     // Number badge - violet rounded square with white "Qn"
     const badgeY = y - 11
@@ -175,12 +274,14 @@ export async function generateQuestionBankPdf({
     doc.setTextColor(...WHITE)
     doc.text(`Q${idx + 1}`, margin + (gutter - 10) / 2, badgeY + 13, { align: 'center' })
 
-    // Question text
-    doc.setFont(bodyFont, 'bold')
-    doc.setFontSize(11.5)
-    doc.setTextColor(...INK)
-    doc.text(qLines, colX, y)
-    y += qLines.length * qLineH + 6
+    // Question text: a two-column table for match questions, else wrapped text.
+    if (!drawMatchStem(q)) {
+      doc.setFont(bodyFont, 'bold')
+      doc.setFontSize(11.5)
+      doc.setTextColor(...INK)
+      doc.text(qLines, colX, y)
+      y += qLines.length * qLineH + 6
+    }
 
     // Options - correct one sits on a mint pill with a check mark
     doc.setFontSize(10)

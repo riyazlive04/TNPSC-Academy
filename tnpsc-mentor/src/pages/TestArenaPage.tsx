@@ -65,7 +65,7 @@ const CARDS: ArenaCard[] = [
   {
     to: '/test-arena/pyq',
     titleKey: 'pyqTitle',
-    subtitle: 'Group 1',
+    subtitle: 'Group 1 · Group 2 / 2A',
     icon: <BookOpen size={19} />,
     tint: 'blue',
   },

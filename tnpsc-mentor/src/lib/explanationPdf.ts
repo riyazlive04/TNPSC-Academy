@@ -1,8 +1,15 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { savePdfDoc } from './savePdf'
-import type { DisplayLang, Question } from '../types'
-import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
+import type { DisplayLang, Question, ParsedMatch } from '../types'
+import {
+  optionLetters,
+  displayQuestion,
+  displayOption,
+  displayExplanation,
+  parseMatchQuestion,
+  formatMatchLabel,
+} from '../types'
 
 /**
  * Explanation-sheet PDF generator that renders each question as real HTML and
@@ -47,6 +54,58 @@ interface ExplanationPdfParams {
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+/** One "Match List I with List II" block as a real two-column HTML table — the
+ *  printed-paper layout the on-screen QuestionStem also uses. */
+function matchTableHtml(p: ParsedMatch): string {
+  const rowCount = Math.max(p.listI.items.length, p.listII.items.length)
+  const hasHeader = Boolean(p.listI.header || p.listII.header)
+  const cell = (
+    item: { label: string; text: string } | undefined,
+    left: boolean,
+    top: boolean
+  ): string => {
+    const border = `${left ? `border-left:1px solid ${LINE};` : ''}${top ? `border-top:1px solid ${LINE};` : ''}`
+    if (!item) return `<td style="${border}padding:6px 9px"></td>`
+    return `<td style="${border}padding:6px 9px;font-size:13px;font-weight:400;line-height:1.45;color:${INK};vertical-align:top">
+      <span style="font-weight:700;color:#6E6C7C">${esc(formatMatchLabel(item.label))}</span> ${esc(item.text)}
+    </td>`
+  }
+  let rows = ''
+  if (hasHeader) {
+    const th = (text: string, left: boolean) =>
+      `<th style="text-align:left;padding:7px 9px;font-size:12px;font-weight:700;color:${VIOLET_DEEP};border-bottom:1px solid ${LINE}${left ? `;border-left:1px solid ${LINE}` : ''}">${esc(text)}</th>`
+    rows += `<tr>${th(p.listI.header, false)}${th(p.listII.header, true)}</tr>`
+  }
+  for (let r = 0; r < rowCount; r++) {
+    const top = hasHeader || r > 0
+    rows += `<tr>${cell(p.listI.items[r], false, top)}${cell(p.listII.items[r], true, top)}</tr>`
+  }
+  return `<table style="width:100%;border-collapse:collapse;border:1px solid ${LINE};margin-top:6px;table-layout:fixed">${rows}</table>`
+}
+
+/** The question stem: a two-column table for "match" questions (per language for
+ *  bilingual mode), otherwise the usual pre-wrapped paragraph. */
+function questionStemHtml(q: Question, lang: DisplayLang): string {
+  if (q.question_type === 'match') {
+    const en = q.question_text
+    const ta = q.question_text_ta?.trim() || null
+    const texts = lang === 'ta' ? [ta ?? en] : lang === 'both' ? [en, ...(ta ? [ta] : [])] : [en]
+    const parsed = texts.map(parseMatchQuestion)
+    if (parsed.every(Boolean)) {
+      return (parsed as ParsedMatch[])
+        .map((p) => {
+          const pre = p.preamble ? `<div style="margin-bottom:5px">${esc(p.preamble)}</div>` : ''
+          const trail = p.trailing
+            ? `<div style="margin-top:5px;font-size:13px;font-weight:500;color:#6E6C7C">${esc(p.trailing)}</div>`
+            : ''
+          return pre + matchTableHtml(p) + trail
+        })
+        .join('<div style="height:8px"></div>')
+    }
+  }
+  return `<div style="white-space:pre-line">${esc(displayQuestion(q, lang))}</div>`
+}
+
 /** Build the inner HTML for one question block (question, options, explanation). */
 function questionBlockHtml(q: Question, index: number, lang: DisplayLang): string {
   const optionRows = optionLetters(q).map((letter) => {
@@ -75,7 +134,7 @@ function questionBlockHtml(q: Question, index: number, lang: DisplayLang): strin
   return `<div style="padding:14px 4px;border-bottom:1px solid ${LINE}">
     <div style="display:flex;gap:10px;align-items:flex-start">
       <span style="flex:0 0 auto;box-sizing:border-box;display:inline-block;min-width:24px;height:20px;line-height:20px;text-align:center;padding:0 6px;background:${VIOLET};color:#fff;font-weight:700;font-size:11px;border-radius:5px">Q${index + 1}</span>
-      <div style="font-weight:700;color:${INK};font-size:15px;line-height:1.5;white-space:pre-line">${esc(displayQuestion(q, lang))}</div>
+      <div style="flex:1;min-width:0;font-weight:700;color:${INK};font-size:15px;line-height:1.5">${questionStemHtml(q, lang)}</div>
     </div>
     <div style="margin-top:8px">${optionRows}</div>
     ${explHtml}

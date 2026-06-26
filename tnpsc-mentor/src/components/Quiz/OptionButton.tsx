@@ -4,6 +4,9 @@ import { Check, X } from 'lucide-react'
 interface OptionButtonProps {
   letter: AnswerLetter
   text: string
+  /** When set, the option is a figure (non-verbal question): render the image
+   *  instead of the text. The letter badge still identifies the choice. */
+  image?: string | null
   selected: boolean
   onSelect: () => void
   /** When set, the option renders in graded mode (admin / review). */
@@ -24,6 +27,7 @@ interface OptionButtonProps {
 export default function OptionButton({
   letter,
   text,
+  image,
   selected,
   onSelect,
   reveal,
@@ -72,9 +76,20 @@ export default function OptionButton({
       >
         {letter}
       </span>
-      <span className="tamil min-w-0 flex-1 text-[15px] leading-relaxed [overflow-wrap:anywhere]">
-        {text}
-      </span>
+      {image ? (
+        <span className="min-w-0 flex-1">
+          <img
+            src={image}
+            alt={`Option ${letter}`}
+            loading="lazy"
+            className="max-h-40 w-auto max-w-full rounded-lg border border-navytext/10 bg-white object-contain p-1"
+          />
+        </span>
+      ) : (
+        <span className="tamil min-w-0 flex-1 text-[15px] leading-relaxed [overflow-wrap:anywhere]">
+          {text}
+        </span>
+      )}
       {icon}
     </button>
   )
