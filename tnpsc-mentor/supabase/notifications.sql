@@ -60,14 +60,17 @@ create table if not exists public.notifications (
   created_at   timestamptz not null default now()
 );
 create index if not exists idx_notifications_created on public.notifications(created_at desc);
+
+-- Backfill target_user_id on pre-existing databases: the create-table above is a
+-- no-op once the table exists, so the column must be added explicitly here —
+-- BEFORE the partial index below references it. Idempotent.
+alter table public.notifications
+  add column if not exists target_user_id uuid references auth.users(id) on delete cascade;
+
 -- Per-user feed lookups probe target_user_id; a partial index keeps it tiny
 -- (only the targeted rows, not the broadcast majority).
 create index if not exists idx_notifications_target_user
   on public.notifications(target_user_id) where target_user_id is not null;
-
--- Backfill for existing databases (idempotent; no-op once the column exists).
-alter table public.notifications
-  add column if not exists target_user_id uuid references auth.users(id) on delete cascade;
 
 -- RLS ON but NO user policies → reads go through the server (service role),
 -- which applies audience filtering per user. Keeps targeting logic in one place.
