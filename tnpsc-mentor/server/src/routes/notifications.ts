@@ -1,17 +1,12 @@
 import { Router } from 'express'
-import webpush from 'web-push'
 import { config, pushEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { sendPushTo } from '../notify.js'
 import { PREMIUM_VALIDITY_MS } from '../pricing.js'
 
 const router = Router()
-
-// Configure web-push once at module load (only when keys are present).
-if (pushEnabled) {
-  webpush.setVapidDetails(config.vapidSubject, config.vapidPublicKey, config.vapidPrivateKey)
-}
 
 // ─── Audience helpers ────────────────────────────────────────────────────────
 /** user_ids with an active (paid, within the validity window) premium_annual
@@ -139,7 +134,10 @@ router.get(
       premiumUserIds(),
       supabaseAdmin
         .from('notifications')
-        .select('id, kind, title, body, url, audience, audience_value, created_at')
+        .select('id, kind, title, body, url, audience, audience_value, target_user_id, created_at')
+        // Broadcasts (target_user_id null) + this user's own targeted messages.
+        // (req.userId is a verified-JWT UUID, safe to interpolate.)
+        .or(`target_user_id.is.null,target_user_id.eq.${req.userId}`)
         .order('created_at', { ascending: false })
         .limit(100),
       supabaseAdmin.from('notification_reads').select('notification_id').eq('user_id', req.userId),
@@ -154,7 +152,12 @@ router.get(
     const readSet = new Set((reads ?? []).map((r) => (r as { notification_id: string }).notification_id))
 
     const items = (rows ?? [])
-      .filter((n) => matches(n.audience as string, (n.audience_value as string | null) ?? null, ctx))
+      .filter((n) => {
+        // A targeted message is for its user only; broadcasts use audience rules.
+        const target = (n.target_user_id as string | null) ?? null
+        if (target) return target === req.userId
+        return matches(n.audience as string, (n.audience_value as string | null) ?? null, ctx)
+      })
       .slice(0, 50)
       .map((n) => ({
         id: n.id as string,
@@ -193,44 +196,6 @@ router.post(
 
 // ─── Superadmin: author + send ───────────────────────────────────────────────
 const admin = [requireAuth, requireSuperadmin] as const
-
-/** Send a Web Push to every subscription of the given users. Prunes dead subs. */
-async function sendPushTo(
-  userIds: string[],
-  payload: { id: string; title: string; body: string; url: string | null }
-): Promise<number> {
-  if (!pushEnabled || userIds.length === 0) return 0
-  const { data: subs } = await supabaseAdmin
-    .from('push_subscriptions')
-    .select('endpoint, p256dh, auth')
-    .in('user_id', userIds)
-  if (!subs || subs.length === 0) return 0
-
-  const body = JSON.stringify(payload)
-  const dead: string[] = []
-  const results = await Promise.allSettled(
-    subs.map((s) =>
-      webpush.sendNotification(
-        { endpoint: s.endpoint as string, keys: { p256dh: s.p256dh as string, auth: s.auth as string } },
-        body
-      )
-    )
-  )
-  let sent = 0
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') {
-      sent++
-    } else {
-      // 404/410 = the subscription is gone (browser revoked / reinstalled) → prune.
-      const code = (r.reason as { statusCode?: number })?.statusCode
-      if (code === 404 || code === 410) dead.push(subs[i].endpoint as string)
-    }
-  })
-  if (dead.length) {
-    await supabaseAdmin.from('push_subscriptions').delete().in('endpoint', dead)
-  }
-  return sent
-}
 
 /** Resolve the concrete user_ids an audience targets (for push delivery). */
 async function audienceUserIds(audience: string, audienceValue: string | null): Promise<string[]> {

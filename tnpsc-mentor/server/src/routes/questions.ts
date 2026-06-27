@@ -154,6 +154,76 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
   ],
 }
 
+// ─── Subject Practice free gate ──────────────────────────────────────────────
+// Free (non-premium, non-staff) learners get ONE completed Subject Practice test
+// per subject; a second test on a subject they've already finished is premium.
+// Other categories (samacheer/pyq/aptitude/current_affairs) are never gated here.
+
+/** Has the caller already completed a Subject Practice test for this subject? */
+async function subjectFreeTestUsed(req: AuthedRequest, subject: string): Promise<boolean> {
+  // RLS scopes test_sessions to the caller; an exact head-count is not capped by
+  // PostgREST's row limit, so power users with 1000+ sessions still gate right.
+  const { count, error } = await req.db!
+    .from('test_sessions')
+    .select('id', { count: 'exact', head: true })
+    .eq('category', 'subject')
+    .eq('subject', subject)
+    .eq('status', 'completed')
+  if (error) {
+    // Fail OPEN: a transient read error must not deny a free learner their first
+    // legitimate test. Worst case is one extra free test, never a wrongful lock.
+    console.error('[subject-gate] count failed', error.code, error.message)
+    return false
+  }
+  return (count ?? 0) >= 1
+}
+
+/** True when this subject is locked behind premium for the caller (UI + /quiz gate). */
+async function subjectLocked(req: AuthedRequest, subject: string): Promise<boolean> {
+  if (await isStaff(req)) return false
+  let premium = false
+  try {
+    premium = (await premiumEntitlement(req.db!)).premium
+  } catch {
+    premium = false // fail closed on entitlement: treat as free (gate may apply)
+  }
+  if (premium) return false
+  return subjectFreeTestUsed(req, subject)
+}
+
+// ─── GET /api/questions/subject-access ───────────────────────────────────────
+// Powers the Subject Practice lock UI: the caller's premium state plus the
+// subjects whose one free test is already used (locked for free users). Premium
+// and staff have no locks, so the list is empty for them.
+router.get(
+  '/subject-access',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const staff = await isStaff(req)
+    let premium = staff
+    if (!premium) {
+      try {
+        premium = (await premiumEntitlement(req.db!)).premium
+      } catch {
+        premium = false
+      }
+    }
+    if (premium) return res.json({ premium: true, usedSubjects: [] })
+
+    const { data, error } = await req.db!
+      .from('test_sessions')
+      .select('subject')
+      .eq('category', 'subject')
+      .eq('status', 'completed')
+      .not('subject', 'is', null)
+    if (error) return sendDbError(res, error)
+    const usedSubjects = [
+      ...new Set(((data ?? []) as { subject: string | null }[]).map((r) => r.subject).filter(Boolean)),
+    ]
+    res.json({ premium: false, usedSubjects })
+  })
+)
+
 // ─── POST /api/questions/quiz ────────────────────────────────────────────────
 // Safe quiz questions for a config (no answers — get_quiz_questions strips them
 // server-side and returns a random sample).
@@ -162,6 +232,13 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const config = req.body?.config ?? {}
+    // Subject Practice: enforce the one-free-test-per-subject gate server-side
+    // (the picker only hints at it). Premium/staff bypass; other categories skip.
+    if (config.category === 'subject' && config.subject) {
+      if (await subjectLocked(req, String(config.subject))) {
+        return res.status(403).json({ error: 'premium_required', reason: 'subject_free_used' })
+      }
+    }
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
     const questions = (data ?? []) as { id?: string }[]

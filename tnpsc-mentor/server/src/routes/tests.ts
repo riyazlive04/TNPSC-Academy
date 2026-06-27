@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
-import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { FREE_PDF_DOWNLOADS } from '../pricing.js'
 import { premiumEntitlement } from '../lib/premium.js'
+import { notifyUser } from '../notify.js'
 import {
   REVISION_PASS_MARK,
   buildLabel,
@@ -54,6 +55,13 @@ router.post(
         console.error('[revision] post-submit hook failed', e)
         return null
       }
+    )
+
+    // Subject Practice free-gate nudge: if this submission just used up the
+    // learner's one free test for the subject, tell them (in-app feed + a device
+    // push). Fire-and-forget — the result must not wait on a notification.
+    void maybeNotifySubjectFreeUsed(req, session).catch((e) =>
+      console.error('[subject-free-notify] post-submit hook failed', e)
     )
 
     res.json(revision ? { ...result, revision } : result)
@@ -131,6 +139,60 @@ async function applyRevision(
   }
 
   return null
+}
+
+/**
+ * After a Subject Practice test is graded, notify a free learner exactly once —
+ * on the FIRST completed test for that subject, i.e. the one that just spent
+ * their free pass and locked the subject (gate lives in routes/questions.ts).
+ * Sends an in-app feed entry + a Web Push to their device(s). Staff and premium
+ * users aren't gated, so they're never notified. Best-effort; never throws.
+ */
+async function maybeNotifySubjectFreeUsed(
+  req: AuthedRequest,
+  session: Record<string, unknown>
+): Promise<void> {
+  if ((session.category as string | null) !== 'subject') return
+  const subject = (session.subject as string | null) ?? null
+  if (!subject) return
+
+  // Staff bypass the gate entirely.
+  const role = await roleOf(req.userId!)
+  if (role === 'admin' || role === 'superadmin') return
+
+  // Premium isn't gated either.
+  let premium = false
+  try {
+    premium = (await premiumEntitlement(req.db!)).premium
+  } catch {
+    premium = false
+  }
+  if (premium) return
+
+  // Only on the transition 0 → 1 completed tests for this subject. The just-saved
+  // session is already committed, so an exact head-count of 1 means this was the
+  // first (and now-spent) free test. (RLS scopes the count to the caller.)
+  const { count, error } = await req.db!
+    .from('test_sessions')
+    .select('id', { count: 'exact', head: true })
+    .eq('category', 'subject')
+    .eq('subject', subject)
+    .eq('status', 'completed')
+  if (error || (count ?? 0) !== 1) return
+
+  // Localize to the learner's saved language (ta → Tamil; else English).
+  const { data: profile } = await req.db!
+    .from('profiles')
+    .select('language')
+    .eq('id', req.userId!)
+    .maybeSingle()
+  const ta = (profile?.language as string | null) === 'ta'
+  const title = ta ? 'இலவசத் தேர்வு முடிந்தது' : 'Free subject test used'
+  const body = ta
+    ? `${subject} பாடத்திற்கான உங்கள் இலவசத் தேர்வை முடித்துவிட்டீர்கள். வரம்பற்ற பாடத் தேர்வுகளுக்கு பிரீமியம் பெறுங்கள்.`
+    : `You've used your free ${subject} practice test. Go Premium for unlimited subject tests.`
+
+  await notifyUser(req.userId!, { title, body, url: '/test-arena', push: true })
 }
 
 // Premium check that never blocks the free path: a ledger read error fails

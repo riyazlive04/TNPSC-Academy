@@ -96,8 +96,8 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
 export default function App() {
   const init = useAuthStore((s) => s.init)
 
-  // Bootstrap the Supabase session once on mount, and immediately ping the API
-  // so a sleeping (Render free) container starts waking in parallel. Also wire
+  // Bootstrap the Supabase session once on mount, and warm the API connection
+  // in parallel (DNS/TLS pre-connect — the VPS API is always-on). Also wire
   // the theme store (re-apply + listen for OS light/dark changes).
   useEffect(() => {
     useThemeStore.getState().init()

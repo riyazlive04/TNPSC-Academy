@@ -25,18 +25,19 @@ import appRoutes from './routes/app.js'
 
 const app = express()
 
-// Render/Vercel/most PaaS terminate TLS at a proxy that sets X-Forwarded-For.
-// Trust the first proxy hop so req.ip is the real client IP and express-rate-limit
-// stops throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR (which was 500-ing every
-// request, including sign-in). '1' = trust exactly one proxy (Render's edge).
+// Nginx fronts the API on the VPS and sets X-Forwarded-For/Proto (see
+// deploy/nginx-tnpsc.conf). Trust the first proxy hop so req.ip is the real
+// client IP and express-rate-limit stops throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+// (which was 500-ing every request, including sign-in). '1' = trust exactly one
+// proxy (Nginx).
 app.set('trust proxy', 1)
 
 app.use(helmet())
 app.use(
   cors({
-    // Supports exact origins and `*` wildcards (Vercel preview URLs change every
-    // deploy). An origin that isn't allowed simply gets no CORS headers → the
-    // browser blocks it, which is the intended behaviour.
+    // Supports exact origins (the app + main + www domains) and `*` wildcards
+    // within a single DNS label. An origin that isn't allowed simply gets no CORS
+    // headers → the browser blocks it, which is the intended behaviour.
     origin: (origin, cb) => cb(null, isAllowedOrigin(origin)),
     // The WEB client holds its refresh token in an HttpOnly cookie, so credentialed
     // requests must be allowed. cors echoes the exact (allowed) Origin and sets

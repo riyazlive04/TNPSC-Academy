@@ -188,7 +188,7 @@ still be sent.
 
 The Service relies on third parties including, without limitation, **Supabase**
 (authentication and database), **Razorpay** (payments), **Google** (sign-in),
-and hosting providers (**Render**, **Vercel**). Their terms and privacy
+and our hosting provider (**Hostinger** VPS). Their terms and privacy
 practices apply to their respective services, and we are not responsible for
 them.
 

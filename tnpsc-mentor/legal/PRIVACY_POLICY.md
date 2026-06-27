@@ -108,14 +108,14 @@ processors ("Data Processors") who act on our instructions:
   learning data).
 - **Razorpay** — payment processing.
 - **Google** — only if you choose Google Sign-In.
-- **Render** and **Vercel** — application and API hosting/infrastructure.
+- **Hostinger** — VPS hosting/infrastructure for the application and API.
 - **Web Push services** (browser push providers, e.g. via the VAPID protocol) —
   to deliver notifications you have enabled.
 - **Professional advisers, authorities or successors** — where required by law,
   to enforce our Terms, protect rights and safety, or in connection with a
   merger, acquisition or asset sale (subject to this Policy).
 
-`[Confirm the actual hosting regions of Supabase/Render/Vercel and list them.]`
+`[Confirm the actual hosting regions of Supabase and Hostinger and list them.]`
 
 ## 6. International Transfers
 

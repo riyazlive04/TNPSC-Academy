@@ -24,11 +24,13 @@ import {
   Lightbulb,
   ListChecks,
   Target,
+  Lock,
   type LucideIcon,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import IconTile from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
+import PremiumCard from '../components/UI/PremiumCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
 import { toast } from '../store/toastStore'
@@ -125,6 +127,15 @@ export default function SubjectPracticePage() {
   const [topicCounts, setTopicCounts] = useState<Record<string, number>>({})
   const [counts, setCounts] = useState<Record<string, number>>({})
 
+  // One-free-test-per-subject gate. `usedSubjects` are the subjects whose single
+  // free test is spent (locked for free users); premium/staff get an empty set.
+  // The /quiz endpoint enforces this for real — here it just drives the lock UI
+  // so a locked subject opens the upsell instead of dead-ending.
+  const [premium, setPremium] = useState(false)
+  const [usedSubjects, setUsedSubjects] = useState<Set<string>>(new Set())
+  const [showUpsell, setShowUpsell] = useState(false)
+  const isLocked = (s: string) => !premium && usedSubjects.has(s)
+
   const [loadingSubjects, setLoadingSubjects] = useState(!subjectsCache)
   const [loadingTopics, setLoadingTopics] = useState(false)
   // Boolean (not a string) so the fetch effects never depend on the unstable
@@ -150,6 +161,24 @@ export default function SubjectPracticePage() {
       })
       .catch(() => !cancelled && setErrored(true))
       .finally(() => !cancelled && setLoadingSubjects(false))
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Subject access (premium + used-up subjects), refreshed on each mount so a
+  // free test finished moments ago locks its subject the instant the user
+  // returns to the picker. Failure is silent — the server gate still protects it.
+  useEffect(() => {
+    let cancelled = false
+    api
+      .subjectAccess()
+      .then((a) => {
+        if (cancelled) return
+        setPremium(a.premium)
+        setUsedSubjects(new Set(a.usedSubjects))
+      })
+      .catch(() => {})
     return () => {
       cancelled = true
     }
@@ -253,6 +282,15 @@ export default function SubjectPracticePage() {
 
   // ─── Step transitions ──────────────────────────────────────────────────────
   const chooseSubject = (s: string) => {
+    // Free user out of their one free test for this subject → show the upsell
+    // (the picker stays on the subject step) instead of drilling into a test
+    // the server would reject anyway.
+    if (isLocked(s)) {
+      setShowUpsell(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    setShowUpsell(false)
     setSubject(s)
     setPeriod(null)
     setTopic(null)
@@ -361,6 +399,16 @@ export default function SubjectPracticePage() {
           <p className="tamil mt-1 font-body text-[15px] text-muted">{hint}</p>
         </div>
 
+        {/* Premium upsell — shown when a free user taps a subject whose one free
+            test is already spent. Lives above the picker so they can still pick
+            a different (unlocked) subject below. */}
+        {showUpsell && step === 'subject' && (
+          <div className="mb-5 animate-fadeInFast">
+            <p className="tamil mb-3 font-body text-[15px] text-muted">{t('subjectFreeUsed')}</p>
+            <PremiumCard />
+          </div>
+        )}
+
         {/* Animated step body (re-keyed so each step animates in) */}
         <div key={step} className="animate-fadeInFast">
           {step === 'subject' && (
@@ -369,6 +417,8 @@ export default function SubjectPracticePage() {
               loading={loadingSubjects}
               error={errorText}
               questionsWord={t('questionsCount')}
+              lockedLabel={t('premiumLockLabel')}
+              isLocked={isLocked}
               nameOf={(s) => subjectName(s, lang)}
               onPick={chooseSubject}
             />
@@ -480,6 +530,8 @@ function SubjectStep({
   loading,
   error,
   questionsWord,
+  lockedLabel,
+  isLocked,
   nameOf,
   onPick,
 }: {
@@ -487,6 +539,8 @@ function SubjectStep({
   loading: boolean
   error: string
   questionsWord: string
+  lockedLabel: string
+  isLocked: (s: string) => boolean
   nameOf: (s: string) => string
   onPick: (s: string) => void
 }) {
@@ -497,6 +551,7 @@ function SubjectStep({
     <List>
       {subjects.map((s, i) => {
         const Icon = subjectIcon(s.subject)
+        const locked = isLocked(s.subject)
         return (
           <ListRow
             key={s.subject}
@@ -515,6 +570,15 @@ function SubjectStep({
                 </span>
                 <span>{questionsWord}</span>
               </span>
+            }
+            // A spent subject shows a premium lock pill instead of the chevron;
+            // tapping it still fires onPick, which routes to the upsell.
+            trailing={
+              locked ? (
+                <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-accentwarmsoft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-accentwarm">
+                  <Lock size={11} /> {lockedLabel}
+                </span>
+              ) : undefined
             }
           />
         )

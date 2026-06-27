@@ -42,12 +42,10 @@ export const isPhoneOtpConfigured =
   String(import.meta.env.VITE_OTP_LOGIN ?? '').toLowerCase() === 'true'
 
 /**
- * Fire-and-forget ping to /api/health. The API runs on Render's free plan, which
- * spins the container down after ~15 min idle and takes 30-60s to cold-start.
- * Calling this on app mount starts that wake-up in parallel with the rest of the
- * boot, so the server is (often already) warm by the time the user navigates.
- * A scheduled cron (see .github/workflows/keep-alive.yml) keeps it warm even
- * when no one is on the site.
+ * Fire-and-forget ping to /api/health on app mount. The API now runs always-on
+ * under PM2 on the VPS (no cold starts), so this is just a cheap warm-up: it
+ * opens the DNS/TLS/keep-alive connection to the API in parallel with the rest
+ * of the boot, shaving a little latency off the first real request.
  */
 export function warmApi(): void {
   fetch(`${API_URL}/api/health`).catch(() => {})
@@ -404,6 +402,14 @@ export const api = {
       { method: 'POST', body: {} }
     )
     return data.subjects
+  },
+  /**
+   * Subject Practice access state: whether the caller is premium and which
+   * subjects have used their one free test (locked for free users). Drives the
+   * lock badges on the subject picker; the /quiz endpoint enforces it for real.
+   */
+  async subjectAccess(): Promise<{ premium: boolean; usedSubjects: string[] }> {
+    return request<{ premium: boolean; usedSubjects: string[] }>('/api/questions/subject-access')
   },
   async questionTypeCounts(params: { subject: string; topic?: string }): Promise<Record<string, number>> {
     const data = await request<{ counts: Record<string, number> }>('/api/questions/qtypes', {

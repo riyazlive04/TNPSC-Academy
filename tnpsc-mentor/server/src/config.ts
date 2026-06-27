@@ -17,21 +17,20 @@ const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
   .filter(Boolean)
 
 /**
- * Whether a browser Origin is allowed. Entries in CORS_ORIGIN may be exact
- * (`https://app.vercel.app`) or contain `*` wildcards
- * (`https://*-samad-webs-projects.vercel.app` to cover Vercel's per-deploy
- * preview URLs, or `https://*.vercel.app`). Requests with no Origin (curl,
- * health checks, same-origin) are always allowed.
+ * Whether a browser Origin is allowed. Entries in CORS_ORIGIN are normally exact
+ * (`https://app.tnpscmentors.in`) but may also contain a `*` wildcard within a
+ * single DNS label (e.g. `https://*.tnpscmentors.in`). Requests with no Origin
+ * (curl, health checks, same-origin) are always allowed.
  */
 export function isAllowedOrigin(origin?: string): boolean {
   if (!origin) return true
   return corsOrigins.some((pattern) => {
     if (pattern === origin) return true
     if (!pattern.includes('*')) return false
-    // A `*` matches within a SINGLE DNS label only ([^.]*), never across dots.
-    // This keeps Vercel preview wildcards working (`https://*-proj.vercel.app`)
-    // while preventing a broad `*` from matching an attacker subdomain on a
-    // different parent (greedy `.*` previously let `evil.vercel.app` through).
+    // A `*` matches within a SINGLE DNS label only ([^.]*), never across dots,
+    // so a wildcard entry (`https://*.tnpscmentors.in`) can't be widened by an
+    // attacker subdomain on a different parent (a greedy `.*` previously let
+    // `evil.example.com` through).
     const re = new RegExp(
       '^' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '[^.]*') + '$'
     )
@@ -41,9 +40,10 @@ export function isAllowedOrigin(origin?: string): boolean {
 
 export const config = {
   port: Number(process.env.PORT ?? 4000),
-  // Drives refresh-token cookie security: in production the cookie is cross-site
-  // (Vercel → Render) so it must be Secure + SameSite=None; in dev it's served
-  // over http on same-site localhost, so SameSite=Lax without Secure.
+  // Drives refresh-token cookie security: in production (the VPS, served over
+  // HTTPS) the cookie is Secure + SameSite=None so it survives the landing
+  // page's cross-origin call to the app subdomain; in dev it's plain http on
+  // same-site localhost, so SameSite=Lax without Secure.
   isProd: (process.env.NODE_ENV ?? 'development') === 'production',
   corsOrigins,
   supabaseUrl: required('SUPABASE_URL'),

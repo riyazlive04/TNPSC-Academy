@@ -295,6 +295,11 @@ const STRINGS = {
     ta: 'வினாக்களை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
   },
   backToTestArena: { en: 'Back to Test Arena', ta: 'தேர்வு அரங்கத்திற்குத் திரும்பு' },
+  premiumLockLabel: { en: 'Premium', ta: 'பிரீமியம்' },
+  subjectFreeUsed: {
+    en: 'Your free test for this subject is used up. Go Premium for unlimited subject tests.',
+    ta: 'இந்தப் பாடத்திற்கான உங்கள் இலவசத் தேர்வு முடிந்துவிட்டது. வரம்பற்ற பாடத் தேர்வுகளுக்கு பிரீமியம் பெறுங்கள்.',
+  },
   noQuestionsLong: {
     en: 'No questions are available for this selection yet. Please choose another topic.',
     ta: 'இந்தத் தேர்வுக்கு இன்னும் வினாக்கள் இல்லை. வேறு தலைப்பைத் தேர்ந்தெடுக்கவும்.',

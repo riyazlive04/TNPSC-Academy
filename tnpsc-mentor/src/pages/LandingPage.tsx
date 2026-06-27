@@ -264,7 +264,7 @@ const T = {
 } as const
 
 const FREE_ITEMS: { ta: string; en: string }[] = [
-  { ta: '3 தேர்வுகள் வரையில் -  உங்களுடைய விருப்ப பாடம் அல்லது தலைப்புகளில் ', en: 'Upto 3 tests in subject or topics of your choice' },
+  { ta: '10 தேர்வுகள் வரையில் -  உங்களுடைய விருப்பமான படங்களில்  ', en: 'Upto 10 tests in subject ' },
   { ta: 'ஒரு முழு மாதிரி தேர்வு (200 வினாக்கள்)', en: '1 mock test(200 questions)' },
   { ta: 'திரையிலேயே வினாக்களுக்கு விளக்கங்களை  பார்த்துக்கொள்ளலாம் PDF Download செய்துகொள்ளலாம்', en: 'On-screen explanations for questions' },
 ]

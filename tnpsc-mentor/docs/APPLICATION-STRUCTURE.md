@@ -4,7 +4,7 @@ A reference guide to how the TNPSC Mentors exam-prep web app is organised, how d
 flows through it, and how its main user journeys work end to end.
 
 > Companion docs: [`README.md`](../README.md) (quick start), [`PROJECT-OVERVIEW.md`](PROJECT-OVERVIEW.md),
-> [`HANDOVER-DEVELOPER.md`](HANDOVER-DEVELOPER.md), and [`DEPLOY-VERCEL-RENDER.md`](DEPLOY-VERCEL-RENDER.md).
+> [`HANDOVER-DEVELOPER.md`](HANDOVER-DEVELOPER.md), and [`deploy/README-VPS.md`](../deploy/README-VPS.md).
 
 ---
 
@@ -164,9 +164,10 @@ and `constants.ts` / `features.ts`.
 
 [`server/src/index.ts`](../server/src/index.ts) wires it together:
 
-- **Middleware:** `helmet`, `cors` (origin allow-list supporting `*` wildcards for Vercel
-  previews; no `credentials` since auth is Bearer-based), `express.json({ limit: '2mb' })`,
-  and `trust proxy = 1` (for correct client IP behind Render's edge).
+- **Middleware:** `helmet`, `cors` (origin allow-list of the app + main + www
+  domains, plus single-label `*` wildcards; credentials on for the web refresh
+  cookie), `express.json({ limit: '2mb' })`, and `trust proxy = 1` (for correct
+  client IP behind Nginx).
 - **Rate limits:** 300 req/min on `/api`, a stricter 30 req/min on `/api/auth`.
 - **Health check:** `GET /api/health`.
 
@@ -374,11 +375,13 @@ feature migrations in [`supabase/`](../supabase/).
 
 ## 13. Deployment
 
-- **Frontend → Vercel** (or Hostinger static): build to `dist/`, set `VITE_API_URL` to the
-  API URL. See [`vercel.json`](../vercel.json) / [`DEPLOY-HOSTINGER.md`](DEPLOY-HOSTINGER.md).
-- **Backend → Render:** deploy `server/` via [`render.yaml`](../render.yaml); set Supabase
-  creds + `CORS_ORIGIN` there.
-- Full walkthrough: [`DEPLOY-VERCEL-RENDER.md`](DEPLOY-VERCEL-RENDER.md).
+Single VPS, Nginx + PM2; database stays on Supabase Cloud.
+
+- **Frontend → Nginx static:** build to `dist/`, set `VITE_API_URL` to the app
+  subdomain, publish to the web root.
+- **Backend → PM2:** run `server/` under PM2 ([`deploy/ecosystem.config.cjs`](../deploy/ecosystem.config.cjs));
+  Nginx reverse-proxies `/api` to it ([`deploy/nginx-tnpsc.conf`](../deploy/nginx-tnpsc.conf)).
+- Full walkthrough: [`deploy/README-VPS.md`](../deploy/README-VPS.md).
 
 ---
 

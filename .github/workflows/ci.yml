@@ -1,8 +1,8 @@
 name: CI
 
 # Build + test the frontend SPA and type-check the API server on every push and
-# pull request targeting main, so broken builds are caught before deploy
-# (Vercel for the frontend, Render for the API).
+# pull request targeting main, so broken builds are caught before they're pulled
+# onto the VPS and rebuilt there (see deploy/README-VPS.md).
 
 on:
   push:

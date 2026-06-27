@@ -102,17 +102,18 @@ page.
 
 ## 6. Deployment — what's left
 
-The backend (Supabase Cloud) is already live. **Deployment = ship the static
-frontend.** Steps:
+The database (Supabase Cloud) is already live. **Everything else runs on one
+VPS** — Nginx serves the SPA and reverse-proxies `/api` to the Express server
+under PM2. Steps (full walkthrough: [`deploy/README-VPS.md`](../deploy/README-VPS.md)):
 
-1. `cd tnpsc-mentor && npm run build` → produces `dist/`.
-2. Host `dist/` on any static host (Vercel / Netlify / Cloudflare Pages /
-   Hostinger). Configure SPA fallback (all routes → `index.html`).
-3. Set production env vars `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at
-   build time on the host.
-4. In Supabase Auth settings, add the production domain to allowed redirect /
+1. On the VPS: `git pull` then `bash deploy/deploy.sh` — rebuilds the SPA + API,
+   republishes `dist/` to the Nginx web root, and reloads PM2.
+2. Build-time env (`.env.production`): `VITE_API_URL` = the app subdomain
+   (e.g. `https://app.tnpscmentors.in`). Runtime env (`server/.env`): Supabase
+   keys, `CORS_ORIGIN`, `NODE_ENV=production`, etc.
+3. In Supabase Auth settings, add the production domain to allowed redirect /
    site URLs (so login + password-reset emails point to the live site).
-5. Smoke-test: register → login → take a test → submit → results → PDF download.
+4. Smoke-test: register → login → take a test → submit → results → PDF download.
 
 **Pre-launch checklist (from handover):** confirm RLS is on in production,
 verify the monthly-CA GitHub Action secrets, and review the copyright/paraphrase

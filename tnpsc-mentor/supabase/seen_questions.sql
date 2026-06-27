@@ -13,6 +13,15 @@
 -- (user_id, question_id) is exactly the index the LEFT JOIN probes, so the
 -- per-candidate lookup is an index hit. Recording is insert-or-ignore, so a
 -- question already seen costs nothing on subsequent fetches.
+--
+-- No-repeat cooldown: the 180 most-recently-seen questions are suppressed
+-- (sunk to the very back of every draw), so a question the learner just saw
+-- won't reappear until ~180 other questions have gone by. It's a soft sink,
+-- NOT a hard exclude: if the fresh pool (unseen + seen-more-than-180-ago) can't
+-- fill the requested count, the suppressed ones come back (longest-ago first)
+-- rather than the test running short/empty on a small bank. The cutoff is the
+-- seen_at of the user's 180th-newest seen row (null when they've seen <180,
+-- i.e. every seen question is still within the window).
 -- ============================================================================
 
 create table if not exists public.seen_questions (
@@ -30,6 +39,11 @@ create policy "manage own seen_questions"
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 grant select, insert, update, delete on public.seen_questions to authenticated;
+
+-- The cooldown cutoff lookup orders one user's seen rows by seen_at desc and
+-- skips to the 180th — a backwards index scan on (user_id, seen_at).
+create index if not exists idx_seen_questions_user_seen_at
+  on public.seen_questions (user_id, seen_at desc);
 
 -- ─── Practice quiz sampler: unseen-first ordering (+ exclude_ids hard filter) ─
 create or replace function public.get_quiz_questions(p_config jsonb)
@@ -67,6 +81,16 @@ as $$
         then array(select (jsonb_array_elements_text(p_config->'exclude_ids'))::uuid)
         else null end                                  as exclude_ids,
       greatest(coalesce((p_config->>'limit')::int, 100), 1)    as lim
+  ),
+  -- Cooldown cutoff: seen_at of the caller's 180th-most-recent seen question.
+  -- Null when they've seen fewer than 180 (so every seen question is still in
+  -- the window). Uncorrelated → evaluated once (InitPlan), not per row.
+  cd as (
+    select seen_at as ts
+    from public.seen_questions
+    where user_id = auth.uid()
+    order by seen_at desc
+    offset 179 limit 1
   )
   select q.id, q.category, q.group_type, q.year, q.standard,
          q.ca_month, q.ca_year, q.ca_type, q.ca_topic,
@@ -98,8 +122,15 @@ as $$
     and (cfg.mock or cfg.aptitude_type  is null or q.aptitude_type  = cfg.aptitude_type)
     and (cfg.mock or cfg.aptitude_topic is null or q.aptitude_topic = cfg.aptitude_topic)
     and (cfg.exclude_ids is null or not (q.id = any(cfg.exclude_ids)))
-  -- Unseen first; among seen, longest-ago first; random within each group.
-  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
+  -- 1) Cooldown: questions seen within the last 180 sink to the very back (only
+  --    used to top up when the fresh pool is too small to fill the count).
+  -- 2) Among the fresh pool, unseen first; 3) then longest-ago-seen; 4) random.
+  order by
+    (sq.question_id is not null
+       and ((select ts from cd) is null or sq.seen_at >= (select ts from cd))),
+    (sq.question_id is not null),
+    sq.seen_at asc nulls first,
+    random()
   limit (select lim from cfg);
 $$;
 
@@ -122,6 +153,13 @@ security definer
 stable
 set search_path = public
 as $$
+  with cd as (
+    select seen_at as ts
+    from public.seen_questions
+    where user_id = auth.uid()
+    order by seen_at desc
+    offset 179 limit 1
+  )
   select q.id, q.category, q.group_type, q.year, q.standard,
          q.ca_month, q.ca_year, q.ca_type, q.ca_topic,
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
@@ -137,7 +175,13 @@ as $$
     and (p_subject    is null or q.subject    = p_subject)
     and (p_topic      is null or q.topic      = p_topic)
     and (p_difficulty is null or q.difficulty = p_difficulty)
-  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
+  -- Cooldown sink (last 180 seen) → unseen first → longest-ago-seen → random.
+  order by
+    (sq.question_id is not null
+       and ((select ts from cd) is null or sq.seen_at >= (select ts from cd))),
+    (sq.question_id is not null),
+    sq.seen_at asc nulls first,
+    random()
   limit greatest(least(coalesce(p_count, 50), 200), 1);
 $$;
 
@@ -158,6 +202,13 @@ security definer
 stable
 set search_path = public
 as $$
+  with cd as (
+    select seen_at as ts
+    from public.seen_questions
+    where user_id = auth.uid()
+    order by seen_at desc
+    offset 179 limit 1
+  )
   select q.id, q.category, q.group_type, q.year, q.standard,
          q.ca_month, q.ca_year, q.ca_type, q.ca_topic,
          q.aptitude_type, q.aptitude_topic, q.subject, q.topic,
@@ -181,7 +232,13 @@ as $$
           )
         )
     )
-  order by (sq.question_id is not null), sq.seen_at asc nulls first, random()
+  -- Cooldown sink (last 180 seen) → unseen first → longest-ago-seen → random.
+  order by
+    (sq.question_id is not null
+       and ((select ts from cd) is null or sq.seen_at >= (select ts from cd))),
+    (sq.question_id is not null),
+    sq.seen_at asc nulls first,
+    random()
   limit greatest(coalesce(p_count, 0), 0);
 $$;
 

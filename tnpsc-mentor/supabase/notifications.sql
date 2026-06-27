@@ -49,12 +49,25 @@ create table if not exists public.notifications (
   audience       text not null default 'all'
                    check (audience in ('all', 'premium', 'free', 'group')),
   audience_value text,
+  -- Per-user targeting (server-authored system messages, e.g. "your free subject
+  -- test is used up"). When set, the message goes ONLY to this user and the
+  -- audience fields are ignored by the feed matcher. NULL = a broadcast governed
+  -- by `audience` (the admin-authored case).
+  target_user_id uuid references auth.users(id) on delete cascade,
   -- Delivery bookkeeping for the admin history view (push only).
   push_sent    integer not null default 0,
   created_by   uuid references auth.users(id) on delete set null,
   created_at   timestamptz not null default now()
 );
 create index if not exists idx_notifications_created on public.notifications(created_at desc);
+-- Per-user feed lookups probe target_user_id; a partial index keeps it tiny
+-- (only the targeted rows, not the broadcast majority).
+create index if not exists idx_notifications_target_user
+  on public.notifications(target_user_id) where target_user_id is not null;
+
+-- Backfill for existing databases (idempotent; no-op once the column exists).
+alter table public.notifications
+  add column if not exists target_user_id uuid references auth.users(id) on delete cascade;
 
 -- RLS ON but NO user policies → reads go through the server (service role),
 -- which applies audience filtering per user. Keeps targeting logic in one place.

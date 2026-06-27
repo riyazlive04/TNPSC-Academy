@@ -142,12 +142,17 @@ cp .env.example .env                # SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
 python upload_to_supabase.py        # bulk insert into the questions table
 ```
 
-## Deployment (Vercel + Render)
+## Deployment (VPS — Nginx + PM2)
 
-- **Frontend → Vercel.** Build the SPA (`npm run build` → `dist/`) and deploy
-  via [`vercel.json`](vercel.json). Set `VITE_API_URL` to your Render service URL.
-- **Backend → Render.** Deploy the Express API in `server/` via
-  [`render.yaml`](render.yaml); set its Supabase + `CORS_ORIGIN` env vars there.
+Everything runs on a single VPS; the database stays on Supabase Cloud.
 
-See [`docs/DEPLOY-VERCEL-RENDER.md`](docs/DEPLOY-VERCEL-RENDER.md) for the
-step-by-step walkthrough.
+- **Frontend → Nginx static.** Build the SPA (`npm run build` → `dist/`) and
+  publish it to the web root. Set `VITE_API_URL` to the app subdomain at build
+  time (e.g. `https://app.tnpscmentors.in`).
+- **Backend → PM2.** Run the Express API in `server/` under PM2
+  ([`deploy/ecosystem.config.cjs`](deploy/ecosystem.config.cjs)); Nginx
+  reverse-proxies `/api` to it ([`deploy/nginx-tnpsc.conf`](deploy/nginx-tnpsc.conf)).
+- **Redeploys.** `git pull && bash deploy/deploy.sh` on the box.
+
+See [`deploy/README-VPS.md`](deploy/README-VPS.md) for the step-by-step
+walkthrough.

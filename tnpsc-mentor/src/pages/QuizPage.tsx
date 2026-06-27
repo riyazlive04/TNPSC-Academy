@@ -21,7 +21,7 @@ import {
 import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
@@ -151,7 +151,12 @@ export default function QuizPage() {
         setLoading(false)
       } catch (e) {
         if (!cancelled) {
-          setLoadError(t('loadQuestionsError'))
+          // Backstop for the one-free-test-per-subject gate (e.g. a second tab):
+          // the picker normally diverts locked subjects to the upsell, but if a
+          // request slips through the server answers 403 premium_required.
+          const blocked =
+            e instanceof ApiError && e.status === 403 && e.message === 'premium_required'
+          setLoadError(blocked ? t('subjectFreeUsed') : t('loadQuestionsError'))
           setLoading(false)
         }
       }

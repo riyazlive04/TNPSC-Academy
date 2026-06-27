@@ -109,7 +109,7 @@ enforcement is login-only, so no active user is logged out by the switch.)
 
 ### ✅ High — Refresh token moved out of `localStorage` (web) into an HttpOnly cookie
 `server/src/routes/auth.ts`, `server/src/index.ts`, `server/src/config.ts`, `src/lib/api.ts`,
-`src/store/authStore.ts`, `render.yaml`
+`src/store/authStore.ts`, `server/.env` (VPS)
 **Web** now receives its refresh token in an `HttpOnly; Secure; SameSite=None`
 cookie scoped to `/api/auth` — unreadable by JS, so an XSS can't exfiltrate the
 durable credential. The server reads it from the cookie on `/refresh`, rotates it
@@ -117,8 +117,9 @@ on every refresh, and clears it on logout / dead-token. **Native (Capacitor)** k
 the body-token flow (cross-site cookies are unreliable in the Android WebView),
 detected via `Capacitor.isNativePlatform()`. CORS is now credentialed (echoes the
 exact allowed origin, never `*`). **Deploy requirement:** `NODE_ENV=production` must
-be set on Render (added to both `render.yaml`) or the cookie falls back to
-`SameSite=Lax` and won't work cross-site — verify web login + reload after deploy.
+be set in `server/.env` on the VPS (see `deploy/server.env.production.example`) or
+the cookie falls back to `SameSite=Lax` and won't work cross-site — verify web
+login + reload after deploy.
 
 ### ✅ High — Razorpay `/verify` is now idempotent, terminal-state-guarded, and amount-verified
 `server/src/routes/payments.ts`
@@ -206,7 +207,7 @@ that is **never imported** in `src`, so the vulnerable path isn't exercised.
 
 1. ✅ **Done (pass 1):** brute-force limits, array caps, enumeration/leak fixes, device-info stripping.
 2. ✅ **Done (pass 2):** Razorpay `/verify` idempotent + amount-verified; device cap bound to `session_id`; refresh token in HttpOnly cookie (web) / body (native).
-3. ⬜ **Deploy:** set `NODE_ENV=production` on Render (in `render.yaml`) and verify web login + reload work after deploy (cookie depends on it).
+3. ⬜ **Deploy:** set `NODE_ENV=production` in `server/.env` on the VPS and verify web login + reload work after deploy (cookie depends on it).
 4. ⬜ Delete the on-disk Google `client_secret_*.json` (rotate if ever exposed).
 5. ⬜ Move user-facing notification queries onto `req.db` (restore RLS backstop).
 6. ⬜ `npm audit fix` for dompurify; Android release hardening.

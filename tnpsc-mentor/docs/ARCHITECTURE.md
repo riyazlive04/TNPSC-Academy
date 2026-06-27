@@ -37,9 +37,10 @@ Key decisions:
   keeps the Supabase service-role key server-side only.
 - **Auth** is JWT bearer tokens (no cookies → smaller CSRF/attack surface). Email/
   password + Google sign-in (web and native).
-- **Deployment:** push to `main` → Vercel auto-deploys the frontend, Render
-  auto-deploys the API. The API runs on Render's free tier, so the app pings
-  `/api/health` on boot (and a GitHub Actions cron keeps it warm) to dodge cold starts.
+- **Deployment:** a single VPS — Nginx serves the SPA on the main + app domains
+  and reverse-proxies `/api` to the Express server run by PM2; the database stays
+  on Supabase Cloud. Redeploys are `git pull && bash deploy/deploy.sh` on the box
+  (see [`deploy/README-VPS.md`](../deploy/README-VPS.md)).
 
 ---
 
@@ -56,9 +57,9 @@ TNPSC/                                # workspace root (data + tooling, not the 
 ├── by_topic/  history/  latest/      # topic-sliced and dated question dumps
 ├── design-system.md                  # product design language (de-cardified, list-led)
 └── TNPSC-Academy/                    # ← the git repository
-    ├── render.yaml  vercel.json      # deploy configs (root-level)
+    ├── .github/workflows/            # CI (build/test) + monthly current-affairs cron
     ├── context.md                    # project brief / context
-    └── tnpsc-mentor/                 # ← the application (frontend + server)
+    └── tnpsc-mentor/                 # ← the application (frontend + server; deploy/ holds VPS configs)
 ```
 
 ---
@@ -86,7 +87,7 @@ tnpsc-mentor/
 ├── capacitor.config.ts   # appId com.tnpscmentor.app, webDir=dist, Google auth plugin
 ├── package.json          # frontend deps (React 18, react-router 6, zustand, motion, lucide)
 ├── .env / .env.example / .env.production   # VITE_API_URL, VITE_GOOGLE_CLIENT_ID, etc.
-├── render.yaml / vercel.json
+├── deploy/                # VPS deploy: nginx-tnpsc.conf, ecosystem.config.cjs, deploy.sh, README-VPS.md
 └── tnpsc-release.keystore # Android release signing key
 ```
 
@@ -225,7 +226,7 @@ server/
 │   │   ├── revision.ts     # revision-topic scheduling logic
 │   │   └── seen.ts         # seen-questions (no-repeat) sampling
 │   └── routes/             # one router per /api/* namespace (see table)
-├── dist/                   # compiled JS (tsc output, what Render runs)
+├── dist/                   # compiled JS (tsc output, what PM2 runs on the VPS)
 ├── *.mjs                   # one-off data ops: import_*, load-*, run-migration,
 │                           #   backfill, backup-and-purge, restore, etc.
 ├── package.json / tsconfig.json
@@ -234,8 +235,8 @@ server/
 
 ### 5.1 API surface (`index.ts`)
 
-Global middleware: `trust proxy = 1` (Render edge), `helmet`, CORS via
-`isAllowedOrigin` (supports `*` Vercel preview wildcards, no credentials),
+Global middleware: `trust proxy = 1` (Nginx), `helmet`, CORS via
+`isAllowedOrigin` (exact origins + single-label `*` wildcards, no credentials),
 `express.json({ limit: '2mb' })`, rate limits (300/min global, 30/min on `/api/auth`).
 
 | Mount | Router | Purpose |
@@ -326,9 +327,10 @@ Question bank is partitioned by `category`: `pyq` (previous-year), `subject`
 | Concern | Frontend | Backend |
 |---------|----------|---------|
 | Build | `npm run build` (`tsc && vite build` → `dist/`) | `tsc` → `server/dist/` |
-| Host | Vercel (auto-deploy on push to `main`) | Render (auto-deploy on push to `main`) |
-| Config | `vercel.json`, `vite.config.ts` | `render.yaml`, env vars on Render |
+| Host | Nginx static (web root on the VPS) | Express under PM2 on the VPS |
+| Config | `vite.config.ts`, `deploy/nginx-tnpsc.conf` | `deploy/ecosystem.config.cjs`, `server/.env` |
 | Mobile | `npx cap sync` → Android Studio / Gradle → signed APK | n/a |
 
-Live URLs are dashboard-only; there are no deploy CLIs. The API's free-tier cold
-start is mitigated by `warmApi()` on boot plus a keep-alive GitHub Actions cron.
+Deploy/redeploy on the box with `git pull && bash deploy/deploy.sh`, which
+rebuilds the SPA + API, republishes `dist/`, and reloads PM2. `warmApi()` on boot
+is now just a connection pre-warm (the API is always-on — no cold starts).
