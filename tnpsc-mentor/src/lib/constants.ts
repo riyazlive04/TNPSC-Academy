@@ -19,6 +19,7 @@ export const SUBJECT_NAME_TA: Record<string, string> = {
   Economy: 'பொருளியல்',
   'Indian Economy': 'இந்தியப் பொருளாதாரம்',
   'Tamil Nadu Administration': 'தமிழ்நாடு நிர்வாகம்',
+  'Development Administration in Tamil Nadu': 'தமிழ்நாடு வளர்ச்சி நிர்வாகம்',
   'Development Administration of TamilNadu': 'தமிழ்நாடு வளர்ச்சி நிர்வாகம்',
   'History, Culture & Heritage of TN': 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & பாரம்பரியம்',
   'History Culture Heritage of TN': 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & பாரம்பரியம்',
@@ -384,7 +385,7 @@ export const SUBJECT_PRACTICE_ORDER: string[] = [
   'Indian National Movement',
   'Polity',
   'Economy',
-  'Tamil Nadu Administration',
+  'Development Administration in Tamil Nadu',
   'History, Culture & Heritage of TN',
 ]
 
@@ -504,13 +505,22 @@ export const SUBJECT_TOPIC_ORDER: Record<string, string[]> = {
     'Government Schemes',
     'Other Topics',
   ],
-  'Tamil Nadu Administration': [
+  'Development Administration in Tamil Nadu': [
     'Human Development Indicators',
+    'Impact of Social Reform Movements',
     'Political Parties & Welfare Schemes',
+    'Reservation Policy & Access to Social Resources',
+    'Economic Trends in Tamil Nadu',
+    'Role & Impact of Social Welfare Schemes',
     'Social Justice & Harmony',
     'Education & Health Systems',
     'Geography of TN & its Impact on Economic Growth',
+    'Achievements of Tamil Nadu',
     'e-Governance in TN',
+    'Public Awareness & General Administration',
+    'Welfare-oriented Government Schemes',
+    'Problems in Public Delivery Systems',
+    'Current Socio-Economic Issues',
   ],
   'History, Culture & Heritage of TN': [
     'Pre Historic Tamilagam & Archaeological',

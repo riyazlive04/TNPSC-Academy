@@ -101,7 +101,7 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
       ] },
     { label: 'TN Administration', count: 5,
       queries: [
-        { category: 'subject', subjects: ['Tamil Nadu Administration'] },
+        { category: 'subject', subjects: ['Development Administration in Tamil Nadu'] },
         { category: 'pyq', subjects: ['Development Administration of TamilNadu'] },
       ] },
     { label: 'General Tamil', count: 15,
@@ -144,7 +144,7 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
       ] },
     { label: 'TN Administration', count: 6,
       queries: [
-        { category: 'subject', subjects: ['Tamil Nadu Administration'] },
+        { category: 'subject', subjects: ['Development Administration in Tamil Nadu'] },
         { category: 'pyq', subjects: ['Development Administration of TamilNadu'] },
       ] },
     { label: 'Current Affairs', count: 10,
