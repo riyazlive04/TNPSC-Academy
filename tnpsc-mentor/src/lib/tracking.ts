@@ -213,6 +213,34 @@ export function trackApkDownload(source: string): void {
   metaTrackCustom('APKDownload', { source })
 }
 
+/**
+ * A test was abandoned mid-way (started but never submitted). The `reason` is how
+ * they left (back_button | exit_button), and attempted/total/time capture how far
+ * they got — together these explain *why* users drop off. Register `reason` as a
+ * GA4 custom dimension to break the abandonment down in reports.
+ */
+export function trackAbandonTest(params: {
+  reason: string
+  category?: string | null
+  subject?: string | null
+  totalQuestions: number
+  attempted: number
+  timeTakenSeconds: number
+}): void {
+  track('abandon_test', {
+    reason: params.reason,
+    category: params.category ?? undefined,
+    subject: params.subject ?? undefined,
+    total_questions: params.totalQuestions,
+    attempted: params.attempted,
+    time_taken_seconds: params.timeTakenSeconds,
+  })
+  metaTrackCustom('AbandonTest', {
+    reason: params.reason,
+    category: params.category ?? undefined,
+  })
+}
+
 /** A study material file was downloaded from the Materials hub / Profile videos. */
 export function trackDownloadMaterial(params: {
   id: string

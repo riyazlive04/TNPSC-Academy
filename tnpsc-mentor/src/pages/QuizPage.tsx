@@ -24,6 +24,7 @@ import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { api } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
+import { trackAbandonTest } from '../lib/tracking'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
@@ -285,6 +286,14 @@ export default function QuizPage() {
   const handleExitDiscard = async () => {
     const s = useQuizStore.getState()
     if (s.config && s.questions.length > 0) {
+      trackAbandonTest({
+        reason: 'exit_button',
+        category: s.config.category,
+        subject: s.config.subject,
+        totalQuestions: s.questions.length,
+        attempted: Object.values(s.answers).filter((a) => a.selected_answer).length,
+        timeTakenSeconds: Math.max(0, Math.round((Date.now() - (s.startedAt ?? Date.now())) / 1000)),
+      })
       try {
         await abandonTest({
           config: s.config,

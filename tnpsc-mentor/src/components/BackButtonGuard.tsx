@@ -7,6 +7,7 @@ import { useT } from '../lib/i18n'
 import { useQuizStore } from '../store/quizStore'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { abandonTest } from '../lib/abandonTest'
+import { trackAbandonTest } from '../lib/tracking'
 import { exitFullscreen } from '../lib/proctor'
 
 // Screens that hold a live, unfinished test - a back press here must confirm
@@ -109,6 +110,14 @@ export default function BackButtonGuard() {
     if (kind === 'practice') {
       const s = useQuizStore.getState()
       if (s.config && s.questions.length > 0) {
+        trackAbandonTest({
+          reason: 'back_button',
+          category: s.config.category,
+          subject: s.config.subject,
+          totalQuestions: s.questions.length,
+          attempted: Object.values(s.answers).filter((a) => a.selected_answer).length,
+          timeTakenSeconds: Math.max(0, Math.round((Date.now() - (s.startedAt ?? Date.now())) / 1000)),
+        })
         try {
           await abandonTest({
             config: s.config,
