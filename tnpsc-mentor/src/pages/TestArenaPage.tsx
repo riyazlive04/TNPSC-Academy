@@ -13,6 +13,7 @@ import {
   Activity,
   BarChart3,
   ScrollText,
+  CalendarDays,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
@@ -23,6 +24,7 @@ import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
+import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -92,6 +94,7 @@ const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 export default function TestArenaPage() {
   const navigate = useNavigate()
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
+  const testSeriesOn = useTestSeriesEnabled()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
@@ -276,6 +279,19 @@ export default function TestArenaPage() {
         <section className="space-y-2" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
           <List>
+            {/* Scheduled Test Series - only once the superadmin has enabled it. */}
+            {testSeriesOn && (
+              <ListRow
+                onClick={() => navigate('/test-series')}
+                leading={
+                  <IconTile tint="coral">
+                    <CalendarDays size={19} />
+                  </IconTile>
+                }
+                title={t('testSeriesTitle')}
+                subtitle={t('testSeriesArenaSub')}
+              />
+            )}
             {restCards.map((card, i) => (
               <ListRow
                 key={card.to}

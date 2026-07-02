@@ -10,6 +10,8 @@ import { toast } from '../../store/toastStore'
 import WorkedSolution from './WorkedSolution'
 import QuestionFigures from './QuestionFigures'
 import QuestionStem from './QuestionStem'
+import YouTubeEmbed from './YouTubeEmbed'
+import MathText from '../UI/MathText'
 
 interface ResultCardProps {
   question: Question
@@ -136,7 +138,7 @@ export default function ResultCard({
                   ].join(' ')}
                 >
                   <span className="font-heading font-bold">{letter}.</span>{' '}
-                  {displayOption(question, letter, lang)}
+                  <MathText text={displayOption(question, letter, lang)} />
                   {isCorrect && ' ✓'}
                   {isChosenWrong && ` ✗ ${t('yourAnswerSuffix')}`}
                 </div>
@@ -169,13 +171,14 @@ export default function ResultCard({
                     <span className="font-heading font-bold text-secondary">
                       {t('explanationColon')}{' '}
                     </span>
-                    {displayExplanation(question, lang)}
+                    <MathText text={displayExplanation(question, lang)} />
                   </p>
                 )}
               </div>
             )
           )}
-          {(isAptitude || displayExplanation(question, lang)) && (
+          <YouTubeEmbed url={question.explanation_video_url} />
+          {(isAptitude || displayExplanation(question, lang) || question.explanation_video_url) && (
             <ExplanationVote questionId={question.id} />
           )}
         </>

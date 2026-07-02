@@ -345,6 +345,68 @@ router.post(
   })
 )
 
+// ─── GET /api/superadmin/test-series ─────────────────────────────────────────
+// All tests (incl. disabled), each with the count of questions actually loaded
+// for its test_set, so the console can warn if a set is empty/short.
+router.get(
+  '/test-series',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data: tests, error } = await req.db!
+      .from('test_series')
+      .select(
+        'id, test_set, title, title_ta, unit_label, subjects_label, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order'
+      )
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    const { data: rows, error: cErr } = await req.db!
+      .from('questions')
+      .select('test_set')
+      .eq('category', 'testseries')
+    if (cErr) return sendDbError(res, cErr)
+    const loaded: Record<number, number> = {}
+    for (const r of (rows ?? []) as { test_set: number }[]) {
+      loaded[r.test_set] = (loaded[r.test_set] ?? 0) + 1
+    }
+
+    const result = ((tests ?? []) as { test_set: number }[]).map((tst) => ({
+      ...tst,
+      loaded_questions: loaded[tst.test_set] ?? 0,
+    }))
+    res.json({ tests: result })
+  })
+)
+
+// ─── POST /api/superadmin/test-series/:id ────────────────────────────────────
+// Patch a test's gating/schedule via the is_admin()-gated RPC. Only the fields
+// present in the body are changed (the RPC treats null as "leave unchanged").
+router.post(
+  '/test-series/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { enabled, open_override, scheduled_date, duration_seconds, negative_mark, title } =
+      req.body ?? {}
+    if (
+      open_override != null &&
+      open_override !== 'auto' &&
+      open_override !== 'open' &&
+      open_override !== 'closed'
+    ) {
+      return res.status(400).json({ error: `Invalid open_override: ${open_override}` })
+    }
+    const { data, error } = await req.db!.rpc('admin_set_test_series', {
+      p_id: req.params.id,
+      p_enabled: typeof enabled === 'boolean' ? enabled : null,
+      p_open_override: open_override ?? null,
+      p_scheduled_date: scheduled_date ?? null,
+      p_duration_seconds: duration_seconds == null ? null : Math.trunc(Number(duration_seconds)),
+      p_negative_mark: negative_mark == null ? null : Number(negative_mark),
+      p_title: title ?? null,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ test: data })
+  })
+)
+
 // ─── GET /api/superadmin/settings ────────────────────────────────────────────
 // All app-settings rows as a raw key→value map.
 router.get(

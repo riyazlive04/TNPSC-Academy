@@ -43,7 +43,7 @@ const SECTION_HEADERS: { re: RegExp; key: SectionKey }[] = [
   { re: /^(கேட்டது|தேவை|கேட்கப்பட்டது)\s*[:：]?\s*$/, key: 'asked' },
 ]
 
-const FORMULA_RE = /^(formula|rule|வாய்ப்பாடு|விதி)\s*[:：]/i
+const FORMULA_RE = /^(formula|rule|சூத்திரம்|வாய்ப்பாடு|விதி)\s*[:：]/i
 const OPTION_RE = /(?:→|⇒|->)?\s*(?:option|விடை)\s*\(?\s*([A-D])\s*\)?\.?\s*$/i
 
 export function parseSolution(text: string): ParsedSolution {

@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import type { Question, DisplayLang, ParsedMatch, MatchItem } from '../../types'
 import { displayQuestion, parseMatchQuestion, formatMatchLabel } from '../../types'
+import MathText from '../UI/MathText'
 
 interface QuestionStemProps {
   question: Question
@@ -50,7 +51,7 @@ export default function QuestionStem({ question, lang, textClassName, prefix }: 
   return (
     <p className={`tamil whitespace-pre-line ${textClassName}`}>
       {prefix}
-      {displayQuestion(question, lang)}
+      <MathText text={displayQuestion(question, lang)} />
     </p>
   )
 }
@@ -72,7 +73,7 @@ function MatchBlock({
       {(preamble || prefix) && (
         <p className={`tamil mb-3 ${textClassName}`}>
           {prefix}
-          {preamble}
+          <MathText text={preamble} />
         </p>
       )}
       {/* One shared grid (not two independent columns) so each List I item and
@@ -136,7 +137,9 @@ function ItemCell({
           <span className="font-heading font-bold text-navytext/70">
             {formatMatchLabel(item.label)}
           </span>
-          <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">{item.text}</span>
+          <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+            <MathText text={item.text} />
+          </span>
         </>
       )}
     </div>

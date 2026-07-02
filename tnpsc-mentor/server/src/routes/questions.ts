@@ -3,7 +3,7 @@ import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
 import { premiumEntitlement } from '../lib/premium.js'
-import { MAX_MOCK_EXAM_ATTEMPTS } from '../pricing.js'
+import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 
 const router = Router()
 
@@ -786,6 +786,190 @@ router.post(
     const { error } = await req.db!.from('mock_exam_attempts').insert({
       user_id: req.userId!,
       exam_id: String(exam_id),
+      session_id: session_id ?? null,
+      score: score == null ? null : Number(score),
+      total: total == null ? null : Math.trunc(Number(total)),
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true, recorded: true })
+  })
+)
+
+// ─── Test Series (scheduled, fixed Group 1 "Test Marathon 2026" papers) ──────
+// Like Full Mock Exams (fixed rows tagged category='testseries' + test_set) but
+// the WHOLE series is premium-only and each paper is date-gated: locked until its
+// scheduled_date (IST), with a superadmin open/closed override. Attempt-capped.
+
+interface TestSeriesRow {
+  id: string
+  test_set: number
+  title: string
+  title_ta: string | null
+  unit_label: string | null
+  unit_label_ta: string | null
+  subjects_label: string | null
+  subjects_label_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  scheduled_date: string | null // 'YYYY-MM-DD'
+  enabled: boolean
+  open_override: 'auto' | 'open' | 'closed'
+  sort_order: number
+}
+
+/** Today's date in IST (Asia/Kolkata, UTC+5:30, no DST) as 'YYYY-MM-DD'. Lexical
+ *  comparison against a scheduled_date string is a valid date comparison. */
+function todayIST(): string {
+  const ist = new Date(Date.now() + 330 * 60_000)
+  return ist.toISOString().slice(0, 10)
+}
+
+/** A test is date-locked when its override is 'closed', or 'auto' and its
+ *  scheduled date is still in the future. 'open' bypasses the date gate. */
+function dateLocked(row: TestSeriesRow): boolean {
+  if (row.open_override === 'open') return false
+  if (row.open_override === 'closed') return true
+  return Boolean(row.scheduled_date && row.scheduled_date > todayIST())
+}
+
+/** Count this user's recorded test-series attempts per test (RLS scopes rows). */
+async function testSeriesAttemptCounts(req: AuthedRequest): Promise<Record<string, number>> {
+  const { data, error } = await req.db!.from('test_series_attempts').select('test_id')
+  if (error) throw error
+  const counts: Record<string, number> = {}
+  for (const r of (data ?? []) as { test_id: string }[]) {
+    counts[r.test_id] = (counts[r.test_id] ?? 0) + 1
+  }
+  return counts
+}
+
+// ─── GET /api/questions/test-series ──────────────────────────────────────────
+// The enabled tests, annotated with lock state (premium OR date), the date they
+// unlock, and attempts used. Premium is derived from the payment ledger (the
+// whole series is premium). Staff preview everything unlocked.
+router.get(
+  '/test-series',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!
+      .from('test_series')
+      .select(
+        'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order'
+      )
+      .eq('enabled', true)
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    const staff = await isStaff(req)
+    let premium = staff
+    if (!premium) {
+      try {
+        premium = (await premiumEntitlement(req.db!)).premium
+      } catch {
+        premium = false // fail closed
+      }
+    }
+    const counts = await testSeriesAttemptCounts(req)
+
+    const tests = ((data ?? []) as TestSeriesRow[]).map((r) => {
+      const isDateLocked = !staff && dateLocked(r)
+      const locked = !premium || isDateLocked
+      // Premium takes precedence in the reason (upgrade unblocks the series; the
+      // date still applies afterwards, reported via availableFrom).
+      const lockReason = !premium ? 'premium' : isDateLocked ? 'date' : null
+      return {
+        id: r.id,
+        title: r.title,
+        title_ta: r.title_ta,
+        unit_label: r.unit_label,
+        unit_label_ta: r.unit_label_ta,
+        subjects_label: r.subjects_label,
+        subjects_label_ta: r.subjects_label_ta,
+        total_questions: r.total_questions,
+        duration_seconds: r.duration_seconds,
+        negative_mark: Number(r.negative_mark),
+        scheduled_date: r.scheduled_date,
+        locked,
+        lockReason,
+        attemptsUsed: staff ? 0 : counts[r.id] ?? 0,
+        attemptsMax: MAX_TEST_SERIES_ATTEMPTS,
+      }
+    })
+    res.json({ tests, premium })
+  })
+)
+
+// ─── POST /api/questions/test-series ─────────────────────────────────────────
+// Returns the fixed question set for one test, shuffled. Re-checks every gate
+// server-side (enabled, premium, date/override, attempt cap). Answer columns
+// never appear (column grants + QUIZ_COLS). Staff bypass premium+date+attempts.
+router.post(
+  '/test-series',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const testId = String((req.body ?? {}).test_id ?? '')
+    if (!testId) return res.status(400).json({ error: 'test_id is required' })
+
+    const { data: test, error: tErr } = await req.db!
+      .from('test_series')
+      .select('id, test_set, enabled, scheduled_date, open_override')
+      .eq('id', testId)
+      .maybeSingle()
+    if (tErr) return sendDbError(res, tErr)
+    if (!test || !(test as TestSeriesRow).enabled) {
+      return res.status(404).json({ error: 'Test not found' })
+    }
+
+    const staff = await isStaff(req)
+
+    if (!staff) {
+      let premium = false
+      try {
+        premium = (await premiumEntitlement(req.db!)).premium
+      } catch {
+        premium = false
+      }
+      if (!premium) return res.status(403).json({ error: 'premium_required' })
+
+      if (dateLocked(test as TestSeriesRow)) {
+        return res.status(403).json({ error: 'not_yet_available' })
+      }
+
+      const counts = await testSeriesAttemptCounts(req)
+      if ((counts[testId] ?? 0) >= MAX_TEST_SERIES_ATTEMPTS) {
+        return res.status(403).json({ error: 'attempt_limit_reached' })
+      }
+    }
+
+    const { data, error } = await req.db!
+      .from('questions')
+      .select(QUIZ_COLS)
+      .eq('category', 'testseries')
+      .eq('test_set', (test as TestSeriesRow).test_set)
+    if (error) return sendDbError(res, error)
+    res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
+  })
+)
+
+// ─── POST /api/questions/test-series/attempt ─────────────────────────────────
+// Records a completed attempt (called after the server grader returns). This is
+// what the start gate counts. Best-effort: overflow/missing test is ignored.
+router.post(
+  '/test-series/attempt',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { test_id, session_id, score, total } = req.body ?? {}
+    if (!test_id) return res.status(400).json({ error: 'test_id is required' })
+
+    const counts = await testSeriesAttemptCounts(req)
+    if ((counts[String(test_id)] ?? 0) >= MAX_TEST_SERIES_ATTEMPTS) {
+      return res.json({ ok: true, recorded: false })
+    }
+
+    const { error } = await req.db!.from('test_series_attempts').insert({
+      user_id: req.userId!,
+      test_id: String(test_id),
       session_id: session_id ?? null,
       score: score == null ? null : Number(score),
       total: total == null ? null : Math.trunc(Number(total)),

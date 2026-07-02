@@ -4,6 +4,7 @@ import {
   selectIsSuperAdmin,
   selectIsAuthenticated,
 } from '../store/authStore'
+import { useAdminViewStore } from '../store/adminViewStore'
 
 /**
  * Convenience hook exposing the slice of auth state most pages need.
@@ -13,8 +14,15 @@ export function useAuth() {
   const profile = useAuthStore((s) => s.profile)
   const loading = useAuthStore((s) => s.loading)
   const isAuthenticated = useAuthStore(selectIsAuthenticated)
-  const isAdmin = useAuthStore(selectIsAdmin)
-  const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
+  const realIsAdmin = useAuthStore(selectIsAdmin)
+  const realIsSuperAdmin = useAuthStore(selectIsSuperAdmin)
+
+  // "Preview as student" (admins only): mask the effective role so every UI
+  // consumer renders the learner experience. Non-admins can never be in preview.
+  const previewAsStudent = useAdminViewStore((s) => s.previewAsStudent) && realIsAdmin
+  const setPreviewAsStudent = useAdminViewStore((s) => s.setPreviewAsStudent)
+  const isAdmin = realIsAdmin && !previewAsStudent
+  const isSuperAdmin = realIsSuperAdmin && !previewAsStudent
 
   const signIn = useAuthStore((s) => s.signIn)
   const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle)
@@ -34,6 +42,12 @@ export function useAuth() {
     isAuthenticated,
     isAdmin,
     isSuperAdmin,
+    /** The user's real role, ignoring student-preview (drives the preview toggle). */
+    realIsAdmin,
+    realIsSuperAdmin,
+    /** True while a real admin is previewing the learner experience. */
+    previewAsStudent,
+    setPreviewAsStudent,
     signIn,
     signInWithGoogle,
     replaceDevice,

@@ -1,8 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library } from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useHasMaterials } from '../../hooks/useHasMaterials'
+import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
@@ -36,6 +37,7 @@ function withinFeedbackWindow(key: string | null): boolean {
 // insights, profile) shown to regular users.
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
+  { to: '/test-series', icon: CalendarDays, key: 'testSeries' as const, short: 'testSeries' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/materials', icon: Library, key: 'materials' as const, short: 'materials' as const },
   { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
@@ -57,7 +59,19 @@ const ADMIN_NAV = [
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { profile, isAdmin, isSuperAdmin, user } = useAuth()
+  const { profile, isAdmin, isSuperAdmin, user, realIsAdmin, previewAsStudent, setPreviewAsStudent } =
+    useAuth()
+
+  // Admins can preview the learner experience. Entering/leaving preview homes to
+  // the arena so the switch lands on a sensible screen in the target mode.
+  const enterStudentPreview = () => {
+    setPreviewAsStudent(true)
+    navigate('/test-arena')
+  }
+  const exitStudentPreview = () => {
+    setPreviewAsStudent(false)
+    navigate('/test-arena')
+  }
   const { t } = useT()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   // Feedback is accepted once per 3 months (enforced server-side). After a user
@@ -78,9 +92,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // Admins/superadmins manage content; learners get the study tabs. The
   // Materials tab is shown only once a material has been published (no empty tab).
   const hasMaterials = useHasMaterials()
+  const testSeriesOn = useTestSeriesEnabled()
   const nav = isAdmin
     ? ADMIN_NAV
-    : LEARNER_NAV.filter((item) => item.to !== '/materials' || hasMaterials)
+    : LEARNER_NAV.filter(
+        (item) =>
+          (item.to !== '/materials' || hasMaterials) &&
+          (item.to !== '/test-series' || testSeriesOn)
+      )
 
   // Badge: number of open student question-reports awaiting triage (admins only).
   const [openReports, setOpenReports] = useState(0)
@@ -194,6 +213,27 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               {user && <NotificationBell />}
+              {/* Preview toggle (real admins only) - switch between the admin and
+                  the student experience. Visible in both modes so it's reversible. */}
+              {realIsAdmin && (
+                <button
+                  onClick={previewAsStudent ? exitStudentPreview : enterStudentPreview}
+                  title={previewAsStudent ? t('adminView') : t('studentView')}
+                  aria-label={previewAsStudent ? t('adminView') : t('studentView')}
+                  aria-pressed={previewAsStudent}
+                  className={[
+                    'press inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-heading text-xs font-semibold focus-ring',
+                    previewAsStudent
+                      ? 'bg-gold text-white shadow-brand'
+                      : 'bg-brand-soft text-brand-dark hover:bg-tint',
+                  ].join(' ')}
+                >
+                  {previewAsStudent ? <EyeOff size={14} /> : <Eye size={14} />}
+                  <span className="tamil hidden sm:inline">
+                    {previewAsStudent ? t('adminView') : t('studentView')}
+                  </span>
+                </button>
+              )}
               {isSuperAdmin ? (
                 <button
                   onClick={() => navigate('/superadmin')}
@@ -240,6 +280,24 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
             </div>
           </div>
         </header>
+      )}
+
+      {/* Student-preview banner - a clear reminder + one-tap exit below the header
+          (the header keeps a compact toggle on every screen size too). */}
+      {!bare && previewAsStudent && (
+        <div className="border-b border-gold/30 bg-goldsoft">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2">
+            <span className="tamil flex items-center gap-2 font-heading text-xs font-semibold text-gold">
+              <Eye size={14} /> {t('viewingAsStudent')}
+            </span>
+            <button
+              onClick={exitStudentPreview}
+              className="press tamil inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 font-heading text-xs font-semibold text-white shadow-brand focus-ring"
+            >
+              <EyeOff size={14} /> {t('exitStudentView')}
+            </button>
+          </div>
+        </div>
       )}
 
       <main className={bare ? '' : 'pb-24 lg:pb-10'}>{children}</main>

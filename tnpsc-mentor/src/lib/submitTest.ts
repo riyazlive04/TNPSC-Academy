@@ -113,6 +113,19 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
       .catch(() => {})
   }
 
+  // Scheduled Test Series: record the attempt so the server can enforce the
+  // per-test attempt cap. Best-effort — must not block the result screen.
+  if (config.mockKind === 'series' && config.seriesTestId) {
+    void api
+      .recordTestSeriesAttempt({
+        test_id: config.seriesTestId,
+        session_id: result.session_id ?? null,
+        score: result.score_percentage,
+        total: result.total,
+      })
+      .catch(() => {})
+  }
+
   // Merge graded correctness (+ gated explanations) back onto the questions.
   const byId = new Map<string, GradedResult>(
     result.results.map((r) => [r.question_id, r])
@@ -125,6 +138,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
         correct_answer: r.correct_answer ?? undefined,
         explanation: r.explanation ?? undefined,
         explanation_ta: r.explanation_ta ?? undefined,
+        explanation_video_url: r.explanation_video_url ?? undefined,
         why_wrong: r.why_wrong ?? undefined,
       }
     }

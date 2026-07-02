@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Loader2, X } from 'lucide-react'
 import { SUBJECTS } from '../../lib/constants'
+import { youtubeEmbedUrl } from '../../lib/youtube'
 import { upsertAdminQuestion } from '../../lib/fetchQuestions'
 import type { AnswerLetter, Category, Question, QuizConfig } from '../../types'
 import { LETTERS } from '../../types'
@@ -49,6 +50,7 @@ function buildInitialForm(initial?: Question | null, config?: QuizConfig | null)
     option_d: s((q as Question).option_d),
     option_e: s((q as Question).option_e),
     explanation: s((q as Question).explanation),
+    explanation_video_url: s((q as Question).explanation_video_url),
     question_text_ta: s((q as Question).question_text_ta),
     option_a_ta: s((q as Question).option_a_ta),
     option_b_ta: s((q as Question).option_b_ta),
@@ -127,6 +129,7 @@ export default function QuestionEditor({
         option_e: form.option_e.trim() || null,
         correct_answer: correct,
         explanation: form.explanation.trim(),
+        explanation_video_url: form.explanation_video_url.trim() || null,
         why_wrong: Object.keys(whyWrong).length ? whyWrong : null,
         question_text_ta: form.question_text_ta.trim() || null,
         option_a_ta: form.option_a_ta.trim() || null,
@@ -229,6 +232,21 @@ export default function QuestionEditor({
 
         <div className="mt-3">
           <TextArea label="Explanation" value={form.explanation} onChange={set('explanation')} rows={3} />
+        </div>
+
+        <div className="mt-3">
+          <Field
+            label="Explanation video (YouTube URL)"
+            value={form.explanation_video_url}
+            onChange={set('explanation_video_url')}
+            placeholder="https://www.youtube.com/watch?v=… (optional)"
+          />
+          {form.explanation_video_url.trim() && !youtubeEmbedUrl(form.explanation_video_url) && (
+            <p className="mt-1 font-body text-xs text-coral">
+              Not a recognised YouTube link — the video won't show until this is a valid
+              YouTube URL (watch, youtu.be, shorts, or embed).
+            </p>
+          )}
         </div>
 
         {/* Tamil (collapsible) */}

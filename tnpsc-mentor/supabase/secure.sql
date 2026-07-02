@@ -109,6 +109,9 @@ as $$
     -- 'mock' is the fixed full-exam bank, served only by /api/questions/mock-exam.
     -- Never let it leak into the general sampler (esp. unscoped mock pools).
     and q.category <> 'mock'
+    -- 'testseries' is the fixed scheduled bank, served only by
+    -- /api/questions/test-series. Never let it leak into the general sampler.
+    and q.category <> 'testseries'
     and case when cfg.mock
       then (not cfg.scope_to_category or q.category = cfg.category)
       else q.category = cfg.category
@@ -241,6 +244,7 @@ begin
            'correct_answer', case when v_passed then q.correct_answer end,
            'explanation',    case when v_passed then q.explanation end,
            'explanation_ta', case when v_passed then q.explanation_ta end,
+           'explanation_video_url', case when v_passed then q.explanation_video_url end,
            'why_wrong',      case when v_passed then q.why_wrong end
          ))
   into v_results
@@ -354,6 +358,7 @@ declare
   v_answer text;
   v_explanation text;
   v_explanation_ta text;
+  v_explanation_video_url text;
   v_interval int;
   intervals int[] := array[1, 3, 7, 16, 35, 75];
 begin
@@ -364,8 +369,9 @@ begin
   where id = p_item_id and user_id = v_user;
   if v_qid is null then raise exception 'review item not found'; end if;
 
-  select (p_selected = correct_answer), correct_answer, explanation, explanation_ta
-  into v_correct, v_answer, v_explanation, v_explanation_ta
+  select (p_selected = correct_answer), correct_answer, explanation, explanation_ta,
+         explanation_video_url
+  into v_correct, v_answer, v_explanation, v_explanation_ta, v_explanation_video_url
   from public.questions where id = v_qid;
 
   if v_correct then
@@ -388,7 +394,8 @@ begin
     'is_correct',     v_correct,
     'correct_answer', v_answer,
     'explanation',    v_explanation,
-    'explanation_ta', v_explanation_ta
+    'explanation_ta', v_explanation_ta,
+    'explanation_video_url', v_explanation_video_url
   );
 end;
 $$;
@@ -477,6 +484,9 @@ as $$
     -- 'mock' is the fixed full-exam bank, served only by /api/questions/mock-exam.
     -- Never let it leak into the general sampler (esp. unscoped mock pools).
     and q.category <> 'mock'
+    -- 'testseries' is the fixed scheduled bank, served only by
+    -- /api/questions/test-series. Never let it leak into the general sampler.
+    and q.category <> 'testseries'
     and case when cfg.mock
       then (not cfg.scope_to_category or q.category = cfg.category)
       else q.category = cfg.category

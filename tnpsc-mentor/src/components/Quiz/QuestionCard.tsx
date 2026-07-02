@@ -3,6 +3,8 @@ import { optionLetters, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
 import QuestionFigures from './QuestionFigures'
 import QuestionStem from './QuestionStem'
+import YouTubeEmbed from './YouTubeEmbed'
+import MathText from '../UI/MathText'
 import { useT } from '../../lib/i18n'
 import { topicName } from '../../lib/constants'
 
@@ -128,10 +130,12 @@ export default function QuestionCard({
             {t('explanation')}
           </p>
           <p className="tamil whitespace-pre-line text-sm leading-relaxed text-navytext/80">
-            {displayExplanation(question, lang)}
+            <MathText text={displayExplanation(question, lang)} />
           </p>
         </div>
       )}
+
+      {reveal && <YouTubeEmbed url={question.explanation_video_url} />}
     </div>
   )
 }

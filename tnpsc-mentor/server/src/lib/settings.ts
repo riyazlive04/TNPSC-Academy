@@ -12,11 +12,14 @@ export interface PublicSettings {
   mock_group_enabled: boolean
   /** Show the Subject / Topic mock tab. */
   mock_subject_enabled: boolean
+  /** Show the scheduled Test Series nav tab + Test Arena tile. */
+  test_series_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   mock_group_enabled: false,
   mock_subject_enabled: false,
+  test_series_enabled: false,
 }
 
 /** Keys the superadmin console is allowed to write (allow-list). */
@@ -38,6 +41,9 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     mock_group_enabled: Boolean(raw.mock_group_enabled ?? PUBLIC_SETTING_DEFAULTS.mock_group_enabled),
     mock_subject_enabled: Boolean(
       raw.mock_subject_enabled ?? PUBLIC_SETTING_DEFAULTS.mock_subject_enabled
+    ),
+    test_series_enabled: Boolean(
+      raw.test_series_enabled ?? PUBLIC_SETTING_DEFAULTS.test_series_enabled
     ),
   }
 }

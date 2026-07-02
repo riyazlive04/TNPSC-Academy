@@ -42,6 +42,7 @@ import {
   Upload,
   Eye,
   EyeOff,
+  CalendarDays,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -69,9 +70,9 @@ import {
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
 import { toast } from '../store/toastStore'
-import type { MockExamAdmin, UserRole } from '../types'
+import type { MockExamAdmin, TestSeriesAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'materials'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'materials'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -87,6 +88,7 @@ export default function SuperAdminPage() {
     { id: 'reports', label: 'reportsTab', icon: Flag },
     { id: 'notes', label: 'notesTab', icon: BookOpen },
     { id: 'mockexams', label: 'mockExamsTab', icon: ClipboardList },
+    { id: 'testseries', label: 'testSeriesTab', icon: CalendarDays },
     { id: 'materials', label: 'materialsTab', icon: Library },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
@@ -135,6 +137,7 @@ export default function SuperAdminPage() {
           {tab === 'reports' && <ReportedQuestions />}
           {tab === 'notes' && <StudyNotesTab />}
           {tab === 'mockexams' && <MockExamsTab />}
+          {tab === 'testseries' && <TestSeriesTab />}
           {tab === 'materials' && <MaterialsTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
@@ -989,6 +992,212 @@ function MockExamsTab() {
                       </button>
                     ))}
                   </div>
+
+                  {/* Duration (minutes) */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">
+                    <Clock size={14} className="text-ink2" />
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={minutes}
+                      disabled={busy}
+                      onBlur={(ev) => {
+                        const m = Math.trunc(Number(ev.target.value))
+                        if (m > 0 && m !== minutes) patch(e.id, { duration_seconds: m * 60 })
+                      }}
+                      className="w-14 bg-transparent font-heading text-sm text-ink outline-none"
+                    />
+                    <span className="font-body text-xs text-ink2">{t('minutesUnit')}</span>
+                  </label>
+
+                  {/* Enabled toggle */}
+                  <button
+                    disabled={busy}
+                    onClick={() => patch(e.id, { enabled: !e.enabled })}
+                    aria-pressed={e.enabled}
+                    className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+                      e.enabled ? 'bg-correct' : 'bg-ink2/30'
+                    } disabled:opacity-50`}
+                  >
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                        e.enabled ? 'left-6' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─── Test Series ────────────────────────────────────────────────────────────────
+function TestSeriesTab() {
+  const { t } = useT()
+  const [tests, setTests] = useState<TestSeriesAdmin[]>([])
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  // Master visibility flag (app_settings) — hides the whole Test Series tab +
+  // Test Arena tile for all students until turned on.
+  const [seriesOn, setSeriesOn] = useState(false)
+  const [savingFlag, setSavingFlag] = useState(false)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    Promise.all([api.superadmin.testSeries(), api.superadmin.settings()])
+      .then(([ts, settings]) => {
+        setTests(ts)
+        setSeriesOn(Boolean(settings.test_series_enabled))
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const toggleSeries = async (next: boolean) => {
+    setSavingFlag(true)
+    setSeriesOn(next) // optimistic
+    try {
+      await api.superadmin.setSetting('test_series_enabled', next)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setSeriesOn(!next)
+    } finally {
+      setSavingFlag(false)
+    }
+  }
+
+  const patch = async (
+    id: string,
+    p: Partial<{
+      enabled: boolean
+      open_override: 'auto' | 'open' | 'closed'
+      scheduled_date: string
+      duration_seconds: number
+    }>
+  ) => {
+    setSavingId(id)
+    try {
+      const updated = await api.superadmin.setTestSeries(id, p)
+      setTests((xs) => xs.map((e) => (e.id === id ? { ...e, ...updated } : e)))
+    } catch {
+      toast.error(t('couldNotLoad'))
+    } finally {
+      setSavingId(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="skeleton h-24 w-full" />
+        ))}
+      </div>
+    )
+  }
+  if (error) return <ErrorState onRetry={load} />
+
+  const enabledCount = tests.filter((e) => e.enabled).length
+
+  return (
+    <div>
+      <div className="card mb-4 flex items-center justify-between p-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-soft text-brand">
+            <CalendarDays size={20} />
+          </span>
+          <div>
+            <p className="font-heading text-xl font-semibold text-ink">
+              {enabledCount}/{tests.length}
+            </p>
+            <p className="font-body text-xs text-ink2">{t('testSeriesTab')} · enabled</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Master visibility — show/hide the whole Test Series feature for students */}
+      <div className="card mb-4 p-4">
+        <p className="mb-1 font-heading text-sm font-semibold text-ink">{t('testSeriesShowTitle')}</p>
+        <p className="mb-3 font-body text-xs text-ink2">{t('testSeriesShowSub')}</p>
+        <div className="flex items-center justify-between gap-3">
+          <span className="tamil font-body text-sm text-ink">{t('testSeriesTitle')}</span>
+          <button
+            disabled={savingFlag}
+            onClick={() => toggleSeries(!seriesOn)}
+            aria-pressed={seriesOn}
+            className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+              seriesOn ? 'bg-correct' : 'bg-ink2/30'
+            } disabled:opacity-50`}
+          >
+            <span
+              className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                seriesOn ? 'left-6' : 'left-1'
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        {tests.map((e) => {
+          const minutes = Math.round(e.duration_seconds / 60)
+          const short = e.loaded_questions !== e.total_questions
+          const busy = savingId === e.id
+          return (
+            <div key={e.id} className="card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="tamil font-heading text-sm font-semibold text-ink">
+                    {e.title}
+                    {e.unit_label && (
+                      <span className="ml-2 font-body text-xs text-ink2">· {e.unit_label}</span>
+                    )}
+                  </p>
+                  <p className="font-body text-xs text-ink2">
+                    {e.loaded_questions}/{e.total_questions} questions
+                    {short && <span className="text-wrong"> · mismatch</span>}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Availability override */}
+                  <select
+                    value={e.open_override}
+                    disabled={busy}
+                    onChange={(ev) =>
+                      patch(e.id, {
+                        open_override: ev.target.value as 'auto' | 'open' | 'closed',
+                      })
+                    }
+                    className="rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs text-ink outline-none disabled:opacity-50"
+                  >
+                    <option value="auto">{t('availabilityAuto')}</option>
+                    <option value="open">{t('availabilityOpen')}</option>
+                    <option value="closed">{t('availabilityClosed')}</option>
+                  </select>
+
+                  {/* Scheduled date */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">
+                    <CalendarDays size={14} className="text-ink2" />
+                    <input
+                      type="date"
+                      defaultValue={e.scheduled_date ?? ''}
+                      disabled={busy}
+                      onBlur={(ev) => {
+                        const v = ev.target.value
+                        if (v && v !== e.scheduled_date) patch(e.id, { scheduled_date: v })
+                      }}
+                      className="bg-transparent font-heading text-xs text-ink outline-none"
+                    />
+                  </label>
 
                   {/* Duration (minutes) */}
                   <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">

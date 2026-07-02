@@ -14,6 +14,8 @@ import type {
   RevisionTopic,
   SubmitResult,
   TestAnswer,
+  TestSeriesAdmin,
+  TestSeriesItem,
   UserRole,
 } from '../types'
 
@@ -493,6 +495,27 @@ export const api = {
   }): Promise<void> {
     await request('/api/questions/mock-exam/attempt', { method: 'POST', body: p })
   },
+  /** Scheduled test-series papers visible to this user + lock/schedule/attempts. */
+  async testSeries(): Promise<{ tests: TestSeriesItem[]; premium: boolean }> {
+    return request<{ tests: TestSeriesItem[]; premium: boolean }>('/api/questions/test-series')
+  },
+  /** The fixed question set for one test. Server re-checks premium/date/attempts. */
+  async testSeriesQuestions(testId: string): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/test-series', {
+      method: 'POST',
+      body: { test_id: testId },
+    })
+    return data.questions
+  },
+  /** Record a completed test-series attempt (counts toward the attempt cap). */
+  async recordTestSeriesAttempt(p: {
+    test_id: string
+    session_id?: string | null
+    score?: number
+    total?: number
+  }): Promise<void> {
+    await request('/api/questions/test-series/attempt', { method: 'POST', body: p })
+  },
   /** Public client-facing feature flags (e.g. which Mock Test sections show). */
   async appSettings(): Promise<AppSettings> {
     const data = await request<{ settings: AppSettings }>('/api/app/settings', { auth: false })
@@ -709,6 +732,29 @@ export const api = {
         body: patch,
       })
       return data.exam
+    },
+    /** All scheduled test-series papers (incl. disabled), with loaded counts. */
+    async testSeries(): Promise<TestSeriesAdmin[]> {
+      const data = await request<{ tests: TestSeriesAdmin[] }>('/api/superadmin/test-series')
+      return data.tests
+    },
+    /** Patch a test's gating/schedule. Only the supplied fields change. */
+    async setTestSeries(
+      id: string,
+      patch: Partial<{
+        enabled: boolean
+        open_override: 'auto' | 'open' | 'closed'
+        scheduled_date: string
+        duration_seconds: number
+        negative_mark: number
+        title: string
+      }>
+    ): Promise<TestSeriesAdmin> {
+      const data = await request<{ test: TestSeriesAdmin }>(`/api/superadmin/test-series/${id}`, {
+        method: 'POST',
+        body: patch,
+      })
+      return data.test
     },
     /** All app-settings rows as a raw key→value map. */
     async settings(): Promise<Record<string, unknown>> {
@@ -1050,6 +1096,8 @@ export interface AppSettings {
   mock_group_enabled: boolean
   /** Show the Subject / Topic mock tab. */
   mock_subject_enabled: boolean
+  /** Show the scheduled Test Series nav tab + Test Arena tile. */
+  test_series_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

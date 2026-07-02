@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
+import YouTubeEmbed from '../components/Quiz/YouTubeEmbed'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
@@ -141,6 +142,8 @@ export default function BookmarksPage() {
                     </p>
                   </div>
                 )}
+
+                <YouTubeEmbed url={q.explanation_video_url} />
               </article>
             ))}
           </div>

@@ -47,7 +47,8 @@ begin
       aptitude_type, aptitude_topic, subject, unit, topic,
       question_type, external_id,
       question_text, option_a, option_b, option_c, option_d,
-      correct_answer, explanation, why_wrong, why_wrong_ta, difficulty, source_url,
+      correct_answer, explanation, explanation_video_url, why_wrong, why_wrong_ta,
+      difficulty, source_url,
       question_text_ta, option_a_ta, option_b_ta, option_c_ta, option_d_ta,
       explanation_ta
     ) values (
@@ -70,6 +71,7 @@ begin
       p->>'option_a', p->>'option_b', p->>'option_c', p->>'option_d',
       p->>'correct_answer',
       nullif(p->>'explanation', ''),
+      nullif(p->>'explanation_video_url', ''),
       v_why,
       v_why_ta,
       coalesce(nullif(p->>'difficulty', ''), 'medium'),
@@ -104,6 +106,7 @@ begin
       option_d        = p->>'option_d',
       correct_answer  = p->>'correct_answer',
       explanation     = nullif(p->>'explanation', ''),
+      explanation_video_url = nullif(p->>'explanation_video_url', ''),
       why_wrong       = v_why,
       why_wrong_ta    = v_why_ta,
       difficulty      = coalesce(nullif(p->>'difficulty', ''), 'medium'),

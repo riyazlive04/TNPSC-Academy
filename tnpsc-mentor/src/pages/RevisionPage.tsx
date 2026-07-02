@@ -50,6 +50,7 @@ export default function RevisionPage() {
         correct_answer: grade.correct_answer ?? undefined,
         explanation: grade.explanation ?? undefined,
         explanation_ta: grade.explanation_ta ?? undefined,
+        explanation_video_url: grade.explanation_video_url ?? undefined,
       })
     } else {
       // Grading unavailable (offline) - reveal without the answer highlight.

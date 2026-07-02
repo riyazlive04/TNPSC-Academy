@@ -1,5 +1,6 @@
 import type { AnswerLetter } from '../../types'
 import { Check, X } from 'lucide-react'
+import MathText from '../UI/MathText'
 
 interface OptionButtonProps {
   letter: AnswerLetter
@@ -87,7 +88,7 @@ export default function OptionButton({
         </span>
       ) : (
         <span className="tamil min-w-0 flex-1 text-[15px] leading-relaxed [overflow-wrap:anywhere]">
-          {text}
+          <MathText text={text} />
         </span>
       )}
       {icon}

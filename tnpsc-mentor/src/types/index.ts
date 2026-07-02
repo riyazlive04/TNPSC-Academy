@@ -110,6 +110,10 @@ export interface Question {
   // and merged in after a result is graded - hence optional.
   correct_answer?: AnswerLetter
   explanation?: string
+  // Optional YouTube video URL for the explanation. Set by admins; rendered as an
+  // embedded player wherever the explanation shows. Delivered via the same gated
+  // RPCs as `explanation` (never shipped with un-attempted quiz questions).
+  explanation_video_url?: string | null
   // Per-option rationale: for each WRONG option letter, why it is incorrect.
   // Powers the targeted "your answer is wrong because…" feedback.
   why_wrong?: Partial<Record<AnswerLetter, string>> | null
@@ -172,6 +176,7 @@ export interface GradedResult {
   correct_answer?: AnswerLetter | null
   explanation?: string | null
   explanation_ta?: string | null
+  explanation_video_url?: string | null
   why_wrong?: Partial<Record<AnswerLetter, string>> | null
 }
 
@@ -317,11 +322,13 @@ export interface QuizConfig {
    * exam from a single subject/topic drill.
    */
   proctored?: boolean
-  mockKind?: 'group' | 'subject' | 'exam'
+  mockKind?: 'group' | 'subject' | 'exam' | 'series'
   /** Which TNPSC group blueprint a group mock follows (2024/2025 pattern). */
   mockGroup?: GroupType
   /** A fixed full mock exam id ('exam1'..'exam6') when mockKind === 'exam'. */
   mockExamId?: string
+  /** A scheduled test-series id ('test1'..'test13') when mockKind === 'series'. */
+  seriesTestId?: string
   /** Set when this quiz is a revision re-test (gates similar-question fetch). */
   revision?: boolean
   /** The revision_topics row id, threaded back through submit so a pass clears it. */
@@ -379,6 +386,49 @@ export interface MockExamAdmin {
   negative_mark: number
   tier: 'free' | 'paid'
   enabled: boolean
+  sort_order: number
+  /** Questions actually loaded for this set (should be total_questions). */
+  loaded_questions: number
+}
+
+// ─── Test Series (scheduled Group 1 "Test Marathon 2026" papers) ─────────────
+
+/** One scheduled test as seen by a student: access + schedule + attempts. */
+export interface TestSeriesItem {
+  id: string
+  title: string
+  title_ta: string | null
+  unit_label: string | null
+  unit_label_ta: string | null
+  subjects_label: string | null
+  subjects_label_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  /** Unlock date 'YYYY-MM-DD' (IST), or null. */
+  scheduled_date: string | null
+  /** True when the user can't start it yet (not premium, or before its date). */
+  locked: boolean
+  /** Why it's locked: 'premium' (whole series is paid) or 'date' (not yet open). */
+  lockReason: 'premium' | 'date' | null
+  attemptsUsed: number
+  attemptsMax: number
+}
+
+/** One test row in the superadmin console (all tests, incl. disabled). */
+export interface TestSeriesAdmin {
+  id: string
+  test_set: number
+  title: string
+  title_ta: string | null
+  unit_label: string | null
+  subjects_label: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  scheduled_date: string | null
+  enabled: boolean
+  open_override: 'auto' | 'open' | 'closed'
   sort_order: number
   /** Questions actually loaded for this set (should be total_questions). */
   loaded_questions: number

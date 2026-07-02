@@ -13,6 +13,13 @@ const STRINGS = {
   signOut: { en: 'Sign out', ta: 'வெளியேறு' },
   home: { en: 'Home', ta: 'முகப்பு' },
   admin: { en: 'Admin', ta: 'நிர்வாகி' },
+  studentView: { en: 'Student view', ta: 'மாணவர் காட்சி' },
+  adminView: { en: 'Admin view', ta: 'நிர்வாகி காட்சி' },
+  viewingAsStudent: {
+    en: "You're previewing the app as a student",
+    ta: 'நீங்கள் மாணவராக செயலியை முன்னோட்டமிடுகிறீர்கள்',
+  },
+  exitStudentView: { en: 'Exit student view', ta: 'மாணவர் காட்சியிலிருந்து வெளியேறு' },
   back: { en: 'Back', ta: 'பின்செல்' },
   darkMode: { en: 'Dark mode', ta: 'இருண்ட பயன்முறை' },
   lightMode: { en: 'Light mode', ta: 'ஒளி பயன்முறை' },
@@ -273,6 +280,7 @@ const STRINGS = {
   },
   abandonTestConfirm: { en: 'Yes, leave', ta: 'ஆம், வெளியேறு' },
   explanation: { en: 'Explanation', ta: 'விளக்கம்' },
+  videoExplanation: { en: 'Video explanation', ta: 'காணொளி விளக்கம்' },
   preparingTest: { en: 'Preparing your test…', ta: 'உங்கள் தேர்வு தயாராகிறது…' },
   min15: {
     en: 'Hold on - please read the question before moving on.',
@@ -507,6 +515,36 @@ const STRINGS = {
     ta: '200 வினாக்கள் கொண்ட முழு நீள மாதிரித் தேர்வுகள். ஒவ்வொன்றையும் இருமுறை எழுதலாம்.',
   },
   mockExamsEmpty: { en: 'No mock exams are available yet.', ta: 'இன்னும் மாதிரித் தேர்வுகள் எதுவும் இல்லை.' },
+
+  // Test Series - scheduled Group 1 "Test Marathon 2026" papers
+  testSeries: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  testSeriesTitle: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  testSeriesArenaSub: { en: 'Scheduled Group 1 marathon', ta: 'திட்டமிடப்பட்ட குரூப் 1 மாரத்தான்' },
+  testSeriesSub: {
+    en: 'A scheduled marathon of full-length papers. Each unlocks on its date and can be attempted twice.',
+    ta: 'திட்டமிடப்பட்ட முழு நீளத் தேர்வுத் தொடர். ஒவ்வொன்றும் அதன் தேதியில் திறக்கும்; இருமுறை எழுதலாம்.',
+  },
+  testSeriesEmpty: {
+    en: 'No tests have been scheduled yet.',
+    ta: 'இன்னும் எந்தத் தேர்வும் திட்டமிடப்படவில்லை.',
+  },
+  testSeriesLockedPremium: {
+    en: 'Upgrade to Premium to unlock the full Test Series',
+    ta: 'முழுத் தேர்வுத் தொடரைத் திறக்க பிரீமியத்திற்கு மேம்படுத்துங்கள்',
+  },
+  unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
+  availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
+  scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
+  // Superadmin
+  testSeriesTab: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  testSeriesShowTitle: { en: 'Test Series visibility', ta: 'தேர்வுத் தொடர் காட்சி' },
+  testSeriesShowSub: {
+    en: 'Show or hide the Test Series tab and Test Arena tile for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் தேர்வுத் தொடர் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
+  },
+  availabilityAuto: { en: 'Auto (by date)', ta: 'தானியங்கி (தேதிப்படி)' },
+  availabilityOpen: { en: 'Force open', ta: 'கட்டாயம் திற' },
+  availabilityClosed: { en: 'Force closed', ta: 'கட்டாயம் மூடு' },
   premiumOnly: { en: 'Premium', ta: 'பிரீமியம்' },
   examLocked: {
     en: 'Upgrade to Premium to unlock this exam',

@@ -25,6 +25,7 @@ function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
     a.mockKind === b.mockKind &&
     a.mockGroup === b.mockGroup &&
     a.mockExamId === b.mockExamId &&
+    a.seriesTestId === b.seriesTestId &&
     a.subject === b.subject &&
     a.topic === b.topic &&
     a.difficulty === b.difficulty
@@ -130,7 +131,9 @@ export default function MockQuizPage() {
     ;(async () => {
       try {
         const qs =
-          config.mockKind === 'exam'
+          config.mockKind === 'series'
+            ? await api.testSeriesQuestions(config.seriesTestId as string)
+            : config.mockKind === 'exam'
             ? await api.mockExamQuestions(config.mockExamId as string)
             : config.mockKind === 'group'
               ? await api.mockGroupQuestions(config.mockGroup as string)

@@ -118,6 +118,7 @@ export interface ReviewGrade {
   correct_answer: AnswerLetter | null
   explanation: string | null
   explanation_ta: string | null
+  explanation_video_url: string | null
 }
 
 /** Total due count (for the dashboard badge). */

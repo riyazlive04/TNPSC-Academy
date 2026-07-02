@@ -32,6 +32,13 @@ export const FREE_PDF_DOWNLOADS = 3
 export const MAX_MOCK_EXAM_ATTEMPTS = 2
 
 /**
+ * Each user may attempt a given scheduled Test Series paper at most this many
+ * times. Enforced server-side at start (POST /test-series) by counting recorded
+ * submissions in test_series_attempts; the picker UI mirrors it for display.
+ */
+export const MAX_TEST_SERIES_ATTEMPTS = 2
+
+/**
  * Trusted base amount for an order. For a known plan we use the server price and
  * ignore the client amount entirely; for the generic contribution path we accept
  * the client amount, clamped to a sane range.
