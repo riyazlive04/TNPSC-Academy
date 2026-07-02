@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { api, type ReportStatus, type ReportedQuestion } from '../../lib/api'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../../types'
+import MathText from '../UI/MathText'
 import type { Question } from '../../types'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
@@ -183,7 +184,7 @@ function ReportCard({
       {q ? (
         <>
           <p className="tamil mb-3 whitespace-pre-line font-heading text-base font-bold leading-snug text-ink">
-            {displayQuestion(q, lang)}
+            <MathText text={displayQuestion(q, lang)} />
           </p>
           <div className="mb-3 flex flex-col gap-1.5">
             {optionLetters(q).map((letter) => {
@@ -204,7 +205,7 @@ function ReportCard({
                   >
                     {letter}
                   </span>
-                  {displayOption(q, letter, lang)}
+                  <MathText text={displayOption(q, letter, lang)} />
                   {isCorrect && <span className="ml-auto text-xs font-bold">✓</span>}
                 </div>
               )
@@ -214,7 +215,7 @@ function ReportCard({
             <div className="mb-3 rounded-lg border-l-4 border-brand bg-brand-soft/40 p-3">
               <p className="tamil whitespace-pre-line font-body text-xs leading-relaxed text-ink2">
                 <span className="font-heading font-bold text-brand">Explanation: </span>
-                {displayExplanation(q, lang)}
+                <MathText text={displayExplanation(q, lang)} />
               </p>
             </div>
           )}

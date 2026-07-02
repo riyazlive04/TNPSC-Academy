@@ -21,6 +21,7 @@ import QuestionEditor from '../components/Admin/QuestionEditor'
 import BulkImportPanel from '../components/Admin/BulkImportPanel'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
+import MathText from '../components/UI/MathText'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
@@ -397,7 +398,7 @@ export default function AdminQuestionsPage() {
                         <EyeOff size={11} /> Hidden
                       </span>
                     )}
-                    {displayQuestion(q, lang)}
+                    <MathText text={displayQuestion(q, lang)} />
                   </p>
                   <div className="flex flex-shrink-0 gap-1">
                     <button
@@ -463,7 +464,7 @@ export default function AdminQuestionsPage() {
                         >
                           {letter}
                         </span>
-                        {displayOption(q, letter, lang)}
+                        <MathText text={displayOption(q, letter, lang)} />
                         {isCorrect && (
                           <span className="ml-auto text-xs font-bold">✓ {t('correctMark')}</span>
                         )}
@@ -477,7 +478,7 @@ export default function AdminQuestionsPage() {
                       <span className="font-heading font-bold text-secondary">
                         Explanation:{' '}
                       </span>
-                      {displayExplanation(q, lang)}
+                      <MathText text={displayExplanation(q, lang)} />
                     </p>
                   </div>
                 )}
