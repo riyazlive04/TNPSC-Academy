@@ -474,7 +474,7 @@ export default function AdminQuestionsPage() {
                 </div>
                 {displayExplanation(q, lang) && (
                   <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-                    <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
+                    <p className="tamil whitespace-pre-line text-xs leading-loose text-navytext/80">
                       <span className="font-heading font-bold text-secondary">
                         Explanation:{' '}
                       </span>

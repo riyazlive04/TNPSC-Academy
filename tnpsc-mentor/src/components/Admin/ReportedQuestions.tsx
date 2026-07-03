@@ -213,7 +213,7 @@ function ReportCard({
           </div>
           {displayExplanation(q, lang) && (
             <div className="mb-3 rounded-lg border-l-4 border-brand bg-brand-soft/40 p-3">
-              <p className="tamil whitespace-pre-line font-body text-xs leading-relaxed text-ink2">
+              <p className="tamil whitespace-pre-line font-body text-xs leading-loose text-ink2">
                 <span className="font-heading font-bold text-brand">Explanation: </span>
                 <MathText text={displayExplanation(q, lang)} />
               </p>

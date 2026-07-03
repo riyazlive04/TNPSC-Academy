@@ -94,12 +94,12 @@ function SolutionPane({
               {t('explanationLabel')}
             </p>
           )}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-3">
             {section.lines.map((line, i) =>
               line.kind === 'formula' ? (
                 <div
                   key={i}
-                  className="tamil rounded-lg border border-secondary/30 bg-tint px-3 py-1.5 text-[13px] font-semibold leading-relaxed text-ink"
+                  className="tamil rounded-lg border border-secondary/30 bg-tint px-3 py-2 text-[13px] font-semibold leading-loose text-ink"
                 >
                   {line.label && (
                     <span className="mr-1 font-heading text-secondary">{line.label}:</span>
@@ -109,7 +109,7 @@ function SolutionPane({
               ) : (
                 <p
                   key={i}
-                  className="tamil whitespace-pre-line pl-1 text-[13px] leading-relaxed text-navytext/80"
+                  className="tamil whitespace-pre-line pl-1 text-[13px] leading-loose text-navytext/80"
                 >
                   <MathText text={line.text} />
                 </p>

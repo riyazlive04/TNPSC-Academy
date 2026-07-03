@@ -167,7 +167,7 @@ export default function ResultCard({
                   </p>
                 )}
                 {displayExplanation(question, lang) && (
-                  <p className="tamil whitespace-pre-line text-xs leading-relaxed text-navytext/80">
+                  <p className="tamil whitespace-pre-line text-xs leading-loose text-navytext/80">
                     <span className="font-heading font-bold text-secondary">
                       {t('explanationColon')}{' '}
                     </span>
