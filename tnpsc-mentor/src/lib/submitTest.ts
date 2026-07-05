@@ -2,6 +2,7 @@ import { api } from './api'
 import { ATTENDANCE_GATE } from '../store/quizStore'
 import { recordTestCompleted } from './testProgress'
 import { trackSubmitTest } from './tracking'
+import { useCreditsStore } from '../store/creditsStore'
 import type {
   GradedResult,
   Question,
@@ -78,6 +79,11 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     ca_topic: config.ca_topic ?? null,
     aptitude_type: config.aptitude_type ?? null,
     aptitude_topic: config.aptitude_topic ?? null,
+    // Flags the server's free-topic gate reads (submit_test ignores them): `mock`
+    // marks group-exam/weekly flows, `mock_kind` marks fixed-bank exams (exam/
+    // series/vettri) — both are excluded from the one-free-test-per-topic ledger.
+    mock: config.mock ?? null,
+    mock_kind: config.mockKind ?? null,
     // When set, this test is a revision re-attempt - a pass clears that row.
     revision_id: config.revisionId ?? null,
     total_questions: questions.length,
@@ -87,6 +93,9 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
 
   const result = (await api.submitTest(pSession, pAnswers)) as SubmitResult
   if (!result) throw new Error('No response from grader')
+
+  // The server may have just spent a test credit — refresh the header meter.
+  void useCreditsStore.getState().reload()
 
   trackSubmitTest({
     category: config.category,

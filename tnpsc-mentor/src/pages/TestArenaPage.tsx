@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { cloneElement, useEffect, useState, type ReactElement } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
@@ -14,9 +14,11 @@ import {
   BarChart3,
   ScrollText,
   CalendarDays,
+  Trophy,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
+import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
@@ -25,6 +27,7 @@ import SectionHeader from '../components/UI/SectionHeader'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
+import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -91,10 +94,21 @@ const CARDS: ArenaCard[] = [
 // categories - the Mock Test entry (a student exam mode, not a bank) is excluded.
 const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 
+// Gradient stops per tint for the dashboard category cards. Each pairs two real
+// theme colours (br direction) so the icon tile reads as a designed, dimensional
+// chip rather than a flat pastel square. White glyph sits on top.
+const GRADIENTS: Record<Tint, string> = {
+  violet: 'from-brand to-brand-deep',
+  coral: 'from-accentwarm to-coral',
+  blue: 'from-sky to-brand',
+  green: 'from-mint to-sky',
+}
+
 export default function TestArenaPage() {
   const navigate = useNavigate()
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const testSeriesOn = useTestSeriesEnabled()
+  const vettriOn = useVettriEnabled()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
@@ -234,29 +248,27 @@ export default function TestArenaPage() {
                   className="ml-auto text-primary/50 transition-transform group-hover:translate-x-0.5"
                 />
               </span>
-              {lang !== 'en' && (
-                <p className="tamil mt-2 font-display text-[16px] font-semibold leading-relaxed text-ink">
-                  {/* Couplet structure: line 1 (4 words) above line 2 (3 words). */}
-                  <span className="block">{dailyKural.line1_ta}</span>
-                  <span className="block">{dailyKural.line2_ta}</span>
+              {/* The kural is ALWAYS shown in Tamil — line 1 (4 சீர்) above
+                  line 2 (3 சீர்) — and auto-fits so each line stays on one line
+                  even on a narrow phone. */}
+              <Couplet
+                line1={dailyKural.line1_ta}
+                line2={dailyKural.line2_ta}
+                className="tamil mt-2 font-display font-semibold leading-relaxed text-ink"
+                max={17}
+              />
+              {lang === 'ta' ? (
+                <p className="mt-1 font-body text-[12px] italic leading-relaxed text-muted sm:text-[13px]">
+                  {dailyKural.transliteration}
                 </p>
-              )}
-              {lang !== 'ta' && (
-                <p
-                  className={`font-body text-[13px] leading-relaxed text-muted ${
-                    lang === 'en' ? 'mt-2 not-italic' : 'mt-1 italic'
-                  }`}
-                >
-                  {lang === 'en' ? (
-                    // English translation as a two-line couplet, mirroring the Tamil.
-                    splitCoupletEn(dailyKural.translation_en).map((line, i) => (
-                      <span key={i} className="block">
-                        {line}
-                      </span>
-                    ))
-                  ) : (
-                    dailyKural.transliteration
-                  )}
+              ) : (
+                // English meaning as a two-line couplet, mirroring the Tamil.
+                <p className="mt-1.5 font-body text-[12px] not-italic leading-relaxed text-muted sm:text-[13px]">
+                  {splitCoupletEn(dailyKural.translation_en).map((line, i) => (
+                    <span key={i} className="block">
+                      {line}
+                    </span>
+                  ))}
                 </p>
               )}
             </button>
@@ -275,75 +287,76 @@ export default function TestArenaPage() {
           />
         </div>
 
-        {/* Practice - subjects as a hairline-divided list, not a card grid. */}
-        <section className="space-y-2" data-tour="practice">
+        {/* Practice - a two-column grid of tactile category cards. */}
+        <section className="space-y-3" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
-          <List>
-            {/* Scheduled Test Series - only once the superadmin has enabled it. */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Vettri Nichayam bundle - gold to signal the flagship paid product. */}
+            {vettriOn && (
+              <CategoryCard
+                onClick={() => navigate('/vettri')}
+                icon={<Trophy />}
+                gradient="from-gold to-accentwarm"
+                title={t('vettriTitle')}
+                subtitle={t('vettriArenaSub')}
+                index={0}
+              />
+            )}
+            {/* Test Marathon - only once the superadmin has enabled it. */}
             {testSeriesOn && (
-              <ListRow
+              <CategoryCard
                 onClick={() => navigate('/test-series')}
-                leading={
-                  <IconTile tint="coral">
-                    <CalendarDays size={19} />
-                  </IconTile>
-                }
+                icon={<CalendarDays />}
+                gradient={GRADIENTS.coral}
                 title={t('testSeriesTitle')}
                 subtitle={t('testSeriesArenaSub')}
+                index={1}
               />
             )}
             {restCards.map((card, i) => (
-              <ListRow
+              <CategoryCard
                 key={card.to}
                 onClick={() => navigate(card.to)}
-                style={{ '--i': i } as React.CSSProperties}
-                leading={<IconTile tint={card.tint}>{card.icon}</IconTile>}
+                icon={card.icon}
+                gradient={GRADIENTS[card.tint]}
                 title={t(card.titleKey)}
                 subtitle={card.subtitle}
+                index={i + 2}
               />
             ))}
             {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
-            <ListRow
+            <CategoryCard
               onClick={() => navigate('/test-arena/thirukural')}
-              style={{ '--i': restCards.length } as React.CSSProperties}
-              leading={
-                <IconTile tint="green">
-                  <ScrollText size={19} />
-                </IconTile>
-              }
+              icon={<ScrollText />}
+              gradient={GRADIENTS.green}
               title={t('tkQuizTitle')}
               subtitle={t('tkQuizSub')}
+              index={restCards.length + 2}
             />
-          </List>
+          </div>
         </section>
 
         {/* Premium upsell - the one deliberately distinct surface (its own coral
             identity), kept as a self-contained monetisation unit. */}
         <PremiumCard dismissible />
 
-        {/* Keep going - study-loop quick links, also a list. */}
-        <section className="space-y-2" data-tour="progress">
+        {/* Keep going - study-loop quick links, matching the practice cards. */}
+        <section className="space-y-3" data-tour="progress">
           <SectionHeader title={t('keepGoingShort')} className="px-1" />
-          <List>
-            <ListRow
+          <div className="grid grid-cols-2 gap-3">
+            <CategoryCard
               onClick={() => navigate('/revision')}
-              leading={
-                <IconTile tint="violet">
-                  <RefreshCw size={19} />
-                </IconTile>
-              }
+              icon={<RefreshCw />}
+              gradient={GRADIENTS.violet}
               title={t('revision')}
             />
-            <ListRow
+            <CategoryCard
               onClick={() => navigate('/insights')}
-              leading={
-                <IconTile tint="blue">
-                  <BarChart3 size={19} />
-                </IconTile>
-              }
+              icon={<BarChart3 />}
+              gradient={GRADIENTS.blue}
               title={t('insights')}
             />
-          </List>
+          </div>
         </section>
       </div>
 
@@ -355,6 +368,52 @@ export default function TestArenaPage() {
 
       <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} />
     </AppLayout>
+  )
+}
+
+/** A dashboard category as a clean, compact card: a gradient icon chip, title +
+ * optional (clamped) subtitle. Presses via motion; lifts subtly on hover. */
+function CategoryCard({
+  onClick,
+  icon,
+  gradient,
+  title,
+  subtitle,
+  index = 0,
+}: {
+  onClick: () => void
+  icon: React.ReactNode
+  /** Tailwind gradient stops, e.g. 'from-brand to-brand-deep'. */
+  gradient: string
+  title: string
+  subtitle?: string
+  index?: number
+}) {
+  const glyph = icon as ReactElement<{ size?: number }>
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      style={{ '--i': index } as React.CSSProperties}
+      className="stagger-item group focus-ring flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
+      {...tapScaleSubtle}
+    >
+      <span
+        className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-sm`}
+      >
+        {cloneElement(glyph, { size: 20 })}
+      </span>
+      <span className="min-w-0">
+        <span className="tamil block font-heading text-sm font-semibold leading-tight text-ink">
+          {title}
+        </span>
+        {subtitle && (
+          <span className="tamil mt-0.5 line-clamp-2 block font-body text-[11.5px] leading-snug text-muted">
+            {subtitle}
+          </span>
+        )}
+      </span>
+    </motion.button>
   )
 }
 

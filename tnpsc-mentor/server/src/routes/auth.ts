@@ -16,6 +16,7 @@ import {
   type DeviceSession,
 } from '../sessions.js'
 import { normalizeMobile, sendOtp, verifyOtp } from '../lib/msg91.js'
+import { phoneTakenByOther } from '../lib/phone.js'
 import { issueOtpTicket, verifyOtpTicket } from '../lib/otpTicket.js'
 
 const router = Router()
@@ -260,6 +261,22 @@ router.post(
   })
 )
 
+/**
+ * How an email is already registered (service-role-only RPC over auth.users):
+ * 'none' | 'google' | 'password'. Fails OPEN to 'none' on a lookup error — GoTrue
+ * still rejects a true duplicate at signUp, so the worst case is a generic (not a
+ * tailored) message, never a wrongly-let-through account.
+ */
+async function emailStatus(email: string): Promise<'none' | 'google' | 'password'> {
+  const { data, error } = await supabaseAdmin.rpc('email_registration_status', { p_email: email })
+  if (error) {
+    console.error('[email-unique] status lookup failed', error.message)
+    return 'none'
+  }
+  const s = String(data ?? 'none')
+  return s === 'google' || s === 'password' ? s : 'none'
+}
+
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
 router.post(
   '/register',
@@ -269,8 +286,24 @@ router.post(
     if (!email || !password || !fullName) {
       return res.status(400).json({ error: 'Name, email and password are required' })
     }
+    // One mobile number = one account. Reject BEFORE creating the auth user so a
+    // duplicate number never leaves an orphaned GoTrue user behind.
+    const normalizedPhone = typeof phone === 'string' ? normalizeMobile(phone) : ''
+    if (normalizedPhone && (await phoneTakenByOther(normalizedPhone))) {
+      return res.status(409).json({ error: 'phone_already_registered' })
+    }
+    // One email = one account, and an email already registered THROUGH GOOGLE must
+    // not become an email/password account — send those users to Google sign-in.
+    const emailTrim = String(email).trim()
+    const eStatus = await emailStatus(emailTrim)
+    if (eStatus === 'google') {
+      return res.status(409).json({ error: 'email_registered_google' })
+    }
+    if (eStatus === 'password') {
+      return res.status(409).json({ error: 'email_already_registered' })
+    }
     const { data, error } = await supabaseAuthClient.auth.signUp({
-      email: String(email).trim(),
+      email: emailTrim,
       password: String(password),
       options: { data: { full_name: fullName } },
     })
@@ -291,7 +324,7 @@ router.post(
       id: data.user.id,
       full_name: fullName,
       email: String(email).trim(),
-      phone: phone ?? null,
+      phone: normalizedPhone || null,
       gender: gender ?? null,
       target_group: targetGroup ?? null,
     })

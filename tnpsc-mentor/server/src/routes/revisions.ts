@@ -1,9 +1,22 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
-import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
+import { bundleAccess } from '../lib/premium.js'
+import { chargeTestStart } from '../lib/credits.js'
 
 const router = Router()
+
+/** premium OR vettri OR staff → unlimited (never spends credits). Fails closed. */
+async function isUnlimited(req: AuthedRequest): Promise<boolean> {
+  const role = await roleOf(req.userId!)
+  if (role === 'admin' || role === 'superadmin') return true
+  try {
+    return (await bundleAccess(req.db!)).unlimited
+  } catch {
+    return false
+  }
+}
 
 /** Validate a UUID so a malformed :id can't reach the RPC as a bad cast. */
 function isUuid(s: string): boolean {
@@ -91,6 +104,14 @@ router.post(
         have.add(q.id)
         if (questions.length >= requested) break
       }
+    }
+
+    // Charge the flat test fee at start (atomic), like every other gated test —
+    // a revision re-test costs credits too. Premium/Vettri/staff bypass. Only a
+    // non-empty re-test is charged. See lib/credits.chargeTestStart.
+    if (!(await isUnlimited(req)) && questions.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'revision')
+      if (gate) return res.status(402).json(gate)
     }
 
     void recordSeen(req, questions)

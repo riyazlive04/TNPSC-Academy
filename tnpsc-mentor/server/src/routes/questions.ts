@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
-import { premiumEntitlement } from '../lib/premium.js'
+import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
+import { chargeTestStart, FREE_MOCK_LIMIT } from '../lib/credits.js'
 import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 
 const router = Router()
@@ -154,42 +155,34 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
   ],
 }
 
-// ─── Subject Practice free gate ──────────────────────────────────────────────
-// Free (non-premium, non-staff) learners get ONE completed Subject Practice test
-// per subject; a second test on a subject they've already finished is premium.
-// Other categories (samacheer/pyq/aptitude/current_affairs) are never gated here.
+// ─── Unlimited-access check ──────────────────────────────────────────────────
+// premium OR vettri OR staff → unlimited tests: they never spend credits and skip
+// the free-mock cap. Everyone else is a credit-gated free learner.
 
-/** Has the caller already completed a Subject Practice test for this subject? */
-async function subjectFreeTestUsed(req: AuthedRequest, subject: string): Promise<boolean> {
-  // RLS scopes test_sessions to the caller; an exact head-count is not capped by
-  // PostgREST's row limit, so power users with 1000+ sessions still gate right.
-  const { count, error } = await req.db!
-    .from('test_sessions')
-    .select('id', { count: 'exact', head: true })
-    .eq('category', 'subject')
-    .eq('subject', subject)
-    .eq('status', 'completed')
-  if (error) {
-    // Fail OPEN: a transient read error must not deny a free learner their first
-    // legitimate test. Worst case is one extra free test, never a wrongful lock.
-    console.error('[subject-gate] count failed', error.code, error.message)
-    return false
-  }
-  return (count ?? 0) >= 1
-}
-
-/** True when this subject is locked behind premium for the caller (UI + /quiz gate). */
-async function subjectLocked(req: AuthedRequest, subject: string): Promise<boolean> {
-  if (await isStaff(req)) return false
-  let premium = false
+/** premium OR vettri OR staff → unlimited. Fails closed (treat as free on error). */
+async function isUnlimited(req: AuthedRequest): Promise<boolean> {
+  if (await isStaff(req)) return true
   try {
-    premium = (await premiumEntitlement(req.db!)).premium
+    return (await bundleAccess(req.db!)).unlimited
   } catch {
-    premium = false // fail closed on entitlement: treat as free (gate may apply)
+    return false // fail closed on entitlement: treat as free (gate may apply)
   }
-  if (premium) return false
-  return subjectFreeTestUsed(req, subject)
 }
+
+// ─── GET /api/questions/topic-access ─────────────────────────────────────────
+// Powers the PYQ + Current Affairs lock UI: the caller's unlimited state plus the
+// topic keys whose one free test is already used. Unlimited (premium/vettri/staff)
+// callers have no locks, so the list is empty for them. The client derives each
+// row's key with the mirrored src/lib/freeGate.ts and checks membership.
+router.get(
+  '/topic-access',
+  requireAuth,
+  asyncH(async (_req: AuthedRequest, res) => {
+    // Credits replaced per-topic locks — always report "no locks". Gating is now a
+    // global credit balance (routes/credits.ts) enforced at test start (402).
+    res.json({ unlimited: true, usedKeys: [] })
+  })
+)
 
 // ─── GET /api/questions/subject-access ───────────────────────────────────────
 // Powers the Subject Practice lock UI: the caller's premium state plus the
@@ -198,29 +191,9 @@ async function subjectLocked(req: AuthedRequest, subject: string): Promise<boole
 router.get(
   '/subject-access',
   requireAuth,
-  asyncH(async (req: AuthedRequest, res) => {
-    const staff = await isStaff(req)
-    let premium = staff
-    if (!premium) {
-      try {
-        premium = (await premiumEntitlement(req.db!)).premium
-      } catch {
-        premium = false
-      }
-    }
-    if (premium) return res.json({ premium: true, usedSubjects: [] })
-
-    const { data, error } = await req.db!
-      .from('test_sessions')
-      .select('subject')
-      .eq('category', 'subject')
-      .eq('status', 'completed')
-      .not('subject', 'is', null)
-    if (error) return sendDbError(res, error)
-    const usedSubjects = [
-      ...new Set(((data ?? []) as { subject: string | null }[]).map((r) => r.subject).filter(Boolean)),
-    ]
-    res.json({ premium: false, usedSubjects })
+  asyncH(async (_req: AuthedRequest, res) => {
+    // Credits replaced per-subject locks — always report "no locks".
+    res.json({ premium: true, usedSubjects: [] })
   })
 )
 
@@ -232,16 +205,19 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const config = req.body?.config ?? {}
-    // Subject Practice: enforce the one-free-test-per-subject gate server-side
-    // (the picker only hints at it). Premium/staff bypass; other categories skip.
-    if (config.category === 'subject' && config.subject) {
-      if (await subjectLocked(req, String(config.subject))) {
-        return res.status(403).json({ error: 'premium_required', reason: 'subject_free_used' })
-      }
-    }
+    const unlimited = await isUnlimited(req)
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
     const questions = (data ?? []) as { id?: string }[]
+    // Credit gate: a free learner is CHARGED 10 credits at START (atomic), the
+    // moment a real test is delivered — never at submit, where a forged payload
+    // could dodge the fee. Charging on start also makes each start a reservation,
+    // so opening several tests at once can't be graded off one balance. Only a
+    // non-empty draw is charged. Premium/Vettri/staff are unlimited and bypass.
+    if (!unlimited && questions.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, (config.category as string) ?? 'quiz')
+      if (gate) return res.status(402).json(gate)
+    }
     // Mark these as seen so they sink to the back of future draws.
     void recordSeen(req, questions)
     res.json({ questions })
@@ -524,6 +500,9 @@ router.post(
     const slots = GROUP_SLOTS[group_type as string]
     if (!slots) return res.status(400).json({ error: `Unknown group_type: ${group_type}` })
 
+    // Resolved once; the credit is charged at the end, only if a real test is built.
+    const unlimited = await isUnlimited(req)
+
     const result: Record<string, unknown>[] = []
     // Dedup ACROSS slots too (a question tagged for two slots must appear once).
     const globalSeen = new Set<string>()
@@ -581,6 +560,14 @@ router.post(
       }
     }
 
+    // Charge at start (atomic) now that a real test is assembled. Premium/Vettri/
+    // staff bypass. See chargeTestStart — charging here (not at submit) closes the
+    // forged-payload and multi-start bypasses.
+    if (!unlimited && result.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-group')
+      if (gate) return res.status(402).json(gate)
+    }
+
     void recordSeen(req, result as { id?: string }[])
     res.json({ questions: shuffle(result) })
   })
@@ -594,12 +581,14 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const { subject, topic, difficulty, count = 50 } = req.body ?? {}
+    const unlimited = await isUnlimited(req)
     // Clamp the requested count to a sane range (the RPC also clamps to [1,200],
     // but guard here so a NaN/negative never reaches it).
     const n = Math.min(Math.max(Math.trunc(Number(count)) || 50, 1), 200)
 
     // Random sampling done server-side (ORDER BY random + limit) so it's not
     // limited to the first 1000 rows of the subject bank.
+    let questions: { id?: string }[]
     const { data, error } = await req.db!.rpc('subject_mock_questions', {
       p_subject: subject ?? null,
       p_topic: topic ?? null,
@@ -607,25 +596,31 @@ router.post(
       p_count: n,
     })
     if (!error) {
-      const questions = (data ?? []) as { id?: string }[]
-      void recordSeen(req, questions)
-      return res.json({ questions })
+      questions = (data ?? []) as { id?: string }[]
+    } else if (!isMissingFunction(error)) {
+      return sendDbError(res, error)
+    } else {
+      // Fallback (RPC not migrated yet): fetch then shuffle/slice in JS.
+      let q = req.db!
+        .from('questions')
+        .select(QUIZ_COLS)
+        .eq('category', 'subject')
+        .eq('active', true)
+      if (subject) q = q.eq('subject', subject)
+      if (topic) q = q.eq('topic', topic)
+      if (difficulty) q = q.eq('difficulty', difficulty)
+      const { data: rows, error: e2 } = await q
+      if (e2) return sendDbError(res, e2)
+      questions = shuffle((rows ?? []) as unknown as Record<string, unknown>[]).slice(0, n) as { id?: string }[]
     }
-    if (!isMissingFunction(error)) return sendDbError(res, error)
 
-    // Fallback (RPC not migrated yet): fetch then shuffle/slice in JS.
-    let q = req.db!
-      .from('questions')
-      .select(QUIZ_COLS)
-      .eq('category', 'subject')
-      .eq('active', true)
-    if (subject) q = q.eq('subject', subject)
-    if (topic) q = q.eq('topic', topic)
-    if (difficulty) q = q.eq('difficulty', difficulty)
-    const { data: rows, error: e2 } = await q
-    if (e2) return sendDbError(res, e2)
-    const questions = shuffle((rows ?? []) as unknown as Record<string, unknown>[]).slice(0, n)
-    void recordSeen(req, questions as { id?: string }[])
+    // Charge at start (atomic), only when a real test is delivered. Bypass for
+    // premium/Vettri/staff. See chargeTestStart.
+    if (!unlimited && questions.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'subject-mock')
+      if (gate) return res.status(402).json(gate)
+    }
+    void recordSeen(req, questions)
     res.json({ questions })
   })
 )
@@ -748,6 +743,25 @@ router.post(
       if (!premium) return res.status(403).json({ error: 'premium_required' })
     }
 
+    // Free learners: at most ONE mock exam ever (locks even with credits), and a
+    // mock costs 10 credits like any test. Premium/Vettri/staff are unlimited.
+    const unlimited = await isUnlimited(req)
+    if (!unlimited) {
+      // Count prior mocks from the AUTHORITATIVE credit ledger (each mock start
+      // writes a `test:mock-exam` spend via the SECURITY DEFINER RPC), NOT the
+      // client-reported mock_exam_attempts table — so skipping the attempt
+      // callback can't unlock extra free mocks. The current mock isn't charged
+      // until after this check, so the count is strictly prior mocks.
+      const { count } = await req.db!
+        .from('credit_transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('kind', 'spend')
+        .eq('reason', 'test:mock-exam')
+      if ((count ?? 0) >= FREE_MOCK_LIMIT) {
+        return res.status(403).json({ error: 'premium_required', reason: 'mock_free_used' })
+      }
+    }
+
     if (!staff) {
       const counts = await attemptCounts(req)
       if ((counts[examId] ?? 0) >= MAX_MOCK_EXAM_ATTEMPTS) {
@@ -763,7 +777,14 @@ router.post(
     if (error) return sendDbError(res, error)
     // Shuffle so each attempt presents the questions in a fresh, mixed order
     // (the client persists this order for resume, so it stays stable mid-exam).
-    res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
+    const questions = shuffle((data ?? []) as unknown as Record<string, unknown>[])
+
+    // Charge at start (atomic) once the paper is fetched. See chargeTestStart.
+    if (!unlimited && questions.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-exam')
+      if (gate) return res.status(402).json(gate)
+    }
+    res.json({ questions })
   })
 )
 
@@ -795,10 +816,95 @@ router.post(
   })
 )
 
+// ─── Vettri Nichayam bank (fixed paid 13-exam set, unlimited attempts) ───────
+// Fixed rows tagged category='vettri' + vettri_set. The whole bank is bundle-only
+// (premium OR vettri unlocks it) with NO free tier and NO attempt cap — unlimited,
+// per the product. Served only here (the leak guard keeps 'vettri' out of the
+// general sampler). Answer columns never appear (column grants + QUIZ_COLS).
+
+interface VettriExamRow {
+  id: string
+  vettri_set: number
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  enabled: boolean
+  sort_order: number
+}
+
+// ─── GET /api/questions/vettri-exams ─────────────────────────────────────────
+// The enabled exams, each annotated with lock state. `unlocked` (premium/vettri/
+// staff) drives whether the whole bank is playable; non-unlocked users see the
+// Vettri upsell.
+router.get(
+  '/vettri-exams',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!
+      .from('vettri_exams')
+      .select(
+        'id, vettri_set, title, title_ta, total_questions, duration_seconds, negative_mark, enabled, sort_order'
+      )
+      .eq('enabled', true)
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    const unlocked = await isUnlimited(req)
+    const exams = ((data ?? []) as VettriExamRow[]).map((e) => ({
+      id: e.id,
+      title: e.title,
+      title_ta: e.title_ta,
+      total_questions: e.total_questions,
+      duration_seconds: e.duration_seconds,
+      negative_mark: Number(e.negative_mark),
+      locked: !unlocked,
+      lockReason: unlocked ? null : 'vettri',
+    }))
+    res.json({ exams, unlocked })
+  })
+)
+
+// ─── POST /api/questions/vettri-exam ─────────────────────────────────────────
+// The fixed question set for one exam. Re-checks the bundle gate server-side (the
+// picker UI is only a hint). No attempt cap — unlimited attempts by design.
+router.post(
+  '/vettri-exam',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const examId = String((req.body ?? {}).exam_id ?? '')
+    if (!examId) return res.status(400).json({ error: 'exam_id is required' })
+
+    const { data: exam, error: examErr } = await req.db!
+      .from('vettri_exams')
+      .select('id, vettri_set, enabled')
+      .eq('id', examId)
+      .maybeSingle()
+    if (examErr) return sendDbError(res, examErr)
+    if (!exam || !(exam as VettriExamRow).enabled) {
+      return res.status(404).json({ error: 'Exam not found' })
+    }
+
+    if (!(await isUnlimited(req))) {
+      return res.status(403).json({ error: 'premium_required', reason: 'vettri_required' })
+    }
+
+    const { data, error } = await req.db!
+      .from('questions')
+      .select(QUIZ_COLS)
+      .eq('category', 'vettri')
+      .eq('vettri_set', (exam as VettriExamRow).vettri_set)
+    if (error) return sendDbError(res, error)
+    res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
+  })
+)
+
 // ─── Test Series (scheduled, fixed Group 1 "Test Marathon 2026" papers) ──────
 // Like Full Mock Exams (fixed rows tagged category='testseries' + test_set) but
-// the WHOLE series is premium-only and each paper is date-gated: locked until its
-// scheduled_date (IST), with a superadmin open/closed override. Attempt-capped.
+// the WHOLE series is paid-bundle-only (premium OR Vettri) and each paper is
+// date-gated: locked until its scheduled_date (IST), with a superadmin open/closed
+// override. Attempt-capped.
 
 interface TestSeriesRow {
   id: string
@@ -845,9 +951,9 @@ async function testSeriesAttemptCounts(req: AuthedRequest): Promise<Record<strin
 }
 
 // ─── GET /api/questions/test-series ──────────────────────────────────────────
-// The enabled tests, annotated with lock state (premium OR date), the date they
-// unlock, and attempts used. Premium is derived from the payment ledger (the
-// whole series is premium). Staff preview everything unlocked.
+// The enabled tests, annotated with lock state (paid-bundle OR date), the date
+// they unlock, and attempts used. Access is derived from the payment ledger — any
+// paid bundle (premium OR Vettri) unlocks the whole series. Staff preview all.
 router.get(
   '/test-series',
   requireAuth,
@@ -862,22 +968,24 @@ router.get(
     if (error) return sendDbError(res, error)
 
     const staff = await isStaff(req)
-    let premium = staff
-    if (!premium) {
+    // The whole series unlocks for ANY paid bundle — premium (₹1,699) OR Vettri
+    // (₹899) — plus staff. bundleAccess().unlimited = premium || vettri.
+    let unlocked = staff
+    if (!unlocked) {
       try {
-        premium = (await premiumEntitlement(req.db!)).premium
+        unlocked = (await bundleAccess(req.db!)).unlimited
       } catch {
-        premium = false // fail closed
+        unlocked = false // fail closed
       }
     }
     const counts = await testSeriesAttemptCounts(req)
 
     const tests = ((data ?? []) as TestSeriesRow[]).map((r) => {
       const isDateLocked = !staff && dateLocked(r)
-      const locked = !premium || isDateLocked
-      // Premium takes precedence in the reason (upgrade unblocks the series; the
-      // date still applies afterwards, reported via availableFrom).
-      const lockReason = !premium ? 'premium' : isDateLocked ? 'date' : null
+      const locked = !unlocked || isDateLocked
+      // A paid bundle takes precedence in the reason (buying unblocks the series;
+      // the date still applies afterwards, reported via scheduled_date).
+      const lockReason = !unlocked ? 'premium' : isDateLocked ? 'date' : null
       return {
         id: r.id,
         title: r.title,
@@ -896,14 +1004,16 @@ router.get(
         attemptsMax: MAX_TEST_SERIES_ATTEMPTS,
       }
     })
-    res.json({ tests, premium })
+    // Key kept as `premium` for the client, but it now means "has a paid bundle"
+    // (premium OR Vettri) — either unlocks the whole series.
+    res.json({ tests, premium: unlocked })
   })
 )
 
 // ─── POST /api/questions/test-series ─────────────────────────────────────────
 // Returns the fixed question set for one test, shuffled. Re-checks every gate
-// server-side (enabled, premium, date/override, attempt cap). Answer columns
-// never appear (column grants + QUIZ_COLS). Staff bypass premium+date+attempts.
+// server-side (enabled, paid-bundle, date/override, attempt cap). Answer columns
+// never appear (column grants + QUIZ_COLS). Staff bypass bundle+date+attempts.
 router.post(
   '/test-series',
   requireAuth,
@@ -924,13 +1034,14 @@ router.post(
     const staff = await isStaff(req)
 
     if (!staff) {
-      let premium = false
+      // Any paid bundle (premium OR Vettri) unlocks the series.
+      let unlocked = false
       try {
-        premium = (await premiumEntitlement(req.db!)).premium
+        unlocked = (await bundleAccess(req.db!)).unlimited
       } catch {
-        premium = false
+        unlocked = false
       }
-      if (!premium) return res.status(403).json({ error: 'premium_required' })
+      if (!unlocked) return res.status(403).json({ error: 'premium_required' })
 
       if (dateLocked(test as TestSeriesRow)) {
         return res.status(403).json({ error: 'not_yet_available' })
@@ -949,6 +1060,108 @@ router.post(
       .eq('test_set', (test as TestSeriesRow).test_set)
     if (error) return sendDbError(res, error)
     res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
+  })
+)
+
+// Derive a coarse "question type" from a stem — the test-series bank barely
+// populates questions.question_type, so we classify by content pattern (bilingual
+// cues) into buckets the student can actually train on. Returned per answer so
+// the analytics view can show "what kind of question you keep missing".
+function deriveQType(questionType: string | null, subject: string | null, stem: string | null): string {
+  const s = (stem ?? '').toLowerCase()
+  if (questionType === 'match' || (/list\s*i\b/.test(s) && /list\s*ii\b/.test(s)) || /பொருத்த/.test(s))
+    return 'match'
+  if ((/assertion/.test(s) && /reason/.test(s)) || (/கூற்று/.test(s) && /காரணம்/.test(s)))
+    return 'assertion'
+  if (/\bstatements?\b/.test(s) || /\bwhich of the following\b/.test(s) || /கூற்றுக/.test(s) || /பின்வருவனவற்றுள/.test(s))
+    return 'statement'
+  if (subject === 'Aptitude' || subject === 'Reasoning') return 'aptitude'
+  return 'factual'
+}
+
+// ─── GET /api/questions/test-series/analytics ────────────────────────────────
+// This user's Test Marathon attempt history + a per-answer breakdown (subject,
+// topic, derived question-type) so the client can aggregate weak areas. All rows
+// are the user's own (RLS on attempts/sessions/answers). Answer stems are read
+// server-side only to derive the type label — never sent to the client.
+router.get(
+  '/test-series/analytics',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    // 1. The attempt ledger (score/total live here), newest first.
+    const { data: attemptRows, error: aErr } = await req.db!
+      .from('test_series_attempts')
+      .select('id, test_id, session_id, score, total, submitted_at')
+      .order('submitted_at', { ascending: false })
+    if (aErr) return sendDbError(res, aErr)
+    const attempts = (attemptRows ?? []) as {
+      id: string; test_id: string; session_id: string | null
+      score: number | null; total: number | null; submitted_at: string | null
+    }[]
+    if (attempts.length === 0) return res.json({ attempts: [], answers: [] })
+
+    // 2. Paper titles (small catalog) and 3. session stats (attempted/correct/time).
+    const sessionIds = attempts.map((a) => a.session_id).filter(Boolean) as string[]
+    const [{ data: catalog }, sessionsRes] = await Promise.all([
+      req.db!.from('test_series').select('id, title, title_ta, unit_label, unit_label_ta'),
+      sessionIds.length
+        ? req.db!
+            .from('test_sessions')
+            .select('id, total_questions, attempted, correct, time_taken_seconds')
+            .in('id', sessionIds)
+        : Promise.resolve({ data: [] as unknown[] }),
+    ])
+    const titleById = new Map(
+      ((catalog ?? []) as { id: string }[]).map((c) => [c.id, c as Record<string, unknown>])
+    )
+    const sessById = new Map(
+      ((sessionsRes.data ?? []) as { id: string }[]).map((s) => [s.id, s as Record<string, unknown>])
+    )
+
+    const outAttempts = attempts.map((a) => {
+      const cat = titleById.get(a.test_id)
+      const sess = a.session_id ? sessById.get(a.session_id) : undefined
+      return {
+        id: a.id,
+        test_id: a.test_id,
+        title: (cat?.title as string) ?? a.test_id,
+        title_ta: (cat?.title_ta as string) ?? null,
+        unit_label: (cat?.unit_label as string) ?? null,
+        unit_label_ta: (cat?.unit_label_ta as string) ?? null,
+        score: a.score == null ? 0 : Number(a.score),
+        total: a.total ?? (sess?.total_questions as number) ?? 0,
+        correct: (sess?.correct as number) ?? null,
+        attempted: (sess?.attempted as number) ?? null,
+        time_taken_seconds: (sess?.time_taken_seconds as number) ?? null,
+        submitted_at: a.submitted_at,
+      }
+    })
+
+    // 4. Per-answer subject/topic/type across every attempt session.
+    let answers: { is_correct: boolean | null; subject: string | null; topic: string | null; qtype: string }[] = []
+    if (sessionIds.length) {
+      const { data: ans, error: ansErr } = await req.db!
+        .from('test_answers')
+        .select('is_correct, question:questions(subject, topic, question_type, question_text)')
+        .in('session_id', sessionIds)
+      if (ansErr) return sendDbError(res, ansErr)
+      type Row = {
+        is_correct: boolean | null
+        question: { subject: string | null; topic: string | null; question_type: string | null; question_text: string | null } | null
+      }
+      // supabase-js types the to-one `question` join as an array; at runtime it's
+      // a single row (FK question_id → questions.id), so cast through unknown.
+      answers = ((ans ?? []) as unknown as Row[])
+        .filter((r) => r.question)
+        .map((r) => ({
+          is_correct: r.is_correct,
+          subject: r.question!.subject,
+          topic: r.question!.topic,
+          qtype: deriveQType(r.question!.question_type, r.question!.subject, r.question!.question_text),
+        }))
+    }
+
+    res.json({ attempts: outAttempts, answers })
   })
 )
 

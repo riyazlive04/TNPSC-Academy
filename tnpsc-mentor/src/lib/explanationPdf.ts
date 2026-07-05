@@ -1,5 +1,7 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
 import { savePdfDoc } from './savePdf'
 import type { DisplayLang, Question, ParsedMatch } from '../types'
 import {
@@ -54,6 +56,77 @@ interface ExplanationPdfParams {
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+// Math delimiters — identical to MathText.tsx (the on-screen renderer) so the
+// exported sheet typesets the SAME KaTeX the student sees: \( … \) / $ … $
+// inline, \[ … \] / $$ … $$ display. Author a big stacked fraction with \dfrac.
+const MATH_RE = /\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g
+
+/**
+ * A single-`$…$` span that is really a pair of literal dollar signs around prose
+ * (currency, e.g. "$100 billion … $102 billion") — mirror of MathText.tsx so the
+ * PDF treats it as text instead of letting KaTeX mangle the sentence.
+ */
+function isLiteralDollarSpan(s: string): boolean {
+  if (/[\\^_{}]/.test(s)) return false
+  if (/\b(billion|million|trillion|crore|lakh)\b/i.test(s)) return true
+  return (s.match(/[A-Za-z]{3,}/g) ?? []).length >= 2
+}
+
+/**
+ * Escape a user string AND typeset any embedded LaTeX with KaTeX, returning HTML.
+ * Without this the raw TeX source ("\dfrac{22}{7}") was html-escaped and printed
+ * literally, so fractions never stacked in the PDF. html2canvas snapshots the
+ * KaTeX HTML (stacked fractions, √, exponents …) as pixels, same as the app UI.
+ * Non-math text is escaped; a KaTeX parse error falls back to the escaped TeX.
+ */
+function mathHtml(raw: string | null | undefined): string {
+  const text = raw ?? ''
+  // Fast path: nothing that could open a math segment (matches MathText.tsx).
+  if (!text.includes('\\') && !text.includes('$')) return esc(text)
+  let out = ''
+  let last = 0
+  let m: RegExpExecArray | null
+  MATH_RE.lastIndex = 0
+  while ((m = MATH_RE.exec(text)) !== null) {
+    if (m.index > last) out += esc(text.slice(last, m.index))
+    // Literal-currency `$…$` → print the source verbatim, don't typeset.
+    if (m[4] != null && isLiteralDollarSpan(m[4])) {
+      out += esc(m[0])
+      last = m.index + m[0].length
+      continue
+    }
+    const tex = (m[1] ?? m[2] ?? m[3] ?? m[4] ?? '').trim()
+    try {
+      out += katex.renderToString(tex, { throwOnError: false, displayMode: false, output: 'html' })
+    } catch {
+      out += esc(tex)
+    }
+    last = m.index + m[0].length
+  }
+  if (last < text.length) out += esc(text.slice(last))
+  return out
+}
+
+/**
+ * Render a multi-line worked solution: each source line ("Given:", each step,
+ * "→ Option (C)") becomes its OWN block row. A display-style \dfrac is ~2.4× the
+ * text height, so flowing every step through one `white-space:pre-line` box with
+ * a fixed line-height left tall fraction lines crowding the rows above/below
+ * (the "not aligned" look). One block per line lets each fraction claim its own
+ * row height while inline text stays baseline-aligned to its fraction; a blank
+ * source line becomes a small gap.
+ */
+function mathBlockHtml(raw: string | null | undefined): string {
+  return (raw ?? '')
+    .split('\n')
+    .map((line) =>
+      line.trim() === ''
+        ? '<div style="height:5px"></div>'
+        : `<div style="margin:3px 0">${mathHtml(line)}</div>`
+    )
+    .join('')
+}
+
 /** One "Match List I with List II" block as a real two-column HTML table — the
  *  printed-paper layout the on-screen QuestionStem also uses. */
 function matchTableHtml(p: ParsedMatch): string {
@@ -67,13 +140,13 @@ function matchTableHtml(p: ParsedMatch): string {
     const border = `${left ? `border-left:1px solid ${LINE};` : ''}${top ? `border-top:1px solid ${LINE};` : ''}`
     if (!item) return `<td style="${border}padding:6px 9px"></td>`
     return `<td style="${border}padding:6px 9px;font-size:13px;font-weight:400;line-height:1.45;color:${INK};vertical-align:top">
-      <span style="font-weight:700;color:#6E6C7C">${esc(formatMatchLabel(item.label))}</span> ${esc(item.text)}
+      <span style="font-weight:700;color:#6E6C7C">${esc(formatMatchLabel(item.label))}</span> ${mathHtml(item.text)}
     </td>`
   }
   let rows = ''
   if (hasHeader) {
     const th = (text: string, left: boolean) =>
-      `<th style="text-align:left;padding:7px 9px;font-size:12px;font-weight:700;color:${VIOLET_DEEP};border-bottom:1px solid ${LINE}${left ? `;border-left:1px solid ${LINE}` : ''}">${esc(text)}</th>`
+      `<th style="text-align:left;padding:7px 9px;font-size:12px;font-weight:700;color:${VIOLET_DEEP};border-bottom:1px solid ${LINE}${left ? `;border-left:1px solid ${LINE}` : ''}">${mathHtml(text)}</th>`
     rows += `<tr>${th(p.listI.header, false)}${th(p.listII.header, true)}</tr>`
   }
   for (let r = 0; r < rowCount; r++) {
@@ -94,16 +167,16 @@ function questionStemHtml(q: Question, lang: DisplayLang): string {
     if (parsed.every(Boolean)) {
       return (parsed as ParsedMatch[])
         .map((p) => {
-          const pre = p.preamble ? `<div style="margin-bottom:5px">${esc(p.preamble)}</div>` : ''
+          const pre = p.preamble ? `<div style="margin-bottom:5px">${mathHtml(p.preamble)}</div>` : ''
           const trail = p.trailing
-            ? `<div style="margin-top:5px;font-size:13px;font-weight:500;color:#6E6C7C">${esc(p.trailing)}</div>`
+            ? `<div style="margin-top:5px;font-size:13px;font-weight:500;color:#6E6C7C">${mathHtml(p.trailing)}</div>`
             : ''
           return pre + matchTableHtml(p) + trail
         })
         .join('<div style="height:8px"></div>')
     }
   }
-  return `<div style="white-space:pre-line">${esc(displayQuestion(q, lang))}</div>`
+  return `<div>${mathBlockHtml(displayQuestion(q, lang))}</div>`
 }
 
 /** Build the inner HTML for one question block (question, options, explanation). */
@@ -119,7 +192,7 @@ function questionBlockHtml(q: Question, index: number, lang: DisplayLang): strin
       ? `<span style="float:right;color:${MINT};font-weight:700">&#10003;</span>`
       : ''
     return `<div style="background:${bg};color:${color};font-weight:${weight};border-radius:7px;padding:5px 10px;margin:3px 0;font-size:14px;line-height:1.45">
-      <span style="font-weight:700">${letter}.</span> ${esc(text)} ${check}
+      <span style="font-weight:700">${letter}.</span> ${mathHtml(text)} ${check}
     </div>`
   }).join('')
 
@@ -127,7 +200,7 @@ function questionBlockHtml(q: Question, index: number, lang: DisplayLang): strin
   const explHtml = explanation
     ? `<div style="background:${VIOLET_SOFT};border-left:4px solid ${VIOLET};border-radius:8px;padding:10px 12px;margin-top:8px">
         <div style="color:${VIOLET};font-weight:700;font-size:10px;letter-spacing:.5px;margin-bottom:3px">EXPLANATION</div>
-        <div style="color:#3C3850;font-size:13px;line-height:1.5;white-space:pre-line">${esc(explanation)}</div>
+        <div style="color:#3C3850;font-size:13px;line-height:1.55">${mathBlockHtml(explanation)}</div>
       </div>`
     : ''
 
@@ -152,13 +225,45 @@ function coverHtml(title: string, label: string, count: number): string {
     </div>`
 }
 
+// KaTeX ships its own web fonts; fraction bars, √ vinculums and exponents are
+// positioned assuming THOSE exact glyph metrics. They load lazily on first use,
+// and `document.fonts.ready` can resolve BEFORE they arrive — so html2canvas
+// would snapshot the math shaped with fallback fonts, which is exactly what
+// breaks fraction rules and detaches radical overlines in the export. Force the
+// families our content uses to load (each weight/style) before rasterising.
+const KATEX_FONTS = [
+  'KaTeX_Main', 'KaTeX_Math', 'KaTeX_AMS',
+  'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4',
+]
+async function ensureKatexFonts(): Promise<void> {
+  const fonts = document.fonts
+  if (!fonts) return
+  const specs = KATEX_FONTS.flatMap((f) => [`16px "${f}"`, `italic 16px "${f}"`, `bold 16px "${f}"`])
+  // A family/weight that isn't declared just rejects — ignore and load the rest.
+  await Promise.all(specs.map((s) => fonts.load(s).catch(() => [])))
+  await fonts.ready
+}
+
+// html2canvas renders sub-pixel borders unreliably; KaTeX's default rule lines
+// (~0.04em) are thinner than a device pixel at our export size and come out
+// faint or broken. Floor them at 1px so fraction bars / roots rasterise solidly.
+const KATEX_PDF_STYLE =
+  '<style>' +
+  '.katex .frac-line{border-bottom-width:max(1px,0.04em)}' +
+  '.katex .sqrt>.sqrt-line{border-top-width:max(1px,0.05em)}' +
+  '.katex .overline .overline-line,.katex .underline .underline-line{border-top-width:max(1px,0.04em)}' +
+  '</style>'
+
 /** Render one off-screen HTML string to a canvas via html2canvas. */
 async function htmlToCanvas(html: string): Promise<HTMLCanvasElement> {
   const host = document.createElement('div')
   host.style.cssText = `position:fixed;left:-99999px;top:0;width:${RENDER_W}px;background:#fff;font-family:${FONT_STACK}`
-  host.innerHTML = html
+  host.innerHTML = KATEX_PDF_STYLE + html
   document.body.appendChild(host)
   try {
+    // Wait for KaTeX (and Tamil) web fonts triggered by the just-inserted nodes,
+    // else html2canvas can snapshot fraction bars/glyphs before they paint.
+    await ensureKatexFonts()
     return await html2canvas(host, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
   } finally {
     document.body.removeChild(host)
@@ -182,9 +287,11 @@ const CHUNK = 12
 async function renderQuestionChunk(blocks: string[]): Promise<HTMLCanvasElement[]> {
   const host = document.createElement('div')
   host.style.cssText = `position:fixed;left:-99999px;top:0;width:${RENDER_W}px;background:#fff;font-family:${FONT_STACK}`
-  host.innerHTML = blocks.map((b) => `<div data-pdf-q>${b}</div>`).join('')
+  host.innerHTML = KATEX_PDF_STYLE + blocks.map((b) => `<div data-pdf-q>${b}</div>`).join('')
   document.body.appendChild(host)
   try {
+    // See htmlToCanvas: let KaTeX/Tamil fonts finish loading before rasterising.
+    await ensureKatexFonts()
     const full = await html2canvas(host, { scale: 2, backgroundColor: '#ffffff', useCORS: true })
     const scale = full.width / host.offsetWidth // device scale actually applied (≈2)
     const children = Array.from(host.querySelectorAll<HTMLElement>('[data-pdf-q]'))

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertCircle, ArrowLeft, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, BookOpen, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import { mockBlueprint } from '../lib/constants'
 import { describeConfig } from '../lib/fetchQuestions'
@@ -99,6 +99,7 @@ export default function MockInstructionsPage() {
           <Rule icon={<Maximize2 size={18} />} text={t('instrFullscreen')} />
           <Rule icon={<Clock size={18} />} text={t('instrTimer')} />
           <Rule icon={<FileText size={18} />} text={t('instrPalette')} />
+          <Rule icon={<BookOpen size={18} />} text={t('instrExplanations')} />
           <Rule icon={<Copy size={18} />} text={t('instrNoCopy')} />
           {/* Report-a-problem - highlighted so aspirants notice it's available. */}
           <div className="flex items-start gap-3 rounded-xl border border-accentwarm/30 bg-accentwarmsoft p-3.5">

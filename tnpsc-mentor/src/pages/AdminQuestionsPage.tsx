@@ -390,17 +390,13 @@ export default function AdminQuestionsPage() {
                   isActive ? 'border-line' : 'border-coral/40 bg-coralsoft/30',
                 ].join(' ')}
               >
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
-                    <span className="mr-1 text-secondary">{i + 1}.</span>
-                    {!isActive && (
-                      <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 align-middle font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
-                        <EyeOff size={11} /> Hidden
-                      </span>
-                    )}
-                    <MathText text={displayQuestion(q, lang)} />
-                  </p>
-                  <div className="flex flex-shrink-0 gap-1">
+                {/* Controls float top-right so the question text flows the FULL
+                    width and only wraps beside the buttons on the first line(s),
+                    reclaiming the space below them (was a flex row that boxed the
+                    text into `width − buttons` on every line). Float must precede
+                    the text in the DOM; the clearfix contains it. */}
+                <div className="mb-3 after:clear-both after:block after:content-['']">
+                  <div className="float-right ml-3 flex flex-shrink-0 gap-1">
                     <button
                       onClick={() => handleToggleActive(q)}
                       disabled={togglingId === q.id}
@@ -441,6 +437,15 @@ export default function AdminQuestionsPage() {
                       )}
                     </button>
                   </div>
+                  <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
+                    <span className="mr-1 text-secondary">{i + 1}.</span>
+                    {!isActive && (
+                      <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 align-middle font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                        <EyeOff size={11} /> Hidden
+                      </span>
+                    )}
+                    <MathText text={displayQuestion(q, lang)} />
+                  </p>
                 </div>
                 <QuestionFigures images={q.images} className="mb-3" />
                 <div className="flex flex-col gap-1.5">

@@ -22,6 +22,21 @@ function renderTeX(tex: string): string {
   }
 }
 
+/**
+ * A single-`$…$` span is ambiguous: authored math (`$x^2$`) vs a stray pair of
+ * literal dollar signs around prose ("crossed $100 billion … $102 billion"). The
+ * latter is common in economy/current-affairs text, where KaTeX would typeset the
+ * sentence between the two `$` as math and mangle it into unreadable italics. Real
+ * math is kept (any TeX command `\`, a sub/superscript `^`/`_`, or a `{…}` group);
+ * a span carrying a currency word or two+ plain words is treated as literal text.
+ * (Only applied to single-`$` spans — `\(…\)`, `\[…\]`, `$$…$$` are always math.)
+ */
+function isLiteralDollarSpan(s: string): boolean {
+  if (/[\\^_{}]/.test(s)) return false
+  if (/\b(billion|million|trillion|crore|lakh)\b/i.test(s)) return true
+  return (s.match(/[A-Za-z]{3,}/g) ?? []).length >= 2
+}
+
 export default function MathText({
   text,
   className,
@@ -40,6 +55,13 @@ export default function MathText({
   MATH_RE.lastIndex = 0
   while ((m = MATH_RE.exec(text)) !== null) {
     if (m.index > last) nodes.push(<Fragment key={key++}>{text.slice(last, m.index)}</Fragment>)
+    // A single-`$…$` span that is really a pair of literal dollar signs around
+    // prose (currency amounts) is emitted verbatim rather than typeset.
+    if (m[4] != null && isLiteralDollarSpan(m[4])) {
+      nodes.push(<Fragment key={key++}>{m[0]}</Fragment>)
+      last = m.index + m[0].length
+      continue
+    }
     const tex = (m[1] ?? m[2] ?? m[3] ?? m[4] ?? '').trim()
     nodes.push(
       <span

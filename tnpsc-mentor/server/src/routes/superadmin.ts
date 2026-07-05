@@ -407,6 +407,58 @@ router.post(
   })
 )
 
+// ─── GET /api/superadmin/vettri-exams ────────────────────────────────────────
+// All Vettri Nichayam exams (incl. disabled), each with the count of questions
+// actually loaded for its vettri_set, so the console can warn on an empty set.
+router.get(
+  '/vettri-exams',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data: exams, error } = await req.db!
+      .from('vettri_exams')
+      .select(
+        'id, vettri_set, title, title_ta, total_questions, duration_seconds, negative_mark, enabled, sort_order'
+      )
+      .order('sort_order')
+    if (error) return sendDbError(res, error)
+
+    const { data: rows, error: cErr } = await req.db!
+      .from('questions')
+      .select('vettri_set')
+      .eq('category', 'vettri')
+    if (cErr) return sendDbError(res, cErr)
+    const loaded: Record<number, number> = {}
+    for (const r of (rows ?? []) as { vettri_set: number }[]) {
+      loaded[r.vettri_set] = (loaded[r.vettri_set] ?? 0) + 1
+    }
+
+    const result = ((exams ?? []) as { vettri_set: number }[]).map((e) => ({
+      ...e,
+      loaded_questions: loaded[e.vettri_set] ?? 0,
+    }))
+    res.json({ exams: result })
+  })
+)
+
+// ─── POST /api/superadmin/vettri-exams/:id ───────────────────────────────────
+// Patch a Vettri exam's gating/metadata via the is_admin()-gated RPC. Only the
+// fields present in the body are changed (the RPC treats null as "leave as is").
+router.post(
+  '/vettri-exams/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { enabled, title, total_questions, duration_seconds, negative_mark } = req.body ?? {}
+    const { data, error } = await req.db!.rpc('admin_set_vettri_exam', {
+      p_id: req.params.id,
+      p_enabled: typeof enabled === 'boolean' ? enabled : null,
+      p_title: title ?? null,
+      p_total_questions: total_questions == null ? null : Math.trunc(Number(total_questions)),
+      p_duration_seconds: duration_seconds == null ? null : Math.trunc(Number(duration_seconds)),
+      p_negative_mark: negative_mark == null ? null : Number(negative_mark),
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ exam: data })
+  })
+)
+
 // ─── GET /api/superadmin/settings ────────────────────────────────────────────
 // All app-settings rows as a raw key→value map.
 router.get(

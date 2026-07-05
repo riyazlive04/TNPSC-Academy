@@ -15,8 +15,11 @@ import type {
   SubmitResult,
   TestAnswer,
   TestSeriesAdmin,
+  TestSeriesAnalyticsResponse,
   TestSeriesItem,
   UserRole,
+  VettriExam,
+  VettriExamAdmin,
 } from '../types'
 
 import { getDeviceId } from './device'
@@ -516,6 +519,30 @@ export const api = {
   }): Promise<void> {
     await request('/api/questions/test-series/attempt', { method: 'POST', body: p })
   },
+  /** This user's Test Marathon attempt history + per-answer weak-area breakdown. */
+  async testSeriesAnalytics(): Promise<TestSeriesAnalyticsResponse> {
+    return request<TestSeriesAnalyticsResponse>('/api/questions/test-series/analytics')
+  },
+  /** Vettri Nichayam exams visible to this user (enabled only) + lock state. */
+  async vettriExams(): Promise<{ exams: VettriExam[]; unlocked: boolean }> {
+    return request<{ exams: VettriExam[]; unlocked: boolean }>('/api/questions/vettri-exams')
+  },
+  /** The fixed question set for one Vettri exam. Server re-checks the bundle gate. */
+  async vettriExamQuestions(examId: string): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/vettri-exam', {
+      method: 'POST',
+      body: { exam_id: examId },
+    })
+    return data.questions
+  },
+  /**
+   * PYQ + Current Affairs lock state: whether the caller is unlimited (premium/
+   * vettri) and, if not, which topic keys have used their one free test. The
+   * client derives each row's key with lib/freeGate.ts and checks membership.
+   */
+  async topicAccess(): Promise<{ unlimited: boolean; usedKeys: string[] }> {
+    return request<{ unlimited: boolean; usedKeys: string[] }>('/api/questions/topic-access')
+  },
   /** Public client-facing feature flags (e.g. which Mock Test sections show). */
   async appSettings(): Promise<AppSettings> {
     const data = await request<{ settings: AppSettings }>('/api/app/settings', { auth: false })
@@ -756,6 +783,28 @@ export const api = {
       })
       return data.test
     },
+    /** All Vettri Nichayam exams (incl. disabled), with loaded-question counts. */
+    async vettriExams(): Promise<VettriExamAdmin[]> {
+      const data = await request<{ exams: VettriExamAdmin[] }>('/api/superadmin/vettri-exams')
+      return data.exams
+    },
+    /** Patch a Vettri exam's gating/metadata. Only the supplied fields change. */
+    async setVettriExam(
+      id: string,
+      patch: Partial<{
+        enabled: boolean
+        title: string
+        total_questions: number
+        duration_seconds: number
+        negative_mark: number
+      }>
+    ): Promise<VettriExamAdmin> {
+      const data = await request<{ exam: VettriExamAdmin }>(`/api/superadmin/vettri-exams/${id}`, {
+        method: 'POST',
+        body: patch,
+      })
+      return data.exam
+    },
     /** All app-settings rows as a raw key→value map. */
     async settings(): Promise<Record<string, unknown>> {
       const data = await request<{ settings: Record<string, unknown> }>('/api/superadmin/settings')
@@ -938,6 +987,22 @@ export const api = {
     async premiumStatus(): Promise<PremiumStatus> {
       return request<PremiumStatus>('/api/payments/premium')
     },
+    /** Full bundle entitlement (premium + vettri + derived `unlimited`) in one call. */
+    async entitlements(): Promise<BundleEntitlement> {
+      return request<BundleEntitlement>('/api/payments/entitlements')
+    },
+  },
+
+  // ─── Credits (free-tier test balance) ────────────────────────────────────
+  credits: {
+    /** Current balance + whether the caller is unlimited (paid/staff). */
+    async balance(): Promise<{ balance: number; unlimited: boolean }> {
+      return request<{ balance: number; unlimited: boolean }>('/api/credits')
+    },
+    /** Grant the +10 daily bonus if due, then return the balance. Call on app load. */
+    async checkin(): Promise<{ balance: number; granted: boolean; unlimited: boolean }> {
+      return request('/api/credits/checkin', { method: 'POST' })
+    },
   },
 
   // ─── Coupons (promoter / affiliate discount codes) ───────────────────────
@@ -1090,6 +1155,16 @@ export interface PremiumStatus {
   until: string | null
 }
 
+/** Full bundle entitlement from GET /api/payments/entitlements. */
+export interface BundleEntitlement {
+  premium: boolean
+  premiumUntil: string | null
+  vettri: boolean
+  vettriUntil: string | null
+  /** premium || vettri — unlocks the Vettri bank + unlimited PYQ/CA. */
+  unlimited: boolean
+}
+
 /** Public, superadmin-controlled feature flags (defaults applied server-side). */
 export interface AppSettings {
   /** Show the random-sampled Group Exam mock tab. */
@@ -1098,6 +1173,8 @@ export interface AppSettings {
   mock_subject_enabled: boolean
   /** Show the scheduled Test Series nav tab + Test Arena tile. */
   test_series_enabled: boolean
+  /** Show the Vettri Nichayam nav tab + Test Arena tile. */
+  vettri_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

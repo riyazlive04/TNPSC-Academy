@@ -20,6 +20,7 @@ import {
 } from '../store/quizStore'
 import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
+import { useCreditsStore } from '../store/creditsStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { api, ApiError } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
@@ -148,15 +149,26 @@ export default function QuizPage() {
         }
         // Server already returns a randomised pool; no client shuffle needed.
         store.initSession(config, fetched)
+        // The 10-credit fee is charged at start (server) — refresh the meter now.
+        void useCreditsStore.getState().reload()
         setLoading(false)
       } catch (e) {
         if (!cancelled) {
-          // Backstop for the one-free-test-per-subject gate (e.g. a second tab):
-          // the picker normally diverts locked subjects to the upsell, but if a
-          // request slips through the server answers 403 premium_required.
-          const blocked =
-            e instanceof ApiError && e.status === 403 && e.message === 'premium_required'
-          setLoadError(blocked ? t('subjectFreeUsed') : t('loadQuestionsError'))
+          // Credit gate: /quiz answers 402 insufficient_credits when a free learner
+          // is out of credits. Both that and a stray mock_free_used point at the
+          // upgrade path; anything else is a transport error.
+          const err = e instanceof ApiError ? e : null
+          const reason =
+            err?.data && typeof err.data === 'object'
+              ? (err.data as { reason?: string }).reason
+              : undefined
+          setLoadError(
+            err?.status === 402 && err.message === 'insufficient_credits'
+              ? t('outOfCredits')
+              : reason === 'mock_free_used'
+                ? t('mockFreeUsed')
+                : t('loadQuestionsError')
+          )
           setLoading(false)
         }
       }

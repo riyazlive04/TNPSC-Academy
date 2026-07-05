@@ -8,13 +8,14 @@ import OmrOptions from '../components/Quiz/OmrOptions'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import { formatTime } from '../components/UI/Timer'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { describeConfig } from '../lib/fetchQuestions'
 import { exitFullscreen } from '../lib/proctor'
 import { submitTest } from '../lib/submitTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { useMockQuizStore } from '../store/mockQuizStore'
+import { useCreditsStore } from '../store/creditsStore'
 import { useT } from '../lib/i18n'
 import { optionLetters, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
@@ -26,6 +27,7 @@ function sameMockConfig(a: QuizConfig, b: QuizConfig): boolean {
     a.mockGroup === b.mockGroup &&
     a.mockExamId === b.mockExamId &&
     a.seriesTestId === b.seriesTestId &&
+    a.vettriExamId === b.vettriExamId &&
     a.subject === b.subject &&
     a.topic === b.topic &&
     a.difficulty === b.difficulty
@@ -133,6 +135,8 @@ export default function MockQuizPage() {
         const qs =
           config.mockKind === 'series'
             ? await api.testSeriesQuestions(config.seriesTestId as string)
+            : config.mockKind === 'vettri'
+            ? await api.vettriExamQuestions(config.vettriExamId as string)
             : config.mockKind === 'exam'
             ? await api.mockExamQuestions(config.mockExamId as string)
             : config.mockKind === 'group'
@@ -152,14 +156,32 @@ export default function MockQuizPage() {
           startedAtRef.current = now
           // Begin a fresh persisted session so a refresh can resume it.
           useMockQuizStore.getState().start(config, qs)
+          // Credit-charged mocks (exam/group/subject) deduct at start — refresh
+          // the meter now (series/vettri are unlimited-only, so it's a no-op there).
+          void useCreditsStore.getState().reload()
           setTimeLeft(config.mockDurationSeconds ?? 0)
           setAnswers({})
           setMarked({})
           setVisited({ 0: true })
           setPage(0)
         }
-      } catch {
-        if (!cancelled) setLoadError(t('loadQuestionsError'))
+      } catch (e) {
+        if (!cancelled) {
+          // Credit gate on the start endpoints: 402 out-of-credits, or a
+          // 403 mock_free_used when a free learner already spent their 1 mock.
+          const err = e instanceof ApiError ? e : null
+          const reason =
+            err?.data && typeof err.data === 'object'
+              ? (err.data as { reason?: string }).reason
+              : undefined
+          setLoadError(
+            err?.status === 402 && err.message === 'insufficient_credits'
+              ? t('outOfCredits')
+              : reason === 'mock_free_used'
+                ? t('mockFreeUsed')
+                : t('loadQuestionsError')
+          )
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }

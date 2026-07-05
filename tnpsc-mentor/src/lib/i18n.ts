@@ -312,6 +312,19 @@ const STRINGS = {
     en: 'No questions are available for this selection yet. Please choose another topic.',
     ta: 'இந்தத் தேர்வுக்கு இன்னும் வினாக்கள் இல்லை. வேறு தலைப்பைத் தேர்ந்தெடுக்கவும்.',
   },
+  // ── Credits (free-tier test balance) ──
+  creditsTitle: { en: 'Your credits', ta: 'உங்கள் கிரெடிட்கள்' },
+  creditsWord: { en: 'credits', ta: 'கிரெடிட்கள்' },
+  creditsPerTest: { en: 'Each test costs 10 credits.', ta: 'ஒவ்வொரு தேர்வுக்கும் 10 கிரெடிட்கள்.' },
+  creditsDaily: { en: 'You get +10 free credits each day you log in.', ta: 'நீங்கள் உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்.' },
+  outOfCredits: {
+    en: "You're out of credits. You'll get 10 more free credits tomorrow, or go Premium / Vettri Nichayam for unlimited tests.",
+    ta: 'உங்கள் கிரெடிட்கள் தீர்ந்துவிட்டன. நாளை மேலும் 10 இலவச கிரெடிட்கள் கிடைக்கும், அல்லது வரம்பற்ற தேர்வுகளுக்கு பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
+  },
+  mockFreeUsed: {
+    en: "You've used your one free mock exam. Go Premium / Vettri Nichayam for all mock exams.",
+    ta: 'உங்கள் ஒரு இலவச மாதிரித் தேர்வைப் பயன்படுத்திவிட்டீர்கள். அனைத்து மாதிரித் தேர்வுகளுக்கும் பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
+  },
 
   // Quiz dialogs (modals)
   attendanceBelow25: { en: 'Attendance below 25%', ta: 'வருகை 25%க்குக் கீழே' },
@@ -516,35 +529,164 @@ const STRINGS = {
   },
   mockExamsEmpty: { en: 'No mock exams are available yet.', ta: 'இன்னும் மாதிரித் தேர்வுகள் எதுவும் இல்லை.' },
 
-  // Test Series - scheduled Group 1 "Test Marathon 2026" papers
-  testSeries: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
-  testSeriesTitle: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  // Test Marathon - scheduled Group 1 "Test Marathon 2026" papers
+  testSeries: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
+  testSeriesTitle: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
   testSeriesArenaSub: { en: 'Scheduled Group 1 marathon', ta: 'திட்டமிடப்பட்ட குரூப் 1 மாரத்தான்' },
   testSeriesSub: {
     en: 'A scheduled marathon of full-length papers. Each unlocks on its date and can be attempted twice.',
-    ta: 'திட்டமிடப்பட்ட முழு நீளத் தேர்வுத் தொடர். ஒவ்வொன்றும் அதன் தேதியில் திறக்கும்; இருமுறை எழுதலாம்.',
+    ta: 'திட்டமிடப்பட்ட முழு நீளத் தேர்வு மாரத்தான். ஒவ்வொன்றும் அதன் தேதியில் திறக்கும்; இருமுறை எழுதலாம்.',
   },
   testSeriesEmpty: {
     en: 'No tests have been scheduled yet.',
     ta: 'இன்னும் எந்தத் தேர்வும் திட்டமிடப்படவில்லை.',
   },
   testSeriesLockedPremium: {
-    en: 'Upgrade to Premium to unlock the full Test Series',
-    ta: 'முழுத் தேர்வுத் தொடரைத் திறக்க பிரீமியத்திற்கு மேம்படுத்துங்கள்',
+    en: 'Unlock the full Test Marathon with Vettri Nichayam or Premium',
+    ta: 'முழுத் தேர்வுத் தொடரை வெற்றி நிச்சயம் அல்லது பிரீமியம் மூலம் திறக்கலாம்',
   },
   unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
   scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
+  // Test Marathon — Analytics tab
+  tsTabPapers: { en: 'Papers', ta: 'தேர்வுகள்' },
+  tsTabAnalytics: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
+  tsAnalyticsEmpty: {
+    en: 'Attempt a paper to unlock your analytics — your scores, weak subjects and the question types to train on.',
+    ta: 'உங்கள் பகுப்பாய்வைத் திறக்க ஒரு தேர்வை எழுதுங்கள் — உங்கள் மதிப்பெண்கள், பலவீனமான பாடங்கள் மற்றும் பயிற்சி செய்ய வேண்டிய வினா வகைகள்.',
+  },
+  tsAttempts: { en: 'Attempts', ta: 'முயற்சிகள்' },
+  tsAvgScore: { en: 'Avg score', ta: 'சராசரி' },
+  tsBestScore: { en: 'Best', ta: 'சிறந்தது' },
+  tsYourAttempts: { en: 'Your attempts', ta: 'உங்கள் முயற்சிகள்' },
+  tsFocusTitle: { en: 'What to focus on', ta: 'எதில் கவனம் செலுத்த வேண்டும்' },
+  tsFocusHint: {
+    en: 'Your weakest subjects across all attempts — tap Practice to revise them.',
+    ta: 'அனைத்து முயற்சிகளிலும் உங்கள் பலவீனமான பாடங்கள் — திருத்த பயிற்சியைத் தட்டவும்.',
+  },
+  tsProgress: { en: 'Your progress', ta: 'உங்கள் முன்னேற்றம்' },
+  tsSubjectPerf: { en: 'Subject performance', ta: 'பாட வாரியான செயல்திறன்' },
+  tsQuestions: { en: 'Questions', ta: 'வினாக்கள்' },
+  tsAverage: { en: 'avg', ta: 'சராசரி' },
+  tsLatest: { en: 'Latest', ta: 'சமீபத்தியது' },
+  tsAccuracy: { en: 'accuracy', ta: 'திறன்' },
+  tsTypeMix: { en: 'Question mix', ta: 'வினா வகைக் கலவை' },
+  tsTypeAccuracy: { en: 'Accuracy by type', ta: 'வகை வாரியான திறன்' },
+  // Study plan (advice) — {delta}/{last}/{subject}/{acc}/{type} are filled in code
+  tsAdviceTitle: { en: 'Your study plan', ta: 'உங்கள் படிப்புத் திட்டம்' },
+  tsAdviceSub: {
+    en: 'Built from your attempts — what to revise before the next paper.',
+    ta: 'உங்கள் முயற்சிகளிலிருந்து உருவாக்கப்பட்டது — அடுத்த தேர்வுக்கு முன் எதைத் திருத்த வேண்டும்.',
+  },
+  tsAdviceTrendUp: {
+    en: 'Your scores are climbing — up {delta}% since your first paper. Keep the momentum.',
+    ta: 'உங்கள் மதிப்பெண்கள் உயர்கின்றன — முதல் தேர்விலிருந்து {delta}% அதிகரிப்பு. இந்த வேகத்தைத் தொடருங்கள்.',
+  },
+  tsAdviceTrendDown: {
+    en: 'Scores have dipped {delta}% — revisit the fundamentals before your next paper.',
+    ta: 'மதிப்பெண்கள் {delta}% குறைந்துள்ளன — அடுத்த தேர்வுக்கு முன் அடிப்படைகளை மீண்டும் பாருங்கள்.',
+  },
+  tsAdviceTrendFlat: {
+    en: 'Scores are steady around {last}% — push into your weak areas to break through.',
+    ta: 'மதிப்பெண்கள் {last}% ஐ சுற்றி நிலையாக உள்ளன — முன்னேற பலவீனமான பகுதிகளில் கவனம் செலுத்துங்கள்.',
+  },
+  tsAdviceFocus: {
+    en: 'Prioritise {subject} — you are at {acc}%. Revise it before the next attempt.',
+    ta: '{subject} பாடத்திற்கு முன்னுரிமை கொடுங்கள் — நீங்கள் {acc}% இல் உள்ளீர்கள். அடுத்த முயற்சிக்கு முன் திருத்துங்கள்.',
+  },
+  tsAdviceType: {
+    en: 'You lose the most marks on {type} questions ({acc}%). Drill these for easy gains.',
+    ta: '{type} வினாக்களில் நீங்கள் அதிக மதிப்பெண்களை இழக்கிறீர்கள் ({acc}%). எளிதாக மதிப்பெண் பெற இவற்றைப் பயிற்சி செய்யுங்கள்.',
+  },
+  tsAdviceStrength: {
+    en: 'Strongest area: {subject} ({acc}%). Keep it warm with quick revisions.',
+    ta: 'வலிமையான பகுதி: {subject} ({acc}%). விரைவான திருத்தங்களால் அதைத் தக்கவைத்துக் கொள்ளுங்கள்.',
+  },
+  tsByType: { en: 'By question type', ta: 'வினா வகை வாரியாக' },
+  tsPractice: { en: 'Practice', ta: 'பயிற்சி' },
+  tsOfAttempted: { en: 'correct', ta: 'சரி' },
+  tsNoWeak: {
+    en: "No weak areas yet — you're scoring well across the board. Keep it up!",
+    ta: 'இதுவரை பலவீனமான பகுதிகள் இல்லை — எல்லாப் பாடங்களிலும் நன்றாக மதிப்பெண் பெறுகிறீர்கள். தொடருங்கள்!',
+  },
+  tsFocusBanner: { en: 'Before your next test, strengthen these areas', ta: 'அடுத்த தேர்வுக்கு முன், இந்தப் பகுதிகளை வலுப்படுத்துங்கள்' },
+  tsSeeAnalytics: { en: 'See analytics', ta: 'பகுப்பாய்வைப் பார்' },
+  qtypeMatch: { en: 'Match the following', ta: 'பொருத்துக' },
+  qtypeAssertion: { en: 'Assertion & Reason', ta: 'கூற்று & காரணம்' },
+  qtypeStatement: { en: 'Statement-based', ta: 'கூற்று அடிப்படையிலான' },
+  qtypeAptitude: { en: 'Aptitude & Reasoning', ta: 'திறனறிவு & பகுத்தறிவு' },
+  qtypeFactual: { en: 'Direct / Factual', ta: 'நேரடி / உண்மை' },
   // Superadmin
-  testSeriesTab: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
-  testSeriesShowTitle: { en: 'Test Series visibility', ta: 'தேர்வுத் தொடர் காட்சி' },
+  testSeriesTab: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
+  testSeriesShowTitle: { en: 'Test Marathon visibility', ta: 'தேர்வு மாரத்தான் காட்சி' },
   testSeriesShowSub: {
-    en: 'Show or hide the Test Series tab and Test Arena tile for all students.',
-    ta: 'அனைத்து மாணவர்களுக்கும் தேர்வுத் தொடர் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
+    en: 'Show or hide the Test Marathon tab and Test Arena tile for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் தேர்வு மாரத்தான் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
   },
   availabilityAuto: { en: 'Auto (by date)', ta: 'தானியங்கி (தேதிப்படி)' },
   availabilityOpen: { en: 'Force open', ta: 'கட்டாயம் திற' },
   availabilityClosed: { en: 'Force closed', ta: 'கட்டாயம் மூடு' },
+
+  // ─── Vettri Nichayam bundle (₹999: 13 mock exams + unlimited PYQ & CA) ─────
+  vettriNav: { en: 'Vettri', ta: 'வெற்றி' },
+  vettriBadge: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
+  vettriTitle: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
+  vettriArenaSub: {
+    en: '13 mock exams · unlimited PYQ & CA · 2 months',
+    ta: '13 மாதிரித் தேர்வுகள் · வரம்பற்ற PYQ & CA · 2 மாதம்',
+  },
+  vettriSub: {
+    en: 'A two-month program: 13 full-length mock exams with unlimited attempts, plus unlimited PYQ and Current Affairs tests.',
+    ta: 'இரண்டு மாத திட்டம்: 13 முழு நீள மாதிரித் தேர்வுகள் — வரம்பற்ற முயற்சிகள்; மேலும் வரம்பற்ற PYQ மற்றும் நடப்பு நிகழ்வுத் தேர்வுகள்.',
+  },
+  vettriValidity: { en: 'Valid for two months', ta: 'இரண்டு மாதங்களுக்கு செல்லுபடியாகும்' },
+  vettriMonthValidity: { en: 'One month (first half)', ta: 'ஒரு மாதம் (முதல் பாதி)' },
+  vettriMonthNote: {
+    en: '₹499 covers only the first month of this two-month program. Pay ₹499 again for the second month, or you won’t be able to access the second half.',
+    ta: '₹499 இந்த இரண்டு மாத திட்டத்தின் முதல் மாதத்தை மட்டுமே உள்ளடக்கும். இரண்டாவது மாதத்திற்கு ₹499 மீண்டும் செலுத்துங்கள், இல்லையெனில் இரண்டாவது பாதியை அணுக முடியாது.',
+  },
+  vettriFullNote: {
+    en: 'This is a limited-period plan — your access lasts two months and then ends. Renew to keep using it.',
+    ta: 'இது வரையறுக்கப்பட்ட காலத் திட்டம் — உங்கள் அணுகல் இரண்டு மாதங்கள் மட்டுமே நீடிக்கும், பிறகு முடிவடையும். தொடர்ந்து பயன்படுத்த புதுப்பிக்கவும்.',
+  },
+  vettriPlanFull: { en: 'Full', ta: 'முழு' },
+  vettriPlanMonth: { en: 'Monthly', ta: 'மாதம்' },
+  vettriFullSuffix: { en: '/ 2 months', ta: '/ 2 மாதம்' },
+  vettriMonthSuffix: { en: '/ month', ta: '/ மாதம்' },
+  vettriPerk1: { en: '13 full-length mock exams', ta: '13 முழு நீள மாதிரித் தேர்வுகள்' },
+  vettriPerk2: {
+    en: 'Unlimited Previous-Year (PYQ) tests',
+    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள்',
+  },
+  vettriPerk3: {
+    en: 'Unlimited Current Affairs tests',
+    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள்',
+  },
+  vettriGet: { en: 'Get Vettri Nichayam', ta: 'வெற்றி நிச்சயம் பெறுங்கள்' },
+  vettriThanks: {
+    en: 'Welcome to Vettri Nichayam! Everything is unlocked.',
+    ta: 'வெற்றி நிச்சயத்திற்கு வரவேற்கிறோம்! அனைத்தும் திறக்கப்பட்டது.',
+  },
+  vettriEmpty: { en: 'No exams are available yet.', ta: 'இன்னும் தேர்வுகள் எதுவும் கிடைக்கவில்லை.' },
+  vettriOnly: { en: 'Vettri', ta: 'வெற்றி' },
+  vettriUnlimited: { en: 'Unlimited attempts', ta: 'வரம்பற்ற முயற்சிகள்' },
+  vettriLocked: {
+    en: 'Unlock Vettri Nichayam to take these exams',
+    ta: 'இந்தத் தேர்வுகளை எழுத வெற்றி நிச்சயத்தைத் திறங்கள்',
+  },
+  lockedLabel: { en: 'Locked', ta: 'பூட்டப்பட்டது' },
+  topicFreeUsed: {
+    en: "You've used your free test for this topic. Get unlimited tests with Vettri Nichayam or Premium.",
+    ta: 'இந்தத் தலைப்பிற்கான உங்கள் இலவசத் தேர்வைப் பயன்படுத்திவிட்டீர்கள். வெற்றி நிச்சயம் அல்லது பிரீமியத்துடன் வரம்பற்ற தேர்வுகளைப் பெறுங்கள்.',
+  },
+  // Superadmin — Vettri tab
+  vettriTab: { en: 'Vettri', ta: 'வெற்றி' },
+  vettriShowTitle: { en: 'Vettri Nichayam visibility', ta: 'வெற்றி நிச்சயம் காட்சி' },
+  vettriShowSub: {
+    en: 'Show or hide the Vettri Nichayam tab and Test Arena tile for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் வெற்றி நிச்சயம் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
+  },
+
   premiumOnly: { en: 'Premium', ta: 'பிரீமியம்' },
   examLocked: {
     en: 'Upgrade to Premium to unlock this exam',
@@ -588,6 +730,10 @@ const STRINGS = {
   instrNoCopy: {
     en: 'Copy, paste, and right-click are disabled during the test.',
     ta: 'தேர்வின் போது நகலெடுத்தல், ஒட்டுதல் மற்றும் வலது-கிளிக் முடக்கப்படும்.',
+  },
+  instrExplanations: {
+    en: 'Correct answers and detailed explanations appear in the review only after you attempt at least 25% of the test (or submit it at the end). Answer more questions to unlock them.',
+    ta: 'சரியான விடைகளும் விரிவான விளக்கங்களும், நீங்கள் தேர்வில் குறைந்தது 25% வினாக்களுக்குப் பதிலளித்த பிறகே (அல்லது இறுதியில் சமர்ப்பித்த பிறகே) மதிப்பாய்வில் தோன்றும். அவற்றைத் திறக்க மேலும் வினாக்களுக்குப் பதிலளிக்கவும்.',
   },
   instrConfirm: {
     en: 'I have read the instructions and agree to take this test under exam conditions.',
@@ -942,6 +1088,10 @@ const STRINGS = {
   errPasswordMismatch: { en: 'Passwords do not match.', ta: 'கடவுச்சொற்கள் பொருந்தவில்லை.' },
   errNameRequired: { en: 'Please enter your full name.', ta: 'உங்கள் முழுப் பெயரை உள்ளிடவும்.' },
   errPhoneRequired: { en: 'Please enter your phone number.', ta: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்.' },
+  phoneAlreadyRegistered: {
+    en: 'This mobile number is already registered to another account. Please use a different number.',
+    ta: 'இந்த மொபைல் எண் ஏற்கனவே வேறு கணக்கில் பதிவு செய்யப்பட்டுள்ளது. வேறு எண்ணைப் பயன்படுத்தவும்.',
+  },
   errServerUnreachable: {
     en: "Couldn't reach the server. Please try again in a moment.",
     ta: 'சேவையகத்தை அணுக முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்.',

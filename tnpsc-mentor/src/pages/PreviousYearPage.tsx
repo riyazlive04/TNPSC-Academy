@@ -14,12 +14,15 @@ import {
   TrendingUp,
   Calculator,
   BookOpen,
+  Lock,
   type LucideIcon,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
+import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
+import { deriveGateKey } from '../lib/freeGate'
 import { PYQ_SUBJECTS, subjectName } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
@@ -47,52 +50,106 @@ function subjectIcon(name: string): LucideIcon {
   return BookOpen
 }
 
-// Cache the per-subject counts so re-entering the page is instant.
-let countsCache: Record<string, number> | null = null
+// Exam years present in the Group 1 PYQ bank (newest first); null = all years.
+const PYQ_YEARS = [2025, 2024, 2022, 2021, 2019]
+
+// Cache per-subject counts per year so flicking between years is instant.
+const countsCache = new Map<number | 'all', Record<string, number>>()
+const yearKey = (y: number | null): number | 'all' => y ?? 'all'
 
 export default function PreviousYearPage() {
   const startTest = useStartTest()
   const navigate = useNavigate()
   const { t, lang } = useT()
-  const [counts, setCounts] = useState<Record<string, number> | null>(countsCache)
 
-  // One count per subject (category='pyq'), fetched in parallel once.
+  // Selected exam year (null = all years). Scopes every test + the subject counts.
+  const [year, setYear] = useState<number | null>(null)
+  const [counts, setCounts] = useState<Record<string, number> | null>(
+    countsCache.get('all') ?? null
+  )
+
+  // Free-tier gate: one PYQ test per subject. `unlimited` (premium/vettri) has no
+  // locks; otherwise `usedKeys` lists the subjects whose free test is spent.
+  const [unlimited, setUnlimited] = useState(true)
+  const [usedKeys, setUsedKeys] = useState<Set<string>>(new Set())
+  const [showUpsell, setShowUpsell] = useState(false)
+
+  // (Re)load per-subject counts (category='pyq') whenever the year changes.
   useEffect(() => {
-    if (countsCache) return
+    const key = yearKey(year)
+    const cached = countsCache.get(key)
+    if (cached) {
+      setCounts(cached)
+      return
+    }
+    setCounts(null)
     let cancelled = false
     Promise.all(
       PYQ_SUBJECTS.map((s) =>
         api
-          .countQuestions({ category: 'pyq', subject: s })
+          .countQuestions({ category: 'pyq', subject: s, year: year ?? undefined })
           .then((n) => [s, n] as const)
           .catch(() => [s, 0] as const)
       )
     ).then((pairs) => {
       if (cancelled) return
       const map = Object.fromEntries(pairs)
-      countsCache = map
+      countsCache.set(key, map)
       setCounts(map)
     })
     return () => {
       cancelled = true
     }
+  }, [year])
+
+  // Lock state (which subjects have used their one free test).
+  useEffect(() => {
+    let cancelled = false
+    api
+      .topicAccess()
+      .then((a) => {
+        if (cancelled) return
+        setUnlimited(a.unlimited)
+        setUsedKeys(new Set(a.usedKeys))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
+  const isLocked = (subj: string) => {
+    if (unlimited) return false
+    const key = deriveGateKey({ category: 'pyq', subject: subj })
+    return key ? usedKeys.has(key) : false
+  }
+
   const begin = (subj: string) => {
-    // History opens the period selector, Aptitude the numeric/reasoning selector;
-    // every other subject starts a test directly.
-    if (subj === HISTORY_SUBJECT) {
-      navigate('/test-arena/pyq/history')
+    // A subject whose free test is spent diverts to the upsell instead of starting.
+    if (isLocked(subj)) {
+      setShowUpsell(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
-    if (subj === APTITUDE_SUBJECT) {
-      navigate('/test-arena/pyq/aptitude')
-      return
+    // With "All years" selected, History opens the period selector and Aptitude the
+    // numeric/reasoning selector. With a specific YEAR selected, that year already
+    // narrows the pool, so every subject (incl. History/Aptitude) starts directly,
+    // scoped to the year.
+    if (year === null) {
+      if (subj === HISTORY_SUBJECT) {
+        navigate('/test-arena/pyq/history')
+        return
+      }
+      if (subj === APTITUDE_SUBJECT) {
+        navigate('/test-arena/pyq/aptitude')
+        return
+      }
     }
     startTest({
       category: 'pyq',
       subject: subj,
-      labelParts: ['PYQ', { subject: subj }],
+      year: year ?? undefined,
+      labelParts: year ? ['PYQ', { subject: subj }, String(year)] : ['PYQ', { subject: subj }],
       availableCount: counts?.[subj],
     })
   }
@@ -103,6 +160,26 @@ export default function PreviousYearPage() {
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
         <p className="tamil mt-1 font-body text-[15px] text-muted">{t('subjectStepHint')}</p>
       </div>
+
+      {/* Exam-year filter. "All Years" + each year; scopes every subject below. */}
+      <div className="mb-5">
+        <p className="tamil mb-2 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+          {t('filterByYear')}
+        </p>
+        <div className="-mx-1 flex flex-wrap gap-2 px-1">
+          <YearChip label={t('allYears')} active={year === null} onClick={() => setYear(null)} />
+          {PYQ_YEARS.map((y) => (
+            <YearChip key={y} label={String(y)} active={year === y} onClick={() => setYear(y)} />
+          ))}
+        </div>
+      </div>
+
+      {showUpsell && (
+        <div className="mb-5 animate-fadeInFast">
+          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <VettriCard />
+        </div>
+      )}
 
       {counts === null ? (
         <div className="flex justify-center py-16">
@@ -116,6 +193,7 @@ export default function PreviousYearPage() {
             const n = counts[s] ?? 0
             const isHistory = s === HISTORY_SUBJECT
             const isAptitude = s === APTITUDE_SUBJECT
+            const locked = isLocked(s)
             return (
               <ListRow
                 key={s}
@@ -126,6 +204,13 @@ export default function PreviousYearPage() {
                     <Icon size={19} strokeWidth={2} />
                   </IconTile>
                 }
+                trailing={
+                  locked ? (
+                    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
+                      <Lock size={11} /> {t('lockedLabel')}
+                    </span>
+                  ) : undefined
+                }
                 title={subjectName(s, lang)}
                 subtitle={
                   <span className="flex items-baseline gap-1">
@@ -134,7 +219,11 @@ export default function PreviousYearPage() {
                     </span>
                     <span>
                       {t('questionsCount')}
-                      {isHistory ? ` · ${t('byPeriod')}` : isAptitude ? ` · ${t('byType')}` : ''}
+                      {year === null && isHistory
+                        ? ` · ${t('byPeriod')}`
+                        : year === null && isAptitude
+                          ? ` · ${t('byType')}`
+                          : ''}
                     </span>
                   </span>
                 }
@@ -144,5 +233,19 @@ export default function PreviousYearPage() {
         </List>
       )}
     </PickerPage>
+  )
+}
+
+function YearChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-[13px] font-semibold tabular-nums transition-colors ${
+        active ? 'bg-primary text-white' : 'bg-tint-violet text-primary hover:bg-primary/15'
+      }`}
+    >
+      {label}
+    </button>
   )
 }

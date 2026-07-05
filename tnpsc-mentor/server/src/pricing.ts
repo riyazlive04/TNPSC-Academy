@@ -6,6 +6,12 @@
 /** Premium plan price in paise (₹1 = 100). Mirrors PremiumCard.tsx (₹1,699). */
 export const PREMIUM_PRICE_PAISE = 169900 // ₹1,699
 
+/** Vettri Nichayam FULL price in paise (single payment, two months). Mirrors ₹899. */
+export const VETTRI_PRICE_PAISE = 89900 // ₹899
+
+/** Vettri Nichayam MONTHLY price in paise (30-day; pay again to renew). ₹499. */
+export const VETTRI_MONTH_PRICE_PAISE = 49900 // ₹499
+
 /** Razorpay needs a positive order; never charge below ₹1. */
 export const MIN_CHARGE_PAISE = 100
 
@@ -16,6 +22,19 @@ export const MIN_CHARGE_PAISE = 100
  * two can never drift.
  */
 export const PREMIUM_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 3 months
+
+/**
+ * Vettri Nichayam FULL entitlement window — the ₹899 plan is a TWO-MONTH program.
+ * This diverges from PREMIUM_VALIDITY_MS (90d), which is fine: bundleAccess queries
+ * on max(the two) and then bounds each plan against its OWN window, so a shorter
+ * Vettri validity lapses correctly.
+ */
+export const VETTRI_VALIDITY_MS = 60 * 24 * 60 * 60 * 1000 // 2 months
+
+/** Vettri MONTHLY entitlement window — one paid ₹499 grants 30 days (ONE month, the
+ *  first half of the two-month program); paying again grants another 30 days from
+ *  that payment, unlocking the second half. */
+export const VETTRI_MONTH_VALIDITY_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
 
 /**
  * Free users may download this many explanation PDFs in total (mirrors the
@@ -45,6 +64,11 @@ export const MAX_TEST_SERIES_ATTEMPTS = 2
  */
 export function baseAmountForPlan(plan: string | undefined, clientAmount: number): number {
   if (plan === 'premium_annual') return PREMIUM_PRICE_PAISE
+  if (plan === 'vettri_nichayam') return VETTRI_PRICE_PAISE
+  if (plan === 'vettri_month') return VETTRI_MONTH_PRICE_PAISE
   const n = Math.trunc(Number(clientAmount))
   return Math.min(Math.max(Number.isFinite(n) ? n : 0, MIN_CHARGE_PAISE), 10_000_000)
 }
+
+/** Plan ids the order route will honour (anything else → generic contribution). */
+export const KNOWN_PLANS = new Set(['premium_annual', 'vettri_nichayam', 'vettri_month'])

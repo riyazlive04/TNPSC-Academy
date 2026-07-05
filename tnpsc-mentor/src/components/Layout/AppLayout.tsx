@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Eye, EyeOff } from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useCreditsStore } from '../../store/creditsStore'
 import { useHasMaterials } from '../../hooks/useHasMaterials'
 import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
+import { useVettriEnabled } from '../../hooks/useVettriEnabled'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
@@ -34,9 +36,12 @@ function withinFeedbackWindow(key: string | null): boolean {
 }
 
 // Learner navigation - the personal study tabs (spaced revision, progress
-// insights, profile) shown to regular users.
+// insights, profile) shown to regular users. The same list drives both the
+// desktop top nav and the mobile bottom bar; each entry is gated by its feature
+// flag below, so the bar only grows when a feature is turned on.
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
+  { to: '/vettri', icon: Trophy, key: 'vettriNav' as const, short: 'vettriNav' as const },
   { to: '/test-series', icon: CalendarDays, key: 'testSeries' as const, short: 'testSeries' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/materials', icon: Library, key: 'materials' as const, short: 'materials' as const },
@@ -85,6 +90,13 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const setLang = useLanguageStore((s) => s.setLang)
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const toggleTheme = useThemeStore((s) => s.toggle)
+
+  // Credit balance + daily +10 check-in — fetched once per session on first load.
+  const creditsLoaded = useCreditsStore((s) => s.loaded)
+  const refreshCredits = useCreditsStore((s) => s.refresh)
+  useEffect(() => {
+    if (user && !creditsLoaded) refreshCredits()
+  }, [user, creditsLoaded, refreshCredits])
   // The first-run tour owns the screen for new accounts - don't let the periodic
   // feedback prompt pop over it.
   const tourActive = useOnboardingStore((s) => s.open || s.pending)
@@ -93,12 +105,15 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   // Materials tab is shown only once a material has been published (no empty tab).
   const hasMaterials = useHasMaterials()
   const testSeriesOn = useTestSeriesEnabled()
+  const vettriOn = useVettriEnabled()
+  // Same nav for desktop top bar + mobile bottom bar; gated per feature flag.
   const nav = isAdmin
     ? ADMIN_NAV
     : LEARNER_NAV.filter(
         (item) =>
           (item.to !== '/materials' || hasMaterials) &&
-          (item.to !== '/test-series' || testSeriesOn)
+          (item.to !== '/test-series' || testSeriesOn) &&
+          (item.to !== '/vettri' || vettriOn)
       )
 
   // Badge: number of open student question-reports awaiting triage (admins only).
@@ -212,6 +227,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               >
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
+              {user && <CreditPill />}
               {user && <NotificationBell />}
               {/* Preview toggle (real admins only) - switch between the admin and
                   the student experience. Visible in both modes so it's reversible. */}
@@ -363,5 +379,33 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
         onSubmitted={markFeedbackGiven}
       />
     </div>
+  )
+}
+
+/**
+ * Header credit meter for free learners: the current balance, coral-tinted when
+ * too low to start a test (< 10). Hidden for unlimited (paid/staff) users. Taps
+ * through to the profile, where the meter + upgrade options live.
+ */
+function CreditPill() {
+  const navigate = useNavigate()
+  const { t } = useT()
+  const loaded = useCreditsStore((s) => s.loaded)
+  const unlimited = useCreditsStore((s) => s.unlimited)
+  const balance = useCreditsStore((s) => s.balance)
+  if (!loaded || unlimited) return null
+  const low = balance < 10
+  return (
+    <button
+      onClick={() => navigate('/profile')}
+      title={t('creditsTitle')}
+      aria-label={`${balance} ${t('creditsWord')}`}
+      className={[
+        'press focus-ring inline-flex items-center gap-1 rounded-lg px-2 py-1.5 font-heading text-xs font-bold tabular-nums transition',
+        low ? 'bg-coralsoft text-coral' : 'bg-brand-soft text-brand-dark hover:bg-tint',
+      ].join(' ')}
+    >
+      <Coins size={14} /> {balance}
+    </button>
   )
 }

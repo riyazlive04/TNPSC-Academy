@@ -11,9 +11,14 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
+import VettriCard from '../components/UI/VettriCard'
+import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { api } from '../lib/api'
+import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
 import { useT } from '../lib/i18n'
 import type { QuizConfig, TestSeriesItem } from '../types'
+
+type Tab = 'papers' | 'analytics'
 
 /** Format 'YYYY-MM-DD' as "09 Jul" (locale-stable; used for schedule badges). */
 function formatDate(iso: string | null): string {
@@ -28,10 +33,14 @@ export default function TestSeriesPage() {
   const navigate = useNavigate()
   const { t, lang } = useT()
 
+  const [tab, setTab] = useState<Tab>('papers')
   const [tests, setTests] = useState<TestSeriesItem[]>([])
   const [premium, setPremium] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  // Analytics loads in the background (non-blocking): it feeds the prep banner on
+  // the Papers tab and the whole Analytics tab.
+  const [analytics, setAnalytics] = useState<TestSeriesAnalytics | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -44,6 +53,9 @@ export default function TestSeriesPage() {
       })
       .catch(() => !cancelled && setError(t('couldNotLoad')))
       .finally(() => !cancelled && setLoading(false))
+    fetchTestSeriesAnalytics()
+      .then((a) => !cancelled && setAnalytics(a))
+      .catch(() => undefined) // non-critical; the tab just shows the empty state
     return () => {
       cancelled = true
     }
@@ -84,6 +96,29 @@ export default function TestSeriesPage() {
           <p className="tamil mt-1 font-body text-[15px] text-muted">{t('testSeriesSub')}</p>
         </header>
 
+        {/* Tabs: browse the papers, or review your own performance. */}
+        {!loading && !error && (
+          <div className="mb-6 flex gap-5 border-b border-line">
+            {([
+              ['papers', t('tsTabPapers')],
+              ['analytics', t('tsTabAnalytics')],
+            ] as [Tab, string][]).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setTab(key)}
+                className={[
+                  '-mb-px border-b-2 pb-2.5 font-heading text-sm font-semibold transition-colors',
+                  tab === key
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted hover:text-ink',
+                ].join(' ')}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {loading && (
           <div className="flex justify-center py-10">
             <Loader2 size={28} className="animate-spin text-brand" />
@@ -92,19 +127,35 @@ export default function TestSeriesPage() {
 
         {!loading && error && <p className="text-center font-body text-sm text-wrong">{error}</p>}
 
-        {!loading && !error && tests.length === 0 && (
+        {/* ── ANALYTICS TAB ── */}
+        {!loading && !error && tab === 'analytics' &&
+          (analytics ? (
+            <TestSeriesAnalyticsView analytics={analytics} />
+          ) : (
+            <div className="flex justify-center py-10">
+              <Loader2 size={24} className="animate-spin text-brand" />
+            </div>
+          ))}
+
+        {/* ── PAPERS TAB ── */}
+        {!loading && !error && tab === 'papers' && tests.length === 0 && (
           <p className="tamil text-center font-body text-sm text-ink2">{t('testSeriesEmpty')}</p>
         )}
 
-        {/* Whole-series paywall — one upgrade card above the schedule. */}
-        {!loading && !error && tests.length > 0 && seriesLocked && (
-          <div className="mb-6">
+        {/* Whole-series paywall — EITHER paid bundle unlocks the series, so surface
+            the cheaper Vettri option first, then the full Premium kit. */}
+        {!loading && !error && tab === 'papers' && tests.length > 0 && seriesLocked && (
+          <div className="mb-6 space-y-4">
+            <VettriCard />
             <PremiumCard />
           </div>
         )}
 
-        {!loading && !error && tests.length > 0 && (
-          <div className="space-y-3">
+        {!loading && !error && tab === 'papers' && tests.length > 0 && (
+          // Papers as a 2-up card grid at every width (incl. phones); each is an
+          // elevated card with its CTA pinned to the bottom so the Start buttons
+          // line up across a row regardless of how much content each card holds.
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
             {tests.map((tst) => {
               const title = lang === 'ta' && tst.title_ta ? tst.title_ta : tst.title
               const unit = lang === 'ta' && tst.unit_label_ta ? tst.unit_label_ta : tst.unit_label
@@ -119,41 +170,45 @@ export default function TestSeriesPage() {
                 <div
                   key={tst.id}
                   className={[
-                    'rounded-card border border-line bg-card p-4 sm:p-5',
-                    disabled ? 'opacity-80' : '',
+                    'flex h-full flex-col rounded-card border border-line bg-card p-2.5 shadow-soft transition-shadow sm:p-4',
+                    disabled ? 'opacity-80' : 'hover:shadow-card',
                   ].join(' ')}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="tamil truncate font-heading text-base font-semibold text-ink">
-                          {title}
-                        </h3>
-                        {unit && (
-                          <span className="tamil inline-flex shrink-0 items-center rounded-md bg-brand-soft px-2 py-0.5 font-heading text-[11px] font-semibold text-brand-dark">
-                            {unit}
-                          </span>
-                        )}
-                        {premiumLocked && (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-[11px] font-semibold text-accentwarm">
-                            <Lock size={11} /> {t('premiumOnly')}
-                          </span>
-                        )}
-                      </div>
-
-                      {subjects && (
-                        <p className="tamil mt-1.5 font-body text-[13px] leading-snug text-ink2">
-                          {subjects}
-                        </p>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                      <h3 className="tamil font-heading text-sm font-semibold text-ink [overflow-wrap:anywhere] sm:text-base">
+                        {title}
+                      </h3>
+                      {unit && (
+                        <span className="tamil inline-flex shrink-0 items-center rounded-md bg-brand-soft px-2 py-0.5 font-heading text-[11px] font-semibold text-brand-dark">
+                          {unit}
+                        </span>
                       )}
+                      {premiumLocked && (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-[11px] font-semibold text-accentwarm">
+                          <Lock size={11} /> {t('premiumOnly')}
+                        </span>
+                      )}
+                    </div>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {subjects && (
+                      <p className="tamil mt-1 font-body text-[12px] leading-snug text-ink2">
+                        {subjects}
+                      </p>
+                    )}
+
+                    {/* Meta kept to TWO lines on the narrow card: questions +
+                        duration on row 1; date + attempts on row 2. */}
+                    <div className="mt-1.5 space-y-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <Tag>
                           <FileText size={12} /> {tst.total_questions} Q
                         </Tag>
                         <Tag>
                           <Clock size={12} /> {minutes} {t('minutesUnit')}
                         </Tag>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
                         {tst.scheduled_date && (
                           <Tag>
                             <CalendarDays size={12} /> {formatDate(tst.scheduled_date)}
@@ -170,27 +225,28 @@ export default function TestSeriesPage() {
                         </span>
                       </div>
                     </div>
+                  </div>
 
+                  {/* CTA + locked note, pinned to the card bottom. */}
+                  <div className="mt-auto pt-2.5">
+                    {dateLocked && (
+                      <p className="tamil mb-2 flex items-center gap-1.5 font-body text-xs text-ink2">
+                        <Lock size={12} /> {t('unlocksOn')} {formatDate(tst.scheduled_date)}
+                      </p>
+                    )}
+                    {premiumLocked && (
+                      <p className="tamil mb-2 font-body text-xs text-ink2">
+                        {t('testSeriesLockedPremium')}
+                      </p>
+                    )}
                     <button
                       onClick={() => !disabled && launch(tst)}
                       disabled={disabled}
-                      className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="btn-brand w-full whitespace-normal px-2 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-40 sm:px-5 sm:py-2.5 sm:text-sm"
                     >
                       {exhausted ? t('examCompleted') : t('startExam')}
                     </button>
                   </div>
-
-                  {/* Locked footnote — premium upsell or the unlock date. */}
-                  {dateLocked && (
-                    <p className="tamil mt-3 flex items-center gap-1.5 border-t border-line pt-3 font-body text-xs text-ink2">
-                      <Lock size={12} /> {t('unlocksOn')} {formatDate(tst.scheduled_date)}
-                    </p>
-                  )}
-                  {premiumLocked && (
-                    <p className="tamil mt-3 border-t border-line pt-3 font-body text-xs text-ink2">
-                      {t('testSeriesLockedPremium')}
-                    </p>
-                  )}
                 </div>
               )
             })}
@@ -203,7 +259,7 @@ export default function TestSeriesPage() {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-[11px] font-medium uppercase tracking-wide text-ink2">
+    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-1 font-heading text-[11px] font-medium uppercase text-ink2">
       {children}
     </span>
   )

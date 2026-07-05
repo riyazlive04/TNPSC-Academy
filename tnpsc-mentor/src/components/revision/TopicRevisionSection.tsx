@@ -5,6 +5,7 @@ import { api, ApiError } from '../../lib/api'
 import { toast } from '../../store/toastStore'
 import { useT } from '../../lib/i18n'
 import { useQuizStore } from '../../store/quizStore'
+import { useCreditsStore } from '../../store/creditsStore'
 import type { QuizConfig, RevisionAnalytics, RevisionTopic } from '../../types'
 import ConfirmDialog from '../UI/ConfirmDialog'
 import RevisionCard from './RevisionCard'
@@ -56,11 +57,15 @@ export default function TopicRevisionSection() {
       // Seed the quiz with the exact similar questions, then hand off to the
       // quiz page (which resumes this session instead of re-fetching).
       useQuizStore.getState().initSession(config as QuizConfig, questions)
+      // The 10-credit fee is charged at start (server) — refresh the meter.
+      void useCreditsStore.getState().reload()
       navigate('/quiz', { state: config })
     } catch (e) {
       if (e instanceof ApiError && e.status === 423) {
         toast.info(t('revStudyFirstToast'))
         load() // refresh - its unlock time just hasn't arrived
+      } else if (e instanceof ApiError && e.status === 402) {
+        toast.error(t('outOfCredits')) // out of credits for the re-test
       } else {
         toast.error(t('loadQuestionsError'))
       }

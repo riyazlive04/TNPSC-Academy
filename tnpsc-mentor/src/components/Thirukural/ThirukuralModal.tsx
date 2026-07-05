@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Loader2, Search, X } from 'lucide-react'
 import { List, ListRow } from '../UI/ListRow'
 import { useFocusTrap } from '../UI/useFocusTrap'
+import Couplet from './Couplet'
 import {
   loadKurals,
   groupByAdhigaram,
@@ -39,8 +40,6 @@ export default function ThirukuralModal({
   const dialogRef = useRef<HTMLDivElement>(null)
   // Trap Tab focus within the dialog and restore it to the opener on close.
   useFocusTrap(open, dialogRef)
-
-  const showTa = lang !== 'en'
 
   // Each time the box opens, start at the requested kural (or the list).
   useEffect(() => {
@@ -202,13 +201,12 @@ export default function ThirukuralModal({
                               </span>
                             }
                             title={
-                              showTa ? (
-                                <span className="tamil">{k.line1_ta} {k.line2_ta}</span>
-                              ) : (
-                                k.translation_en
-                              )
+                              /* The kural is always listed in Tamil, whatever the UI language. */
+                              <span className="tamil">
+                                {k.line1_ta} {k.line2_ta}
+                              </span>
                             }
-                            subtitle={lang === 'both' ? k.translation_en : undefined}
+                            subtitle={lang !== 'ta' ? k.translation_en : undefined}
                           />
                         ))}
                       </List>
@@ -242,23 +240,18 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
 
   return (
     <dl className="divide-y divide-line">
-      {/* KURAL - Tamil verse and/or romanised verse */}
+      {/* KURAL - the couplet is ALWAYS shown in Tamil (line 1 = 4 சீர், line 2 =
+          3 சீர்) and auto-fits so each line stays on one line; the romanised
+          reading follows as muted secondary text for en/both. */}
       <DetailRow label={ta ? 'குறள்' : 'Kural'} labelTamil={ta}>
-        {showTa && (
-          <p className="tamil font-display text-[17px] font-bold leading-relaxed text-ink sm:text-[19px]">
-            {k.line1_ta}
-            <br />
-            {k.line2_ta}
-          </p>
-        )}
+        <Couplet
+          line1={k.line1_ta}
+          line2={k.line2_ta}
+          className="tamil font-display font-bold leading-relaxed text-ink"
+          max={19}
+        />
         {showEn && (
-          <p
-            className={`font-display italic leading-relaxed ${
-              showTa
-                ? 'mt-1.5 text-[13px] font-medium text-muted'
-                : 'text-[15px] font-semibold text-ink sm:text-base'
-            }`}
-          >
+          <p className="mt-1.5 font-display text-[13px] font-medium italic leading-relaxed text-muted">
             {translitLines.map((line, i) => (
               <span key={i}>
                 {i > 0 && <br />}

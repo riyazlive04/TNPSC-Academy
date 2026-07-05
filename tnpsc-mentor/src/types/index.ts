@@ -322,13 +322,15 @@ export interface QuizConfig {
    * exam from a single subject/topic drill.
    */
   proctored?: boolean
-  mockKind?: 'group' | 'subject' | 'exam' | 'series'
+  mockKind?: 'group' | 'subject' | 'exam' | 'series' | 'vettri'
   /** Which TNPSC group blueprint a group mock follows (2024/2025 pattern). */
   mockGroup?: GroupType
   /** A fixed full mock exam id ('exam1'..'exam6') when mockKind === 'exam'. */
   mockExamId?: string
   /** A scheduled test-series id ('test1'..'test13') when mockKind === 'series'. */
   seriesTestId?: string
+  /** A Vettri Nichayam exam id ('vettri1'..'vettri13') when mockKind === 'vettri'. */
+  vettriExamId?: string
   /** Set when this quiz is a revision re-test (gates similar-question fetch). */
   revision?: boolean
   /** The revision_topics row id, threaded back through submit so a pass clears it. */
@@ -391,6 +393,36 @@ export interface MockExamAdmin {
   loaded_questions: number
 }
 
+// ─── Vettri Nichayam bank (fixed paid 13-exam set, unlimited attempts) ───────
+
+/** One Vettri exam as seen by a student. Whole bank is bundle-gated, no attempt cap. */
+export interface VettriExam {
+  id: string
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  /** True when the user hasn't unlocked the bundle (not premium/vettri). */
+  locked: boolean
+  lockReason: 'vettri' | null
+}
+
+/** One Vettri exam row in the superadmin console (all exams, incl. disabled). */
+export interface VettriExamAdmin {
+  id: string
+  vettri_set: number
+  title: string
+  title_ta: string | null
+  total_questions: number
+  duration_seconds: number
+  negative_mark: number
+  enabled: boolean
+  sort_order: number
+  /** Questions actually loaded for this set (should be total_questions). */
+  loaded_questions: number
+}
+
 // ─── Test Series (scheduled Group 1 "Test Marathon 2026" papers) ─────────────
 
 /** One scheduled test as seen by a student: access + schedule + attempts. */
@@ -413,6 +445,38 @@ export interface TestSeriesItem {
   lockReason: 'premium' | 'date' | null
   attemptsUsed: number
   attemptsMax: number
+}
+
+/** One completed Test Marathon attempt (for the analytics tab). */
+export interface TestSeriesAttempt {
+  id: string
+  test_id: string
+  title: string
+  title_ta: string | null
+  unit_label: string | null
+  unit_label_ta: string | null
+  /** Score % as graded by the server. */
+  score: number
+  total: number
+  correct: number | null
+  attempted: number | null
+  time_taken_seconds: number | null
+  submitted_at: string | null
+}
+
+/** One graded answer, reduced to what the weak-area aggregation needs. */
+export interface TestSeriesAnswerStat {
+  is_correct: boolean | null
+  subject: string | null
+  topic: string | null
+  /** Derived bucket: 'match' | 'assertion' | 'statement' | 'aptitude' | 'factual'. */
+  qtype: string
+}
+
+/** Raw payload from GET /api/questions/test-series/analytics. */
+export interface TestSeriesAnalyticsResponse {
+  attempts: TestSeriesAttempt[]
+  answers: TestSeriesAnswerStat[]
 }
 
 /** One test row in the superadmin console (all tests, incl. disabled). */

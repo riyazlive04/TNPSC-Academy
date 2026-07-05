@@ -234,7 +234,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       trackSignUp('password')
       return { error: null }
     } catch (e) {
-      return { error: e instanceof Error ? e.message : 'Sign up failed' }
+      const code = e instanceof Error ? e.message : ''
+      if (code === 'phone_already_registered') {
+        return { error: 'This mobile number is already registered to another account. Please sign in, or use a different number.' }
+      }
+      if (code === 'email_registered_google') {
+        return { error: 'This email is registered with Google. Please use “Continue with Google” to sign in.' }
+      }
+      if (code === 'email_already_registered') {
+        return { error: 'This email is already registered to another account. Please sign in instead.' }
+      }
+      return { error: code || 'Sign up failed' }
     }
   },
 

@@ -14,12 +14,15 @@ export interface PublicSettings {
   mock_subject_enabled: boolean
   /** Show the scheduled Test Series nav tab + Test Arena tile. */
   test_series_enabled: boolean
+  /** Show the Vettri Nichayam nav tab + Test Arena tile. */
+  vettri_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   mock_group_enabled: false,
   mock_subject_enabled: false,
   test_series_enabled: false,
+  vettri_enabled: false,
 }
 
 /** Keys the superadmin console is allowed to write (allow-list). */
@@ -45,6 +48,7 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     test_series_enabled: Boolean(
       raw.test_series_enabled ?? PUBLIC_SETTING_DEFAULTS.test_series_enabled
     ),
+    vettri_enabled: Boolean(raw.vettri_enabled ?? PUBLIC_SETTING_DEFAULTS.vettri_enabled),
   }
 }
 

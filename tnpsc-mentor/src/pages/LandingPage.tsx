@@ -20,6 +20,7 @@ import {
   ListChecks,
   Lock,
   Award,
+  Trophy,
   Target,
   TriangleAlert,
   Sparkles,
@@ -159,6 +160,8 @@ const T = {
     ta: 'Serious-ஆ TNPSC Group exams எழுதுறீங்கனா, இந்த Prelims Kit-ஐ unlock பண்ணி full fledge-ஆ தயாராகுங்க.',
     en: 'Serious about TNPSC Group exams? Unlock the Prelims Kit and prepare with everything you need.',
   },
+  premiumCta: { ta: 'Prelims Kit-ஐ unlock பண்ணுங்க', en: 'Unlock the Prelims Kit' },
+  freeCta: { ta: 'இலவசமா தொடங்குங்க', en: 'Start for free' },
 
   // Section 4 - PAM
   s4Title: {
@@ -261,6 +264,20 @@ const T = {
     en: 'Not affiliated with the Tamil Nadu Public Service Commission.',
   },
   stickyHint: { ta: 'TNPSC · Group 1', en: 'TNPSC · Group 1' },
+  // Vettri Nichayam bundle banner (pricing section)
+  vettriBadge: { ta: 'வெற்றி நிச்சயம்', en: 'Vettri Nichayam' },
+  vettriBannerTitle: { ta: 'வெற்றி நிச்சயம் தேர்வுத் தொகுப்பு', en: 'Vettri Nichayam bundle' },
+  vettriBannerSub: {
+    ta: '13 முழு மாதிரித் தேர்வுகள் + வரம்பற்ற PYQ மற்றும் நடப்பு நிகழ்வுத் தேர்வுகள்.',
+    en: '13 full mock exams + unlimited PYQ and Current Affairs tests.',
+  },
+  vettriOneTime: { ta: 'ஒரே கட்டணம் · முழு அணுகல்', en: 'one-time · full access' },
+  vettriInstallment: { ta: 'மாதம் ஒன்றுக்கு', en: 'per month' },
+  vettriInstallmentNote: {
+    ta: '₹499 = 1 மாதம் · அடுத்த மாதத்திற்கு மீண்டும் ₹499',
+    en: '₹499 unlocks 1 month · pay ₹499 again for the next',
+  },
+  vettriCta: { ta: 'இப்போது தொடங்குங்கள்', en: 'Get started' },
 } as const
 
 const FREE_ITEMS: { ta: string; en: string }[] = [
@@ -278,6 +295,13 @@ const PREMIUM_ITEMS: { ta: string; en: string }[] = [
   { ta: 'Formula & Infographic pdf\'s', en: 'Formula and Infographic pdf\s' },
   { ta: 'PYQ trend report', en: 'PYQ trend report' },
   { ta: 'Prelims வரைக்கும் valid · ஒரே payment · subscription இல்ல', en: 'Valid till the prelims · one payment · no subscription' },
+]
+
+// What the Vettri Nichayam bundle unlocks (shown in the pricing-section banner).
+const VETTRI_ITEMS: { ta: string; en: string }[] = [
+  { ta: '13 முழு மாதிரித் தேர்வுகள்-வரம்பற்ற முயற்சிகள்', en: '13 full mock exams — unlimited attempts' },
+  { ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள்', en: 'Unlimited Previous-Year (PYQ) tests' },
+  { ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள்', en: 'Unlimited Current Affairs tests' },
 ]
 
 // ─── Colour system ───────────────────────────────────────────────────────────
@@ -319,6 +343,8 @@ const PAM_CARDS: {
 ]
 
 const PREMIUM_ICONS = [FileText, ListChecks, Timer, Newspaper, CalendarDays, Calculator, TrendingUp, ShieldCheck]
+// One icon per VETTRI_ITEMS row: 13 mocks · unlimited PYQ · unlimited current affairs.
+const VETTRI_ICONS = [Timer, FileText, Newspaper]
 
 const INSTALL_STEPS: { ta: string; en: string }[] = [
   { ta: 'App download-ஐ tap பண்ணுங்க.', en: 'Tap Download the app.' },
@@ -700,10 +726,10 @@ export default function LandingPage() {
               {t('s3Title')}
             </h2>
           </Reveal>
-          <div className="mt-12 grid items-start gap-5 lg:grid-cols-2">
+          <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {/* Free - the hook. Green = free & safe, the immediate reward. */}
             <Reveal>
-              <div className="card interactive relative h-full overflow-hidden p-7 ring-1 ring-correct/20">
+              <div className="card interactive relative flex h-full flex-col overflow-hidden p-7 ring-1 ring-correct/20">
                 <div className="absolute inset-x-0 top-0 h-1 bg-correct" />
                 <span className="inline-flex items-center gap-2 rounded-full bg-tint-green px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-correct">
                   <Check size={13} /> {t('freeTitle')}
@@ -718,16 +744,62 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-7">
-                  <WebAppButton label={t('webCta')} />
+                <div className="mt-auto pt-7">
+                  <WebAppButton label={t('freeCta')} />
                 </div>
               </div>
             </Reveal>
 
-            {/* Inside the app - framed as "when you're ready", never a checkout.
+            {/* Vettri Nichayam - the centre / featured tier. Violet accent (green =
+                free, gold = the premium kit); ringed so the middle column pops. */}
+            <Reveal>
+              <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/40 p-7 ring-1 ring-brand/25">
+                <div className="absolute inset-x-0 top-0 h-1 bg-brand" />
+                <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-brand">
+                  <Trophy size={13} /> ₹899 · {t('vettriBadge')}
+                </span>
+                <h3 className="mt-4 font-heading text-base font-semibold text-ink">{t('vettriBannerTitle')}</h3>
+                <ul className="mt-5 space-y-3">
+                  {VETTRI_ITEMS.map((it, i) => {
+                    const Icon = VETTRI_ICONS[i] ?? Check
+                    const tint = TINTS[i % TINTS.length]
+                    return (
+                      <li key={it.en} className="flex items-start gap-3">
+                        <span className={`mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-lg ${tint.bg} ${tint.fg}`}>
+                          <Icon size={13} />
+                        </span>
+                        <span className="font-body text-[15px] text-ink2">{it[lang]}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+
+                {/* Pricing - the single payment + the monthly option - then the CTA. */}
+                <div className="mt-auto border-t border-line pt-5">
+                  <div className="flex items-end gap-2">
+                    <span className="font-display text-3xl font-bold leading-none text-ink">₹499</span>
+                    <span className="mb-0.5 font-body text-xs text-ink2">{t('vettriInstallment')}</span>
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-1.5 rounded-xl bg-brand-soft px-3 py-2">
+                    <span className="font-heading text-base font-bold leading-none text-brand">₹899</span>
+                    <span className="font-body text-xs text-ink2">{t('vettriOneTime')}</span>
+                  </div>
+                  <p className="mt-1.5 font-body text-[11px] text-ink2/80">{t('vettriInstallmentNote')}</p>
+                  <a
+                    href={isAuthed ? APP_URL : APP_REGISTER_URL}
+                    onClick={() => trackEvent('vettri-card')}
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-3 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 active:scale-[0.99]"
+                  >
+                    {t('vettriCta')} <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+            </Reveal>
+
+            {/* Inside the app - the full Prelims Kit, framed as "when you're ready".
                 Gold = achievement / the premium kit (design-system accent of value). */}
             <Reveal>
-              <div className="card interactive relative h-full overflow-hidden border-brand/30 p-7">
+              <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/30 p-7">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gold" />
                 <span className="inline-flex items-center gap-2 rounded-full bg-goldsoft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-gold">
                   <Lock size={13} /> ₹1,699 · Premium Prelims Kit
@@ -747,7 +819,16 @@ export default function LandingPage() {
                     )
                   })}
                 </ul>
-                <p className="mt-6 font-body text-sm italic text-ink2">{t('premiumCaption')}</p>
+                <div className="mt-auto pt-6">
+                  <p className="font-body text-sm italic text-ink2">{t('premiumCaption')}</p>
+                  <a
+                    href={isAuthed ? APP_URL : APP_REGISTER_URL}
+                    onClick={() => trackEvent('premium-card')}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-pill bg-gold px-5 py-3 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99]"
+                  >
+                    {t('premiumCta')} <ArrowRight size={16} />
+                  </a>
+                </div>
               </div>
             </Reveal>
           </div>

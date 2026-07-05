@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { normalizeMobile } from '../lib/msg91.js'
+import { phoneTakenByOther } from '../lib/phone.js'
 
 const router = Router()
 
@@ -29,6 +31,15 @@ router.patch(
     const fields: Record<string, unknown> = {}
     for (const k of allowed) {
       if (k in (req.body ?? {})) fields[k] = req.body[k]
+    }
+    // One mobile number = one account: block editing to a number another account
+    // already owns, and store it normalized (bare 10-digit) for consistent matching.
+    if (typeof fields.phone === 'string') {
+      const ten = normalizeMobile(fields.phone)
+      if (ten && (await phoneTakenByOther(ten, req.userId!))) {
+        return res.status(409).json({ error: 'phone_already_registered' })
+      }
+      fields.phone = ten || null
     }
     const { data, error } = await req.db!
       .from('profiles')

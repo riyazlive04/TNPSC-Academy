@@ -21,6 +21,7 @@ import couponRoutes from './routes/coupons.js'
 import notificationRoutes from './routes/notifications.js'
 import thirukuralRoutes from './routes/thirukural.js'
 import materialRoutes from './routes/materials.js'
+import creditRoutes from './routes/credits.js'
 import appRoutes from './routes/app.js'
 
 const app = express()
@@ -77,6 +78,7 @@ app.use('/api/coupons', couponRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/thirukural', thirukuralRoutes)
 app.use('/api/materials', materialRoutes)
+app.use('/api/credits', creditRoutes)
 app.use('/api/app', appRoutes)
 
 // 404 for unknown API routes.

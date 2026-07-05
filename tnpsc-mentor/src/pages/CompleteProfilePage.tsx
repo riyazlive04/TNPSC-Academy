@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore, selectProfileNeedsOnboarding } from '../store/authStore'
 import { useOnboardingStore } from '../store/onboardingStore'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { postAuthDestination } from '../lib/authRouting'
 import AuthShell from '../components/Auth/AuthShell'
 import Spinner from '../components/UI/Spinner'
@@ -62,8 +62,12 @@ export default function CompleteProfilePage() {
       // New Google account just finished profile setup - arm the first-run tour.
       useOnboardingStore.getState().arm()
       navigate(postAuthDestination(), { replace: true })
-    } catch {
-      setError(t('errServerUnreachable'))
+    } catch (e) {
+      setError(
+        e instanceof ApiError && e.message === 'phone_already_registered'
+          ? t('phoneAlreadyRegistered')
+          : t('errServerUnreachable')
+      )
       setSaving(false)
     }
   }

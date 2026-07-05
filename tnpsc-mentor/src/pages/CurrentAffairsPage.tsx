@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle } from 'lucide-react'
+import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle, Lock } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
+import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName } from '../lib/constants'
 import { api } from '../lib/api'
+import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
 import type { QuizConfig } from '../types'
@@ -25,6 +27,41 @@ export default function CurrentAffairsPage() {
   // Per-month / per-topic question counts shown on every row.
   const [monthCounts, setMonthCounts] = useState<Record<string, number> | null>(monthCountsCache)
   const [topicCounts, setTopicCounts] = useState<Record<string, number> | null>(topicCountsCache)
+
+  // Free-tier gate: one CA test per topic. `unlimited` (premium/vettri) has no
+  // locks; otherwise `usedKeys` lists the topic keys already spent.
+  const [unlimited, setUnlimited] = useState(true)
+  const [usedKeys, setUsedKeys] = useState<Set<string>>(new Set())
+  const [showUpsell, setShowUpsell] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    api
+      .topicAccess()
+      .then((a) => {
+        if (cancelled) return
+        setUnlimited(a.unlimited)
+        setUsedKeys(new Set(a.usedKeys))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  /** Is this config's topic locked for the caller? */
+  const keyLocked = (cfg: GateConfigLike): boolean => {
+    if (unlimited) return false
+    const key = deriveGateKey(cfg)
+    return key ? usedKeys.has(key) : false
+  }
+  /** Divert a locked start to the upsell; returns true when it blocked. */
+  const blockIfLocked = (cfg: GateConfigLike): boolean => {
+    if (!keyLocked(cfg)) return false
+    setShowUpsell(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return true
+  }
 
   // Month counts: one HEAD count per month (mirrors the PYQ subject pattern).
   useEffect(() => {
@@ -149,10 +186,10 @@ export default function CurrentAffairsPage() {
   // already-known count as availableCount so the instructions slider shows it
   // instantly (no /count round-trip), like Subject Practice does.
   const startMonthAll = (label: string) => {
+    const cfg = { category: 'current_affairs' as const, ca_type: 'month_wise', ca_month: label }
+    if (blockIfLocked(cfg)) return
     startTest({
-      category: 'current_affairs',
-      ca_type: 'month_wise',
-      ca_month: label,
+      ...cfg,
       availableCount: monthTotal,
       labelParts: [{ t: 'currentAffairsBadge' }, label],
     })
@@ -160,20 +197,20 @@ export default function CurrentAffairsPage() {
 
   // A specific topic within the month (filters on both ca_month and topic).
   const startMonthTopic = (label: string, topic: string) => {
+    const cfg = { category: 'current_affairs' as const, ca_type: 'month_wise', ca_month: label, topic }
+    if (blockIfLocked(cfg)) return
     startTest({
-      category: 'current_affairs',
-      ca_type: 'month_wise',
-      ca_month: label,
-      topic,
+      ...cfg,
       availableCount: monthTopicCounts?.[topic],
       labelParts: [{ t: 'currentAffairsBadge' }, label, { topic }],
     })
   }
 
   const handleTopic = (topic: string) => {
+    const cfg = { category: 'current_affairs' as const, topic }
+    if (blockIfLocked(cfg)) return
     startTest({
-      category: 'current_affairs',
-      topic,
+      ...cfg,
       availableCount: topicCounts?.[topic],
       labelParts: [{ t: 'currentAffairsBadge' }, { topic }],
     })
@@ -181,6 +218,12 @@ export default function CurrentAffairsPage() {
 
   return (
     <PickerPage badge={t('currentAffairsBadge')}>
+      {showUpsell && (
+        <div className="mb-5 animate-fadeInFast">
+          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <VettriCard />
+        </div>
+      )}
       {selectedMonth ? (
         /* Month detail - choose All Topics or a specific topic within the month */
         <section className="animate-fadeIn">
@@ -241,6 +284,12 @@ export default function CurrentAffairsPage() {
                   .sort()
                   .map((topic, i) => {
                     const n = monthTopicCounts?.[topic]
+                    const locked = keyLocked({
+                      category: 'current_affairs',
+                      ca_type: 'month_wise',
+                      ca_month: selectedMonth,
+                      topic,
+                    })
                     return (
                       <ListRow
                         key={topic}
@@ -251,6 +300,7 @@ export default function CurrentAffairsPage() {
                             <Newspaper size={18} />
                           </IconTile>
                         }
+                        trailing={locked ? <LockPill label={t('lockedLabel')} /> : undefined}
                         title={topicName(topic, lang)}
                         subtitle={
                           n != null ? (
@@ -319,6 +369,11 @@ export default function CurrentAffairsPage() {
           <List>
             {CA_MONTHS.map((m, i) => {
               const n = monthCounts?.[m.label]
+              const locked = keyLocked({
+                category: 'current_affairs',
+                ca_type: 'month_wise',
+                ca_month: m.label,
+              })
               return (
                 <ListRow
                   key={m.slug}
@@ -330,6 +385,7 @@ export default function CurrentAffairsPage() {
                       <CalendarDays size={18} />
                     </IconTile>
                   }
+                  trailing={locked ? <LockPill label={t('lockedLabel')} /> : undefined}
                   title={m.label}
                   subtitle={
                     n != null ? (
@@ -365,6 +421,7 @@ export default function CurrentAffairsPage() {
             <List>
               {topics.map((topic, i) => {
                 const n = topicCounts?.[topic]
+                const locked = keyLocked({ category: 'current_affairs', topic })
                 return (
                   <ListRow
                     key={topic}
@@ -375,6 +432,7 @@ export default function CurrentAffairsPage() {
                         <Newspaper size={18} />
                       </IconTile>
                     }
+                    trailing={locked ? <LockPill label={t('lockedLabel')} /> : undefined}
                     title={topicName(topic, lang)}
                     subtitle={
                       n != null ? (
@@ -396,5 +454,14 @@ export default function CurrentAffairsPage() {
       </>
       )}
     </PickerPage>
+  )
+}
+
+/** Small "locked" chip shown on a row whose one free test is spent. */
+function LockPill({ label }: { label: string }) {
+  return (
+    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
+      <Lock size={11} /> {label}
+    </span>
   )
 }

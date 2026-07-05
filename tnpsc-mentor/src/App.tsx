@@ -50,6 +50,7 @@ const MockTestPage = lazy(() => import('./pages/MockTestPage'))
 const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
 const MockQuizPage = lazy(() => import('./pages/MockQuizPage'))
 const TestSeriesPage = lazy(() => import('./pages/TestSeriesPage'))
+const VettriPage = lazy(() => import('./pages/VettriPage'))
 const SetupPage = lazy(() => import('./pages/SetupPage'))
 const ThirukuralQuizPage = lazy(() => import('./pages/ThirukuralQuizPage'))
 const DailyPage = lazy(() => import('./pages/DailyPage'))
@@ -89,6 +90,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/mock/instructions', element: <MockInstructionsPage /> },
   { path: '/mock/quiz', element: <MockQuizPage /> },
   { path: '/test-series', element: <TestSeriesPage /> },
+  { path: '/vettri', element: <VettriPage /> },
   { path: '/setup', element: <SetupPage /> },
   { path: '/daily', element: <DailyPage /> },
   { path: '/bookmarks', element: <BookmarksPage /> },

@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2, Layers, Calculator, Brain, ChevronRight, Shuffle } from 'lucide-react'
+import { ArrowLeft, Loader2, Layers, Calculator, Brain, ChevronRight, Shuffle, Lock } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
+import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import { api } from '../lib/api'
+import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import {
   PYQ2_SECTION_SLUGS,
   PYQ2_SECTION_TOPICS,
@@ -48,10 +50,32 @@ export default function PyqGroup2SectionPage() {
     section ? countsCache.get(cacheKey(section, null)) ?? null : {}
   )
 
+  // Free-tier gate: one pyq2 test per sub-type. `unlimited` (premium/vettri) has
+  // no locks; otherwise `usedKeys` lists the sub-type keys already spent.
+  const [unlimited, setUnlimited] = useState(true)
+  const [usedKeys, setUsedKeys] = useState<Set<string>>(new Set())
+  const [showUpsell, setShowUpsell] = useState(false)
+
   // Unknown slug → back to the section list.
   useEffect(() => {
     if (!section) navigate('/test-arena/pyq/group2', { replace: true })
   }, [section, navigate])
+
+  // Lock state (which sub-types have used their one free test).
+  useEffect(() => {
+    let cancelled = false
+    api
+      .topicAccess()
+      .then((a) => {
+        if (cancelled) return
+        setUnlimited(a.unlimited)
+        setUsedKeys(new Set(a.usedKeys))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // (Re)load the per-sub-type counts whenever the section or year changes.
   useEffect(() => {
@@ -101,7 +125,25 @@ export default function PyqGroup2SectionPage() {
   const baseLabel: QuizLabelSeg[] = ['PYQ', 'Group 2', { subject: section }]
   const yearSeg: QuizLabelSeg[] = year ? [String(year)] : []
 
-  const begin = (extra: Record<string, unknown>, labelMid: QuizLabelSeg[], availableCount?: number) =>
+  // Gate helpers. The pyq2 key ignores year (a sub-type across years = one topic).
+  const gateCfg = (extra: Record<string, unknown>): GateConfigLike => ({
+    category: 'pyq2',
+    subject: section,
+    ...(extra as Partial<GateConfigLike>),
+  })
+  const keyLocked = (extra: Record<string, unknown>): boolean => {
+    if (unlimited) return false
+    const key = deriveGateKey(gateCfg(extra))
+    return key ? usedKeys.has(key) : false
+  }
+
+  const begin = (extra: Record<string, unknown>, labelMid: QuizLabelSeg[], availableCount?: number) => {
+    // A sub-type whose free test is spent diverts to the upsell instead of starting.
+    if (keyLocked(extra)) {
+      setShowUpsell(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
     startTest({
       category: 'pyq2',
       subject: section,
@@ -110,6 +152,7 @@ export default function PyqGroup2SectionPage() {
       availableCount,
       ...extra,
     })
+  }
 
   const beginAll = () => begin({}, [], allCount)
   const beginTopic = (topic: string) => begin({ topic }, [{ topic }], counts?.[topic])
@@ -136,6 +179,13 @@ export default function PyqGroup2SectionPage() {
           {subjectName(section, lang)}
         </h2>
       </div>
+
+      {showUpsell && (
+        <div className="mb-5 animate-fadeInFast">
+          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <VettriCard />
+        </div>
+      )}
 
       {/* Exam-year filter chips. "All Years" + each year; scopes every test below. */}
       <div className="mb-5">
@@ -170,6 +220,7 @@ export default function PyqGroup2SectionPage() {
             <List>
               {APT_TYPES.map(({ type, titleKey, subKey, icon, tint }, i) => {
                 const n = counts[type] ?? 0
+                const locked = keyLocked({ aptitude_type: type })
                 return (
                   <ListRow
                     key={type}
@@ -180,15 +231,19 @@ export default function PyqGroup2SectionPage() {
                     title={t(titleKey)}
                     subtitle={t(subKey)}
                     trailing={
-                      <span className="flex flex-shrink-0 items-center gap-2">
-                        <span className="font-heading text-sm font-semibold text-primary">
-                          {n}{' '}
-                          <span className="font-body text-xs font-normal text-muted">
-                            {t('questionsCount')}
+                      locked ? (
+                        <LockPill label={t('lockedLabel')} />
+                      ) : (
+                        <span className="flex flex-shrink-0 items-center gap-2">
+                          <span className="font-heading text-sm font-semibold text-primary">
+                            {n}{' '}
+                            <span className="font-body text-xs font-normal text-muted">
+                              {t('questionsCount')}
+                            </span>
                           </span>
+                          <ChevronRight size={18} className="text-muted/40" />
                         </span>
-                        <ChevronRight size={18} className="text-muted/40" />
-                      </span>
+                      )
                     }
                   />
                 )
@@ -210,6 +265,7 @@ export default function PyqGroup2SectionPage() {
                       <Layers size={18} />
                     </IconTile>
                   }
+                  trailing={keyLocked({ topic: tp }) ? <LockPill label={t('lockedLabel')} /> : undefined}
                   title={topicName(tp, lang)}
                   subtitle={
                     counts[tp] != null ? (
@@ -228,6 +284,15 @@ export default function PyqGroup2SectionPage() {
         </div>
       )}
     </PickerPage>
+  )
+}
+
+/** Small "locked" chip shown on a sub-type whose one free test is spent. */
+function LockPill({ label }: { label: string }) {
+  return (
+    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
+      <Lock size={11} /> {label}
+    </span>
   )
 }
 

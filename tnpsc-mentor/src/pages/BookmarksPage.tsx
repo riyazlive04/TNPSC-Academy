@@ -89,16 +89,16 @@ export default function BookmarksPage() {
           <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
             {questions.map((q, i) => (
               <article key={q.id} className="rounded-card border border-line bg-card p-4 sm:p-5">
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <p className="tamil whitespace-pre-line font-display text-base font-bold leading-snug text-ink">
-                    <span className="mr-1 text-primary">{i + 1}.</span>
-                    {displayQuestion(q, lang)}
-                  </p>
+                {/* Remove button floats top-right so the question stem flows the
+                    FULL card width (wraps beside the button only on the first
+                    line, then reclaims the space below it) instead of being
+                    boxed into `width − button` on every line. */}
+                <div className="mb-3 after:clear-both after:block after:content-['']">
                   <button
                     onClick={() => handleRemove(q.id)}
                     disabled={removingId === q.id}
                     aria-label="Remove bookmark"
-                    className="rounded-lg p-1.5 text-muted transition-colors hover:bg-coralsoft hover:text-coral disabled:opacity-50"
+                    className="float-right ml-3 rounded-lg p-1.5 text-muted transition-colors hover:bg-coralsoft hover:text-coral disabled:opacity-50"
                   >
                     {removingId === q.id ? (
                       <Loader2 size={16} className="animate-spin" />
@@ -106,6 +106,10 @@ export default function BookmarksPage() {
                       <BookmarkX size={18} />
                     )}
                   </button>
+                  <p className="tamil whitespace-pre-line font-display text-base font-bold leading-snug text-ink">
+                    <span className="mr-1 text-primary">{i + 1}.</span>
+                    {displayQuestion(q, lang)}
+                  </p>
                 </div>
 
                 <div className="flex flex-col gap-1.5">

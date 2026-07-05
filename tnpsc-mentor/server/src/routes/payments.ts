@@ -5,8 +5,8 @@ import { config, razorpayEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
-import { baseAmountForPlan } from '../pricing.js'
-import { premiumEntitlement } from '../lib/premium.js'
+import { baseAmountForPlan, KNOWN_PLANS } from '../pricing.js'
+import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
 import { evaluateCoupon, couponLimiter } from './coupons.js'
 import { notifyAdmins } from '../notify.js'
 
@@ -46,9 +46,11 @@ router.post(
 
     // Resolve the plan SERVER-SIDE: only a plan pricing.ts recognizes is honoured
     // — anything else is the generic contribution path (plan stripped). We then
-    // overwrite notes.plan with this validated value so entitlement (GET /premium)
-    // can never be driven by an arbitrary client-supplied notes.plan string.
-    const plan: string | null = req.body?.notes?.plan === 'premium_annual' ? 'premium_annual' : null
+    // overwrite notes.plan with this validated value so entitlement (GET /premium,
+    // /entitlements) can never be driven by an arbitrary client-supplied plan.
+    const requestedPlan = req.body?.notes?.plan
+    const plan: string | null =
+      typeof requestedPlan === 'string' && KNOWN_PLANS.has(requestedPlan) ? requestedPlan : null
     if (plan) notes.plan = plan
     else delete notes.plan
 
@@ -113,7 +115,14 @@ router.post(
         .eq('id', req.userId)
         .single()
       const who = (prof?.full_name as string) || (prof?.email as string) || 'A user'
-      const planLabel = notes.plan === 'premium_annual' ? 'Premium' : 'a paid plan'
+      const planLabel =
+        notes.plan === 'premium_annual'
+          ? 'Premium'
+          : notes.plan === 'vettri_nichayam'
+            ? 'Vettri Nichayam (full)'
+            : notes.plan === 'vettri_month'
+              ? 'Vettri Nichayam (monthly)'
+              : 'a paid plan'
       const waived = `₹${Math.round(base / 100)}`
       await notifyAdmins(
         'Free unlock via coupon',
@@ -265,6 +274,24 @@ router.get(
   asyncH(async (req: AuthedRequest, res) => {
     try {
       res.json(await premiumEntitlement(req.db!))
+    } catch (e) {
+      return sendDbError(res, e as Parameters<typeof sendDbError>[1])
+    }
+  })
+)
+
+// ─── GET /api/payments/entitlements ──────────────────────────────────────────
+// The full bundle picture in one call: { premium, premiumUntil, vettri,
+// vettriUntil, unlimited }. `unlimited` (premium || vettri) is what the Vettri
+// bank and the PYQ/CA per-topic gate check. Premium is a superset of vettri, so a
+// premium buyer reads back vettri-equivalent access via `unlimited`. Used by the
+// client entitlements store to drive the Vettri upsell card + lock UI.
+router.get(
+  '/entitlements',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    try {
+      res.json(await bundleAccess(req.db!))
     } catch (e) {
       return sendDbError(res, e as Parameters<typeof sendDbError>[1])
     }

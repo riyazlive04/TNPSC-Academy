@@ -43,6 +43,7 @@ import {
   Eye,
   EyeOff,
   CalendarDays,
+  Trophy,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -70,9 +71,9 @@ import {
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
 import { toast } from '../store/toastStore'
-import type { MockExamAdmin, TestSeriesAdmin, UserRole } from '../types'
+import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'materials'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -89,6 +90,7 @@ export default function SuperAdminPage() {
     { id: 'notes', label: 'notesTab', icon: BookOpen },
     { id: 'mockexams', label: 'mockExamsTab', icon: ClipboardList },
     { id: 'testseries', label: 'testSeriesTab', icon: CalendarDays },
+    { id: 'vettri', label: 'vettriTab', icon: Trophy },
     { id: 'materials', label: 'materialsTab', icon: Library },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
@@ -138,6 +140,7 @@ export default function SuperAdminPage() {
           {tab === 'notes' && <StudyNotesTab />}
           {tab === 'mockexams' && <MockExamsTab />}
           {tab === 'testseries' && <TestSeriesTab />}
+          {tab === 'vettri' && <VettriExamsTab />}
           {tab === 'materials' && <MaterialsTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
@@ -1219,6 +1222,195 @@ function TestSeriesTab() {
                   {/* Enabled toggle */}
                   <button
                     disabled={busy}
+                    onClick={() => patch(e.id, { enabled: !e.enabled })}
+                    aria-pressed={e.enabled}
+                    className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+                      e.enabled ? 'bg-correct' : 'bg-ink2/30'
+                    } disabled:opacity-50`}
+                  >
+                    <span
+                      className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                        e.enabled ? 'left-6' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ─── Vettri Nichayam exams ──────────────────────────────────────────────────────
+
+function VettriExamsTab() {
+  const { t } = useT()
+  const [exams, setExams] = useState<VettriExamAdmin[]>([])
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [savingId, setSavingId] = useState<string | null>(null)
+
+  // Master visibility flag (app_settings) — hides the whole Vettri tab + Test
+  // Arena tile for all students until turned on.
+  const [vettriOn, setVettriOn] = useState(false)
+  const [savingFlag, setSavingFlag] = useState(false)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    Promise.all([api.superadmin.vettriExams(), api.superadmin.settings()])
+      .then(([ex, settings]) => {
+        setExams(ex)
+        setVettriOn(Boolean(settings.vettri_enabled))
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const toggleVettri = async (next: boolean) => {
+    setSavingFlag(true)
+    setVettriOn(next) // optimistic
+    try {
+      await api.superadmin.setSetting('vettri_enabled', next)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setVettriOn(!next)
+    } finally {
+      setSavingFlag(false)
+    }
+  }
+
+  const patch = async (
+    id: string,
+    p: Partial<{ enabled: boolean; total_questions: number; duration_seconds: number }>
+  ) => {
+    setSavingId(id)
+    try {
+      const updated = await api.superadmin.setVettriExam(id, p)
+      setExams((xs) => xs.map((e) => (e.id === id ? { ...e, ...updated } : e)))
+    } catch {
+      toast.error(t('couldNotLoad'))
+    } finally {
+      setSavingId(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="skeleton h-24 w-full" />
+        ))}
+      </div>
+    )
+  }
+  if (error) return <ErrorState onRetry={load} />
+
+  const enabledCount = exams.filter((e) => e.enabled).length
+
+  return (
+    <div>
+      <div className="card mb-4 flex items-center justify-between p-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-soft text-brand">
+            <Trophy size={20} />
+          </span>
+          <div>
+            <p className="font-heading text-xl font-semibold text-ink">
+              {enabledCount}/{exams.length}
+            </p>
+            <p className="font-body text-xs text-ink2">{t('vettriTab')} · enabled</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Master visibility — show/hide the whole Vettri feature for students */}
+      <div className="card mb-4 p-4">
+        <p className="mb-1 font-heading text-sm font-semibold text-ink">{t('vettriShowTitle')}</p>
+        <p className="mb-3 font-body text-xs text-ink2">{t('vettriShowSub')}</p>
+        <div className="flex items-center justify-between gap-3">
+          <span className="tamil font-body text-sm text-ink">{t('vettriTitle')}</span>
+          <button
+            disabled={savingFlag}
+            onClick={() => toggleVettri(!vettriOn)}
+            aria-pressed={vettriOn}
+            className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+              vettriOn ? 'bg-correct' : 'bg-ink2/30'
+            } disabled:opacity-50`}
+          >
+            <span
+              className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                vettriOn ? 'left-6' : 'left-1'
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        {exams.map((e) => {
+          const minutes = Math.round(e.duration_seconds / 60)
+          const short = e.loaded_questions !== e.total_questions
+          const empty = e.loaded_questions === 0
+          const busy = savingId === e.id
+          return (
+            <div key={e.id} className="card p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="tamil font-heading text-sm font-semibold text-ink">{e.title}</p>
+                  <p className="font-body text-xs text-ink2">
+                    {e.loaded_questions}/{e.total_questions} questions
+                    {empty ? (
+                      <span className="text-wrong"> · no questions loaded</span>
+                    ) : (
+                      short && <span className="text-wrong"> · mismatch</span>
+                    )}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Total questions */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">
+                    <FileText size={14} className="text-ink2" />
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={e.total_questions}
+                      disabled={busy}
+                      onBlur={(ev) => {
+                        const n = Math.trunc(Number(ev.target.value))
+                        if (n > 0 && n !== e.total_questions) patch(e.id, { total_questions: n })
+                      }}
+                      className="w-14 bg-transparent font-heading text-sm text-ink outline-none"
+                    />
+                    <span className="font-body text-xs text-ink2">Q</span>
+                  </label>
+
+                  {/* Duration (minutes) */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5">
+                    <Clock size={14} className="text-ink2" />
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={minutes}
+                      disabled={busy}
+                      onBlur={(ev) => {
+                        const m = Math.trunc(Number(ev.target.value))
+                        if (m > 0 && m !== minutes) patch(e.id, { duration_seconds: m * 60 })
+                      }}
+                      className="w-14 bg-transparent font-heading text-sm text-ink outline-none"
+                    />
+                    <span className="font-body text-xs text-ink2">{t('minutesUnit')}</span>
+                  </label>
+
+                  {/* Enabled toggle (guarded: don't enable an empty exam) */}
+                  <button
+                    disabled={busy || (!e.enabled && empty)}
+                    title={!e.enabled && empty ? 'Load questions before enabling' : undefined}
                     onClick={() => patch(e.id, { enabled: !e.enabled })}
                     aria-pressed={e.enabled}
                     className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
