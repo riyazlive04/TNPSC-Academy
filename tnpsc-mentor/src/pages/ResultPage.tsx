@@ -24,7 +24,7 @@ import { scoreByTopic, weakAreas, fetchUserAnalytics } from '../lib/analytics'
 import { fetchHabit } from '../lib/habit'
 import { computeXp, levelInfo } from '../lib/game'
 import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
-import { isHiddenBadge } from '../lib/features'
+import { isHiddenBadge, SHOW_GOALS } from '../lib/features'
 import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import { assetsFor } from '../lib/assets'
 import { exitFullscreen } from '../lib/proctor'
@@ -76,6 +76,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   const { user, profile } = useAuth()
   const claim = useProgressStore((s) => s.claim)
   const claimDaily = useProgressStore((s) => s.claimDaily)
+  const claimGoalMet = useProgressStore((s) => s.claimGoalMet)
   const payload = previewPayload ?? (location.state as ResultPayload | null)
 
   // Report the result view to analytics once per finished test. Skipped for the
@@ -108,6 +109,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
     leveledTo: number | null
     newBadges: Badge[]
     daily: DailyReward | null
+    goalDone: boolean
   } | null>(null)
 
   // Guard - no result data means a direct visit; bounce home.
@@ -165,18 +167,28 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
         if (dc.granted) daily = { points: dc.points, streak: h.currentStreak }
       }
 
-      if (res.newBadges.length || res.leveledTo != null || daily) {
+      // Daily-goal completion - celebrate only the test that crossed the line
+      // (today's count includes this test; subtracting it must land below goal),
+      // and only once per IST day via the store latch.
+      const crossedGoal =
+        SHOW_GOALS &&
+        h.questionsToday >= h.dailyGoal &&
+        h.questionsToday - payload.totalQuestions < h.dailyGoal
+      const goalDone = crossedGoal && claimGoalMet()
+
+      if (res.newBadges.length || res.leveledTo != null || daily || goalDone) {
         setRewards({
           leveledTo: res.leveledTo,
           newBadges: all.filter((b) => res.newBadges.includes(b.id)),
           daily,
+          goalDone,
         })
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [payload, user, profile, claim, claimDaily])
+  }, [payload, user, profile, claim, claimDaily, claimGoalMet])
 
   // Load which of these questions are already bookmarked (for the toggle state).
   useEffect(() => {
@@ -597,6 +609,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
           leveledTo={rewards.leveledTo}
           newBadges={rewards.newBadges}
           daily={rewards.daily}
+          goalDone={rewards.goalDone}
           onClose={() => setRewards(null)}
         />
       )}

@@ -1,4 +1,4 @@
-import { cloneElement, useEffect, useState, type ReactElement } from 'react'
+import { cloneElement, useEffect, useMemo, useState, type ReactElement } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
@@ -8,8 +8,6 @@ import {
   ShieldCheck,
   RefreshCw,
   Flame,
-  Check,
-  Target,
   ChevronRight,
   Layers,
   Activity,
@@ -27,19 +25,21 @@ import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
-import StatStrip, { type Stat } from '../components/UI/StatStrip'
+import MomentumPanel from '../components/Home/MomentumPanel'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import { fetchHabit, type HabitState } from '../lib/habit'
-import { SHOW_STREAK, SHOW_GOALS } from '../lib/features'
+import { SHOW_STREAK, isHiddenBadge } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { computeXp, levelInfo } from '../lib/game'
-import { unlockedBadgeIds, type GameStats } from '../lib/achievements'
+import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
 import { GROUP_SUBJECTS } from '../lib/constants'
 import { useProgressStore } from '../store/progressStore'
+import { useMomentumStore } from '../store/momentumStore'
 import { useOnboardingStore } from '../store/onboardingStore'
+import RewardOverlay from '../components/RewardOverlay'
 import { toast } from '../store/toastStore'
 import { tapScaleSubtle } from '../lib/motion'
 import type { GroupType } from '../types'
@@ -181,13 +181,12 @@ export default function TestArenaPage() {
     })
   )
 
-  // Seed the reward baseline once, so the celebration overlay (on the Result
-  // page) only fires for progress earned AFTER this point - never a backlog.
-  const syncProgress = useProgressStore((s) => s.sync)
-  useEffect(() => {
-    if (!analytics || !habit) return
+  // One stat snapshot shared by the reward-baseline sync and the momentum
+  // panel's badge counter, so both always agree.
+  const stats: GameStats | null = useMemo(() => {
+    if (!analytics || !habit) return null
     const group = (profile?.target_group as GroupType) || 'Group1'
-    const stats: GameStats = {
+    return {
       tests: analytics.overview.testsTaken,
       questions: analytics.overview.totalQuestions,
       correct: analytics.overview.totalCorrect,
@@ -199,8 +198,39 @@ export default function TestArenaPage() {
       subjects: analytics.bySubject.length,
       totalSubjects: (GROUP_SUBJECTS[group] ?? []).length,
     }
-    syncProgress(unlockedBadgeIds(stats), lvl.level)
-  }, [analytics, habit, profile, lvl.level, syncProgress])
+  }, [analytics, habit, profile?.target_group])
+
+  // Celebrate achievements the moment they're first seen here - including
+  // streak badges, which unlock just by coming back a day later (no test run,
+  // so the Result page never sees them). claim() seeds silently on a cold
+  // store (never a backlog) and advances the shared baseline, so the Result
+  // page and this popup can never both fire for the same unlock.
+  const claimProgress = useProgressStore((s) => s.claim)
+  const [rewards, setRewards] = useState<{ leveledTo: number | null; newBadges: Badge[] } | null>(
+    null
+  )
+  useEffect(() => {
+    if (!stats) return
+    const all = computeBadges(stats).filter((b) => !isHiddenBadge(b.id))
+    const res = claimProgress(all.filter((b) => b.unlocked).map((b) => b.id), lvl.level)
+    if (res.newBadges.length || res.leveledTo != null) {
+      setRewards({
+        leveledTo: res.leveledTo,
+        newBadges: all.filter((b) => res.newBadges.includes(b.id)),
+      })
+    }
+  }, [stats, lvl.level, claimProgress])
+
+  // The momentum panel shows once per sign-in: the auth store arms the flag on
+  // every successful login/signup; we latch it at mount (so it stays for this
+  // visit) and consume it only once the panel has really rendered - a failed
+  // habit fetch keeps it pending for the next visit.
+  const momentumPending = useMomentumStore((s) => s.pending)
+  const consumeMomentum = useMomentumStore((s) => s.consume)
+  const [showMomentum] = useState(momentumPending)
+  useEffect(() => {
+    if (showMomentum && habit && stats && !isAdmin) consumeMomentum()
+  }, [showMomentum, habit, stats, isAdmin, consumeMomentum])
 
   // ─── Admin / superadmin: a focused content-management home (no aspirant
   // gamification - no level, streak, daily goal or achievements). ──────────────
@@ -218,35 +248,12 @@ export default function TestArenaPage() {
   const [featured, ...restCards] = CARDS
   const showStreak = SHOW_STREAK && (habit?.currentStreak ?? 0) > 0
 
-  // Habit strip under the greeting - goal progress, best streak, exam countdown.
-  // The coral accent stays on the streak chip beside the name (the one number
-  // that matters); the strip carries the supporting metrics.
-  const habitStats: Stat[] = []
-  if (habit) {
-    if (SHOW_GOALS)
-      habitStats.push({
-        label: t('questionsToday'),
-        value: habit.goalMetToday ? (
-          <span className="inline-flex items-center gap-1.5">
-            {habit.questionsToday}/{habit.dailyGoal}
-            <Check size={16} className="text-mint" />
-          </span>
-        ) : (
-          `${habit.questionsToday}/${habit.dailyGoal}`
-        ),
-      })
-    if (SHOW_STREAK && habit.longestStreak > 1)
-      habitStats.push({ label: t('bestStreak'), value: habit.longestStreak })
-    if (SHOW_GOALS && habit.daysToExam != null && habit.daysToExam >= 0)
-      habitStats.push({ label: t('daysToExam'), value: habit.daysToExam })
-  }
-
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
         {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
         <header className="px-1">
-          <p className="font-body text-[13px] text-muted">{t('welcomeBack')}</p>
+          <p className="tamil font-body text-[13px] text-muted">{t(greetingKey())}</p>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
             <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink">
               {firstName || 'Aspirant'}
@@ -260,17 +267,8 @@ export default function TestArenaPage() {
               </span>
             )}
           </div>
-          {habitStats.length > 0 && <StatStrip items={habitStats} className="mt-5" />}
-          {/* No exam date yet - a quiet pointer to the goals screen. */}
-          {SHOW_GOALS && habit && !habit.examDate && (
-            <button
-              onClick={() => navigate('/setup')}
-              className="focus-ring mt-3 inline-flex items-center gap-1.5 font-heading text-[13px] font-semibold text-primary transition hover:opacity-80"
-            >
-              <Target size={14} />
-              <span className="tamil">{t('setExamDate')}</span>
-              <ChevronRight size={14} />
-            </button>
+          {showMomentum && habit && stats && (
+            <MomentumPanel habit={habit} lvl={lvl} stats={stats} />
           )}
           {/* Kural of the day - the actual couplet, rotating daily. Tapping it
               opens the box straight at this kural's full detail. */}
@@ -410,6 +408,14 @@ export default function TestArenaPage() {
         initialKuralNo={dailyKural?.kural_no}
       />
 
+      {rewards && (
+        <RewardOverlay
+          leveledTo={rewards.leveledTo}
+          newBadges={rewards.newBadges}
+          onClose={() => setRewards(null)}
+        />
+      )}
+
       <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} />
     </AppLayout>
   )
@@ -503,6 +509,15 @@ function Hero({
       <ChevronRight size={20} className="relative flex-shrink-0 text-white/70 sm:hidden" />
     </motion.button>
   )
+}
+
+/** Time-of-day greeting key - a small warmth cue over a static "Welcome back".
+ * Local device time is correct here (the audience is IST anyway). */
+function greetingKey(): StringKey {
+  const h = new Date().getHours()
+  if (h < 12) return 'goodMorning'
+  if (h < 17) return 'goodAfternoon'
+  return 'goodEvening'
 }
 
 /**

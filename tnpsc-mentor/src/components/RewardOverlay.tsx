@@ -1,4 +1,4 @@
-import { Flame, Gift } from 'lucide-react'
+import { Check, Flame, Gift } from 'lucide-react'
 import { badgeIcon } from './badgeIcons'
 import type { Badge } from '../lib/achievements'
 import { SHOW_STREAK } from '../lib/features'
@@ -16,22 +16,36 @@ interface RewardOverlayProps {
   newBadges: Badge[]
   /** Present when a fresh daily-challenge reward was just claimed. */
   daily?: DailyReward | null
+  /** True when this test just completed the daily question goal. */
+  goalDone?: boolean
   onClose: () => void
 }
 
 /**
- * Minimal celebration shown after a test when the user levels up and/or unlocks
- * new badges - plus the daily-challenge reward when one was just earned.
- * Restrained, premium - no confetti.
+ * Minimal celebration shown when the user levels up, unlocks badges, completes
+ * the daily goal and/or earns the daily-challenge reward. Fired from the Result
+ * page after a test and from the dashboard for unlocks first seen there (e.g.
+ * streak badges). Restrained, premium - no confetti.
  */
-export default function RewardOverlay({ leveledTo, newBadges, daily, onClose }: RewardOverlayProps) {
+export default function RewardOverlay({
+  leveledTo,
+  newBadges,
+  daily,
+  goalDone = false,
+  onClose,
+}: RewardOverlayProps) {
   const { t } = useT()
-  const nothingElse = leveledTo == null && newBadges.length === 0
+  const hasProgress = leveledTo != null || newBadges.length > 0
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/50 px-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('achievements')}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/50 px-4"
+    >
       <div className="animate-pop w-full max-w-sm rounded-2xl border border-line bg-card p-6 text-center shadow-card">
         {daily && (
-          <div className={nothingElse ? '' : 'mb-5 border-b border-line pb-5'}>
+          <div className={!hasProgress && !goalDone ? '' : 'mb-5 border-b border-line pb-5'}>
             <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-brand-soft text-brand">
               <Gift size={26} />
             </div>
@@ -52,6 +66,23 @@ export default function RewardOverlay({ leveledTo, newBadges, daily, onClose }: 
               )}
             </div>
             <p className="tamil mt-3 font-body text-sm text-ink2">{t('comeBackTomorrow')}</p>
+          </div>
+        )}
+
+        {goalDone && (
+          <div className={hasProgress ? 'mb-5 border-b border-line pb-5' : ''}>
+            <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-mintsoft text-mint">
+              <Check size={26} strokeWidth={3} className="animate-checkPop" />
+            </div>
+            <p className="font-heading text-xs font-semibold uppercase tracking-[0.14em] text-ink2">
+              {t('dailyGoal')}
+            </p>
+            <p className="tamil mt-1 font-heading text-2xl font-semibold tracking-tight text-ink">
+              {t('goalDone')}
+            </p>
+            {!daily && (
+              <p className="tamil mt-3 font-body text-sm text-ink2">{t('comeBackTomorrow')}</p>
+            )}
           </div>
         )}
 
@@ -87,7 +118,7 @@ export default function RewardOverlay({ leveledTo, newBadges, daily, onClose }: 
           </>
         )}
 
-        {nothingElse && !daily && (
+        {!hasProgress && !daily && !goalDone && (
           <p className="mb-4 font-heading text-xl font-semibold text-ink">Nice work</p>
         )}
 

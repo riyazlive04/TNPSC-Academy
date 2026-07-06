@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck, Download } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useVettriEnabled } from '../../hooks/useVettriEnabled'
 import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
 import { usePremiumStore } from '../../store/premiumStore'
@@ -9,6 +11,7 @@ import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
+import VettriSuggestModal from './VettriSuggestModal'
 
 // ─── Premium plan pricing ───────────────────────────────────────────────────
 // Single source of truth for the 3-month plan. `PRICE_PAISE` is what the order is
@@ -71,9 +74,18 @@ export default function PremiumCard({
 }) {
   const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
+  const navigate = useNavigate()
   const [paying, setPaying] = useState(false)
   // Pre-payment recap popup: "Get Premium" opens it; checkout runs only on OK.
   const [confirmOpen, setConfirmOpen] = useState(false)
+  // Vettri-first suggestion: intercepts the first "Get Premium" tap with the
+  // better-value bundle; "Continue with Premium" proceeds to the confirm popup
+  // and is remembered for this mount so the pitch never nags twice.
+  const [suggestOpen, setSuggestOpen] = useState(false)
+  const [suggestSeen, setSuggestSeen] = useState(false)
+  const vettriOn = useVettriEnabled()
+  const hasVettri = useEntitlementsStore((s) => s.vettri)
+  const entitlementsLoaded = useEntitlementsStore((s) => s.loaded)
   const { premium, loaded, refresh, markPremium } = usePremiumStore()
   // Premium is a superset of every paid entitlement, so a successful buy must
   // also update the bundle + credit stores — otherwise the Vettri/Marathon
@@ -99,6 +111,13 @@ export default function PremiumCard({
   useEffect(() => {
     if (!loaded) refresh()
   }, [loaded, refresh])
+
+  // The Vettri pitch needs the bundle entitlement too - on pages where no
+  // VettriCard is mounted (e.g. Profile) nothing else loads it, and an unloaded
+  // store would mis-pitch Vettri to someone who already owns it.
+  useEffect(() => {
+    if (!entitlementsLoaded) refreshEntitlements()
+  }, [entitlementsLoaded, refreshEntitlements])
 
   const applyCoupon = async () => {
     const trimmed = code.trim()
@@ -168,6 +187,14 @@ export default function PremiumCard({
   const finalPaise = applied ? applied.finalAmount : PREMIUM_PRICE_PAISE
   const isFree = finalPaise === 0
 
+  // "Get Premium" → pitch Vettri first when it's actually a live alternative:
+  // the bundle is enabled, the buyer doesn't already own it, and this is a real
+  // payment (a 100%-off coupon has no value decision to make).
+  const openPurchase = () => {
+    if (vettriOn && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
+    else setConfirmOpen(true)
+  }
+
   return (
     <div
       className={`card relative overflow-hidden p-6 pl-7 ${className}`}
@@ -204,7 +231,27 @@ export default function PremiumCard({
             {PERK_KEYS.map((p) => (
               <li key={p} className="flex items-start gap-2 font-body text-sm text-ink2">
                 <Check size={15} className="mt-0.5 flex-shrink-0 text-mint" />
-                <span className="tamil">{t(p)}</span>
+                <span className="tamil">
+                  {t(p)}
+                  {/* The Test Marathon perk carries an inline "download the schedule
+                      (PDF)" link to the timetable flyer — same flyer + wording as
+                      the VettriCard perk, tinted mint to match this card. */}
+                  {p === 'premiumPerk5' && (
+                    <>
+                      ,{' '}
+                      <a
+                        href="/test-marathon-2026-schedule.pdf"
+                        download="TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf"
+                        target="_blank"
+                        rel="noopener"
+                        className="font-semibold text-mint underline decoration-mint/40 underline-offset-2 transition hover:decoration-mint"
+                      >
+                        {t('vettriPerk1Link')}
+                        <Download size={12} className="ml-1 inline-block align-[-1px]" />
+                      </a>
+                    </>
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -304,7 +351,7 @@ export default function PremiumCard({
           )}
 
           <button
-            onClick={() => setConfirmOpen(true)}
+            onClick={openPurchase}
             disabled={paying}
             className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-pill bg-mint px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-mint transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60"
           >
@@ -325,6 +372,22 @@ export default function PremiumCard({
           </p>
         </div>
       </div>
+
+      {/* Vettri-first pitch; "Continue with Premium" falls through to the recap. */}
+      <VettriSuggestModal
+        open={suggestOpen}
+        premiumRupees={PREMIUM_PRICE_RUPEES}
+        onVettri={() => {
+          setSuggestOpen(false)
+          navigate('/vettri')
+        }}
+        onPremium={() => {
+          setSuggestOpen(false)
+          setSuggestSeen(true)
+          setConfirmOpen(true)
+        }}
+        onClose={() => setSuggestOpen(false)}
+      />
 
       {/* What-you-get recap; Razorpay opens only after the buyer taps OK. */}
       <PurchaseConfirmModal

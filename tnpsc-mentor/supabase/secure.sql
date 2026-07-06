@@ -751,3 +751,24 @@ grant execute on function public.pyq_history_period_counts()  to authenticated;
 grant execute on function public.subject_mock_questions(text, text, text, int) to authenticated;
 grant execute on function public.mock_slot_questions(jsonb, int) to authenticated;
 grant execute on function public.increment_activity(int, int) to authenticated;
+
+-- ─── 5. Backup tables: server-only ──────────────────────────────────────────
+-- Ad-hoc backup tables created by data scripts (question-bank restructures,
+-- explanation rewrites) are NOT part of the app surface. Without RLS they get
+-- PostgREST's default anon/authenticated grants — full read AND write with the
+-- public anon key. Lock them down: RLS on (no policies = deny-all) + revoke the
+-- public-role grants. The Express server (service role) and migration scripts
+-- (table owner) are unaffected. Guarded so fresh installs without the backup
+-- tables still run clean.
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['questions_backup', 'question_stem_backup', 'aptitude_explanation_backup']
+  loop
+    if to_regclass('public.' || t) is not null then
+      execute format('alter table public.%I enable row level security', t);
+      execute format('revoke all on table public.%I from anon, authenticated', t);
+    end if;
+  end loop;
+end $$;

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { api, tokens, isApiConfigured, canTryRefresh, ApiError, type DeviceSession } from '../lib/api'
 import { useLanguageStore } from './languageStore'
+import { armMomentumPanel } from './momentumStore'
 import { trackLogin, trackSignUp, setUserId } from '../lib/tracking'
 import type { Profile, UserRole } from '../types'
 
@@ -160,6 +161,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.login(email.trim(), password)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       trackLogin('password')
       return { error: null }
     } catch (e) {
@@ -174,6 +176,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.google(idToken)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       trackLogin('google')
       return { error: null }
     } catch (e) {
@@ -188,6 +191,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.replaceDevice(email.trim(), password, sessionId)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       return { error: null }
     } catch (e) {
       const devices = deviceLimitFrom(e)
@@ -201,6 +205,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.googleReplaceDevice(idToken, sessionId)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       return { error: null }
     } catch (e) {
       const devices = deviceLimitFrom(e)
@@ -230,6 +235,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.otpVerify(phone, otp)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       trackLogin('otp')
       return { error: null }
     } catch (e) {
@@ -244,6 +250,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { user, profile } = await api.auth.otpReplaceDevice(ticket, sessionId)
       applyProfileLanguage(profile)
       set({ user, profile })
+      armMomentumPanel()
       return { error: null }
     } catch (e) {
       const devices = deviceLimitFrom(e)
@@ -260,6 +267,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       applyProfileLanguage(res.profile)
       set({ user: res.user, profile: res.profile })
+      armMomentumPanel()
       trackSignUp('password')
       return { error: null }
     } catch (e) {

@@ -28,7 +28,7 @@ import { abandonTest } from '../lib/abandonTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
-import { useT } from '../lib/i18n'
+import { useT, translate } from '../lib/i18n'
 import type { AnswerLetter, QuizConfig } from '../types'
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
@@ -602,11 +602,14 @@ export default function QuizPage() {
             <div className="animate-slideDown flex w-full max-w-md items-center gap-3 rounded-2xl bg-warn px-5 py-4 text-white shadow-2xl ring-4 ring-warn/25">
               <AlertTriangle size={26} className="flex-shrink-0 animate-pulse" />
               <div className="min-w-0 flex-1">
+                {/* The nudge is about the question the aspirant is READING, so it
+                    follows the in-test question language, not the app UI chrome. */}
                 <p className="tamil font-heading text-sm font-bold leading-snug">
-                  {isLongQuestion ? t('readCarefully') : t('min15')}
+                  {translate(isLongQuestion ? 'readCarefully' : 'min15', quizLang)}
                 </p>
                 <p className="tamil mt-0.5 font-body text-xs font-medium text-white/85">
-                  {t('waitSeconds')} {Math.max(0, MIN_SECONDS_PER_QUESTION - secondsOnQuestion)}s
+                  {translate('waitSeconds', quizLang)}{' '}
+                  {Math.max(0, MIN_SECONDS_PER_QUESTION - secondsOnQuestion)}s
                 </p>
               </div>
             </div>

@@ -31,6 +31,9 @@ interface ProgressState {
   lastDailyDate: string | null
   dailyRewardPoints: number
 
+  // Last IST day the "daily goal complete" celebration was shown.
+  lastGoalDate: string | null
+
   /** Seed the baseline silently (called on the dashboard) - no rewards shown. */
   sync: (badgeIds: string[], level: number) => void
   /**
@@ -45,6 +48,12 @@ interface ProgressState {
    * an explicit `today` may be passed in tests. Idempotent within the day.
    */
   claimDaily: (today?: string) => DailyClaim
+  /**
+   * Mark today's daily-goal completion as celebrated. Returns true only on the
+   * first call of the IST day, so the "goal complete" popup can never repeat
+   * (e.g. when a result page is revisited). Idempotent within the day.
+   */
+  claimGoalMet: (today?: string) => boolean
 }
 
 export const useProgressStore = create<ProgressState>()(
@@ -55,6 +64,7 @@ export const useProgressStore = create<ProgressState>()(
       seenLevel: 1,
       lastDailyDate: null,
       dailyRewardPoints: 0,
+      lastGoalDate: null,
 
       sync: (badgeIds, level) => {
         if (get().initialized) return
@@ -92,6 +102,13 @@ export const useProgressStore = create<ProgressState>()(
         const total = dailyRewardPoints + DAILY_REWARD_POINTS
         set({ lastDailyDate: day, dailyRewardPoints: total })
         return { granted: true, points: DAILY_REWARD_POINTS, total }
+      },
+
+      claimGoalMet: (today) => {
+        const day = today ?? todayIso()
+        if (get().lastGoalDate === day) return false
+        set({ lastGoalDate: day })
+        return true
       },
     }),
     { name: 'tnpsc-mentor-progress' }
