@@ -90,6 +90,15 @@ export const config = {
   evolutionApiUrl: (process.env.EVOLUTION_API_URL ?? '').replace(/\/+$/, ''),
   evolutionApiKey: process.env.EVOLUTION_API_KEY ?? '',
   evolutionInstance: process.env.EVOLUTION_INSTANCE ?? '',
+  // ─── Telegram bot — signup phone verification fallback (optional) ───────────
+  // For numbers with no WhatsApp: the user opens this bot via a one-time deep
+  // link and shares their Telegram-verified phone number, which must match the
+  // number being registered (see lib/telegramVerify.ts). TOKEN comes from
+  // BotFather (full "<bot_id>:<secret>" form); USERNAME is the bot's @handle
+  // (without '@') used to build the t.me deep link. When either is blank the
+  // /api/telegram endpoints return 503 and signup offers WhatsApp only.
+  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
+  telegramBotUsername: (process.env.TELEGRAM_BOT_USERNAME ?? '').replace(/^@/, ''),
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -108,4 +117,10 @@ export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTempla
  * signup-OTP endpoints AND makes /register require a verified-phone ticket. */
 export const whatsappOtpEnabled = Boolean(
   config.evolutionApiUrl && config.evolutionApiKey && config.evolutionInstance
+)
+
+/** True when the Telegram bot is configured — gates the Telegram fallback for
+ * signup phone verification (/api/telegram). */
+export const telegramVerifyEnabled = Boolean(
+  config.telegramBotToken && config.telegramBotUsername
 )

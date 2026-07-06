@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Info, Send } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
-import { api, isSignupWaOtpConfigured } from '../lib/api'
+import { api, isSignupWaOtpConfigured, isTelegramVerifyConfigured } from '../lib/api'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
 import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
+import TelegramHelpModal from '../components/Auth/TelegramHelpModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
@@ -58,7 +59,8 @@ const STRENGTH_META: { key: StringKey; color: string }[] = [
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { signUp, sendSignupOtp, verifySignupOtp } = useAuth()
+  const { signUp, sendSignupOtp, verifySignupOtp, startTelegramVerify, checkTelegramVerify } =
+    useAuth()
   const { t } = useT()
   const setLang = useLanguageStore((s) => s.setLang)
 
@@ -81,11 +83,17 @@ export default function RegisterPage() {
   // number's WhatsApp and the form flips to a code-entry step. The verified
   // ticket is kept so an unchanged number never re-prompts (e.g. after fixing a
   // duplicate-email error and resubmitting).
-  const [step, setStep] = useState<'form' | 'otp'>('form')
+  const [step, setStep] = useState<'form' | 'otp' | 'telegram'>('form')
   const [otp, setOtp] = useState('')
   const [otpInfo, setOtpInfo] = useState('')
   const [resendIn, setResendIn] = useState(0)
   const [verified, setVerified] = useState<{ phone: string; ticket: string } | null>(null)
+
+  // Telegram fallback (number has no WhatsApp): deep link + polling token of the
+  // in-flight verification, and whether to offer the button under the error.
+  const [tg, setTg] = useState<{ token: string; url: string } | null>(null)
+  const [offerTelegram, setOfferTelegram] = useState(false)
+  const [showTgHelp, setShowTgHelp] = useState(false)
 
   // Tick the resend-cooldown counter down once per second while it's running.
   useEffect(() => {
@@ -95,8 +103,13 @@ export default function RegisterPage() {
   }, [resendIn])
 
   const update = (key: keyof typeof form, value: string) => {
-    // A different phone invalidates any previously verified ticket.
-    if (key === 'phone') setVerified(null)
+    // A different phone invalidates any previously verified ticket AND the
+    // pending Telegram offer/verification.
+    if (key === 'phone') {
+      setVerified(null)
+      setOfferTelegram(false)
+      setTg(null)
+    }
     setForm((f) => ({ ...f, [key]: value }))
   }
 
@@ -152,6 +165,8 @@ export default function RegisterPage() {
     }
     if (res.noWhatsApp) {
       setError(t('waOtpNoWhatsApp'))
+      // No WhatsApp is exactly the case the Telegram fallback exists for.
+      if (isTelegramVerifyConfigured) setOfferTelegram(true)
       return false
     }
     if (res.error) {
@@ -172,6 +187,7 @@ export default function RegisterPage() {
     setTouched(true)
     setError('')
     setInfo('')
+    setOfferTelegram(false)
 
     if (!form.fullName.trim()) return setError(t('errNameRequired'))
     if (!form.email.trim()) return setError(t('errEmailRequired'))
@@ -233,6 +249,73 @@ export default function RegisterPage() {
     setLoading(false)
     if (ok) setOtpInfo((prev) => prev || t('otpResent'))
   }
+
+  /** Telegram fallback: start a verification, open the bot, flip to the waiting
+   * step (the polling effect below picks it up from there). */
+  const handleStartTelegram = async () => {
+    if (loading) return
+    setError('')
+    // Claim the new tab NOW, synchronously inside the click gesture — popup
+    // blockers reject window.open calls made after an await. The tab gets its
+    // real URL once the server responds; sever `opener` so the t.me page can't
+    // reach back into the app.
+    const win = window.open('', '_blank')
+    if (win) win.opener = null
+    setLoading(true)
+    const res = await startTelegramVerify(form.phone.trim())
+    setLoading(false)
+    if (res.phoneTaken || res.error || !res.token || !res.url) {
+      win?.close()
+      if (res.phoneTaken) return setError(t('errPhoneRegistered'))
+      const f = friendlyAuthError(res.error)
+      return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+    }
+    setTg({ token: res.token, url: res.url })
+    setStep('telegram')
+    if (win) {
+      win.location.href = res.url
+    } else {
+      // Pop-up fully denied — the waiting step's "Open Telegram" button is the
+      // user-gesture fallback.
+      window.open(res.url, '_blank', 'noopener')
+    }
+  }
+
+  // Poll the Telegram verification while the waiting step is showing. Terminal
+  // states clear `tg`, which also stops the loop; 'verified' rolls straight
+  // into account creation with the same ticket the WhatsApp path uses.
+  useEffect(() => {
+    if (step !== 'telegram' || !tg) return
+    let cancelled = false
+    const interval = setInterval(async () => {
+      const res = await checkTelegramVerify(tg.token)
+      if (cancelled) return
+      if (res.status === 'verified' && res.ticket) {
+        cancelled = true
+        clearInterval(interval)
+        setTg(null)
+        setVerified({ phone: tenDigits(form.phone), ticket: res.ticket })
+        setLoading(true)
+        await doSignUp(res.ticket)
+        setLoading(false)
+      } else if (res.status === 'mismatch') {
+        clearInterval(interval)
+        setTg(null)
+        setError(t('tgMismatch'))
+      } else if (res.status === 'expired') {
+        clearInterval(interval)
+        setTg(null)
+        setError(t('tgExpired'))
+      }
+      // 'pending' (or a transient network error) → keep polling.
+    }, 3000)
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- phone/handlers are
+    // stable while the waiting step is showing; re-run only on step/tg changes.
+  }, [step, tg])
 
   return (
     <AuthShell>
@@ -319,6 +402,61 @@ export default function RegisterPage() {
               </button>
             </div>
           </form>
+        ) : step === 'telegram' ? (
+          /* Telegram fallback — waiting for the user to share their contact in
+             the bot; the polling effect advances this step automatically. */
+          <div className="flex flex-col gap-4">
+            <p className="text-center font-body text-sm text-ink2">{t('tgInstructions')}</p>
+
+            <button
+              type="button"
+              onClick={() => setShowTgHelp(true)}
+              className="focus-ring mx-auto inline-flex items-center gap-1.5 rounded font-heading text-xs font-semibold text-accent transition hover:opacity-80"
+            >
+              <Info size={14} />
+              {t('tgHelpTitle')}
+            </button>
+
+            {tg && (
+              <div className="flex items-center justify-center gap-2 font-body text-sm font-medium text-ink2">
+                <Spinner size={16} />
+                {loading ? t('creatingAccount') : t('tgWaiting')}
+              </div>
+            )}
+
+            {error && (
+              <div
+                role="alert"
+                className="animate-slideDown rounded-2xl bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+              >
+                {error}
+              </div>
+            )}
+
+            {tg && (
+              <a
+                href={tg.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-brand press flex items-center justify-center gap-2 px-6 py-3.5 text-base"
+              >
+                <Send size={18} />
+                {t('tgOpen')}
+              </a>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                setStep('form')
+                setTg(null)
+                setError('')
+              }}
+              className="focus-ring mx-auto rounded font-heading text-xs font-semibold text-ink2 transition hover:text-ink"
+            >
+              {t('changeNumber')}
+            </button>
+          </div>
         ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
           <Field
@@ -466,6 +604,29 @@ export default function RegisterPage() {
               {error}
             </div>
           )}
+          {/* Telegram fallback offer — shown when the number has no WhatsApp.
+              The ⓘ opens an illustrated how-to before the user commits. */}
+          {offerTelegram && (
+            <div className="flex animate-slideDown items-stretch gap-2">
+              <button
+                type="button"
+                onClick={handleStartTelegram}
+                disabled={loading}
+                className="btn-brand press flex flex-1 items-center justify-center gap-2 px-6 py-3 text-sm"
+              >
+                <Send size={16} />
+                {t('tgOfferBtn')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowTgHelp(true)}
+                aria-label={t('tgHelpTitle')}
+                className="focus-ring grid w-11 flex-shrink-0 place-items-center rounded-xl border border-line bg-card text-ink2 transition hover:border-brand/30 hover:text-ink"
+              >
+                <Info size={18} />
+              </button>
+            </div>
+          )}
           {info && (
             <div
               role="status"
@@ -504,6 +665,8 @@ export default function RegisterPage() {
           </Link>
         </div>
       </div>
+
+      <TelegramHelpModal open={showTgHelp} onClose={() => setShowTgHelp(false)} />
     </AuthShell>
   )
 }

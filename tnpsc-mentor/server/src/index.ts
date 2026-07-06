@@ -23,6 +23,7 @@ import thirukuralRoutes from './routes/thirukural.js'
 import materialRoutes from './routes/materials.js'
 import creditRoutes from './routes/credits.js'
 import appRoutes from './routes/app.js'
+import telegramRoutes from './routes/telegram.js'
 
 const app = express()
 
@@ -80,6 +81,7 @@ app.use('/api/thirukural', thirukuralRoutes)
 app.use('/api/materials', materialRoutes)
 app.use('/api/credits', creditRoutes)
 app.use('/api/app', appRoutes)
+app.use('/api/telegram', telegramRoutes)
 
 // 404 for unknown API routes.
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }))

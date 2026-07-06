@@ -56,6 +56,14 @@ export const isSignupWaOtpConfigured =
   String(import.meta.env.VITE_SIGNUP_WA_OTP ?? '').toLowerCase() === 'true'
 
 /**
+ * Whether the Telegram fallback for signup phone verification is available
+ * (offered when the number has no WhatsApp). Mirrors the server's
+ * TELEGRAM_BOT_* config: set VITE_SIGNUP_TG_VERIFY=true once the bot is live.
+ */
+export const isTelegramVerifyConfigured =
+  String(import.meta.env.VITE_SIGNUP_TG_VERIFY ?? '').toLowerCase() === 'true'
+
+/**
  * Fire-and-forget ping to /api/health on app mount. The API now runs always-on
  * under PM2 on the VPS (no cold starts), so this is just a cheap warm-up: it
  * opens the DNS/TLS/keep-alive connection to the API in parallel with the rest
@@ -307,6 +315,19 @@ export const api = {
         auth: false,
         body: { phone, otp },
       })
+    },
+    /** Telegram fallback (numbers with no WhatsApp): start a verification and
+     * get the bot deep link + polling token. Throws ApiError with
+     * 'phone_already_registered' (409). */
+    async telegramVerifyStart(phone: string): Promise<{ token: string; url: string }> {
+      return request('/api/telegram/start', { method: 'POST', auth: false, body: { phone } })
+    },
+    /** Poll a Telegram verification; 'verified' carries the same ticket the
+     * WhatsApp flow issues. */
+    async telegramVerifyStatus(
+      token: string
+    ): Promise<{ status: 'pending' | 'verified' | 'mismatch' | 'expired'; ticket?: string }> {
+      return request('/api/telegram/status', { method: 'POST', auth: false, body: { token } })
     },
     /** Exchange a Google ID token (from Google Identity Services in the browser)
      * for the same session the email/password flow returns. Auto-creates the

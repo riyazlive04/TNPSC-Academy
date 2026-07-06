@@ -1189,6 +1189,55 @@ const STRINGS = {
     en: 'This mobile number is already registered to another account. Please sign in, or use a different number.',
     ta: 'இந்த கைபேசி எண் ஏற்கனவே வேறு கணக்கில் பதிவாகியுள்ளது. உள்நுழையவும் அல்லது வேறு எண்ணைப் பயன்படுத்தவும்.',
   },
+  // Telegram fallback for signup phone verification (no WhatsApp on the number)
+  tgOfferBtn: { en: 'Verify via Telegram instead', ta: 'மாற்றாக Telegram மூலம் சரிபார்க்கவும்' },
+  tgInstructions: {
+    en: 'We opened our Telegram bot. Tap “Start”, then “Share my phone number” — this page will continue automatically.',
+    ta: 'எங்கள் Telegram bot திறக்கப்பட்டது. “Start” அழுத்தி, பின் “Share my phone number” பொத்தானை அழுத்தவும் — இந்தப் பக்கம் தானாகத் தொடரும்.',
+  },
+  tgWaiting: { en: 'Waiting for verification…', ta: 'சரிபார்ப்புக்காக காத்திருக்கிறது…' },
+  tgOpen: { en: 'Open Telegram', ta: 'Telegram-ஐத் திற' },
+  tgMismatch: {
+    en: 'Your Telegram account is linked to a different mobile number. Please sign up with that number, or use a number that has WhatsApp.',
+    ta: 'உங்கள் Telegram கணக்கு வேறு கைபேசி எண்ணுடன் இணைக்கப்பட்டுள்ளது. அந்த எண்ணுடன் பதிவு செய்யவும் அல்லது WhatsApp உள்ள எண்ணைப் பயன்படுத்தவும்.',
+  },
+  tgExpired: {
+    en: 'Telegram verification timed out. Please try again.',
+    ta: 'Telegram சரிபார்ப்பு காலாவதியானது. மீண்டும் முயற்சிக்கவும்.',
+  },
+  tgHelpTitle: {
+    en: 'How Telegram verification works',
+    ta: 'Telegram சரிபார்ப்பு எப்படி வேலை செய்கிறது',
+  },
+  tgHelpStep1: {
+    en: 'Tap “Verify via Telegram” — our bot opens in your Telegram app. Tap START.',
+    ta: '"Verify via Telegram" அழுத்தவும் — உங்கள் Telegram-இல் எங்கள் bot திறக்கும். START அழுத்தவும்.',
+  },
+  tgHelpStep2: {
+    en: 'Tap “📱 Share my phone number”, then confirm with Share.',
+    ta: '"📱 Share my phone number" பொத்தானை அழுத்தி, Share-ஐ உறுதிப்படுத்தவும்.',
+  },
+  tgHelpStep3: {
+    en: 'Done! When you see “Number verified”, come back here — your account continues automatically.',
+    ta: 'முடிந்தது! "Number verified" வந்ததும் இங்கு திரும்பவும் — உங்கள் கணக்கு தானாகத் தொடரும்.',
+  },
+  tgHelpMockIntro: {
+    en: 'Welcome to TNPSC Mentor! To verify your mobile number, tap the button below…',
+    ta: 'Welcome to TNPSC Mentor! உங்கள் எண்ணைச் சரிபார்க்க கீழே உள்ள பொத்தானை அழுத்தவும்…',
+  },
+  tgHelpMockAsk: {
+    en: 'Tap the button below and allow Telegram to share your number.',
+    ta: 'கீழே உள்ள பொத்தானை அழுத்தி எண்ணைப் பகிர அனுமதிக்கவும்.',
+  },
+  tgHelpMockDone: {
+    en: 'Number verified! Return to the TNPSC Mentor app.',
+    ta: 'Number verified! TNPSC Mentor செயலிக்குத் திரும்பவும்.',
+  },
+  tgHelpNote: {
+    en: 'Note: this works only if your Telegram account uses the same mobile number you entered on the form.',
+    ta: 'குறிப்பு: படிவத்தில் உள்ளிட்ட அதே எண்ணில் உங்கள் Telegram கணக்கு இருந்தால் மட்டுமே இது செயல்படும்.',
+  },
+  gotIt: { en: 'Got it', ta: 'புரிந்தது' },
   googleSignInFailed: {
     en: "Couldn't sign in with Google. Please try again.",
     ta: 'Google மூலம் உள்நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',

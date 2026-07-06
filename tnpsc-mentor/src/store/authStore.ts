@@ -90,6 +90,18 @@ export interface AuthState {
     phone: string,
     otp: string
   ) => Promise<{ error: string | null; ticket?: string; invalid?: boolean; dead?: boolean }>
+  /** Telegram fallback (no WhatsApp on the number): start a verification and get
+   * the bot deep link + the token to poll with. */
+  startTelegramVerify: (
+    phone: string
+  ) => Promise<{ error: string | null; phoneTaken?: boolean; token?: string; url?: string }>
+  /** Telegram fallback: poll the verification; 'verified' carries the same
+   * ticket the WhatsApp flow issues. */
+  checkTelegramVerify: (token: string) => Promise<{
+    error: string | null
+    status?: 'pending' | 'verified' | 'mismatch' | 'expired'
+    ticket?: string
+  }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
 }
@@ -292,6 +304,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { error: null, dead: true }
       }
       return { error: code || 'Could not verify the code' }
+    }
+  },
+
+  startTelegramVerify: async (phone) => {
+    try {
+      const { token, url } = await api.auth.telegramVerifyStart(phone)
+      return { error: null, token, url }
+    } catch (e) {
+      const code = e instanceof Error ? e.message : ''
+      if (code === 'phone_already_registered') return { error: null, phoneTaken: true }
+      return { error: code || 'Could not start Telegram verification' }
+    }
+  },
+
+  checkTelegramVerify: async (token) => {
+    try {
+      const { status, ticket } = await api.auth.telegramVerifyStatus(token)
+      return { error: null, status, ticket }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Could not check verification' }
     }
   },
 

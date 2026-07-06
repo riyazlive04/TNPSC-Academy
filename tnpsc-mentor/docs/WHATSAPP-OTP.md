@@ -95,6 +95,43 @@ be skipped with curl. With the vars blank, signup behaves exactly as before.
 
    Then register a test account end-to-end from the app.
 
+## Telegram fallback (numbers with no WhatsApp)
+
+When `/register/otp/send` answers `phone_no_whatsapp`, the signup page offers
+**"Verify via Telegram instead"**. Telegram bots can't message a phone number,
+so the direction reverses — the user comes to us:
+
+```
+RegisterPage → POST /api/telegram/start { phone }
+    · same uniqueness pre-check; stores a pending row in telegram_verifications
+    · returns t.me/<bot>?start=<one-time-token> (opened in a new tab)
+user taps Start in the bot
+    → Telegram → POST /api/telegram/webhook (/start <token>)
+    · row is bound to the chat; bot shows a "📱 Share my phone number" button
+user taps the button
+    → webhook receives the TELEGRAM-VERIFIED contact
+    · accepted only when contact.user_id === sender id (no forwarded cards)
+    · matches the number on the form → row 'verified' (else 'mismatch')
+RegisterPage polls POST /api/telegram/status { token } every 3 s
+    · 'verified' → returns the SAME phone-verified ticket → signup continues
+```
+
+The register gate is untouched — a ticket is a ticket, whichever channel
+proved ownership. Note the inherent constraint: this verifies numbers whose
+Telegram account is registered ON that number. No WhatsApp *and* no Telegram
+on the number → cannot verify (SMS via MSG91 would be the eventual fallback).
+
+### Telegram one-time setup
+
+1. In Telegram, talk to **@BotFather** → `/newbot` → pick a name and a
+   username. Copy the full token (`<bot_id>:<secret>` — both halves).
+2. In `server/.env` set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME`,
+   restart the API server.
+3. Register the webhook once (after the server is live over HTTPS):
+   `node -r dotenv/config setup-telegram-webhook.mjs` — it derives the same
+   `secret_token` the webhook route validates, so no extra secret to manage.
+4. Rebuild the frontend with `VITE_SIGNUP_TG_VERIFY=true`.
+
 ## Operational caveats
 
 - **Unofficial channel.** Evolution API drives WhatsApp through the WhatsApp
