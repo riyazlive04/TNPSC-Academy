@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, FileText, Infinity as InfinityIcon, Loader2, Lock } f
 import AppLayout from '../components/Layout/AppLayout'
 import VettriCard from '../components/UI/VettriCard'
 import { api } from '../lib/api'
+import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useT } from '../lib/i18n'
 import type { QuizConfig, VettriExam } from '../types'
 
@@ -21,6 +22,9 @@ export default function VettriPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // A purchase flips this to true; re-fetch so the locked rows unlock in place.
+  const entitledUnlimited = useEntitlementsStore((s) => s.unlimited)
+
   useEffect(() => {
     let cancelled = false
     api
@@ -36,6 +40,24 @@ export default function VettriPage() {
       cancelled = true
     }
   }, [])
+
+  // Re-fetch once entitlement unlocks (right after a successful purchase) so the
+  // rows unlock without a reload. Guarded so it only fires on false→true.
+  useEffect(() => {
+    if (!entitledUnlimited) return
+    let cancelled = false
+    api
+      .vettriExams()
+      .then((r) => {
+        if (cancelled) return
+        setExams(r.exams)
+        setUnlocked(r.unlocked)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [entitledUnlimited])
 
   const launch = (e: VettriExam) => {
     const config: QuizConfig = {

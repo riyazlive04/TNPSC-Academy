@@ -16,6 +16,7 @@ import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProct
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { useCreditsStore } from '../store/creditsStore'
+import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useT } from '../lib/i18n'
 import { optionLetters, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
@@ -45,12 +46,32 @@ function hasOptions(q: Question, lang: DisplayLang): boolean {
 /** Per-question status used to colour the OMR palette. */
 type Status = 'notVisited' | 'visited' | 'answered' | 'markedReview' | 'answeredMarked'
 
+// EN → தமிழ் → EN+த cycle, mirroring the AppLayout header toggle. The proctored
+// quiz hides the app chrome, so it needs its own switch to stay reachable mid-test.
+const LANG_LABEL: Record<Lang, string> = { en: 'EN', ta: 'தமிழ்', both: 'EN+த' }
+const LANG_CYCLE: Lang[] = ['en', 'ta', 'both']
+
+// One-shot countdown warnings: [secondsRemaining, i18n key]. Kept module-level so
+// the timer effect doesn't depend on a per-render array.
+const TIME_WARNINGS = [
+  [1800, 'timeWarning30'],
+  [600, 'timeWarning10'],
+  [300, 'timeWarning5'],
+] as const
+
 const PAGE_SIZE = 50 // questions per OMR answer-sheet page (100-Q exam → 2 pages of 50)
 
 export default function MockQuizPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { t, lang } = useT()
+  const setLang = useLanguageStore((s) => s.setLang)
+  const cycleLang = () => {
+    const next = LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length]
+    setLang(next)
+    // Keep the account preference in sync so the choice persists across devices.
+    api.updateProfile({ language: next }).catch(() => {})
+  }
   // On a hard refresh, router `location.state` is lost - fall back to the
   // persisted in-progress mock session's config so the test can resume.
   const navConfig = location.state as QuizConfig | null
@@ -252,14 +273,24 @@ export default function MockQuizPage() {
         navigate('/result', { state: { ...payload, violations: violationsRef.current, autoSubmitted: auto } })
       } catch {
         submittedRef.current = false
-        // TODO i18n: no dedicated key in src/lib/i18n.ts (owned elsewhere);
-        // reuse the closest existing key for the connection-failure message.
-        setSubmitError(t('loadQuestionsError'))
+        setSubmitError(t('submitFailedBody'))
         setSubmitting(false)
       }
     },
     [answers, marked, questions, config, navigate, t]
   )
+
+  // Latest-value refs so the countdown effect never lists `doSubmit`/`t` as deps.
+  // Both get a fresh identity every render (t is a new closure; doSubmit closes
+  // over answers), and including them would tear down and rebuild the interval on
+  // every keystroke/tap — discarding the partial second in flight and drifting the
+  // proctored clock slow. The interval reads the current values through the refs.
+  const doSubmitRef = useRef(doSubmit)
+  const tRef = useRef(t)
+  useEffect(() => {
+    doSubmitRef.current = doSubmit
+    tRef.current = t
+  }, [doSubmit, t])
 
   // ── Countdown timer (auto-submit at zero, warn at 30/10/5 min) ──
   useEffect(() => {
@@ -270,18 +301,14 @@ export default function MockQuizPage() {
         const next = prev - 1
         if (next <= 0) {
           window.clearInterval(id)
-          void doSubmit(true)
+          void doSubmitRef.current(true)
           return 0
         }
         // One-shot warnings.
-        for (const [sec, key] of [
-          [1800, t('timeWarning30')],
-          [600, t('timeWarning10')],
-          [300, t('timeWarning5')],
-        ] as [number, string][]) {
+        for (const [sec, key] of TIME_WARNINGS) {
           if (next === sec && !warnedRef.current.has(sec)) {
             warnedRef.current.add(sec)
-            setTimeToast(key)
+            setTimeToast(tRef.current(key))
             timeToastTimers.current.push(window.setTimeout(() => setTimeToast(''), 5000))
           }
         }
@@ -293,7 +320,7 @@ export default function MockQuizPage() {
       timeToastTimers.current.forEach((tid) => window.clearTimeout(tid))
       timeToastTimers.current = []
     }
-  }, [loading, empty, loadError, total, doSubmit, t, reportIdx])
+  }, [loading, empty, loadError, total, reportIdx])
 
   // ── Proctoring (fullscreen, tab-switch, copy/paste; auto-submit on abuse) ──
   // Shared engine; mirrors QuizPage. Its synchronous done-latch prevents rapid
@@ -515,6 +542,14 @@ export default function MockQuizPage() {
           {describeConfig(config, lang)}
         </span>
         <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
+          <button
+            onClick={cycleLang}
+            title={t('viewLanguage')}
+            aria-label={`${t('viewLanguage')} (${LANG_LABEL[lang]})`}
+            className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
+          >
+            {LANG_LABEL[lang]}
+          </button>
           {violations.length > 0 && (
             <span className="inline-flex items-center gap-1 rounded-lg bg-coral/10 px-2 py-1 font-heading text-xs font-semibold text-coral">
               <AlertTriangle size={13} /> {violations.length}/{MAX_VIOLATIONS}

@@ -22,6 +22,7 @@ import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
+import MarathonBanner from '../components/UI/MarathonBanner'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import { List, ListRow } from '../components/UI/ListRow'
@@ -335,6 +336,10 @@ export default function TestArenaPage() {
             />
           </div>
         </section>
+
+        {/* Marathon price banner above the premium upsell - the ₹899 Vettri route
+            into the Test Marathon; hides itself for paid users / feature off. */}
+        <MarathonBanner ctaTo="/test-series" />
 
         {/* Premium upsell - the one deliberately distinct surface (its own coral
             identity), kept as a self-contained monetisation unit. */}

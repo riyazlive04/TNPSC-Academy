@@ -59,10 +59,17 @@ function loadCheckoutScript(): Promise<boolean> {
   return scriptPromise
 }
 
+/**
+ * Stable code for a client-side checkout failure, so the caller can show a
+ * translated message. Absent when `error` is already a specific server/Razorpay
+ * message worth surfacing verbatim.
+ */
+export type CheckoutErrorCode = 'start' | 'sdk' | 'verify' | 'pay'
+
 export type CheckoutResult =
   | { status: 'paid' }
   | { status: 'dismissed' }
-  | { status: 'failed'; error: string }
+  | { status: 'failed'; error: string; code?: CheckoutErrorCode }
 
 export interface CheckoutParams {
   /** Amount in paise (₹1 = 100). For known plans the server overrides this. */
@@ -86,7 +93,12 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
   try {
     res = await api.payments.createOrder(params.amount, params.notes, params.couponCode)
   } catch (e) {
-    return { status: 'failed', error: e instanceof Error ? e.message : 'Could not start payment.' }
+    // A specific server message (coupon rejected, etc.) is worth showing verbatim;
+    // a bare/unknown failure falls back to the translated generic (code: 'start').
+    const msg = e instanceof Error ? e.message : ''
+    return msg
+      ? { status: 'failed', error: msg }
+      : { status: 'failed', error: 'Could not start payment.', code: 'start' }
   }
 
   // Coupon covered the whole price → the server already recorded it as paid.
@@ -95,7 +107,11 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
 
   const ready = await loadCheckoutScript()
   if (!ready || !window.Razorpay) {
-    return { status: 'failed', error: 'Could not load the payment SDK. Check your connection.' }
+    return {
+      status: 'failed',
+      error: 'Could not load the payment SDK. Check your connection.',
+      code: 'sdk',
+    }
   }
 
   return new Promise<CheckoutResult>((resolve) => {
@@ -127,16 +143,29 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
               description: params.description,
             })
           }
-          resolve(verified ? { status: 'paid' } : { status: 'failed', error: 'Verification failed.' })
+          resolve(
+            verified
+              ? { status: 'paid' }
+              : { status: 'failed', error: 'Verification failed.', code: 'verify' }
+          )
         } catch (e) {
-          resolve({ status: 'failed', error: e instanceof Error ? e.message : 'Verification failed.' })
+          const msg = e instanceof Error ? e.message : ''
+          resolve(
+            msg
+              ? { status: 'failed', error: msg }
+              : { status: 'failed', error: 'Verification failed.', code: 'verify' }
+          )
         }
       },
       modal: { ondismiss: () => resolve({ status: 'dismissed' }) },
     })
     rzp.on('payment.failed', (resp: unknown) => {
       const err = (resp as { error?: { description?: string } })?.error?.description
-      resolve({ status: 'failed', error: err ?? 'Payment failed.' })
+      resolve(
+        err
+          ? { status: 'failed', error: err }
+          : { status: 'failed', error: 'Payment failed.', code: 'pay' }
+      )
     })
     rzp.open()
   })

@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Crown, Check, Loader2, Tag, X, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
-import { startCheckout } from '../../lib/razorpay'
+import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
 import { usePremiumStore } from '../../store/premiumStore'
+import { useEntitlementsStore } from '../../store/entitlementsStore'
+import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import PurchaseConfirmModal from './PurchaseConfirmModal'
 
 // ─── Premium plan pricing ───────────────────────────────────────────────────
 // Single source of truth for the 3-month plan. `PRICE_PAISE` is what the order is
@@ -16,7 +19,16 @@ export const PREMIUM_PRICE_RUPEES = 1699
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
 
-const PERK_KEYS = ['premiumPerk1', 'premiumPerk2', 'premiumPerk3', 'premiumPerk4'] as const
+// Test Marathon (premiumPerk5) leads: Premium includes the whole Vettri Nichayam
+// series, which is the headline reason to pick Premium over the cheaper bundle.
+const PERK_KEYS = [
+  'premiumPerk5',
+  'premiumPerk1',
+  'premiumPerk2',
+  'premiumPerk3',
+  'premiumPerk4',
+  'premiumPerk6',
+] as const
 const BONUS_KEYS = [
   'premiumBonus1',
   'premiumBonus2',
@@ -26,6 +38,14 @@ const BONUS_KEYS = [
 
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
+
+/** Checkout failure code → translated toast key. */
+const PAY_ERR_KEY: Record<CheckoutErrorCode, 'payErrStart' | 'payErrSdk' | 'payErrVerify' | 'payErrPay'> = {
+  start: 'payErrStart',
+  sdk: 'payErrSdk',
+  verify: 'payErrVerify',
+  pay: 'payErrPay',
+}
 
 /** ₹ from paise, no trailing .00 for whole rupees. */
 function rupees(paise: number): string {
@@ -47,10 +67,18 @@ export default function PremiumCard({
   /** Show a close button that hides the card (re-surfaces after ~1 week). */
   dismissible?: boolean
 }) {
-  const { profile } = useAuth()
+  const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
   const [paying, setPaying] = useState(false)
+  // Pre-payment recap popup: "Get Premium" opens it; checkout runs only on OK.
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const { premium, loaded, refresh, markPremium } = usePremiumStore()
+  // Premium is a superset of every paid entitlement, so a successful buy must
+  // also update the bundle + credit stores — otherwise the Vettri/Marathon
+  // upsells and the finite credit meter linger until a manual reload.
+  const markEntitledPremium = useEntitlementsStore((s) => s.markPremium)
+  const refreshEntitlements = useEntitlementsStore((s) => s.refresh)
+  const reloadCredits = useCreditsStore((s) => s.reload)
 
   // In-memory dismissal: closing hides the card for the current view only. It is
   // intentionally NOT persisted - a page reload remounts this component and the
@@ -86,7 +114,7 @@ export default function PremiumCard({
       }
     } catch (e) {
       setApplied(null)
-      setCouponError(e instanceof Error ? e.message : 'Could not check that coupon.')
+      setCouponError(e instanceof Error ? e.message : t('couponCheckError'))
     } finally {
       setChecking(false)
     }
@@ -100,6 +128,7 @@ export default function PremiumCard({
 
   const handleBuy = async () => {
     if (paying) return
+    setConfirmOpen(false)
     setPaying(true)
     try {
       const result = await startCheckout({
@@ -111,9 +140,15 @@ export default function PremiumCard({
       })
       if (result.status === 'paid') {
         toast.success(t('premiumThanks'))
-        markPremium() // hide the card immediately…
-        refresh() // …then reconcile with the server (expiry etc.)
-      } else if (result.status === 'failed') toast.error(result.error)
+        // Optimistically flip every entitlement surface, then reconcile with the
+        // server (expiry, exact balance) so nothing stays locked until a reload.
+        markPremium()
+        markEntitledPremium()
+        refresh()
+        refreshEntitlements()
+        reloadCredits()
+      } else if (result.status === 'failed')
+        toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
       // 'dismissed' → user closed the modal; stay silent.
     } finally {
       setPaying(false)
@@ -123,6 +158,9 @@ export default function PremiumCard({
   // Already premium (or still checking) → render nothing. Hiding until the first
   // check resolves avoids a flash of the upsell for users who already paid.
   // When dismissible, a recent "close" also hides it (until the window lapses).
+  // Staff never buy — hide the upsell for admins/superadmins. (useAuth returns the
+  // EFFECTIVE role, so an admin using the student-preview toggle still sees it.)
+  if (isAdmin || isSuperAdmin) return null
   if (!loaded || premium || (dismissible && dismissed)) return null
 
   const finalPaise = applied ? applied.finalAmount : PREMIUM_PRICE_PAISE
@@ -256,7 +294,7 @@ export default function PremiumCard({
           )}
 
           <button
-            onClick={handleBuy}
+            onClick={() => setConfirmOpen(true)}
             disabled={paying}
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-accentwarm px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-warm transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
           >
@@ -270,6 +308,21 @@ export default function PremiumCard({
           </button>
         </div>
       </div>
+
+      {/* What-you-get recap; Razorpay opens only after the buyer taps OK. */}
+      <PurchaseConfirmModal
+        open={confirmOpen}
+        planName={t('premiumBadge')}
+        validity={t('premiumValidity')}
+        perks={[...PERK_KEYS, ...BONUS_KEYS].map((k) => t(k))}
+        priceLabel={isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
+        strikePrice={applied ? `₹${PREMIUM_PRICE_RUPEES}` : undefined}
+        isFree={isFree}
+        accent="warm"
+        busy={paying}
+        onConfirm={handleBuy}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   )
 }

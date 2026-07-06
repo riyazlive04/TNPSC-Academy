@@ -19,6 +19,7 @@ import {
   Pencil,
   Check,
   Compass,
+  Coins,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -36,6 +37,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
+import { useCreditsStore } from '../store/creditsStore'
 import { api, type DeviceSession } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -156,9 +158,9 @@ export default function ProfilePage() {
   const badges = computeBadges(stats).filter((b) => !isHiddenBadge(b.id))
   const earned = badges.filter((b) => b.unlocked).length
 
-  const name = profile?.full_name || 'Aspirant'
+  const name = profile?.full_name || t('aspirant')
   const initial = name.trim().charAt(0).toUpperCase() || 'A'
-  const roleLabel = isSuperAdmin ? t('superadmin') : isAdmin ? t('admin') : 'Aspirant'
+  const roleLabel = isSuperAdmin ? t('superadmin') : isAdmin ? t('admin') : t('aspirant')
 
   const handleSignOut = async () => {
     await signOut()
@@ -321,6 +323,10 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Credit balance - where the header credit pill taps through to.
+                Free learners only; hidden for unlimited (paid/staff). */}
+            <CreditsCard />
+
             {/* Premium upsell - 3-month plan (₹1,699) */}
             <PremiumCard />
 
@@ -379,6 +385,61 @@ export default function ProfilePage() {
   )
 }
 
+/**
+ * Credit balance card for free learners: the current balance and how credits
+ * work (10 per test, +10 daily), with a low-balance warning that points to the
+ * paid plans. This is the surface the header credit pill deep-links to. Hidden
+ * for unlimited (paid/staff) users and until the balance has loaded.
+ */
+function CreditsCard() {
+  const { t } = useT()
+  const loaded = useCreditsStore((s) => s.loaded)
+  const unlimited = useCreditsStore((s) => s.unlimited)
+  const balance = useCreditsStore((s) => s.balance)
+  if (!loaded || unlimited) return null
+  const low = balance < 10
+  return (
+    <div className="rounded-card border border-line bg-card p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span
+            className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl ${
+              low ? 'bg-coralsoft text-coral' : 'bg-brand-soft text-brand-dark'
+            }`}
+          >
+            <Coins size={20} />
+          </span>
+          <h2 className="tamil font-heading text-base font-semibold tracking-tight text-ink">
+            {t('creditsTitle')}
+          </h2>
+        </div>
+        <span
+          className={`font-display text-2xl font-bold tabular-nums tracking-tight ${
+            low ? 'text-coral' : 'text-ink'
+          }`}
+        >
+          {balance}
+        </span>
+      </div>
+      <ul className="mt-3 space-y-1.5 font-body text-sm text-ink2">
+        <li className="tamil flex items-start gap-2">
+          <Check size={15} className="mt-0.5 flex-shrink-0 text-brand" />
+          <span>{t('creditsPerTest')}</span>
+        </li>
+        <li className="tamil flex items-start gap-2">
+          <Check size={15} className="mt-0.5 flex-shrink-0 text-brand" />
+          <span>{t('creditsDaily')}</span>
+        </li>
+      </ul>
+      {low && (
+        <p className="tamil mt-3 rounded-field bg-coralsoft px-3 py-2.5 font-body text-xs leading-snug text-coral">
+          {t('outOfCredits')}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // App version - bump on release (kept in one place so the footer always matches).
 const APP_VERSION = '1.0.0'
 
@@ -387,20 +448,19 @@ const APP_VERSION = '1.0.0'
  * and copyright. The single place the app advertises who built it.
  */
 function AppFooter() {
+  const { t } = useT()
   const year = new Date().getFullYear()
   return (
     <footer className="mt-2 flex flex-col items-center gap-3 border-t border-line pb-2 pt-6 text-center">
       <div className="flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-gradient font-display text-sm font-bold text-white">
-          த
-        </span>
+        <img src="/logo-mark.png" alt="" className="h-8 w-8 object-contain" />
         <span className="font-display text-sm font-semibold tracking-tight text-ink">
           TNPSC <span className="text-primary">Mentors</span>
         </span>
       </div>
 
-      <p className="font-body text-[13px] text-muted">
-        Developed by{' '}
+      <p className="tamil font-body text-[13px] text-muted">
+        {t('developedBy')}{' '}
         <a
           href="https://sirahdigital.in"
           target="_blank"
@@ -411,12 +471,12 @@ function AppFooter() {
         </a>
       </p>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-[12px] text-muted">
+      <div className="tamil flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-[12px] text-muted">
         <a
           href="mailto:support@sirahdigital.in"
           className="transition-colors hover:text-ink"
         >
-          Contact support
+          {t('contactSupport')}
         </a>
         <span className="text-muted/40">·</span>
         <a
@@ -425,7 +485,7 @@ function AppFooter() {
           rel="noreferrer"
           className="transition-colors hover:text-ink"
         >
-          Privacy Policy
+          {t('privacyPolicy')}
         </a>
         <span className="text-muted/40">·</span>
         <a
@@ -434,26 +494,28 @@ function AppFooter() {
           rel="noreferrer"
           className="transition-colors hover:text-ink"
         >
-          Terms of Use
+          {t('termsOfUse')}
         </a>
       </div>
 
-      <p className="font-body text-[11px] text-muted/70">
-        Version {APP_VERSION} · © {year} Sirah Digital. All rights reserved.
+      <p className="tamil font-body text-[11px] text-muted/70">
+        Version {APP_VERSION} · © {year} Sirah Digital. {t('allRightsReserved')}
       </p>
     </footer>
   )
 }
 
-/** Compact relative time for "last active" (e.g. "5m ago", "2d ago"). */
-function relTime(iso: string): string {
+/** Compact relative time for "last active" (e.g. "5m ago", "2d ago"). The unit
+ *  letters stay universal; only "just now" / "ago" are translated. */
+function relTime(iso: string, t: (k: StringKey) => string): string {
   const diff = Date.now() - new Date(iso).getTime()
   const m = Math.floor(diff / 60000)
-  if (m < 1) return 'just now'
-  if (m < 60) return `${m}m ago`
+  if (m < 1) return t('relJustNow')
+  const ago = t('relAgo')
+  if (m < 60) return `${m}m ${ago}`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  return `${Math.floor(h / 24)}d ago`
+  if (h < 24) return `${h}h ${ago}`
+  return `${Math.floor(h / 24)}d ${ago}`
 }
 
 /**
@@ -525,8 +587,8 @@ function DevicesSection() {
                       </span>
                     )}
                   </p>
-                  <p className="font-body text-xs text-ink2">
-                    {t('devicesLastActive')}: {relTime(s.last_seen_at)}
+                  <p className="tamil font-body text-xs text-ink2">
+                    {t('devicesLastActive')}: {relTime(s.last_seen_at, t)}
                   </p>
                 </div>
                 {!current && (

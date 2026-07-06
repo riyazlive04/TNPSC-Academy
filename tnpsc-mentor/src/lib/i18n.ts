@@ -326,6 +326,16 @@ const STRINGS = {
     ta: 'உங்கள் ஒரு இலவச மாதிரித் தேர்வைப் பயன்படுத்திவிட்டீர்கள். அனைத்து மாதிரித் தேர்வுகளுக்கும் பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
   },
 
+  // Profile: role badge, footer, and "last active" relative time.
+  aspirant: { en: 'Aspirant', ta: 'விண்ணப்பதாரர்' },
+  developedBy: { en: 'Developed by', ta: 'உருவாக்கியவர்' },
+  contactSupport: { en: 'Contact support', ta: 'ஆதரவைத் தொடர்புகொள்ளுங்கள்' },
+  privacyPolicy: { en: 'Privacy Policy', ta: 'தனியுரிமைக் கொள்கை' },
+  termsOfUse: { en: 'Terms of Use', ta: 'பயன்பாட்டு விதிமுறைகள்' },
+  allRightsReserved: { en: 'All rights reserved.', ta: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.' },
+  relJustNow: { en: 'just now', ta: 'இப்போது' },
+  relAgo: { en: 'ago', ta: 'முன்' },
+
   // Quiz dialogs (modals)
   attendanceBelow25: { en: 'Attendance below 25%', ta: 'வருகை 25%க்குக் கீழே' },
   attendanceGateMsg: {
@@ -345,6 +355,14 @@ const STRINGS = {
   keepGoingBtn: { en: 'Keep Going', ta: 'தொடரவும்' },
   submitFailed: { en: 'Submit failed', ta: 'சமர்ப்பிப்பு தோல்வியடைந்தது' },
   retrySubmit: { en: 'Retry Submit', ta: 'மீண்டும் சமர்ப்பி' },
+  submitFailedBody: {
+    en: 'Could not submit your test — grading happens on the server. Check your connection and retry.',
+    ta: 'உங்கள் தேர்வைச் சமர்ப்பிக்க முடியவில்லை — மதிப்பீடு சேவையகத்தில் நடைபெறுகிறது. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+  },
+  submitSessionExpired: {
+    en: 'Your session expired. Please sign in again to submit.',
+    ta: 'உங்கள் அமர்வு காலாவதியானது. சமர்ப்பிக்க மீண்டும் உள்நுழையவும்.',
+  },
   signInAgain: { en: 'Sign In Again', ta: 'மீண்டும் உள்நுழை' },
 
   // Result page labels
@@ -548,6 +566,14 @@ const STRINGS = {
   unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
   scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
+  // Test Marathon promo banner — shown above the upsell cards for locked users.
+  marathonBannerTitle: { en: 'Test Marathon 2026', ta: 'தேர்வு மாரத்தான் 2026' },
+  marathonBannerSub: {
+    en: '13 full-length Group 1 papers on a fixed schedule',
+    ta: 'திட்டமிட்ட அட்டவணையில் 13 முழு நீள குரூப் 1 தேர்வுத் தாள்கள்',
+  },
+  marathonBannerVia: { en: 'with Vettri Nichayam', ta: 'வெற்றி நிச்சயத்துடன்' },
+  marathonBannerCta: { en: 'Unlock now', ta: 'இப்போதே திறக்கவும்' },
   // Test Marathon — Analytics tab
   tsTabPapers: { en: 'Papers', ta: 'தேர்வுகள்' },
   tsTabAnalytics: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
@@ -911,8 +937,8 @@ const STRINGS = {
   premiumValidity: { en: 'Group 1 · 3-month plan', ta: 'குரூப் 1 · 3-மாத திட்டம்' },
   premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
   premiumPerk2: {
-    en: '5 mock exams (2 anytime + 3 after the exam announcement)',
-    ta: '5 மாதிரித் தேர்வுகள் (2 எப்போது வேண்டுமானாலும் + அறிவிப்புக்குப் பின் 3)',
+    en: '6 mock exams (3 now + 3 after the exam announcement)',
+    ta: '6 மாதிரித் தேர்வுகள் (3 இப்போது + அறிவிப்புக்குப் பின் 3)',
   },
   premiumPerk3: {
     en: 'Previous-year papers - last 5 years',
@@ -921,6 +947,16 @@ const STRINGS = {
   premiumPerk4: {
     en: 'Current Affairs (Aug 2025 - Jun 2026)',
     ta: 'நடப்பு நிகழ்வுகள் (ஆக 2025 - ஜூன் 2026)',
+  },
+  // Premium is a superset of Vettri Nichayam, so it includes the full Test
+  // Marathon series (all 13 scheduled papers) plus every future content update.
+  premiumPerk5: {
+    en: 'Test Marathon series (Vettri Nichayam) — all 13 papers',
+    ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்) — அனைத்து 13 தாள்களும்',
+  },
+  premiumPerk6: {
+    en: 'All future updates included for your plan duration',
+    ta: 'உங்கள் திட்டக் காலம் வரை அனைத்து எதிர்கால புதுப்பிப்புகளும் அடங்கும்',
   },
   // Bonus benefits, shown as a separate "extras" block on the premium banner.
   premiumBonusTitle: { en: 'Bonus with Premium', ta: 'பிரீமியத்துடன் போனஸ்' },
@@ -947,6 +983,39 @@ const STRINGS = {
   premiumThanks: {
     en: 'Welcome to Premium - thank you!',
     ta: 'பிரீமியத்திற்கு வரவேற்கிறோம் - நன்றி!',
+  },
+  // Pre-payment confirmation popup (Premium + Vettri): recaps exactly what the
+  // buyer gets and the amount, before the Razorpay checkout opens.
+  buyConfirmTitle: {
+    en: 'Confirm your plan',
+    ta: 'உங்கள் திட்டத்தை உறுதிப்படுத்துங்கள்',
+  },
+  buyConfirmWhatYouGet: { en: 'What you get', ta: 'நீங்கள் பெறுவது' },
+  buyConfirmValidity: { en: 'Validity', ta: 'செல்லுபடி காலம்' },
+  buyConfirmTotal: { en: 'You pay', ta: 'நீங்கள் செலுத்தும் தொகை' },
+  buyConfirmOk: { en: 'OK, proceed to pay', ta: 'சரி, பணம் செலுத்த தொடரவும்' },
+  buyConfirmOkFree: { en: 'OK, unlock free', ta: 'சரி, இலவசமாகத் திற' },
+  // Payment failure toasts (client-side checkout errors; server/Razorpay messages
+  // pass through verbatim). Keyed by the CheckoutResult.code from lib/razorpay.ts.
+  payErrStart: {
+    en: 'Could not start the payment. Please try again.',
+    ta: 'பணம் செலுத்துவதைத் தொடங்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+  },
+  payErrSdk: {
+    en: 'Could not load the payment screen. Check your connection.',
+    ta: 'பணம் செலுத்தும் திரையை ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்.',
+  },
+  payErrVerify: {
+    en: 'Payment could not be verified. If money was deducted, it will be refunded.',
+    ta: 'பணம் செலுத்தியதை உறுதிப்படுத்த முடியவில்லை. பணம் கழிக்கப்பட்டிருந்தால், அது திரும்ப வழங்கப்படும்.',
+  },
+  payErrPay: {
+    en: 'Payment failed. Please try again.',
+    ta: 'பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.',
+  },
+  couponCheckError: {
+    en: 'Could not check that coupon. Please try again.',
+    ta: 'அந்தக் கூப்பனைச் சரிபார்க்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
   },
   examDate: { en: 'Exam Date', ta: 'தேர்வு தேதி' },
   dailyGoalQ: { en: 'Daily question goal', ta: 'தினசரி வினா இலக்கு' },

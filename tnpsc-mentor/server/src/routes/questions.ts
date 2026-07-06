@@ -8,6 +8,14 @@ import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 
 const router = Router()
 
+// Categories that must NEVER be served through the generic student quiz/count
+// routes: the paid fixed banks (mock/testseries/vettri) have their own
+// entitlement-gated routes, and `outer` is admin-only (browsed via the admin
+// bank, not practised). The get_quiz_questions RPC already excludes these, but
+// this server-side backstop keeps the exclusion from depending on which migration
+// of the RPC is live (see the note in supabase/*.sql). Add any new paid bank here.
+const QUIZ_BLOCKED_CATEGORIES = new Set(['mock', 'testseries', 'vettri', 'outer'])
+
 // Columns safe to return to the client during a quiz (answer/explanation columns
 // are stripped at the column-grant level; listed explicitly for the fallbacks).
 const QUIZ_COLS = [
@@ -172,8 +180,9 @@ async function isUnlimited(req: AuthedRequest): Promise<boolean> {
 // ─── GET /api/questions/topic-access ─────────────────────────────────────────
 // Powers the PYQ + Current Affairs lock UI: the caller's unlimited state plus the
 // topic keys whose one free test is already used. Unlimited (premium/vettri/staff)
-// callers have no locks, so the list is empty for them. The client derives each
-// row's key with the mirrored src/lib/freeGate.ts and checks membership.
+// callers have no locks, so the list is empty for them. (Per-topic locks were
+// replaced by the global credit balance, so this always reports "no locks"; the
+// client still derives keys with src/lib/freeGate.ts but they never match.)
 router.get(
   '/topic-access',
   requireAuth,
@@ -205,6 +214,11 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const config = req.body?.config ?? {}
+    // Backstop: never let a client draw a paid/admin bank through the generic
+    // quiz route by naming its category directly.
+    if (typeof config.category === 'string' && QUIZ_BLOCKED_CATEGORIES.has(config.category)) {
+      return res.status(403).json({ error: 'This content is not available here.' })
+    }
     const unlimited = await isUnlimited(req)
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
@@ -232,6 +246,10 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const config = req.body?.config ?? {}
+    // Same backstop as /quiz: don't expose counts for a paid/admin bank either.
+    if (typeof config.category === 'string' && QUIZ_BLOCKED_CATEGORIES.has(config.category)) {
+      return res.json({ count: 0 })
+    }
     const { data, error } = await req.db!.rpc('count_quiz_questions', { p_config: config })
     if (!error) return res.json({ count: Number(data ?? 0) })
     if (!isMissingFunction(error)) return sendDbError(res, error)
@@ -752,11 +770,14 @@ router.post(
       // client-reported mock_exam_attempts table — so skipping the attempt
       // callback can't unlock extra free mocks. The current mock isn't charged
       // until after this check, so the count is strictly prior mocks.
-      const { count } = await req.db!
+      const { count, error: countErr } = await req.db!
         .from('credit_transactions')
         .select('id', { count: 'exact', head: true })
         .eq('kind', 'spend')
         .eq('reason', 'test:mock-exam')
+      // Fail CLOSED: if the count can't be read, treat the free mock as used
+      // rather than letting a transient error hand out extra free mocks.
+      if (countErr) return sendDbError(res, countErr)
       if ((count ?? 0) >= FREE_MOCK_LIMIT) {
         return res.status(403).json({ error: 'premium_required', reason: 'mock_free_used' })
       }

@@ -12,20 +12,26 @@ import {
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
+import MarathonBanner from '../components/UI/MarathonBanner'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { api } from '../lib/api'
 import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
+import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useT } from '../lib/i18n'
+import type { Lang } from '../store/languageStore'
 import type { QuizConfig, TestSeriesItem } from '../types'
 
 type Tab = 'papers' | 'analytics'
 
-/** Format 'YYYY-MM-DD' as "09 Jul" (locale-stable; used for schedule badges). */
-function formatDate(iso: string | null): string {
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS_TA = ['ஜன', 'பிப்', 'மார்', 'ஏப்', 'மே', 'ஜூன்', 'ஜூலை', 'ஆக', 'செப்', 'அக்', 'நவ', 'டிச']
+
+/** Format 'YYYY-MM-DD' as "09 Jul" / "09 ஜூலை" (used for schedule badges). */
+function formatDate(iso: string | null, lang: Lang): string {
   if (!iso) return ''
   const [y, m, d] = iso.split('-').map(Number)
   if (!y || !m || !d) return ''
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const months = lang === 'ta' ? MONTHS_TA : MONTHS_EN
   return `${String(d).padStart(2, '0')} ${months[m - 1]}`
 }
 
@@ -41,6 +47,11 @@ export default function TestSeriesPage() {
   // Analytics loads in the background (non-blocking): it feeds the prep banner on
   // the Papers tab and the whole Analytics tab.
   const [analytics, setAnalytics] = useState<TestSeriesAnalytics | null>(null)
+
+  // A purchase (Vettri/Premium) flips this to true. The per-paper locks are
+  // computed server-side (premium vs date), so re-fetch on unlock rather than
+  // reconstructing them here — papers clear without a manual reload.
+  const entitledUnlimited = useEntitlementsStore((s) => s.unlimited)
 
   useEffect(() => {
     let cancelled = false
@@ -60,6 +71,25 @@ export default function TestSeriesPage() {
       cancelled = true
     }
   }, [])
+
+  // Re-fetch once entitlement unlocks (e.g. right after a successful purchase) so
+  // the premium-locked papers become playable without a reload. Guarded on the
+  // flag so it only fires on the false→true transition, never on mount.
+  useEffect(() => {
+    if (!entitledUnlimited) return
+    let cancelled = false
+    api
+      .testSeries()
+      .then((r) => {
+        if (cancelled) return
+        setTests(r.tests)
+        setPremium(r.premium)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [entitledUnlimited])
 
   const launch = (tst: TestSeriesItem) => {
     const config: QuizConfig = {
@@ -143,9 +173,11 @@ export default function TestSeriesPage() {
         )}
 
         {/* Whole-series paywall — EITHER paid bundle unlocks the series, so surface
-            the cheaper Vettri option first, then the full Premium kit. */}
+            the marathon price banner, then the cheaper Vettri option, then the
+            full Premium kit. */}
         {!loading && !error && tab === 'papers' && tests.length > 0 && seriesLocked && (
           <div className="mb-6 space-y-4">
+            <MarathonBanner />
             <VettriCard />
             <PremiumCard />
           </div>
@@ -211,7 +243,7 @@ export default function TestSeriesPage() {
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
                         {tst.scheduled_date && (
                           <Tag>
-                            <CalendarDays size={12} /> {formatDate(tst.scheduled_date)}
+                            <CalendarDays size={12} /> {formatDate(tst.scheduled_date, lang)}
                           </Tag>
                         )}
                         <span className="inline-flex items-center gap-1 font-body text-[11px] text-ink2">
@@ -231,7 +263,7 @@ export default function TestSeriesPage() {
                   <div className="mt-auto pt-2.5">
                     {dateLocked && (
                       <p className="tamil mb-2 flex items-center gap-1.5 font-body text-xs text-ink2">
-                        <Lock size={12} /> {t('unlocksOn')} {formatDate(tst.scheduled_date)}
+                        <Lock size={12} /> {t('unlocksOn')} {formatDate(tst.scheduled_date, lang)}
                       </p>
                     )}
                     {premiumLocked && (

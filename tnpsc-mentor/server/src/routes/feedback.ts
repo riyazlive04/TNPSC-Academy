@@ -1,8 +1,22 @@
 import { Router } from 'express'
+import { rateLimit } from 'express-rate-limit'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 
 const router = Router()
+
+// Per-user cap on the high-frequency feedback writes (explanation votes +
+// question reports). Generous for a real review session, but bounds a script
+// churning writes across many question ids. Keyed by user (falls back to IP).
+const feedbackWriteLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+  keyGenerator: (req) => (req as AuthedRequest).userId || req.ip || 'anon',
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many requests. Please slow down and try again.' },
+})
 
 // ─── POST /api/feedback ──────────────────────────────────────────────────────
 // Any signed-in student can submit an app rating (1-5) + optional message. The
@@ -55,6 +69,7 @@ router.post(
 router.post(
   '/explanation',
   requireAuth,
+  feedbackWriteLimiter,
   asyncH(async (req: AuthedRequest, res) => {
     const questionId = String(req.body?.questionId ?? '').trim()
     const vote = req.body?.vote
@@ -80,6 +95,7 @@ router.post(
 router.post(
   '/question-report',
   requireAuth,
+  feedbackWriteLimiter,
   asyncH(async (req: AuthedRequest, res) => {
     const questionId = String(req.body?.questionId ?? '').trim()
     if (!questionId) return res.status(400).json({ error: 'questionId is required' })

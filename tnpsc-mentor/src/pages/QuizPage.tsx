@@ -357,7 +357,7 @@ export default function QuizPage() {
     if (!user) {
       s.setSubmitting(false)
       submittedRef.current = false
-      setSubmitError('Your session expired. Please sign in again to submit.')
+      setSubmitError(t('submitSessionExpired'))
       return
     }
 
@@ -374,9 +374,7 @@ export default function QuizPage() {
     } catch {
       s.setSubmitting(false)
       submittedRef.current = false
-      setSubmitError(
-        'Could not submit your test - grading happens on the server. Check your connection and retry.'
-      )
+      setSubmitError(t('submitFailedBody'))
       return
     }
 

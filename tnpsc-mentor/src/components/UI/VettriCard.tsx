@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Trophy, Check, Loader2, Tag, X, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
-import { startCheckout } from '../../lib/razorpay'
+import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
 import { useEntitlementsStore } from '../../store/entitlementsStore'
+import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import PurchaseConfirmModal from './PurchaseConfirmModal'
 
 // ─── Vettri Nichayam pricing (mirrors server pricing.ts) ─────────────────────
 // Display only — the server always recomputes the price from the plan + coupon.
@@ -55,6 +57,14 @@ const PERK_KEYS = ['vettriPerk1', 'vettriPerk2', 'vettriPerk3'] as const
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
 
+/** Checkout failure code → translated toast key. */
+const PAY_ERR_KEY: Record<CheckoutErrorCode, 'payErrStart' | 'payErrSdk' | 'payErrVerify' | 'payErrPay'> = {
+  start: 'payErrStart',
+  sdk: 'payErrSdk',
+  verify: 'payErrVerify',
+  pay: 'payErrPay',
+}
+
 /** ₹ from paise, no trailing .00 for whole rupees. */
 function rupees(paise: number): string {
   const r = paise / 100
@@ -77,10 +87,15 @@ export default function VettriCard({
   /** Show a close button that hides the card for the current view only. */
   dismissible?: boolean
 }) {
-  const { profile } = useAuth()
+  const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
   const [paying, setPaying] = useState(false)
+  // Pre-payment recap popup: the CTA opens it; checkout runs only on OK.
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const { unlimited, loaded, refresh, markVettri } = useEntitlementsStore()
+  // Unlocking the bundle also makes the buyer unlimited, so refresh the credit
+  // meter — otherwise the header pill keeps showing a finite balance.
+  const reloadCredits = useCreditsStore((s) => s.reload)
 
   const [dismissed, setDismissed] = useState(false)
   const dismiss = () => setDismissed(true)
@@ -121,7 +136,7 @@ export default function VettriCard({
       }
     } catch (e) {
       setApplied(null)
-      setCouponError(e instanceof Error ? e.message : 'Could not check that coupon.')
+      setCouponError(e instanceof Error ? e.message : t('couponCheckError'))
     } finally {
       setChecking(false)
     }
@@ -135,6 +150,7 @@ export default function VettriCard({
 
   const handleBuy = async () => {
     if (paying) return
+    setConfirmOpen(false)
     setPaying(true)
     try {
       const result = await startCheckout({
@@ -148,13 +164,18 @@ export default function VettriCard({
         toast.success(t('vettriThanks'))
         markVettri() // hide the card immediately…
         refresh() // …then reconcile with the server (expiry etc.)
-      } else if (result.status === 'failed') toast.error(result.error)
+        reloadCredits() // …and drop the finite credit meter (now unlimited).
+      } else if (result.status === 'failed')
+        toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
     } finally {
       setPaying(false)
     }
   }
 
   // Already unlocked (bundle or premium) or still checking → render nothing.
+  // Staff never buy — hide the upsell for admins/superadmins. (useAuth returns the
+  // EFFECTIVE role, so an admin using the student-preview toggle still sees it.)
+  if (isAdmin || isSuperAdmin) return null
   if (!loaded || unlimited || (dismissible && dismissed)) return null
 
   const finalPaise = applied ? applied.finalAmount : sel.paise
@@ -275,7 +296,7 @@ export default function VettriCard({
           )}
 
           <button
-            onClick={handleBuy}
+            onClick={() => setConfirmOpen(true)}
             disabled={paying}
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
           >
@@ -296,6 +317,22 @@ export default function VettriCard({
         <AlertCircle size={14} className="mt-0.5 shrink-0 text-accentwarm" />
         <span>{t(plan === 'month' ? 'vettriMonthNote' : 'vettriFullNote')}</span>
       </p>
+
+      {/* What-you-get recap; Razorpay opens only after the buyer taps OK. */}
+      <PurchaseConfirmModal
+        open={confirmOpen}
+        planName={`${t('vettriTitle')} · ${t(sel.labelKey)}`}
+        validity={t(sel.validityKey)}
+        perks={PERK_KEYS.map((k) => t(k))}
+        priceLabel={isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
+        strikePrice={applied ? `₹${sel.rupees}` : undefined}
+        note={t(plan === 'month' ? 'vettriMonthNote' : 'vettriFullNote')}
+        isFree={isFree}
+        accent="brand"
+        busy={paying}
+        onConfirm={handleBuy}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   )
 }

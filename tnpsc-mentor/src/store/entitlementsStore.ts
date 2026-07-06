@@ -18,6 +18,9 @@ interface EntitlementsState {
   refresh: () => Promise<void>
   /** Optimistically mark vettri (called right after a verified Vettri payment). */
   markVettri: () => void
+  /** Optimistically mark premium (called right after a verified Premium payment).
+   *  Premium is a superset, so this also flips `unlimited`. */
+  markPremium: () => void
 }
 
 export const useEntitlementsStore = create<EntitlementsState>((set) => ({
@@ -48,4 +51,5 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
     }
   },
   markVettri: () => set({ vettri: true, unlimited: true }),
+  markPremium: () => set({ premium: true, unlimited: true }),
 }))

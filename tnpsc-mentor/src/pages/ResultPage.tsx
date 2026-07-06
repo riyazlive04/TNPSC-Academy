@@ -293,7 +293,16 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
     scorePercentage >= 80 ? 'verdictGreat' : scorePercentage >= 50 ? 'verdictGood' : 'verdictKeepGoing'
 
   const handleRetry = () => {
-    navigate('/quiz', { state: config, replace: true })
+    // A proctored mock/marathon/vettri paper (mockKind set) must re-run the REAL
+    // fixed paper through its instructions + fullscreen flow — that path re-fetches
+    // the actual paper, charges credits at start, and records the attempt against
+    // the correct exam. Routing it to /quiz instead would serve a random practice
+    // sample (category is the 'pyq' placeholder) and burn a capped attempt on it.
+    if (config.mockKind) {
+      navigate('/mock/instructions', { state: config, replace: true })
+    } else {
+      navigate('/quiz', { state: config, replace: true })
+    }
   }
 
   // Optimistic bookmark toggle - revert the local set if the write fails.

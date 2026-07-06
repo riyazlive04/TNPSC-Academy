@@ -38,10 +38,14 @@ router.post(
   requireAuth,
   couponLimiter,
   asyncH(async (req: AuthedRequest, res) => {
-    const currency = typeof req.body?.currency === 'string' ? req.body.currency : 'INR'
+    // Currency is FIXED server-side. Prices are computed in paise (INR); honouring
+    // a client-sent currency would reprice the same integer in that currency's
+    // subunit (e.g. 169900 IDR ≪ ₹1,699) and verify only asserts the amount.
+    const currency = 'INR'
+    // Server-owned keys go LAST so a client-sent notes.user_id can't shadow them.
     const notes: Record<string, string> = {
-      user_id: req.userId!,
       ...(req.body?.notes && typeof req.body.notes === 'object' ? req.body.notes : {}),
+      user_id: req.userId!,
     }
 
     // Resolve the plan SERVER-SIDE: only a plan pricing.ts recognizes is honoured
