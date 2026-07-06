@@ -8,7 +8,9 @@ import { supabaseAdmin } from '../supabase.js'
 
 /** Credits a single question costs — a test costs (question count × this). */
 export const CREDIT_PER_QUESTION = 1
-/** Credits granted once per IST day the user logs in. */
+/** Credits granted once per IST day the user logs in — starting the day AFTER
+ * signup (day one is the 50 signup credits only; profiles are born with
+ * last_daily_grant = creation day, so the same-day grant no-ops). */
 export const DAILY_CREDIT_GRANT = 10
 /** A free user may take at most this many mock exams total, ever. */
 export const FREE_MOCK_LIMIT = 1

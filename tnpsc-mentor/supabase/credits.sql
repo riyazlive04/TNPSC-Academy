@@ -1,7 +1,9 @@
 -- ─── Credit system ───────────────────────────────────────────────────────────
 -- Replaces the per-topic / per-subject free gate with a single credit balance.
 --   • 50 credits on signup (column default → back-fills every existing profile).
---   • +10 once per IST day, only on days the user logs in (grant_daily_credit).
+--   • +10 once per IST day, only on days the user logs in (grant_daily_credit),
+--     STARTING THE DAY AFTER SIGNUP — day one is the 50 signup credits only
+--     (last_daily_grant defaults to the row's IST creation day, see 1b).
 --     Daily credits are use-it-or-lose-it: whatever remains of the most recent
 --     daily grant expires at the IST day boundary. Enforcement is lazy — the
 --     unspent remainder (daily_left) is clawed back inside the NEXT day's grant,
@@ -24,6 +26,14 @@
 alter table public.profiles add column if not exists credits integer not null default 50;
 alter table public.profiles add column if not exists last_daily_grant date;
 alter table public.profiles add column if not exists daily_left integer not null default 0;
+
+-- 1b. New accounts start with EXACTLY the 50 signup credits: the row is born
+--     with last_daily_grant = its IST creation day, so the same-day check-in
+--     no-ops and the +10 daily bonus starts the day AFTER signup. (The
+--     handle_new_user trigger inserts without this column, so the default
+--     applies; existing rows are untouched.)
+alter table public.profiles
+  alter column last_daily_grant set default ((now() at time zone 'Asia/Kolkata')::date);
 
 -- 2. Audit ledger — one row per grant/spend. RLS: a user reads only their own;
 --    nobody writes directly (only the SECURITY DEFINER RPCs / service role).
