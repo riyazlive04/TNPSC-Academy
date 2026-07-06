@@ -47,6 +47,15 @@ export const isPhoneOtpConfigured =
   String(import.meta.env.VITE_OTP_LOGIN ?? '').toLowerCase() === 'true'
 
 /**
+ * Whether signup requires WhatsApp OTP verification of the mobile number. The
+ * server independently gates on its Evolution API credentials (and REJECTS an
+ * unverified register when they're set), so this flag must match the server's
+ * state: set VITE_SIGNUP_WA_OTP=true once the WhatsApp gateway is live.
+ */
+export const isSignupWaOtpConfigured =
+  String(import.meta.env.VITE_SIGNUP_WA_OTP ?? '').toLowerCase() === 'true'
+
+/**
  * Fire-and-forget ping to /api/health on app mount. The API now runs always-on
  * under PM2 on the VPS (no cold starts), so this is just a cheap warm-up: it
  * opens the DNS/TLS/keep-alive connection to the API in parallel with the rest
@@ -267,6 +276,9 @@ export const api = {
       gender?: string
       password: string
       targetGroup: string
+      /** Proof the phone passed WhatsApp OTP (from registerOtpVerify). The
+       * server demands it whenever its WhatsApp gateway is configured. */
+      phoneTicket?: string
     }): Promise<SessionResponse | { requiresConfirmation: true }> {
       const data = await request<SessionResponse | { requiresConfirmation: true }>(
         '/api/auth/register',
@@ -274,6 +286,27 @@ export const api = {
       )
       if ('access_token' in data) tokens.set(data.access_token, data.refresh_token)
       return data
+    },
+    // ─── Signup phone verification (WhatsApp OTP) ─────────────────────────────
+    /** Send a WhatsApp code to a number being registered. Throws ApiError with
+     * 'phone_already_registered' (409), 'phone_no_whatsapp' (404) or
+     * 'otp_cooldown' (429). */
+    async registerOtpSend(phone: string): Promise<{ ok: true }> {
+      return request('/api/auth/register/otp/send', {
+        method: 'POST',
+        auth: false,
+        body: { phone },
+      })
+    },
+    /** Verify the signup code; returns the short-lived ticket register() needs.
+     * Throws ApiError with 'otp_invalid' (401), 'otp_expired' or
+     * 'otp_too_many_attempts' (410). */
+    async registerOtpVerify(phone: string, otp: string): Promise<{ ticket: string }> {
+      return request('/api/auth/register/otp/verify', {
+        method: 'POST',
+        auth: false,
+        body: { phone, otp },
+      })
     },
     /** Exchange a Google ID token (from Google Identity Services in the browser)
      * for the same session the email/password flow returns. Auto-creates the

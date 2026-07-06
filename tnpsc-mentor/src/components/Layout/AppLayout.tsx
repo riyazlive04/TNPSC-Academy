@@ -398,6 +398,7 @@ function CreditPill() {
   return (
     <button
       onClick={() => navigate('/profile')}
+      data-tour="credits"
       title={t('creditsTitle')}
       aria-label={`${balance} ${t('creditsWord')}`}
       className={[

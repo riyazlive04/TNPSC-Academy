@@ -228,9 +228,10 @@ begin
      or coalesce(a.flagged, false)
   on conflict (user_id, question_id) do nothing;
 
-  -- Habit: record today's activity (streaks + daily goal).
+  -- Habit: record today's activity (streaks + daily goal). Keyed on the IST
+  -- day — the habit layer reads streaks in IST, and current_date is UTC here.
   insert into public.daily_activity (user_id, activity_date, questions, tests)
-  values (v_user, current_date, v_attempted, 1)
+  values (v_user, (now() at time zone 'Asia/Kolkata')::date, v_attempted, 1)
   on conflict (user_id, activity_date)
   do update set questions = public.daily_activity.questions + excluded.questions,
                 tests     = public.daily_activity.tests + excluded.tests;
@@ -726,7 +727,8 @@ security definer
 set search_path = public
 as $$
   insert into public.daily_activity (user_id, activity_date, questions, tests)
-  values (auth.uid(), current_date, greatest(coalesce(p_questions, 0), 0),
+  values (auth.uid(), (now() at time zone 'Asia/Kolkata')::date,
+          greatest(coalesce(p_questions, 0), 0),
           greatest(coalesce(p_tests, 0), 0))
   on conflict (user_id, activity_date)
   do update set questions = public.daily_activity.questions + excluded.questions,

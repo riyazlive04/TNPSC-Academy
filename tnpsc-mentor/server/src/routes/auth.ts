@@ -2,7 +2,13 @@ import { Router, type Request, type Response } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
-import { config, isAllowedOrigin, googleEnabled, msg91Enabled } from '../config.js'
+import {
+  config,
+  isAllowedOrigin,
+  googleEnabled,
+  msg91Enabled,
+  whatsappOtpEnabled,
+} from '../config.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import {
   registerLoginSession,
@@ -17,7 +23,13 @@ import {
 } from '../sessions.js'
 import { normalizeMobile, sendOtp, verifyOtp } from '../lib/msg91.js'
 import { phoneTakenByOther } from '../lib/phone.js'
-import { issueOtpTicket, verifyOtpTicket } from '../lib/otpTicket.js'
+import {
+  issueOtpTicket,
+  verifyOtpTicket,
+  issuePhoneVerifyTicket,
+  verifyPhoneVerifyTicket,
+} from '../lib/otpTicket.js'
+import { sendSignupOtp, verifySignupOtp } from '../lib/whatsappOtp.js'
 
 const router = Router()
 
@@ -277,6 +289,62 @@ async function emailStatus(email: string): Promise<'none' | 'google' | 'password
   return s === 'google' || s === 'password' ? s : 'none'
 }
 
+// ─── Signup phone verification (WhatsApp OTP via Evolution API) ──────────────
+// Proves the user OWNS the number BEFORE the account exists: send a code to the
+// number's WhatsApp, verify it, and hand back a short-lived signed ticket that
+// /register then requires. Reuses the login-OTP rate limiters (phone+IP).
+
+// POST /api/auth/register/otp/send — deliver a code to a number being signed up.
+// Only for numbers NOT yet on an account (mirror of /otp/send, which is only for
+// numbers that ARE) — rejecting here saves a message and matches what /register
+// would say anyway.
+router.post(
+  '/register/otp/send',
+  otpSendLimiter,
+  asyncH(async (req, res) => {
+    if (!whatsappOtpEnabled) {
+      return res.status(503).json({ error: 'Phone verification is not configured' })
+    }
+    const phone = normalizeMobile(typeof req.body?.phone === 'string' ? req.body.phone : '')
+    if (!phone) return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
+    if (await phoneTakenByOther(phone)) {
+      return res.status(409).json({ error: 'phone_already_registered' })
+    }
+    const result = await sendSignupOtp(phone)
+    if (!result.ok) {
+      // Distinct codes so the UI can give a precise nudge.
+      if (result.code === 'no_whatsapp') return res.status(404).json({ error: 'phone_no_whatsapp' })
+      if (result.code === 'cooldown') return res.status(429).json({ error: 'otp_cooldown' })
+      console.error('[register/otp/send] send failed', phone, result.code)
+      return res.status(502).json({ error: 'Could not send the code right now. Please try again.' })
+    }
+    res.json({ ok: true })
+  })
+)
+
+// POST /api/auth/register/otp/verify — check the code; success returns the
+// phone-verified ticket /register demands.
+router.post(
+  '/register/otp/verify',
+  otpVerifyLimiter,
+  asyncH(async (req, res) => {
+    if (!whatsappOtpEnabled) {
+      return res.status(503).json({ error: 'Phone verification is not configured' })
+    }
+    const phone = normalizeMobile(typeof req.body?.phone === 'string' ? req.body.phone : '')
+    const otp = typeof req.body?.otp === 'string' ? req.body.otp.trim() : ''
+    if (!phone || !otp) return res.status(400).json({ error: 'Phone and code are required' })
+    const check = await verifySignupOtp(phone, otp)
+    if (!check.ok) {
+      // 401 invalid guess (retryable), 410 dead code (expired / guess budget
+      // spent) — the UI sends the user back to "resend" on 410.
+      const status = check.code === 'invalid' ? 401 : 410
+      return res.status(status).json({ error: `otp_${check.code}` })
+    }
+    res.json({ ticket: issuePhoneVerifyTicket(phone) })
+  })
+)
+
 // ─── POST /api/auth/register ─────────────────────────────────────────────────
 router.post(
   '/register',
@@ -291,6 +359,18 @@ router.post(
     const normalizedPhone = typeof phone === 'string' ? normalizeMobile(phone) : ''
     if (normalizedPhone && (await phoneTakenByOther(normalizedPhone))) {
       return res.status(409).json({ error: 'phone_already_registered' })
+    }
+    // WhatsApp-OTP gate: when configured, an account can only be created with a
+    // phone whose ownership was JUST proven (the /register/otp/verify ticket).
+    // Enforced server-side — the client flow alone would be trivial to curl past.
+    if (whatsappOtpEnabled) {
+      if (!normalizedPhone) {
+        return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
+      }
+      const ticketPhone = verifyPhoneVerifyTicket(String(req.body?.phoneTicket ?? ''))
+      if (!ticketPhone || ticketPhone !== normalizedPhone) {
+        return res.status(403).json({ error: 'phone_not_verified' })
+      }
     }
     // One email = one account, and an email already registered THROUGH GOOGLE must
     // not become an email/password account — send those users to Google sign-in.

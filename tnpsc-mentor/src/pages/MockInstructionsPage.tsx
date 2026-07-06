@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, BookOpen, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
+import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
+import { useCreditsStore } from '../store/creditsStore'
 import { mockBlueprint } from '../lib/constants'
 import { describeConfig } from '../lib/fetchQuestions'
 import { enterFullscreen } from '../lib/proctor'
@@ -42,13 +44,26 @@ export default function MockInstructionsPage() {
   const totalQ = config.mockQuestionCount ?? blueprint?.totalQuestions ?? 0
   const minutes = Math.round((config.mockDurationSeconds ?? 0) / 60)
 
-  const begin = async () => {
-    if (!agreed) return
+  // Free (credit-gated) learners confirm the per-question credit fee in a popup.
+  const creditGated = useCreditsStore((s) => s.loaded && !s.unlimited)
+  const [creditPopup, setCreditPopup] = useState(false)
+
+  const startMock = async () => {
     // Request full-screen before handing off; the quiz engine enforces it where
     // supported. On phones (no Fullscreen API) this is a no-op and the quiz
-    // falls back to visibility/blur proctoring - see lib/proctor.ts.
+    // falls back to visibility/blur proctoring - see lib/proctor.ts. The popup's
+    // confirm click is still a user gesture, so the fullscreen request is valid.
     await enterFullscreen()
     navigate('/mock/quiz', { state: config })
+  }
+
+  const begin = () => {
+    if (!agreed) return
+    if (creditGated) {
+      setCreditPopup(true)
+      return
+    }
+    void startMock()
   }
 
   return (
@@ -154,6 +169,17 @@ export default function MockInstructionsPage() {
           <Maximize2 size={18} /> {t('enterFullscreen')}
         </button>
       </div>
+
+      {/* Credit fee popup - free (credit-gated) learners only */}
+      <CreditConfirmPopup
+        open={creditPopup}
+        cost={totalQ}
+        onConfirm={() => {
+          setCreditPopup(false)
+          void startMock()
+        }}
+        onCancel={() => setCreditPopup(false)}
+      />
     </AppLayout>
   )
 }

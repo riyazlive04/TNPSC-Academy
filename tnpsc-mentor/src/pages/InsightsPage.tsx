@@ -16,8 +16,10 @@ import {
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
+import StatStrip from '../components/UI/StatStrip'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
-import { fetchPercentile } from '../lib/habit'
+import { fetchHabit, fetchPercentile, type HabitState } from '../lib/habit'
+import { SHOW_STREAK } from '../lib/features'
 import { assetsFor } from '../lib/assets'
 import { GROUP_SUBJECTS, subjectName } from '../lib/constants'
 import type { GroupType } from '../types'
@@ -43,6 +45,7 @@ export default function InsightsPage() {
   const { t, lang } = useT()
   const [data, setData] = useState<UserAnalytics | null>(null)
   const [percentile, setPercentile] = useState<number | null>(null)
+  const [habit, setHabit] = useState<HabitState | null>(null)
   const [loading, setLoading] = useState(true)
   const [subjectSort, setSubjectSort] = useState<'accuracy' | 'volume'>('accuracy')
   const [subjectPage, setSubjectPage] = useState(0)
@@ -50,18 +53,23 @@ export default function InsightsPage() {
   useEffect(() => {
     if (!user) return
     let cancelled = false
-    Promise.all([fetchUserAnalytics(user.id), fetchPercentile(user.id)])
-      .then(([d, p]) => {
+    Promise.all([
+      fetchUserAnalytics(user.id),
+      fetchPercentile(user.id),
+      fetchHabit(user.id, profile?.daily_goal ?? 20, profile?.exam_date ?? null),
+    ])
+      .then(([d, p, h]) => {
         if (cancelled) return
         setData(d)
         setPercentile(p)
+        setHabit(h)
       })
       .catch(() => !cancelled && setData(null))
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
-  }, [user])
+  }, [user, profile?.daily_goal, profile?.exam_date])
 
   // Syllabus coverage: subjects practised vs the target group's subject list.
   const group = (profile?.target_group as GroupType) || 'Group1'
@@ -170,6 +178,26 @@ export default function InsightsPage() {
               <StatCard icon={<TrendingUp size={18} />} label={t('bestScore')} value={`${data.overview.bestScore}%`} />
               <StatCard icon={<Clock size={18} />} label={t('studyTime')} value={`${data.overview.totalTimeMinutes}m`} />
             </div>
+
+            {/* ── Consistency: the habit numbers behind the streak ── */}
+            {SHOW_STREAK && habit && (
+              <section className="rounded-card border border-line bg-card p-5">
+                <h3 className="tamil mb-4 font-heading text-base font-semibold tracking-tight text-ink">
+                  {t('consistency')}
+                </h3>
+                <StatStrip
+                  items={[
+                    {
+                      label: t('dayStreak'),
+                      value: habit.currentStreak,
+                      accent: habit.currentStreak > 0,
+                    },
+                    { label: t('bestStreak'), value: habit.longestStreak },
+                    { label: t('daysStudied30'), value: habit.last30.length },
+                  ]}
+                />
+              </section>
+            )}
 
             {/* ── Performance trend ── */}
             {data.trend.length >= 2 && (

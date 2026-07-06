@@ -80,6 +80,16 @@ export const config = {
   // Country code prefixed to the 10-digit Indian mobile before calling MSG91,
   // which wants the full international number with no leading '+'.
   msg91CountryCode: process.env.MSG91_COUNTRY_CODE ?? '91',
+  // ─── Evolution API — WhatsApp signup OTP (optional) ─────────────────────────
+  // Self-hosted WhatsApp gateway (github.com/EvolutionAPI/evolution-api, v2)
+  // used to send the one-time code that verifies phone OWNERSHIP at signup.
+  // Unlike MSG91, Evolution API only delivers messages — this server generates,
+  // stores (hashed) and verifies the code itself (see lib/whatsappOtp.ts).
+  // When any of these is blank the /register/otp endpoints return 503 and
+  // /register works exactly as before (no phone verification required).
+  evolutionApiUrl: (process.env.EVOLUTION_API_URL ?? '').replace(/\/+$/, ''),
+  evolutionApiKey: process.env.EVOLUTION_API_KEY ?? '',
+  evolutionInstance: process.env.EVOLUTION_INSTANCE ?? '',
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -93,3 +103,9 @@ export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateK
 
 /** True when MSG91 OTP credentials are present — gates phone-OTP login. */
 export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTemplateId)
+
+/** True when the Evolution API gateway is fully configured — gates the WhatsApp
+ * signup-OTP endpoints AND makes /register require a verified-phone ticket. */
+export const whatsappOtpEnabled = Boolean(
+  config.evolutionApiUrl && config.evolutionApiKey && config.evolutionInstance
+)

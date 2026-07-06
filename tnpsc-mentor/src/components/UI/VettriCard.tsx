@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Trophy, Check, Loader2, Tag, X, AlertCircle } from 'lucide-react'
+import { Trophy, Check, Download, Loader2, Tag, X, AlertCircle, CalendarDays, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
 import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
 import { useEntitlementsStore } from '../../store/entitlementsStore'
@@ -52,7 +53,10 @@ const PLANS: Record<
   },
 }
 
-const PERK_KEYS = ['vettriPerk1', 'vettriPerk2', 'vettriPerk3'] as const
+// Core perk (the 13-exam marathon) up top; everything else rides in the
+// "Bonus" extras box beneath it (mirrors the PremiumCard bonus block).
+const PERK_KEYS = ['vettriPerk1'] as const
+const BONUS_KEYS = ['vettriBonus1', 'vettriBonus2', 'vettriBonus3'] as const
 
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
@@ -89,6 +93,7 @@ export default function VettriCard({
 }) {
   const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
+  const seriesOn = useTestSeriesEnabled()
   const [paying, setPaying] = useState(false)
   // Pre-payment recap popup: the CTA opens it; checkout runs only on OK.
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -197,6 +202,32 @@ export default function VettriCard({
         </button>
       )}
 
+      {/* Test Marathon header - the bundle's 13 mocks ARE the marathon papers, so
+          the promo strip rides inside the card wherever it shows. Hidden while
+          the superadmin has the Test Marathon feature switched off. */}
+      {seriesOn && (
+        <div className="relative -ml-7 -mr-6 -mt-6 mb-5 bg-gradient-to-r from-brand to-brand-dark py-4 pl-7 pr-6 text-white">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                <CalendarDays size={20} />
+              </span>
+              <div className="min-w-0">
+                <h3 className="tamil font-display text-base font-bold tracking-tight">
+                  {t('marathonBannerTitle')}
+                </h3>
+                <p className="tamil mt-0.5 font-body text-xs text-white/85">
+                  {t('marathonBannerSub')}
+                </p>
+              </div>
+            </div>
+            <span className="tamil flex-shrink-0 rounded-pill bg-white/15 px-3 py-1 font-heading text-[11px] font-semibold">
+              {t('marathonIncluded')}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
@@ -210,13 +241,40 @@ export default function VettriCard({
             {t(sel.validityKey)}
           </p>
           <ul className="mt-3 space-y-1.5">
-            {PERK_KEYS.map((p) => (
-              <li key={p} className="flex items-start gap-2 font-body text-sm text-ink2">
-                <Check size={15} className="mt-0.5 flex-shrink-0 text-brand" />
-                <span className="tamil">{t(p)}</span>
-              </li>
-            ))}
+            {/* Single core perk, with "download the schedule" as an inline link
+                to the timetable flyer (public/ static PDF). */}
+            <li className="flex items-start gap-2 font-body text-sm text-ink2">
+              <Check size={15} className="mt-0.5 flex-shrink-0 text-brand" />
+              <span className="tamil">
+                {t('vettriPerk1')},{' '}
+                <a
+                  href="/test-marathon-2026-schedule.pdf"
+                  download="TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf"
+                  target="_blank"
+                  rel="noopener"
+                  className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 transition hover:decoration-brand"
+                >
+                  {t('vettriPerk1Link')}
+                  <Download size={12} className="ml-1 inline-block align-[-1px]" />
+                </a>
+              </span>
+            </li>
           </ul>
+
+          {/* Bonus extras - a distinct block under the core perk. */}
+          <div className="mt-4 rounded-field border border-brand/25 bg-brand-soft/60 p-3">
+            <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-brand">
+              <Gift size={13} /> {t('vettriBonusTitle')}
+            </p>
+            <ul className="mt-2 space-y-1">
+              {BONUS_KEYS.map((b) => (
+                <li key={b} className="flex items-start gap-1.5 font-body text-xs text-ink">
+                  <Check size={12} className="mt-0.5 flex-shrink-0 text-brand" />
+                  <span className="tamil">{t(b)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {/* Right: plan toggle + price + coupon + CTA */}
@@ -323,7 +381,7 @@ export default function VettriCard({
         open={confirmOpen}
         planName={`${t('vettriTitle')} · ${t(sel.labelKey)}`}
         validity={t(sel.validityKey)}
-        perks={PERK_KEYS.map((k) => t(k))}
+        perks={[...PERK_KEYS, ...BONUS_KEYS].map((k) => t(k))}
         priceLabel={isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
         strikePrice={applied ? `₹${sel.rupees}` : undefined}
         note={t(plan === 'month' ? 'vettriMonthNote' : 'vettriFullNote')}

@@ -44,7 +44,15 @@ const SUBJECT = process.env.SUBJECT ?? 'Polity'
 const QUESTIONS = Number(process.env.QUESTIONS ?? 5)
 const MIN_SEC_PER_Q = 7 // mirrors MIN_SECONDS_PER_QUESTION in the app
 
-const VIEWPORT = { width: 1280, height: 800 }
+// MOBILE=1 records the true phone layout (390×844) at 2× for a crisp capture to
+// drop into a device frame; otherwise the 1280×800 desktop layout.
+const MOBILE = process.env.MOBILE === '1'
+const VIEWPORT = MOBILE ? { width: 390, height: 844 } : { width: 1280, height: 800 }
+// Playwright encodes the video at the CSS-viewport dimensions, so recordVideo.size
+// MUST equal the viewport (a larger size just paints the page into a corner).
+// deviceScaleFactor: 2 still renders the source crisply; we upscale modestly when
+// compositing into the phone frame.
+const RECORD_SIZE = VIEWPORT
 
 // A little slower than real use so the recording reads naturally on playback.
 const pause = (page, ms) => page.waitForTimeout(ms)
@@ -57,7 +65,15 @@ async function run() {
   const context = await browser.newContext({
     viewport: VIEWPORT,
     deviceScaleFactor: 2, // crisper capture
-    recordVideo: { dir: 'recordings/', size: VIEWPORT },
+    ...(MOBILE
+      ? {
+          isMobile: true,
+          hasTouch: true,
+          userAgent:
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+        }
+      : {}),
+    recordVideo: { dir: 'recordings/', size: RECORD_SIZE },
   })
 
   // Pre-seed the two first-run choices so the flow lands straight on the
@@ -89,7 +105,8 @@ async function run() {
   try {
     // ── 1. Login ──────────────────────────────────────────────────────────────
     step('Open the sign-in screen')
-    await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' })
+    await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 45_000 })
+    await page.locator('#login-email').waitFor({ state: 'visible', timeout: 30_000 })
     await pause(page, 1400)
 
     step('Type the aspirant credentials')
@@ -177,12 +194,43 @@ async function run() {
     // ── 5. Result ──────────────────────────────────────────────────────────────
     await page.waitForURL('**/result', { timeout: 25_000 })
     step('Show the score')
-    await pause(page, 2600)
+    await pause(page, 2400)
     step('Scroll through the answer review + explanations')
     await page.mouse.wheel(0, 700)
-    await pause(page, 2400)
-    await page.mouse.wheel(0, 700)
-    await pause(page, 2600)
+    await pause(page, 2200)
+
+    // Tour the bottom-nav tabs, dwelling 1.5s on each so the video also showcases
+    // the app's breadth (Home · Test Marathon · Revision · Insights · Profile).
+    // Turn on reduced-motion for the tour so each tab switch is instant and
+    // full-opacity (the app's route cross-fade would otherwise dim the frames).
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+
+    // A page settles when the network is idle AND no spinner is visible (some
+    // pages, e.g. Revision, load several sections independently).
+    const anySpinnerVisible = async () => {
+      const s = page.locator('.animate-spin')
+      const n = await s.count()
+      for (let k = 0; k < n; k++) if (await s.nth(k).isVisible().catch(() => false)) return true
+      return false
+    }
+    const waitSettled = async () => {
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {})
+      for (let s = 0; s < 28; s++) {
+        if (!(await anySpinnerVisible())) return
+        await pause(page, 250)
+      }
+    }
+
+    const tabs = page.locator('nav.bottom-0 button')
+    const nTabs = await tabs.count()
+    for (let i = 0; i < nTabs; i++) {
+      step(`Tab ${i + 1}/${nTabs}: open, wait for load, hold 1.5s`)
+      await tabs.nth(i).click()
+      await pause(page, 500) // let the destination mount + kick off its fetch
+      await waitSettled()
+      await pause(page, 300) // let content paint
+      await pause(page, 1500) // the requested dwell
+    }
 
     console.log('\n✅ Flow complete — finalising the video…')
   } catch (err) {

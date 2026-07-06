@@ -20,6 +20,8 @@ import {
   Check,
   Compass,
   Coins,
+  Target,
+  CalendarDays,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -56,6 +58,10 @@ const GENDER_OPTIONS: { id: string; labelKey: StringKey }[] = [
   { id: 'female', labelKey: 'genderFemale' },
   { id: 'other', labelKey: 'genderOther' },
 ]
+
+// Daily-question goal presets (habit layer). A custom value set elsewhere still
+// shows up as its own active chip so it is never silently lost.
+const GOAL_OPTIONS = [10, 20, 30, 50, 100]
 
 export default function ProfilePage() {
   const navigate = useNavigate()
@@ -99,6 +105,44 @@ export default function ProfilePage() {
         toast.error(t('genderSaveFailed'))
       })
   }
+
+  // Daily-question goal + exam date - the "goals" half of the habit layer. Same
+  // optimistic pattern as gender: save immediately, revert + toast on failure.
+  const [goalSel, setGoalSel] = useState<number>(profile?.daily_goal ?? 20)
+  useEffect(() => {
+    setGoalSel(profile?.daily_goal ?? 20)
+  }, [profile?.daily_goal])
+  const changeGoal = (next: number) => {
+    if (next === goalSel) return
+    const prev = goalSel
+    setGoalSel(next)
+    api
+      .updateProfile({ daily_goal: next })
+      .then(() => refreshProfile())
+      .catch(() => {
+        setGoalSel(prev)
+        toast.error(t('saveFailed'))
+      })
+  }
+  const [examSel, setExamSel] = useState<string>(profile?.exam_date ?? '')
+  useEffect(() => {
+    setExamSel(profile?.exam_date ?? '')
+  }, [profile?.exam_date])
+  const changeExamDate = (next: string) => {
+    if (next === examSel) return
+    const prev = examSel
+    setExamSel(next)
+    api
+      .updateProfile({ exam_date: next || null })
+      .then(() => refreshProfile())
+      .catch(() => {
+        setExamSel(prev)
+        toast.error(t('saveFailed'))
+      })
+  }
+  const goalChips = GOAL_OPTIONS.includes(goalSel)
+    ? GOAL_OPTIONS
+    : [...GOAL_OPTIONS, goalSel].sort((a, b) => a - b)
 
   // Account details start read-only; the pencil toggles inline editing of the
   // gender + language chips. Selections still save immediately while editing.
@@ -302,6 +346,52 @@ export default function ProfilePage() {
                   ) : (
                     <span className="ml-auto truncate text-right font-heading text-sm font-semibold text-ink">
                       {languageLabel}
+                    </span>
+                  )}
+                </div>
+                {/* Daily question goal - preset chips in edit mode; powers the
+                    dashboard goal progress + goal-met state. */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                    <Target size={16} />
+                  </span>
+                  <span className="tamil font-body text-sm text-ink2">{t('dailyGoalQ')}</span>
+                  {editing ? (
+                    <div className="ml-auto flex flex-wrap justify-end gap-2" role="group" aria-label={t('dailyGoalQ')}>
+                      {goalChips.map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => changeGoal(n)}
+                          aria-pressed={goalSel === n}
+                          className={goalSel === n ? 'chip chip-active' : 'chip'}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="ml-auto truncate text-right font-heading text-sm font-semibold text-ink">
+                      {goalSel}
+                    </span>
+                  )}
+                </div>
+                {/* Exam date - powers the days-to-exam countdown. */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                    <CalendarDays size={16} />
+                  </span>
+                  <span className="tamil font-body text-sm text-ink2">{t('examDate')}</span>
+                  {editing ? (
+                    <input
+                      type="date"
+                      value={examSel}
+                      onChange={(e) => changeExamDate(e.target.value)}
+                      aria-label={t('examDate')}
+                      className="input-soft ml-auto w-44 px-3 py-1.5 text-sm"
+                    />
+                  ) : (
+                    <span className="tamil ml-auto truncate text-right font-heading text-sm font-semibold text-ink">
+                      {examSel ? new Date(examSel + 'T00:00:00').toLocaleDateString() : t('notSet')}
                     </span>
                   )}
                 </div>

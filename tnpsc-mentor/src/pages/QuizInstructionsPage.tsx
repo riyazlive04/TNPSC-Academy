@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ArrowLeft, Clock, Copy, ListChecks, Loader2, Maximize2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
+import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
+import { useCreditsStore } from '../store/creditsStore'
 import { enterFullscreen } from '../lib/proctor'
 import { api } from '../lib/api'
 import { DEFAULT_QUESTIONS, describeConfig } from '../lib/fetchQuestions'
@@ -98,8 +100,11 @@ export default function QuizInstructionsPage() {
   const minCount = Math.min(MIN_QUESTIONS, maxCount)
   const noQuestions = available === 0
 
-  const begin = async () => {
-    if (!agreed || noQuestions) return
+  // Free (credit-gated) learners confirm the per-question credit fee in a popup.
+  const creditGated = useCreditsStore((s) => s.loaded && !s.unlimited)
+  const [creditPopup, setCreditPopup] = useState(false)
+
+  const startQuiz = () => {
     // Regular practice tests are NOT proctored - no fullscreen, no violation
     // tracking. Proctoring is reserved for the Mock Test flow only.
     navigate('/quiz', {
@@ -110,6 +115,15 @@ export default function QuizInstructionsPage() {
         durationSeconds: minutes * 60,
       } as QuizConfig,
     })
+  }
+
+  const begin = () => {
+    if (!agreed || noQuestions) return
+    if (creditGated) {
+      setCreditPopup(true)
+      return
+    }
+    startQuiz()
   }
 
   return (
@@ -264,6 +278,17 @@ export default function QuizInstructionsPage() {
           <Maximize2 size={18} /> {t('enterFullscreen')}
         </button>
       </div>
+
+      {/* Credit fee popup - free (credit-gated) learners only */}
+      <CreditConfirmPopup
+        open={creditPopup}
+        cost={count}
+        onConfirm={() => {
+          setCreditPopup(false)
+          startQuiz()
+        }}
+        onCancel={() => setCreditPopup(false)}
+      />
     </AppLayout>
   )
 }

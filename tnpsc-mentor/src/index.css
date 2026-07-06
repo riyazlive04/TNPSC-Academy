@@ -81,6 +81,7 @@ html.no-copy [contenteditable='true'] {
   --shadow-brand: none; /* violet glow removed app-wide (was a halo on primary buttons/chips) */
   --shadow-warm: 0 8px 22px rgb(var(--c-accentwarm) / 0.22);
   --shadow-gold: 0 8px 22px rgb(var(--c-gold) / 0.18);
+  --shadow-mint: 0 8px 22px rgb(var(--c-mint) / 0.22);
 }
 
 .dark {
@@ -135,6 +136,7 @@ html.no-copy [contenteditable='true'] {
   --shadow-brand: none;
   --shadow-warm: none;
   --shadow-gold: none;
+  --shadow-mint: none;
 }
 
 * {

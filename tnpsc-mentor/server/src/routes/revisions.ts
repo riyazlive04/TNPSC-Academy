@@ -106,11 +106,11 @@ router.post(
       }
     }
 
-    // Charge the flat test fee at start (atomic), like every other gated test —
-    // a revision re-test costs credits too. Premium/Vettri/staff bypass. Only a
-    // non-empty re-test is charged. See lib/credits.chargeTestStart.
+    // Charge the per-question test fee at start (atomic), like every other gated
+    // test — a revision re-test costs credits too. Premium/Vettri/staff bypass.
+    // Only a non-empty re-test is charged. See lib/credits.chargeTestStart.
     if (!(await isUnlimited(req)) && questions.length > 0) {
-      const gate = await chargeTestStart(req.db!, req.userId!, 'revision')
+      const gate = await chargeTestStart(req.db!, req.userId!, 'revision', questions.length)
       if (gate) return res.status(402).json(gate)
     }
 

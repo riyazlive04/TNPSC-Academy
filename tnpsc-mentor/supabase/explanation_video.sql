@@ -222,7 +222,7 @@ begin
   on conflict (user_id, question_id) do nothing;
 
   insert into public.daily_activity (user_id, activity_date, questions, tests)
-  values (v_user, current_date, v_attempted, 1)
+  values (v_user, (now() at time zone 'Asia/Kolkata')::date, v_attempted, 1)
   on conflict (user_id, activity_date)
   do update set questions = public.daily_activity.questions + excluded.questions,
                 tests     = public.daily_activity.tests + excluded.tests;

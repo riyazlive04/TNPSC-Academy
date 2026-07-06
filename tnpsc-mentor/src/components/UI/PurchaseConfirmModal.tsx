@@ -8,7 +8,7 @@ interface PurchaseConfirmModalProps {
   open: boolean
   /** Plan being bought, e.g. "Premium" or "Vettri Nichayam · Full". */
   planName: string
-  /** Validity line, e.g. "Group 1 · 3-month plan". */
+  /** Validity line, e.g. "3-month plan". */
   validity: string
   /** Already-translated benefit lines shown as a checklist. */
   perks: string[]
@@ -20,7 +20,7 @@ interface PurchaseConfirmModalProps {
   note?: string
   /** Free unlock (100% coupon) - changes the OK label, no Razorpay opens. */
   isFree?: boolean
-  /** 'warm' = Premium coral, 'brand' = Vettri violet. */
+  /** 'warm' = Premium mint green, 'brand' = Vettri violet. */
   accent?: 'warm' | 'brand'
   busy?: boolean
   onConfirm: () => void
@@ -64,7 +64,7 @@ export default function PurchaseConfirmModal({
   if (!open) return null
 
   const warm = accent === 'warm'
-  const accentText = warm ? 'text-accentwarm' : 'text-brand'
+  const accentText = warm ? 'text-mint' : 'text-brand'
   const Icon = warm ? Crown : Trophy
 
   return (
@@ -85,7 +85,7 @@ export default function PurchaseConfirmModal({
         <div className="flex flex-col items-center text-center">
           <span
             className={`mb-3 grid h-12 w-12 place-items-center rounded-full ${
-              warm ? 'bg-accentwarmsoft text-accentwarm' : 'bg-brand-soft text-brand'
+              warm ? 'bg-mintsoft text-mint' : 'bg-brand-soft text-brand'
             }`}
           >
             <Icon size={22} />
@@ -152,7 +152,7 @@ export default function PurchaseConfirmModal({
             onClick={onConfirm}
             disabled={busy}
             className={`btn press flex-1 px-4 py-2.5 text-sm text-white ${
-              warm ? 'bg-accentwarm hover:brightness-105' : 'bg-brand hover:bg-brand-dark'
+              warm ? 'bg-mint hover:brightness-105' : 'bg-brand hover:bg-brand-dark'
             }`}
           >
             {busy && <Spinner size={15} />}

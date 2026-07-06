@@ -8,6 +8,8 @@ import {
   ShieldCheck,
   RefreshCw,
   Flame,
+  Check,
+  Target,
   ChevronRight,
   Layers,
   Activity,
@@ -22,15 +24,16 @@ import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
-import MarathonBanner from '../components/UI/MarathonBanner'
+import VettriCard from '../components/UI/VettriCard'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
+import StatStrip, { type Stat } from '../components/UI/StatStrip'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import { fetchHabit, type HabitState } from '../lib/habit'
-import { SHOW_STREAK } from '../lib/features'
+import { SHOW_STREAK, SHOW_GOALS } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { computeXp, levelInfo } from '../lib/game'
 import { unlockedBadgeIds, type GameStats } from '../lib/achievements'
@@ -215,6 +218,29 @@ export default function TestArenaPage() {
   const [featured, ...restCards] = CARDS
   const showStreak = SHOW_STREAK && (habit?.currentStreak ?? 0) > 0
 
+  // Habit strip under the greeting - goal progress, best streak, exam countdown.
+  // The coral accent stays on the streak chip beside the name (the one number
+  // that matters); the strip carries the supporting metrics.
+  const habitStats: Stat[] = []
+  if (habit) {
+    if (SHOW_GOALS)
+      habitStats.push({
+        label: t('questionsToday'),
+        value: habit.goalMetToday ? (
+          <span className="inline-flex items-center gap-1.5">
+            {habit.questionsToday}/{habit.dailyGoal}
+            <Check size={16} className="text-mint" />
+          </span>
+        ) : (
+          `${habit.questionsToday}/${habit.dailyGoal}`
+        ),
+      })
+    if (SHOW_STREAK && habit.longestStreak > 1)
+      habitStats.push({ label: t('bestStreak'), value: habit.longestStreak })
+    if (SHOW_GOALS && habit.daysToExam != null && habit.daysToExam >= 0)
+      habitStats.push({ label: t('daysToExam'), value: habit.daysToExam })
+  }
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
@@ -234,6 +260,18 @@ export default function TestArenaPage() {
               </span>
             )}
           </div>
+          {habitStats.length > 0 && <StatStrip items={habitStats} className="mt-5" />}
+          {/* No exam date yet - a quiet pointer to the goals screen. */}
+          {SHOW_GOALS && habit && !habit.examDate && (
+            <button
+              onClick={() => navigate('/setup')}
+              className="focus-ring mt-3 inline-flex items-center gap-1.5 font-heading text-[13px] font-semibold text-primary transition hover:opacity-80"
+            >
+              <Target size={14} />
+              <span className="tamil">{t('setExamDate')}</span>
+              <ChevronRight size={14} />
+            </button>
+          )}
           {/* Kural of the day - the actual couplet, rotating daily. Tapping it
               opens the box straight at this kural's full detail. */}
           {dailyKural && (
@@ -337,9 +375,10 @@ export default function TestArenaPage() {
           </div>
         </section>
 
-        {/* Marathon price banner above the premium upsell - the ₹899 Vettri route
-            into the Test Marathon; hides itself for paid users / feature off. */}
-        <MarathonBanner ctaTo="/test-series" />
+        {/* Vettri Nichayam upsell (carries the Test Marathon banner as its
+            header) - the ₹899 route into the Test Marathon; hides itself for
+            paid users, and its marathon strip hides when the feature is off. */}
+        <VettriCard />
 
         {/* Premium upsell - the one deliberately distinct surface (its own coral
             identity), kept as a self-contained monetisation unit. */}

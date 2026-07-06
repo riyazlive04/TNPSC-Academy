@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Crown, Check, Loader2, Tag, X, Gift } from 'lucide-react'
+import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
 import { toast } from '../../store/toastStore'
@@ -18,6 +18,8 @@ export const PREMIUM_MRP_RUPEES = 1699
 export const PREMIUM_PRICE_RUPEES = 1699
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
+// Value framing shown under the price ("≈ ₹566 / month" for the 3-month plan).
+const PER_MONTH_RUPEES = Math.round(PREMIUM_PRICE_RUPEES / 3)
 
 // Test Marathon (premiumPerk5) leads: Premium includes the whole Vettri Nichayam
 // series, which is the headline reason to pick Premium over the cheaper bundle.
@@ -170,9 +172,9 @@ export default function PremiumCard({
     <div
       className={`card relative overflow-hidden p-6 pl-7 ${className}`}
     >
-      {/* Coral accent stripe - premium gets its own identity, distinct from the
+      {/* Mint accent stripe - premium gets its own identity, distinct from the
           violet app chrome, without another heavy gradient panel. */}
-      <span className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-accentwarm" />
+      <span className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-mint" />
 
       {dismissible && (
         <button
@@ -189,33 +191,33 @@ export default function PremiumCard({
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accentwarmsoft px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-accentwarm">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-mintsoft px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-mint">
             <Crown size={13} /> {t('premiumBadge')}
           </span>
           <h2 className="mt-3 font-display text-xl font-bold tracking-tight text-ink">
             {t('premiumTitle')}
           </h2>
-          <p className="tamil mt-1 font-heading text-xs font-bold uppercase tracking-wide text-accentwarm">
+          <p className="tamil mt-1 font-heading text-xs font-bold uppercase tracking-wide text-mint">
             {t('premiumValidity')}
           </p>
           <ul className="mt-3 space-y-1.5">
             {PERK_KEYS.map((p) => (
               <li key={p} className="flex items-start gap-2 font-body text-sm text-ink2">
-                <Check size={15} className="mt-0.5 flex-shrink-0 text-accentwarm" />
+                <Check size={15} className="mt-0.5 flex-shrink-0 text-mint" />
                 <span className="tamil">{t(p)}</span>
               </li>
             ))}
           </ul>
 
           {/* Bonus benefits - a distinct extras block under the core perks. */}
-          <div className="mt-4 rounded-field border border-accentwarm/25 bg-accentwarmsoft/60 p-3">
-            <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-accentwarm">
+          <div className="mt-4 rounded-field border border-mint/25 bg-mintsoft/60 p-3">
+            <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-mint">
               <Gift size={13} /> {t('premiumBonusTitle')}
             </p>
             <ul className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2">
               {BONUS_KEYS.map((b) => (
                 <li key={b} className="flex items-start gap-1.5 font-body text-xs text-ink">
-                  <Check size={12} className="mt-0.5 flex-shrink-0 text-accentwarm" />
+                  <Check size={12} className="mt-0.5 flex-shrink-0 text-mint" />
                   <span className="tamil">{t(b)}</span>
                 </li>
               ))}
@@ -223,51 +225,59 @@ export default function PremiumCard({
           </div>
         </div>
 
-        {/* Right: price + coupon + CTA */}
-        <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
-          <div className="flex items-baseline gap-2">
-            {applied ? (
-              <>
+        {/* Right: checkout panel - price, value framing, coupon and CTA as one
+            contained unit instead of loose right-aligned rows. */}
+        <div className="w-full flex-shrink-0 rounded-tile border border-line bg-tint/40 p-4 sm:w-64">
+          {/* Price */}
+          <div className="text-center">
+            <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5">
+              {applied && (
                 <span className="font-body text-base text-ink2 line-through">
                   ₹{PREMIUM_PRICE_RUPEES}
                 </span>
-                <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                  {isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
-                </span>
-              </>
-            ) : (
-              <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                ₹{PREMIUM_PRICE_RUPEES}
+              )}
+              <span className="font-display text-4xl font-bold tracking-tight text-ink">
+                {isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
               </span>
+              {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
+            </div>
+            {applied ? (
+              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+                {`${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`}
+              </span>
+            ) : SAVINGS > 0 ? (
+              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+                {`${t('premiumFlatSave')} ₹${SAVINGS}`}
+              </span>
+            ) : (
+              <p className="tamil mt-1 font-body text-xs text-ink2">
+                ≈ ₹{PER_MONTH_RUPEES} {t('premiumPerMonth')}
+              </p>
             )}
-            {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
           </div>
-          {(applied || SAVINGS > 0) && (
-            <span className="tamil inline-flex items-center rounded-full bg-accentwarm px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
-              {applied
-                ? `${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`
-                : `${t('premiumFlatSave')} ₹${SAVINGS}`}
-            </span>
-          )}
+
+          <div className="my-3.5 border-t border-dashed border-line" />
 
           {/* Coupon row */}
           {applied ? (
-            <div className="flex items-center gap-2 rounded-field bg-accentwarmsoft px-3 py-2 ring-1 ring-accentwarm/25">
-              <Tag size={14} className="text-accentwarm" />
-              <span className="font-heading text-xs font-semibold text-ink">
-                {applied.code} {t('premiumApplied')}
+            <div className="flex items-center justify-between gap-2 rounded-field bg-mintsoft px-3 py-2 ring-1 ring-mint/25">
+              <span className="flex min-w-0 items-center gap-2">
+                <Tag size={14} className="flex-shrink-0 text-mint" />
+                <span className="truncate font-heading text-xs font-semibold text-ink">
+                  {applied.code} {t('premiumApplied')}
+                </span>
               </span>
               <button
                 type="button"
                 onClick={removeCoupon}
                 aria-label={t('premiumRemoveCoupon')}
-                className="text-ink2 transition-colors hover:text-ink"
+                className="flex-shrink-0 text-ink2 transition-colors hover:text-ink"
               >
                 <X size={14} />
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-stretch gap-1 sm:items-end">
+            <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1.5">
                 <input
                   value={code}
@@ -276,13 +286,13 @@ export default function PremiumCard({
                   placeholder={t('premiumCouponPlaceholder')}
                   spellCheck={false}
                   autoCapitalize="characters"
-                  className="w-32 rounded-field border border-line bg-canvas px-3 py-2 font-body text-sm text-ink placeholder:text-ink2/50 focus:border-accentwarm/50 focus:outline-none focus:ring-2 focus:ring-accentwarm/20"
+                  className="min-w-0 flex-1 rounded-field border border-line bg-canvas px-3 py-2 font-body text-sm text-ink placeholder:text-ink2/50 focus:border-mint/50 focus:outline-none focus:ring-2 focus:ring-mint/20"
                 />
                 <button
                   type="button"
                   onClick={applyCoupon}
                   disabled={checking || !code.trim()}
-                  className="inline-flex items-center justify-center rounded-field border border-line bg-card px-3 py-2 font-heading text-xs font-semibold text-ink2 transition-all hover:border-accentwarm/40 hover:text-ink disabled:opacity-50"
+                  className="inline-flex flex-shrink-0 items-center justify-center rounded-field border border-line bg-card px-3 py-2 font-heading text-xs font-semibold text-ink2 transition-all hover:border-mint/40 hover:text-ink disabled:opacity-50"
                 >
                   {checking ? <Loader2 size={14} className="animate-spin" /> : t('premiumApply')}
                 </button>
@@ -296,7 +306,7 @@ export default function PremiumCard({
           <button
             onClick={() => setConfirmOpen(true)}
             disabled={paying}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-accentwarm px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-warm transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
+            className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-pill bg-mint px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-mint transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60"
           >
             {paying ? (
               <Loader2 size={16} className="animate-spin" />
@@ -306,6 +316,13 @@ export default function PremiumCard({
               </>
             )}
           </button>
+
+          {/* Trust microcopy - Razorpay order checkout is one-time, not a
+              subscription, so "no auto-renewal" is accurate. */}
+          <p className="tamil mt-2.5 flex items-center justify-center gap-1 text-center font-body text-[11px] text-ink2">
+            <ShieldCheck size={12} className="flex-shrink-0 text-mint" />
+            {t('premiumSecureNote')}
+          </p>
         </div>
       </div>
 

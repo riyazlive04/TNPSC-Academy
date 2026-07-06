@@ -2,9 +2,10 @@ import { create } from 'zustand'
 import { api } from '../lib/api'
 
 /**
- * Free-tier credit balance. Free users spend 10 credits per test; paid/staff are
- * `unlimited` and the meter is hidden for them. `refresh` also performs the daily
- * check-in (grants +10 once per IST day) and is called once on app load.
+ * Free-tier credit balance. Free users spend 1 credit per question (a test costs
+ * its question count); paid/staff are `unlimited` and the meter is hidden for
+ * them. `refresh` also performs the daily check-in (grants +10 once per IST day)
+ * and is called once on app load.
  */
 interface CreditsState {
   balance: number
@@ -12,10 +13,8 @@ interface CreditsState {
   loaded: boolean
   /** App-load entry point: daily check-in (grants +10 if due) + balance. */
   refresh: () => Promise<void>
-  /** Re-read the balance only (e.g. after a submit spends a credit). */
+  /** Re-read the balance only (e.g. after a test start spends credits). */
   reload: () => Promise<void>
-  /** Optimistic local decrement so the meter drops instantly on submit. */
-  spendLocal: (n?: number) => void
 }
 
 export const useCreditsStore = create<CreditsState>((set) => ({
@@ -43,5 +42,4 @@ export const useCreditsStore = create<CreditsState>((set) => ({
       /* keep last-known balance */
     }
   },
-  spendLocal: (n = 10) => set((s) => (s.unlimited ? s : { ...s, balance: Math.max(0, s.balance - n) })),
 }))

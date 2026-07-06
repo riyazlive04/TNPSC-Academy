@@ -35,3 +35,33 @@ export function verifyOtpTicket(ticket: string): string | null {
   if (!exp || exp < Date.now()) return null
   return userId
 }
+
+// ─── Signup phone-verification ticket ────────────────────────────────────────
+// Same trick for a DIFFERENT claim: "this 10-digit phone passed a WhatsApp OTP
+// just now" — issued by /register/otp/verify, demanded by /register. The signed
+// payload carries a `pv` prefix (and a 4th dot-part), so neither ticket kind can
+// ever be replayed as the other. 15-minute TTL: enough to finish the signup
+// form, short enough that a leaked ticket goes stale fast.
+
+const PHONE_TTL_MS = 15 * 60 * 1000
+
+/** Issue a ticket binding a verified 10-digit phone for the next 15 minutes. */
+export function issuePhoneVerifyTicket(tenDigit: string): string {
+  const exp = Date.now() + PHONE_TTL_MS
+  const payload = `pv.${tenDigit}.${exp}`
+  return `${payload}.${sign(payload)}`
+}
+
+/** Return the phone iff the ticket is well-formed, unexpired and untampered. */
+export function verifyPhoneVerifyTicket(ticket: string): string | null {
+  const parts = String(ticket ?? '').split('.')
+  if (parts.length !== 4 || parts[0] !== 'pv') return null
+  const [, phone, expStr, sig] = parts
+  const expected = sign(`pv.${phone}.${expStr}`)
+  const a = Buffer.from(sig)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+  const exp = Number(expStr)
+  if (!exp || exp < Date.now()) return null
+  return phone
+}

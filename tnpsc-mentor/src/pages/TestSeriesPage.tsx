@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock,
+  Download,
   FileText,
   Loader2,
   Lock,
@@ -12,7 +13,6 @@ import {
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
-import MarathonBanner from '../components/UI/MarathonBanner'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { api } from '../lib/api'
 import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
@@ -124,6 +124,18 @@ export default function TestSeriesPage() {
             {t('testSeriesTitle')}
           </h1>
           <p className="tamil mt-1 font-body text-[15px] text-muted">{t('testSeriesSub')}</p>
+          {/* The full 13-test timetable as a shareable flyer (public/ static PDF).
+              target=_blank so Android webviews without <a download> support still
+              hand the PDF to the system viewer. */}
+          <a
+            href="/test-marathon-2026-schedule.pdf"
+            download="TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf"
+            target="_blank"
+            rel="noopener"
+            className="tamil mt-3 inline-flex items-center gap-2 rounded-pill bg-brand-soft px-4 py-2 font-heading text-xs font-bold text-brand transition hover:bg-brand/10"
+          >
+            <Download size={14} /> {t('downloadSchedule')}
+          </a>
         </header>
 
         {/* Tabs: browse the papers, or review your own performance. */}
@@ -172,12 +184,11 @@ export default function TestSeriesPage() {
           <p className="tamil text-center font-body text-sm text-ink2">{t('testSeriesEmpty')}</p>
         )}
 
-        {/* Whole-series paywall — EITHER paid bundle unlocks the series, so surface
-            the marathon price banner, then the cheaper Vettri option, then the
-            full Premium kit. */}
+        {/* Whole-series paywall — EITHER paid bundle unlocks the series: the
+            cheaper Vettri option (which carries the Test Marathon banner as its
+            header), then the full Premium kit. */}
         {!loading && !error && tab === 'papers' && tests.length > 0 && seriesLocked && (
           <div className="mb-6 space-y-4">
-            <MarathonBanner />
             <VettriCard />
             <PremiumCard />
           </div>

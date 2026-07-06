@@ -35,8 +35,8 @@ const STRINGS = {
     ta: '12,000+ இருமொழி வினாக்கள், நேரத் தேர்வுகள், திறன்மிகு மீள்பார்வை மற்றும் முன்னேற்றப் பகுப்பாய்வு - அனைத்தும் ஒரே இடத்தில்.',
   },
   authFooter: {
-    en: 'Tamil Nadu Public Service Commission · Aspirant Portal',
-    ta: 'தமிழ்நாடு அரசுப் பணியாளர் தேர்வாணையம் · மாணவர் வாயில்',
+    en: 'Aspirant Portal',
+    ta: 'மாணவர் வாயில்',
   },
   chipPyq: { en: 'Previous Year', ta: 'முந்தைய ஆண்டு' },
   chipSamacheer: { en: 'Samacheer', ta: 'சமச்சீர்' },
@@ -111,6 +111,13 @@ const STRINGS = {
   onbProgressBody: {
     en: 'Weak topics are saved as smart revisions, and Insights show your accuracy, strengths and focus areas.',
     ta: 'பலவீனமான தலைப்புகள் திறன்மிகு மீள்பார்வைகளாகச் சேமிக்கப்படும், மேலும் பகுப்பாய்வு உங்கள் துல்லியம், பலங்கள் மற்றும் கவனப் பகுதிகளைக் காட்டும்.',
+  },
+  // Test Marathon schedule flyer (static PDF in public/).
+  downloadSchedule: { en: 'Download the schedule (PDF)', ta: 'தேர்வு அட்டவணையை பதிவிறக்கு (PDF)' },
+  onbCreditsTitle: { en: 'Your test credits', ta: 'உங்கள் தேர்வு கிரெடிட்கள்' },
+  onbCreditsBody: {
+    en: 'Each question uses 1 credit — a 20-question test costs 20 credits. You get +10 free credits every day you log in, but unused daily credits expire at the end of the day (midnight) — so practise every day! Premium / Vettri Nichayam plans are unlimited.',
+    ta: 'ஒவ்வொரு கேள்விக்கும் 1 கிரெடிட் செலவாகும் — 20 கேள்வித் தேர்வுக்கு 20 கிரெடிட்கள். உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்; ஆனால் பயன்படுத்தாத தினசரி கிரெடிட்கள் அன்றைய நாள் முடிவில் (நள்ளிரவில்) காலாவதியாகும் — எனவே தினமும் பயிற்சி செய்யுங்கள்! பிரீமியம் / வெற்றி நிச்சயம் திட்டங்களில் வரம்பே இல்லை.',
   },
   onbLangTitle: { en: 'Tamil, English or both', ta: 'தமிழ், ஆங்கிலம் அல்லது இரண்டும்' },
   onbLangBody: {
@@ -315,8 +322,19 @@ const STRINGS = {
   // ── Credits (free-tier test balance) ──
   creditsTitle: { en: 'Your credits', ta: 'உங்கள் கிரெடிட்கள்' },
   creditsWord: { en: 'credits', ta: 'கிரெடிட்கள்' },
-  creditsPerTest: { en: 'Each test costs 10 credits.', ta: 'ஒவ்வொரு தேர்வுக்கும் 10 கிரெடிட்கள்.' },
-  creditsDaily: { en: 'You get +10 free credits each day you log in.', ta: 'நீங்கள் உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்.' },
+  creditsPerTest: { en: 'Each question costs 1 credit.', ta: 'ஒவ்வொரு கேள்விக்கும் 1 கிரெடிட்.' },
+  creditsDaily: {
+    en: 'You get +10 free credits each day you log in — unused daily credits expire at the end of the day.',
+    ta: 'நீங்கள் உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும் — பயன்படுத்தாத தினசரி கிரெடிட்கள் அன்றைய நாள் முடிவில் காலாவதியாகும்.',
+  },
+  // Pre-test credit popup (instructions screens, free users only). {n} is
+  // replaced with the actual question count (= cost at 1 credit/question).
+  creditConfirmTitle: { en: 'Use {n} credits?', ta: '{n} கிரெடிட்கள் பயன்படுத்தவா?' },
+  creditConfirmStart: { en: 'OK, start test', ta: 'சரி, தேர்வைத் தொடங்கு' },
+  creditDebitNotice: {
+    en: '{n} credits will be debited from your balance for this test (1 credit per question).',
+    ta: 'இந்தத் தேர்வுக்கு உங்கள் இருப்பிலிருந்து {n} கிரெடிட்கள் கழிக்கப்படும் (ஒரு கேள்விக்கு 1 கிரெடிட்).',
+  },
   outOfCredits: {
     en: "You're out of credits. You'll get 10 more free credits tomorrow, or go Premium / Vettri Nichayam for unlimited tests.",
     ta: 'உங்கள் கிரெடிட்கள் தீர்ந்துவிட்டன. நாளை மேலும் 10 இலவச கிரெடிட்கள் கிடைக்கும், அல்லது வரம்பற்ற தேர்வுகளுக்கு பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
@@ -566,14 +584,14 @@ const STRINGS = {
   unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
   scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
-  // Test Marathon promo banner — shown above the upsell cards for locked users.
+  // Test Marathon promo strip — rendered as the VettriCard's header. The price
+  // sits right below in the card, so it carries an "included" pill, not ₹899.
   marathonBannerTitle: { en: 'Test Marathon 2026', ta: 'தேர்வு மாரத்தான் 2026' },
   marathonBannerSub: {
-    en: '13 full-length Group 1 papers on a fixed schedule',
-    ta: 'திட்டமிட்ட அட்டவணையில் 13 முழு நீள குரூப் 1 தேர்வுத் தாள்கள்',
+    en: '13 Group 1 papers on a fixed schedule: 10 sectional + 3 full mocks',
+    ta: 'திட்டமிட்ட அட்டவணையில் 13 குரூப் 1 தேர்வுத் தாள்கள்: 10 பிரிவு வாரியான + 3 முழு மாதிரி',
   },
-  marathonBannerVia: { en: 'with Vettri Nichayam', ta: 'வெற்றி நிச்சயத்துடன்' },
-  marathonBannerCta: { en: 'Unlock now', ta: 'இப்போதே திறக்கவும்' },
+  marathonIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
   // Test Marathon — Analytics tab
   tsTabPapers: { en: 'Papers', ta: 'தேர்வுகள்' },
   tsTabAnalytics: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
@@ -675,18 +693,33 @@ const STRINGS = {
     en: 'This is a limited-period plan — your access lasts two months and then ends. Renew to keep using it.',
     ta: 'இது வரையறுக்கப்பட்ட காலத் திட்டம் — உங்கள் அணுகல் இரண்டு மாதங்கள் மட்டுமே நீடிக்கும், பிறகு முடிவடையும். தொடர்ந்து பயன்படுத்த புதுப்பிக்கவும்.',
   },
-  vettriPlanFull: { en: 'Full', ta: 'முழு' },
-  vettriPlanMonth: { en: 'Monthly', ta: 'மாதம்' },
+  vettriPlanFull: { en: 'One-time', ta: 'ஒருமுறை' },
+  vettriPlanMonth: { en: 'Installment', ta: 'தவணை' },
   vettriFullSuffix: { en: '/ 2 months', ta: '/ 2 மாதம்' },
   vettriMonthSuffix: { en: '/ month', ta: '/ மாதம்' },
-  vettriPerk1: { en: '13 full-length mock exams', ta: '13 முழு நீள மாதிரித் தேர்வுகள்' },
-  vettriPerk2: {
-    en: 'Unlimited Previous-Year (PYQ) tests',
-    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள்',
+  // The perk sentence is split so "download the schedule" renders as an INLINE
+  // link to the flyer PDF (VettriCard appends vettriPerk1Link as the anchor).
+  vettriPerk1: {
+    en: '13 mock tests (10 sectional / 3 full mock)',
+    ta: '13 மாதிரித் தேர்வுகள் (10 பிரிவு வாரியான / 3 முழு மாதிரி)',
   },
-  vettriPerk3: {
-    en: 'Unlimited Current Affairs tests',
-    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள்',
+  vettriPerk1Link: {
+    en: 'download the schedule (PDF)',
+    ta: 'அட்டவணையை பதிவிறக்க (PDF)',
+  },
+  // "Bonus" extras box under the core perk.
+  vettriBonusTitle: { en: 'Bonus', ta: 'போனஸ்' },
+  vettriBonus1: {
+    en: 'Unlimited PYQ tests (Premium feature · 2-month access)',
+    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
+  },
+  vettriBonus2: {
+    en: 'Unlimited Current Affairs tests (Premium feature · 2-month access)',
+    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
+  },
+  vettriBonus3: {
+    en: 'Subject-wise test questions (3000+), unlimited · 2-month access and much more',
+    ta: 'பாட வாரியான தேர்வு வினாக்கள் (3000+), வரம்பற்றது · 2 மாத அணுகல் மற்றும் இன்னும் பல',
   },
   vettriGet: { en: 'Get Vettri Nichayam', ta: 'வெற்றி நிச்சயம் பெறுங்கள்' },
   vettriThanks: {
@@ -879,6 +912,10 @@ const STRINGS = {
   questionsToday: { en: 'questions today', ta: 'இன்று வினாக்கள்' },
   daysToExam: { en: 'days to exam', ta: 'தேர்வுக்கு நாட்கள்' },
   setExamDate: { en: 'Set your exam date & goal', ta: 'உங்கள் தேர்வு தேதி & இலக்கை அமைக்கவும்' },
+  startStreak: { en: 'Start your streak', ta: 'உங்கள் தொடர்ச்சியைத் தொடங்குங்கள்' },
+  bestStreak: { en: 'Best streak', ta: 'சிறந்த தொடர்ச்சி' },
+  consistency: { en: 'Consistency', ta: 'தொடர் பயிற்சி' },
+  daysStudied30: { en: 'Days studied (30d)', ta: 'படித்த நாட்கள் (30 நாளில்)' },
   daily: { en: 'Daily Current Affairs', ta: 'தினசரி நடப்பு நிகழ்வுகள்' },
   dailyCta: { en: "Today's 10-question current-affairs drill", ta: 'இன்றைய 10-வினா நடப்பு நிகழ்வுப் பயிற்சி' },
 
@@ -915,6 +952,7 @@ const STRINGS = {
   genderFemale: { en: 'Female', ta: 'பெண்' },
   genderOther: { en: 'Do not prefer', ta: 'தெரிவிக்க விரும்பவில்லை' },
   genderSaveFailed: { en: 'Could not save gender. Please try again.', ta: 'பாலினத்தை சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
+  saveFailed: { en: 'Could not save. Please try again.', ta: 'சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
   askedInYear: { en: 'Asked in', ta: 'கேட்கப்பட்ட ஆண்டு' },
   pdfPremiumOnly: { en: 'Download PDF - upgrade to Premium', ta: 'PDF பதிவிறக்க - பிரீமியத்திற்கு மேம்படுத்தவும்' },
   pdfPremiumPrompt: {
@@ -934,19 +972,19 @@ const STRINGS = {
     en: 'Go Premium - prepare faster',
     ta: 'பிரீமியம் பெறுங்கள் - வேகமாக தயாராகுங்கள்',
   },
-  premiumValidity: { en: 'Group 1 · 3-month plan', ta: 'குரூப் 1 · 3-மாத திட்டம்' },
+  premiumValidity: { en: '3-month plan', ta: '3-மாத திட்டம்' },
   premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
   premiumPerk2: {
-    en: '6 mock exams (3 now + 3 after the exam announcement)',
-    ta: '6 மாதிரித் தேர்வுகள் (3 இப்போது + அறிவிப்புக்குப் பின் 3)',
+    en: '6 mock exams',
+    ta: '6 மாதிரித் தேர்வுகள்',
   },
   premiumPerk3: {
     en: 'Previous-year papers - last 5 years',
     ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் - கடந்த 5 ஆண்டுகள்',
   },
   premiumPerk4: {
-    en: 'Current Affairs (Aug 2025 - Jun 2026)',
-    ta: 'நடப்பு நிகழ்வுகள் (ஆக 2025 - ஜூன் 2026)',
+    en: 'Current Affairs',
+    ta: 'நடப்பு நிகழ்வுகள்',
   },
   // Premium is a superset of Vettri Nichayam, so it includes the full Test
   // Marathon series (all 13 scheduled papers) plus every future content update.
@@ -971,6 +1009,11 @@ const STRINGS = {
     ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்',
   },
   premiumPerYear: { en: '/ 3 months', ta: '/ 3 மாதம்' },
+  premiumPerMonth: { en: '/ month', ta: '/ மாதம்' },
+  premiumSecureNote: {
+    en: 'Secure payment via Razorpay · one-time, no auto-renewal',
+    ta: 'Razorpay மூலம் பாதுகாப்பான கட்டணம் · ஒருமுறை மட்டும், தானாக புதுப்பிக்காது',
+  },
   premiumFlatSave: { en: 'Flat save', ta: 'சேமிப்பு' },
   premiumYouSave: { en: 'You save', ta: 'நீங்கள் சேமிக்கிறீர்கள்' },
   premiumApplied: { en: 'applied', ta: 'பயன்படுத்தப்பட்டது' },
@@ -1119,6 +1162,32 @@ const STRINGS = {
   otpNotRegistered: {
     en: 'No account found with this number. Please sign up, or sign in with email.',
     ta: 'இந்த எண்ணுடன் கணக்கு இல்லை. பதிவு செய்யவும் அல்லது மின்னஞ்சல் மூலம் உள்நுழையவும்.',
+  },
+  // Signup phone verification (WhatsApp OTP)
+  waOtpSentTo: {
+    en: 'We sent a code on WhatsApp to',
+    ta: 'WhatsApp-இல் குறியீட்டை அனுப்பியுள்ளோம்:',
+  },
+  verifyAndCreate: { en: 'Verify & create account', ta: 'சரிபார்த்து கணக்கை உருவாக்கு' },
+  waOtpNoWhatsApp: {
+    en: "This number doesn't seem to be on WhatsApp. Please use a mobile number that has WhatsApp.",
+    ta: 'இந்த எண்ணில் WhatsApp இல்லை போல் தெரிகிறது. WhatsApp உள்ள கைபேசி எண்ணைப் பயன்படுத்தவும்.',
+  },
+  waOtpInvalid: {
+    en: 'Incorrect code. Please check and try again.',
+    ta: 'தவறான குறியீடு. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+  },
+  waOtpDead: {
+    en: 'This code is no longer valid. Please request a new one.',
+    ta: 'இந்த குறியீடு இனி செல்லாது. புதிய குறியீட்டைக் கோரவும்.',
+  },
+  waOtpCooldown: {
+    en: 'Please wait a moment before requesting another code.',
+    ta: 'மற்றொரு குறியீட்டைக் கோரும் முன் சிறிது காத்திருக்கவும்.',
+  },
+  errPhoneRegistered: {
+    en: 'This mobile number is already registered to another account. Please sign in, or use a different number.',
+    ta: 'இந்த கைபேசி எண் ஏற்கனவே வேறு கணக்கில் பதிவாகியுள்ளது. உள்நுழையவும் அல்லது வேறு எண்ணைப் பயன்படுத்தவும்.',
   },
   googleSignInFailed: {
     en: "Couldn't sign in with Google. Please try again.",

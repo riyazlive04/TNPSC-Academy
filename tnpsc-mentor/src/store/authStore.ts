@@ -75,6 +75,21 @@ export interface AuthState {
    * re-verifying the same Google ID token. */
   replaceDeviceGoogle: (idToken: string, sessionId: string) => Promise<SignInResult>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
+  /** Signup WhatsApp-OTP: send a code to the number being registered. Flags let
+   * the UI give a precise nudge without parsing error strings. */
+  sendSignupOtp: (phone: string) => Promise<{
+    error: string | null
+    phoneTaken?: boolean
+    noWhatsApp?: boolean
+    cooldown?: boolean
+  }>
+  /** Signup WhatsApp-OTP: verify the code. Success carries the ticket signUp
+   * must include; `dead` means the code can't be retried (expired/attempts spent)
+   * so the UI should send the user back to "resend". */
+  verifySignupOtp: (
+    phone: string,
+    otp: string
+  ) => Promise<{ error: string | null; ticket?: string; invalid?: boolean; dead?: boolean }>
   resetPassword: (email: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
 }
@@ -86,6 +101,8 @@ export interface SignUpParams {
   gender?: string
   password: string
   targetGroup: string
+  /** Proof of WhatsApp phone verification (required when the feature is live). */
+  phoneTicket?: string
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -244,7 +261,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (code === 'email_already_registered') {
         return { error: 'This email is already registered to another account. Please sign in instead.' }
       }
+      if (code === 'phone_not_verified') {
+        return { error: 'Phone verification expired. Please verify your number again.' }
+      }
       return { error: code || 'Sign up failed' }
+    }
+  },
+
+  sendSignupOtp: async (phone) => {
+    try {
+      await api.auth.registerOtpSend(phone)
+      return { error: null }
+    } catch (e) {
+      const code = e instanceof Error ? e.message : ''
+      if (code === 'phone_already_registered') return { error: null, phoneTaken: true }
+      if (code === 'phone_no_whatsapp') return { error: null, noWhatsApp: true }
+      if (code === 'otp_cooldown') return { error: null, cooldown: true }
+      return { error: code || 'Could not send the code' }
+    }
+  },
+
+  verifySignupOtp: async (phone, otp) => {
+    try {
+      const { ticket } = await api.auth.registerOtpVerify(phone, otp)
+      return { error: null, ticket }
+    } catch (e) {
+      const code = e instanceof Error ? e.message : ''
+      if (code === 'otp_invalid') return { error: null, invalid: true }
+      if (code === 'otp_expired' || code === 'otp_too_many_attempts') {
+        return { error: null, dead: true }
+      }
+      return { error: code || 'Could not verify the code' }
     }
   },
 

@@ -25,6 +25,7 @@ const STEPS: Step[] = [
   { titleKey: 'onbWelcomeTitle', bodyKey: 'onbWelcomeBody' },
   { target: 'mock', titleKey: 'onbMockTitle', bodyKey: 'onbMockBody' },
   { target: 'practice', titleKey: 'onbPracticeTitle', bodyKey: 'onbPracticeBody' },
+  { target: 'credits', titleKey: 'onbCreditsTitle', bodyKey: 'onbCreditsBody' },
   { target: 'progress', titleKey: 'onbProgressTitle', bodyKey: 'onbProgressBody' },
   { target: 'lang', titleKey: 'onbLangTitle', bodyKey: 'onbLangBody' },
   { titleKey: 'onbFinishTitle', bodyKey: 'onbFinishBody' },

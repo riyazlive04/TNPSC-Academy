@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Newspaper, Flame, Gift, Check } from 'lucide-react'
+import { ArrowLeft, Newspaper, Flame, Gift, Check, Target } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
+import ProgressBar from '../components/UI/ProgressBar'
+import StreakCalendar from '../components/StreakCalendar'
 import { useAuth } from '../hooks/useAuth'
-import { fetchHabit, type HabitState } from '../lib/habit'
-import { SHOW_STREAK } from '../lib/features'
+import { fetchHabit, todayIso, type HabitState } from '../lib/habit'
+import { SHOW_STREAK, SHOW_GOALS } from '../lib/features'
 import { useProgressStore } from '../store/progressStore'
 import { toast } from '../store/toastStore'
 import { useT } from '../lib/i18n'
@@ -20,7 +22,10 @@ export default function DailyPage() {
   const lastDailyDate = useProgressStore((s) => s.lastDailyDate)
   const dailyRewardPoints = useProgressStore((s) => s.dailyRewardPoints)
 
-  const today = new Date().toISOString().slice(0, 10)
+  // The reward ledger stamps lastDailyDate in IST (progressStore uses
+  // todayIso()) - compare on the same calendar or the claim state flips wrongly
+  // between midnight IST and midnight UTC.
+  const today = todayIso()
   const claimedToday = lastDailyDate === today
 
   useEffect(() => {
@@ -96,6 +101,41 @@ export default function DailyPage() {
             </div>
           </div>
         </div>
+
+        {/* Last 7 days at a glance - agrees with the streak number by design. */}
+        {SHOW_STREAK && habit && (
+          <StreakCalendar
+            last30={habit.last30}
+            currentStreak={habit.currentStreak}
+            bestStreak={habit.longestStreak}
+            className="mb-5"
+          />
+        )}
+
+        {/* Today's question goal - fills as tests are submitted. */}
+        {SHOW_GOALS && habit && (
+          <div className="card mb-5 flex items-center gap-3 p-3.5">
+            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
+              <Target size={18} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="tamil truncate font-body text-[11px] uppercase tracking-wide text-ink2">
+                  {habit.goalMetToday ? t('goalDone') : t('dailyGoal')}
+                </span>
+                <span className="font-heading text-sm font-semibold text-ink">
+                  {habit.questionsToday}/{habit.dailyGoal}
+                </span>
+              </div>
+              <div className="mt-1.5">
+                <ProgressBar
+                  percent={Math.min(100, (habit.questionsToday / Math.max(1, habit.dailyGoal)) * 100)}
+                  height={6}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="card p-7 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-xl bg-tint text-ink">

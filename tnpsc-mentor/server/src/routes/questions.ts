@@ -223,13 +223,18 @@ router.post(
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
     const questions = (data ?? []) as { id?: string }[]
-    // Credit gate: a free learner is CHARGED 10 credits at START (atomic), the
-    // moment a real test is delivered — never at submit, where a forged payload
-    // could dodge the fee. Charging on start also makes each start a reservation,
-    // so opening several tests at once can't be graded off one balance. Only a
-    // non-empty draw is charged. Premium/Vettri/staff are unlimited and bypass.
+    // Credit gate: a free learner is CHARGED 1 credit per question at START
+    // (atomic), the moment a real test is delivered — never at submit, where a
+    // forged payload could dodge the fee. Charging on start also makes each start
+    // a reservation, so opening several tests at once can't be graded off one
+    // balance. Only a non-empty draw is charged. Premium/Vettri/staff bypass.
     if (!unlimited && questions.length > 0) {
-      const gate = await chargeTestStart(req.db!, req.userId!, (config.category as string) ?? 'quiz')
+      const gate = await chargeTestStart(
+        req.db!,
+        req.userId!,
+        (config.category as string) ?? 'quiz',
+        questions.length
+      )
       if (gate) return res.status(402).json(gate)
     }
     // Mark these as seen so they sink to the back of future draws.
@@ -582,7 +587,7 @@ router.post(
     // staff bypass. See chargeTestStart — charging here (not at submit) closes the
     // forged-payload and multi-start bypasses.
     if (!unlimited && result.length > 0) {
-      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-group')
+      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-group', result.length)
       if (gate) return res.status(402).json(gate)
     }
 
@@ -635,7 +640,7 @@ router.post(
     // Charge at start (atomic), only when a real test is delivered. Bypass for
     // premium/Vettri/staff. See chargeTestStart.
     if (!unlimited && questions.length > 0) {
-      const gate = await chargeTestStart(req.db!, req.userId!, 'subject-mock')
+      const gate = await chargeTestStart(req.db!, req.userId!, 'subject-mock', questions.length)
       if (gate) return res.status(402).json(gate)
     }
     void recordSeen(req, questions)
@@ -802,7 +807,7 @@ router.post(
 
     // Charge at start (atomic) once the paper is fetched. See chargeTestStart.
     if (!unlimited && questions.length > 0) {
-      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-exam')
+      const gate = await chargeTestStart(req.db!, req.userId!, 'mock-exam', questions.length)
       if (gate) return res.status(402).json(gate)
     }
     res.json({ questions })

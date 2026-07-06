@@ -1,11 +1,11 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
-import { api } from '../lib/api'
+import { api, isSignupWaOtpConfigured } from '../lib/api'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
 import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
@@ -24,6 +24,17 @@ function isValidIndianMobile(raw: string): boolean {
   const m = cleaned.match(/^(?:\+91|91|0)?([6-9]\d{9})$/)
   return Boolean(m)
 }
+
+/** The bare 10 digits of a valid Indian mobile ('' when invalid) — used to tell
+ * whether the number a WhatsApp-OTP ticket was issued for is still the one in
+ * the form (any prefix/spacing variant of the same number counts as unchanged). */
+function tenDigits(raw: string): string {
+  const m = raw.replace(/[\s\-()]/g, '').match(/^(?:\+91|91|0)?([6-9]\d{9})$/)
+  return m ? m[1] : ''
+}
+
+/** Seconds the user must wait between WhatsApp-OTP sends (mirrors the server). */
+const RESEND_COOLDOWN_S = 45
 
 const GENDERS: { value: string; labelKey: StringKey }[] = [
   { value: 'male', labelKey: 'genderMale' },
@@ -47,7 +58,7 @@ const STRENGTH_META: { key: StringKey; color: string }[] = [
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { signUp } = useAuth()
+  const { signUp, sendSignupOtp, verifySignupOtp } = useAuth()
   const { t } = useT()
   const setLang = useLanguageStore((s) => s.setLang)
 
@@ -66,29 +77,36 @@ export default function RegisterPage() {
   const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const update = (key: keyof typeof form, value: string) =>
+  // WhatsApp phone verification: after the form validates, a code goes to the
+  // number's WhatsApp and the form flips to a code-entry step. The verified
+  // ticket is kept so an unchanged number never re-prompts (e.g. after fixing a
+  // duplicate-email error and resubmitting).
+  const [step, setStep] = useState<'form' | 'otp'>('form')
+  const [otp, setOtp] = useState('')
+  const [otpInfo, setOtpInfo] = useState('')
+  const [resendIn, setResendIn] = useState(0)
+  const [verified, setVerified] = useState<{ phone: string; ticket: string } | null>(null)
+
+  // Tick the resend-cooldown counter down once per second while it's running.
+  useEffect(() => {
+    if (resendIn <= 0) return
+    const timer = setTimeout(() => setResendIn((s) => s - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [resendIn])
+
+  const update = (key: keyof typeof form, value: string) => {
+    // A different phone invalidates any previously verified ticket.
+    if (key === 'phone') setVerified(null)
     setForm((f) => ({ ...f, [key]: value }))
+  }
 
   const strength = useMemo(() => passwordStrength(form.password), [form.password])
   const confirmMismatch = touched && form.confirm.length > 0 && form.password !== form.confirm
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setTouched(true)
-    setError('')
-    setInfo('')
-
-    if (!form.fullName.trim()) return setError(t('errNameRequired'))
-    if (!form.email.trim()) return setError(t('errEmailRequired'))
-    if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
-    if (!form.phone.trim()) return setError(t('errPhoneRequired'))
-    // TODO i18n: no errPhoneInvalid key in src/lib/i18n.ts (owned elsewhere).
-    if (!isValidIndianMobile(form.phone))
-      return setError('Please enter a valid 10-digit mobile number.')
-    if (form.password.length < 6) return setError(t('errPasswordShort'))
-    if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
-
-    setLoading(true)
+  /** Create the account (with the WhatsApp ticket when the feature is live) and
+   * run the post-signup routine. On failure the user lands back on the form —
+   * every fixable signup error (duplicate email etc.) lives there. */
+  const doSignUp = async (phoneTicket?: string) => {
     const { error: err } = await signUp({
       fullName: form.fullName.trim(),
       email: form.email.trim(),
@@ -96,10 +114,14 @@ export default function RegisterPage() {
       gender: form.gender || undefined,
       password: form.password,
       targetGroup: form.targetGroup,
+      phoneTicket,
     })
-    setLoading(false)
 
     if (err) {
+      // Ticket went stale between verify and register (very slow submit) — the
+      // next submit will re-run the WhatsApp step for a fresh code.
+      if (err.startsWith('Phone verification expired')) setVerified(null)
+      setStep('form')
       const f = friendlyAuthError(err)
       setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
       return
@@ -116,8 +138,100 @@ export default function RegisterPage() {
       api.updateProfile({ language: form.language }).catch(() => {})
       navigate('/test-arena', { replace: true })
     } else {
+      setStep('form')
       setInfo(t('confirmEmailSent'))
     }
+  }
+
+  /** Send (or re-send) the WhatsApp code and open the code-entry step. */
+  const sendCode = async (): Promise<boolean> => {
+    const res = await sendSignupOtp(form.phone.trim())
+    if (res.phoneTaken) {
+      setError(t('errPhoneRegistered'))
+      return false
+    }
+    if (res.noWhatsApp) {
+      setError(t('waOtpNoWhatsApp'))
+      return false
+    }
+    if (res.error) {
+      const f = friendlyAuthError(res.error)
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+      return false
+    }
+    // On cooldown a still-valid code is already in their WhatsApp — let the user
+    // type it rather than block them.
+    setStep('otp')
+    setResendIn(RESEND_COOLDOWN_S)
+    if (res.cooldown) setOtpInfo(t('waOtpCooldown'))
+    return true
+  }
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setTouched(true)
+    setError('')
+    setInfo('')
+
+    if (!form.fullName.trim()) return setError(t('errNameRequired'))
+    if (!form.email.trim()) return setError(t('errEmailRequired'))
+    if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
+    if (!form.phone.trim()) return setError(t('errPhoneRequired'))
+    if (!isValidIndianMobile(form.phone)) return setError(t('errMobileInvalid'))
+    if (form.password.length < 6) return setError(t('errPasswordShort'))
+    if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
+
+    setLoading(true)
+    if (!isSignupWaOtpConfigured) {
+      // Feature off: single-step signup, exactly as before.
+      await doSignUp()
+    } else if (verified && verified.phone === tenDigits(form.phone)) {
+      // This exact number already passed the OTP — no second prompt.
+      await doSignUp(verified.ticket)
+    } else {
+      setOtp('')
+      setOtpInfo('')
+      await sendCode()
+    }
+    setLoading(false)
+  }
+
+  const handleVerifyOtp = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setOtpInfo('')
+    if (otp.trim().length !== 6) return setError(t('errOtpRequired'))
+
+    setLoading(true)
+    const res = await verifySignupOtp(form.phone.trim(), otp.trim())
+    if (res.invalid) {
+      setLoading(false)
+      return setError(t('waOtpInvalid'))
+    }
+    if (res.dead) {
+      setLoading(false)
+      setOtp('')
+      return setError(t('waOtpDead'))
+    }
+    if (res.error || !res.ticket) {
+      setLoading(false)
+      const f = friendlyAuthError(res.error)
+      return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+    }
+    setVerified({ phone: tenDigits(form.phone), ticket: res.ticket })
+    // Straight into account creation — the button reads "Verify & create account".
+    await doSignUp(res.ticket)
+    setLoading(false)
+  }
+
+  const handleResendOtp = async () => {
+    if (loading || resendIn > 0) return
+    setError('')
+    setOtpInfo('')
+    setLoading(true)
+    const ok = await sendCode()
+    setLoading(false)
+    if (ok) setOtpInfo((prev) => prev || t('otpResent'))
   }
 
   return (
@@ -128,6 +242,84 @@ export default function RegisterPage() {
         </h2>
         <p className="mb-6 text-center font-body text-sm text-ink2">{t('startPreparing')}</p>
 
+        {step === 'otp' ? (
+          /* WhatsApp phone verification — the code was sent to the number's
+             WhatsApp; verifying it immediately creates the account. */
+          <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4" noValidate>
+            <p className="text-center font-body text-sm text-ink2">
+              {t('waOtpSentTo')}{' '}
+              <span className="font-semibold text-ink">{form.phone.trim()}</span>
+            </p>
+            <div>
+              <label
+                htmlFor="reg-otp"
+                className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
+              >
+                {t('enterOtp')}
+              </label>
+              <input
+                id="reg-otp"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                className="input-soft text-center text-lg tracking-[0.5em]"
+                placeholder="••••••"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              />
+            </div>
+
+            {error && (
+              <div
+                role="alert"
+                className="animate-slideDown rounded-2xl bg-coralsoft px-4 py-3 text-center font-body text-sm font-medium text-coral"
+              >
+                {error}
+              </div>
+            )}
+            {otpInfo && (
+              <div
+                role="status"
+                className="animate-slideDown rounded-2xl bg-mintsoft px-4 py-3 text-center font-body text-sm font-medium text-mint"
+              >
+                {otpInfo}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+            >
+              {loading && <Spinner size={18} />}
+              {loading ? t('verifyingOtp') : t('verifyAndCreate')}
+            </button>
+
+            <div className="flex items-center justify-between font-heading text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('form')
+                  setOtp('')
+                  setError('')
+                  setOtpInfo('')
+                }}
+                className="focus-ring rounded text-ink2 transition hover:text-ink"
+              >
+                {t('changeNumber')}
+              </button>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={loading || resendIn > 0}
+                className="focus-ring rounded text-accent transition hover:opacity-80 disabled:opacity-50"
+              >
+                {resendIn > 0 ? `${t('resendOtp')} (${resendIn}s)` : t('resendOtp')}
+              </button>
+            </div>
+          </form>
+        ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
           <Field
             id="reg-name"
@@ -286,11 +478,16 @@ export default function RegisterPage() {
 
           <button type="submit" disabled={loading} className="btn-brand press mt-2 px-6 py-3.5 text-base">
             {loading && <Spinner size={18} />}
-            {loading ? t('creatingAccount') : t('createAccount')}
+            {loading
+              ? isSignupWaOtpConfigured
+                ? t('sendingOtp')
+                : t('creatingAccount')
+              : t('createAccount')}
           </button>
         </form>
+        )}
 
-        {isGoogleConfigured && (
+        {isGoogleConfigured && step === 'form' && (
           <>
             <AuthDivider label={t('orDivider')} />
             <GoogleSignInButton onError={setError} text="signup_with" />

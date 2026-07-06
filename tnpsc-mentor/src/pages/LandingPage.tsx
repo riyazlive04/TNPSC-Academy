@@ -152,6 +152,10 @@ const T = {
     en: 'Download the app now - explore what you get when you pay, before the actual payment!',
   },
   freeTitle: { ta: 'Starter ( கட்டணம் இல்லை )', en: 'Starter ( Cost free )' },
+  // Ribbon band across the top of each pricing card.
+  freeRibbon: { ta: 'புதிய கணக்கு சலுகை ', en: 'Signup bonus' },
+  vettriRibbon: { ta: 'தேர்வு மாரத்தான்', en: 'Test Marathon' },
+  premiumRibbon: { ta: 'பிரீமியம்', en: 'Premium' },
   premiumTitle: {
     ta: 'App-க்குள்ள - TNPSC Premium Prelims Kit (₹1,699, எப்பவும் unlock பண்ணலாம்)',
     en: "Inside the application - TNPSC Premium Prelims Kit (₹1,699, unlock anytime)",
@@ -278,30 +282,62 @@ const T = {
     en: '₹499 unlocks 1 month · pay ₹499 again for the next',
   },
   vettriCta: { ta: 'இப்போது தொடங்குங்கள்', en: 'Get started' },
+  vettriScheduleInline: { ta: 'அட்டவணையை பதிவிறக்க (PDF)', en: 'download the schedule (PDF)' },
 } as const
 
+// Mirrors what free accounts actually get (credit system: 50 on signup,
+// 10/day on login expiring at IST end-of-day, 1 credit per question).
 const FREE_ITEMS: { ta: string; en: string }[] = [
-  { ta: '10 தேர்வுகள் வரையில் -  உங்களுடைய விருப்பமான படங்களில்  ', en: 'Upto 10 tests in subject ' },
-  { ta: 'ஒரு முழு மாதிரி தேர்வு (200 வினாக்கள்)', en: '1 mock test(200 questions)' },
-  { ta: 'திரையிலேயே வினாக்களுக்கு விளக்கங்களை  பார்த்துக்கொள்ளலாம் PDF Download செய்துகொள்ளலாம்', en: 'On-screen explanations for questions' },
+  {
+    ta: 'பதிவு செய்தவுடன் 50 இலவச கிரெடிட்கள் + தினமும் 10 (ஒரு கேள்விக்கு 1 கிரெடிட்)',
+    en: '50 free credits on signup + 10 daily (1 credit per question)',
+  },
+  {
+    ta: 'கிரெடிட்களில் எந்தத் தேர்வும்: பாடங்கள், PYQ, நடப்பு நிகழ்வுகள், அப்டிட்யூட்',
+    en: 'Use credits on any test: subjects, PYQ, Current Affairs, aptitude',
+  },
+  { ta: 'ஒரு முழு மாதிரி தேர்வு (200 வினாக்கள்)', en: '1 full mock exam (200 questions)' },
+  {
+    ta: 'ஒவ்வொரு வினாவிற்கும் திரையிலேயே விளக்கங்கள்',
+    en: 'On-screen explanations for every question',
+  },
 ]
 
+// Mirrors the in-app PremiumCard (perks + the bonus extras), so the landing
+// pitch and the in-app upsell always say the same thing.
 const PREMIUM_ITEMS: { ta: string; en: string }[] = [
-  { ta: 'கடந்த 5 வருட TNPSC PYQ, முழு விளக்கத்தோடு ', en: "Last 5 years TNPSC PYQ, fully solved" },
-  { ta: 'Unlimited tests attempts, எந்த subject/topic வேணாலும்', en: 'Unlimited test attempts on any subject/topic' },
-  { ta: ' 5 மாதிரி தேர்வு(2 Attempt)', en: ' 5 Mock Tests(2 Attempt)' },
-  { ta: 'ஆகஸ்ட் 2025 முதல் ஜூலை 2026 வரையிலான நடப்பு நிகழ்வுகள்', en: 'August 2025 to July 2026 current affairs' },
-  { ta: '45 நாள் revision plan', en: '45-day revision plan' },
-  { ta: 'Formula & Infographic pdf\'s', en: 'Formula and Infographic pdf\s' },
-  { ta: 'PYQ trend report', en: 'PYQ trend report' },
-  { ta: 'Prelims வரைக்கும் valid · ஒரே payment · subscription இல்ல', en: 'Valid till the prelims · one payment · no subscription' },
+  { ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்), அனைத்து 13 தாள்களும்', en: 'Test Marathon series (Vettri Nichayam), all 13 papers' },
+  { ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்', en: 'Unlimited practice tests' },
+  { ta: '6 மாதிரித் தேர்வுகள்', en: '6 mock exams' },
+  { ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் - கடந்த 5 ஆண்டுகள்', en: 'Previous-year papers - last 5 years' },
+  { ta: 'நடப்பு நிகழ்வுகள் (ஆகஸ்ட் 2025 - ஜூன் 2026)', en: 'Current Affairs (Aug 2025 - Jun 2026)' },
+  { ta: 'உங்கள் திட்டக் காலம் வரை அனைத்து எதிர்கால புதுப்பிப்புகளும் அடங்கும்', en: 'All future updates included for your plan duration' },
+  { ta: 'அப்டிட்யூட் & பிற பாடச் சுருக்கக் குறிப்புகள்', en: 'Aptitude & other-subject short notes' },
+  { ta: 'PYQ போக்கு அறிக்கை', en: 'PYQ trend report' },
+  { ta: '45-நாள் திருப்புதல் திட்டம்', en: '45-day revision plan' },
+  { ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்', en: 'Face the exam with confidence' },
 ]
 
-// What the Vettri Nichayam bundle unlocks (shown in the pricing-section banner).
+// What the Vettri Nichayam bundle unlocks — mirrors the in-app VettriCard
+// (core marathon perk + its Bonus box items). The first item gets an inline
+// "download the schedule" link appended at render time (vettriScheduleInline).
 const VETTRI_ITEMS: { ta: string; en: string }[] = [
-  { ta: '13 முழு மாதிரித் தேர்வுகள்-வரம்பற்ற முயற்சிகள்', en: '13 full mock exams — unlimited attempts' },
-  { ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள்', en: 'Unlimited Previous-Year (PYQ) tests' },
-  { ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள்', en: 'Unlimited Current Affairs tests' },
+  {
+    ta: '13 மாதிரித் தேர்வுகள் (10 பிரிவு வாரியான / 3 முழு மாதிரி)',
+    en: '13 mock tests (10 sectional / 3 full mock)',
+  },
+  {
+    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
+    en: 'Unlimited PYQ tests (Premium feature · 2-month access)',
+  },
+  {
+    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
+    en: 'Unlimited Current Affairs tests (Premium feature · 2-month access)',
+  },
+  {
+    ta: 'பாட வாரியான தேர்வு வினாக்கள் (3000+), வரம்பற்றது · 2 மாத அணுகல் மற்றும் இன்னும் பல',
+    en: 'Subject-wise test questions (3000+), unlimited · 2-month access and much more',
+  },
 ]
 
 // ─── Colour system ───────────────────────────────────────────────────────────
@@ -342,9 +378,11 @@ const PAM_CARDS: {
   },
 ]
 
-const PREMIUM_ICONS = [FileText, ListChecks, Timer, Newspaper, CalendarDays, Calculator, TrendingUp, ShieldCheck]
-// One icon per VETTRI_ITEMS row: 13 mocks · unlimited PYQ · unlimited current affairs.
-const VETTRI_ICONS = [Timer, FileText, Newspaper]
+// One icon per PREMIUM_ITEMS row: marathon · practice · mocks · PYQ · CA ·
+// updates · short notes · trend report · revision plan · confidence.
+const PREMIUM_ICONS = [Trophy, ListChecks, Timer, FileText, Newspaper, ShieldCheck, Calculator, TrendingUp, CalendarDays, Award]
+// One icon per VETTRI_ITEMS row: 13 mocks · unlimited PYQ · unlimited CA · subject bank.
+const VETTRI_ICONS = [Timer, FileText, Newspaper, ListChecks]
 
 const INSTALL_STEPS: { ta: string; en: string }[] = [
   { ta: 'App download-ஐ tap பண்ணுங்க.', en: 'Tap Download the app.' },
@@ -730,7 +768,9 @@ export default function LandingPage() {
             {/* Free - the hook. Green = free & safe, the immediate reward. */}
             <Reveal>
               <div className="card interactive relative flex h-full flex-col overflow-hidden p-7 ring-1 ring-correct/20">
-                <div className="absolute inset-x-0 top-0 h-1 bg-correct" />
+                <div className="-mx-7 -mt-7 mb-6 bg-correct py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+                  {t('freeRibbon')}
+                </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-tint-green px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-correct">
                   <Check size={13} /> {t('freeTitle')}
                 </span>
@@ -754,7 +794,9 @@ export default function LandingPage() {
                 free, gold = the premium kit); ringed so the middle column pops. */}
             <Reveal>
               <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/40 p-7 ring-1 ring-brand/25">
-                <div className="absolute inset-x-0 top-0 h-1 bg-brand" />
+                <div className="-mx-7 -mt-7 mb-6 bg-brand py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+                  {t('vettriRibbon')}
+                </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-brand">
                   <Trophy size={13} /> ₹899 · {t('vettriBadge')}
                 </span>
@@ -768,7 +810,27 @@ export default function LandingPage() {
                         <span className={`mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-lg ${tint.bg} ${tint.fg}`}>
                           <Icon size={13} />
                         </span>
-                        <span className="font-body text-[15px] text-ink2">{it[lang]}</span>
+                        <span className="font-body text-[15px] text-ink2">
+                          {it[lang]}
+                          {/* First item carries the inline schedule download
+                              (the 13-test timetable flyer, a public/ PDF). */}
+                          {i === 0 && (
+                            <>
+                              {', '}
+                              <a
+                                href="/test-marathon-2026-schedule.pdf"
+                                download="TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf"
+                                target="_blank"
+                                rel="noopener"
+                                onClick={() => trackEvent('schedule-download')}
+                                className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 transition hover:decoration-brand"
+                              >
+                                {t('vettriScheduleInline')}
+                                <Download size={13} className="ml-1 inline-block align-[-1.5px]" />
+                              </a>
+                            </>
+                          )}
+                        </span>
                       </li>
                     )
                   })}
@@ -800,7 +862,9 @@ export default function LandingPage() {
                 Gold = achievement / the premium kit (design-system accent of value). */}
             <Reveal>
               <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/30 p-7">
-                <div className="absolute inset-x-0 top-0 h-1 bg-gold" />
+                <div className="-mx-7 -mt-7 mb-6 bg-gold py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+                  {t('premiumRibbon')}
+                </div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-goldsoft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-gold">
                   <Lock size={13} /> ₹1,699 · Premium Prelims Kit
                 </span>

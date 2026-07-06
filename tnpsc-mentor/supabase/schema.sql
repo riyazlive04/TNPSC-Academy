@@ -145,9 +145,10 @@ alter table profiles add column if not exists exam_date date;
 alter table profiles add column if not exists daily_goal integer default 20;
 
 -- One row per user per active day — powers streaks + daily-goal progress.
+-- Days are IST calendar days (the habit layer reads streaks in IST).
 create table if not exists daily_activity (
   user_id uuid references auth.users(id) on delete cascade,
-  activity_date date not null default current_date,
+  activity_date date not null default ((now() at time zone 'Asia/Kolkata')::date),
   questions integer default 0,
   tests integer default 0,
   primary key (user_id, activity_date)

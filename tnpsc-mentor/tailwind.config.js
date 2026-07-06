@@ -93,6 +93,7 @@ export default {
         brand: 'var(--shadow-brand)',
         warm: 'var(--shadow-warm)',
         gold: 'var(--shadow-gold)',
+        mint: 'var(--shadow-mint)',
       },
       backgroundImage: {
         // Violet hero gradient — design-system.md: linear-gradient(135deg,#8175EC,#6A5DD6).
