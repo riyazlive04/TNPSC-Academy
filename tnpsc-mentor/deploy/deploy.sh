@@ -16,6 +16,11 @@ cd "$APP_DIR"
 # Capacitor CLI and asset generator). They live in optionalDependencies and are
 # only needed to build the Android APK - the web/SPA build never imports them.
 npm ci --omit=optional
+# Rollup 4 ships its platform binary as an optionalDependency too, so the flag
+# above also strips @rollup/rollup-linux-x64-gnu and the Vite build dies with
+# MODULE_NOT_FOUND (npm/cli#4828). Reinstall just that binary, version-matched
+# to the installed rollup; --no-save keeps package.json/lock untouched.
+npm i --no-save "@rollup/rollup-linux-x64-gnu@$(node -p "require('rollup/package.json').version")"
 npm run build                       # outputs to dist/
 
 echo "==> Publishing SPA to $WEB_ROOT…"
