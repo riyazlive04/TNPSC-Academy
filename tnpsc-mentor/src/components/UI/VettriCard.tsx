@@ -369,8 +369,9 @@ export default function VettriCard({
         </div>
       </div>
 
-      {/* Access-period alert, per plan: the Full plan is a limited two-month
-          window (not lifetime); the Monthly plan is only the first month/half. */}
+      {/* Access-period alert, per plan: the Full plan keeps test series questions
+          for 12 months with 2 months of Premium access; the Monthly plan is only
+          the first month/half. */}
       <p className="tamil mt-4 flex items-start gap-2 rounded-field border border-accentwarm/30 bg-accentwarmsoft px-3 py-2.5 font-body text-xs leading-snug text-ink">
         <AlertCircle size={14} className="mt-0.5 shrink-0 text-accentwarm" />
         <span>{t(plan === 'month' ? 'vettriMonthNote' : 'vettriFullNote')}</span>

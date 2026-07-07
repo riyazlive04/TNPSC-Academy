@@ -289,7 +289,7 @@ async function emailStatus(email: string): Promise<'none' | 'google' | 'password
   return s === 'google' || s === 'password' ? s : 'none'
 }
 
-// ─── Signup phone verification (WhatsApp OTP via Evolution API) ──────────────
+// ─── Signup phone verification (WhatsApp OTP via AiSensy) ─────────────────────
 // Proves the user OWNS the number BEFORE the account exists: send a code to the
 // number's WhatsApp, verify it, and hand back a short-lived signed ticket that
 // /register then requires. Reuses the login-OTP rate limiters (phone+IP).
@@ -297,7 +297,9 @@ async function emailStatus(email: string): Promise<'none' | 'google' | 'password
 // POST /api/auth/register/otp/send — deliver a code to a number being signed up.
 // Only for numbers NOT yet on an account (mirror of /otp/send, which is only for
 // numbers that ARE) — rejecting here saves a message and matches what /register
-// would say anyway.
+// would say anyway. Note: the official WhatsApp API has no "is this number on
+// WhatsApp" lookup, so a WhatsApp-less number is accepted here and simply never
+// receives the message (the old Evolution gateway could pre-reject those).
 router.post(
   '/register/otp/send',
   otpSendLimiter,
@@ -313,7 +315,6 @@ router.post(
     const result = await sendSignupOtp(phone)
     if (!result.ok) {
       // Distinct codes so the UI can give a precise nudge.
-      if (result.code === 'no_whatsapp') return res.status(404).json({ error: 'phone_no_whatsapp' })
       if (result.code === 'cooldown') return res.status(429).json({ error: 'otp_cooldown' })
       console.error('[register/otp/send] send failed', phone, result.code)
       return res.status(502).json({ error: 'Could not send the code right now. Please try again.' })

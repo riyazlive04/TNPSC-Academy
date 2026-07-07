@@ -87,6 +87,48 @@ router.post(
   })
 )
 
+// ─── POST /api/superadmin/users/revoke-vettri ────────────────────────────────
+// Withdraw a user's Vettri Nichayam: flips their paid vettri rows (full +
+// monthly plan) to 'revoked'. Premium rows are untouched.
+router.post(
+  '/users/revoke-vettri',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId } = req.body ?? {}
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' })
+    }
+    const { data, error } = await req.db!.rpc('superadmin_revoke_vettri', {
+      p_user: userId,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ revoked: Number(data ?? 0) })
+  })
+)
+
+// ─── POST /api/superadmin/users/grant-plan ───────────────────────────────────
+// Comp a plan: inserts a ₹0 'paid' ledger row (same shape as a 100%-off coupon
+// order), so the normal computed entitlement grants access for the plan's own
+// validity window starting now.
+router.post(
+  '/users/grant-plan',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId, plan } = req.body ?? {}
+    if (!userId || !plan) {
+      return res.status(400).json({ error: 'userId and plan are required' })
+    }
+    // Allow-list before the RPC (which validates again) for a clear message.
+    if (!['premium_annual', 'vettri_nichayam', 'vettri_month'].includes(plan)) {
+      return res.status(400).json({ error: `Invalid plan: ${plan}` })
+    }
+    const { error } = await req.db!.rpc('superadmin_grant_plan', {
+      p_user: userId,
+      p_plan: plan,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ granted: true })
+  })
+)
+
 // ─── POST /api/superadmin/users/delete ───────────────────────────────────────
 // Hard-delete a user: removes the auth account (GoTrue admin API), which
 // cascades the profile + every user-owned row. Guards prevent deleting yourself

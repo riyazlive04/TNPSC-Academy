@@ -80,16 +80,16 @@ export const config = {
   // Country code prefixed to the 10-digit Indian mobile before calling MSG91,
   // which wants the full international number with no leading '+'.
   msg91CountryCode: process.env.MSG91_COUNTRY_CODE ?? '91',
-  // ─── Evolution API — WhatsApp signup OTP (optional) ─────────────────────────
-  // Self-hosted WhatsApp gateway (github.com/EvolutionAPI/evolution-api, v2)
-  // used to send the one-time code that verifies phone OWNERSHIP at signup.
-  // Unlike MSG91, Evolution API only delivers messages — this server generates,
+  // ─── AiSensy — WhatsApp signup OTP (optional) ────────────────────────────────
+  // Official WhatsApp Business API platform (aisensy.com) used to send the
+  // one-time code that verifies phone OWNERSHIP at signup, through a
+  // Meta-approved Authentication template wired to an AiSensy "API campaign".
+  // Unlike MSG91, AiSensy only delivers messages — this server generates,
   // stores (hashed) and verifies the code itself (see lib/whatsappOtp.ts).
-  // When any of these is blank the /register/otp endpoints return 503 and
+  // When either of these is blank the /register/otp endpoints return 503 and
   // /register works exactly as before (no phone verification required).
-  evolutionApiUrl: (process.env.EVOLUTION_API_URL ?? '').replace(/\/+$/, ''),
-  evolutionApiKey: process.env.EVOLUTION_API_KEY ?? '',
-  evolutionInstance: process.env.EVOLUTION_INSTANCE ?? '',
+  aisensyApiKey: process.env.AISENSY_API_KEY ?? '',
+  aisensyCampaignName: process.env.AISENSY_CAMPAIGN_NAME ?? '',
   // ─── Telegram bot — signup phone verification fallback (optional) ───────────
   // For numbers with no WhatsApp: the user opens this bot via a one-time deep
   // link and shares their Telegram-verified phone number, which must match the
@@ -113,10 +113,10 @@ export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateK
 /** True when MSG91 OTP credentials are present — gates phone-OTP login. */
 export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTemplateId)
 
-/** True when the Evolution API gateway is fully configured — gates the WhatsApp
- * signup-OTP endpoints AND makes /register require a verified-phone ticket. */
+/** True when AiSensy is fully configured — gates the WhatsApp signup-OTP
+ * endpoints AND makes /register require a verified-phone ticket. */
 export const whatsappOtpEnabled = Boolean(
-  config.evolutionApiUrl && config.evolutionApiKey && config.evolutionInstance
+  config.aisensyApiKey && config.aisensyCampaignName
 )
 
 /** True when the Telegram bot is configured — gates the Telegram fallback for

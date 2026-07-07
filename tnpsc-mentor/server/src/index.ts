@@ -19,6 +19,7 @@ import feedbackRoutes from './routes/feedback.js'
 import paymentRoutes from './routes/payments.js'
 import couponRoutes from './routes/coupons.js'
 import notificationRoutes from './routes/notifications.js'
+import alertRoutes from './routes/alerts.js'
 import thirukuralRoutes from './routes/thirukural.js'
 import materialRoutes from './routes/materials.js'
 import creditRoutes from './routes/credits.js'
@@ -77,6 +78,7 @@ app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payments', paymentRoutes)
 app.use('/api/coupons', couponRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/alerts', alertRoutes)
 app.use('/api/thirukural', thirukuralRoutes)
 app.use('/api/materials', materialRoutes)
 app.use('/api/credits', creditRoutes)

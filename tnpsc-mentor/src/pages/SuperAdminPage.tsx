@@ -62,6 +62,7 @@ import {
   type AdminNotification,
   type NotificationAudience,
   type NotificationKind,
+  type AdminAlert,
   type DeviceSession,
   type AppRelease,
   type Material,
@@ -465,10 +466,28 @@ const ROLE_LABELS: Record<UserRole, StringKey> = {
   superadmin: 'roleSuperadmin',
 }
 
+// User-list filters (client-side, over the loaded page of users). Console
+// tooling: kept in English like the rest of the superadmin screens.
+type UserPlanFilter = 'all' | 'premium' | 'vettri' | 'free'
+type UserActivityFilter = 'any' | '7d' | '30d' | 'inactive30'
+
+/** Local-midnight epoch for a YYYY-MM-DD date-input value (null when empty). */
+function parseDayLocal(s: string): number | null {
+  if (!s) return null
+  const [y, m, d] = s.split('-').map(Number)
+  if (!y || !m || !d) return null
+  return new Date(y, m - 1, d).getTime()
+}
+
 function UsersTab() {
   const { t } = useT()
   const [users, setUsers] = useState<AdminUserRow[]>([])
   const [search, setSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all')
+  const [planFilter, setPlanFilter] = useState<UserPlanFilter>('all')
+  const [activityFilter, setActivityFilter] = useState<UserActivityFilter>('any')
+  const [joinedFrom, setJoinedFrom] = useState('')
+  const [joinedTo, setJoinedTo] = useState('')
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [pending, setPending] = useState<{ user: AdminUserRow; role: UserRole } | null>(null)
@@ -476,6 +495,9 @@ function UsersTab() {
   const [revokeTarget, setRevokeTarget] = useState<AdminUserRow | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminUserRow | null>(null)
   const [devicesTarget, setDevicesTarget] = useState<AdminUserRow | null>(null)
+  // Detail popup: store the id and derive the row from `users`, so grant/revoke
+  // updates inside the modal reflect immediately (a snapshot would go stale).
+  const [detailId, setDetailId] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
   const load = () => {
@@ -491,13 +513,48 @@ function UsersTab() {
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return users
-    return users.filter(
-      (u) =>
-        (u.full_name ?? '').toLowerCase().includes(term) ||
-        (u.email ?? '').toLowerCase().includes(term)
-    )
-  }, [users, search])
+    const fromMs = parseDayLocal(joinedFrom)
+    // "to" is inclusive: anything before the NEXT local midnight counts.
+    const toEnd = parseDayLocal(joinedTo)
+    const toMs = toEnd === null ? null : toEnd + 24 * 60 * 60 * 1000
+    const now = Date.now()
+    const DAY = 24 * 60 * 60 * 1000
+
+    return users.filter((u) => {
+      if (
+        term &&
+        !(u.full_name ?? '').toLowerCase().includes(term) &&
+        !(u.email ?? '').toLowerCase().includes(term)
+      ) {
+        return false
+      }
+      if (roleFilter !== 'all' && u.role !== roleFilter) return false
+      if (planFilter === 'premium' && !u.premium) return false
+      if (planFilter === 'vettri' && !u.vettri) return false
+      if (planFilter === 'free' && (u.premium || u.vettri)) return false
+      const joined = new Date(u.created_at).getTime()
+      if (fromMs !== null && joined < fromMs) return false
+      if (toMs !== null && joined >= toMs) return false
+      if (activityFilter !== 'any') {
+        const last = u.last_active ? new Date(u.last_active).getTime() : null
+        const activeWithin = (days: number) => last !== null && now - last <= days * DAY
+        if (activityFilter === '7d' && !activeWithin(7)) return false
+        if (activityFilter === '30d' && !activeWithin(30)) return false
+        if (activityFilter === 'inactive30' && activeWithin(30)) return false
+      }
+      return true
+    })
+  }, [users, search, roleFilter, planFilter, activityFilter, joinedFrom, joinedTo])
+
+  const filtersActive =
+    roleFilter !== 'all' || planFilter !== 'all' || activityFilter !== 'any' || !!joinedFrom || !!joinedTo
+  const clearFilters = () => {
+    setRoleFilter('all')
+    setPlanFilter('all')
+    setActivityFilter('any')
+    setJoinedFrom('')
+    setJoinedTo('')
+  }
 
   const confirmRoleChange = async () => {
     if (!pending) return
@@ -573,6 +630,78 @@ function UsersTab() {
         />
       </div>
 
+      {/* Filters — every facet mirrors a field shown on the user rows below. */}
+      <div className="card mb-4 space-y-3 p-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <Field label="Role">
+            <select
+              className={COUPON_INPUT}
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as 'all' | UserRole)}
+            >
+              <option value="all">All roles</option>
+              <option value="user">Student</option>
+              <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option>
+            </select>
+          </Field>
+          <Field label="Plan">
+            <select
+              className={COUPON_INPUT}
+              value={planFilter}
+              onChange={(e) => setPlanFilter(e.target.value as UserPlanFilter)}
+            >
+              <option value="all">All plans</option>
+              <option value="premium">Premium</option>
+              <option value="vettri">Vettri Nichayam</option>
+              <option value="free">Free</option>
+            </select>
+          </Field>
+          <Field label="Activity">
+            <select
+              className={COUPON_INPUT}
+              value={activityFilter}
+              onChange={(e) => setActivityFilter(e.target.value as UserActivityFilter)}
+            >
+              <option value="any">Any activity</option>
+              <option value="7d">Active in last 7 days</option>
+              <option value="30d">Active in last 30 days</option>
+              <option value="inactive30">Inactive 30+ days</option>
+            </select>
+          </Field>
+          <Field label="Joined from">
+            <input
+              type="date"
+              className={COUPON_INPUT}
+              value={joinedFrom}
+              onChange={(e) => setJoinedFrom(e.target.value)}
+            />
+          </Field>
+          <Field label="Joined to">
+            <input
+              type="date"
+              className={COUPON_INPUT}
+              value={joinedTo}
+              onChange={(e) => setJoinedTo(e.target.value)}
+            />
+          </Field>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="font-body text-xs text-ink2">
+            Showing {filtered.length} of {users.length} users
+          </p>
+          {filtersActive && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="focus-ring press inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-xs font-semibold text-ink2 transition hover:bg-tint hover:text-ink"
+            >
+              <X size={13} /> Clear filters
+            </button>
+          )}
+        </div>
+      </div>
+
       {filtered.length === 0 ? (
         <p className="py-12 text-center font-body text-ink2">{t('noUsers')}</p>
       ) : (
@@ -583,25 +712,42 @@ function UsersTab() {
               style={{ '--i': i } as React.CSSProperties}
               className="card stagger-item flex flex-wrap items-center gap-3 p-3.5 sm:flex-nowrap"
             >
-              <Avatar
-                src={u.avatar_url}
-                name={u.full_name ?? u.email}
-                className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-sm font-bold uppercase text-brand"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="truncate font-heading text-sm font-semibold text-ink">
-                    {u.full_name || '-'}
+              <button
+                type="button"
+                onClick={() => setDetailId(u.id)}
+                title="View details"
+                className="focus-ring flex min-w-0 flex-1 items-center gap-3 rounded-xl text-left transition hover:bg-tint/60"
+              >
+                <Avatar
+                  src={u.avatar_url}
+                  name={u.full_name ?? u.email}
+                  className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-sm font-bold uppercase text-brand"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate font-heading text-sm font-semibold text-ink">
+                      {u.full_name || '-'}
+                    </p>
+                    {u.premium && (
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
+                        <Crown size={11} />
+                        {t('premiumBadge')}
+                      </span>
+                    )}
+                    {u.vettri && (
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                        <Trophy size={11} />
+                        Vettri
+                      </span>
+                    )}
+                  </div>
+                  <p className="truncate font-body text-xs text-ink2">{u.email}</p>
+                  <p className="truncate font-body text-[11px] text-ink2/80">
+                    Joined {new Date(u.created_at).toLocaleDateString()}
+                    {u.last_active ? ` · ${relativeTime(u.last_active)}` : ' · never active'}
                   </p>
-                  {u.premium && (
-                    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
-                      <Crown size={11} />
-                      {t('premiumBadge')}
-                    </span>
-                  )}
                 </div>
-                <p className="truncate font-body text-xs text-ink2">{u.email}</p>
-              </div>
+              </button>
               <div className="hidden text-center sm:block">
                 <p className="font-heading text-sm font-semibold text-ink">{u.tests_taken}</p>
                 <p className="font-body text-[10px] uppercase tracking-wide text-ink2">{t('testsTakenCol')}</p>
@@ -688,6 +834,19 @@ function UsersTab() {
       {devicesTarget && (
         <DevicesModal user={devicesTarget} onClose={() => setDevicesTarget(null)} />
       )}
+
+      {(() => {
+        const detailUser = detailId ? users.find((u) => u.id === detailId) : undefined
+        return detailUser ? (
+          <UserDetailModal
+            user={detailUser}
+            onClose={() => setDetailId(null)}
+            onChange={(patch) =>
+              setUsers((prev) => prev.map((x) => (x.id === detailUser.id ? { ...x, ...patch } : x)))
+            }
+          />
+        ) : null
+      })()}
     </div>
   )
 }
@@ -838,6 +997,240 @@ function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => vo
             })}
           </ul>
         )}
+      </div>
+    </div>
+  )
+}
+
+// ─── User detail popup ────────────────────────────────────────────────────────
+// Opened by clicking a row in the Users tab: the full profile picture (name,
+// email, phone, group, activity) plus each paid plan with grant/revoke controls.
+// Grant comps the plan via a ₹0 paid ledger row (entitlement starts now for the
+// plan's own window); revoke flips only THAT plan's paid rows to 'revoked'.
+// Actions use an inline two-step confirm — ConfirmDialog sits at z-[55], below
+// this z-[60] overlay, so a nested dialog would render behind the popup.
+
+type PlanAction = 'grant-premium' | 'revoke-premium' | 'grant-vettri' | 'revoke-vettri'
+
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-card border border-line bg-surface px-3 py-2">
+      <p className="font-heading text-[10px] font-semibold uppercase tracking-wide text-ink2">
+        {label}
+      </p>
+      <p className="mt-0.5 truncate font-body text-sm text-ink" title={value}>
+        {value}
+      </p>
+    </div>
+  )
+}
+
+function UserDetailModal({
+  user,
+  onClose,
+  onChange,
+}: {
+  user: AdminUserRow
+  onClose: () => void
+  onChange: (patch: Partial<AdminUserRow>) => void
+}) {
+  const [confirm, setConfirm] = useState<PlanAction | null>(null)
+  const [busy, setBusy] = useState<PlanAction | null>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !busy) onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [busy, onClose])
+
+  const run = async (action: PlanAction) => {
+    setBusy(action)
+    try {
+      if (action === 'revoke-premium') {
+        await api.superadmin.revokePremium(user.id)
+        onChange({ premium: false, premium_until: null })
+        toast.success('Premium revoked.')
+      } else if (action === 'grant-premium') {
+        await api.superadmin.grantPlan(user.id, 'premium_annual')
+        onChange({
+          premium: true,
+          premium_until: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        toast.success('Premium granted for 90 days.')
+      } else if (action === 'revoke-vettri') {
+        await api.superadmin.revokeVettri(user.id)
+        onChange({ vettri: false, vettri_until: null })
+        toast.success('Vettri Nichayam revoked.')
+      } else {
+        await api.superadmin.grantPlan(user.id, 'vettri_nichayam')
+        onChange({
+          vettri: true,
+          vettri_until: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        toast.success('Vettri Nichayam granted for 60 days.')
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Action failed.')
+    } finally {
+      setBusy(null)
+      setConfirm(null)
+    }
+  }
+
+  const planRow = (opts: {
+    icon: React.ReactNode
+    iconClass: string
+    name: string
+    active: boolean
+    until: string | null
+    grant: PlanAction
+    revoke: PlanAction
+    grantLabel: string
+  }) => {
+    const action = opts.active ? opts.revoke : opts.grant
+    const isBusy = busy === action
+    const confirming = confirm === action
+    return (
+      <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3">
+        <span className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg ${opts.iconClass}`}>
+          {opts.icon}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-heading text-sm font-semibold text-ink">{opts.name}</p>
+          <p className="font-body text-xs text-ink2">
+            {opts.active
+              ? `Active${opts.until ? ` · until ${new Date(opts.until).toLocaleDateString()}` : ''}`
+              : 'Not active'}
+          </p>
+        </div>
+        {confirming ? (
+          <div className="flex flex-shrink-0 items-center gap-1.5">
+            <button
+              onClick={() => run(action)}
+              disabled={!!busy}
+              className={`focus-ring inline-flex items-center gap-1.5 rounded-lg px-3 py-2 font-heading text-xs font-semibold text-white transition disabled:opacity-60 ${
+                opts.active ? 'bg-coral hover:bg-coral/90' : 'bg-brand hover:bg-brand-dark'
+              }`}
+            >
+              {isBusy && <Spinner size={13} />} Confirm
+            </button>
+            <button
+              onClick={() => setConfirm(null)}
+              disabled={!!busy}
+              className="focus-ring rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink2 transition hover:bg-tint disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirm(action)}
+            disabled={!!busy}
+            className={`focus-ring flex-shrink-0 rounded-lg border px-3 py-2 font-heading text-xs font-semibold transition disabled:opacity-50 ${
+              opts.active
+                ? 'border-line text-coral hover:border-coral/40 hover:bg-coral/5'
+                : 'border-line text-brand hover:border-brand/40 hover:bg-brand-soft/50'
+            }`}
+          >
+            {opts.active ? 'Revoke' : opts.grantLabel}
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  const groupLabel = user.target_group
+    ? GROUP_OPTIONS.find((g) => g.value === user.target_group)?.label ?? user.target_group
+    : '—'
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm animate-fadeInFast"
+      onClick={() => !busy && onClose()}
+      role="presentation"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="User details"
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[85vh] w-full max-w-md overflow-y-auto animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card"
+      >
+        <div className="mb-5 flex items-start gap-3">
+          <Avatar
+            src={user.avatar_url}
+            name={user.full_name ?? user.email}
+            className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-full bg-brand-soft font-heading text-base font-bold uppercase text-brand"
+          />
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate font-heading text-base font-semibold text-ink">
+              {user.full_name || '—'}
+            </h2>
+            <p className="truncate font-body text-xs text-ink2">{user.email ?? '—'}</p>
+            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                {user.role}
+              </span>
+              {user.premium && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
+                  <Crown size={11} /> Premium
+                </span>
+              )}
+              {user.vettri && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                  <Trophy size={11} /> Vettri
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => !busy && onClose()}
+            aria-label="Close"
+            className="focus-ring grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="mb-5 grid grid-cols-2 gap-2.5">
+          <DetailItem label="Phone" value={user.phone || '—'} />
+          <DetailItem label="Target group" value={groupLabel} />
+          <DetailItem label="Joined" value={new Date(user.created_at).toLocaleDateString()} />
+          <DetailItem
+            label="Last active"
+            value={user.last_active ? relativeTime(user.last_active) : 'Never'}
+          />
+          <DetailItem label="Tests taken" value={String(user.tests_taken)} />
+          <DetailItem label="User ID" value={user.id} />
+        </div>
+
+        <h3 className="mb-2 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+          Plans
+        </h3>
+        <div className="space-y-2">
+          {planRow({
+            icon: <Crown size={18} />,
+            iconClass: 'bg-amber-400/15 text-amber-500',
+            name: 'Premium',
+            active: user.premium,
+            until: user.premium_until,
+            grant: 'grant-premium',
+            revoke: 'revoke-premium',
+            grantLabel: 'Grant 90 days',
+          })}
+          {planRow({
+            icon: <Trophy size={18} />,
+            iconClass: 'bg-brand-soft text-brand',
+            name: 'Vettri Nichayam',
+            active: user.vettri,
+            until: user.vettri_until,
+            grant: 'grant-vettri',
+            revoke: 'revoke-vettri',
+            grantLabel: 'Grant 60 days',
+          })}
+        </div>
       </div>
     </div>
   )
@@ -1866,7 +2259,7 @@ const EMPTY_NOTIF_FORM = {
 }
 
 function NotificationsTab() {
-  const [sub, setSub] = useState<NotificationKind>('push')
+  const [sub, setSub] = useState<NotificationKind | 'alert'>('push')
   const [form, setForm] = useState(EMPTY_NOTIF_FORM)
   const [sending, setSending] = useState(false)
   const [list, setList] = useState<AdminNotification[]>([])
@@ -1889,7 +2282,7 @@ function NotificationsTab() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (sending) return
+    if (sending || sub === 'alert') return // alerts have their own composer (AlertsPanel)
     const title = form.title.trim()
     const body = form.body.trim()
     if (!title || !body) return toast.error('Title and message are required.')
@@ -1944,7 +2337,7 @@ function NotificationsTab() {
   return (
     <div className="space-y-6">
       {/* Sub-tabs */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setSub('push')}
           className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
@@ -1961,8 +2354,19 @@ function NotificationsTab() {
         >
           <Megaphone size={15} /> System Notifications
         </button>
+        <button
+          onClick={() => setSub('alert')}
+          className={`press flex items-center gap-2 rounded-lg px-4 py-2 font-heading text-sm font-medium transition ${
+            sub === 'alert' ? 'bg-brand text-white shadow-brand' : 'bg-tint text-ink2 hover:text-ink'
+          }`}
+        >
+          <AlertTriangle size={15} /> Popup Alerts
+        </button>
       </div>
 
+      {sub === 'alert' && <AlertsPanel />}
+      {sub !== 'alert' && (
+      <>
       {/* Composer */}
       <form onSubmit={submit} className="card space-y-4 p-5">
         <div className="flex items-start gap-2">
@@ -2098,6 +2502,305 @@ function NotificationsTab() {
         open={!!pendingDelete}
         title="Delete notification?"
         message={`Remove "${pendingDelete?.title ?? ''}" from the feed? Devices already notified keep their copy.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+      </>
+      )}
+    </div>
+  )
+}
+
+// ─── Popup Alerts ───────────────────────────────────────────────────────────────
+// Superadmin-authored announcements shown to users as a blocking popup on app
+// open. Each user sees an alert once per account ("Got it" is recorded server-
+// side), so unlike notifications these interrupt — reserve them for things every
+// user must see (downtime, exam-date changes, new-feature launches).
+const EMPTY_ALERT_FORM = {
+  title: '',
+  body: '',
+  titleTa: '',
+  bodyTa: '',
+  url: '',
+  audience: 'all' as NotificationAudience,
+  audienceValue: 'Group1',
+  expiresAt: '',
+}
+
+function AlertsPanel() {
+  const [form, setForm] = useState(EMPTY_ALERT_FORM)
+  const [sending, setSending] = useState(false)
+  const [list, setList] = useState<AdminAlert[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<AdminAlert | null>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.alerts
+      .adminList()
+      .then(setList)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (sending) return
+    const title = form.title.trim()
+    const body = form.body.trim()
+    if (!title || !body) return toast.error('Title and message are required.')
+
+    setSending(true)
+    try {
+      await api.alerts.create({
+        title,
+        body,
+        titleTa: form.titleTa.trim() || null,
+        bodyTa: form.bodyTa.trim() || null,
+        url: form.url.trim() || null,
+        audience: form.audience,
+        audienceValue: form.audience === 'group' ? form.audienceValue : null,
+        // datetime-local gives a local wall-clock string; send it as an ISO instant.
+        expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
+      })
+      toast.success('Popup alert published — users see it on their next app open.')
+      setForm(EMPTY_ALERT_FORM)
+      load()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not publish the alert.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  const toggleActive = async (a: AdminAlert) => {
+    if (togglingId) return
+    setTogglingId(a.id)
+    try {
+      const updated = await api.alerts.setActive(a.id, !a.active)
+      setList((prev) => prev.map((x) => (x.id === a.id ? { ...x, active: updated.active } : x)))
+      toast.success(updated.active ? 'Alert is live again.' : 'Alert deactivated.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update the alert.')
+    } finally {
+      setTogglingId(null)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    try {
+      await api.alerts.remove(pendingDelete.id)
+      setList((prev) => prev.filter((a) => a.id !== pendingDelete.id))
+      toast.success('Alert deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete.')
+    }
+  }
+
+  const audienceLabel = (a: AdminAlert): string => {
+    if (a.audience === 'group') {
+      return GROUP_OPTIONS.find((g) => g.value === a.audience_value)?.label ?? a.audience_value ?? 'group'
+    }
+    return AUDIENCE_OPTIONS.find((o) => o.value === a.audience)?.label ?? a.audience
+  }
+
+  const expired = (a: AdminAlert) => !!a.expires_at && new Date(a.expires_at).getTime() <= Date.now()
+
+  return (
+    <div className="space-y-6">
+      {/* Composer */}
+      <form onSubmit={submit} className="card space-y-4 p-5">
+        <div className="flex items-start gap-2">
+          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+            <AlertTriangle size={18} />
+          </span>
+          <div>
+            <h2 className="font-heading text-sm font-semibold text-ink">Publish a popup alert</h2>
+            <p className="font-body text-xs text-ink2">
+              Shown as a popup when a user opens the app, until they tap “Got it” (once per
+              account). Use for must-see announcements only.
+            </p>
+          </div>
+        </div>
+
+        <Field label="Title *">
+          <input
+            className={COUPON_INPUT}
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="e.g. Scheduled maintenance tonight"
+            maxLength={120}
+          />
+        </Field>
+        <Field label="Message *">
+          <textarea
+            className={COUPON_INPUT + ' min-h-[80px] resize-y'}
+            value={form.body}
+            onChange={(e) => set('body', e.target.value)}
+            placeholder="Write the announcement…"
+            maxLength={1000}
+          />
+        </Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Tamil title (optional)">
+            <input
+              className={COUPON_INPUT + ' tamil'}
+              value={form.titleTa}
+              onChange={(e) => set('titleTa', e.target.value)}
+              placeholder="தமிழ் தலைப்பு"
+              maxLength={120}
+            />
+          </Field>
+          <Field label="Tamil message (optional)">
+            <textarea
+              className={COUPON_INPUT + ' tamil min-h-[42px] resize-y'}
+              value={form.bodyTa}
+              onChange={(e) => set('bodyTa', e.target.value)}
+              placeholder="தமிழ் அறிவிப்பு"
+              maxLength={1000}
+            />
+          </Field>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Link (optional)">
+            <input
+              className={COUPON_INPUT}
+              value={form.url}
+              onChange={(e) => set('url', e.target.value)}
+              placeholder="/mock  or  https://…"
+            />
+          </Field>
+          <Field label="Audience">
+            <select
+              className={COUPON_INPUT}
+              value={form.audience}
+              onChange={(e) => set('audience', e.target.value)}
+            >
+              {AUDIENCE_OPTIONS.map((a) => (
+                <option key={a.value} value={a.value}>
+                  {a.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {form.audience === 'group' && (
+            <Field label="Target group">
+              <select
+                className={COUPON_INPUT}
+                value={form.audienceValue}
+                onChange={(e) => set('audienceValue', e.target.value)}
+              >
+                {GROUP_OPTIONS.map((g) => (
+                  <option key={g.value} value={g.value}>
+                    {g.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+          <Field label="Stop showing after (optional)">
+            <input
+              type="datetime-local"
+              className={COUPON_INPUT}
+              value={form.expiresAt}
+              onChange={(e) => set('expiresAt', e.target.value)}
+            />
+          </Field>
+        </div>
+        <button type="submit" disabled={sending} className="btn-brand press disabled:opacity-60">
+          {sending ? <Spinner size={16} /> : <Send size={16} />}
+          Publish alert
+        </button>
+      </form>
+
+      {/* History */}
+      <div>
+        <h2 className="mb-3 font-heading text-sm font-semibold text-ink">Published alerts</h2>
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="skeleton h-16 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <ErrorState onRetry={load} />
+        ) : list.length === 0 ? (
+          <p className="py-10 text-center font-body text-ink2">No alerts published yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {list.map((a, i) => (
+              <div
+                key={a.id}
+                style={{ '--i': i } as React.CSSProperties}
+                className="card stagger-item flex items-start gap-3 p-3.5"
+              >
+                <span
+                  className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg ${
+                    a.active && !expired(a) ? 'bg-brand-soft text-brand' : 'bg-tint text-ink2'
+                  }`}
+                >
+                  <AlertTriangle size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {a.title}
+                    {!a.active && (
+                      <span className="ml-2 rounded bg-tint px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase text-ink2">
+                        Off
+                      </span>
+                    )}
+                    {a.active && expired(a) && (
+                      <span className="ml-2 rounded bg-goldsoft px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase text-gold">
+                        Expired
+                      </span>
+                    )}
+                  </p>
+                  <p className="line-clamp-2 font-body text-xs text-ink2">{a.body}</p>
+                  <p className="mt-1 font-body text-[11px] text-ink2/80">
+                    {audienceLabel(a)} · seen by {a.dismissed_count} ·{' '}
+                    {new Date(a.created_at).toLocaleDateString()}
+                    {a.expires_at ? ` · until ${new Date(a.expires_at).toLocaleString()}` : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => toggleActive(a)}
+                  disabled={togglingId === a.id}
+                  aria-label={a.active ? 'Deactivate alert' : 'Activate alert'}
+                  title={a.active ? 'Deactivate' : 'Activate'}
+                  className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-ink2 transition hover:border-brand/40 hover:text-brand disabled:opacity-50"
+                >
+                  {a.active ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingDelete(a)}
+                  aria-label="Delete alert"
+                  className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-coral transition hover:border-coral/40"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete alert?"
+        message={`Remove "${pendingDelete?.title ?? ''}"? Users who haven't seen it yet never will.`}
         confirmLabel="Delete"
         cancelLabel="Cancel"
         tone="danger"

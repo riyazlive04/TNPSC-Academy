@@ -16,6 +16,7 @@ import Avatar from '../UI/Avatar'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
 import BackToTopButton from './BackToTopButton'
+import AlertPopup from './AlertPopup'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -367,6 +368,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
           </div>
         </nav>
       )}
+
+      {/* Superadmin popup alerts — chrome screens only, never over a live test. */}
+      {!bare && user && <AlertPopup />}
 
       <FeedbackModal
         open={feedbackOpen}

@@ -1,6 +1,6 @@
 -- ─── Signup phone verification (WhatsApp OTP) ────────────────────────────────
--- Pending one-time codes sent (via the self-hosted Evolution API WhatsApp
--- gateway) to a mobile number while it is being registered. One row per phone.
+-- Pending one-time codes sent (via AiSensy, an official WhatsApp Business API
+-- platform) to a mobile number while it is being registered. One row per phone.
 -- The code itself is stored ONLY as an HMAC (keyed with the service-role key),
 -- so a DB leak reveals nothing usable. Service-role only: RLS is enabled with
 -- NO policies and client roles are revoked — the browser can never touch it.

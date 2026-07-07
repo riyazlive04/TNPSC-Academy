@@ -1,12 +1,18 @@
-// ─── WhatsApp signup OTP (Evolution API) ─────────────────────────────────────
+// ─── WhatsApp signup OTP (AiSensy) ───────────────────────────────────────────
 // Sends and verifies the one-time code that proves a user OWNS the mobile
 // number they typed at signup. Unlike MSG91 (which owns the whole OTP
-// lifecycle), Evolution API is a dumb pipe — a self-hosted WhatsApp gateway
-// (github.com/EvolutionAPI/evolution-api, v2 REST) that delivers plain text
-// messages from a QR-paired WhatsApp number. So THIS module owns code
-// generation, storage and verification: codes live in public.phone_otps as an
-// HMAC only (service-role access only), expire after 10 minutes, allow 5 wrong
-// guesses, and a fresh code can't be re-requested inside a 45 s cooldown.
+// lifecycle), AiSensy is a dumb pipe — a WhatsApp Business API platform
+// (aisensy.com) that delivers a Meta-approved Authentication template through
+// its "API campaign" endpoint. So THIS module owns code generation, storage
+// and verification: codes live in public.phone_otps as an HMAC only
+// (service-role access only), expire after 10 minutes, allow 5 wrong guesses,
+// and a fresh code can't be re-requested inside a 45 s cooldown.
+//
+// The message text lives in the approved template, not here — Meta only
+// permits OTP content in AUTHENTICATION-category templates, whose body is
+// fixed ("<code> is your verification code…" + copy-code button); custom
+// wording gets auto-rejected. The template behind AISENSY_CAMPAIGN_NAME must
+// take the code as its single body param AND as the copy-code button param.
 
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { config } from '../config.js'
@@ -18,9 +24,11 @@ const MAX_ATTEMPTS = 5
 // India-only app (every entry point validates a 6-9 leading 10-digit mobile).
 const COUNTRY_CODE = '91'
 
+const AISENSY_ENDPOINT = 'https://backend.aisensy.com/campaign/t1/api/v2'
+
 export type SendResult =
   | { ok: true }
-  | { ok: false; code: 'cooldown' | 'no_whatsapp' | 'send_failed' | 'store_failed' }
+  | { ok: false; code: 'cooldown' | 'send_failed' | 'store_failed' }
 
 export type VerifyResult =
   | { ok: true }
@@ -34,43 +42,40 @@ function hashOtp(tenDigit: string, code: string): string {
     .digest('base64url')
 }
 
-/** POST to the Evolution API instance. Never throws — network/DNS failures come
- * back as status 0 so callers surface a clean 502 instead of a stack trace. */
-async function evo(path: string, body: unknown): Promise<{ status: number; data: unknown }> {
+/** Fire the AiSensy API campaign that delivers the code. Never throws —
+ * network/DNS failures come back as status 0 so callers surface a clean 502
+ * instead of a stack trace. Note "accepted" here means AiSensy queued the
+ * message with Meta, not that it reached a handset — a number with no WhatsApp
+ * fails silently downstream (there is no pre-send lookup on the official API). */
+async function aisensySend(tenDigit: string, code: string): Promise<{ status: number; data: unknown }> {
   try {
-    const res = await fetch(`${config.evolutionApiUrl}${path}`, {
+    const res = await fetch(AISENSY_ENDPOINT, {
       method: 'POST',
-      headers: { apikey: config.evolutionApiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: config.aisensyApiKey,
+        campaignName: config.aisensyCampaignName,
+        destination: `${COUNTRY_CODE}${tenDigit}`,
+        // Names the contact inside AiSensy's CRM; no real name exists yet at
+        // this point in signup, so the number itself is the honest label.
+        userName: tenDigit,
+        // Authentication templates want the code twice: once for the body
+        // param, once for the copy-code (url-type) button param.
+        templateParams: [code],
+        buttons: [
+          {
+            type: 'button',
+            sub_type: 'url',
+            index: 0,
+            parameters: [{ type: 'text', text: code }],
+          },
+        ],
+      }),
     })
     return { status: res.status, data: await res.json().catch(() => ({})) }
   } catch (e) {
     return { status: 0, data: { message: e instanceof Error ? e.message : 'network error' } }
   }
-}
-
-/**
- * Whether the number has a WhatsApp account, per Evolution API's lookup.
- * Returns null when the lookup itself failed — callers should treat that as
- * "unknown" and attempt the send anyway rather than falsely reject a user.
- */
-async function isOnWhatsApp(tenDigit: string): Promise<boolean | null> {
-  const { status, data } = await evo(
-    `/chat/whatsappNumbers/${encodeURIComponent(config.evolutionInstance)}`,
-    { numbers: [`${COUNTRY_CODE}${tenDigit}`] }
-  )
-  if (status !== 200 && status !== 201) return null
-  const first = Array.isArray(data) ? (data[0] as { exists?: unknown } | undefined) : undefined
-  return typeof first?.exists === 'boolean' ? first.exists : null
-}
-
-/** The message the aspirant receives — bilingual, WhatsApp-bold code. */
-function otpMessage(code: string): string {
-  return (
-    `TNPSC Mentor: Your verification code is *${code}*\n\n` +
-    `உங்கள் சரிபார்ப்புக் குறியீடு: *${code}*\n\n` +
-    `Valid for ${OTP_TTL_MIN} minutes. Do not share this code with anyone.`
-  )
 }
 
 /**
@@ -89,10 +94,6 @@ export async function sendSignupOtp(tenDigit: string): Promise<SendResult> {
     if (elapsed < RESEND_COOLDOWN_S * 1000) return { ok: false, code: 'cooldown' }
   }
 
-  // Reject numbers with no WhatsApp up front — clearer error for the user and
-  // no wasted send. An inconclusive lookup (gateway hiccup) falls through.
-  if ((await isOnWhatsApp(tenDigit)) === false) return { ok: false, code: 'no_whatsapp' }
-
   // Full 000000–999999 range (padded), crypto-grade randomness.
   const code = randomInt(0, 1_000_000).toString().padStart(6, '0')
   const { error: upsertErr } = await supabaseAdmin.from('phone_otps').upsert({
@@ -107,11 +108,8 @@ export async function sendSignupOtp(tenDigit: string): Promise<SendResult> {
     return { ok: false, code: 'store_failed' }
   }
 
-  const { status, data } = await evo(
-    `/message/sendText/${encodeURIComponent(config.evolutionInstance)}`,
-    { number: `${COUNTRY_CODE}${tenDigit}`, text: otpMessage(code) }
-  )
-  if (status !== 200 && status !== 201) {
+  const { status, data } = await aisensySend(tenDigit, code)
+  if (status < 200 || status >= 300) {
     console.error('[wa-otp] send failed', tenDigit, status, JSON.stringify(data).slice(0, 300))
     return { ok: false, code: 'send_failed' }
   }

@@ -1,11 +1,17 @@
-# WhatsApp signup OTP (Evolution API)
+# WhatsApp signup OTP (AiSensy)
 
-Signup now verifies that the aspirant **owns** the mobile number they register:
+Signup verifies that the aspirant **owns** the mobile number they register:
 a 6-digit code is sent to that number **on WhatsApp**, and the account is only
 created after the code checks out. Delivery goes through
-[Evolution API](https://github.com/EvolutionAPI/evolution-api) — a self-hosted
-WhatsApp gateway that pairs a real WhatsApp number (QR scan, like WhatsApp Web)
-and exposes a REST API for sending messages.
+[AiSensy](https://aisensy.com) — a WhatsApp Business API platform riding the
+**official** Meta Cloud API: a Meta-approved *Authentication* template is wired
+to an AiSensy "API campaign", and the server triggers that campaign per send.
+
+> Historical note: this feature originally shipped against a self-hosted
+> Evolution API gateway (unofficial WhatsApp Web protocol, QR-paired number).
+> It was swapped to AiSensy in July 2026 before ever going live — official
+> API, no ban risk, no gateway to babysit. Only the delivery call changed;
+> code generation/storage/verification were always server-owned.
 
 ## How the flow works
 
@@ -13,10 +19,9 @@ and exposes a REST API for sending messages.
 RegisterPage (form valid)
   → POST /api/auth/register/otp/send    { phone }
       · rejects numbers already on an account (phone_already_registered)
-      · rejects numbers with no WhatsApp   (phone_no_whatsapp)
       · generates a 6-digit code, stores ONLY its HMAC in public.phone_otps
         (10-min expiry, 5 wrong guesses, 45 s resend cooldown)
-      · sends the code via Evolution API → the user's WhatsApp
+      · triggers the AiSensy API campaign → the user's WhatsApp
   → user types the code
   → POST /api/auth/register/otp/verify  { phone, otp }
       · success returns a signed 15-min "phone-verified ticket"
@@ -24,82 +29,81 @@ RegisterPage (form valid)
       · server accepts ONLY with a valid ticket matching the phone
 ```
 
-Everything is server-enforced: with `EVOLUTION_*` configured, `/register`
+Everything is server-enforced: with `AISENSY_*` configured, `/register`
 returns `403 phone_not_verified` without a valid ticket — the OTP step cannot
 be skipped with curl. With the vars blank, signup behaves exactly as before.
+
+**Google signups are gated too.** They never call `/register` — their number is
+collected post-signup on `/complete-profile` and saved via `PATCH /api/profile`.
+That endpoint demands the identical `phoneTicket` whenever a (non-empty) phone
+is being set, and the complete-profile page runs the same send → verify steps
+as the signup form. Clearing a phone needs no ticket — only attaching one
+claims ownership.
 
 - Rate limits: 5 sends / 30 min and 10 verify attempts / 15 min per phone+IP
   (same limiters as the MSG91 login OTP), plus the per-phone cooldown and
   guess budget in `phone_otps` itself.
 - Code storage: HMAC-SHA256 keyed with the service-role key, phone bound in.
   Plaintext codes never touch the DB or logs.
+- **No pre-send WhatsApp lookup.** The official API (unlike the old Evolution
+  gateway) cannot ask "is this number on WhatsApp?". A WhatsApp-less number is
+  accepted by `/register/otp/send` and simply never receives the message —
+  the old `phone_no_whatsapp` (404) error is no longer emitted (the client
+  still handles it as a harmless dead path).
 
-## One-time setup on the VPS
+## One-time setup in AiSensy
 
-1. **Pick the sender number.** A real SIM/number that will become the
-   "TNPSC Mentor" WhatsApp sender. Use a dedicated number, NOT anyone's
-   personal WhatsApp — pairing here logs it into this gateway.
+1. **Account + WABA.** Sign up at aisensy.com and complete the WhatsApp
+   Business API onboarding (Meta business verification + a phone number
+   dedicated to the WABA — it can't simultaneously run the normal WhatsApp
+   app).
 
-2. **Run Evolution API (Docker, localhost-only port):**
+2. **Create the Authentication template** — Templates → Create Template:
+   - Name `signup_otp`, **Category: AUTHENTICATION**, Language: English.
+   - The body is fixed by Meta (custom OTP wording in any other category is
+     auto-rejected). Tick **security recommendation** and **code expiry =
+     10 minutes** (matches the server's `OTP_TTL_MIN`), button **Copy Code**.
+   - Delivered message: “*123456* is your verification code. For your
+     security, do not share this code. This code expires in 10 minutes.”
+   - Optional: an identical template with Language = Tamil (Meta supplies the
+     fixed Tamil text) if a per-language send is ever wanted.
 
-   ```bash
-   docker run -d --name evolution-api --restart unless-stopped \
-     -p 127.0.0.1:8080:8080 \
-     -e AUTHENTICATION_API_KEY='<generate-a-long-random-key>' \
-     -v evolution_instances:/evolution/instances \
-     evoapicloud/evolution-api:latest
-   ```
-
-   Keep the port bound to `127.0.0.1` — the API server talks to it on
-   localhost; it must never be reachable through Nginx/the internet.
-
-3. **Create + pair the instance:**
-
-   ```bash
-   # create
-   curl -X POST http://127.0.0.1:8080/instance/create \
-     -H 'apikey: <your-key>' -H 'Content-Type: application/json' \
-     -d '{"instanceName":"tnpsc-otp","qrcode":true,"integration":"WHATSAPP-BAILEYS"}'
-
-   # fetch the pairing QR (base64 PNG in the response)
-   curl http://127.0.0.1:8080/instance/connect/tnpsc-otp -H 'apikey: <your-key>'
-   ```
-
-   Scan the QR from the sender phone: WhatsApp → Linked devices → Link a
-   device. Confirm with
-   `curl http://127.0.0.1:8080/instance/connectionState/tnpsc-otp -H 'apikey: <your-key>'`
-   → `"state":"open"`.
+3. **Create the API campaign** — Campaigns → Create Campaign → **API
+   Campaign** → select the approved template → name it (e.g. `signup_otp`)
+   → set Live. The campaign name is what the server sends to.
 
 4. **Point the API server at it** — in `server/.env`:
 
    ```
-   EVOLUTION_API_URL=http://127.0.0.1:8080
-   EVOLUTION_API_KEY=<your-key>
-   EVOLUTION_INSTANCE=tnpsc-otp
+   AISENSY_API_KEY=<dashboard → Manage → API Key (long JWT)>
+   AISENSY_CAMPAIGN_NAME=signup_otp
    ```
 
    Restart PM2 (`pm2 restart tnpsc-api --update-env`).
 
 5. **Enable the frontend step** — build with `VITE_SIGNUP_WA_OTP=true` in
    `.env.production`, then redeploy the SPA. This flag must mirror the server:
-   server on + flag off breaks signup (register demands a ticket the UI never
-   fetched); server off + flag on breaks it the other way (send returns 503).
+   server on + flag off breaks signup AND Google profile completion (both
+   demand a ticket the UI never fetched); server off + flag on breaks it the
+   other way (send returns 503).
 
 6. **Smoke test:**
 
    ```bash
-   curl -X POST http://127.0.0.1:8080/message/sendText/tnpsc-otp \
-     -H 'apikey: <your-key>' -H 'Content-Type: application/json' \
-     -d '{"number":"91XXXXXXXXXX","text":"TNPSC Mentor gateway test"}'
+   curl -X POST https://backend.aisensy.com/campaign/t1/api/v2 \
+     -H 'Content-Type: application/json' \
+     -d '{"apiKey":"<key>","campaignName":"signup_otp","destination":"91XXXXXXXXXX",
+          "userName":"smoke-test","templateParams":["123456"],
+          "buttons":[{"type":"button","sub_type":"url","index":0,
+                      "parameters":[{"type":"text","text":"123456"}]}]}'
    ```
 
    Then register a test account end-to-end from the app.
 
 ## Telegram fallback (numbers with no WhatsApp)
 
-When `/register/otp/send` answers `phone_no_whatsapp`, the signup page offers
-**"Verify via Telegram instead"**. Telegram bots can't message a phone number,
-so the direction reverses — the user comes to us:
+The signup page can offer **"Verify via Telegram instead"**. Telegram bots
+can't message a phone number, so the direction reverses — the user comes to us:
 
 ```
 RegisterPage → POST /api/telegram/start { phone }
@@ -117,9 +121,11 @@ RegisterPage polls POST /api/telegram/status { token } every 3 s
 ```
 
 The register gate is untouched — a ticket is a ticket, whichever channel
-proved ownership. Note the inherent constraint: this verifies numbers whose
-Telegram account is registered ON that number. No WhatsApp *and* no Telegram
-on the number → cannot verify (SMS via MSG91 would be the eventual fallback).
+proved ownership. **Caveat since the AiSensy swap:** the UI used to offer
+Telegram when the send answered `phone_no_whatsapp`; that signal no longer
+exists (no lookup on the official API), so the fallback currently has no
+automatic trigger — if it's ever enabled, surface it as an always-visible
+"can't get the code?" option instead.
 
 ### Telegram one-time setup
 
@@ -134,16 +140,18 @@ on the number → cannot verify (SMS via MSG91 would be the eventual fallback).
 
 ## Operational caveats
 
-- **Unofficial channel.** Evolution API drives WhatsApp through the WhatsApp
-  Web protocol (Baileys), not the official Business API. WhatsApp can ban
-  numbers it flags as automated spam. OTP-on-request to users who just typed
-  their own number is low-risk behaviour, but: keep the sender number
-  dedicated (cheap to replace), warm it up with normal usage first, and if it
-  is ever banned, pair a new number and update nothing but the QR pairing.
-- **Session drops.** If the phone is off/offline for long periods the linked
-  session can disconnect; sends then fail (users see "could not send the
-  code"). Check `connectionState`, re-scan the QR to recover. Consider a
-  monitor/alert on that endpoint.
+- **Per-message cost.** Authentication-category messages are billed by Meta
+  (~₹0.12 each for India as of 2026, plus the AiSensy plan). Cheap per send,
+  but the phone+IP rate limits and the 45 s cooldown are also the cost guard —
+  keep them.
+- **"Accepted" ≠ delivered.** A 2xx from AiSensy means the message was queued
+  with Meta. Numbers without WhatsApp fail silently downstream; check the
+  AiSensy dashboard/webhooks when investigating "code never arrived" reports.
+- **Campaign must stay Live.** Pausing/renaming the API campaign in the
+  AiSensy dashboard breaks sends with no code change — the campaign name in
+  `server/.env` must always match a live campaign.
+- **Template edits re-enter review.** Editing the authentication template
+  sends it back through Meta approval; don't touch it casually in production.
 - **DB table.** `public.phone_otps` (see `supabase/phone_otps.sql`) is
   service-role-only (RLS on, no policies). Rows are single-use and dead rows
   are swept opportunistically on each send.

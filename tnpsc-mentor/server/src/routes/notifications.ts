@@ -8,11 +8,11 @@ import { PREMIUM_VALIDITY_MS } from '../pricing.js'
 
 const router = Router()
 
-// ─── Audience helpers ────────────────────────────────────────────────────────
+// ─── Audience helpers (shared with routes/alerts.ts) ─────────────────────────
 /** user_ids with an active (paid, within the validity window) premium_annual
  *  order — the 'premium' audience. Mirrors the entitlement rule in payments
  *  exactly via the shared PREMIUM_VALIDITY_MS so the two can't drift. */
-async function premiumUserIds(): Promise<Set<string>> {
+export async function premiumUserIds(): Promise<Set<string>> {
   const since = new Date(Date.now() - PREMIUM_VALIDITY_MS).toISOString()
   const { data } = await supabaseAdmin
     .from('payments')
@@ -29,7 +29,7 @@ async function premiumUserIds(): Promise<Set<string>> {
 }
 
 /** Whether a single user matches a notification's audience. */
-function matches(
+export function matchesAudience(
   audience: string,
   audienceValue: string | null,
   ctx: { premium: boolean; group: string | null; isAdmin: boolean }
@@ -156,7 +156,7 @@ router.get(
         // A targeted message is for its user only; broadcasts use audience rules.
         const target = (n.target_user_id as string | null) ?? null
         if (target) return target === req.userId
-        return matches(n.audience as string, (n.audience_value as string | null) ?? null, ctx)
+        return matchesAudience(n.audience as string, (n.audience_value as string | null) ?? null, ctx)
       })
       .slice(0, 50)
       .map((n) => ({

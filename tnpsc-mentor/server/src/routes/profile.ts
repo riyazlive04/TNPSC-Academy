@@ -3,6 +3,8 @@ import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { normalizeMobile } from '../lib/msg91.js'
 import { phoneTakenByOther } from '../lib/phone.js'
+import { whatsappOtpEnabled } from '../config.js'
+import { verifyPhoneVerifyTicket } from '../lib/otpTicket.js'
 
 const router = Router()
 
@@ -38,6 +40,18 @@ router.patch(
       const ten = normalizeMobile(fields.phone)
       if (ten && (await phoneTakenByOther(ten, req.userId!))) {
         return res.status(409).json({ error: 'phone_already_registered' })
+      }
+      // WhatsApp-OTP gate, mirroring /register: when configured, a number can
+      // only be ATTACHED to an account with proof of ownership — the ticket
+      // issued by /register/otp/verify (or the Telegram fallback). Google
+      // signups set their phone HERE (complete-profile) instead of /register,
+      // so without this check the gate could be walked around entirely.
+      // Clearing the number stakes no ownership claim, so it needs no ticket.
+      if (ten && whatsappOtpEnabled) {
+        const ticketPhone = verifyPhoneVerifyTicket(String(req.body?.phoneTicket ?? ''))
+        if (ticketPhone !== ten) {
+          return res.status(403).json({ error: 'phone_not_verified' })
+        }
       }
       fields.phone = ten || null
     }
