@@ -3,6 +3,7 @@ import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { bundleAccess } from '../lib/premium.js'
 import { creditBalance, grantDaily } from '../lib/credits.js'
+import { maybeSendFirstTestNudge } from '../lib/firstTestNudge.js'
 
 const router = Router()
 
@@ -43,6 +44,10 @@ router.post(
       const r = await grantDaily(req.db!)
       const unlimited = await isUnlimited(req)
       res.json({ ...r, unlimited })
+      // A day-old account that still has zero completed tests gets its one-time
+      // "take your first test" push/in-app nudge. Fire-and-forget after the
+      // response — it must never slow down or fail the check-in.
+      void maybeSendFirstTestNudge(req.userId!)
     } catch (e) {
       return sendDbError(res, e as Parameters<typeof sendDbError>[1])
     }

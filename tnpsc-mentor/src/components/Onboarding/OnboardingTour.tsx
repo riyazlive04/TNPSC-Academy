@@ -9,9 +9,11 @@ import { useT, type StringKey } from '../../lib/i18n'
  * revision/insights links, the language toggle), pointing the new aspirant at
  * what to tap. Steps that target a real element are anchored to it via a
  * `data-tour="<id>"` attribute; steps with no target render as a centred card
- * (welcome / finish). The final step simply closes the tour, leaving the user on
- * the dashboard to explore freely. Fully bilingual via useT(). Robust by design:
- * if a target can't be found it degrades to a centred card instead of breaking.
+ * (welcome / finish). The final step ends in ACTION: its primary button launches
+ * the Starter Challenge (via onStartTest), with a quiet "explore on my own"
+ * escape underneath — new accounts should leave the tour inside a test, not on
+ * an empty dashboard. Fully bilingual via useT(). Robust by design: if a target
+ * can't be found it degrades to a centred card instead of breaking.
  */
 
 interface Step {
@@ -28,7 +30,7 @@ const STEPS: Step[] = [
   { target: 'credits', titleKey: 'onbCreditsTitle', bodyKey: 'onbCreditsBody' },
   { target: 'progress', titleKey: 'onbProgressTitle', bodyKey: 'onbProgressBody' },
   { target: 'lang', titleKey: 'onbLangTitle', bodyKey: 'onbLangBody' },
-  { titleKey: 'onbFinishTitle', bodyKey: 'onbFinishBody' },
+  { titleKey: 'onbFirstTestTitle', bodyKey: 'onbFirstTestBody' },
 ]
 
 /** Padding (px) around the spotlit element, and gap between it and the tooltip. */
@@ -39,10 +41,13 @@ const CARD_W = 340
 export default function OnboardingTour({
   open,
   onFinish,
+  onStartTest,
 }: {
   open: boolean
   /** Called when the tour completes, is skipped, or the user starts a mock. */
   onFinish: () => void
+  /** Launches the Starter Challenge from the final step (tour closes first). */
+  onStartTest?: () => void
 }) {
   const { t } = useT()
   const [step, setStep] = useState(0)
@@ -163,17 +168,41 @@ export default function OnboardingTour({
         </div>
         <p className="tamil font-body text-[14px] leading-relaxed text-muted">{t(current.bodyKey)}</p>
 
-        {/* Footer nav */}
-        <div className="mt-5 flex items-center gap-2.5">
-          {!isFirst && (
-            <button onClick={back} className="btn-ghost flex-shrink-0 px-3.5 py-2 text-sm" aria-label={t('back')}>
-              <ArrowLeft size={16} />
+        {/* Footer nav. The last step ends in action: the primary button hands
+            the new aspirant straight to the Starter Challenge; a quiet ghost
+            row underneath lets them explore the dashboard instead. */}
+        {isLast && onStartTest ? (
+          <div className="mt-5 space-y-2">
+            <button
+              onClick={() => {
+                onFinish()
+                onStartTest()
+              }}
+              className="btn-brand w-full py-2.5 text-sm"
+            >
+              {t('onbFirstTestCta')} <ArrowRight size={16} />
             </button>
-          )}
-          <button onClick={next} className="btn-brand flex-1 py-2.5 text-sm">
-            {isLast ? t('onbStartExploring') : t('onbNext')} <ArrowRight size={16} />
-          </button>
-        </div>
+            <div className="flex items-center gap-2.5">
+              <button onClick={back} className="btn-ghost flex-shrink-0 px-3.5 py-2 text-sm" aria-label={t('back')}>
+                <ArrowLeft size={16} />
+              </button>
+              <button onClick={onFinish} className="btn-ghost flex-1 py-2 text-sm">
+                {t('onbStartExploring')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-5 flex items-center gap-2.5">
+            {!isFirst && (
+              <button onClick={back} className="btn-ghost flex-shrink-0 px-3.5 py-2 text-sm" aria-label={t('back')}>
+                <ArrowLeft size={16} />
+              </button>
+            )}
+            <button onClick={next} className="btn-brand flex-1 py-2.5 text-sm">
+              {isLast ? t('onbStartExploring') : t('onbNext')} <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
       </TourCard>
     </div>
   )

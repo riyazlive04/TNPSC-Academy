@@ -11,6 +11,7 @@ import {
   Loader2,
   Lock,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import RewardOverlay, { type DailyReward } from '../components/RewardOverlay'
@@ -383,6 +384,26 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
             <HeroStat label={t('timeTaken')} value={formatTime(timeTakenSeconds)} divider />
           </div>
         </section>
+
+        {/* First-test bonus - awarded once ever, right when the user's first
+            completed test was graded. Celebrated loudly so the reward lands. */}
+        {payload.firstTestBonus && (
+          <div className="mt-6 flex items-start gap-3 rounded-card border border-primary/30 bg-tint-violet/50 p-4">
+            <Sparkles size={20} className="mt-0.5 shrink-0 text-primary" />
+            <div className="min-w-0">
+              <p className="tamil font-heading text-sm font-bold text-ink">
+                {t('firstTestBonusTitle')}
+              </p>
+              <p className="tamil mt-1 font-body text-sm text-ink2">
+                {t('firstTestBonusBody1')}
+                <span className="font-heading font-bold text-primary">
+                  {' '}+{payload.firstTestBonus.amount}{' '}
+                </span>
+                {t('firstTestBonusBody2')}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Topic-revision outcome: a low score was saved to study & retry, or a
             re-test passed and cleared the topic. */}

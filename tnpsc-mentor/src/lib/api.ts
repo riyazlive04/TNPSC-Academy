@@ -48,9 +48,9 @@ export const isPhoneOtpConfigured =
 
 /**
  * Whether signup requires WhatsApp OTP verification of the mobile number. The
- * server independently gates on its Evolution API credentials (and REJECTS an
+ * server independently gates on its AiSensy credentials (and REJECTS an
  * unverified register when they're set), so this flag must match the server's
- * state: set VITE_SIGNUP_WA_OTP=true once the WhatsApp gateway is live.
+ * state: set VITE_SIGNUP_WA_OTP=true once the AiSensy campaign is live.
  */
 export const isSignupWaOtpConfigured =
   String(import.meta.env.VITE_SIGNUP_WA_OTP ?? '').toLowerCase() === 'true'
@@ -297,8 +297,10 @@ export const api = {
     },
     // ─── Signup phone verification (WhatsApp OTP) ─────────────────────────────
     /** Send a WhatsApp code to a number being registered. Throws ApiError with
-     * 'phone_already_registered' (409), 'phone_no_whatsapp' (404) or
-     * 'otp_cooldown' (429). */
+     * 'phone_already_registered' (409) or 'otp_cooldown' (429).
+     * ('phone_no_whatsapp' (404) is legacy: the official WhatsApp API behind
+     * AiSensy has no exists-on-WhatsApp lookup, so the server no longer emits
+     * it — the store/pages keep their handling as a harmless dead path.) */
     async registerOtpSend(phone: string): Promise<{ ok: true }> {
       return request('/api/auth/register/otp/send', {
         method: 'POST',
@@ -414,6 +416,14 @@ export const api = {
     const data = await request<{ questions: Question[] }>('/api/questions/quiz', {
       method: 'POST',
       body: { config },
+    })
+    return data.questions
+  },
+  /** The new-user Starter Challenge paper (fixed hard mixed set, ≤18 questions). */
+  async starterQuestions(count: number): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/starter-test', {
+      method: 'POST',
+      body: { count },
     })
     return data.questions
   },
@@ -760,13 +770,25 @@ export const api = {
     async setRole(userId: string, role: UserRole): Promise<void> {
       await request('/api/superadmin/users/role', { method: 'POST', body: { userId, role } })
     },
-    /** Withdraw a user's premium (revokes their paid payment rows). Returns the count revoked. */
+    /** Withdraw a user's premium (revokes their paid premium rows). Returns the count revoked. */
     async revokePremium(userId: string): Promise<number> {
       const data = await request<{ revoked: number }>('/api/superadmin/users/revoke-premium', {
         method: 'POST',
         body: { userId },
       })
       return data.revoked
+    },
+    /** Withdraw a user's Vettri Nichayam (revokes their paid vettri rows). */
+    async revokeVettri(userId: string): Promise<number> {
+      const data = await request<{ revoked: number }>('/api/superadmin/users/revoke-vettri', {
+        method: 'POST',
+        body: { userId },
+      })
+      return data.revoked
+    },
+    /** Comp a plan (₹0 paid ledger row) — entitlement starts now for the plan's window. */
+    async grantPlan(userId: string, plan: GrantablePlan): Promise<void> {
+      await request('/api/superadmin/users/grant-plan', { method: 'POST', body: { userId, plan } })
     },
     /** Hard-delete a user account and all their data. Irreversible. */
     async deleteUser(userId: string): Promise<void> {
@@ -1129,6 +1151,39 @@ export const api = {
       await request(`/api/notifications/${id}`, { method: 'DELETE' })
     },
   },
+
+  // ─── Popup alerts (superadmin-authored modal announcements) ───────────────
+  alerts: {
+    /** Pending popup alerts for the signed-in user (active, audience-matched, undismissed). */
+    async active(): Promise<ActiveAlert[]> {
+      const data = await request<{ alerts: ActiveAlert[] }>('/api/alerts/active')
+      return data.alerts
+    },
+    /** "Got it" — never show this alert to this account again (any device). */
+    async dismiss(id: string): Promise<void> {
+      await request(`/api/alerts/${id}/dismiss`, { method: 'POST' })
+    },
+    /** Superadmin: publish a popup alert. */
+    async create(input: AlertInput): Promise<void> {
+      await request('/api/alerts', { method: 'POST', body: input })
+    },
+    /** Superadmin: authored-alert history with per-alert seen counts. */
+    async adminList(): Promise<AdminAlert[]> {
+      const data = await request<{ alerts: AdminAlert[] }>('/api/alerts/admin')
+      return data.alerts
+    },
+    /** Superadmin: pull (or re-publish) an alert without deleting it. */
+    async setActive(id: string, active: boolean): Promise<AdminAlert> {
+      const data = await request<{ alert: AdminAlert }>(`/api/alerts/${id}`, {
+        method: 'PATCH',
+        body: { active },
+      })
+      return data.alert
+    },
+    async remove(id: string): Promise<void> {
+      await request(`/api/alerts/${id}`, { method: 'DELETE' })
+    },
+  },
 }
 
 // ─── Material shapes ────────────────────────────────────────────────────────────
@@ -1201,6 +1256,48 @@ export interface AdminNotification {
   audience_value: string | null
   push_sent: number
   created_at: string
+}
+
+// ─── Popup alert shapes ─────────────────────────────────────────────────────────
+/** One pending popup alert for the signed-in user. */
+export interface ActiveAlert {
+  id: string
+  title: string
+  body: string
+  title_ta: string | null
+  body_ta: string | null
+  url: string | null
+  created_at: string
+}
+
+/** Body sent by the superadmin alert composer. */
+export interface AlertInput {
+  title: string
+  body: string
+  titleTa?: string | null
+  bodyTa?: string | null
+  url?: string | null
+  audience: NotificationAudience
+  audienceValue?: string | null
+  /** ISO datetime after which the alert stops showing (optional). */
+  expiresAt?: string | null
+}
+
+/** Full authored row in the superadmin alert list. */
+export interface AdminAlert {
+  id: string
+  title: string
+  body: string
+  title_ta: string | null
+  body_ta: string | null
+  url: string | null
+  audience: NotificationAudience
+  audience_value: string | null
+  active: boolean
+  expires_at: string | null
+  created_at: string
+  /** How many users have tapped "Got it". */
+  dismissed_count: number
 }
 
 export interface PremiumStatus {
@@ -1366,6 +1463,8 @@ export interface AdminUserRow {
   id: string
   full_name: string | null
   email: string | null
+  phone: string | null
+  target_group: string | null
   avatar_url: string | null
   role: UserRole
   created_at: string
@@ -1373,7 +1472,12 @@ export interface AdminUserRow {
   last_active: string | null
   premium: boolean
   premium_until: string | null
+  vettri: boolean
+  vettri_until: string | null
 }
+
+/** Plans a superadmin can comp to a user (mirrors the server allow-list). */
+export type GrantablePlan = 'premium_annual' | 'vettri_nichayam' | 'vettri_month'
 
 export interface FeedbackRow {
   id: string

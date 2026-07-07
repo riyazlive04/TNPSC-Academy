@@ -70,6 +70,8 @@ const STRINGS = {
   delete: { en: 'Delete', ta: 'நீக்கு' },
   cancel: { en: 'Cancel', ta: 'ரத்து' },
   dismiss: { en: 'Dismiss', ta: 'மூடு' },
+  alertAnnouncement: { en: 'Announcement', ta: 'அறிவிப்பு' },
+  alertViewLink: { en: 'View', ta: 'பார்க்க' },
 
   // Language screen
   chooseLanguage: { en: 'Choose Your Language', ta: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்' },
@@ -91,7 +93,7 @@ const STRINGS = {
   onbSkip: { en: 'Skip tour', ta: 'சுற்றுப்பயணத்தைத் தவிர்' },
   onbGetStarted: { en: 'Get started', ta: 'தொடங்குவோம்' },
   onbStepOf: { en: 'of', ta: '/' },
-  onbStartExploring: { en: 'Start exploring', ta: 'ஆராயத் தொடங்கு' },
+  onbStartExploring: { en: 'Explore on my own', ta: 'நானே ஆராய்கிறேன்' },
   onbWelcomeTitle: { en: 'Welcome to TNPSC Mentors', ta: 'TNPSC வழிகாட்டிக்கு வரவேற்கிறோம்' },
   onbWelcomeBody: {
     en: "Let's take a quick 30-second tour of how to prepare here. Tap Next to begin.",
@@ -124,10 +126,35 @@ const STRINGS = {
     en: 'Tap here to switch language anytime - and the icon beside it toggles light and dark mode.',
     ta: 'மொழியை எப்போது வேண்டுமானாலும் மாற்ற இங்கே தட்டவும் - அதன் அருகிலுள்ள ஐகான் ஒளி/இருண்ட பயன்முறையை மாற்றும்.',
   },
-  onbFinishTitle: { en: "You're all set!", ta: 'நீங்கள் தயார்!' },
-  onbFinishBody: {
-    en: 'Start exploring, or explore at your own pace. All the best for your exam!',
-    ta: 'ஆராயத் தொடங்குங்கள், அல்லது உங்கள் விருப்பப்படி ஆராயுங்கள். உங்கள் தேர்வுக்கு வாழ்த்துக்கள்!',
+  onbFirstTestTitle: { en: 'Ready for your first test?', ta: 'உங்கள் முதல் தேர்வுக்குத் தயாரா?' },
+  onbFirstTestBody: {
+    en: 'The Starter Challenge: 18 hard questions mixing every style - statements, match, assertion-reason, chronology, direct and aptitude. Finish it and earn +25 bonus credits. The best way to see where you stand!',
+    ta: 'தொடக்க சவால்: எல்லா வகைகளும் கலந்த 18 கடின கேள்விகள் - கூற்றுகள், பொருத்துக, உறுதி-காரணம், காலவரிசை, நேரடி மற்றும் திறனாய்வு. முடித்தால் +25 போனஸ் கிரெடிட்கள். நீங்கள் எந்த நிலையில் இருக்கிறீர்கள் என்று அறிய இதுவே சிறந்த வழி!',
+  },
+  onbFirstTestCta: { en: 'Take the Starter Challenge', ta: 'தொடக்க சவாலை எடு' },
+  // First-test funnel (dashboard hero + Starter Challenge + result bonus).
+  starterTestLabel: { en: 'Starter Challenge', ta: 'தொடக்க சவால்' },
+  firstTestBadge: { en: 'Your first test', ta: 'உங்கள் முதல் தேர்வு' },
+  firstTestHeroTitle: {
+    en: 'Take the Starter Challenge',
+    ta: 'தொடக்க சவாலை எடுங்கள்',
+  },
+  firstTestHeroSub: {
+    en: '18 hard questions · every question style + aptitude · finish and earn +25 bonus credits',
+    ta: '18 கடின கேள்விகள் · எல்லா கேள்வி வகைகளும் + திறனாய்வு · முடித்தால் +25 போனஸ் கிரெடிட்கள்',
+  },
+  firstTestHeroCta: { en: 'Start now', ta: 'இப்போதே தொடங்கு' },
+  firstTestBonusTitle: {
+    en: 'First test complete - bonus earned!',
+    ta: 'முதல் தேர்வு நிறைவு - போனஸ் வென்றீர்கள்!',
+  },
+  firstTestBonusBody1: {
+    en: 'Well done on your first test!',
+    ta: 'உங்கள் முதல் தேர்வுக்கு வாழ்த்துக்கள்!',
+  },
+  firstTestBonusBody2: {
+    en: 'bonus credits were added to your balance.',
+    ta: 'போனஸ் கிரெடிட்கள் உங்கள் இருப்பில் சேர்க்கப்பட்டன.',
   },
   howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
   howItWorksSub: { en: 'Replay the app tour', ta: 'செயலி சுற்றுப்பயணத்தை மீண்டும் பார்க்க' },
@@ -681,7 +708,7 @@ const STRINGS = {
   },
   vettriSub: {
     en: 'A two-month program: 13 full-length mock exams with unlimited attempts, plus unlimited PYQ and Current Affairs tests.',
-    ta: 'இரண்டு மாத திட்டம்: 13 முழு நீள மாதிரித் தேர்வுகள் — வரம்பற்ற முயற்சிகள்; மேலும் வரம்பற்ற PYQ மற்றும் நடப்பு நிகழ்வுத் தேர்வுகள்.',
+    ta: 'இரண்டு மாத திட்டம்: 13 முழு நீள மாதிரித் தேர்வுகள் - வரம்பற்ற முயற்சிகள்; மேலும் வரம்பற்ற PYQ மற்றும் நடப்பு நிகழ்வுத் தேர்வுகள்.',
   },
   vettriValidity: { en: 'Valid for two months', ta: 'இரண்டு மாதங்களுக்கு செல்லுபடியாகும்' },
   vettriMonthValidity: { en: 'One month (first half)', ta: 'ஒரு மாதம் (முதல் பாதி)' },
@@ -690,13 +717,13 @@ const STRINGS = {
     ta: '₹499 இந்த இரண்டு மாத திட்டத்தின் முதல் மாதத்தை மட்டுமே உள்ளடக்கும். இரண்டாவது மாதத்திற்கு ₹499 மீண்டும் செலுத்துங்கள், இல்லையெனில் இரண்டாவது பாதியை அணுக முடியாது.',
   },
   vettriFullNote: {
-    en: 'This is a limited-period plan — your access lasts two months and then ends. Renew to keep using it.',
-    ta: 'இது வரையறுக்கப்பட்ட காலத் திட்டம் — உங்கள் அணுகல் இரண்டு மாதங்கள் மட்டுமே நீடிக்கும், பிறகு முடிவடையும். தொடர்ந்து பயன்படுத்த புதுப்பிக்கவும்.',
+    en: 'Test series questions will be available for 12 months. You get Premium access for 2 months with this plan.',
+    ta: 'தேர்வுத் தொடர் வினாக்கள் 12 மாதங்களுக்குக் கிடைக்கும். இந்தத் திட்டத்துடன் 2 மாதங்களுக்கு பிரீமியம் அணுகல் கிடைக்கும்.',
   },
   vettriPlanFull: { en: 'One-time', ta: 'ஒருமுறை' },
   vettriPlanMonth: { en: 'Installment', ta: 'தவணை' },
-  vettriFullSuffix: { en: '/ 2 months', ta: '/ 2 மாதம்' },
-  vettriMonthSuffix: { en: '/ month', ta: '/ மாதம்' },
+  vettriFullSuffix: { en: 'for 2 months', ta: '2 மாதங்களுக்கு' },
+  vettriMonthSuffix: { en: 'per month', ta: 'மாதத்திற்கு' },
   // The perk sentence is split so "download the schedule" renders as an INLINE
   // link to the flyer PDF (VettriCard appends vettriPerk1Link as the anchor).
   vettriPerk1: {
@@ -1011,8 +1038,8 @@ const STRINGS = {
   // Premium is a superset of Vettri Nichayam, so it includes the full Test
   // Marathon series (all 13 scheduled papers) plus every future content update.
   premiumPerk5: {
-    en: 'Test Marathon series (Vettri Nichayam) — all 13 papers',
-    ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்) — அனைத்து 13 தாள்களும்',
+    en: 'Test Marathon series (Vettri Nichayam) - all 13 papers',
+    ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்) - அனைத்து 13 தாள்களும்',
   },
   premiumPerk6: {
     en: 'All future updates included for your plan duration',
@@ -1030,8 +1057,8 @@ const STRINGS = {
     en: 'Face the exam with confidence',
     ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்',
   },
-  premiumPerYear: { en: '/ 3 months', ta: '/ 3 மாதம்' },
-  premiumPerMonth: { en: '/ month', ta: '/ மாதம்' },
+  premiumPerYear: { en: 'for 3 months', ta: '3 மாதங்களுக்கு' },
+  premiumPerMonth: { en: 'per month', ta: 'மாதத்திற்கு' },
   premiumSecureNote: {
     en: 'Secure payment via Razorpay · one-time, no auto-renewal',
     ta: 'Razorpay மூலம் பாதுகாப்பான கட்டணம் · ஒருமுறை மட்டும், தானாக புதுப்பிக்காது',
@@ -1191,6 +1218,12 @@ const STRINGS = {
     ta: 'WhatsApp-இல் குறியீட்டை அனுப்பியுள்ளோம்:',
   },
   verifyAndCreate: { en: 'Verify & create account', ta: 'சரிபார்த்து கணக்கை உருவாக்கு' },
+  // Complete-profile (Google signup) variant of the same verification step.
+  verifyAndContinue: { en: 'Verify & Continue', ta: 'சரிபார்த்துத் தொடரவும்' },
+  phoneVerifyExpired: {
+    en: 'Phone verification expired. Please verify your number again.',
+    ta: 'தொலைபேசி சரிபார்ப்பு காலாவதியானது. உங்கள் எண்ணை மீண்டும் சரிபார்க்கவும்.',
+  },
   waOtpNoWhatsApp: {
     en: "This number doesn't seem to be on WhatsApp. Please use a mobile number that has WhatsApp.",
     ta: 'இந்த எண்ணில் WhatsApp இல்லை போல் தெரிகிறது. WhatsApp உள்ள கைபேசி எண்ணைப் பயன்படுத்தவும்.',

@@ -15,6 +15,7 @@ import {
   ScrollText,
   CalendarDays,
   Trophy,
+  Sparkles,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
@@ -28,8 +29,10 @@ import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
+import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
+import { starterTestConfig } from '../lib/starterTest'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { SHOW_STREAK, isHiddenBadge } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -110,6 +113,7 @@ const GRADIENTS: Record<Tint, string> = {
 
 export default function TestArenaPage() {
   const navigate = useNavigate()
+  const startTest = useStartTest()
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const testSeriesOn = useTestSeriesEnabled()
   const vettriOn = useVettriEnabled()
@@ -248,6 +252,12 @@ export default function TestArenaPage() {
   const [featured, ...restCards] = CARDS
   const showStreak = SHOW_STREAK && (habit?.currentStreak ?? 0) > 0
 
+  // The first-test funnel: launches the Starter Challenge (a fixed hard mixed
+  // paper). Reached from the tour's final step and — until the user has one
+  // completed test — from the dashboard hero card below.
+  const launchStarterTest = () => startTest(starterTestConfig())
+  const showFirstTestHero = analytics !== null && analytics.overview.testsTaken === 0
+
   return (
     <AppLayout>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
@@ -311,6 +321,27 @@ export default function TestArenaPage() {
             </button>
           )}
         </header>
+
+        {/* First-test funnel - shown only while the account has ZERO completed
+            tests, then gone forever. Leads the page so a brand-new aspirant has
+            exactly one obvious next action: the Starter Challenge. */}
+        {showFirstTestHero && (
+          <section className="rounded-card border border-primary/30 bg-tint-violet/50 p-5">
+            <span className="inline-flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+              <Sparkles size={13} />
+              <span className="tamil">{t('firstTestBadge')}</span>
+            </span>
+            <h2 className="tamil mt-2 font-display text-lg font-bold leading-tight tracking-tight text-ink">
+              {t('firstTestHeroTitle')}
+            </h2>
+            <p className="tamil mt-1 font-body text-sm leading-relaxed text-muted">
+              {t('firstTestHeroSub')}
+            </p>
+            <button onClick={launchStarterTest} className="btn-brand mt-4 w-full py-2.5 text-sm">
+              {t('firstTestHeroCta')} <ChevronRight size={16} />
+            </button>
+          </section>
+        )}
 
         {/* The one gradient hero - the single elevated element on the screen.
             data-tour anchors the onboarding spotlight to the mock-test card. */}
@@ -416,7 +447,7 @@ export default function TestArenaPage() {
         />
       )}
 
-      <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} />
+      <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} onStartTest={launchStarterTest} />
     </AppLayout>
   )
 }

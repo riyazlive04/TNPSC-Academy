@@ -4,6 +4,7 @@ import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { FREE_PDF_DOWNLOADS } from '../pricing.js'
 import { premiumEntitlement } from '../lib/premium.js'
+import { FIRST_TEST_BONUS, grantFirstTestBonus } from '../lib/credits.js'
 import {
   REVISION_PASS_MARK,
   buildLabel,
@@ -56,12 +57,27 @@ router.post(
       }
     )
 
+    // ── First-test bonus ────────────────────────────────────────────────────
+    // Award the one-time bonus the moment this user's FIRST completed test is
+    // graded (the RPC no-ops on every later submit). Best-effort — a failure
+    // must never block the graded result.
+    const bonus = await grantFirstTestBonus(req.db!).catch((e) => {
+      console.error('[first-test-bonus] grant failed', e)
+      return null
+    })
+
     // NOTE: the 10-credit test fee is charged at test START (routes/questions.ts
     // and routes/revisions.ts via chargeTestStart), not here. Charging on start —
     // atomically, server-side — is what makes the gate un-dodgeable: submit used to
     // spend based on the client-sent session (a forged `mock_kind:'series'` skipped
     // it) and was best-effort, so it could be bypassed entirely.
-    res.json(revision ? { ...result, revision } : result)
+    res.json({
+      ...result,
+      ...(revision ? { revision } : {}),
+      ...(bonus?.granted
+        ? { first_test_bonus: { amount: FIRST_TEST_BONUS, balance: bonus.balance } }
+        : {}),
+    })
   })
 )
 

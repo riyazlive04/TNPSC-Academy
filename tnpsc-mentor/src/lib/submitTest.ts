@@ -180,6 +180,7 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     timeTakenSeconds: timeTaken,
     sessionId: result.session_id,
     revision: result.revision,
+    firstTestBonus: result.first_test_bonus,
   }
 }
 

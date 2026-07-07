@@ -38,6 +38,11 @@ export async function fetchQuestionsForConfig(
     const { buildThirukuralQuestions } = await import('./thirukuralQuiz')
     return buildThirukuralQuestions(config, limit)
   }
+  // The Starter Challenge has its own fixed-shape sampler (hard, every question
+  // style + aptitude) - the generic per-category sampler can't build it.
+  if (config.starter) {
+    return api.starterQuestions(limit)
+  }
   return api.quizQuestions({ ...config, limit } as QuizConfig)
 }
 

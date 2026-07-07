@@ -42,7 +42,9 @@ export default function QuizInstructionsPage() {
   const config = location.state as QuizConfig | null
 
   const [agreed, setAgreed] = useState(false)
-  const [count, setCount] = useState(20)
+  // Seed the question count from the config when the launching flow chose one
+  // (e.g. the Starter Challenge's fixed paper); the pool clamp still applies.
+  const [count, setCount] = useState(config?.questionCount ?? 20)
   const [minutes, setMinutes] = useState(20)
   // Until the user drags the time slider, the time limit tracks the recommended
   // pace (≈1 min/question) so it always matches the chosen question count.

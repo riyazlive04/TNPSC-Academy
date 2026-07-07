@@ -243,6 +243,33 @@ router.post(
   })
 )
 
+// ─── POST /api/questions/starter-test ────────────────────────────────────────
+// The new-user "Starter Challenge": a fixed-shape HARD mixed paper — 3 questions
+// of every Subject-bank style (statements, match, assertion-reason,
+// chronological, direct) plus 3 aptitude — sampled hard-first by the
+// starter_test_questions RPC (18 total). An optional `count` (5–18) trims the
+// shuffled paper for aspirants who lower the slider. Charged like any test
+// (1 credit/question) at start; premium/Vettri/staff bypass.
+export const STARTER_TEST_SIZE = 18
+router.post(
+  '/starter-test',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const requested = Math.trunc(Number((req.body ?? {}).count)) || STARTER_TEST_SIZE
+    const n = Math.min(Math.max(requested, 5), STARTER_TEST_SIZE)
+    const unlimited = await isUnlimited(req)
+    const { data, error } = await req.db!.rpc('starter_test_questions')
+    if (error) return sendDbError(res, error)
+    const questions = shuffle((data ?? []) as Record<string, unknown>[]).slice(0, n)
+    if (!unlimited && questions.length > 0) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'starter', questions.length)
+      if (gate) return res.status(402).json(gate)
+    }
+    void recordSeen(req, questions as { id?: string }[])
+    res.json({ questions })
+  })
+)
+
 // ─── POST /api/questions/count ───────────────────────────────────────────────
 // How many questions are available for a config — bounds the question-count
 // slider on the pre-test setup screen. Mirrors get_quiz_questions' filters.

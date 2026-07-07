@@ -192,6 +192,8 @@ export interface SubmitResult {
   results: GradedResult[]
   /** Set by the API's topic-revision hook (see server/routes/tests.ts). */
   revision?: RevisionInfo
+  /** Set once ever, when this submit graded the user's FIRST completed test. */
+  first_test_bonus?: { amount: number; balance: number }
 }
 
 // ─── Topic revision (study-gate + similar-question re-tests) ────────────────
@@ -315,6 +317,12 @@ export interface QuizConfig {
   daily?: boolean
   /** Weekly Current-Affairs consolidation drill. */
   weekly?: boolean
+  /**
+   * New-user Starter Challenge: the fixed hard mixed paper (every question
+   * style + aptitude) served by /api/questions/starter-test instead of the
+   * generic sampler.
+   */
+  starter?: boolean
   /**
    * Proctored mock-test mode. When set, the quiz runs through the dedicated
    * OMR-style engine (fullscreen, question palette, violation tracking) instead
@@ -532,6 +540,8 @@ export interface ResultPayload {
   sessionId?: string
   /** Topic-revision outcome of this test, surfaced as a notice on the Result page. */
   revision?: RevisionInfo
+  /** First-completed-test credit reward, celebrated on the Result page. */
+  firstTestBonus?: { amount: number; balance: number }
 }
 
 // The four options every bank has. Use optionLetters(q) when rendering so a
