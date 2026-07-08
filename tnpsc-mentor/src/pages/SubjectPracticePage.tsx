@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
   ChevronRight,
-  Loader2,
   Atom,
   FlaskConical,
   Leaf,
@@ -32,6 +31,7 @@ import IconTile from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import PremiumCard from '../components/UI/PremiumCard'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { toast } from '../store/toastStore'
 import {
@@ -830,7 +830,7 @@ function TypeStep({
 function CenterSpinner() {
   return (
     <div className="flex justify-center py-16">
-      <Loader2 size={28} className="animate-spin text-primary" />
+      <LogoLoader size={56} />
     </div>
   )
 }

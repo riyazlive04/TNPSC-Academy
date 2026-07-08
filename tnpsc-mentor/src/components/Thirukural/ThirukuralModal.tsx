@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Loader2, Search, X } from 'lucide-react'
+import { ArrowLeft, Search, X } from 'lucide-react'
 import { List, ListRow } from '../UI/ListRow'
+import LogoLoader from '../UI/LogoLoader'
 import { useFocusTrap } from '../UI/useFocusTrap'
 import Couplet from './Couplet'
 import {
@@ -142,7 +143,7 @@ export default function ThirukuralModal({
             <p className="py-12 text-center font-body text-sm text-muted">{t('couldNotLoad')}</p>
           ) : kurals === null ? (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-primary" />
+              <LogoLoader size={56} />
             </div>
           ) : current ? (
             <KuralDetail k={current} lang={lang} />

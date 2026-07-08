@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Trophy, Check, Download, Loader2, Tag, X, AlertCircle, CalendarDays, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
@@ -93,6 +94,7 @@ export default function VettriCard({
 }) {
   const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
+  const navigate = useNavigate()
   const seriesOn = useTestSeriesEnabled()
   const [paying, setPaying] = useState(false)
   // Pre-payment recap popup: the CTA opens it; checkout runs only on OK.
@@ -137,7 +139,9 @@ export default function VettriCard({
         setCouponError(null)
       } else {
         setApplied(null)
-        setCouponError(result.reason)
+        // Bilingual for the common miss (a made-up code); other server reasons
+        // (expired / limit reached) pass through as-is.
+        setCouponError(result.reason === 'Invalid coupon code.' ? t('couponInvalid') : result.reason)
       }
     } catch (e) {
       setApplied(null)
@@ -166,10 +170,11 @@ export default function VettriCard({
         couponCode: applied?.code,
       })
       if (result.status === 'paid') {
-        toast.success(t('vettriThanks'))
         markVettri() // hide the card immediately…
         refresh() // …then reconcile with the server (expiry etc.)
         reloadCredits() // …and drop the finite credit meter (now unlimited).
+        // Land on the success screen (it re-pulls the stores again on mount).
+        navigate(`/payment-success?plan=${plan === 'month' ? 'vettri_month' : 'vettri_full'}`)
       } else if (result.status === 'failed')
         toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
     } finally {
@@ -333,7 +338,10 @@ export default function VettriCard({
               <div className="flex items-center gap-1.5">
                 <input
                   value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  onChange={(e) => {
+                    setCode(e.target.value.toUpperCase())
+                    setCouponError(null) // stale error clears as they retype
+                  }}
                   onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                   placeholder={t('premiumCouponPlaceholder')}
                   spellCheck={false}
@@ -354,7 +362,16 @@ export default function VettriCard({
           )}
 
           <button
-            onClick={() => setConfirmOpen(true)}
+            onClick={() => {
+              // A typed-but-never-applied code must not be silently ignored:
+              // validate it now and stay put, so "Invalid coupon code" (or the
+              // applied-✓ chip) shows right here before the purchase dialog.
+              if (code.trim() && !applied) {
+                void applyCoupon()
+                return
+              }
+              setConfirmOpen(true)
+            }}
             disabled={paying}
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
           >

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Loader2,
   ChevronRight,
   Landmark,
   Palette,
@@ -21,6 +20,7 @@ import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { deriveGateKey } from '../lib/freeGate'
 import { PYQ_SUBJECTS, subjectName } from '../lib/constants'
@@ -183,7 +183,7 @@ export default function PreviousYearPage() {
 
       {counts === null ? (
         <div className="flex justify-center py-16">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <LogoLoader size={56} />
         </div>
       ) : (
         // Subjects as a hairline-divided list with small tint tiles + chevron.

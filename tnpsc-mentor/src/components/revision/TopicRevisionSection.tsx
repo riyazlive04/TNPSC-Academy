@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, GraduationCap } from 'lucide-react'
+import { GraduationCap } from 'lucide-react'
 import { api, ApiError } from '../../lib/api'
 import { toast } from '../../store/toastStore'
 import { useT } from '../../lib/i18n'
@@ -9,6 +9,7 @@ import { useCreditsStore } from '../../store/creditsStore'
 import { upsell } from '../../store/upsellStore'
 import type { QuizConfig, RevisionAnalytics, RevisionTopic } from '../../types'
 import ConfirmDialog from '../UI/ConfirmDialog'
+import LogoLoader from '../UI/LogoLoader'
 import RevisionCard from './RevisionCard'
 import RevisionAnalyticsPanel from './RevisionAnalyticsPanel'
 
@@ -99,7 +100,7 @@ export default function TopicRevisionSection() {
   if (loading) {
     return (
       <div className="flex justify-center py-10">
-        <Loader2 size={26} className="animate-spin text-primary" />
+        <LogoLoader size={48} />
       </div>
     )
   }

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Loader2 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
+import LogoLoader from '../components/UI/LogoLoader'
 import { SUBJECTS, STANDARDS, standardLabel } from '../lib/constants'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
@@ -97,7 +97,7 @@ export default function SamacheerPage() {
         >
           {loading && (
             <div className="flex justify-center py-8">
-              <Loader2 size={28} className="animate-spin text-primary" />
+              <LogoLoader size={56} />
             </div>
           )}
 

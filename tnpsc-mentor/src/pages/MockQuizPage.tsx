@@ -7,6 +7,7 @@ import OmrBubbles from '../components/Quiz/OmrBubbles'
 import OmrOptions from '../components/Quiz/OmrOptions'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
+import LogoLoader from '../components/UI/LogoLoader'
 import { formatTime } from '../components/UI/Timer'
 import { api, ApiError } from '../lib/api'
 import { describeConfig } from '../lib/fetchQuestions'
@@ -488,7 +489,7 @@ export default function MockQuizPage() {
   if (loading) {
     return (
       <CenteredScreen>
-        <Loader2 size={36} className="animate-spin text-brand" />
+        <LogoLoader size={64} />
         <p className="mt-3 font-body text-sm text-ink2">{t('loading')}</p>
       </CenteredScreen>
     )

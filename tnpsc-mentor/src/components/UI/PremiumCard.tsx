@@ -67,10 +67,15 @@ function rupees(paise: number): string {
 export default function PremiumCard({
   className = '',
   dismissible = false,
+  showForVettri = false,
 }: {
   className?: string
   /** Show a close button that hides the card (re-surfaces after ~1 week). */
   dismissible?: boolean
+  /** Vettri owners already paid, so the ambient Premium upsell hides for them
+   *  app-wide. Only the Profile page (their one upgrade path) and the forced
+   *  paywall modal (which must still answer a Premium-only lock) opt in. */
+  showForVettri?: boolean
 }) {
   const { profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
@@ -131,7 +136,9 @@ export default function PremiumCard({
         setCouponError(null)
       } else {
         setApplied(null)
-        setCouponError(result.reason)
+        // Bilingual for the common miss (a made-up code); other server reasons
+        // (expired / limit reached) pass through as-is.
+        setCouponError(result.reason === 'Invalid coupon code.' ? t('couponInvalid') : result.reason)
       }
     } catch (e) {
       setApplied(null)
@@ -160,7 +167,6 @@ export default function PremiumCard({
         couponCode: applied?.code,
       })
       if (result.status === 'paid') {
-        toast.success(t('premiumThanks'))
         // Optimistically flip every entitlement surface, then reconcile with the
         // server (expiry, exact balance) so nothing stays locked until a reload.
         markPremium()
@@ -168,6 +174,8 @@ export default function PremiumCard({
         refresh()
         refreshEntitlements()
         reloadCredits()
+        // Land on the success screen (it re-pulls the stores again on mount).
+        navigate('/payment-success?plan=premium')
       } else if (result.status === 'failed')
         toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
       // 'dismissed' → user closed the modal; stay silent.
@@ -182,7 +190,10 @@ export default function PremiumCard({
   // Staff never buy — hide the upsell for admins/superadmins. (useAuth returns the
   // EFFECTIVE role, so an admin using the student-preview toggle still sees it.)
   if (isAdmin || isSuperAdmin) return null
-  if (!loaded || premium || (dismissible && dismissed)) return null
+  if (!loaded || !entitlementsLoaded || premium || (dismissible && dismissed)) return null
+  // Vettri owners see this card only where showForVettri opts in (Profile /
+  // the paywall modal) - no ambient Premium nagging after they've paid.
+  if (hasVettri && !showForVettri) return null
 
   const finalPaise = applied ? applied.finalAmount : PREMIUM_PRICE_PAISE
   const isFree = finalPaise === 0
@@ -191,6 +202,13 @@ export default function PremiumCard({
   // the bundle is enabled, the buyer doesn't already own it, and this is a real
   // payment (a 100%-off coupon has no value decision to make).
   const openPurchase = () => {
+    // A typed-but-never-applied code must not be silently ignored: validate it
+    // now and stay put, so "Invalid coupon code" (or the applied-✓ chip) shows
+    // right here before any purchase dialog opens.
+    if (code.trim() && !applied) {
+      void applyCoupon()
+      return
+    }
     if (vettriOn && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
     else setConfirmOpen(true)
   }
@@ -328,7 +346,10 @@ export default function PremiumCard({
               <div className="flex items-center gap-1.5">
                 <input
                   value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  onChange={(e) => {
+                    setCode(e.target.value.toUpperCase())
+                    setCouponError(null) // stale error clears as they retype
+                  }}
                   onKeyDown={(e) => e.key === 'Enter' && applyCoupon()}
                   placeholder={t('premiumCouponPlaceholder')}
                   spellCheck={false}

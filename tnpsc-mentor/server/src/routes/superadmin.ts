@@ -185,6 +185,21 @@ router.get(
   })
 )
 
+// ─── GET /api/superadmin/users/:userId/insights ──────────────────────────────
+// Activity + credit snapshot for the console's user-detail popup: study time,
+// per-subject / per-section practice breakdown (accuracy = the weakness
+// signal), and the credit balance + lifetime usage from the ledger.
+router.get(
+  '/users/:userId/insights',
+  asyncH(async (req: AuthedRequest, res) => {
+    const userId = String(req.params.userId)
+    if (!userId) return res.status(400).json({ error: 'userId is required' })
+    const { data, error } = await req.db!.rpc('superadmin_user_insights', { p_user: userId })
+    if (error) return sendDbError(res, error)
+    res.json({ insights: data ?? null })
+  })
+)
+
 // ─── POST /api/superadmin/users/sessions/revoke ──────────────────────────────
 // Remotely sign a user out of one device. revokeSessionById is scoped to the
 // (userId, id) pair, so a mismatched id is a no-op rather than a cross-account

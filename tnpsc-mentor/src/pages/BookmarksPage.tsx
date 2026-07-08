@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import YouTubeEmbed from '../components/Quiz/YouTubeEmbed'
+import LogoLoader from '../components/UI/LogoLoader'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
@@ -64,7 +65,7 @@ export default function BookmarksPage() {
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-16">
-            <Loader2 size={32} className="animate-spin text-primary" />
+            <LogoLoader size={56} />
             <p className="font-heading font-semibold uppercase tracking-widest text-muted">
               Loading saved questions…
             </p>

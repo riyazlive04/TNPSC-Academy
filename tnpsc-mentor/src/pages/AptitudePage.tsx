@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Loader2,
   Calculator,
   Brain,
   Shuffle,
@@ -12,6 +11,7 @@ import {
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import {
   topicName,
@@ -268,7 +268,7 @@ export default function AptitudePage() {
 
           {loading && (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-primary" />
+              <LogoLoader size={56} />
             </div>
           )}
           {!loading && error && (

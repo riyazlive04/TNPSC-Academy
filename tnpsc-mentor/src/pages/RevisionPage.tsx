@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Loader2, RefreshCw, Check } from 'lucide-react'
+import { ArrowLeft, RefreshCw, Check } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
+import LogoLoader from '../components/UI/LogoLoader'
 import { fetchDueItems, gradeReview, type ReviewItem } from '../lib/srs'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
@@ -99,7 +100,7 @@ export default function RevisionPage() {
 
         {loading && (
           <div className="flex justify-center py-16">
-            <Loader2 size={32} className="animate-spin text-primary" />
+            <LogoLoader size={56} />
           </div>
         )}
 

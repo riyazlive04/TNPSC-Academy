@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Loader2, Maximize2, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Maximize2, X } from 'lucide-react'
 import type { Lang } from '../store/languageStore'
 import Timer from '../components/UI/Timer'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
 import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
+import LogoLoader from '../components/UI/LogoLoader'
 import {
   AttendanceGateModal,
   CenteredMessage,
@@ -419,7 +420,7 @@ export default function QuizPage() {
   if (loading) {
     return (
       <CenteredMessage>
-        <Loader2 size={36} className="animate-spin text-brand" />
+        <LogoLoader size={64} />
         <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
           {t('preparingTest')}
         </p>

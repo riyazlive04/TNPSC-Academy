@@ -8,6 +8,7 @@ import {
 } from '../../store/authStore'
 import { isApiConfigured } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import LogoLoader from '../UI/LogoLoader'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -46,7 +47,7 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
     return (
       <div className="flex min-h-screen items-center justify-center bg-canvas bg-brand-radial">
         <div className="flex flex-col items-center gap-4 animate-fadeIn">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-brand-soft border-t-brand" />
+          <LogoLoader size={64} label={t('loading')} />
           <p className="font-heading text-sm uppercase tracking-widest text-ink2">{t('loading')}</p>
         </div>
       </div>

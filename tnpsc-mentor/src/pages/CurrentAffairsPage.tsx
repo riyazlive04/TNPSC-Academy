@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle, Lock } from 'lucide-react'
+import { RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle, Lock } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName } from '../lib/constants'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
@@ -239,7 +240,7 @@ export default function CurrentAffairsPage() {
           </h3>
           {loadingMonthTopics ? (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-primary" />
+              <LogoLoader size={56} />
             </div>
           ) : (
             <div className="space-y-6">
@@ -415,7 +416,7 @@ export default function CurrentAffairsPage() {
           )}
           {loadingTopics ? (
             <div className="flex justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-primary" />
+              <LogoLoader size={56} />
             </div>
           ) : (
             <List>

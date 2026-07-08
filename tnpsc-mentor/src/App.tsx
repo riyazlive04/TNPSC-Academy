@@ -17,7 +17,7 @@ import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
 import Toaster from './components/UI/Toaster'
-import Spinner from './components/UI/Spinner'
+import LogoLoader from './components/UI/LogoLoader'
 
 // The forced-upsell overlay ships in its own chunk (it drags in the purchase
 // cards + Razorpay plumbing) and is only fetched the first time a paywall
@@ -69,6 +69,7 @@ const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
 const MockQuizPage = lazy(() => import('./pages/MockQuizPage'))
 const TestSeriesPage = lazy(() => import('./pages/TestSeriesPage'))
 const VettriPage = lazy(() => import('./pages/VettriPage'))
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
 const SetupPage = lazy(() => import('./pages/SetupPage'))
 const ThirukuralQuizPage = lazy(() => import('./pages/ThirukuralQuizPage'))
 const DailyPage = lazy(() => import('./pages/DailyPage'))
@@ -109,6 +110,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/mock/quiz', element: <MockQuizPage /> },
   { path: '/test-series', element: <TestSeriesPage /> },
   { path: '/vettri', element: <VettriPage /> },
+  { path: '/payment-success', element: <PaymentSuccessPage /> },
   { path: '/setup', element: <SetupPage /> },
   { path: '/daily', element: <DailyPage /> },
   { path: '/bookmarks', element: <BookmarksPage /> },
@@ -249,7 +251,7 @@ function RootRedirect() {
 function PageLoader() {
   return (
     <div className="grid min-h-screen place-items-center bg-canvas">
-      <Spinner size={28} />
+      <LogoLoader size={64} />
     </div>
   )
 }

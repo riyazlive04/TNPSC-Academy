@@ -27,6 +27,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
 import PremiumCard from '../components/UI/PremiumCard'
 import ProfileVideos from '../components/Profile/ProfileVideos'
+import LogoLoader from '../components/UI/LogoLoader'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -223,7 +224,7 @@ export default function ProfilePage() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         ) : (
           <div className="space-y-5">
@@ -417,8 +418,9 @@ export default function ProfilePage() {
                 Free learners only; hidden for unlimited (paid/staff). */}
             <CreditsCard />
 
-            {/* Premium upsell - 3-month plan (₹1,699) */}
-            <PremiumCard />
+            {/* Premium upsell - 3-month plan (₹1,699). Profile is the ONE place
+                a Vettri owner still sees the Premium upgrade path. */}
+            <PremiumCard showForVettri />
 
             {/* Saved Questions - moved here from the top bar so the toolbar stays
                 to language · theme · profile. */}

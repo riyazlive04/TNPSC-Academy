@@ -7,13 +7,13 @@ import {
   Clock,
   Download,
   FileText,
-  Loader2,
   Lock,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
 import { useEntitlementsStore } from '../store/entitlementsStore'
@@ -164,7 +164,7 @@ export default function TestSeriesPage() {
 
         {loading && (
           <div className="flex justify-center py-10">
-            <Loader2 size={28} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         )}
 
@@ -176,7 +176,7 @@ export default function TestSeriesPage() {
             <TestSeriesAnalyticsView analytics={analytics} />
           ) : (
             <div className="flex justify-center py-10">
-              <Loader2 size={24} className="animate-spin text-brand" />
+              <LogoLoader size={48} />
             </div>
           ))}
 

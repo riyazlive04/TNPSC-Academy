@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Loader2, Layers, Calculator, Brain, ChevronRight, Shuffle, Lock } from 'lucide-react'
+import { ArrowLeft, Layers, Calculator, Brain, ChevronRight, Shuffle, Lock } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import {
@@ -202,7 +203,7 @@ export default function PyqGroup2SectionPage() {
 
       {counts === null ? (
         <div className="flex justify-center py-12">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <LogoLoader size={56} />
         </div>
       ) : (
         <div className="space-y-4">

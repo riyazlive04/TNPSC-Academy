@@ -58,6 +58,12 @@ export default function OnboardingTour({
   const isLast = step === STEPS.length - 1
   const isFirst = step === 0
 
+  // The final step adapts to the test-first flow: while the Starter Challenge
+  // is still untaken (onStartTest provided) it pitches the test; once it's
+  // done, it closes on an "all set" note instead of re-offering the same test.
+  const titleKey: StringKey = isLast && !onStartTest ? 'onbAllSetTitle' : current.titleKey
+  const bodyKey: StringKey = isLast && !onStartTest ? 'onbAllSetBody' : current.bodyKey
+
   // Resolve the current step's target, scroll it into view, and measure it.
   // Re-measured on resize/scroll so the spotlight tracks the element. A missing
   // target (or a no-target step) clears the rect → centred card.
@@ -163,10 +169,10 @@ export default function OnboardingTour({
           {isFirst && <Sparkles size={18} className="text-primary" />}
           {isLast && <Compass size={18} className="text-primary" />}
           <h2 className="tamil font-display text-[18px] font-bold leading-tight tracking-tight text-ink">
-            {t(current.titleKey)}
+            {t(titleKey)}
           </h2>
         </div>
-        <p className="tamil font-body text-[14px] leading-relaxed text-muted">{t(current.bodyKey)}</p>
+        <p className="tamil font-body text-[14px] leading-relaxed text-muted">{t(bodyKey)}</p>
 
         {/* Footer nav. The last step ends in action: the primary button hands
             the new aspirant straight to the Starter Challenge; a quiet ghost

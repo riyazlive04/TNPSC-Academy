@@ -21,6 +21,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
+import StarterTestPrompt from '../components/Onboarding/StarterTestPrompt'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
@@ -123,17 +124,20 @@ export default function TestArenaPage() {
   const [thirukuralOpen, setThirukuralOpen] = useState(false)
   const [dailyKural, setDailyKural] = useState<Kural | null>(null)
 
-  // First-run guided tour - shown ONLY to a freshly created account. Signup arms
-  // `pending`; the dashboard consumes it once here and opens the spotlight tour.
-  // Existing users never had it armed, so it never fires for them. Admins skip
-  // the aspirant layer entirely.
+  // First-run sequence - shown ONLY to a freshly created account (signup arms
+  // both flags; existing users never had them, admins skip the aspirant layer).
+  // Order: the Starter Challenge prompt leads; the guided tour is HELD BACK
+  // while the prompt is unanswered, so it fires when the user lands back here
+  // after the test (or immediately if they skip the test).
   const onboardingPending = useOnboardingStore((s) => s.pending)
+  const testPromptPending = useOnboardingStore((s) => s.testPrompt)
+  const consumeTestPrompt = useOnboardingStore((s) => s.consumeTestPrompt)
   const onboardingOpen = useOnboardingStore((s) => s.open)
   const startOnboarding = useOnboardingStore((s) => s.start)
   const finishOnboarding = useOnboardingStore((s) => s.finish)
   useEffect(() => {
-    if (!isAdmin && onboardingPending) startOnboarding()
-  }, [isAdmin, onboardingPending, startOnboarding])
+    if (!isAdmin && onboardingPending && !testPromptPending) startOnboarding()
+  }, [isAdmin, onboardingPending, testPromptPending, startOnboarding])
 
   // Load the kural bank once and pick today's couplet for the header. The modal
   // shares the same module-level cache, so opening it makes no extra request.
@@ -447,7 +451,26 @@ export default function TestArenaPage() {
         />
       )}
 
-      <OnboardingTour open={onboardingOpen} onFinish={finishOnboarding} onStartTest={launchStarterTest} />
+      {/* First login: the Starter Challenge prompt comes BEFORE the tour. Both
+          buttons consume the prompt; the tour effect above then takes over -
+          straight away on skip, or on the return to this dashboard after the
+          test. The tour's final-step CTA only re-offers the test when it is
+          still untaken (showFirstTestHero mirrors testsTaken === 0). */}
+      {!isAdmin && testPromptPending && (
+        <StarterTestPrompt
+          onStart={() => {
+            consumeTestPrompt()
+            launchStarterTest()
+          }}
+          onSkip={consumeTestPrompt}
+        />
+      )}
+
+      <OnboardingTour
+        open={onboardingOpen}
+        onFinish={finishOnboarding}
+        onStartTest={showFirstTestHero ? launchStarterTest : undefined}
+      />
     </AppLayout>
   )
 }

@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Clock,
   HelpCircle,
-  Loader2,
   Sparkles,
   Target,
   TrendingUp,
@@ -17,6 +16,7 @@ import {
 import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
 import StatStrip from '../components/UI/StatStrip'
+import LogoLoader from '../components/UI/LogoLoader'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, fetchPercentile, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
@@ -123,7 +123,7 @@ export default function InsightsPage() {
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-24">
-            <Loader2 size={32} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         )}
 

@@ -131,7 +131,18 @@ const STRINGS = {
     en: 'The Starter Challenge: 18 hard questions mixing every style - statements, match, assertion-reason, chronology, direct and aptitude. Finish it and earn +25 bonus credits. The best way to see where you stand!',
     ta: 'தொடக்க சவால்: எல்லா வகைகளும் கலந்த 18 கடின கேள்விகள் - கூற்றுகள், பொருத்துக, உறுதி-காரணம், காலவரிசை, நேரடி மற்றும் திறனாய்வு. முடித்தால் +25 போனஸ் கிரெடிட்கள். நீங்கள் எந்த நிலையில் இருக்கிறீர்கள் என்று அறிய இதுவே சிறந்த வழி!',
   },
-  onbFirstTestCta: { en: 'Take the Starter Challenge', ta: 'தொடக்க சவாலை எடு' },
+  onbFirstTestCta: { en: 'Experience the free test now!', ta: 'இப்போதே இலவசத் தேர்வை அனுபவியுங்கள்!' },
+  // First-login prompt (StarterTestPrompt): the test leads, the tour follows.
+  startPromptSkip: {
+    en: 'Not now - show me around first',
+    ta: 'இப்போது வேண்டாம் - முதலில் செயலியை சுற்றிக் காட்டுங்கள்',
+  },
+  // Tour final step when the Starter Challenge is already done (test-first flow).
+  onbAllSetTitle: { en: "You're all set!", ta: 'நீங்கள் தயார்!' },
+  onbAllSetBody: {
+    en: 'Great job finishing your first test. Practise a little every day to keep your credits and your streak growing - your exam hall seat is earned one question at a time.',
+    ta: 'உங்கள் முதல் தேர்வை முடித்தது அருமை! கிரெடிட்களும் தொடர்ச்சியும் வளர தினமும் சிறிது பயிற்சி செய்யுங்கள் - தேர்வரங்க இடம் ஒவ்வொரு வினாவாகத்தான் வெல்லப்படுகிறது.',
+  },
   // First-test funnel (dashboard hero + Starter Challenge + result bonus).
   starterTestLabel: { en: 'Starter Challenge', ta: 'தொடக்க சவால்' },
   firstTestBadge: { en: 'Your first test', ta: 'உங்கள் முதல் தேர்வு' },
@@ -1135,6 +1146,24 @@ const STRINGS = {
     en: 'Could not check that coupon. Please try again.',
     ta: 'அந்தக் கூப்பனைச் சரிபார்க்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
   },
+  couponInvalid: {
+    en: 'Invalid coupon code.',
+    ta: 'தவறான கூப்பன் குறியீடு.',
+  },
+  // Post-payment success page (/payment-success) — shown right after a verified
+  // Premium / Vettri Nichayam purchase.
+  paySuccessTitle: {
+    en: 'Payment successful!',
+    ta: 'கட்டணம் வெற்றிகரமாகச் செலுத்தப்பட்டது!',
+  },
+  paySuccessSub: {
+    en: 'Your plan is active and everything is unlocked. Happy learning!',
+    ta: 'உங்கள் திட்டம் செயலில் உள்ளது, அனைத்தும் திறக்கப்பட்டுவிட்டன. மகிழ்ச்சியான கற்றல்!',
+  },
+  paySuccessPlanLabel: { en: 'Your plan', ta: 'உங்கள் திட்டம்' },
+  paySuccessUnlocked: { en: "What's unlocked", ta: 'திறக்கப்பட்டவை' },
+  paySuccessStart: { en: 'Start practising', ta: 'பயிற்சியைத் தொடங்குங்கள்' },
+  paySuccessProfile: { en: 'View my profile', ta: 'என் சுயவிவரத்தைப் பார்க்க' },
   examDate: { en: 'Exam Date', ta: 'தேர்வு தேதி' },
   dailyGoalQ: { en: 'Daily question goal', ta: 'தினசரி வினா இலக்கு' },
   saveContinue: { en: 'Save & Continue', ta: 'சேமித்துத் தொடரவும்' },

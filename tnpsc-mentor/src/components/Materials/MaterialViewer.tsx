@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Download, ExternalLink, FileText, Loader2, X } from 'lucide-react'
 import { useFocusTrap } from '../UI/useFocusTrap'
+import LogoLoader from '../UI/LogoLoader'
 import { api, type Material } from '../../lib/api'
 import { materialTitle, youtubeEmbed, youtubeWatch } from '../../lib/materials'
 import { useT } from '../../lib/i18n'
@@ -202,7 +203,7 @@ export default function MaterialViewer({ material, onClose }: { material: Materi
 function ViewerSpinner() {
   return (
     <div className="flex justify-center py-20">
-      <Loader2 size={28} className="animate-spin text-brand" />
+      <LogoLoader size={56} />
     </div>
   )
 }

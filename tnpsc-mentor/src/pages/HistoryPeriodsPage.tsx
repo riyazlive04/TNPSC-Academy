@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Landmark, Castle, Flag, ChevronRight, Loader2 } from 'lucide-react'
+import { Landmark, Castle, Flag, ChevronRight } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
@@ -67,7 +68,7 @@ export default function HistoryPeriodsPage() {
 
       {counts === null ? (
         <div className="flex justify-center py-10">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <LogoLoader size={56} />
         </div>
       ) : (
         <List>

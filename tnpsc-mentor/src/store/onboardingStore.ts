@@ -2,20 +2,31 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 /**
- * Drives the first-run guided tour, which is shown ONLY to freshly created
- * accounts (never to existing users). The signup flow "arms" the tour
- * (`pending = true`) the moment an account is created; the dashboard "consumes"
- * that flag once and opens the coach-mark overlay. `replay` re-opens it on demand
- * from the profile. Only `pending` is persisted, so it survives the redirect /
+ * Drives the first-run sequence, shown ONLY to freshly created accounts (never
+ * to existing users). Signup "arms" BOTH phases the moment an account is
+ * created; the dashboard then runs them in order:
+ *
+ *   1. `testPrompt` — a modal inviting the new aspirant to take the Starter
+ *      Challenge FIRST. Starting the test (or skipping) consumes this flag.
+ *   2. `pending`    — the guided spotlight tour. It is held back while
+ *      `testPrompt` is set, so it fires when the user lands back on the
+ *      dashboard after the test (or immediately after skipping it).
+ *
+ * `replay` re-opens the tour on demand from the profile. Only the two phase
+ * flags are persisted, so the sequence survives the redirect /
  * email-confirmation hop into the app but never re-triggers uninvited.
  */
 interface OnboardingState {
-  /** Set at account creation; the dashboard shows the tour once, then clears it. */
+  /** Tour pending: set at account creation; the dashboard shows it once, then clears it. */
   pending: boolean
+  /** Starter-test prompt pending: shown before the tour; cleared once answered. */
+  testPrompt: boolean
   /** Transient - whether the tour overlay is currently visible. */
   open: boolean
-  /** Mark a newly created account so the tour fires on first dashboard view. */
+  /** Mark a newly created account so the test prompt + tour fire on first dashboard view. */
   arm: () => void
+  /** Consume the test prompt (the user started the Starter Challenge or skipped it). */
+  consumeTestPrompt: () => void
   /** Consume the pending flag and open the tour (called by the dashboard). */
   start: () => void
   /** Re-open the tour manually (e.g. from the profile's "How it works" row). */
@@ -28,8 +39,10 @@ export const useOnboardingStore = create<OnboardingState>()(
   persist(
     (set) => ({
       pending: false,
+      testPrompt: false,
       open: false,
-      arm: () => set({ pending: true }),
+      arm: () => set({ pending: true, testPrompt: true }),
+      consumeTestPrompt: () => set({ testPrompt: false }),
       start: () => set({ open: true, pending: false }),
       replay: () => set({ open: true }),
       finish: () => set({ open: false }),
@@ -37,7 +50,7 @@ export const useOnboardingStore = create<OnboardingState>()(
     {
       name: 'tnpsc-mentor-onboarding',
       // Only the "new account" intent persists; `open` is transient UI state.
-      partialize: (s) => ({ pending: s.pending }),
+      partialize: (s) => ({ pending: s.pending, testPrompt: s.testPrompt }),
     }
   )
 )

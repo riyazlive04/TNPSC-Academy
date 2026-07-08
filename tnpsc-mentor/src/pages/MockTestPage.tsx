@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, Clock, FileText, Layers, ListChecks, Lock, Loader2, Minus, Plus, Trophy } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Clock, FileText, Layers, ListChecks, Lock, Minus, Plus, Trophy } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import PremiumCard from '../components/UI/PremiumCard'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
 import { upsell } from '../store/upsellStore'
@@ -275,7 +276,7 @@ function SubjectExamTab() {
       <PillSection title={t('step1Subject')} className="mb-8" wrap={false}>
         {loadingSubjects ? (
           <div className="flex justify-center py-8">
-            <Loader2 size={28} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         ) : (
           <div className="flex flex-wrap justify-center gap-3">
@@ -301,7 +302,7 @@ function SubjectExamTab() {
         <PillSection title={t('step3Topic')} className="mb-8 animate-fadeIn" wrap={false}>
           {loadingTopics && (
             <div className="flex justify-center py-8">
-              <Loader2 size={28} className="animate-spin text-brand" />
+              <LogoLoader size={56} />
             </div>
           )}
           {!loadingTopics && error && (
@@ -458,7 +459,7 @@ function FullMockExamTab() {
 
       {loading && (
         <div className="flex justify-center py-10">
-          <Loader2 size={28} className="animate-spin text-brand" />
+          <LogoLoader size={56} />
         </div>
       )}
 

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, FileText, Infinity as InfinityIcon, Loader2, Lock } from 'lucide-react'
+import { ArrowLeft, Clock, FileText, Infinity as InfinityIcon, Lock } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import VettriCard from '../components/UI/VettriCard'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { upsell } from '../store/upsellStore'
@@ -94,7 +95,7 @@ export default function VettriPage() {
 
         {loading && (
           <div className="flex justify-center py-10">
-            <Loader2 size={28} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         )}
 

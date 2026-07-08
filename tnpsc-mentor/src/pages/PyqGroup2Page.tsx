@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'lucide-react'
+import { Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { PYQ2_SECTIONS, pyq2SectionSlug, subjectName, type Pyq2Section } from '../lib/constants'
 import { useT } from '../lib/i18n'
@@ -62,7 +63,7 @@ export default function PyqGroup2Page() {
 
       {counts === null ? (
         <div className="flex justify-center py-16">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <LogoLoader size={56} />
         </div>
       ) : (
         <List>

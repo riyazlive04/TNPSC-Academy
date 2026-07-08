@@ -44,6 +44,8 @@ import {
   EyeOff,
   CalendarDays,
   Trophy,
+  TrendingDown,
+  Coins,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -68,6 +70,7 @@ import {
   type Material,
   type MaterialKind,
   type MaterialPlacement,
+  type UserInsights,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
@@ -728,16 +731,20 @@ function UsersTab() {
                     <p className="truncate font-heading text-sm font-semibold text-ink">
                       {u.full_name || '-'}
                     </p>
+                    {/* Plan chips carry the subscription's expiry so validity is
+                        readable straight off the list, without opening details. */}
                     {u.premium && (
                       <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
                         <Crown size={11} />
                         {t('premiumBadge')}
+                        {u.premium_until && ` · ${new Date(u.premium_until).toLocaleDateString()}`}
                       </span>
                     )}
                     {u.vettri && (
                       <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
                         <Trophy size={11} />
                         Vettri
+                        {u.vettri_until && ` · ${new Date(u.vettri_until).toLocaleDateString()}`}
                       </span>
                     )}
                   </div>
@@ -1025,6 +1032,38 @@ function DetailItem({ label, value }: { label: string; value: string }) {
   )
 }
 
+/** "42 min" / "3h 25m" from seconds of study time. */
+function formatStudyTime(sec: number): string {
+  const min = Math.round(sec / 60)
+  if (min < 60) return `${min} min`
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  return m ? `${h}h ${m}m` : `${h}h`
+}
+
+/** Console label for a test_sessions.category value (unknown values pass through). */
+const SECTION_LABELS: Record<string, string> = {
+  pyq: 'PYQ · Group 1',
+  pyq2: 'PYQ · Group 2',
+  subject: 'Subject practice',
+  current_affairs: 'Current Affairs',
+  aptitude: 'Aptitude',
+  mock: 'Mock exams',
+  testseries: 'Test Marathon',
+  vettri: 'Vettri exams',
+  samacheer: 'Samacheer',
+  outer: 'Outer bank',
+}
+const sectionLabel = (c: string) => SECTION_LABELS[c] ?? c
+
+/** Accuracy → traffic-light tone: the at-a-glance weakness signal. */
+function accuracyTone(acc: number | null): { text: string; bar: string } {
+  if (acc === null) return { text: 'text-ink2', bar: 'bg-ink2/40' }
+  if (acc < 50) return { text: 'text-coral', bar: 'bg-coral' }
+  if (acc < 75) return { text: 'text-amber-500', bar: 'bg-amber-400' }
+  return { text: 'text-mint', bar: 'bg-mint' }
+}
+
 function UserDetailModal({
   user,
   onClose,
@@ -1036,6 +1075,26 @@ function UserDetailModal({
 }) {
   const [confirm, setConfirm] = useState<PlanAction | null>(null)
   const [busy, setBusy] = useState<PlanAction | null>(null)
+  // Activity / weakness / credits snapshot — fetched per user when the popup
+  // opens (too heavy to compute for every row of the list).
+  const [insights, setInsights] = useState<UserInsights | null>(null)
+  const [insightsLoading, setInsightsLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    setInsightsLoading(true)
+    setInsights(null)
+    api.superadmin
+      .userInsights(user.id)
+      .then((d) => {
+        if (!cancelled) setInsights(d)
+      })
+      .catch(() => {}) // the section renders a quiet fallback
+      .finally(() => !cancelled && setInsightsLoading(false))
+    return () => {
+      cancelled = true
+    }
+  }, [user.id])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1044,6 +1103,13 @@ function UserDetailModal({
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [busy, onClose])
+
+  // Weak areas: subjects with enough evidence (≥10 attempted questions) and
+  // accuracy under 60% — worst first. This is the coaching signal.
+  const weakAreas = (insights?.subjects ?? [])
+    .filter((s) => s.accuracy !== null && s.questions >= 10 && s.accuracy < 60)
+    .sort((a, b) => (a.accuracy ?? 0) - (b.accuracy ?? 0))
+    .slice(0, 4)
 
   const run = async (action: PlanAction) => {
     setBusy(action)
@@ -1231,6 +1297,130 @@ function UserDetailModal({
             grantLabel: 'Grant 60 days',
           })}
         </div>
+
+        {/* ── Activity / weakness / credits (superadmin_user_insights RPC) ── */}
+        <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+          Activity
+        </h3>
+        {insightsLoading ? (
+          <div className="space-y-2">
+            <div className="skeleton h-14 w-full" />
+            <div className="skeleton h-14 w-full" />
+          </div>
+        ) : !insights ? (
+          <p className="font-body text-xs text-ink2">
+            Could not load this user's activity. Close and reopen to retry.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-2.5">
+              <DetailItem
+                label="Study time"
+                value={formatStudyTime(insights.totals.time_seconds)}
+              />
+              <DetailItem
+                label="Questions attempted"
+                value={String(insights.totals.questions)}
+              />
+              <DetailItem
+                label="Avg accuracy"
+                value={insights.totals.accuracy !== null ? `${insights.totals.accuracy}%` : '—'}
+              />
+              <DetailItem
+                label="Tests · 7d / 30d"
+                value={`${insights.totals.tests_7d} / ${insights.totals.tests_30d}`}
+              />
+            </div>
+
+            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              Weak areas
+            </h3>
+            {weakAreas.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {weakAreas.map((s) => (
+                  <span
+                    key={s.subject}
+                    className="inline-flex items-center gap-1 rounded-full bg-coralsoft px-2.5 py-1 font-heading text-[11px] font-semibold text-coral"
+                  >
+                    <TrendingDown size={12} /> {s.subject} · {s.accuracy}%
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="font-body text-xs text-ink2">
+                No clear weak areas yet (needs ≥10 attempted questions under 60% in a subject).
+              </p>
+            )}
+
+            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              Subjects practised
+            </h3>
+            {insights.subjects.length === 0 ? (
+              <p className="font-body text-xs text-ink2">No subject-tagged tests yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {insights.subjects.map((s) => {
+                  const tone = accuracyTone(s.accuracy)
+                  return (
+                    <div
+                      key={s.subject}
+                      className="rounded-card border border-line bg-surface px-3 py-2"
+                    >
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="truncate font-heading text-xs font-semibold text-ink">
+                          {s.subject}
+                        </p>
+                        <span className={`flex-shrink-0 font-heading text-xs font-bold ${tone.text}`}>
+                          {s.accuracy !== null ? `${s.accuracy}%` : '—'}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-tint">
+                        <div
+                          className={`h-full rounded-full ${tone.bar}`}
+                          style={{ width: `${Math.max(2, Math.min(100, s.accuracy ?? 0))}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 font-body text-[11px] text-ink2">
+                        {s.tests} tests · {s.questions} questions · {formatStudyTime(s.time_seconds)}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              Sections used
+            </h3>
+            {insights.categories.length === 0 ? (
+              <p className="font-body text-xs text-ink2">No completed tests yet.</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {insights.categories.map((c) => (
+                  <span
+                    key={c.category}
+                    className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-[11px] font-semibold text-ink2"
+                  >
+                    {sectionLabel(c.category)} · {c.tests}
+                    {c.accuracy !== null && (
+                      <span className={accuracyTone(c.accuracy).text}>({c.accuracy}%)</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <h3 className="mb-2 mt-5 flex items-center gap-1.5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              <Coins size={12} /> Credits
+            </h3>
+            <div className="grid grid-cols-2 gap-2.5">
+              <DetailItem label="Balance" value={String(insights.credits.balance)} />
+              <DetailItem label="Used on tests" value={String(insights.credits.spent)} />
+              <DetailItem label="Expiring today" value={String(insights.credits.daily_left)} />
+              <DetailItem label="Expired unused" value={String(insights.credits.expired)} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

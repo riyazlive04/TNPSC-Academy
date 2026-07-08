@@ -3,7 +3,6 @@ import {
   Calculator,
   Brain,
   ChevronRight,
-  Loader2,
   Layers,
   Shapes,
   Shuffle,
@@ -12,6 +11,7 @@ import {
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import {
   topicName,
@@ -195,7 +195,7 @@ export default function PyqAptitudePage() {
 
       {counts === null ? (
         <div className="flex justify-center py-10">
-          <Loader2 size={28} className="animate-spin text-primary" />
+          <LogoLoader size={56} />
         </div>
       ) : !type ? (
         // ── Step 1: style (Numerics / Reasoning) ──

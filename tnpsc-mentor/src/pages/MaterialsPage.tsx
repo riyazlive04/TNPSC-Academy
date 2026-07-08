@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library } from 'lucide-react'
+import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import MaterialViewer from '../components/Materials/MaterialViewer'
+import LogoLoader from '../components/UI/LogoLoader'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
 import { useT, type StringKey } from '../lib/i18n'
@@ -80,7 +81,7 @@ export default function MaterialsPage() {
 
         {items === null && !error && (
           <div className="flex justify-center py-20">
-            <Loader2 size={32} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
           </div>
         )}
 

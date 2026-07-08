@@ -800,6 +800,13 @@ export const api = {
       })
       return data.feedback
     },
+    /** Activity + credits snapshot for the user-detail popup. */
+    async userInsights(userId: string): Promise<UserInsights | null> {
+      const data = await request<{ insights: UserInsights | null }>(
+        `/api/superadmin/users/${userId}/insights`
+      )
+      return data.insights
+    },
     /** A user's active device sessions (where they're signed in). */
     async userSessions(userId: string): Promise<DeviceSession[]> {
       const data = await request<{ sessions: DeviceSession[] }>(
@@ -1478,6 +1485,42 @@ export interface AdminUserRow {
 
 /** Plans a superadmin can comp to a user (mirrors the server allow-list). */
 export type GrantablePlan = 'premium_annual' | 'vettri_nichayam' | 'vettri_month'
+
+/** Per-user activity + credit snapshot (superadmin user-detail popup).
+ *  Mirrors the superadmin_user_insights RPC. Accuracy is null until the user
+ *  has attempted at least one question in that slice. */
+export interface UserInsights {
+  totals: {
+    tests: number
+    questions: number
+    correct: number
+    accuracy: number | null
+    time_seconds: number
+    tests_7d: number
+    tests_30d: number
+    last_test_at: string | null
+  }
+  subjects: {
+    subject: string
+    tests: number
+    questions: number
+    accuracy: number | null
+    time_seconds: number
+  }[]
+  categories: {
+    category: string
+    tests: number
+    questions: number
+    accuracy: number | null
+  }[]
+  credits: {
+    balance: number
+    daily_left: number
+    spent: number
+    expired: number
+    granted: number
+  }
+}
 
 export interface FeedbackRow {
   id: string

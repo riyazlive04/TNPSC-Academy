@@ -132,10 +132,12 @@ export default function UpsellModal() {
         </div>
 
         {/* The real purchase cards. Vettri (cheaper) leads except on
-            Premium-ONLY features, where pitching it would mislead. */}
+            Premium-ONLY features, where pitching it would mislead. A Vettri
+            owner hitting a Premium-only lock must still get an answer here,
+            so the Premium card opts in via showForVettri. */}
         <div className="space-y-4">
           {variant !== 'premium' && <VettriCard />}
-          <PremiumCard />
+          <PremiumCard showForVettri />
         </div>
 
         {/* Soft escape - the credits variant reminds them tomorrow is free. */}

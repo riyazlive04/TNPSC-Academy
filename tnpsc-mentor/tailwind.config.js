@@ -186,6 +186,11 @@ export default {
           '0%,100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(239,68,68,0.55)' },
           '50%': { transform: 'scale(1.07)', boxShadow: '0 0 0 9px rgba(239,68,68,0)' },
         },
+        // Loading-screen logo "breath" (LogoLoader) — a gentle scale + fade.
+        logoPulse: {
+          '0%,100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(0.86)', opacity: '0.75' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 0.35s ease-out',
@@ -204,6 +209,7 @@ export default {
         indeterminate: 'indeterminate 1.1s ease-in-out infinite',
         checkPop: 'checkPop 0.3s cubic-bezier(0.22,1,0.36,1)',
         breathe: 'breathe 1.05s ease-in-out infinite',
+        logoPulse: 'logoPulse 1.2s ease-in-out infinite',
       },
     },
   },

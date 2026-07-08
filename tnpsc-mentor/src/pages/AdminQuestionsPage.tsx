@@ -22,6 +22,7 @@ import BulkImportPanel from '../components/Admin/BulkImportPanel'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import MathText from '../components/UI/MathText'
+import LogoLoader from '../components/UI/LogoLoader'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
@@ -346,7 +347,7 @@ export default function AdminQuestionsPage() {
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-16">
-            <Loader2 size={32} className="animate-spin text-brand" />
+            <LogoLoader size={56} />
             <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
               Loading questions…
             </p>
