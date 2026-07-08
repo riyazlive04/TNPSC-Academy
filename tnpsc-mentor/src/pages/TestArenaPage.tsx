@@ -337,7 +337,7 @@ export default function TestArenaPage() {
             <p className="tamil mt-1 font-body text-sm leading-relaxed text-muted">
               {t('firstTestHeroSub')}
             </p>
-            <button onClick={launchStarterTest} className="btn-brand mt-4 w-full py-2.5 text-sm">
+            <button onClick={launchStarterTest} className="btn-gold mt-4 w-full py-2.5 text-sm">
               {t('firstTestHeroCta')} <ChevronRight size={16} />
             </button>
           </section>
