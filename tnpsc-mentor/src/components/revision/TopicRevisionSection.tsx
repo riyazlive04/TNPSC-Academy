@@ -6,6 +6,7 @@ import { toast } from '../../store/toastStore'
 import { useT } from '../../lib/i18n'
 import { useQuizStore } from '../../store/quizStore'
 import { useCreditsStore } from '../../store/creditsStore'
+import { upsell } from '../../store/upsellStore'
 import type { QuizConfig, RevisionAnalytics, RevisionTopic } from '../../types'
 import ConfirmDialog from '../UI/ConfirmDialog'
 import RevisionCard from './RevisionCard'
@@ -65,7 +66,9 @@ export default function TopicRevisionSection() {
         toast.info(t('revStudyFirstToast'))
         load() // refresh - its unlock time just hasn't arrived
       } else if (e instanceof ApiError && e.status === 402) {
-        toast.error(t('outOfCredits')) // out of credits for the re-test
+        // Out of credits for the re-test → force the buy decision.
+        const gate = (e.data ?? {}) as { cost?: number }
+        upsell.credits(gate.cost)
       } else {
         toast.error(t('loadQuestionsError'))
       }

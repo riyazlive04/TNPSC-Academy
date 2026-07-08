@@ -21,6 +21,7 @@ import {
 import { useQuiz } from '../hooks/useQuiz'
 import { useAuthStore } from '../store/authStore'
 import { useCreditsStore } from '../store/creditsStore'
+import { upsell } from '../store/upsellStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { api, ApiError } from '../lib/api'
 import { submitTest } from '../lib/submitTest'
@@ -158,17 +159,21 @@ export default function QuizPage() {
           // is out of credits. Both that and a stray mock_free_used point at the
           // upgrade path; anything else is a transport error.
           const err = e instanceof ApiError ? e : null
-          const reason =
+          const gate =
             err?.data && typeof err.data === 'object'
-              ? (err.data as { reason?: string }).reason
+              ? (err.data as { reason?: string; cost?: number })
               : undefined
+          const outOfCredits = err?.status === 402 && err.message === 'insufficient_credits'
           setLoadError(
-            err?.status === 402 && err.message === 'insufficient_credits'
+            outOfCredits
               ? t('outOfCredits')
-              : reason === 'mock_free_used'
+              : gate?.reason === 'mock_free_used'
                 ? t('mockFreeUsed')
                 : t('loadQuestionsError')
           )
+          // Force the buy decision: the inline error stays behind as context.
+          if (outOfCredits) upsell.credits(gate?.cost)
+          else if (gate?.reason === 'mock_free_used') upsell.premium()
           setLoading(false)
         }
       }

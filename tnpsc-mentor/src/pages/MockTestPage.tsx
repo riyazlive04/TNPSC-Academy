@@ -7,6 +7,7 @@ import PillSection from '../components/UI/PillSection'
 import PremiumCard from '../components/UI/PremiumCard'
 import { api } from '../lib/api'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
+import { upsell } from '../store/upsellStore'
 import { useT, type StringKey } from '../lib/i18n'
 import type { Difficulty, MockBlueprint, MockExam, QuizConfig } from '../types'
 
@@ -512,9 +513,12 @@ function FullMockExamTab() {
                       </span>
                     </div>
                   </div>
+                  {/* A locked (premium-only) exam stays tappable: the tap opens
+                      the forced upsell instead of silently doing nothing. Only
+                      the attempt-cap state is a true dead end. */}
                   <button
-                    onClick={() => !disabled && launch(e)}
-                    disabled={disabled}
+                    onClick={() => (e.locked ? upsell.premium() : !disabled && launch(e))}
+                    disabled={exhausted}
                     className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {exhausted ? t('examCompleted') : t('startExam')}

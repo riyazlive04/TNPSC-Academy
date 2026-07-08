@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, BookOpen, Clock, Copy, FileText, Flag, Maximize
 import AppLayout from '../components/Layout/AppLayout'
 import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
 import { useCreditsStore } from '../store/creditsStore'
+import { upsell } from '../store/upsellStore'
 import { mockBlueprint } from '../lib/constants'
 import { describeConfig } from '../lib/fetchQuestions'
 import { enterFullscreen } from '../lib/proctor'
@@ -46,6 +47,7 @@ export default function MockInstructionsPage() {
 
   // Free (credit-gated) learners confirm the per-question credit fee in a popup.
   const creditGated = useCreditsStore((s) => s.loaded && !s.unlimited)
+  const balance = useCreditsStore((s) => s.balance)
   const [creditPopup, setCreditPopup] = useState(false)
 
   const startMock = async () => {
@@ -60,6 +62,12 @@ export default function MockInstructionsPage() {
   const begin = () => {
     if (!agreed) return
     if (creditGated) {
+      // A full mock costs its question count in credits - if the balance can't
+      // cover it, push the upgrade instead of letting the server 402 later.
+      if (totalQ > 0 && balance < totalQ) {
+        upsell.credits(totalQ)
+        return
+      }
       setCreditPopup(true)
       return
     }

@@ -5,6 +5,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
 import { useCreditsStore } from '../store/creditsStore'
+import { upsell } from '../store/upsellStore'
 import { enterFullscreen } from '../lib/proctor'
 import { api } from '../lib/api'
 import { DEFAULT_QUESTIONS, describeConfig } from '../lib/fetchQuestions'
@@ -104,6 +105,7 @@ export default function QuizInstructionsPage() {
 
   // Free (credit-gated) learners confirm the per-question credit fee in a popup.
   const creditGated = useCreditsStore((s) => s.loaded && !s.unlimited)
+  const balance = useCreditsStore((s) => s.balance)
   const [creditPopup, setCreditPopup] = useState(false)
 
   const startQuiz = () => {
@@ -122,6 +124,12 @@ export default function QuizInstructionsPage() {
   const begin = () => {
     if (!agreed || noQuestions) return
     if (creditGated) {
+      // Can't afford this paper → straight to the upsell instead of letting the
+      // start bounce off the server's 402 later.
+      if (balance < count) {
+        upsell.credits(count)
+        return
+      }
       setCreditPopup(true)
       return
     }

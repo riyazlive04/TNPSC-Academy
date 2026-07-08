@@ -5,6 +5,7 @@ import AppLayout from '../components/Layout/AppLayout'
 import VettriCard from '../components/UI/VettriCard'
 import { api } from '../lib/api'
 import { useEntitlementsStore } from '../store/entitlementsStore'
+import { upsell } from '../store/upsellStore'
 import { useT } from '../lib/i18n'
 import type { QuizConfig, VettriExam } from '../types'
 
@@ -147,10 +148,11 @@ export default function VettriPage() {
                         </span>
                       </div>
                     </div>
+                    {/* Locked exams stay tappable: the tap opens the forced
+                        upsell (Vettri or Premium both unlock the arena). */}
                     <button
-                      onClick={() => !e.locked && launch(e)}
-                      disabled={e.locked}
-                      className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
+                      onClick={() => (e.locked ? upsell.bundle() : launch(e))}
+                      className="btn-brand shrink-0"
                     >
                       {t('startExam')}
                     </button>

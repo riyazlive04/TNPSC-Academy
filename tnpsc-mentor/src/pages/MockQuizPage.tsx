@@ -16,6 +16,7 @@ import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProct
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { useCreditsStore } from '../store/creditsStore'
+import { upsell } from '../store/upsellStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useT } from '../lib/i18n'
 import { optionLetters, displayOption } from '../types'
@@ -191,17 +192,21 @@ export default function MockQuizPage() {
           // Credit gate on the start endpoints: 402 out-of-credits, or a
           // 403 mock_free_used when a free learner already spent their 1 mock.
           const err = e instanceof ApiError ? e : null
-          const reason =
+          const gate =
             err?.data && typeof err.data === 'object'
-              ? (err.data as { reason?: string }).reason
+              ? (err.data as { reason?: string; cost?: number })
               : undefined
+          const outOfCredits = err?.status === 402 && err.message === 'insufficient_credits'
           setLoadError(
-            err?.status === 402 && err.message === 'insufficient_credits'
+            outOfCredits
               ? t('outOfCredits')
-              : reason === 'mock_free_used'
+              : gate?.reason === 'mock_free_used'
                 ? t('mockFreeUsed')
                 : t('loadQuestionsError')
           )
+          // Force the buy decision: the inline error stays behind as context.
+          if (outOfCredits) upsell.credits(gate?.cost)
+          else if (gate?.reason === 'mock_free_used') upsell.premium()
         }
       } finally {
         if (!cancelled) setLoading(false)

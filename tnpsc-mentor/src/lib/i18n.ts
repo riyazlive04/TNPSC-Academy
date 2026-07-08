@@ -156,6 +156,32 @@ const STRINGS = {
     en: 'bonus credits were added to your balance.',
     ta: 'போனஸ் கிரெடிட்கள் உங்கள் இருப்பில் சேர்க்கப்பட்டன.',
   },
+
+  // ─── Forced upsell (UpsellModal: out of credits / locked feature) ──────────
+  upsellCreditsTitle: { en: 'Out of credits', ta: 'கிரெடிட்கள் தீர்ந்துவிட்டன' },
+  upsellCreditsBody: {
+    en: 'Your credit balance can’t cover this test. Go unlimited with a plan below and never count credits again.',
+    ta: 'உங்கள் கிரெடிட் இருப்பு இந்தத் தேர்வுக்குப் போதவில்லை. கீழே உள்ள திட்டத்துடன் வரம்பில்லாப் பயிற்சிக்கு மாறுங்கள் - இனி கிரெடிட் கணக்கே தேவையில்லை.',
+  },
+  upsellCreditsNeed: {
+    en: 'This test needs {n} credits - you have {b}.',
+    ta: 'இந்தத் தேர்வுக்கு {n} கிரெடிட்கள் தேவை - உங்களிடம் {b} உள்ளன.',
+  },
+  upsellCreditsTomorrow: {
+    en: 'Or come back tomorrow: you get +10 free credits every day you log in.',
+    ta: 'அல்லது நாளை வாருங்கள்: உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்.',
+  },
+  upsellPremiumTitle: { en: 'This is a Premium feature', ta: 'இது பிரீமியம் அம்சம்' },
+  upsellPremiumBody: {
+    en: 'Full mock exams beyond your one free paper are part of the Premium plan. Upgrade to open every exam, unlimited.',
+    ta: 'உங்கள் ஒரு இலவசத் தாளுக்கு அப்பாற்பட்ட முழு மாதிரித் தேர்வுகள் பிரீமியம் திட்டத்தின் ஒரு பகுதி. எல்லா தேர்வுகளையும் வரம்பின்றி திறக்க மேம்படுத்துங்கள்.',
+  },
+  upsellBundleTitle: { en: 'Unlock with a plan', ta: 'திட்டத்துடன் திறக்கவும்' },
+  upsellBundleBody: {
+    en: 'This section opens with any paid plan - Vettri Nichayam or Premium. Pick the one that fits you below.',
+    ta: 'இந்தப் பிரிவு எந்தக் கட்டணத் திட்டத்திலும் திறக்கும் - வெற்றி நிச்சயம் அல்லது பிரீமியம். உங்களுக்கு ஏற்றதைக் கீழே தேர்ந்தெடுங்கள்.',
+  },
+  upsellLater: { en: 'Maybe later', ta: 'பிறகு பார்க்கலாம்' },
   howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
   howItWorksSub: { en: 'Replay the app tour', ta: 'செயலி சுற்றுப்பயணத்தை மீண்டும் பார்க்க' },
 

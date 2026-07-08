@@ -17,6 +17,7 @@ import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalytic
 import { api } from '../lib/api'
 import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
 import { useEntitlementsStore } from '../store/entitlementsStore'
+import { upsell } from '../store/upsellStore'
 import { useT } from '../lib/i18n'
 import type { Lang } from '../store/languageStore'
 import type { QuizConfig, TestSeriesItem } from '../types'
@@ -282,9 +283,14 @@ export default function TestSeriesPage() {
                         {t('testSeriesLockedPremium')}
                       </p>
                     )}
+                    {/* Bundle-locked papers stay tappable: the tap opens the
+                        forced upsell (any paid plan unlocks the series). Date
+                        locks and the attempt cap remain true dead ends. */}
                     <button
-                      onClick={() => !disabled && launch(tst)}
-                      disabled={disabled}
+                      onClick={() =>
+                        premiumLocked ? upsell.bundle() : !disabled && launch(tst)
+                      }
+                      disabled={exhausted || dateLocked}
                       className="btn-brand w-full whitespace-normal px-2 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-40 sm:px-5 sm:py-2.5 sm:text-sm"
                     >
                       {exhausted ? t('examCompleted') : t('startExam')}

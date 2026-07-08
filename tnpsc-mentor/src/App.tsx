@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Compass, Home } from 'lucide-react'
 import { useAuthStore } from './store/authStore'
 import { useThemeStore } from './store/themeStore'
+import { useUpsellStore } from './store/upsellStore'
 import { warmApi } from './lib/api'
 import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
@@ -17,6 +18,23 @@ import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
 import Toaster from './components/UI/Toaster'
 import Spinner from './components/UI/Spinner'
+
+// The forced-upsell overlay ships in its own chunk (it drags in the purchase
+// cards + Razorpay plumbing) and is only fetched the first time a paywall
+// actually opens it - never on app boot.
+const UpsellModal = lazy(() => import('./components/UI/UpsellModal'))
+
+/** Mounts the upsell chunk on demand: nothing rendered (or downloaded) until
+ * some gate calls upsell.credits()/premium()/bundle(). */
+function UpsellOutlet() {
+  const open = useUpsellStore((s) => s.open)
+  if (!open) return null
+  return (
+    <Suspense fallback={null}>
+      <UpsellModal />
+    </Suspense>
+  )
+}
 
 // Route-based code splitting: each page ships as its own chunk and is fetched
 // only when the user navigates to it, instead of bundling all ~30 pages into
@@ -143,6 +161,7 @@ export default function App() {
     <UpdatePrompt />
     <BackButtonGuard />
     <Toaster />
+    <UpsellOutlet />
     </>
   )
 }
