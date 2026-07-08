@@ -121,11 +121,11 @@ RegisterPage polls POST /api/telegram/status { token } every 3 s
 ```
 
 The register gate is untouched — a ticket is a ticket, whichever channel
-proved ownership. **Caveat since the AiSensy swap:** the UI used to offer
-Telegram when the send answered `phone_no_whatsapp`; that signal no longer
-exists (no lookup on the official API), so the fallback currently has no
-automatic trigger — if it's ever enabled, surface it as an always-visible
-"can't get the code?" option instead.
+proved ownership. **Trigger since the AiSensy swap:** the UI used to offer
+Telegram only when the send answered `phone_no_whatsapp`; that signal no
+longer exists (no lookup on the official API), so the code-entry step now
+shows an always-visible "Verify via Telegram instead" button (RegisterPage
+and CompleteProfilePage) whenever `VITE_SIGNUP_TG_VERIFY=true`.
 
 ### Telegram one-time setup
 

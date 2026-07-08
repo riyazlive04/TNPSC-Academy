@@ -401,6 +401,21 @@ export default function RegisterPage() {
                 {resendIn > 0 ? `${t('resendOtp')} (${resendIn}s)` : t('resendOtp')}
               </button>
             </div>
+
+            {/* Telegram fallback entry — the official WhatsApp API can't detect
+                numbers without WhatsApp up front, so the alternative is offered
+                right here on the code step instead of on a no-WhatsApp error. */}
+            {isTelegramVerifyConfigured && (
+              <button
+                type="button"
+                onClick={handleStartTelegram}
+                disabled={loading}
+                className="focus-ring mx-auto inline-flex items-center gap-1.5 rounded font-heading text-xs font-semibold text-accent transition hover:opacity-80 disabled:opacity-50"
+              >
+                <Send size={13} />
+                {t('tgOfferBtn')}
+              </button>
+            )}
           </form>
         ) : step === 'telegram' ? (
           /* Telegram fallback — waiting for the user to share their contact in
