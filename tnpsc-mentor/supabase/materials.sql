@@ -6,6 +6,10 @@
 --   • kind='video'    → a YouTube video (only the 11-char video id is stored).
 --   • kind='image' | 'pdf' | 'document' → a file uploaded to the private
 --     `materials` Storage bucket (storage_path/file_name/file_size/mime_type).
+--   • kind='magazine' → a published CA-magazine issue (no file; references the
+--     ca_magazine rows by magazine_ca_type + magazine_date — see
+--     ca_magazine_publish.sql). Approving an issue in the console inserts one
+--     of these; hiding/deleting it unpublishes without touching ca_magazine.
 --
 -- placement decides WHERE an item shows:
 --   • 'profile'   → on the Profile screen, below "How it works" (videos only).
@@ -26,7 +30,7 @@
 create table if not exists public.materials (
   id           uuid primary key default gen_random_uuid(),
   kind         text not null default 'video'
-                 check (kind in ('video', 'image', 'pdf', 'document')),
+                 check (kind in ('video', 'image', 'pdf', 'document', 'magazine')),
   placement    text not null default 'materials'
                  check (placement in ('materials', 'profile')),
   title        text not null,
@@ -39,6 +43,9 @@ create table if not exists public.materials (
   file_name    text,
   file_size    bigint not null default 0,
   mime_type    text,
+  -- kind='magazine': the published ca_magazine issue (soft reference)
+  magazine_ca_type text check (magazine_ca_type in ('day_wise', 'month_wise')),
+  magazine_date date,
   -- per-item download gate (superadmin enables); viewing is always allowed
   downloadable boolean not null default false,
   active       boolean not null default true,   -- hidden from users when false
@@ -51,6 +58,11 @@ create table if not exists public.materials (
 -- then created_at desc.
 create index if not exists materials_placement_idx
   on public.materials (placement, active, sort_order asc, created_at desc);
+
+-- A magazine issue can be published at most once.
+create unique index if not exists materials_magazine_issue_key
+  on public.materials (magazine_ca_type, magazine_date)
+  where kind = 'magazine';
 
 -- Lock the table: RLS on, no policies → only the service-role client (server)
 -- can touch it. Clients always read through /api/materials.

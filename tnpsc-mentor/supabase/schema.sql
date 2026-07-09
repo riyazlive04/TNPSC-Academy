@@ -74,6 +74,11 @@ alter table questions add column if not exists question_type text;
 -- Useful for deduplication and cross-referencing against source files.
 alter table questions add column if not exists external_id text;
 
+-- UNIQUE so the CA generator's REST upsert (POST ?on_conflict=external_id with
+-- resolution=ignore-duplicates) can dedupe on it. Applied to prod 2026-07-08
+-- (as CREATE UNIQUE INDEX CONCURRENTLY). NULLs are unaffected (older banks).
+create unique index if not exists questions_external_id_key on questions(external_id);
+
 -- Indexes for fast filtering
 create index if not exists idx_questions_category on questions(category);
 create index if not exists idx_questions_group_type on questions(group_type);

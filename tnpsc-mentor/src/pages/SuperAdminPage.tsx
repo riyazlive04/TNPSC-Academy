@@ -46,6 +46,8 @@ import {
   Trophy,
   TrendingDown,
   Coins,
+  Newspaper,
+  CheckCircle2,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -65,19 +67,24 @@ import {
   type NotificationAudience,
   type NotificationKind,
   type AdminAlert,
+  type AlertKind,
   type DeviceSession,
   type AppRelease,
   type Material,
   type MaterialKind,
   type MaterialPlacement,
+  type CaMagazineIssue,
   type UserInsights,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
+import { issueDateLabel } from '../lib/caMagazine'
+import { ALERT_KIND, ALERT_KINDS, alertKindOf } from '../lib/alertKinds'
+import MagazineEditor from '../components/Materials/MagazineEditor'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -96,6 +103,7 @@ export default function SuperAdminPage() {
     { id: 'testseries', label: 'testSeriesTab', icon: CalendarDays },
     { id: 'vettri', label: 'vettriTab', icon: Trophy },
     { id: 'materials', label: 'materialsTab', icon: Library },
+    { id: 'camagazine', label: 'caMagazineTab', icon: Newspaper },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
@@ -146,6 +154,7 @@ export default function SuperAdminPage() {
           {tab === 'testseries' && <TestSeriesTab />}
           {tab === 'vettri' && <VettriExamsTab />}
           {tab === 'materials' && <MaterialsTab />}
+          {tab === 'camagazine' && <CaMagazineTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
       </div>
@@ -1057,6 +1066,31 @@ const SECTION_LABELS: Record<string, string> = {
 const sectionLabel = (c: string) => SECTION_LABELS[c] ?? c
 
 /** Accuracy → traffic-light tone: the at-a-glance weakness signal. */
+/** Human label for the profile's UI-language preference. */
+function languageLabel(lang: 'en' | 'ta' | 'both' | null): string {
+  if (lang === 'en') return 'English'
+  if (lang === 'ta') return 'Tamil (தமிழ்)'
+  if (lang === 'both') return 'Both (EN + தமிழ்)'
+  return 'Not set'
+}
+
+/** "12 Oct 2026 · in 94d" (or overdue) for the profile's exam-date goal. */
+function examDateLabel(iso: string | null): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  const days = Math.ceil((d.getTime() - Date.now()) / 86_400_000)
+  const when = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+  return days >= 0 ? `${when} · in ${days}d` : `${when} · passed`
+}
+
+/** Human label for a payments-ledger plan id. */
+function planLabel(plan: string | null): string {
+  if (plan === 'premium_annual') return 'Premium'
+  if (plan === 'vettri_nichayam') return 'Vettri (full)'
+  if (plan === 'vettri_month') return 'Vettri (monthly)'
+  return plan ?? '—'
+}
+
 function accuracyTone(acc: number | null): { text: string; bar: string } {
   if (acc === null) return { text: 'text-ink2', bar: 'bg-ink2/40' }
   if (acc < 50) return { text: 'text-coral', bar: 'bg-coral' }
@@ -1298,9 +1332,9 @@ function UserDetailModal({
           })}
         </div>
 
-        {/* ── Activity / weakness / credits (superadmin_user_insights RPC) ── */}
+        {/* ── Targeting / activity / weakness / credits (superadmin_user_insights RPC) ── */}
         <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
-          Activity
+          Insights
         </h3>
         {insightsLoading ? (
           <div className="space-y-2">
@@ -1313,6 +1347,86 @@ function UserDetailModal({
           </p>
         ) : (
           <>
+            {/* Reach & targeting: how to segment this user and which channels
+                can actually deliver to them. */}
+            {insights.targeting && (
+              <>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <DetailItem label="App language" value={languageLabel(insights.targeting.language)} />
+                  <DetailItem
+                    label="Gender"
+                    value={
+                      insights.targeting.gender
+                        ? insights.targeting.gender[0].toUpperCase() + insights.targeting.gender.slice(1)
+                        : '—'
+                    }
+                  />
+                  <DetailItem label="Exam date" value={examDateLabel(insights.targeting.exam_date)} />
+                  <DetailItem
+                    label="Daily goal"
+                    value={
+                      insights.targeting.daily_goal != null
+                        ? `${insights.targeting.daily_goal} questions`
+                        : '—'
+                    }
+                  />
+                  <DetailItem
+                    label="Streak / active days 30d"
+                    value={`${insights.targeting.streak} / ${insights.targeting.active_days_30d}`}
+                  />
+                  <DetailItem
+                    label="Last login"
+                    value={
+                      insights.targeting.last_login_at
+                        ? relativeTime(insights.targeting.last_login_at)
+                        : 'Never'
+                    }
+                  />
+                  <DetailItem
+                    label="Push reachable"
+                    value={
+                      insights.targeting.push_devices > 0
+                        ? `Yes · ${insights.targeting.push_devices} device${insights.targeting.push_devices === 1 ? '' : 's'}`
+                        : 'No (in-app only)'
+                    }
+                  />
+                  <DetailItem
+                    label="Lifetime spend"
+                    value={`₹${insights.targeting.payments.lifetime_rupees.toLocaleString()} · ${insights.targeting.payments.orders} order${insights.targeting.payments.orders === 1 ? '' : 's'}`}
+                  />
+                  <DetailItem label="Last plan" value={planLabel(insights.targeting.payments.last_plan)} />
+                  <DetailItem
+                    label="Feedback / error reports"
+                    value={`${insights.targeting.feedback_count} / ${insights.targeting.report_count}`}
+                  />
+                  <DetailItem
+                    label="Bookmarks / revision due"
+                    value={`${insights.targeting.bookmark_count} / ${insights.targeting.revision_pending}`}
+                  />
+                  <DetailItem
+                    label="Questions seen"
+                    value={insights.targeting.seen_questions.toLocaleString()}
+                  />
+                </div>
+                {insights.targeting.devices.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {insights.targeting.devices.map((d, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-[11px] font-semibold text-ink2"
+                      >
+                        <MonitorSmartphone size={12} /> {d.label || 'Unknown device'} ·{' '}
+                        {relativeTime(d.last_seen_at)}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              Activity
+            </h3>
             <div className="grid grid-cols-2 gap-2.5">
               <DetailItem
                 label="Study time"
@@ -2443,6 +2557,8 @@ const GROUP_OPTIONS: { value: string; label: string }[] = [
 const EMPTY_NOTIF_FORM = {
   title: '',
   body: '',
+  titleTa: '',
+  bodyTa: '',
   url: '',
   audience: 'all' as NotificationAudience,
   audienceValue: 'Group1',
@@ -2483,6 +2599,8 @@ function NotificationsTab() {
         kind: sub,
         title,
         body,
+        titleTa: form.titleTa.trim() || null,
+        bodyTa: form.bodyTa.trim() || null,
         url: form.url.trim() || null,
         audience: form.audience,
         audienceValue: form.audience === 'group' ? form.audienceValue : null,
@@ -2593,6 +2711,36 @@ function NotificationsTab() {
             maxLength={500}
           />
         </Field>
+
+        {/* Bilingual variant — delivered by the user's chosen app language:
+            Tamil users get this copy, "both" users see English + Tamil, and
+            English users always get the fields above. Blank = English to all. */}
+        <div className="rounded-card border border-dashed border-line bg-tint/40 p-3.5">
+          <p className="mb-2.5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            Tamil version (optional) — sent to users whose app language is Tamil
+          </p>
+          <div className="space-y-3">
+            <Field label="Title (Tamil)">
+              <input
+                className={COUPON_INPUT}
+                value={form.titleTa}
+                onChange={(e) => set('titleTa', e.target.value)}
+                placeholder="எ.கா. புதிய மாதிரித் தேர்வு சேர்க்கப்பட்டது"
+                maxLength={120}
+              />
+            </Field>
+            <Field label="Message (Tamil)">
+              <textarea
+                className={COUPON_INPUT + ' min-h-[80px] resize-y'}
+                value={form.bodyTa}
+                onChange={(e) => set('bodyTa', e.target.value)}
+                placeholder="அறிவிப்பு செய்தியை தமிழில் எழுதுங்கள்…"
+                maxLength={500}
+              />
+            </Field>
+          </div>
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Link (optional)">
             <input
@@ -2670,6 +2818,7 @@ function NotificationsTab() {
                   <p className="line-clamp-2 font-body text-xs text-ink2">{n.body}</p>
                   <p className="mt-1 font-body text-[11px] text-ink2/80">
                     {n.kind === 'push' ? 'Push' : 'System'} · {audienceLabel(n)}
+                    {(n.title_ta || n.body_ta) && ' · EN+TA'}
                     {n.kind === 'push' ? ` · ${n.push_sent} sent` : ''} ·{' '}
                     {new Date(n.created_at).toLocaleDateString()}
                   </p>
@@ -2710,6 +2859,7 @@ function NotificationsTab() {
 // side), so unlike notifications these interrupt — reserve them for things every
 // user must see (downtime, exam-date changes, new-feature launches).
 const EMPTY_ALERT_FORM = {
+  kind: 'info' as AlertKind,
   title: '',
   body: '',
   titleTa: '',
@@ -2721,6 +2871,7 @@ const EMPTY_ALERT_FORM = {
 }
 
 function AlertsPanel() {
+  const { t } = useT()
   const [form, setForm] = useState(EMPTY_ALERT_FORM)
   const [sending, setSending] = useState(false)
   const [list, setList] = useState<AdminAlert[]>([])
@@ -2741,6 +2892,7 @@ function AlertsPanel() {
   useEffect(load, [])
 
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }))
+  const setKind = (k: AlertKind) => setForm((f) => ({ ...f, kind: k }))
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -2752,6 +2904,7 @@ function AlertsPanel() {
     setSending(true)
     try {
       await api.alerts.create({
+        kind: form.kind,
         title,
         body,
         titleTa: form.titleTa.trim() || null,
@@ -2811,18 +2964,48 @@ function AlertsPanel() {
     <div className="space-y-6">
       {/* Composer */}
       <form onSubmit={submit} className="card space-y-4 p-5">
-        <div className="flex items-start gap-2">
-          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-            <AlertTriangle size={18} />
-          </span>
-          <div>
-            <h2 className="font-heading text-sm font-semibold text-ink">Publish a popup alert</h2>
-            <p className="font-body text-xs text-ink2">
-              Shown as a popup when a user opens the app, until they tap “Got it” (once per
-              account). Use for must-see announcements only.
-            </p>
+        {(() => {
+          const cfg = ALERT_KIND[form.kind]
+          const HeadIcon = cfg.icon
+          return (
+            <div className="flex items-start gap-2">
+              <span className={`grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg ${cfg.badge}`}>
+                <HeadIcon size={18} />
+              </span>
+              <div>
+                <h2 className="font-heading text-sm font-semibold text-ink">Publish a popup announcement</h2>
+                <p className="font-body text-xs text-ink2">
+                  Shown as a popup when a user opens the app, until they tap “Got it” (once per
+                  account). Pick a type so it reads right — info, alert, update or good news.
+                </p>
+              </div>
+            </div>
+          )
+        })()}
+
+        <Field label="Type">
+          <div className="flex flex-wrap gap-2">
+            {ALERT_KINDS.map((k) => {
+              const cfg = ALERT_KIND[k]
+              const Icon = cfg.icon
+              const active = form.kind === k
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setKind(k)}
+                  className={`press tamil inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-heading text-xs font-semibold transition ${
+                    active
+                      ? 'border-brand bg-brand text-white'
+                      : 'border-line bg-card text-ink2 hover:border-brand-ring hover:text-ink'
+                  }`}
+                >
+                  <Icon size={14} /> {t(cfg.labelKey)}
+                </button>
+              )
+            })}
           </div>
-        </div>
+        </Field>
 
         <Field label="Title *">
           <input
@@ -2929,7 +3112,11 @@ function AlertsPanel() {
           <p className="py-10 text-center font-body text-ink2">No alerts published yet.</p>
         ) : (
           <div className="space-y-2">
-            {list.map((a, i) => (
+            {list.map((a, i) => {
+              const cfg = ALERT_KIND[alertKindOf(a.kind)]
+              const RowIcon = cfg.icon
+              const live = a.active && !expired(a)
+              return (
               <div
                 key={a.id}
                 style={{ '--i': i } as React.CSSProperties}
@@ -2937,10 +3124,10 @@ function AlertsPanel() {
               >
                 <span
                   className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg ${
-                    a.active && !expired(a) ? 'bg-brand-soft text-brand' : 'bg-tint text-ink2'
+                    live ? cfg.badge : 'bg-tint text-ink2'
                   }`}
                 >
-                  <AlertTriangle size={18} />
+                  <RowIcon size={18} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-heading text-sm font-semibold text-ink">
@@ -2958,6 +3145,9 @@ function AlertsPanel() {
                   </p>
                   <p className="line-clamp-2 font-body text-xs text-ink2">{a.body}</p>
                   <p className="mt-1 font-body text-[11px] text-ink2/80">
+                    <span className={`mr-0.5 rounded px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide ${cfg.chip}`}>
+                      {t(cfg.labelKey)}
+                    </span>{' '}
                     {audienceLabel(a)} · seen by {a.dismissed_count} ·{' '}
                     {new Date(a.created_at).toLocaleDateString()}
                     {a.expires_at ? ` · until ${new Date(a.expires_at).toLocaleString()}` : ''}
@@ -2982,7 +3172,8 @@ function AlertsPanel() {
                   <Trash2 size={15} />
                 </button>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -3319,6 +3510,7 @@ const MATERIAL_KIND_ICON: Record<MaterialKind, typeof Video> = {
   image: ImageIcon,
   pdf: FileText,
   document: FileText,
+  magazine: Newspaper,
 }
 
 const EMPTY_VIDEO_FORM = {
@@ -3565,7 +3757,7 @@ function MaterialsTab() {
           <div className="space-y-2">
             {list.map((m, i) => {
               const Icon = MATERIAL_KIND_ICON[m.kind]
-              const isFile = m.kind !== 'video'
+              const isFile = m.kind === 'image' || m.kind === 'pdf' || m.kind === 'document'
               return (
                 <div key={m.id} style={{ '--i': i } as React.CSSProperties} className="card stagger-item flex items-center gap-3 p-3">
                   {/* Thumb / icon */}
@@ -3656,6 +3848,221 @@ function MaterialsTab() {
         tone="danger"
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
+      />
+    </div>
+  )
+}
+
+// ─── CA Magazine (pipeline-pushed issues → approve into Materials) ─────────────
+// The VPS pipeline drops daily/monthly magazine issues into ca_magazine every
+// morning. Nothing reaches students until an issue is approved here — approval
+// creates a kind='magazine' materials row, so Hide/Remove below (and the
+// Materials tab) unpublish without touching the pipeline data.
+function CaMagazineTab() {
+  const [issues, setIssues] = useState<CaMagazineIssue[] | null>(null)
+  const [error, setError] = useState(false)
+  const [busyKey, setBusyKey] = useState<string | null>(null)
+  const [preview, setPreview] = useState<CaMagazineIssue | null>(null)
+  const [pendingRemove, setPendingRemove] = useState<CaMagazineIssue | null>(null)
+
+  const load = () => {
+    setError(false)
+    setIssues(null)
+    api.caMagazine
+      .adminIssues()
+      .then(setIssues)
+      .catch(() => setError(true))
+  }
+  useEffect(load, [])
+
+  const keyOf = (i: CaMagazineIssue) => `${i.ca_type}|${i.date}`
+  const patchIssue = (issue: CaMagazineIssue, material: CaMagazineIssue['material']) =>
+    setIssues((prev) => prev?.map((x) => (keyOf(x) === keyOf(issue) ? { ...x, material } : x)) ?? prev)
+
+  const approve = async (issue: CaMagazineIssue) => {
+    setBusyKey(keyOf(issue))
+    try {
+      const material = await api.caMagazine.publish(issue.ca_type, issue.date)
+      patchIssue(issue, { id: material.id, active: material.active })
+      toast.success('Approved — the issue is now live in the Materials tab.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not publish the issue.')
+    } finally {
+      setBusyKey(null)
+    }
+  }
+
+  const toggleVisible = async (issue: CaMagazineIssue) => {
+    if (!issue.material) return
+    setBusyKey(keyOf(issue))
+    try {
+      const updated = await api.materials.update(issue.material.id, { active: !issue.material.active })
+      patchIssue(issue, { id: updated.id, active: updated.active })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update.')
+    } finally {
+      setBusyKey(null)
+    }
+  }
+
+  const confirmRemove = async () => {
+    if (!pendingRemove?.material) return
+    try {
+      await api.materials.remove(pendingRemove.material.id)
+      patchIssue(pendingRemove, null)
+      toast.success('Unpublished — the issue is back to pending review.')
+      setPendingRemove(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not unpublish.')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="card flex items-start gap-3 p-5">
+        <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <Newspaper size={18} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">Current-affairs magazine issues</h2>
+          <p className="font-body text-xs text-ink2">
+            The pipeline pushes a daily issue every morning (and a monthly compilation on the 1st). Preview an
+            issue, then approve it to publish it in the students' Materials tab. Hide or remove a published
+            issue to take it down — the underlying data is never deleted.
+          </p>
+        </div>
+      </div>
+
+      {issues === null && !error && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton h-16 w-full" />
+          ))}
+        </div>
+      )}
+
+      {error && <ErrorState onRetry={load} />}
+
+      {issues !== null && issues.length === 0 && (
+        <p className="py-10 text-center font-body text-ink2">
+          No magazine issues have arrived yet. The pipeline pushes the first one at ~06:00 IST.
+        </p>
+      )}
+
+      {issues !== null && issues.length > 0 && (
+        <div className="space-y-2">
+          {issues.map((issue, i) => {
+            const busy = busyKey === keyOf(issue)
+            const daily = issue.ca_type === 'day_wise'
+            return (
+              <div
+                key={keyOf(issue)}
+                style={{ '--i': i } as React.CSSProperties}
+                className="card stagger-item flex items-center gap-3 p-3"
+              >
+                <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+                  <Newspaper size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {issueDateLabel(issue.ca_type, issue.date)}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                      {daily ? 'Daily' : 'Monthly'}
+                    </span>
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                      {issue.items} items
+                    </span>
+                    {issue.material ? (
+                      issue.material.active ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                          <CheckCircle2 size={10} /> Live
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                          Hidden
+                        </span>
+                      )
+                    ) : (
+                      <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                        Pending review
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-shrink-0 items-center gap-1">
+                  <button
+                    onClick={() => setPreview(issue)}
+                    className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
+                    title="Open — view / edit / add content"
+                  >
+                    <Search size={15} />
+                  </button>
+                  {issue.material ? (
+                    <>
+                      <button
+                        onClick={() => toggleVisible(issue)}
+                        disabled={busy}
+                        className={`grid h-8 w-8 place-items-center rounded-lg transition disabled:opacity-50 ${
+                          issue.material.active ? 'text-mint hover:bg-mintsoft' : 'text-ink2 hover:bg-tint hover:text-ink'
+                        }`}
+                        title={issue.material.active ? 'Visible — click to hide' : 'Hidden — click to show'}
+                      >
+                        {issue.material.active ? <Eye size={15} /> : <EyeOff size={15} />}
+                      </button>
+                      <button
+                        onClick={() => setPendingRemove(issue)}
+                        className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral"
+                        title="Unpublish (remove from Materials)"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => approve(issue)}
+                      disabled={busy}
+                      className="btn-brand press px-3 py-1.5 text-xs disabled:opacity-60"
+                    >
+                      {busy ? <Spinner size={14} /> : <CheckCircle2 size={14} />} Approve
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {preview && (
+        <MagazineEditor
+          issue={preview}
+          onClose={() => setPreview(null)}
+          onCountChange={(count) =>
+            setIssues(
+              (prev) =>
+                prev?.map((x) =>
+                  x.ca_type === preview.ca_type && x.date === preview.date ? { ...x, items: count } : x
+                ) ?? prev
+            )
+          }
+        />
+      )}
+
+      <ConfirmDialog
+        open={!!pendingRemove}
+        title="Unpublish this issue?"
+        message={
+          pendingRemove
+            ? `Remove "${issueDateLabel(pendingRemove.ca_type, pendingRemove.date)}" from the Materials tab? The magazine data stays and you can approve it again later.`
+            : ''
+        }
+        confirmLabel="Unpublish"
+        cancelLabel="Cancel"
+        tone="danger"
+        onConfirm={confirmRemove}
+        onCancel={() => setPendingRemove(null)}
       />
     </div>
   )

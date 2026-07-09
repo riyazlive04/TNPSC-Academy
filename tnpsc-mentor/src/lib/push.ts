@@ -21,6 +21,23 @@ export function pushPermission(): NotificationPermission {
   return isPushSupported() ? Notification.permission : 'denied'
 }
 
+/**
+ * Is THIS browser currently receiving pushes — i.e. does it hold a live
+ * PushManager subscription? Distinct from pushPermission(): a user can have
+ * granted permission yet have unsubscribed (disabled) on this device. Drives
+ * the Profile enable/disable toggle. Never throws.
+ */
+export async function isPushSubscribed(): Promise<boolean> {
+  if (!isPushSupported()) return false
+  try {
+    const reg = await registerServiceWorker()
+    if (!reg) return false
+    return (await reg.pushManager.getSubscription()) != null
+  } catch {
+    return false
+  }
+}
+
 // VAPID keys travel as URL-safe base64; PushManager wants an ArrayBuffer-backed
 // view. Allocate the ArrayBuffer explicitly so the type is exactly
 // Uint8Array<ArrayBuffer> (not the wider ArrayBufferLike the DOM types reject).

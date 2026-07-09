@@ -16,6 +16,11 @@
 -- ─── Alerts (superadmin-authored) ────────────────────────────────────────────
 create table if not exists public.app_alerts (
   id           uuid default uuid_generate_v4() primary key,
+  -- Type of announcement — drives the popup's icon / colour / label.
+  -- 'info' (default) | 'alert' (important) | 'update' (new feature) | 'success'.
+  -- Added later via alert_kinds.sql; kept here so fresh installs match.
+  kind         text not null default 'info'
+                 check (kind in ('info', 'alert', 'update', 'success')),
   title        text not null,
   body         text not null,
   -- Optional Tamil copy: shown when the learner's language is 'ta' (or 'both').

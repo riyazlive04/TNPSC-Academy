@@ -134,7 +134,7 @@ router.get(
       premiumUserIds(),
       supabaseAdmin
         .from('notifications')
-        .select('id, kind, title, body, url, audience, audience_value, target_user_id, created_at')
+        .select('id, kind, title, body, title_ta, body_ta, url, audience, audience_value, target_user_id, created_at')
         // Broadcasts (target_user_id null) + this user's own targeted messages.
         // (req.userId is a verified-JWT UUID, safe to interpolate.)
         .or(`target_user_id.is.null,target_user_id.eq.${req.userId}`)
@@ -164,6 +164,10 @@ router.get(
         kind: n.kind as 'push' | 'system',
         title: n.title as string,
         body: n.body as string,
+        // Tamil variants (when authored): the bell renders by the user's LIVE
+        // language choice, so both ship and the client picks.
+        title_ta: (n.title_ta as string | null) ?? null,
+        body_ta: (n.body_ta as string | null) ?? null,
         url: (n.url as string | null) ?? null,
         created_at: n.created_at as string,
         read: readSet.has(n.id as string),
@@ -234,6 +238,10 @@ router.post(
     const kind = req.body?.kind === 'system' ? 'system' : 'push'
     const title = String(req.body?.title ?? '').trim()
     const body = String(req.body?.body ?? '').trim()
+    // Optional Tamil variants (mirrors alerts.ts): Tamil-language users receive
+    // these; blank = English goes to everyone, as before.
+    const titleTa = String(req.body?.titleTa ?? '').trim() || null
+    const bodyTa = String(req.body?.bodyTa ?? '').trim() || null
     const url = req.body?.url ? String(req.body.url).trim() : null
     const audience = ['all', 'premium', 'free', 'group'].includes(req.body?.audience)
       ? (req.body.audience as string)
@@ -247,7 +255,17 @@ router.post(
 
     const { data: row, error } = await supabaseAdmin
       .from('notifications')
-      .insert({ kind, title, body, url, audience, audience_value: audienceValue, created_by: req.userId })
+      .insert({
+        kind,
+        title,
+        body,
+        title_ta: titleTa,
+        body_ta: bodyTa,
+        url,
+        audience,
+        audience_value: audienceValue,
+        created_by: req.userId,
+      })
       .select('*')
       .single()
     if (error) return sendDbError(res, error)
@@ -255,7 +273,14 @@ router.post(
     let pushSent = 0
     if (kind === 'push' && pushEnabled) {
       const targets = await audienceUserIds(audience, audienceValue)
-      pushSent = await sendPushTo(targets, { id: row.id as string, title, body, url })
+      pushSent = await sendPushTo(targets, {
+        id: row.id as string,
+        title,
+        body,
+        title_ta: titleTa,
+        body_ta: bodyTa,
+        url,
+      })
       await supabaseAdmin.from('notifications').update({ push_sent: pushSent }).eq('id', row.id)
     }
 

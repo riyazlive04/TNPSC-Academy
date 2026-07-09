@@ -60,9 +60,12 @@ const ApkUrlContext = createContext<string | null>(null)
 // hit when sideloading) before the APK actually downloads. Every download CTA on
 // the page routes its click through this so nobody is surprised by the warning.
 const DownloadIntentContext = createContext<() => void>(() => {})
-// Sign-in from the landing page goes to the hosted web app, not the in-page
-// router (the app lives on its own subdomain).
-const APP_URL = 'https://app.tnpscmentors.in'
+// Sign-in from the landing page stays on the MAIN domain (the same SPA build
+// serves both the landing and the app there). API calls still target the app
+// subdomain (VITE_API_URL) — cross-origin from here, allowed by CORS, and the
+// refresh cookie works because it is SameSite=None and always sent to the API
+// host, not the page origin.
+const APP_URL = 'https://tnpscmentors.in'
 const APP_LOGIN_URL = `${APP_URL}/login`
 const APP_REGISTER_URL = `${APP_URL}/register`
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
@@ -413,15 +416,15 @@ const PLATFORMS: {
     icon: Smartphone,
     tint: TINTS[1], // coral
     action: 'web',
-    ta: { t: 'iPhone', d: 'iOS app விரைவில். இப்போதைக்கு Safari Browser-ல app.tnpscmentors.in திறந்து "Add to Home Screen" பண்ணுங்க - app மாதிரியே வேலை செய்யும்.' },
-    en: { t: 'iPhone', d: 'iOS app is coming soon. For now open app.tnpscmentors.in in Safari and "Add to Home Screen" - it behaves just like the app.' },
+    ta: { t: 'iPhone', d: 'iOS app விரைவில். இப்போதைக்கு Safari Browser-ல tnpscmentors.in திறந்து "Add to Home Screen" பண்ணுங்க - app மாதிரியே வேலை செய்யும்.' },
+    en: { t: 'iPhone', d: 'iOS app is coming soon. For now open tnpscmentors.in in Safari and "Add to Home Screen" - it behaves just like the app.' },
   },
   {
     icon: Laptop,
     tint: TINTS[2], // blue
     action: 'web',
-    ta: { t: 'Laptop & Desktop', d: 'Chrome, Edge அல்லது எந்த browser-லயும் app.tnpscmentors.in திறங்க - பெரிய திரையில முழு அனுபவம்.' },
-    en: { t: 'Laptop & Desktop', d: 'Open app.tnpscmentors.in in Chrome, Edge or any browser - the full experience on a big screen.' },
+    ta: { t: 'Laptop & Desktop', d: 'Chrome, Edge அல்லது எந்த browser-லயும் tnpscmentors.in திறங்க - பெரிய திரையில முழு அனுபவம்.' },
+    en: { t: 'Laptop & Desktop', d: 'Open tnpscmentors.in in Chrome, Edge or any browser - the full experience on a big screen.' },
   },
   {
     icon: Tablet,

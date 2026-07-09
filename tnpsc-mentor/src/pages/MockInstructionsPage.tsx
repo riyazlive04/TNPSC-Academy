@@ -61,7 +61,10 @@ export default function MockInstructionsPage() {
 
   const begin = () => {
     if (!agreed) return
-    if (creditGated) {
+    // Test Marathon papers never charge credits: a free learner can only reach
+    // this screen with the free-tier trial paper (paid ones are server-locked),
+    // and bundle owners are unlimited - so no credit pre-flight for 'series'.
+    if (creditGated && config.mockKind !== 'series') {
       // A full mock costs its question count in credits - if the balance can't
       // cover it, push the upgrade instead of letting the server 402 later.
       if (totalQ > 0 && balance < totalQ) {

@@ -21,12 +21,17 @@ interface OnboardingState {
   pending: boolean
   /** Starter-test prompt pending: shown before the tour; cleared once answered. */
   testPrompt: boolean
+  /** "Test Marathon Test 1 is FREE" promo alert: shown once after the test
+   *  prompt + tour have both resolved; cleared once answered. */
+  marathonAlert: boolean
   /** Transient - whether the tour overlay is currently visible. */
   open: boolean
   /** Mark a newly created account so the test prompt + tour fire on first dashboard view. */
   arm: () => void
   /** Consume the test prompt (the user started the Starter Challenge or skipped it). */
   consumeTestPrompt: () => void
+  /** Consume the marathon promo alert (CTA tapped or dismissed). */
+  consumeMarathonAlert: () => void
   /** Consume the pending flag and open the tour (called by the dashboard). */
   start: () => void
   /** Re-open the tour manually (e.g. from the profile's "How it works" row). */
@@ -40,9 +45,11 @@ export const useOnboardingStore = create<OnboardingState>()(
     (set) => ({
       pending: false,
       testPrompt: false,
+      marathonAlert: false,
       open: false,
-      arm: () => set({ pending: true, testPrompt: true }),
+      arm: () => set({ pending: true, testPrompt: true, marathonAlert: true }),
       consumeTestPrompt: () => set({ testPrompt: false }),
+      consumeMarathonAlert: () => set({ marathonAlert: false }),
       start: () => set({ open: true, pending: false }),
       replay: () => set({ open: true }),
       finish: () => set({ open: false }),
@@ -50,7 +57,11 @@ export const useOnboardingStore = create<OnboardingState>()(
     {
       name: 'tnpsc-mentor-onboarding',
       // Only the "new account" intent persists; `open` is transient UI state.
-      partialize: (s) => ({ pending: s.pending, testPrompt: s.testPrompt }),
+      partialize: (s) => ({
+        pending: s.pending,
+        testPrompt: s.testPrompt,
+        marathonAlert: s.marathonAlert,
+      }),
     }
   )
 )

@@ -434,6 +434,15 @@ export const api = {
     })
     return data.count
   },
+  /** Months available in the CA bank (chronological) with question counts —
+   *  sources the /current-affairs month picker from the DB so a new month
+   *  appears without a redeploy. */
+  async caMonths(): Promise<{ label: string; year: number; count: number }[]> {
+    const data = await request<{ months: { label: string; year: number; count: number }[] }>(
+      '/api/questions/ca-months'
+    )
+    return data.months
+  },
   async submitTest(session: Record<string, unknown>, answers: unknown[]): Promise<SubmitResult> {
     return request<SubmitResult>('/api/tests/submit', {
       method: 'POST',
@@ -1013,6 +1022,68 @@ export const api = {
     },
   },
 
+  // ─── CA Magazine (pipeline-pushed daily/monthly issues) ────────────────────
+  // Superadmins review issues and "publish" one, which creates a kind='magazine'
+  // materials row; students read items through that row (hide/delete it via
+  // api.materials to unpublish).
+  caMagazine: {
+    /** Items of a PUBLISHED issue, addressed by its materials row id. */
+    async items(materialId: string): Promise<CaMagazineItem[]> {
+      const data = await request<{ items: CaMagazineItem[] }>(`/api/ca-magazine/${materialId}/items`)
+      return data.items
+    },
+    /** Superadmin: every pushed issue with item count + publication state. */
+    async adminIssues(): Promise<CaMagazineIssue[]> {
+      const data = await request<{ issues: CaMagazineIssue[] }>('/api/ca-magazine/admin/issues')
+      return data.issues
+    },
+    /** Superadmin: preview an issue's items before approving it. */
+    async adminItems(caType: CaMagazineType, date: string): Promise<CaMagazineItem[]> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const data = await request<{ items: CaMagazineItem[] }>(`/api/ca-magazine/admin/items?${qs.toString()}`)
+      return data.items
+    },
+    /** Superadmin: approve an issue → it appears in the Materials tab. */
+    async publish(caType: CaMagazineType, date: string): Promise<Material> {
+      const data = await request<{ material: Material }>('/api/ca-magazine/admin/publish', {
+        method: 'POST',
+        body: { ca_type: caType, date },
+      })
+      return data.material
+    },
+    /** Superadmin: add a new item to an issue. */
+    async adminAddItem(input: {
+      ca_type: CaMagazineType
+      date: string
+      topic: string
+      title: string
+      content: string
+      title_ta?: string | null
+      content_ta?: string | null
+    }): Promise<CaMagazineItem> {
+      const data = await request<{ item: CaMagazineItem }>('/api/ca-magazine/admin/items', {
+        method: 'POST',
+        body: input,
+      })
+      return data.item
+    },
+    /** Superadmin: edit an item's section/title/content (either language). */
+    async adminUpdateItem(
+      id: string,
+      patch: Partial<Pick<CaMagazineItem, 'topic' | 'title' | 'title_ta' | 'content' | 'content_ta'>>
+    ): Promise<CaMagazineItem> {
+      const data = await request<{ item: CaMagazineItem }>(`/api/ca-magazine/admin/items/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      })
+      return data.item
+    },
+    /** Superadmin: delete an item. */
+    async adminDeleteItem(id: string): Promise<void> {
+      await request(`/api/ca-magazine/admin/items/${id}`, { method: 'DELETE' })
+    },
+  },
+
   // ─── Feedback (student-submitted) ────────────────────────────────────────
   feedback: {
     async submit(rating: number, message: string, page: string): Promise<void> {
@@ -1194,7 +1265,7 @@ export const api = {
 }
 
 // ─── Material shapes ────────────────────────────────────────────────────────────
-export type MaterialKind = 'video' | 'image' | 'pdf' | 'document'
+export type MaterialKind = 'video' | 'image' | 'pdf' | 'document' | 'magazine'
 export type MaterialPlacement = 'materials' | 'profile'
 
 /** One curated study-material item (metadata only — file URLs are minted on demand). */
@@ -1209,10 +1280,40 @@ export interface Material {
   file_name: string | null
   file_size: number
   mime_type: string | null
+  magazine_ca_type: CaMagazineType | null
+  magazine_date: string | null
   downloadable: boolean
   active: boolean
   sort_order: number
   created_at: string
+}
+
+// ─── CA Magazine shapes ─────────────────────────────────────────────────────────
+export type CaMagazineType = 'day_wise' | 'month_wise'
+
+/** One pushed issue (a day's paper or a month's consolidation) in the console. */
+export interface CaMagazineIssue {
+  ca_type: CaMagazineType
+  date: string
+  ca_month: string
+  ca_year: number | null
+  items: number
+  /** The materials row publishing this issue, or null while unapproved. */
+  material: { id: string; active: boolean } | null
+}
+
+/** One magazine news item; content is markdown bullets (`- ` lines, `**bold**`). */
+export interface CaMagazineItem {
+  id: string
+  external_id: string
+  ca_type: CaMagazineType
+  date: string
+  ca_month: string
+  topic: string
+  title: string
+  title_ta: string | null
+  content: string
+  content_ta: string | null
 }
 
 /** Editable fields accepted by the PATCH endpoint. */
@@ -1231,22 +1332,28 @@ export interface MaterialPatch {
 export type NotificationKind = 'push' | 'system'
 export type NotificationAudience = 'all' | 'premium' | 'free' | 'group'
 
-/** One entry in a user's in-app feed. */
+/** One entry in a user's in-app feed. Tamil variants (when authored) let the
+ *  bell render by the user's live language choice. */
 export interface NotificationItem {
   id: string
   kind: NotificationKind
   title: string
   body: string
+  title_ta: string | null
+  body_ta: string | null
   url: string | null
   created_at: string
   read: boolean
 }
 
-/** Body sent by the superadmin composer. */
+/** Body sent by the superadmin composer. Tamil fields are optional — Tamil-
+ *  language users receive them; blank sends English to everyone. */
 export interface NotificationInput {
   kind: NotificationKind
   title: string
   body: string
+  titleTa?: string | null
+  bodyTa?: string | null
   url?: string | null
   audience: NotificationAudience
   audienceValue?: string | null
@@ -1258,6 +1365,8 @@ export interface AdminNotification {
   kind: NotificationKind
   title: string
   body: string
+  title_ta: string | null
+  body_ta: string | null
   url: string | null
   audience: NotificationAudience
   audience_value: string | null
@@ -1266,9 +1375,13 @@ export interface AdminNotification {
 }
 
 // ─── Popup alert shapes ─────────────────────────────────────────────────────────
+/** Type of announcement — drives the popup's icon / colour / label. */
+export type AlertKind = 'info' | 'alert' | 'update' | 'success'
+
 /** One pending popup alert for the signed-in user. */
 export interface ActiveAlert {
   id: string
+  kind: AlertKind
   title: string
   body: string
   title_ta: string | null
@@ -1279,6 +1392,7 @@ export interface ActiveAlert {
 
 /** Body sent by the superadmin alert composer. */
 export interface AlertInput {
+  kind: AlertKind
   title: string
   body: string
   titleTa?: string | null
@@ -1293,6 +1407,7 @@ export interface AlertInput {
 /** Full authored row in the superadmin alert list. */
 export interface AdminAlert {
   id: string
+  kind: AlertKind
   title: string
   body: string
   title_ta: string | null
@@ -1519,6 +1634,30 @@ export interface UserInsights {
     spent: number
     expired: number
     granted: number
+  }
+  /** Segmentation & reachability profile (insights v2; absent on an old RPC). */
+  targeting?: {
+    language: 'en' | 'ta' | 'both' | null
+    gender: string | null
+    exam_date: string | null
+    daily_goal: number | null
+    signup_at: string
+    streak: number
+    active_days_30d: number
+    last_login_at: string | null
+    devices: { label: string | null; last_seen_at: string }[]
+    push_devices: number
+    payments: {
+      orders: number
+      lifetime_rupees: number
+      last_plan: string | null
+      last_paid_at: string | null
+    }
+    feedback_count: number
+    report_count: number
+    bookmark_count: number
+    revision_pending: number
+    seen_questions: number
   }
 }
 

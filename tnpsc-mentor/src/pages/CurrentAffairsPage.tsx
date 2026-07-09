@@ -6,7 +6,7 @@ import IconTile from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import LogoLoader from '../components/UI/LogoLoader'
-import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName } from '../lib/constants'
+import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName, type MonthDef } from '../lib/constants'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import { useStartTest } from '../hooks/useStartTest'
@@ -15,7 +15,8 @@ import type { QuizConfig } from '../types'
 
 type CAView = 'month_wise' | 'topic_wise'
 
-// Module-level caches so the counts survive navigating away and back.
+// Module-level caches so the months/counts survive navigating away and back.
+let monthsCache: MonthDef[] | null = null
 let monthCountsCache: Record<string, number> | null = null
 let topicCountsCache: Record<string, number> | null = null
 
@@ -24,6 +25,11 @@ export default function CurrentAffairsPage() {
   const navigate = useNavigate()
   const { t, lang } = useT()
   const [view, setView] = useState<CAView>('month_wise')
+
+  // Months come from the DB (/questions/ca-months) so a month pushed by the CA
+  // generator appears without a redeploy; the hardcoded CA_MONTHS list is only
+  // the fallback while loading / if the endpoint is unavailable.
+  const [months, setMonths] = useState<MonthDef[]>(monthsCache ?? CA_MONTHS)
 
   // Per-month / per-topic question counts shown on every row.
   const [monthCounts, setMonthCounts] = useState<Record<string, number> | null>(monthCountsCache)
@@ -64,23 +70,42 @@ export default function CurrentAffairsPage() {
     return true
   }
 
-  // Month counts: one HEAD count per month (mirrors the PYQ subject pattern).
+  // Month list + counts: a single DB-sourced call. On failure, fall back to the
+  // hardcoded CA_MONTHS with one HEAD count per month (the pre-endpoint path).
   useEffect(() => {
-    if (monthCountsCache) return
+    if (monthsCache && monthCountsCache) return
     let cancelled = false
-    Promise.all(
-      CA_MONTHS.map((m) =>
-        api
-          .countQuestions({ category: 'current_affairs', ca_type: 'month_wise', ca_month: m.label })
-          .then((n) => [m.label, n] as const)
-          .catch(() => [m.label, 0] as const)
-      )
-    ).then((pairs) => {
-      if (cancelled) return
-      const map = Object.fromEntries(pairs)
-      monthCountsCache = map
-      setMonthCounts(map)
-    })
+    api
+      .caMonths()
+      .then((rows) => {
+        if (cancelled || !rows.length) return
+        const list: MonthDef[] = rows.map((r) => ({
+          slug: r.label.toLowerCase().replace(/\s+/g, '-'),
+          label: r.label,
+          year: r.year,
+        }))
+        const map = Object.fromEntries(rows.map((r) => [r.label, r.count]))
+        monthsCache = list
+        monthCountsCache = map
+        setMonths(list)
+        setMonthCounts(map)
+      })
+      .catch(() => {
+        if (cancelled) return
+        Promise.all(
+          CA_MONTHS.map((m) =>
+            api
+              .countQuestions({ category: 'current_affairs', ca_type: 'month_wise', ca_month: m.label })
+              .then((n) => [m.label, n] as const)
+              .catch(() => [m.label, 0] as const)
+          )
+        ).then((pairs) => {
+          if (cancelled) return
+          const map = Object.fromEntries(pairs)
+          monthCountsCache = map
+          setMonthCounts(map)
+        })
+      })
     return () => {
       cancelled = true
     }
@@ -368,7 +393,7 @@ export default function CurrentAffairsPage() {
             {t('selectMonth')}
           </h3>
           <List>
-            {CA_MONTHS.map((m, i) => {
+            {months.map((m, i) => {
               const n = monthCounts?.[m.label]
               const locked = keyLocked({
                 category: 'current_affairs',

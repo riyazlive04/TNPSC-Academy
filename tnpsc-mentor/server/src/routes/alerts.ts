@@ -27,7 +27,7 @@ router.get(
       premiumUserIds(),
       supabaseAdmin
         .from('app_alerts')
-        .select('id, title, body, title_ta, body_ta, url, audience, audience_value, expires_at, created_at')
+        .select('id, kind, title, body, title_ta, body_ta, url, audience, audience_value, expires_at, created_at')
         .eq('active', true)
         .order('created_at', { ascending: true })
         .limit(20),
@@ -52,6 +52,7 @@ router.get(
       })
       .map((a) => ({
         id: a.id as string,
+        kind: (a.kind as string | null) ?? 'info',
         title: a.title as string,
         body: a.body as string,
         title_ta: (a.title_ta as string | null) ?? null,
@@ -88,6 +89,9 @@ router.post(
   asyncH(async (req: AuthedRequest, res) => {
     const title = String(req.body?.title ?? '').trim()
     const body = String(req.body?.body ?? '').trim()
+    const kind = ['info', 'alert', 'update', 'success'].includes(req.body?.kind)
+      ? (req.body.kind as string)
+      : 'info'
     const titleTa = String(req.body?.titleTa ?? '').trim() || null
     const bodyTa = String(req.body?.bodyTa ?? '').trim() || null
     const url = req.body?.url ? String(req.body.url).trim() : null
@@ -109,6 +113,7 @@ router.post(
     const { data: row, error } = await supabaseAdmin
       .from('app_alerts')
       .insert({
+        kind,
         title,
         body,
         title_ta: titleTa,

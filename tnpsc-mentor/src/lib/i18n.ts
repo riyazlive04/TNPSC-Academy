@@ -71,6 +71,11 @@ const STRINGS = {
   cancel: { en: 'Cancel', ta: 'ரத்து' },
   dismiss: { en: 'Dismiss', ta: 'மூடு' },
   alertAnnouncement: { en: 'Announcement', ta: 'அறிவிப்பு' },
+  // Popup announcement types (icon/colour/label per kind).
+  alertKindInfo: { en: 'Information', ta: 'தகவல்' },
+  alertKindAlert: { en: 'Alert', ta: 'எச்சரிக்கை' },
+  alertKindUpdate: { en: 'Update', ta: 'புதுப்பிப்பு' },
+  alertKindSuccess: { en: 'Good news', ta: 'நற்செய்தி' },
   alertViewLink: { en: 'View', ta: 'பார்க்க' },
 
   // Language screen
@@ -137,6 +142,21 @@ const STRINGS = {
     en: 'Not now - show me around first',
     ta: 'இப்போது வேண்டாம் - முதலில் செயலியை சுற்றிக் காட்டுங்கள்',
   },
+  // New-signup promo alert (MarathonFreeAlert): Test Marathon Test 1 is free.
+  marathonFreeBadge: { en: 'Free', ta: 'இலவசம்' },
+  marathonFreeTitle: {
+    en: 'Test Marathon: Test 1 is FREE!',
+    ta: 'தேர்வு மராத்தான்: தேர்வு 1 இலவசம்!',
+  },
+  marathonFreeBody: {
+    en: 'In the 13-test Group 1 Test Marathon, the first test (100 questions, Units I & II) is completely free for every aspirant. Try it before you enroll!',
+    ta: '13-தேர்வு குரூப் 1 தேர்வு மராத்தானில், முதல் தேர்வு (100 வினாக்கள், அலகு I & II) அனைவருக்கும் முற்றிலும் இலவசம். சேருவதற்கு முன் முயற்சித்துப் பாருங்கள்!',
+  },
+  marathonFreeCta: {
+    en: 'Take Test 1 free',
+    ta: 'தேர்வு 1-ஐ இலவசமாக எழுத',
+  },
+  marathonFreeLater: { en: 'Later', ta: 'பிறகு' },
   // Tour final step when the Starter Challenge is already done (test-first flow).
   onbAllSetTitle: { en: "You're all set!", ta: 'நீங்கள் தயார்!' },
   onbAllSetBody: {
@@ -1222,6 +1242,28 @@ const STRINGS = {
     ta: 'புஷ் அறிவிப்புகள் தற்போது கிடைக்கவில்லை.',
   },
   pushFailed: { en: 'Could not enable notifications.', ta: 'அறிவிப்புகளை இயக்க முடியவில்லை.' },
+  pushNudgeTitle: {
+    en: 'Turn on device notifications',
+    ta: 'சாதன அறிவிப்புகளை இயக்குங்கள்',
+  },
+  pushNudgeBody: {
+    en: 'Get test reminders, current affairs and offers — even when the app is closed.',
+    ta: 'தேர்வு நினைவூட்டல்கள், நடப்பு நிகழ்வுகள் மற்றும் சலுகைகளை — ஆப் மூடியிருந்தாலும் — பெறுங்கள்.',
+  },
+  notNow: { en: 'Not now', ta: 'இப்போது வேண்டாம்' },
+  // Profile → Notifications enable/disable toggle
+  pushSettingTitle: { en: 'Device notifications', ta: 'சாதன அறிவிப்புகள்' },
+  pushSettingSub: {
+    en: 'Get test reminders, current affairs and offers on this device.',
+    ta: 'தேர்வு நினைவூட்டல்கள், நடப்பு நிகழ்வுகள் மற்றும் சலுகைகளை இந்த சாதனத்தில் பெறுங்கள்.',
+  },
+  pushSettingOn: { en: 'On', ta: 'இயக்கத்தில்' },
+  pushSettingOff: { en: 'Off', ta: 'அணைந்துள்ளது' },
+  pushSettingBlocked: {
+    en: 'Blocked in your browser settings. Allow notifications for this site to turn them on.',
+    ta: 'உலாவி அமைப்புகளில் தடுக்கப்பட்டுள்ளது. இயக்க இந்த தளத்திற்கு அறிவிப்புகளை அனுமதிக்கவும்.',
+  },
+  pushDisabled: { en: 'Device notifications turned off.', ta: 'சாதன அறிவிப்புகள் அணைக்கப்பட்டன.' },
   notificationsTab: { en: 'Notify', ta: 'அறிவிப்பு' },
 
   // ─── Auth (login / register / forgot) ─────────────────────────────────────
@@ -1458,6 +1500,11 @@ const STRINGS = {
   couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
   appTab: { en: 'App', ta: 'ஆப்' },
   materialsTab: { en: 'Materials', ta: 'பொருட்கள்' },
+  caMagazineTab: { en: 'CA Magazine', ta: 'CA இதழ்' },
+  caMagazineNoItems: {
+    en: 'No items in this issue yet.',
+    ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',
+  },
   close: { en: 'Close', ta: 'மூடு' },
   // ─── Materials / Infographics hub ───────────────────────────────────────
   materials: { en: 'Materials', ta: 'கல்விப் பொருட்கள்' },
@@ -1471,6 +1518,7 @@ const STRINGS = {
     ta: 'இதுவரை பொருட்கள் எதுவும் பகிரப்படவில்லை. விரைவில் மீண்டும் பாருங்கள்!',
   },
   materialsAllTypes: { en: 'All', ta: 'அனைத்தும்' },
+  typeMagazine: { en: 'CA Magazine', ta: 'நடப்பு நிகழ்வுகள் இதழ்' },
   typeVideo: { en: 'Videos', ta: 'வீடியோக்கள்' },
   typeImage: { en: 'Images', ta: 'படங்கள்' },
   typePdf: { en: 'PDFs', ta: 'PDF கோப்புகள்' },

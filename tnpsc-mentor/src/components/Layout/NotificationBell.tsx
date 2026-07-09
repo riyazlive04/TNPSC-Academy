@@ -5,8 +5,6 @@ import {
   useNotificationStore,
   startNotificationPolling,
 } from '../../store/notificationStore'
-import { isPushSupported, pushPermission, enablePush } from '../../lib/push'
-import { toast } from '../../store/toastStore'
 import { useT } from '../../lib/i18n'
 
 /** Compact "3h ago" / "2d ago" relative time. */
@@ -23,18 +21,15 @@ function ago(iso: string): string {
 
 export default function NotificationBell() {
   const navigate = useNavigate()
-  const { t } = useT()
+  const { t, lang } = useT()
   const { items, unread, loading, refresh, markAllRead } = useNotificationStore()
   const [open, setOpen] = useState(false)
-  const [enabling, setEnabling] = useState(false)
-  // Show the opt-in row only while push is supported and not yet decided.
-  const [canPrompt, setCanPrompt] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
 
   // Start the shared feed polling once the bell mounts (user is authenticated).
+  // Enabling/disabling Web Push lives in Profile → Notifications now.
   useEffect(() => {
     startNotificationPolling()
-    setCanPrompt(isPushSupported() && pushPermission() === 'default')
   }, [])
 
   // Open → refresh, then mark everything read so the badge clears.
@@ -57,18 +52,6 @@ export default function NotificationBell() {
       document.removeEventListener('keydown', onKey)
     }
   }, [open])
-
-  const handleEnable = async () => {
-    setEnabling(true)
-    const result = await enablePush()
-    setEnabling(false)
-    setCanPrompt(pushPermission() === 'default')
-    if (result === 'subscribed') toast.success(t('pushEnabled'))
-    else if (result === 'denied') toast.error(t('pushDenied'))
-    else if (result === 'unsupported') toast.error(t('pushUnsupported'))
-    else if (result === 'unconfigured') toast.info(t('pushUnavailable'))
-    else toast.error(t('pushFailed'))
-  }
 
   const onItemClick = (url: string | null) => {
     setOpen(false)
@@ -106,53 +89,54 @@ export default function NotificationBell() {
             {loading && <Loader2 size={14} className="animate-spin text-ink2" />}
           </div>
 
-          {/* Push opt-in */}
-          {canPrompt && (
-            <button
-              onClick={handleEnable}
-              disabled={enabling}
-              className="flex w-full items-center gap-2 border-b border-line bg-brand-soft/50 px-4 py-2.5 text-left font-body text-xs text-brand-dark transition hover:bg-brand-soft disabled:opacity-60"
-            >
-              {enabling ? <Loader2 size={14} className="animate-spin" /> : <BellRing size={14} />}
-              {t('enableDeviceNotifications')}
-            </button>
-          )}
-
           <div className="max-h-96 overflow-y-auto">
             {items.length === 0 ? (
               <p className="px-4 py-10 text-center font-body text-sm text-ink2">{t('noNotifications')}</p>
             ) : (
-              items.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={() => onItemClick(n.url)}
-                  className={`flex w-full items-start gap-3 border-b border-line px-4 py-3 text-left transition hover:bg-tint/50 ${
-                    n.read ? '' : 'bg-brand-soft/30'
-                  }`}
-                >
-                  <span
-                    className={`mt-0.5 grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg ${
-                      n.kind === 'system' ? 'bg-goldsoft text-gold' : 'bg-brand-soft text-brand'
+              items.map((n) => {
+                // Language-aware copy (mirrors AlertPopup): Tamil readers get
+                // the Tamil variant when the composer provided one; 'both'
+                // shows English with the Tamil text stacked below.
+                const title = lang === 'ta' && n.title_ta ? n.title_ta : n.title
+                const body = lang === 'ta' && n.body_ta ? n.body_ta : n.body
+                const secondaryTa = lang === 'both' ? n.body_ta : null
+                return (
+                  <button
+                    key={n.id}
+                    onClick={() => onItemClick(n.url)}
+                    className={`flex w-full items-start gap-3 border-b border-line px-4 py-3 text-left transition hover:bg-tint/50 ${
+                      n.read ? '' : 'bg-brand-soft/30'
                     }`}
                   >
-                    {n.kind === 'system' ? <Megaphone size={15} /> : <Bell size={15} />}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5">
-                      <span className="tamil truncate font-heading text-sm font-semibold text-ink">
-                        {n.title}
+                    <span
+                      className={`mt-0.5 grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg ${
+                        n.kind === 'system' ? 'bg-goldsoft text-gold' : 'bg-brand-soft text-brand'
+                      }`}
+                    >
+                      {n.kind === 'system' ? <Megaphone size={15} /> : <Bell size={15} />}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5">
+                        <span className="tamil truncate font-heading text-sm font-semibold text-ink">
+                          {title}
+                        </span>
+                        {!n.read && <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-coral" />}
                       </span>
-                      {!n.read && <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-coral" />}
+                      <span className="tamil mt-0.5 block whitespace-pre-line font-body text-xs text-ink2">
+                        {body}
+                      </span>
+                      {secondaryTa && (
+                        <span className="tamil mt-0.5 block whitespace-pre-line font-body text-xs text-ink2">
+                          {secondaryTa}
+                        </span>
+                      )}
+                      <span className="mt-1 block font-body text-[10px] uppercase tracking-wide text-ink2/70">
+                        {ago(n.created_at)}
+                      </span>
                     </span>
-                    <span className="tamil mt-0.5 block whitespace-pre-line font-body text-xs text-ink2">
-                      {n.body}
-                    </span>
-                    <span className="mt-1 block font-body text-[10px] uppercase tracking-wide text-ink2/70">
-                      {ago(n.created_at)}
-                    </span>
-                  </span>
-                </button>
-              ))
+                  </button>
+                )
+              })
             )}
           </div>
 

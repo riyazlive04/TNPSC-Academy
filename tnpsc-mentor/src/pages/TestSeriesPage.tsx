@@ -233,6 +233,14 @@ export default function TestSeriesPage() {
                           <Lock size={11} /> {t('premiumOnly')}
                         </span>
                       )}
+                      {/* The trial paper: always flag it FREE on the card so the
+                          offer is visible to everyone (paid/staff owners included,
+                          not just bundle-less learners). */}
+                      {tst.tier === 'free' && (
+                        <span className="tamil inline-flex shrink-0 items-center rounded-md bg-mintsoft px-2 py-0.5 font-heading text-[11px] font-bold uppercase text-mint">
+                          {t('marathonFreeBadge')}
+                        </span>
+                      )}
                     </div>
 
                     {subjects && (

@@ -437,6 +437,51 @@ router.post(
   })
 )
 
+// ─── GET /api/questions/ca-months ────────────────────────────────────────────
+// Months available in the Current Affairs bank (label, year, question count),
+// chronological. Sources the /current-affairs month picker so a month pushed by
+// the CA generator (see work/TNPSC/APP_INTEGRATION.md) appears without a client
+// redeploy — the client keeps its hardcoded CA_MONTHS only as a fallback.
+router.get(
+  '/ca-months',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data, error } = await req.db!.rpc('ca_month_counts')
+    if (!error) {
+      const months = ((data ?? []) as { ca_month: string; ca_year: number | null; total: number }[])
+        .map((r) => ({ label: r.ca_month, year: Number(r.ca_year ?? 0), count: Number(r.total) }))
+      return res.json({ months })
+    }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): group in JS. PostgREST caps one select at
+    // 1000 rows so counts can undercount on a big bank — fine for a transient
+    // fallback; ordering mirrors the RPC (year, then calendar month).
+    const { data: rows, error: e2 } = await req.db!
+      .from('questions')
+      .select('ca_month, ca_year')
+      .eq('category', 'current_affairs')
+      .eq('ca_type', 'month_wise')
+      .not('ca_month', 'is', null)
+    if (e2) return sendDbError(res, e2)
+    const MONTH_ORDER = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December']
+    const byMonth = new Map<string, { year: number; count: number }>()
+    for (const r of (rows ?? []) as { ca_month: string; ca_year: number | null }[]) {
+      const year = r.ca_year ?? (Number(r.ca_month.split(' ')[1]) || 0)
+      const cur = byMonth.get(r.ca_month) ?? { year, count: 0 }
+      cur.count++
+      byMonth.set(r.ca_month, cur)
+    }
+    const months = [...byMonth]
+      .map(([label, v]) => ({ label, year: v.year, count: v.count }))
+      .sort((a, b) =>
+        a.year - b.year ||
+        MONTH_ORDER.indexOf(a.label.split(' ')[0]) - MONTH_ORDER.indexOf(b.label.split(' ')[0]))
+    res.json({ months })
+  })
+)
+
 // ─── POST /api/questions/history-periods ─────────────────────────────────────
 // Counts the PYQ History bank (category='pyq', subject='History and INM') by
 // historical period — the `unit` column holds 'ancient' | 'medieval' | 'modern'.
@@ -975,6 +1020,8 @@ interface TestSeriesRow {
   enabled: boolean
   open_override: 'auto' | 'open' | 'closed'
   sort_order: number
+  /** 'free' = open to every signed-in user (the trial paper); 'paid' = bundle. */
+  tier: 'free' | 'paid'
 }
 
 /** Today's date in IST (Asia/Kolkata, UTC+5:30, no DST) as 'YYYY-MM-DD'. Lexical
@@ -1014,7 +1061,7 @@ router.get(
     const { data, error } = await req.db!
       .from('test_series')
       .select(
-        'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order'
+        'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
       )
       .eq('enabled', true)
       .order('sort_order')
@@ -1034,11 +1081,14 @@ router.get(
     const counts = await testSeriesAttemptCounts(req)
 
     const tests = ((data ?? []) as TestSeriesRow[]).map((r) => {
+      // A 'free' paper (the try-before-you-enroll trial) skips the bundle gate;
+      // the date gate and attempt cap still apply to it.
+      const needsBundle = !unlocked && r.tier !== 'free'
       const isDateLocked = !staff && dateLocked(r)
-      const locked = !unlocked || isDateLocked
+      const locked = needsBundle || isDateLocked
       // A paid bundle takes precedence in the reason (buying unblocks the series;
       // the date still applies afterwards, reported via scheduled_date).
-      const lockReason = !unlocked ? 'premium' : isDateLocked ? 'date' : null
+      const lockReason = needsBundle ? 'premium' : isDateLocked ? 'date' : null
       return {
         id: r.id,
         title: r.title,
@@ -1051,6 +1101,7 @@ router.get(
         duration_seconds: r.duration_seconds,
         negative_mark: Number(r.negative_mark),
         scheduled_date: r.scheduled_date,
+        tier: r.tier,
         locked,
         lockReason,
         attemptsUsed: staff ? 0 : counts[r.id] ?? 0,
@@ -1076,7 +1127,7 @@ router.post(
 
     const { data: test, error: tErr } = await req.db!
       .from('test_series')
-      .select('id, test_set, enabled, scheduled_date, open_override')
+      .select('id, test_set, enabled, scheduled_date, open_override, tier')
       .eq('id', testId)
       .maybeSingle()
     if (tErr) return sendDbError(res, tErr)
@@ -1087,14 +1138,17 @@ router.post(
     const staff = await isStaff(req)
 
     if (!staff) {
-      // Any paid bundle (premium OR Vettri) unlocks the series.
-      let unlocked = false
-      try {
-        unlocked = (await bundleAccess(req.db!)).unlimited
-      } catch {
-        unlocked = false
+      // Any paid bundle (premium OR Vettri) unlocks the series; a 'free'-tier
+      // paper (the trial) needs no bundle. Date gate + attempt cap still apply.
+      if ((test as TestSeriesRow).tier !== 'free') {
+        let unlocked = false
+        try {
+          unlocked = (await bundleAccess(req.db!)).unlimited
+        } catch {
+          unlocked = false
+        }
+        if (!unlocked) return res.status(403).json({ error: 'premium_required' })
       }
-      if (!unlocked) return res.status(403).json({ error: 'premium_required' })
 
       if (dateLocked(test as TestSeriesRow)) {
         return res.status(403).json({ error: 'not_yet_available' })

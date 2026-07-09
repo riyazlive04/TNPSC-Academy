@@ -13,6 +13,11 @@ export interface PushPayload {
   title: string
   body: string
   url: string | null
+  /** Optional Tamil variants. When present, each subscriber receives the copy
+   *  matching their profiles.language: 'ta' → Tamil, 'both' → English with the
+   *  Tamil text stacked below (mirrors AlertPopup), anything else → English. */
+  title_ta?: string | null
+  body_ta?: string | null
 }
 
 /**
@@ -24,17 +29,49 @@ export async function sendPushTo(userIds: string[], payload: PushPayload): Promi
   if (!pushEnabled || userIds.length === 0) return 0
   const { data: subs } = await supabaseAdmin
     .from('push_subscriptions')
-    .select('endpoint, p256dh, auth')
+    .select('endpoint, p256dh, auth, user_id')
     .in('user_id', userIds)
   if (!subs || subs.length === 0) return 0
 
-  const body = JSON.stringify(payload)
+  // Localize per subscriber. Languages are looked up only when a Tamil variant
+  // exists, so the (common) English-only send stays a single query.
+  const hasTa = Boolean(payload.title_ta || payload.body_ta)
+  const langByUser = new Map<string, string>()
+  if (hasTa) {
+    const ids = [...new Set(subs.map((s) => s.user_id as string))]
+    const { data: profiles } = await supabaseAdmin
+      .from('profiles')
+      .select('id, language')
+      .in('id', ids)
+    for (const p of profiles ?? []) {
+      langByUser.set(p.id as string, (p.language as string | null) ?? 'en')
+    }
+  }
+  const base = { id: payload.id, url: payload.url }
+  const bodyEn = JSON.stringify({ ...base, title: payload.title, body: payload.body })
+  const bodyTa = JSON.stringify({
+    ...base,
+    title: payload.title_ta || payload.title,
+    body: payload.body_ta || payload.body,
+  })
+  const bodyBoth = JSON.stringify({
+    ...base,
+    title: payload.title,
+    body: payload.body_ta ? `${payload.body}\n${payload.body_ta}` : payload.body,
+  })
+  const forLang = (lang: string | undefined): string => {
+    if (!hasTa) return bodyEn
+    if (lang === 'ta') return bodyTa
+    if (lang === 'both') return bodyBoth
+    return bodyEn
+  }
+
   const dead: string[] = []
   const results = await Promise.allSettled(
     subs.map((s) =>
       webpush.sendNotification(
         { endpoint: s.endpoint as string, keys: { p256dh: s.p256dh as string, auth: s.auth as string } },
-        body
+        forLang(langByUser.get(s.user_id as string))
       )
     )
   )

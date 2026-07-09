@@ -800,6 +800,10 @@ export interface MonthDef {
   year: number
 }
 
+// FALLBACK ONLY: the /current-affairs month picker is sourced from the DB via
+// GET /api/questions/ca-months (ca_month_counts RPC), so months pushed by the
+// CA generator appear without a redeploy. This list is used only while that
+// call is in flight or if it fails — it does NOT need new months appended.
 export const CA_MONTHS: MonthDef[] = [
   { slug: 'july-2025', label: 'July 2025', year: 2025 },
   { slug: 'august-2025', label: 'August 2025', year: 2025 },

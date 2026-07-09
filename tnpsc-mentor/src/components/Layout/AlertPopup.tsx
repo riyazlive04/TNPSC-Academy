@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Megaphone } from 'lucide-react'
 import { api, type ActiveAlert } from '../../lib/api'
+import { ALERT_KIND, alertKindOf } from '../../lib/alertKinds'
 import { useT } from '../../lib/i18n'
 import { useAuthStore } from '../../store/authStore'
 import { useLanguageStore } from '../../store/languageStore'
@@ -80,6 +80,10 @@ export default function AlertPopup() {
   const body = lang === 'ta' && current.body_ta ? current.body_ta : current.body
   const secondaryTa = lang === 'both' ? current.body_ta : null
 
+  // Type drives the icon, badge colour and the label above the title.
+  const kind = ALERT_KIND[alertKindOf(current.kind)]
+  const KindIcon = kind.icon
+
   return (
     <div
       className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 p-4 animate-fadeInFast backdrop-blur-sm"
@@ -95,11 +99,11 @@ export default function AlertPopup() {
         className="w-full max-w-sm animate-sheetIn rounded-3xl border border-line bg-card p-6 shadow-card outline-none"
       >
         <div className="mb-5 flex flex-col items-center text-center">
-          <span className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-brand-soft text-brand">
-            <Megaphone size={22} />
+          <span className={`mb-3 grid h-12 w-12 place-items-center rounded-full ${kind.badge}`}>
+            <KindIcon size={22} />
           </span>
           <p className="tamil mb-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
-            {t('alertAnnouncement')}
+            {t(kind.labelKey)}
           </p>
           <h2 id="app-alert-title" className="tamil font-heading text-lg font-semibold text-ink">
             {title}

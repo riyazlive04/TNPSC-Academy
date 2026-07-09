@@ -22,6 +22,7 @@ import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import StarterTestPrompt from '../components/Onboarding/StarterTestPrompt'
+import MarathonFreeAlert from '../components/Onboarding/MarathonFreeAlert'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
@@ -43,6 +44,7 @@ import { GROUP_SUBJECTS } from '../lib/constants'
 import { useProgressStore } from '../store/progressStore'
 import { useMomentumStore } from '../store/momentumStore'
 import { useOnboardingStore } from '../store/onboardingStore'
+import PushNudge from '../components/PushNudge'
 import RewardOverlay from '../components/RewardOverlay'
 import { toast } from '../store/toastStore'
 import { tapScaleSubtle } from '../lib/motion'
@@ -132,6 +134,8 @@ export default function TestArenaPage() {
   const onboardingPending = useOnboardingStore((s) => s.pending)
   const testPromptPending = useOnboardingStore((s) => s.testPrompt)
   const consumeTestPrompt = useOnboardingStore((s) => s.consumeTestPrompt)
+  const marathonAlertPending = useOnboardingStore((s) => s.marathonAlert)
+  const consumeMarathonAlert = useOnboardingStore((s) => s.consumeMarathonAlert)
   const onboardingOpen = useOnboardingStore((s) => s.open)
   const startOnboarding = useOnboardingStore((s) => s.start)
   const finishOnboarding = useOnboardingStore((s) => s.finish)
@@ -347,6 +351,11 @@ export default function TestArenaPage() {
           </section>
         )}
 
+        {/* One-time web-push opt-in nudge (browsers only — the Android WebView
+            has no Push API so it never renders there). Held back while the
+            first-run sequence (starter-test prompt / guided tour) is active. */}
+        <PushNudge holdBack={testPromptPending || onboardingPending || onboardingOpen} />
+
         {/* The one gradient hero - the single elevated element on the screen.
             data-tour anchors the onboarding spotlight to the mock-test card. */}
         <div data-tour="mock">
@@ -465,6 +474,24 @@ export default function TestArenaPage() {
           onSkip={consumeTestPrompt}
         />
       )}
+
+      {/* New-signup promo: "Test Marathon Test 1 is FREE". Fires only after the
+          starter prompt AND the tour have fully resolved (never stacks), and
+          only while the Marathon feature is switched on. Shown once ever. */}
+      {!isAdmin &&
+        marathonAlertPending &&
+        !testPromptPending &&
+        !onboardingPending &&
+        !onboardingOpen &&
+        testSeriesOn && (
+          <MarathonFreeAlert
+            onTake={() => {
+              consumeMarathonAlert()
+              navigate('/test-series')
+            }}
+            onDismiss={consumeMarathonAlert}
+          />
+        )}
 
       <OnboardingTour
         open={onboardingOpen}

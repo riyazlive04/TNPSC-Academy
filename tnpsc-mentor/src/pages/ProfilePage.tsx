@@ -22,6 +22,8 @@ import {
   Coins,
   Target,
   CalendarDays,
+  Bell,
+  BellOff,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -42,6 +44,7 @@ import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
 import { useCreditsStore } from '../store/creditsStore'
 import { api, type DeviceSession } from '../lib/api'
+import { isPushSupported, pushPermission, isPushSubscribed, enablePush, disablePush } from '../lib/push'
 import { useT, type StringKey } from '../lib/i18n'
 
 // Each language is shown in its OWN script (English in English, Tamil in Tamil)
@@ -461,6 +464,10 @@ export default function ProfilePage() {
                 Renders nothing until videos are added. */}
             <ProfileVideos />
 
+            {/* Notifications - the persistent enable/disable control for Web Push
+                on this device (the bell/nudge only turn it on). */}
+            <NotificationsSection />
+
             {/* Devices - manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />
 
@@ -608,6 +615,111 @@ function relTime(iso: string, t: (k: StringKey) => string): string {
   const h = Math.floor(m / 60)
   if (h < 24) return `${h}h ${ago}`
   return `${Math.floor(h / 24)}d ${ago}`
+}
+
+/**
+ * Enable/disable Web Push on THIS device — the persistent settings control that
+ * used to live only as a one-shot opt-in row in the bell dropdown. Renders
+ * nothing where Web Push can't work (e.g. the Android WebView app, which has no
+ * Push API — so no dead toggle for those users). When the OS permission is
+ * 'denied' the toggle is shown disabled with a note, since the browser blocks
+ * re-prompting. Otherwise the switch subscribes (enablePush) / unsubscribes
+ * (disablePush) this browser.
+ */
+function NotificationsSection() {
+  const { t } = useT()
+  const supported = isPushSupported()
+  const [subscribed, setSubscribed] = useState(false)
+  const [permission, setPermission] = useState<NotificationPermission>('default')
+  const [ready, setReady] = useState(false)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    if (!supported) return
+    let cancelled = false
+    setPermission(pushPermission())
+    isPushSubscribed()
+      .then((s) => !cancelled && setSubscribed(s))
+      .finally(() => !cancelled && setReady(true))
+    return () => {
+      cancelled = true
+    }
+  }, [supported])
+
+  if (!supported) return null
+
+  const blocked = permission === 'denied'
+  const on = subscribed && permission === 'granted'
+
+  const toggle = async () => {
+    if (busy || blocked) return
+    setBusy(true)
+    try {
+      if (on) {
+        await disablePush()
+        setSubscribed(false)
+        toast.success(t('pushDisabled'))
+      } else {
+        const result = await enablePush()
+        setPermission(pushPermission())
+        if (result === 'subscribed') {
+          setSubscribed(true)
+          toast.success(t('pushEnabled'))
+        } else if (result === 'denied') toast.error(t('pushDenied'))
+        else if (result === 'unconfigured') toast.info(t('pushUnavailable'))
+        else toast.error(t('pushFailed'))
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-3">
+        <span
+          className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl ${
+            on ? 'bg-brand-soft text-brand' : 'bg-tint text-ink2'
+          }`}
+        >
+          {on ? <Bell size={18} /> : <BellOff size={18} />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="tamil font-heading text-base font-semibold text-ink">
+            {t('pushSettingTitle')}
+          </h3>
+          <p className="tamil font-body text-xs text-ink2">{t('pushSettingSub')}</p>
+        </div>
+        <button
+          role="switch"
+          aria-checked={on}
+          aria-label={t('pushSettingTitle')}
+          disabled={busy || blocked || !ready}
+          onClick={toggle}
+          className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full transition-colors disabled:opacity-50 focus-ring ${
+            on ? 'bg-brand' : 'bg-line'
+          }`}
+        >
+          <span
+            className={`grid h-5 w-5 place-items-center rounded-full bg-white shadow transition-transform ${
+              on ? 'translate-x-6' : 'translate-x-1'
+            }`}
+          >
+            {busy && <Loader2 size={12} className="animate-spin text-ink2" />}
+          </span>
+        </button>
+      </div>
+      {blocked ? (
+        <p className="tamil mt-3 rounded-field bg-coralsoft px-3 py-2.5 font-body text-xs leading-snug text-coral">
+          {t('pushSettingBlocked')}
+        </p>
+      ) : (
+        <p className="tamil mt-3 font-body text-xs font-semibold text-ink2">
+          {on ? t('pushSettingOn') : t('pushSettingOff')}
+        </p>
+      )}
+    </div>
+  )
 }
 
 /**

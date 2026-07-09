@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library } from 'lucide-react'
+import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library, Newspaper } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import MaterialViewer from '../components/Materials/MaterialViewer'
+import MagazineReader from '../components/Materials/MagazineReader'
 import LogoLoader from '../components/UI/LogoLoader'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
@@ -12,11 +13,13 @@ const KIND_ICON: Record<MaterialKind, typeof Play> = {
   image: ImageIcon,
   pdf: FileText,
   document: FileText,
+  magazine: Newspaper,
 }
 
 // Type filter chips (the value 'all' shows everything).
 const FILTERS: { value: MaterialKind | 'all'; key: StringKey }[] = [
   { value: 'all', key: 'materialsAllTypes' },
+  { value: 'magazine', key: 'typeMagazine' },
   { value: 'video', key: 'typeVideo' },
   { value: 'image', key: 'typeImage' },
   { value: 'pdf', key: 'typePdf' },
@@ -111,7 +114,17 @@ export default function MaterialsPage() {
         )}
       </div>
 
-      {active && <MaterialViewer material={active} onClose={() => setActive(null)} />}
+      {active && active.kind !== 'magazine' && (
+        <MaterialViewer material={active} onClose={() => setActive(null)} />
+      )}
+      {active && active.kind === 'magazine' && (
+        <MagazineReader
+          title={materialTitle(active, lang)}
+          subtitle={active.description ?? undefined}
+          load={() => api.caMagazine.items(active.id)}
+          onClose={() => setActive(null)}
+        />
+      )}
     </AppLayout>
   )
 }

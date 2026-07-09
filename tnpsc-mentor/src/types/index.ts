@@ -447,6 +447,9 @@ export interface TestSeriesItem {
   negative_mark: number
   /** Unlock date 'YYYY-MM-DD' (IST), or null. */
   scheduled_date: string | null
+  /** 'free' = the try-before-you-enroll trial paper (open to everyone);
+   *  'paid' = needs a paid bundle. */
+  tier: 'free' | 'paid'
   /** True when the user can't start it yet (not premium, or before its date). */
   locked: boolean
   /** Why it's locked: 'premium' (whole series is paid) or 'date' (not yet open). */

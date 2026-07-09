@@ -22,6 +22,7 @@ import notificationRoutes from './routes/notifications.js'
 import alertRoutes from './routes/alerts.js'
 import thirukuralRoutes from './routes/thirukural.js'
 import materialRoutes from './routes/materials.js'
+import caMagazineRoutes from './routes/caMagazine.js'
 import creditRoutes from './routes/credits.js'
 import appRoutes from './routes/app.js'
 import telegramRoutes from './routes/telegram.js'
@@ -81,6 +82,7 @@ app.use('/api/notifications', notificationRoutes)
 app.use('/api/alerts', alertRoutes)
 app.use('/api/thirukural', thirukuralRoutes)
 app.use('/api/materials', materialRoutes)
+app.use('/api/ca-magazine', caMagazineRoutes)
 app.use('/api/credits', creditRoutes)
 app.use('/api/app', appRoutes)
 app.use('/api/telegram', telegramRoutes)
