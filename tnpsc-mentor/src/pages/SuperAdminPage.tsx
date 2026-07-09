@@ -15,6 +15,7 @@ import {
   Plus,
   Copy,
   Trash2,
+  Pencil,
   ShieldOff,
   Crown,
   IndianRupee,
@@ -48,6 +49,7 @@ import {
   Coins,
   Newspaper,
   CheckCircle2,
+  ListChecks,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -74,6 +76,9 @@ import {
   type MaterialKind,
   type MaterialPlacement,
   type CaMagazineIssue,
+  type CaQuestionSet,
+  type CaQuestionSets,
+  type CaQuestionItem,
   type UserInsights,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
@@ -84,7 +89,7 @@ import MagazineEditor from '../components/Materials/MagazineEditor'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caquestions'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -104,6 +109,7 @@ export default function SuperAdminPage() {
     { id: 'vettri', label: 'vettriTab', icon: Trophy },
     { id: 'materials', label: 'materialsTab', icon: Library },
     { id: 'camagazine', label: 'caMagazineTab', icon: Newspaper },
+    { id: 'caquestions', label: 'caQuestionsTab', icon: ListChecks },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
@@ -155,6 +161,7 @@ export default function SuperAdminPage() {
           {tab === 'vettri' && <VettriExamsTab />}
           {tab === 'materials' && <MaterialsTab />}
           {tab === 'camagazine' && <CaMagazineTab />}
+          {tab === 'caquestions' && <CaQuestionsTab />}
           {tab === 'app' && <AppReleasesTab />}
         </div>
       </div>
@@ -3858,6 +3865,574 @@ function MaterialsTab() {
 // morning. Nothing reaches students until an issue is approved here — approval
 // creates a kind='magazine' materials row, so Hide/Remove below (and the
 // Materials tab) unpublish without touching the pipeline data.
+// ─── CA Questions (read-only viewer) ──────────────────────────────────────────
+const DIFF_BADGE: Record<string, string> = {
+  Easy: 'bg-mintsoft text-mint',
+  Medium: 'bg-amber-500/15 text-amber-600',
+  Hard: 'bg-orange-500/15 text-orange-600',
+  'Very Tough': 'bg-coral/15 text-coral',
+}
+
+function QuestionCard({ q, i }: { q: CaQuestionItem; i: number }) {
+  const [ta, setTa] = useState(false)
+  const letters = ['a', 'b', 'c', 'd'] as const
+  const optKey = (l: string) => `option_${l}` as keyof CaQuestionItem
+  const taKey = (l: string) => `option_${l}_ta` as keyof CaQuestionItem
+  const hasTa = Boolean(q.question_text_ta)
+  return (
+    <div style={{ '--i': i } as React.CSSProperties} className="card stagger-item p-4">
+      <div className="mb-2 flex flex-wrap items-center gap-1.5">
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+          {q.topic}
+        </span>
+        <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+          {q.question_type.replace(/_/g, ' ')}
+        </span>
+        <span className={`rounded-full px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide ${DIFF_BADGE[q.difficulty] ?? 'bg-tint text-ink2'}`}>
+          {q.difficulty}
+        </span>
+        <span className="ml-auto font-mono text-[10px] text-ink2">{q.external_id}</span>
+      </div>
+
+      <p className="whitespace-pre-wrap font-body text-sm text-ink">
+        {ta && hasTa ? q.question_text_ta : q.question_text}
+      </p>
+
+      <div className="mt-2 space-y-1">
+        {letters.map((l) => {
+          const correct = q.correct_answer?.toLowerCase() === l
+          const text = String((ta && hasTa ? q[taKey(l)] : q[optKey(l)]) ?? '')
+          return (
+            <div
+              key={l}
+              className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 font-body text-sm ${
+                correct ? 'bg-mintsoft text-mint' : 'text-ink2'
+              }`}
+            >
+              <span className="font-heading font-bold uppercase">{l}.</span>
+              <span className="whitespace-pre-wrap">{text}</span>
+              {correct && <CheckCircle2 size={14} className="ml-auto mt-0.5 flex-shrink-0" />}
+            </div>
+          )
+        })}
+      </div>
+
+      <p className="mt-2 font-body text-xs text-ink2">
+        <span className="font-heading font-semibold text-ink">Answer: {q.correct_answer}</span>
+        {' — '}
+        {ta && hasTa ? q.explanation_ta : q.explanation}
+      </p>
+
+      {hasTa && (
+        <button
+          onClick={() => setTa((v) => !v)}
+          className="mt-2 font-heading text-[11px] font-semibold text-primary hover:underline"
+        >
+          {ta ? 'Show English' : 'Show தமிழ்'}
+        </button>
+      )}
+    </div>
+  )
+}
+
+function CaQuestionPreview({ set, onClose }: { set: CaQuestionSet; onClose: () => void }) {
+  const { lang } = useT()
+  const [items, setItems] = useState<CaQuestionItem[] | null>(null)
+  const [error, setError] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  // Only DAILY sets are curatable — the monthly bank is the student-served
+  // bank (corrected via update-ca.mjs), so it stays strictly read-only here.
+  const editable = set.source === 'daily'
+
+  const load = () => {
+    setError(false)
+    api.caQuestions.adminItems(set).then(setItems).catch(() => setError(true))
+  }
+  useEffect(load, [set])
+
+  const label = set.source === 'daily' ? issueDateLabel('day_wise', set.date ?? '') : set.ca_month
+  const count = items?.length ?? set.total
+  const verified = (items ?? []).filter((q) => q.verified).length
+
+  const downloadPdf = async () => {
+    if (downloading || !items?.length) return
+    setDownloading(true)
+    try {
+      const { generateCaQuestionsPdf } = await import('../lib/caQuestionsPdf')
+      const title = set.source === 'daily' ? 'Daily Current Affairs' : 'Monthly Current Affairs'
+      await generateCaQuestionsPdf({ items, title, label, lang })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not generate the PDF.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const onSaved = (u: CaQuestionItem) =>
+    setItems((list) => (list ?? []).map((q) => (q.id === u.id ? u : q)))
+  const onDeleted = (id: number) => setItems((list) => (list ?? []).filter((q) => q.id !== id))
+  const onAdded = (c: CaQuestionItem) => {
+    setItems((list) => [c, ...(list ?? [])])
+    setAdding(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" onClick={onClose}>
+      <div
+        className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-bg sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
+          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+            <ListChecks size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-heading text-sm font-semibold text-ink">{label}</p>
+            <p className="font-body text-xs text-ink2">
+              {editable ? 'Daily set' : 'Monthly bank'} · {count} questions
+              {editable && ` · ${verified}/${count} verified`}
+            </p>
+          </div>
+          {items && items.length > 0 && (
+            <button
+              onClick={downloadPdf}
+              disabled={downloading}
+              title="Download PDF"
+              className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink2 transition hover:border-brand/40 hover:text-brand disabled:opacity-60"
+            >
+              {downloading ? <Spinner size={13} /> : <Download size={14} />} PDF
+            </button>
+          )}
+          {editable && (
+            <button
+              onClick={() => setAdding((v) => !v)}
+              className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-brand transition hover:border-brand/40 hover:bg-brand-soft/50"
+            >
+              <Plus size={14} /> Add
+            </button>
+          )}
+          <button onClick={onClose} className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg text-ink2 hover:bg-tint hover:text-ink">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="flex-1 space-y-2.5 overflow-y-auto px-4 py-4">
+          {editable && adding && (
+            <QuestionForm
+              title="New question"
+              submitLabel="Add question"
+              onSubmit={(fields) => api.caQuestions.addDailyItem(set.date ?? '', fields)}
+              onDone={onAdded}
+              onCancel={() => setAdding(false)}
+            />
+          )}
+          {items === null && !error && Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-32 w-full" />)}
+          {error && <ErrorState onRetry={load} />}
+          {items?.map((q, i) =>
+            editable ? (
+              <EditableQuestionCard key={q.id} q={q} i={i} onSaved={onSaved} onDeleted={onDeleted} />
+            ) : (
+              <QuestionCard key={q.external_id} q={q} i={i} />
+            )
+          )}
+          {items !== null && items.length === 0 && !adding && (
+            <p className="py-10 text-center font-body text-ink2">No questions in this set.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** A daily question with the verify / edit / delete controls layered on the
+ *  read view; switches to an inline QuestionForm while editing. */
+function EditableQuestionCard({
+  q,
+  i,
+  onSaved,
+  onDeleted,
+}: {
+  q: CaQuestionItem
+  i: number
+  onSaved: (u: CaQuestionItem) => void
+  onDeleted: (id: number) => void
+}) {
+  const [editing, setEditing] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [confirmDel, setConfirmDel] = useState(false)
+
+  if (editing) {
+    return (
+      <QuestionForm
+        title={`Edit · ${q.external_id}`}
+        submitLabel="Save changes"
+        initial={q}
+        onSubmit={(fields) => api.caQuestions.updateDailyItem(q.id!, fields)}
+        onDone={(u) => { onSaved(u); setEditing(false) }}
+        onCancel={() => setEditing(false)}
+      />
+    )
+  }
+
+  const toggleVerify = async () => {
+    setBusy(true)
+    try {
+      const u = await api.caQuestions.updateDailyItem(q.id!, { verified: !q.verified })
+      onSaved(u)
+      toast.success(u.verified ? 'Marked verified.' : 'Verification cleared.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not update.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const del = async () => {
+    setBusy(true)
+    try {
+      await api.caQuestions.deleteDailyItem(q.id!)
+      onDeleted(q.id!)
+      toast.success('Question removed.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not remove.')
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className={`rounded-card border ${q.verified ? 'border-mint/40' : 'border-line'} bg-card`}>
+      <QuestionCard q={q} i={i} />
+      <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-2.5">
+        <button
+          onClick={toggleVerify}
+          disabled={busy}
+          className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-heading text-xs font-semibold transition disabled:opacity-50 ${
+            q.verified ? 'bg-mintsoft text-mint' : 'border border-line text-ink2 hover:border-mint/40 hover:text-mint'
+          }`}
+        >
+          <CheckCircle2 size={14} /> {q.verified ? 'Verified' : 'Verify'}
+        </button>
+        <button
+          onClick={() => setEditing(true)}
+          disabled={busy}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 font-heading text-xs font-semibold text-ink2 transition hover:border-brand/40 hover:text-brand disabled:opacity-50"
+        >
+          <Pencil size={14} /> Edit
+        </button>
+        {confirmDel ? (
+          <span className="ml-auto inline-flex items-center gap-1.5">
+            <button
+              onClick={del}
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-coral px-2.5 py-1.5 font-heading text-xs font-semibold text-white transition hover:bg-coral/90 disabled:opacity-50"
+            >
+              {busy ? <Spinner size={13} /> : <Trash2 size={14} />} Confirm
+            </button>
+            <button
+              onClick={() => setConfirmDel(false)}
+              disabled={busy}
+              className="rounded-lg border border-line px-2.5 py-1.5 font-heading text-xs font-semibold text-ink2 hover:bg-tint disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </span>
+        ) : (
+          <button
+            onClick={() => setConfirmDel(true)}
+            disabled={busy}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 font-heading text-xs font-semibold text-coral transition hover:border-coral/40 hover:bg-coral/5 disabled:opacity-50"
+          >
+            <Trash2 size={14} /> Remove
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const DIFF_OPTS = ['easy', 'medium', 'hard', 'Very Tough']
+const ANS_OPTS = ['A', 'B', 'C', 'D']
+
+/** Shared add/edit form for a daily CA question (EN + optional Tamil twins). */
+function QuestionForm({
+  title,
+  submitLabel,
+  initial,
+  onSubmit,
+  onDone,
+  onCancel,
+}: {
+  title: string
+  submitLabel: string
+  initial?: Partial<CaQuestionItem>
+  onSubmit: (fields: Partial<CaQuestionItem>) => Promise<CaQuestionItem>
+  onDone: (item: CaQuestionItem) => void
+  onCancel: () => void
+}) {
+  const [f, setF] = useState<Partial<CaQuestionItem>>({
+    topic: initial?.topic ?? '',
+    question_type: initial?.question_type ?? 'direct',
+    difficulty: initial?.difficulty ?? 'medium',
+    question_text: initial?.question_text ?? '',
+    option_a: initial?.option_a ?? '',
+    option_b: initial?.option_b ?? '',
+    option_c: initial?.option_c ?? '',
+    option_d: initial?.option_d ?? '',
+    correct_answer: (initial?.correct_answer ?? 'A').toUpperCase(),
+    explanation: initial?.explanation ?? '',
+    question_text_ta: initial?.question_text_ta ?? '',
+    option_a_ta: initial?.option_a_ta ?? '',
+    option_b_ta: initial?.option_b_ta ?? '',
+    option_c_ta: initial?.option_c_ta ?? '',
+    option_d_ta: initial?.option_d_ta ?? '',
+    explanation_ta: initial?.explanation_ta ?? '',
+  })
+  const [showTa, setShowTa] = useState(Boolean(initial?.question_text_ta))
+  const [busy, setBusy] = useState(false)
+  const set = (k: keyof CaQuestionItem, v: string) => setF((p) => ({ ...p, [k]: v }))
+
+  const submit = async () => {
+    setBusy(true)
+    try {
+      const item = await onSubmit(f)
+      onDone(item)
+      toast.success('Saved.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Save failed.')
+      setBusy(false)
+    }
+  }
+
+  // A plain render function (NOT a nested component) so the <input>/<textarea>
+  // host nodes stay stable across renders and never lose focus while typing.
+  const field = (label: string, k: keyof CaQuestionItem, area = false) => (
+    <label className="block">
+      <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">{label}</span>
+      {area ? (
+        <textarea
+          value={String(f[k] ?? '')}
+          onChange={(e) => set(k, e.target.value)}
+          rows={2}
+          className="input-soft w-full px-3 py-2 text-sm"
+        />
+      ) : (
+        <input
+          value={String(f[k] ?? '')}
+          onChange={(e) => set(k, e.target.value)}
+          className="input-soft w-full px-3 py-2 text-sm"
+        />
+      )}
+    </label>
+  )
+
+  return (
+    <div className="rounded-card border border-brand/30 bg-brand-soft/20 p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className="font-heading text-xs font-bold uppercase tracking-wide text-brand">{title}</p>
+        <button onClick={onCancel} disabled={busy} className="grid h-7 w-7 place-items-center rounded-lg text-ink2 hover:bg-tint hover:text-ink disabled:opacity-50">
+          <X size={16} />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="grid grid-cols-3 gap-2">
+          {field('Topic', 'topic')}
+          {field('Type', 'question_type')}
+          <label className="block">
+            <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">Difficulty</span>
+            <select value={String(f.difficulty ?? '')} onChange={(e) => set('difficulty', e.target.value)} className="input-soft w-full px-3 py-2 text-sm">
+              {DIFF_OPTS.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </label>
+        </div>
+
+        {field('Question', 'question_text', true)}
+
+        <div className="grid grid-cols-2 gap-2">
+          {field('Option A', 'option_a')}
+          {field('Option B', 'option_b')}
+          {field('Option C', 'option_c')}
+          {field('Option D', 'option_d')}
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <label className="block">
+            <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">Answer</span>
+            <select value={String(f.correct_answer ?? 'A')} onChange={(e) => set('correct_answer', e.target.value)} className="input-soft w-full px-3 py-2 text-sm">
+              {ANS_OPTS.map((a) => <option key={a} value={a}>{a}</option>)}
+            </select>
+          </label>
+          <div className="col-span-2" />
+        </div>
+
+        {field('Explanation', 'explanation', true)}
+
+        {showTa ? (
+          <div className="space-y-3 rounded-lg border border-line bg-bg/60 p-3">
+            <p className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">தமிழ் (optional)</p>
+            {field('Question (TA)', 'question_text_ta', true)}
+            <div className="grid grid-cols-2 gap-2">
+              {field('Option A (TA)', 'option_a_ta')}
+              {field('Option B (TA)', 'option_b_ta')}
+              {field('Option C (TA)', 'option_c_ta')}
+              {field('Option D (TA)', 'option_d_ta')}
+            </div>
+            {field('Explanation (TA)', 'explanation_ta', true)}
+          </div>
+        ) : (
+          <button onClick={() => setShowTa(true)} className="font-heading text-[11px] font-semibold text-primary hover:underline">
+            + Add Tamil version
+          </button>
+        )}
+
+        <div className="flex items-center gap-2 pt-1">
+          <button onClick={submit} disabled={busy} className="btn-brand inline-flex items-center gap-1.5 px-4 py-2 text-xs disabled:opacity-60">
+            {busy && <Spinner size={13} />} {submitLabel}
+          </button>
+          <button onClick={onCancel} disabled={busy} className="rounded-lg border border-line px-4 py-2 font-heading text-xs font-semibold text-ink2 hover:bg-tint disabled:opacity-50">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CaQuestionsTab() {
+  const { lang } = useT()
+  const [sets, setSets] = useState<CaQuestionSets | null>(null)
+  const [error, setError] = useState(false)
+  const [preview, setPreview] = useState<CaQuestionSet | null>(null)
+  const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
+
+  const load = () => {
+    setError(false)
+    setSets(null)
+    api.caQuestions.adminSets().then(setSets).catch(() => setError(true))
+  }
+  useEffect(load, [])
+
+  // Fetch the set's questions and export a bilingual Q&A + explanation PDF.
+  const downloadSet = async (set: CaQuestionSet) => {
+    const dlKey = `${set.source}:${set.key}`
+    if (downloadingKey) return
+    setDownloadingKey(dlKey)
+    try {
+      const items = await api.caQuestions.adminItems(set)
+      if (!items.length) {
+        toast.error('No questions in this set.')
+        return
+      }
+      const label = set.source === 'daily' ? issueDateLabel('day_wise', set.date ?? '') : set.ca_month
+      const title = set.source === 'daily' ? 'Daily Current Affairs' : 'Monthly Current Affairs'
+      const { generateCaQuestionsPdf } = await import('../lib/caQuestionsPdf')
+      await generateCaQuestionsPdf({ items, title, label, lang })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not generate the PDF.')
+    } finally {
+      setDownloadingKey(null)
+    }
+  }
+
+  const Row = ({ set, i }: { set: CaQuestionSet; i: number }) => {
+    const daily = set.source === 'daily'
+    const label = daily ? issueDateLabel('day_wise', set.date ?? '') : set.ca_month
+    const busy = downloadingKey === `${set.source}:${set.key}`
+    return (
+      <div
+        style={{ '--i': i } as React.CSSProperties}
+        className="card stagger-item flex w-full items-center gap-2 p-3"
+      >
+        <button onClick={() => setPreview(set)} className="press flex min-w-0 flex-1 items-center gap-3 text-left">
+          <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+            <ListChecks size={20} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-heading text-sm font-semibold text-ink">{label}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                {daily ? 'Daily' : 'Monthly'}
+              </span>
+              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                {set.total} questions
+              </span>
+            </div>
+          </div>
+        </button>
+        <button
+          onClick={() => downloadSet(set)}
+          disabled={busy}
+          title="Download PDF"
+          className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-brand disabled:opacity-50"
+        >
+          {busy ? <Spinner size={15} /> : <Download size={16} />}
+        </button>
+        <button
+          onClick={() => setPreview(set)}
+          title="Open set"
+          className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
+        >
+          <Search size={16} />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="card flex items-start gap-3 p-5">
+        <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <ListChecks size={18} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">Current-affairs questions generated</h2>
+          <p className="font-body text-xs text-ink2">
+            The pipeline authors ~15 TNPSC-style MCQs from each day's paper (daily sets) and a 240-question bank
+            each month. Open a set to review every question, its answer and explanation, in English and Tamil.
+          </p>
+        </div>
+      </div>
+
+      {sets === null && !error && (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton h-16 w-full" />)}
+        </div>
+      )}
+
+      {error && <ErrorState onRetry={load} />}
+
+      {sets !== null && (
+        <>
+          <div>
+            <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wide text-ink2">Daily sets</h3>
+            {sets.daily.length === 0 ? (
+              <p className="py-6 text-center font-body text-sm text-ink2">
+                No daily sets yet. The pipeline pushes the first at ~06:00 IST.
+              </p>
+            ) : (
+              <div className="space-y-2">{sets.daily.map((s, i) => <Row key={s.key} set={s} i={i} />)}</div>
+            )}
+          </div>
+
+          <div>
+            <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wide text-ink2">Monthly banks</h3>
+            {sets.monthly.length === 0 ? (
+              <p className="py-6 text-center font-body text-sm text-ink2">
+                No monthly bank yet. The first is built on the 1st of the month.
+              </p>
+            ) : (
+              <div className="space-y-2">{sets.monthly.map((s, i) => <Row key={s.key} set={s} i={i} />)}</div>
+            )}
+          </div>
+        </>
+      )}
+
+      {preview && <CaQuestionPreview set={preview} onClose={() => setPreview(null)} />}
+    </div>
+  )
+}
+
 function CaMagazineTab() {
   const [issues, setIssues] = useState<CaMagazineIssue[] | null>(null)
   const [error, setError] = useState(false)
@@ -3883,7 +4458,7 @@ function CaMagazineTab() {
     setBusyKey(keyOf(issue))
     try {
       const material = await api.caMagazine.publish(issue.ca_type, issue.date)
-      patchIssue(issue, { id: material.id, active: material.active })
+      patchIssue(issue, { id: material.id, active: material.active, downloadable: material.downloadable })
       toast.success('Approved — the issue is now live in the Materials tab.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not publish the issue.')
@@ -3897,7 +4472,24 @@ function CaMagazineTab() {
     setBusyKey(keyOf(issue))
     try {
       const updated = await api.materials.update(issue.material.id, { active: !issue.material.active })
-      patchIssue(issue, { id: updated.id, active: updated.active })
+      patchIssue(issue, { id: updated.id, active: updated.active, downloadable: updated.downloadable })
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update.')
+    } finally {
+      setBusyKey(null)
+    }
+  }
+
+  // Enable / disable the student "Download PDF" for a published issue.
+  const toggleDownloadable = async (issue: CaMagazineIssue) => {
+    if (!issue.material) return
+    setBusyKey(keyOf(issue))
+    try {
+      const updated = await api.materials.update(issue.material.id, {
+        downloadable: !issue.material.downloadable,
+      })
+      patchIssue(issue, { id: updated.id, active: updated.active, downloadable: updated.downloadable })
+      toast.success(updated.downloadable ? 'PDF download enabled.' : 'PDF download disabled.')
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Could not update.')
     } finally {
@@ -4010,6 +4602,22 @@ function CaMagazineTab() {
                         title={issue.material.active ? 'Visible — click to hide' : 'Hidden — click to show'}
                       >
                         {issue.material.active ? <Eye size={15} /> : <EyeOff size={15} />}
+                      </button>
+                      <button
+                        onClick={() => toggleDownloadable(issue)}
+                        disabled={busy}
+                        className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-[11px] font-semibold transition disabled:opacity-50 ${
+                          issue.material.downloadable
+                            ? 'bg-brand text-white'
+                            : 'border border-line text-ink2 hover:border-brand-ring hover:text-brand'
+                        }`}
+                        title={
+                          issue.material.downloadable
+                            ? 'PDF download ON — click to disable'
+                            : 'PDF download OFF — click to enable'
+                        }
+                      >
+                        <Download size={13} /> PDF {issue.material.downloadable ? 'On' : 'Off'}
                       </button>
                       <button
                         onClick={() => setPendingRemove(issue)}

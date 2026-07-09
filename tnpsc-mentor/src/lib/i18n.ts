@@ -1501,6 +1501,7 @@ const STRINGS = {
   appTab: { en: 'App', ta: 'ஆப்' },
   materialsTab: { en: 'Materials', ta: 'பொருட்கள்' },
   caMagazineTab: { en: 'CA Magazine', ta: 'CA இதழ்' },
+  caQuestionsTab: { en: 'CA Questions', ta: 'CA வினாக்கள்' },
   caMagazineNoItems: {
     en: 'No items in this issue yet.',
     ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',
@@ -1531,6 +1532,7 @@ const STRINGS = {
   materialOpen: { en: 'Open', ta: 'திற' },
   materialOpenYoutube: { en: 'Open on YouTube', ta: 'YouTube-இல் திற' },
   materialDownload: { en: 'Download', ta: 'பதிவிறக்கு' },
+  downloadMagazinePdf: { en: 'Download PDF', ta: 'PDF பதிவிறக்கு' },
   materialDocHint: {
     en: 'Preview is not available for this file type — open or download it instead.',
     ta: 'இந்தக் கோப்பு வகைக்கு முன்னோட்டம் இல்லை — அதைத் திறக்கவும் அல்லது பதிவிறக்கவும்.',

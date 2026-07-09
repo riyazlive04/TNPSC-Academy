@@ -123,6 +123,7 @@ export default function MaterialsPage() {
           subtitle={active.description ?? undefined}
           load={() => api.caMagazine.items(active.id)}
           onClose={() => setActive(null)}
+          downloadable={active.downloadable}
         />
       )}
     </AppLayout>

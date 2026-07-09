@@ -1084,6 +1084,44 @@ export const api = {
     },
   },
 
+  // ─── CA Questions (pipeline-generated daily sets + monthly banks) ──────────
+  // Read-only superadmin viewer over the questions the VPS pipeline generates.
+  caQuestions: {
+    /** Daily sets (per day) + monthly banks (per month), with counts. */
+    async adminSets(): Promise<CaQuestionSets> {
+      return request<CaQuestionSets>('/api/ca-questions/admin/sets')
+    },
+    /** Every question in one set (bilingual), for the preview. */
+    async adminItems(set: CaQuestionSet): Promise<CaQuestionItem[]> {
+      const qs = new URLSearchParams({ source: set.source })
+      if (set.source === 'daily') qs.set('date', set.key)
+      else qs.set('ca_month', set.key)
+      const data = await request<{ items: CaQuestionItem[] }>(`/api/ca-questions/admin/items?${qs.toString()}`)
+      return data.items
+    },
+    // ─ DAILY-only curation (ca_daily_questions). Monthly bank is read-only. ─
+    /** Add a hand-authored question to a day (auto-verified). */
+    async addDailyItem(date: string, fields: Partial<CaQuestionItem>): Promise<CaQuestionItem> {
+      const data = await request<{ item: CaQuestionItem }>('/api/ca-questions/admin/daily/items', {
+        method: 'POST',
+        body: { date, ...fields },
+      })
+      return data.item
+    },
+    /** Edit fields and/or toggle `verified` on a daily question. */
+    async updateDailyItem(id: number, patch: Partial<CaQuestionItem>): Promise<CaQuestionItem> {
+      const data = await request<{ item: CaQuestionItem }>(`/api/ca-questions/admin/daily/items/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      })
+      return data.item
+    },
+    /** Remove a daily question. */
+    async deleteDailyItem(id: number): Promise<void> {
+      await request(`/api/ca-questions/admin/daily/items/${id}`, { method: 'DELETE' })
+    },
+  },
+
   // ─── Feedback (student-submitted) ────────────────────────────────────────
   feedback: {
     async submit(rating: number, message: string, page: string): Promise<void> {
@@ -1299,7 +1337,7 @@ export interface CaMagazineIssue {
   ca_year: number | null
   items: number
   /** The materials row publishing this issue, or null while unapproved. */
-  material: { id: string; active: boolean } | null
+  material: { id: string; active: boolean; downloadable: boolean } | null
 }
 
 /** One magazine news item; content is markdown bullets (`- ` lines, `**bold**`). */
@@ -1314,6 +1352,50 @@ export interface CaMagazineItem {
   title_ta: string | null
   content: string
   content_ta: string | null
+}
+
+// ─── CA Questions shapes ────────────────────────────────────────────────────────
+/** One generated set: a day's daily drop, or a month's 240-question bank. */
+export interface CaQuestionSet {
+  source: 'daily' | 'monthly'
+  /** date (YYYY-MM-DD) for daily, ca_month ('July 2026') for monthly. */
+  key: string
+  date: string | null
+  ca_month: string
+  ca_year: number | null
+  total: number
+}
+
+export interface CaQuestionSets {
+  daily: CaQuestionSet[]
+  monthly: CaQuestionSet[]
+}
+
+/** One bilingual MCQ as stored (EN fields + *_ta twins in one row). */
+export interface CaQuestionItem {
+  /** bigint PK — present for DAILY rows only (the curate/verify key). */
+  id?: number
+  /** Review state — DAILY rows only. */
+  verified?: boolean
+  verified_at?: string | null
+  external_id: string
+  topic: string
+  question_type: string
+  difficulty: string
+  question_text: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  correct_answer: string
+  explanation: string
+  why_wrong: Record<string, string> | null
+  question_text_ta: string | null
+  option_a_ta: string | null
+  option_b_ta: string | null
+  option_c_ta: string | null
+  option_d_ta: string | null
+  explanation_ta: string | null
 }
 
 /** Editable fields accepted by the PATCH endpoint. */

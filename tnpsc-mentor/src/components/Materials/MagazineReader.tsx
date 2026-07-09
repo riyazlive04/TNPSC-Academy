@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { AlertTriangle, Newspaper, X } from 'lucide-react'
+import { AlertTriangle, Download, Loader2, Newspaper, X } from 'lucide-react'
 import { useFocusTrap } from '../UI/useFocusTrap'
 import LogoLoader from '../UI/LogoLoader'
 import type { CaMagazineItem } from '../../lib/api'
 import MagazineSections from './MagazineContent'
 import { useT } from '../../lib/i18n'
+import { toast } from '../../store/toastStore'
 
 /**
  * Full-screen reader for one CA-magazine issue (a day's paper or a month's
@@ -21,11 +22,14 @@ export default function MagazineReader({
   subtitle,
   load,
   onClose,
+  downloadable = false,
 }: {
   title: string
   subtitle?: string
   load: () => Promise<CaMagazineItem[]>
   onClose: () => void
+  /** When true, offer a "Download PDF" of the issue (superadmin-gated). */
+  downloadable?: boolean
 }) {
   const { t, lang } = useT()
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -33,6 +37,21 @@ export default function MagazineReader({
 
   const [items, setItems] = useState<CaMagazineItem[] | null>(null)
   const [failed, setFailed] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+
+  const downloadPdf = async () => {
+    if (downloading || !items?.length) return
+    setDownloading(true)
+    try {
+      // Lazy-load the generator so jspdf/html2canvas stay out of the reader chunk.
+      const { generateMagazinePdf } = await import('../../lib/magazinePdf')
+      await generateMagazinePdf({ items, title, subtitle: subtitle ?? '', lang })
+    } catch {
+      toast.error(t('materialDownloadFailed'))
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -79,6 +98,27 @@ export default function MagazineReader({
             <h2 className="tamil truncate font-heading text-base font-semibold text-ink">{title}</h2>
             {subtitle && <p className="tamil mt-0.5 truncate font-body text-xs text-ink2">{subtitle}</p>}
           </div>
+          {downloadable && items && items.length > 0 && (
+            <button
+              onClick={downloadPdf}
+              disabled={downloading}
+              className="btn-soft press tamil hidden flex-shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs disabled:opacity-60 sm:inline-flex"
+              title={t('downloadMagazinePdf')}
+            >
+              {downloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+              {t('downloadMagazinePdf')}
+            </button>
+          )}
+          {downloadable && items && items.length > 0 && (
+            <button
+              onClick={downloadPdf}
+              disabled={downloading}
+              className="focus-ring grid h-8 w-8 flex-shrink-0 place-items-center rounded-full text-brand hover:bg-brand-soft disabled:opacity-60 sm:hidden"
+              aria-label={t('downloadMagazinePdf')}
+            >
+              {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            </button>
+          )}
           <button
             onClick={onClose}
             className="focus-ring -mr-1 grid h-8 w-8 flex-shrink-0 place-items-center rounded-full text-muted hover:bg-tint-violet hover:text-primary"

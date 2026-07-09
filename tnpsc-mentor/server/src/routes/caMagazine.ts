@@ -67,12 +67,15 @@ router.get(
 
     const { data: pubs, error: pubErr } = await supabaseAdmin
       .from('materials')
-      .select('id, active, magazine_ca_type, magazine_date')
+      .select('id, active, downloadable, magazine_ca_type, magazine_date')
       .eq('kind', 'magazine')
     if (pubErr) return sendDbError(res, pubErr)
 
     const byIssue = new Map(
-      (pubs ?? []).map((p) => [`${p.magazine_ca_type}|${p.magazine_date}`, { id: p.id as string, active: p.active as boolean }])
+      (pubs ?? []).map((p) => [
+        `${p.magazine_ca_type}|${p.magazine_date}`,
+        { id: p.id as string, active: p.active as boolean, downloadable: p.downloadable as boolean },
+      ])
     )
     res.json({
       issues: (issues ?? []).map((i: { ca_type: string; date: string; ca_month: string; ca_year: number | null; items: number }) => ({
