@@ -44,6 +44,8 @@ export default function MagazineEditor({
   const { t, lang } = useT()
   const [items, setItems] = useState<CaMagazineItem[] | null>(null)
   const [failed, setFailed] = useState(false)
+  // The issue's news image (daily issues only). Absent is normal.
+  const [newsImage, setNewsImage] = useState<string | null>(null)
   const [mode, setMode] = useState<'preview' | 'edit'>('edit')
   const [previewLang, setPreviewLang] = useState<'en' | 'ta' | 'both'>(lang)
   const [adding, setAdding] = useState(false)
@@ -77,6 +79,20 @@ export default function MagazineEditor({
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(fetchItems, [issue.ca_type, issue.date])
+
+  // News image — fetched independently so a missing image never blocks the
+  // editor. Lets the superadmin verify it before approving the issue.
+  useEffect(() => {
+    let cancelled = false
+    setNewsImage(null)
+    api.caMagazine
+      .adminNewsImage(issue.ca_type, issue.date)
+      .then((url) => !cancelled && setNewsImage(url))
+      .catch(() => !cancelled && setNewsImage(null))
+    return () => {
+      cancelled = true
+    }
+  }, [issue.ca_type, issue.date])
 
   const setAndReport = (next: CaMagazineItem[]) => {
     setItems(next)
@@ -171,9 +187,20 @@ export default function MagazineEditor({
           </div>
         )}
 
-        {/* Preview — exactly what students see */}
+        {/* Preview — exactly what students see, news image included. */}
         {items !== null && mode === 'preview' && (
           <div className="mx-auto w-full max-w-3xl">
+            {newsImage && (
+              <figure className="border-b border-line px-4 pb-4 pt-4 sm:px-6">
+                <img
+                  src={newsImage}
+                  alt={`News image — ${issueDateLabel(issue.ca_type, issue.date)}`}
+                  loading="lazy"
+                  onError={() => setNewsImage(null)}
+                  className="w-full rounded-xl border border-line bg-card object-cover"
+                />
+              </figure>
+            )}
             {items.length === 0 ? <MagazineEmpty /> : <MagazineSections items={items} lang={previewLang} />}
           </div>
         )}

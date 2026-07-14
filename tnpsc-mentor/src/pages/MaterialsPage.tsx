@@ -128,6 +128,7 @@ export default function MaterialsPage() {
           caType={active.magazine_ca_type}
           date={active.magazine_date}
           load={() => api.caMagazine.items(active.id)}
+          loadNewsImage={() => api.caMagazine.newsImage(active.id)}
           onClose={() => setActive(null)}
           downloadable={active.downloadable}
         />

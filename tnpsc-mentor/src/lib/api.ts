@@ -1027,10 +1027,28 @@ export const api = {
   // materials row; students read items through that row (hide/delete it via
   // api.materials to unpublish).
   caMagazine: {
+    /**
+     * Recent PUBLISHED daily issues + their signed news-image URLs, in one call
+     * (the dashboard carousel). `newsImage` is null when the pipeline produced
+     * no image for that date.
+     */
+    async recent(limit = 7): Promise<CaRecentIssue[]> {
+      const data = await request<{ issues: CaRecentIssue[] }>(`/api/ca-magazine/recent?limit=${limit}`)
+      return data.issues
+    },
     /** Items of a PUBLISHED issue, addressed by its materials row id. */
     async items(materialId: string): Promise<CaMagazineItem[]> {
       const data = await request<{ items: CaMagazineItem[] }>(`/api/ca-magazine/${materialId}/items`)
       return data.items
+    },
+    /**
+     * A short-lived signed URL for a published DAILY issue's news image, or null
+     * when there's no image for that date (holiday / before the morning push) —
+     * drop it straight into an <img src>.
+     */
+    async newsImage(materialId: string): Promise<string | null> {
+      const data = await request<{ url: string | null }>(`/api/ca-magazine/${materialId}/news-image`)
+      return data.url
     },
     /** Superadmin: every pushed issue with item count + publication state. */
     async adminIssues(): Promise<CaMagazineIssue[]> {
@@ -1042,6 +1060,12 @@ export const api = {
       const qs = new URLSearchParams({ ca_type: caType, date })
       const data = await request<{ items: CaMagazineItem[] }>(`/api/ca-magazine/admin/items?${qs.toString()}`)
       return data.items
+    },
+    /** Superadmin: an issue's news image (works before approval; null = none). */
+    async adminNewsImage(caType: CaMagazineType, date: string): Promise<string | null> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const data = await request<{ url: string | null }>(`/api/ca-magazine/admin/news-image?${qs.toString()}`)
+      return data.url
     },
     /** Superadmin: approve an issue → it appears in the Materials tab. */
     async publish(caType: CaMagazineType, date: string): Promise<Material> {
@@ -1344,6 +1368,16 @@ export interface Material {
 
 // ─── CA Magazine shapes ─────────────────────────────────────────────────────────
 export type CaMagazineType = 'day_wise' | 'month_wise'
+
+/** One recent published daily issue for the dashboard carousel. */
+export interface CaRecentIssue {
+  /** The publishing materials row id — addresses items/news-image reads. */
+  id: string
+  date: string
+  downloadable: boolean
+  /** Signed news-image URL, or null when there's no image for that date. */
+  newsImage: string | null
+}
 
 /** One pushed issue (a day's paper or a month's consolidation) in the console. */
 export interface CaMagazineIssue {

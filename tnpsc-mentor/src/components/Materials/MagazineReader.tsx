@@ -27,6 +27,7 @@ export default function MagazineReader({
   caType,
   date,
   load,
+  loadNewsImage,
   onClose,
   downloadable = false,
 }: {
@@ -34,6 +35,12 @@ export default function MagazineReader({
   /** Issue date, 'YYYY-MM-DD' (the day, or any day of the month for monthlies). */
   date: string
   load: () => Promise<CaMagazineItem[]>
+  /**
+   * Optional: resolves the issue's news image to a signed URL, or null when
+   * there is none for that date (a holiday, or before the morning push).
+   * Daily issues only — monthly issues have no news image.
+   */
+  loadNewsImage?: () => Promise<string | null>
   onClose: () => void
   /** When true, offer a "Download PDF" of the issue (superadmin-gated). */
   downloadable?: boolean
@@ -46,6 +53,8 @@ export default function MagazineReader({
   const [items, setItems] = useState<CaMagazineItem[] | null>(null)
   const [failed, setFailed] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  // The issue's news image. Absent is normal and never an error.
+  const [newsImage, setNewsImage] = useState<string | null>(null)
   // The reading language — seeded from the app toggle, then owned by the reader.
   const [readLang, setReadLang] = useState<'en' | 'ta' | 'both'>(lang)
 
@@ -97,6 +106,20 @@ export default function MagazineReader({
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(fetchItems, [])
+
+  // The news image loads independently of the items — a missing or failed image
+  // must never hold up (or break) the issue itself.
+  useEffect(() => {
+    if (!loadNewsImage) return
+    let cancelled = false
+    loadNewsImage()
+      .then((url) => !cancelled && setNewsImage(url))
+      .catch(() => !cancelled && setNewsImage(null))
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div
@@ -194,6 +217,20 @@ export default function MagazineReader({
                 {t('retry')}
               </button>
             </div>
+          )}
+
+          {/* News image — leads the issue when the pipeline produced one for
+              this date. onError drops it if the signed URL has expired. */}
+          {items !== null && newsImage && (
+            <figure className="border-b border-line px-4 pb-4 pt-4 sm:px-6">
+              <img
+                src={newsImage}
+                alt={`${title} — ${dateLine}`}
+                loading="lazy"
+                onError={() => setNewsImage(null)}
+                className="w-full rounded-xl border border-line bg-card object-cover"
+              />
+            </figure>
           )}
 
           {items !== null && <MagazineSections items={items} lang={viewLang} />}

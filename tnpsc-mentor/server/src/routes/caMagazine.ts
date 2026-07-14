@@ -44,6 +44,30 @@ function issueDateLabel(caType: string, date: string, caMonth: string): string {
   return caType === 'day_wise' ? `${d} ${monthEn} ${y}` : `${monthEn} ${y}`
 }
 
+// ─── News image ──────────────────────────────────────────────────────────────
+// The CA pipeline drops one news image per DAILY issue into the private
+// `ca-deliverables` bucket. Nothing in the DB records it — the path is derived
+// entirely from the issue's date, so we just try to sign it. A missing object is
+// NORMAL (a holiday, or before the ~06:00 IST push): the sign call 400/404s and
+// we report "no image" rather than an error. Monthly issues have none.
+const CA_DELIVERABLES_BUCKET = 'ca-deliverables'
+const NEWS_IMAGE_TTL_SECONDS = 3600
+
+/** '2026-07-09' → '2026-07/daily/newsimage_2026-07-09.jpg'. */
+function newsImagePath(date: string): string {
+  return `${date.slice(0, 7)}/daily/newsimage_${date}.jpg`
+}
+
+/** A 1-hour signed URL for a daily issue's news image, or null when there is none. */
+async function signNewsImage(caType: string, date: string): Promise<string | null> {
+  if (caType !== 'day_wise' || !DATE_RE.test(date)) return null
+  const { data, error } = await supabaseAdmin.storage
+    .from(CA_DELIVERABLES_BUCKET)
+    .createSignedUrl(newsImagePath(date), NEWS_IMAGE_TTL_SECONDS)
+  if (error || !data?.signedUrl) return null
+  return data.signedUrl
+}
+
 const admin = [requireAuth, requireSuperadmin] as const
 
 // ─── GET /api/ca-magazine/admin/issues ────────────────────────────────────────
@@ -97,6 +121,23 @@ router.get(
       .limit(1000)
     if (error) return sendDbError(res, error)
     res.json({ items: data ?? [] })
+  })
+)
+
+// ─── GET /api/ca-magazine/admin/news-image?ca_type=&date= ────────────────────
+// The issue's news image for the superadmin preview (works before the issue is
+// approved). `url: null` = no image for that date, which is not an error.
+// Declared among /admin/* so it wins over /:materialId/news-image.
+router.get(
+  '/admin/news-image',
+  ...admin,
+  asyncH(async (req: AuthedRequest, res) => {
+    const caType = String(req.query.ca_type ?? '')
+    const date = String(req.query.date ?? '')
+    if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) {
+      return res.status(400).json({ error: 'Invalid issue reference.' })
+    }
+    res.json({ url: await signNewsImage(caType, date) })
   })
 )
 
@@ -249,6 +290,41 @@ router.delete(
   })
 )
 
+// ─── GET /api/ca-magazine/recent?limit=7 ─────────────────────────────────────
+// The most recent PUBLISHED daily issues for the dashboard carousel, each with
+// its signed news-image URL — one round trip instead of a sign call per card.
+// Publication-driven: only active kind='magazine' day_wise rows appear, so the
+// superadmin's approve/hide is the only control. Declared before /:materialId/*.
+router.get(
+  '/recent',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 7, 1), 14)
+    const { data, error } = await supabaseAdmin
+      .from('materials')
+      .select('id, downloadable, magazine_date')
+      .eq('kind', 'magazine')
+      .eq('active', true)
+      .eq('magazine_ca_type', 'day_wise')
+      .not('magazine_date', 'is', null)
+      .order('magazine_date', { ascending: false })
+      .limit(limit)
+    if (error) return sendDbError(res, error)
+
+    const issues = await Promise.all(
+      (data ?? []).map(async (r) => ({
+        id: r.id as string,
+        date: r.magazine_date as string,
+        downloadable: r.downloadable as boolean,
+        newsImage: await signNewsImage('day_wise', r.magazine_date as string),
+      }))
+    )
+    // Well inside the signed URLs' 1-hour lifetime.
+    res.set('Cache-Control', 'private, max-age=600')
+    res.json({ issues })
+  })
+)
+
 // ─── GET /api/ca-magazine/:materialId/items ──────────────────────────────────
 // Student read: the items of a PUBLISHED (active) issue, addressed by the
 // materials row users see in the Materials tab. Declared after /admin/* so
@@ -281,6 +357,34 @@ router.get(
     // Items are immutable once pushed (insert-only pipeline) — cache briefly.
     res.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=600')
     res.json({ items: data ?? [] })
+  })
+)
+
+// ─── GET /api/ca-magazine/:materialId/news-image ─────────────────────────────
+// The news image of a PUBLISHED (active) daily issue, gated exactly like the
+// items read above. `url: null` = no image for that date — the client just
+// renders no image. Cached for half the signed URL's lifetime so a cached URL
+// always has time left on it.
+router.get(
+  '/:materialId/news-image',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = req.params.materialId
+    if (!UUID_RE.test(id)) return res.status(404).json({ error: 'Magazine not found.' })
+
+    const { data: mat, error } = await supabaseAdmin
+      .from('materials')
+      .select('kind, active, magazine_ca_type, magazine_date')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) return sendDbError(res, error)
+    if (!mat || mat.kind !== 'magazine' || !mat.active || !mat.magazine_ca_type || !mat.magazine_date) {
+      return res.status(404).json({ error: 'Magazine not found.' })
+    }
+
+    const url = await signNewsImage(mat.magazine_ca_type as string, mat.magazine_date as string)
+    res.set('Cache-Control', 'private, max-age=1800')
+    res.json({ url })
   })
 )
 

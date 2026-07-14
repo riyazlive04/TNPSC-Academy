@@ -1524,7 +1524,7 @@ const STRINGS = {
   caQuestionsCount: { en: 'questions', ta: 'வினாக்கள்' },
   close: { en: 'Close', ta: 'மூடு' },
   // ─── Materials / Infographics hub ───────────────────────────────────────
-  materials: { en: 'Materials', ta: 'கல்விப் பொருட்கள்' },
+  materials: { en: 'Materials', ta: 'பாடக்கோப்புகள்' },
   materialsTitle: { en: 'Study Materials', ta: 'கல்விப் பொருட்கள்' },
   materialsSubtitle: {
     en: 'Videos, infographics, notes and documents shared by your mentors',
