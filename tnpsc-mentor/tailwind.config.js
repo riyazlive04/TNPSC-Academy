@@ -147,14 +147,6 @@ export default {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(0)' },
         },
-        // Continuous right-to-left ticker. The track renders its item set TWICE;
-        // -50% lands the second copy exactly where the first began, so the loop
-        // is seamless. Requires uniform per-item margin (not flex gap), or the
-        // final gap is missing and the seam jumps.
-        marquee: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
-        },
         toastIn: {
           '0%': { opacity: '0', transform: 'translateY(12px) scale(0.96)' },
           '60%': { opacity: '1', transform: 'translateY(-2px) scale(1.01)' },
@@ -215,9 +207,6 @@ export default {
         scaleIn: 'scaleIn 0.18s ease-out',
         sheetIn: 'sheetIn 0.32s cubic-bezier(0.22,1,0.36,1)',
         slideInLeft: 'slideInLeft 0.28s cubic-bezier(0.22,1,0.36,1)',
-        // Duration is set inline per-track so the pixel speed stays constant
-        // regardless of how many cards are in the loop.
-        marquee: 'marquee 40s linear infinite',
         toastIn: 'toastIn 0.32s cubic-bezier(0.22,1,0.36,1)',
         pulseRing: 'pulseRing 1.4s ease-out',
         popStar: 'popStar 0.32s cubic-bezier(0.22,1,0.36,1)',

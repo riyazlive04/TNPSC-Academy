@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { useReducedMotion } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { Newspaper } from 'lucide-react'
 import { api, type CaRecentIssue } from '../../lib/api'
 import { issueDateLabel, magazineName } from '../../lib/caMagazine'
@@ -13,11 +12,17 @@ import { useT } from '../../lib/i18n'
  * from the pipeline's private bucket (signed server-side and returned with the
  * list, so the whole strip costs ONE request).
  *
- * The strip is a continuously looping right-to-left ticker: the card set is
- * rendered twice and the track animates to -50%, so the second copy lands
- * exactly where the first began and the loop never visibly restarts. It pauses
- * on hover/touch so a moving card is still easy to tap, and falls back to a
- * plain swipeable row when the user prefers reduced motion.
+ * The strip scrolls itself right-to-left forever: the card set is rendered
+ * twice and scrollLeft wraps at exactly one copy's width, so the loop never
+ * visibly restarts.
+ *
+ * The motion is driven by rAF on scrollLeft rather than a CSS animation on
+ * purpose — index.css force-disables every CSS animation under
+ * prefers-reduced-motion (`animation-duration: .001ms !important`), which
+ * silently killed the marquee for anyone with OS animation effects switched
+ * off. Scrolling the container sidesteps that, keeps the strip swipeable by
+ * hand, and lets us pause cleanly on hover/touch so a moving card stays easy
+ * to tap.
  *
  * Renders nothing until at least one daily issue is live.
  */
@@ -25,16 +30,17 @@ import { useT } from '../../lib/i18n'
 // Module-level cache so navigating away and back doesn't refetch/flash.
 let cache: CaRecentIssue[] | null = null
 
-/** Seconds each card spends crossing the strip — sets the ticker's pace. */
-const SECONDS_PER_CARD = 4
+/** Ticker speed, px/second — slow enough to read and tap. */
+const SCROLL_PX_PER_SEC = 34
 /** Cards one copy must contain to overflow the widest dashboard column. */
 const MIN_CARDS_PER_COPY = 6
 
 export default function CaMagazineCarousel() {
   const { t, lang } = useT()
-  const reduce = useReducedMotion()
   const [issues, setIssues] = useState<CaRecentIssue[] | null>(cache)
   const [active, setActive] = useState<CaRecentIssue | null>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const pausedRef = useRef(false)
 
   useEffect(() => {
     let cancelled = false
@@ -54,6 +60,43 @@ export default function CaMagazineCarousel() {
     }
   }, [])
 
+  // The ticker.
+  //
+  // Position is accumulated as a float rather than read back off scrollLeft each
+  // frame: browsers round scrollLeft to whole pixels, so feeding the rounded
+  // value back in makes every sub-pixel step round up to a full pixel — the
+  // strip then moves 1px/frame (i.e. at the display's refresh rate, twice as
+  // fast on a 120Hz screen) instead of the speed asked for. Writing an
+  // accumulated float keeps it time-based and refresh-rate independent.
+  const hasIssues = !!issues?.length
+  useEffect(() => {
+    if (!hasIssues || active) return // pause entirely while the reader is open
+    let raf = 0
+    let last = performance.now()
+    let pos = trackRef.current?.scrollLeft ?? 0
+    let written = pos
+    const tick = (now: number) => {
+      // Clamp dt so returning to a backgrounded tab doesn't jump the strip.
+      const dt = Math.min((now - last) / 1000, 0.05)
+      last = now
+      const el = trackRef.current
+      if (el && !pausedRef.current) {
+        // Someone else moved the scroller (a manual swipe) — adopt their position.
+        if (Math.abs(el.scrollLeft - written) > 1) pos = el.scrollLeft
+        const half = el.scrollWidth / 2
+        if (half > 0) {
+          pos += SCROLL_PX_PER_SEC * dt
+          if (pos >= half) pos -= half // wrap onto the identical second copy
+          el.scrollLeft = pos
+          written = el.scrollLeft // what the browser actually stored (rounded)
+        }
+      }
+      raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [hasIssues, active])
+
   if (!issues || issues.length === 0) return null
 
   const card = (m: CaRecentIssue, key: string, decorative = false) => (
@@ -63,7 +106,7 @@ export default function CaMagazineCarousel() {
       aria-hidden={decorative}
       tabIndex={decorative ? -1 : undefined}
       // mr-3 (not a flex gap) so every card contributes an identical width —
-      // the -50% seam depends on it.
+      // the wrap point depends on both copies measuring exactly the same.
       className="focus-ring group mr-3 w-40 flex-shrink-0 overflow-hidden rounded-card border border-line bg-card text-left transition-colors hover:border-brand/40"
     >
       {/* The day's news image — landscape 3:2, matching the ~1.2–1.6 ratios the
@@ -75,6 +118,7 @@ export default function CaMagazineCarousel() {
             src={m.newsImage}
             alt=""
             loading="lazy"
+            draggable={false}
             className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -95,31 +139,34 @@ export default function CaMagazineCarousel() {
   )
 
   // Repeat the set until one copy is wide enough to overflow the column, then
-  // duplicate that copy — the ticker animates across exactly one copy's width.
+  // duplicate that copy — the ticker wraps across exactly one copy's width.
   const reps = Math.max(1, Math.ceil(MIN_CARDS_PER_COPY / issues.length))
   const copy = Array.from({ length: reps }, () => issues).flat()
-  const duration = copy.length * SECONDS_PER_CARD
+
+  const pause = () => {
+    pausedRef.current = true
+  }
+  const resume = () => {
+    pausedRef.current = false
+  }
 
   return (
     <section className="space-y-3">
       <SectionHeader title={t('caCarouselTitle')} className="px-1" />
 
-      {reduce ? (
-        // Reduced motion: no ticker — a plain swipeable row.
-        <div className="-mx-4 flex snap-x snap-mandatory overflow-x-auto scroll-px-4 px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {issues.map((m) => card(m, m.id))}
-        </div>
-      ) : (
-        <div className="-mx-4 overflow-hidden px-4">
-          <div
-            className="flex w-max animate-marquee hover:[animation-play-state:paused] [&:has(:focus-visible)]:[animation-play-state:paused] active:[animation-play-state:paused]"
-            style={{ animationDuration: `${duration}s` }}
-          >
-            {copy.map((m, i) => card(m, `a-${m.id}-${i}`))}
-            {copy.map((m, i) => card(m, `b-${m.id}-${i}`, true))}
-          </div>
-        </div>
-      )}
+      <div
+        ref={trackRef}
+        onMouseEnter={pause}
+        onMouseLeave={resume}
+        onTouchStart={pause}
+        onTouchEnd={resume}
+        onFocusCapture={pause}
+        onBlurCapture={resume}
+        className="-mx-4 flex overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {copy.map((m, i) => card(m, `a-${m.id}-${i}`))}
+        {copy.map((m, i) => card(m, `b-${m.id}-${i}`, true))}
+      </div>
 
       {active && (
         <MagazineReader
