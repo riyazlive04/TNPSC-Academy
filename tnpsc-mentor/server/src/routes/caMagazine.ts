@@ -24,33 +24,24 @@ const MONTHS_EN = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ]
-const MONTHS_TA: Record<string, string> = {
-  January: 'ஜனவரி', February: 'பிப்ரவரி', March: 'மார்ச்', April: 'ஏப்ரல்',
-  May: 'மே', June: 'ஜூன்', July: 'ஜூலை', August: 'ஆகஸ்ட்',
-  September: 'செப்டம்பர்', October: 'அக்டோபர்', November: 'நவம்பர்', December: 'டிசம்பர்',
-}
-
 /** 'July 2026' label for a date, used when an issue has no rows to copy from. */
 function deriveMonth(date: string): { ca_month: string; ca_year: number } {
   const [y, mo] = date.split('-').map(Number)
   return { ca_month: `${MONTHS_EN[(mo ?? 1) - 1] ?? ''} ${y}`.trim(), ca_year: y }
 }
 
-/** Bilingual card titles for a published issue, built from its date/month. */
-function issueTitles(caType: string, date: string, caMonth: string) {
+// Every issue is named the same — the date is a separate line, not part of the
+// name — and no source publication is credited anywhere a student can see.
+// The app renders both lines from (magazine_ca_type, magazine_date), so these
+// stored values only back the admin lists.
+const MAGAZINE_NAME_EN = 'Current Affair'
+const MAGAZINE_NAME_TA = 'நடப்பு நிகழ்வுகள்'
+
+/** '9 July 2026' (daily) / 'July 2026' (monthly) — the issue's date line. */
+function issueDateLabel(caType: string, date: string, caMonth: string): string {
   const [y, mo, d] = date.split('-').map(Number)
   const monthEn = MONTHS_EN[(mo ?? 1) - 1] ?? caMonth.split(' ')[0]
-  const monthTa = MONTHS_TA[monthEn] ?? monthEn
-  if (caType === 'day_wise') {
-    return {
-      title: `Daily CA Magazine — ${d} ${monthEn} ${y}`,
-      title_ta: `தினசரி நடப்பு நிகழ்வுகள் — ${d} ${monthTa} ${y}`,
-    }
-  }
-  return {
-    title: `Monthly CA Magazine — ${monthEn} ${y}`,
-    title_ta: `மாதாந்திர நடப்பு நிகழ்வுகள் — ${monthTa} ${y}`,
-  }
+  return caType === 'day_wise' ? `${d} ${monthEn} ${y}` : `${monthEn} ${y}`
 }
 
 const admin = [requireAuth, requireSuperadmin] as const
@@ -134,15 +125,14 @@ router.post(
     }
 
     const caMonth = sample[0].ca_month as string
-    const { title, title_ta } = issueTitles(caType, date, caMonth)
     const { data, error } = await supabaseAdmin
       .from('materials')
       .insert({
         kind: 'magazine',
         placement: 'materials',
-        title,
-        title_ta,
-        description: `${count} news items · The Hindu (print edition)`,
+        title: MAGAZINE_NAME_EN,
+        title_ta: MAGAZINE_NAME_TA,
+        description: issueDateLabel(caType, date, caMonth),
         magazine_ca_type: caType,
         magazine_date: date,
         created_by: req.userId,

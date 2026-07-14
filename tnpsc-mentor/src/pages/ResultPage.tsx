@@ -31,6 +31,7 @@ import { assetsFor } from '../lib/assets'
 import { exitFullscreen } from '../lib/proctor'
 import { trackViewResult } from '../lib/tracking'
 import { formatDuration, msUntil } from '../lib/revisionTime'
+import { pdfWatermark } from '../lib/pdfWatermark'
 import { useAuth } from '../hooks/useAuth'
 import { api, isApiConfigured, type PdfQuota } from '../lib/api'
 import { useProgressStore } from '../store/progressStore'
@@ -264,19 +265,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
         label,
         title: 'Explanation Sheet',
         lang,
-        // Personalised watermark: the downloader's name + phone (falls back to
-        // their email handle, then the brand) so a shared/leaked sheet is
-        // traceable to whoever generated it.
-        watermark: [
-          (
-            profile?.full_name?.trim() ||
-            profile?.email?.split('@')[0] ||
-            'TNPSC MENTOR'
-          ).toUpperCase(),
-          profile?.phone?.trim(),
-        ]
-          .filter(Boolean)
-          .join('  ·  '),
+        // Personalised watermark: the downloader's name + phone so a shared/
+        // leaked sheet is traceable to whoever generated it.
+        watermark: pdfWatermark(profile),
       })
     } finally {
       setDownloadingPdf(false)
@@ -323,7 +314,8 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
     const saved = bookmarkIds.has(questionId)
     setBookmarkIds((prev) => {
       const next = new Set(prev)
-      saved ? next.delete(questionId) : next.add(questionId)
+      if (saved) next.delete(questionId)
+      else next.add(questionId)
       return next
     })
     try {
@@ -331,7 +323,8 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
     } catch {
       setBookmarkIds((prev) => {
         const next = new Set(prev)
-        saved ? next.add(questionId) : next.delete(questionId)
+        if (saved) next.add(questionId)
+        else next.delete(questionId)
         return next
       })
     }

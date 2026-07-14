@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library, Newspaper } from 'lucide-react'
+import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library, Newspaper, ListChecks } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import MaterialViewer from '../components/Materials/MaterialViewer'
 import MagazineReader from '../components/Materials/MagazineReader'
 import LogoLoader from '../components/UI/LogoLoader'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
+import { issueDateLabel, magazineName } from '../lib/caMagazine'
 import { useT, type StringKey } from '../lib/i18n'
 
 const KIND_ICON: Record<MaterialKind, typeof Play> = {
@@ -14,9 +15,11 @@ const KIND_ICON: Record<MaterialKind, typeof Play> = {
   pdf: FileText,
   document: FileText,
   magazine: Newspaper,
+  questions: ListChecks,
 }
 
-// Type filter chips (the value 'all' shows everything).
+// Type filter chips (the value 'all' shows everything). CA Questions have their
+// own dashboard section (/test-arena/ca-questions), so they're excluded here.
 const FILTERS: { value: MaterialKind | 'all'; key: StringKey }[] = [
   { value: 'all', key: 'materialsAllTypes' },
   { value: 'magazine', key: 'typeMagazine' },
@@ -36,11 +39,14 @@ export default function MaterialsPage() {
   const load = () => {
     setError(false)
     api.materials
+      // CA Questions are surfaced in their own dashboard section, not here.
       .list('materials')
-      .then(setItems)
+      .then((all) => setItems(all.filter((m) => m.kind !== 'questions')))
       .catch(() => setError(true))
   }
   useEffect(load, [])
+
+  const openMaterial = (m: Material) => setActive(m)
 
   // Only show filter chips for kinds that actually exist in the bank.
   const present = useMemo(() => new Set((items ?? []).map((m) => m.kind)), [items])
@@ -108,19 +114,19 @@ export default function MaterialsPage() {
         {filtered.length > 0 && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((m, i) => (
-              <MaterialCard key={m.id} m={m} lang={lang} i={i} onOpen={() => setActive(m)} />
+              <MaterialCard key={m.id} m={m} lang={lang} i={i} onOpen={() => openMaterial(m)} />
             ))}
           </div>
         )}
       </div>
 
-      {active && active.kind !== 'magazine' && (
+      {active && active.kind !== 'magazine' && active.kind !== 'questions' && (
         <MaterialViewer material={active} onClose={() => setActive(null)} />
       )}
-      {active && active.kind === 'magazine' && (
+      {active && active.kind === 'magazine' && active.magazine_ca_type && active.magazine_date && (
         <MagazineReader
-          title={materialTitle(active, lang)}
-          subtitle={active.description ?? undefined}
+          caType={active.magazine_ca_type}
+          date={active.magazine_date}
           load={() => api.caMagazine.items(active.id)}
           onClose={() => setActive(null)}
           downloadable={active.downloadable}
@@ -143,11 +149,16 @@ function MaterialCard({
 }) {
   const { t } = useT()
   const Icon = KIND_ICON[m.kind]
+  // Magazine cards are named and dated from the issue itself (name on one line,
+  // date on the next) rather than from whatever title the row was published with.
+  const issue = m.kind === 'magazine' && m.magazine_ca_type && m.magazine_date
+  const title = issue ? magazineName(lang) : materialTitle(m, lang)
+  const dateLine = issue ? issueDateLabel(m.magazine_ca_type!, m.magazine_date!, lang) : null
   return (
     <button
       onClick={onOpen}
       style={{ '--i': i } as React.CSSProperties}
-      className="card stagger-item interactive group flex flex-col overflow-hidden p-0 text-left"
+      className="card stagger-item interactive group flex flex-col overflow-hidden p-0 text-left disabled:opacity-70"
     >
       {/* Media / thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden bg-tint">
@@ -185,8 +196,9 @@ function MaterialCard({
           {m.file_size ? ` · ${formatFileSize(m.file_size)}` : ''}
         </span>
         <span className="tamil line-clamp-2 font-heading text-sm font-semibold leading-snug text-ink">
-          {materialTitle(m, lang)}
+          {title}
         </span>
+        {dateLine && <span className="tamil font-body text-xs text-ink2">{dateLine}</span>}
       </div>
     </button>
   )

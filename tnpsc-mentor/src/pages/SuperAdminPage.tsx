@@ -36,6 +36,7 @@ import {
   ClipboardList,
   Clock,
   X,
+  Menu,
   Library,
   Video,
   FileText,
@@ -50,6 +51,7 @@ import {
   Newspaper,
   CheckCircle2,
   ListChecks,
+  FileDown,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -83,7 +85,7 @@ import {
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
-import { issueDateLabel } from '../lib/caMagazine'
+import { issueDateLabel, magazineName } from '../lib/caMagazine'
 import { ALERT_KIND, ALERT_KINDS, alertKindOf } from '../lib/alertKinds'
 import MagazineEditor from '../components/Materials/MagazineEditor'
 import { toast } from '../store/toastStore'
@@ -94,6 +96,8 @@ type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'fee
 export default function SuperAdminPage() {
   const { t } = useT()
   const [tab, setTab] = useState<Tab>('overview')
+  // Mobile-only nav drawer (the desktop rail is always visible).
+  const [navOpen, setNavOpen] = useState(false)
 
   const TABS: { id: Tab; label: StringKey; icon: typeof Activity }[] = [
     { id: 'overview', label: 'overview', icon: Activity },
@@ -113,58 +117,134 @@ export default function SuperAdminPage() {
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
+  const activeTab = TABS.find((x) => x.id === tab)
+
+  // Lock body scroll + close on Escape while the mobile drawer is open.
+  useEffect(() => {
+    if (!navOpen) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setNavOpen(false)
+    window.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prev
+    }
+  }, [navOpen])
+
+  // The vertical list of tab buttons, shared by the desktop rail and the mobile
+  // drawer. `onPick` lets the drawer close itself after a selection.
+  const navList = (onPick?: () => void) => (
+    <nav className="space-y-1">
+      {TABS.map(({ id, label, icon: Icon }) => {
+        const active = tab === id
+        return (
+          <button
+            key={id}
+            onClick={() => {
+              setTab(id)
+              onPick?.()
+            }}
+            aria-current={active}
+            className={`press flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left font-heading text-sm font-medium transition-colors duration-200 ${
+              active ? 'bg-brand-soft text-brand' : 'text-ink2 hover:bg-tint hover:text-ink'
+            }`}
+          >
+            <Icon size={17} className="flex-shrink-0" /> <span className="tamil truncate">{t(label)}</span>
+          </button>
+        )
+      })}
+    </nav>
+  )
+
   return (
     <AppLayout>
-      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
+      <div className="mx-auto max-w-6xl px-4 py-6 lg:py-8">
         <header className="mb-6 flex items-center gap-3 animate-slideDown">
-          <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-gradient text-white shadow-brand">
+          {/* Mobile menu trigger — opens the tab drawer. */}
+          <button
+            onClick={() => setNavOpen(true)}
+            aria-label={t('chooseCategory')}
+            className="focus-ring grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-line bg-card text-ink2 hover:text-ink lg:hidden"
+          >
+            <Menu size={22} />
+          </button>
+          <span className="hidden h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-gradient text-white shadow-brand lg:grid">
             <ShieldCheck size={22} />
           </span>
-          <div>
-            <h1 className="font-heading text-xl font-semibold tracking-tight text-ink">
+          <div className="min-w-0">
+            <h1 className="truncate font-heading text-xl font-semibold tracking-tight text-ink">
               {t('superadminConsole')}
             </h1>
-            <p className="font-body text-sm text-ink2">{t('chooseCategory')}</p>
+            {/* Desktop: static subtitle. Mobile: the active tab, so the current
+                section is always named next to the menu button. */}
+            <p className="tamil truncate font-body text-sm text-ink2">
+              <span className="lg:hidden">{activeTab ? t(activeTab.label) : t('chooseCategory')}</span>
+              <span className="hidden lg:inline">{t('chooseCategory')}</span>
+            </p>
           </div>
         </header>
 
-        {/* Tabs */}
-        <div className="mb-6 flex w-full overflow-x-auto rounded-xl bg-tint p-1">
-          {TABS.map(({ id, label, icon: Icon }) => {
-            const active = tab === id
-            return (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                aria-current={active}
-                className={`press flex flex-shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 font-heading text-sm font-medium transition-all duration-200 lg:flex-1 ${
-                  active ? 'bg-card text-brand shadow-pill' : 'text-ink2 hover:text-ink'
-                }`}
-              >
-                <Icon size={16} /> <span className="tamil">{t(label)}</span>
-              </button>
-            )
-          })}
-        </div>
+        <div className="flex gap-6">
+          {/* Desktop side panel — a sticky vertical rail. */}
+          <aside className="hidden w-56 flex-shrink-0 lg:block">
+            <div className="sticky top-6">{navList()}</div>
+          </aside>
 
-        <div key={tab} className="animate-fadeIn">
-          {tab === 'overview' && <OverviewTab />}
-          {tab === 'revenue' && <RevenueTab />}
-          {tab === 'users' && <UsersTab />}
-          {tab === 'coupons' && <CouponsTab />}
-          {tab === 'notifications' && <NotificationsTab />}
-          {tab === 'feedback' && <FeedbackTab />}
-          {tab === 'reports' && <ReportedQuestions />}
-          {tab === 'notes' && <StudyNotesTab />}
-          {tab === 'mockexams' && <MockExamsTab />}
-          {tab === 'testseries' && <TestSeriesTab />}
-          {tab === 'vettri' && <VettriExamsTab />}
-          {tab === 'materials' && <MaterialsTab />}
-          {tab === 'camagazine' && <CaMagazineTab />}
-          {tab === 'caquestions' && <CaQuestionsTab />}
-          {tab === 'app' && <AppReleasesTab />}
+          {/* Content column */}
+          <div key={tab} className="min-w-0 flex-1 animate-fadeIn">
+            {tab === 'overview' && <OverviewTab />}
+            {tab === 'revenue' && <RevenueTab />}
+            {tab === 'users' && <UsersTab />}
+            {tab === 'coupons' && <CouponsTab />}
+            {tab === 'notifications' && <NotificationsTab />}
+            {tab === 'feedback' && <FeedbackTab />}
+            {tab === 'reports' && <ReportedQuestions />}
+            {tab === 'notes' && <StudyNotesTab />}
+            {tab === 'mockexams' && <MockExamsTab />}
+            {tab === 'testseries' && <TestSeriesTab />}
+            {tab === 'vettri' && <VettriExamsTab />}
+            {tab === 'materials' && <MaterialsTab />}
+            {tab === 'camagazine' && <CaMagazineTab />}
+            {tab === 'caquestions' && <CaQuestionsTab />}
+            {tab === 'app' && <AppReleasesTab />}
+          </div>
         </div>
       </div>
+
+      {/* Mobile nav drawer — slide-in side panel over a scrim. */}
+      {navOpen && (
+        <div
+          className="fixed inset-0 z-[60] bg-ink/50 backdrop-blur-sm animate-fadeInFast lg:hidden"
+          onClick={() => setNavOpen(false)}
+          role="presentation"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('superadminConsole')}
+            className="absolute inset-y-0 left-0 flex w-72 max-w-[82%] flex-col border-r border-line bg-card shadow-card animate-slideInLeft"
+          >
+            <div className="flex items-center gap-2.5 border-b border-line px-4 py-3.5">
+              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-gradient text-white">
+                <ShieldCheck size={18} />
+              </span>
+              <span className="min-w-0 flex-1 truncate font-heading text-sm font-semibold text-ink">
+                {t('superadminConsole')}
+              </span>
+              <button
+                onClick={() => setNavOpen(false)}
+                aria-label={t('close')}
+                className="focus-ring grid h-8 w-8 flex-shrink-0 place-items-center rounded-full text-muted hover:bg-tint hover:text-ink"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-2">{navList(() => setNavOpen(false))}</div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   )
 }
@@ -3518,6 +3598,7 @@ const MATERIAL_KIND_ICON: Record<MaterialKind, typeof Video> = {
   pdf: FileText,
   document: FileText,
   magazine: Newspaper,
+  questions: ListChecks,
 }
 
 const EMPTY_VIDEO_FORM = {
@@ -4305,6 +4386,7 @@ function CaQuestionsTab() {
   const [error, setError] = useState(false)
   const [preview, setPreview] = useState<CaQuestionSet | null>(null)
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
+  const [busyKey, setBusyKey] = useState<string | null>(null)
 
   const load = () => {
     setError(false)
@@ -4312,6 +4394,43 @@ function CaQuestionsTab() {
     api.caQuestions.adminSets().then(setSets).catch(() => setError(true))
   }
   useEffect(load, [])
+
+  const setKey = (s: CaQuestionSet) => `${s.source}:${s.key}`
+  const patchSet = (set: CaQuestionSet, material: CaQuestionSet['material']) =>
+    setSets((prev) =>
+      prev
+        ? {
+            daily: prev.daily.map((x) => (setKey(x) === setKey(set) ? { ...x, material } : x)),
+            monthly: prev.monthly.map((x) => (setKey(x) === setKey(set) ? { ...x, material } : x)),
+          }
+        : prev
+    )
+
+  /** Whether students can currently download this set's PDF. */
+  const studentPdfOn = (s: CaQuestionSet) => !!s.material?.active && !!s.material?.downloadable
+
+  // Toggle the student-facing PDF. First enable publishes a Materials card;
+  // later toggles just flip active+downloadable on that card.
+  const toggleStudentPdf = async (set: CaQuestionSet) => {
+    if (busyKey) return
+    setBusyKey(setKey(set))
+    try {
+      if (!set.material) {
+        const m = await api.caQuestions.publish(set)
+        patchSet(set, { id: m.id, active: m.active, downloadable: m.downloadable })
+        toast.success('Student PDF enabled — the set now appears in Materials.')
+      } else {
+        const on = studentPdfOn(set)
+        const m = await api.materials.update(set.material.id, { active: !on, downloadable: !on })
+        patchSet(set, { id: m.id, active: m.active, downloadable: m.downloadable })
+        toast.success(!on ? 'Student PDF enabled.' : 'Student PDF disabled.')
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not update.')
+    } finally {
+      setBusyKey(null)
+    }
+  }
 
   // Fetch the set's questions and export a bilingual Q&A + explanation PDF.
   const downloadSet = async (set: CaQuestionSet) => {
@@ -4339,6 +4458,7 @@ function CaQuestionsTab() {
     const daily = set.source === 'daily'
     const label = daily ? issueDateLabel('day_wise', set.date ?? '') : set.ca_month
     const busy = downloadingKey === `${set.source}:${set.key}`
+    const on = studentPdfOn(set)
     return (
       <div
         style={{ '--i': i } as React.CSSProperties}
@@ -4363,10 +4483,24 @@ function CaQuestionsTab() {
         <button
           onClick={() => downloadSet(set)}
           disabled={busy}
-          title="Download PDF"
+          title="Download PDF (admin copy)"
           className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-brand disabled:opacity-50"
         >
-          {busy ? <Spinner size={15} /> : <Download size={16} />}
+          {busy ? <Spinner size={15} /> : <FileDown size={16} />}
+        </button>
+        <button
+          onClick={() => toggleStudentPdf(set)}
+          disabled={busyKey === setKey(set)}
+          title={
+            on
+              ? 'Students CAN download this PDF — click to disable'
+              : 'Students cannot download this PDF — click to enable'
+          }
+          className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-[11px] font-semibold transition disabled:opacity-50 ${
+            on ? 'bg-brand text-white' : 'border border-line text-ink2 hover:border-brand-ring hover:text-brand'
+          }`}
+        >
+          {busyKey === setKey(set) ? <Spinner size={13} /> : <Download size={13} />} PDF {on ? 'On' : 'Off'}
         </button>
         <button
           onClick={() => setPreview(set)}
@@ -4434,9 +4568,11 @@ function CaQuestionsTab() {
 }
 
 function CaMagazineTab() {
+  const { lang } = useT()
   const [issues, setIssues] = useState<CaMagazineIssue[] | null>(null)
   const [error, setError] = useState(false)
   const [busyKey, setBusyKey] = useState<string | null>(null)
+  const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
   const [preview, setPreview] = useState<CaMagazineIssue | null>(null)
   const [pendingRemove, setPendingRemove] = useState<CaMagazineIssue | null>(null)
 
@@ -4451,6 +4587,31 @@ function CaMagazineTab() {
   useEffect(load, [])
 
   const keyOf = (i: CaMagazineIssue) => `${i.ca_type}|${i.date}`
+
+  // Admin export — available on EVERY issue, published or still pending review.
+  const downloadIssue = async (issue: CaMagazineIssue) => {
+    if (downloadingKey) return
+    setDownloadingKey(keyOf(issue))
+    try {
+      const items = await api.caMagazine.adminItems(issue.ca_type, issue.date)
+      if (!items.length) {
+        toast.error('No items in this issue.')
+        return
+      }
+      const { generateMagazinePdf } = await import('../lib/magazinePdf')
+      await generateMagazinePdf({
+        items,
+        title: magazineName(lang),
+        subtitle: issueDateLabel(issue.ca_type, issue.date, lang),
+        lang,
+        fileLabel: issueDateLabel(issue.ca_type, issue.date, 'en'),
+      })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not generate the PDF.')
+    } finally {
+      setDownloadingKey(null)
+    }
+  }
   const patchIssue = (issue: CaMagazineIssue, material: CaMagazineIssue['material']) =>
     setIssues((prev) => prev?.map((x) => (keyOf(x) === keyOf(issue) ? { ...x, material } : x)) ?? prev)
 
@@ -4590,6 +4751,14 @@ function CaMagazineTab() {
                     title="Open — view / edit / add content"
                   >
                     <Search size={15} />
+                  </button>
+                  <button
+                    onClick={() => downloadIssue(issue)}
+                    disabled={downloadingKey === keyOf(issue)}
+                    className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-brand disabled:opacity-50"
+                    title="Download PDF (admin copy)"
+                  >
+                    {downloadingKey === keyOf(issue) ? <Spinner size={14} /> : <FileDown size={15} />}
                   </button>
                   {issue.material ? (
                     <>

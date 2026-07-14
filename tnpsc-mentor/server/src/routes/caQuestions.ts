@@ -2,8 +2,40 @@ import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { MATERIAL_COLS } from './materials.js'
 
 const router = Router()
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const MONTHS_EN = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+const MONTHS_TA: Record<string, string> = {
+  January: 'ஜனவரி', February: 'பிப்ரவரி', March: 'மார்ச்', April: 'ஏப்ரல்',
+  May: 'மே', June: 'ஜூன்', July: 'ஜூலை', August: 'ஆகஸ்ட்',
+  September: 'செப்டம்பர்', October: 'அக்டோபர்', November: 'நவம்பர்', December: 'டிசம்பர்',
+}
+
+/** Bilingual card titles for a published question set. */
+function setTitles(source: string, key: string) {
+  if (source === 'daily') {
+    const [y, mo, d] = key.split('-').map(Number)
+    const monthEn = MONTHS_EN[(mo ?? 1) - 1] ?? ''
+    const monthTa = MONTHS_TA[monthEn] ?? monthEn
+    return {
+      title: `Daily CA Questions — ${d} ${monthEn} ${y}`,
+      title_ta: `தினசரி நடப்பு வினாக்கள் — ${d} ${monthTa} ${y}`,
+    }
+  }
+  const [monthEn, y] = key.split(' ')
+  const monthTa = MONTHS_TA[monthEn] ?? monthEn
+  return {
+    title: `Monthly CA Questions — ${key}`,
+    title_ta: `மாதாந்திர நடப்பு வினாக்கள் — ${monthTa} ${y}`,
+  }
+}
 
 // Read-only superadmin viewer for the CA questions the VPS pipeline generates:
 //   • DAILY sets  → ca_daily_questions (day_wise, ~15/day, kept out of the
@@ -81,7 +113,24 @@ router.get(
       })
     )
 
-    res.json({ daily, monthly })
+    // Which sets are published to students (kind='questions' materials rows).
+    const { data: pubs, error: pErr } = await supabaseAdmin
+      .from('materials')
+      .select('id, active, downloadable, questions_source, questions_key')
+      .eq('kind', 'questions')
+    if (pErr) return sendDbError(res, pErr)
+    const byKey = new Map(
+      (pubs ?? []).map((p) => [
+        `${p.questions_source}|${p.questions_key}`,
+        { id: p.id as string, active: p.active as boolean, downloadable: p.downloadable as boolean },
+      ])
+    )
+    const withMaterial = <T extends { source: string; key: string }>(s: T) => ({
+      ...s,
+      material: byKey.get(`${s.source}|${s.key}`) ?? null,
+    })
+
+    res.json({ daily: daily.map(withMaterial), monthly: monthly.map(withMaterial) })
   })
 )
 
@@ -241,6 +290,110 @@ router.delete(
       .eq('id', Number(req.params.id))
     if (error) return sendDbError(res, error)
     res.json({ ok: true })
+  })
+)
+
+// ─── POST /api/ca-questions/admin/publish {source, key} ──────────────────────
+// Turn ON the student PDF for a set: insert the kind='questions' materials row
+// (active + downloadable). Toggling off later is a PATCH via /api/materials.
+// The partial unique index makes a double-publish a 409.
+router.post(
+  '/admin/publish',
+  ...admin,
+  asyncH(async (req: AuthedRequest, res) => {
+    const source = String(req.body?.source ?? '')
+    const key = String(req.body?.key ?? '')
+    const validKey = source === 'daily' ? DATE_RE.test(key) : source === 'monthly' && MONTH_RE.test(key)
+    if (!validKey) return res.status(400).json({ error: 'Invalid set reference.' })
+
+    // Confirm the set actually has questions before exposing a card for it.
+    const table = source === 'daily' ? 'ca_daily_questions' : 'questions'
+    let q = supabaseAdmin.from(table).select('external_id', { count: 'exact', head: true })
+    q = source === 'daily'
+      ? q.eq('date', key)
+      : q.eq('category', 'current_affairs').eq('ca_type', 'month_wise').eq('ca_month', key)
+    const { count, error: cErr } = await q
+    if (cErr) return sendDbError(res, cErr)
+    if (!count) return res.status(404).json({ error: 'That set has no questions.' })
+
+    const { title, title_ta } = setTitles(source, key)
+    const { data, error } = await supabaseAdmin
+      .from('materials')
+      .insert({
+        kind: 'questions',
+        placement: 'materials',
+        title,
+        title_ta,
+        description: `${count} questions with answers and explanations`,
+        questions_source: source,
+        questions_key: key,
+        active: true,
+        downloadable: true,
+        created_by: req.userId,
+      })
+      .select(MATERIAL_COLS)
+      .single()
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'This set is already published.' })
+      return sendDbError(res, error)
+    }
+    res.status(201).json({ material: data })
+  })
+)
+
+// ─── GET /api/ca-questions/:materialId/items ─────────────────────────────────
+// Student read for a PUBLISHED set — the source rows the client turns into a
+// PDF. Requires the materials row to be BOTH active AND downloadable, so the
+// superadmin's toggle is the only thing that exposes answers/explanations.
+// Declared after /admin/* so those literal paths win the match.
+router.get(
+  '/:materialId/items',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = req.params.materialId
+    if (!UUID_RE.test(id)) return res.status(404).json({ error: 'Question set not found.' })
+
+    const { data: mat, error } = await supabaseAdmin
+      .from('materials')
+      .select('kind, active, downloadable, questions_source, questions_key')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) return sendDbError(res, error)
+    if (
+      !mat ||
+      mat.kind !== 'questions' ||
+      !mat.active ||
+      !mat.downloadable ||
+      !mat.questions_source ||
+      !mat.questions_key
+    ) {
+      return res.status(404).json({ error: 'Question set not found.' })
+    }
+
+    const source = mat.questions_source as string
+    const key = mat.questions_key as string
+    if (source === 'daily') {
+      const { data, error: e } = await supabaseAdmin
+        .from('ca_daily_questions')
+        .select(QUESTION_COLS)
+        .eq('date', key)
+        .order('external_id', { ascending: true })
+        .limit(1000)
+      if (e) return sendDbError(res, e)
+      res.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=600')
+      return res.json({ items: data ?? [] })
+    }
+    const { data, error: e } = await supabaseAdmin
+      .from('questions')
+      .select(QUESTION_COLS)
+      .eq('category', 'current_affairs')
+      .eq('ca_type', 'month_wise')
+      .eq('ca_month', key)
+      .order('external_id', { ascending: true })
+      .limit(1000)
+    if (e) return sendDbError(res, e)
+    res.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=600')
+    res.json({ items: data ?? [] })
   })
 )
 

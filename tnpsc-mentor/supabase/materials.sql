@@ -30,7 +30,7 @@
 create table if not exists public.materials (
   id           uuid primary key default gen_random_uuid(),
   kind         text not null default 'video'
-                 check (kind in ('video', 'image', 'pdf', 'document', 'magazine')),
+                 check (kind in ('video', 'image', 'pdf', 'document', 'magazine', 'questions')),
   placement    text not null default 'materials'
                  check (placement in ('materials', 'profile')),
   title        text not null,
@@ -46,6 +46,9 @@ create table if not exists public.materials (
   -- kind='magazine': the published ca_magazine issue (soft reference)
   magazine_ca_type text check (magazine_ca_type in ('day_wise', 'month_wise')),
   magazine_date date,
+  -- kind='questions': the published CA question set (see ca_questions_publish.sql)
+  questions_source text check (questions_source in ('daily', 'monthly')),
+  questions_key text,
   -- per-item download gate (superadmin enables); viewing is always allowed
   downloadable boolean not null default false,
   active       boolean not null default true,   -- hidden from users when false
@@ -63,6 +66,11 @@ create index if not exists materials_placement_idx
 create unique index if not exists materials_magazine_issue_key
   on public.materials (magazine_ca_type, magazine_date)
   where kind = 'magazine';
+
+-- A question set can be published at most once.
+create unique index if not exists materials_questions_set_key
+  on public.materials (questions_source, questions_key)
+  where kind = 'questions';
 
 -- Lock the table: RLS on, no policies → only the service-role client (server)
 -- can touch it. Clients always read through /api/materials.

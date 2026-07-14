@@ -54,6 +54,7 @@ const PyqAptitudePage = lazy(() => import('./pages/PyqAptitudePage'))
 const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
 const SubjectPracticePage = lazy(() => import('./pages/SubjectPracticePage'))
 const CurrentAffairsPage = lazy(() => import('./pages/CurrentAffairsPage'))
+const CaQuestionsPage = lazy(() => import('./pages/CaQuestionsPage'))
 const AptitudePage = lazy(() => import('./pages/AptitudePage'))
 const QuizInstructionsPage = lazy(() => import('./pages/QuizInstructionsPage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
@@ -94,6 +95,7 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   // access (its data currently lives in questions_backup).
   { path: '/test-arena/samacheer', element: <SamacheerPage /> },
   { path: '/test-arena/current-affairs', element: <CurrentAffairsPage /> },
+  { path: '/test-arena/ca-questions', element: <CaQuestionsPage /> },
   { path: '/test-arena/aptitude', element: <AptitudePage /> },
   { path: '/test-arena/thirukural', element: <ThirukuralQuizPage /> },
   { path: '/quiz/instructions', element: <QuizInstructionsPage /> },

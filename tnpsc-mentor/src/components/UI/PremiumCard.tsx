@@ -10,6 +10,7 @@ import { useEntitlementsStore } from '../../store/entitlementsStore'
 import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
 import VettriSuggestModal from './VettriSuggestModal'
 
@@ -158,6 +159,8 @@ export default function PremiumCard({
     if (paying) return
     setConfirmOpen(false)
     setPaying(true)
+    // Meta: buyer confirmed the recap and Razorpay is opening (high-intent lead).
+    trackCheckoutConfirmed({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 3 months' })
     try {
       const result = await startCheckout({
         amount: PREMIUM_PRICE_PAISE,
@@ -209,6 +212,8 @@ export default function PremiumCard({
       void applyCoupon()
       return
     }
+    // Meta: buyer initiated checkout (opened the Vettri suggest / recap popup).
+    trackInitiateCheckout({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 3 months' })
     if (vettriOn && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
     else setConfirmOpen(true)
   }

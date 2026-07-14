@@ -15,7 +15,7 @@ const MAX_FILE_BYTES = 50 * 1024 * 1024 // 50 MB, matches the bucket limit
 // GET /:id/file so the per-item download gate can't be bypassed. Shared with
 // the CA-magazine publish route, which inserts kind='magazine' rows here.
 export const MATERIAL_COLS =
-  'id, kind, placement, title, title_ta, description, youtube_id, file_name, file_size, mime_type, magazine_ca_type, magazine_date, downloadable, active, sort_order, created_at'
+  'id, kind, placement, title, title_ta, description, youtube_id, file_name, file_size, mime_type, magazine_ca_type, magazine_date, questions_source, questions_key, downloadable, active, sort_order, created_at'
 const COLS = MATERIAL_COLS
 
 type Placement = 'materials' | 'profile'

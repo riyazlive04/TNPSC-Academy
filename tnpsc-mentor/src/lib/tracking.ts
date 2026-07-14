@@ -207,6 +207,46 @@ export function trackPurchase(params: {
   })
 }
 
+/**
+ * Buyer opened checkout from a payment banner (tapped "Get Premium/Vettri",
+ * before the recap/confirm modal). Fires Meta's InitiateCheckout — a
+ * top-of-checkout-funnel standard conversion for ad optimisation. Meta-only by
+ * design (no GA4 push requested here). `value` is in rupees, not paise; it's the
+ * post-coupon amount the buyer is expected to pay.
+ */
+export function trackInitiateCheckout(params: {
+  value: number
+  currency?: string
+  description?: string
+}): void {
+  metaTrack('InitiateCheckout', {
+    value: params.value,
+    currency: params.currency ?? 'INR',
+    content_name: params.description ?? 'TNPSC Mentors purchase',
+  })
+}
+
+/**
+ * Buyer confirmed the recap popup and the Razorpay sheet is opening. Fires Meta's
+ * CompleteRegistration as a high-intent lead signal for the payment funnel.
+ * Meta-only, no GA4 push.
+ * NOTE: this is a deliberate SECOND use of CompleteRegistration — trackSignUp()
+ * also fires it at account creation, so this Meta standard event now counts both
+ * new signups and buyers proceeding to pay. Segment in Ads Manager if you need
+ * them apart (e.g. by the presence of `value`).
+ */
+export function trackCheckoutConfirmed(params: {
+  value: number
+  currency?: string
+  description?: string
+}): void {
+  metaTrack('CompleteRegistration', {
+    value: params.value,
+    currency: params.currency ?? 'INR',
+    content_name: params.description ?? 'TNPSC Mentors purchase',
+  })
+}
+
 /** Android APK download initiated from the public landing page. */
 export function trackApkDownload(source: string): void {
   track('apk_download', { source })

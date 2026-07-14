@@ -69,6 +69,19 @@ export function groupBySection(items: CaMagazineItem[]): { topic: string; items:
     .map(([topic, list]) => ({ topic, items: list }))
 }
 
+// ─── Issue identity ──────────────────────────────────────────────────────────
+// Every issue — daily or monthly — carries the same name on one line and its
+// date on the next. No source/publication credit is ever shown to students.
+const MAGAZINE_NAME_EN = 'Current Affair'
+const MAGAZINE_NAME_TA = 'நடப்பு நிகழ்வுகள்'
+
+/** The magazine's name in the chosen language. */
+export function magazineName(lang: 'en' | 'ta' | 'both'): string {
+  if (lang === 'ta') return MAGAZINE_NAME_TA
+  if (lang === 'both') return `${MAGAZINE_NAME_EN} / ${MAGAZINE_NAME_TA}`
+  return MAGAZINE_NAME_EN
+}
+
 // ─── Dates ───────────────────────────────────────────────────────────────────
 const MONTHS_EN = [
   'January', 'February', 'March', 'April', 'May', 'June',

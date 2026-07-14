@@ -42,11 +42,14 @@ export async function generateCaQuestionsPdf(opts: {
   /** Sub-title, e.g. "9 July 2026" or "July 2026". */
   label: string
   lang: DisplayLang
+  /** Personalised watermark for student downloads (see pdfWatermark). */
+  watermark?: string
 }): Promise<void> {
   await generateExplanationPdf({
     questions: opts.items.map(toQuestion),
     title: opts.title,
     label: opts.label,
     lang: opts.lang,
+    watermark: opts.watermark,
   })
 }

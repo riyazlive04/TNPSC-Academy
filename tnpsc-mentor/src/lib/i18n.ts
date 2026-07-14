@@ -1506,6 +1506,22 @@ const STRINGS = {
     en: 'No items in this issue yet.',
     ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',
   },
+  // ─── Dashboard CA-magazine carousel ─────────────────────────────────────
+  caCarouselTitle: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
+  // ─── Student CA-Questions section (own dashboard row + page) ─────────────
+  caQuestionsTitle: { en: 'CA Questions', ta: 'நடப்பு நிகழ்வு வினாக்கள்' },
+  caQuestionsArenaSub: { en: 'Daily & monthly · with answers', ta: 'தினசரி & மாதாந்திரம் · விடைகளுடன்' },
+  caQuestionsPageSub: {
+    en: 'Practice sets with answers and explanations — download as PDF',
+    ta: 'விடைகள் மற்றும் விளக்கங்களுடன் கூடிய தொகுப்புகள் — PDF ஆகப் பதிவிறக்கவும்',
+  },
+  caQuestionsDaily: { en: 'Daily sets', ta: 'தினசரி தொகுப்புகள்' },
+  caQuestionsMonthly: { en: 'Monthly banks', ta: 'மாதாந்திரத் தொகுப்புகள்' },
+  caQuestionsEmpty: {
+    en: 'No question sets published yet. Check back soon!',
+    ta: 'இதுவரை வினாத் தொகுப்புகள் எதுவும் வெளியிடப்படவில்லை. விரைவில் மீண்டும் பாருங்கள்!',
+  },
+  caQuestionsCount: { en: 'questions', ta: 'வினாக்கள்' },
   close: { en: 'Close', ta: 'மூடு' },
   // ─── Materials / Infographics hub ───────────────────────────────────────
   materials: { en: 'Materials', ta: 'கல்விப் பொருட்கள்' },
@@ -1520,6 +1536,7 @@ const STRINGS = {
   },
   materialsAllTypes: { en: 'All', ta: 'அனைத்தும்' },
   typeMagazine: { en: 'CA Magazine', ta: 'நடப்பு நிகழ்வுகள் இதழ்' },
+  typeQuestions: { en: 'CA Questions', ta: 'நடப்பு நிகழ்வு வினாக்கள்' },
   typeVideo: { en: 'Videos', ta: 'வீடியோக்கள்' },
   typeImage: { en: 'Images', ta: 'படங்கள்' },
   typePdf: { en: 'PDFs', ta: 'PDF கோப்புகள்' },

@@ -142,6 +142,11 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(24px) scale(0.98)' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
+        // Left-edge drawer entrance (side-panel nav).
+        slideInLeft: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
         toastIn: {
           '0%': { opacity: '0', transform: 'translateY(12px) scale(0.96)' },
           '60%': { opacity: '1', transform: 'translateY(-2px) scale(1.01)' },
@@ -201,6 +206,7 @@ export default {
         slideDown: 'slideDown 0.3s cubic-bezier(0.22,1,0.36,1)',
         scaleIn: 'scaleIn 0.18s ease-out',
         sheetIn: 'sheetIn 0.32s cubic-bezier(0.22,1,0.36,1)',
+        slideInLeft: 'slideInLeft 0.28s cubic-bezier(0.22,1,0.36,1)',
         toastIn: 'toastIn 0.32s cubic-bezier(0.22,1,0.36,1)',
         pulseRing: 'pulseRing 1.4s ease-out',
         popStar: 'popStar 0.32s cubic-bezier(0.22,1,0.36,1)',

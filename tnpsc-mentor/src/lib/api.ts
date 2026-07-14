@@ -1120,6 +1120,19 @@ export const api = {
     async deleteDailyItem(id: number): Promise<void> {
       await request(`/api/ca-questions/admin/daily/items/${id}`, { method: 'DELETE' })
     },
+    /** Superadmin: turn ON the student PDF for a set (creates the Materials card). */
+    async publish(set: CaQuestionSet): Promise<Material> {
+      const data = await request<{ material: Material }>('/api/ca-questions/admin/publish', {
+        method: 'POST',
+        body: { source: set.source, key: set.key },
+      })
+      return data.material
+    },
+    /** Student: the questions behind a published+downloadable set (for the PDF). */
+    async items(materialId: string): Promise<CaQuestionItem[]> {
+      const data = await request<{ items: CaQuestionItem[] }>(`/api/ca-questions/${materialId}/items`)
+      return data.items
+    },
   },
 
   // ─── Feedback (student-submitted) ────────────────────────────────────────
@@ -1303,7 +1316,7 @@ export const api = {
 }
 
 // ─── Material shapes ────────────────────────────────────────────────────────────
-export type MaterialKind = 'video' | 'image' | 'pdf' | 'document' | 'magazine'
+export type MaterialKind = 'video' | 'image' | 'pdf' | 'document' | 'magazine' | 'questions'
 export type MaterialPlacement = 'materials' | 'profile'
 
 /** One curated study-material item (metadata only — file URLs are minted on demand). */
@@ -1320,6 +1333,9 @@ export interface Material {
   mime_type: string | null
   magazine_ca_type: CaMagazineType | null
   magazine_date: string | null
+  /** kind='questions': which CA question set this card publishes. */
+  questions_source: 'daily' | 'monthly' | null
+  questions_key: string | null
   downloadable: boolean
   active: boolean
   sort_order: number
@@ -1364,6 +1380,8 @@ export interface CaQuestionSet {
   ca_month: string
   ca_year: number | null
   total: number
+  /** The materials row exposing this set's PDF to students, or null when off. */
+  material: { id: string; active: boolean; downloadable: boolean } | null
 }
 
 export interface CaQuestionSets {

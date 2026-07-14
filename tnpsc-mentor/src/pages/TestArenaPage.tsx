@@ -16,6 +16,7 @@ import {
   CalendarDays,
   Trophy,
   Sparkles,
+  ListChecks,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
@@ -29,6 +30,7 @@ import VettriCard from '../components/UI/VettriCard'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
+import CaMagazineCarousel from '../components/Home/CaMagazineCarousel'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
@@ -368,6 +370,11 @@ export default function TestArenaPage() {
           />
         </div>
 
+        {/* Daily Current-Affairs magazines - the last 7 published issues, swiped
+            horizontally. Publication-driven (superadmin-approved); renders
+            nothing until at least one daily issue is live. */}
+        <CaMagazineCarousel />
+
         {/* Practice - a two-column grid of tactile category cards. */}
         <section className="space-y-3" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
@@ -405,6 +412,16 @@ export default function TestArenaPage() {
                 index={i + 2}
               />
             ))}
+            {/* CA Questions - superadmin-published daily/monthly sets, each a
+                one-tap PDF download with answers + explanations. */}
+            <CategoryCard
+              onClick={() => navigate('/test-arena/ca-questions')}
+              icon={<ListChecks />}
+              gradient={GRADIENTS.blue}
+              title={t('caQuestionsTitle')}
+              subtitle={t('caQuestionsArenaSub')}
+              index={restCards.length + 2}
+            />
             {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
             <CategoryCard
               onClick={() => navigate('/test-arena/thirukural')}
@@ -412,7 +429,7 @@ export default function TestArenaPage() {
               gradient={GRADIENTS.green}
               title={t('tkQuizTitle')}
               subtitle={t('tkQuizSub')}
-              index={restCards.length + 2}
+              index={restCards.length + 3}
             />
           </div>
         </section>

@@ -22,6 +22,7 @@ const BODY = '#3C3850'
 const LINE = '#E8E6F3'
 const GREY: [number, number, number] = [110, 108, 124]
 const LINE_RGB: [number, number, number] = [232, 230, 243]
+const VIOLET_RGB: [number, number, number] = [124, 92, 255]
 
 const FONT_STACK = "'Noto Sans Tamil','Inter',system-ui,sans-serif"
 const RENDER_W = 760
@@ -128,12 +129,25 @@ const CHUNK = 8
 
 interface MagazinePdfParams {
   items: CaMagazineItem[]
+  /** Magazine name — the cover's first line. */
   title: string
+  /** The issue date — the cover's second line. */
   subtitle: string
   lang: Lang
+  /** Latin text for the filename (a Tamil title/date would sanitise to nothing). */
+  fileLabel?: string
+  /** Personalised diagonal watermark tiled on every page (see pdfWatermark). */
+  watermark?: string
 }
 
-export async function generateMagazinePdf({ items, title, subtitle, lang }: MagazinePdfParams): Promise<void> {
+export async function generateMagazinePdf({
+  items,
+  title,
+  subtitle,
+  lang,
+  fileLabel,
+  watermark,
+}: MagazinePdfParams): Promise<void> {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
@@ -206,10 +220,25 @@ export async function generateMagazinePdf({ items, title, subtitle, lang }: Maga
     for (const canvas of canvases) placeBlock(canvas)
   }
 
-  // Footer on every page (Latin only → safe in jsPDF's Helvetica).
+  // Watermark + footer on every page (Latin only → safe in jsPDF's Helvetica).
   const total = doc.getNumberOfPages()
   for (let p = 1; p <= total; p++) {
     doc.setPage(p)
+    if (watermark) {
+      const g = doc as unknown as {
+        GState?: new (o: { opacity: number }) => unknown
+        setGState?: (s: unknown) => void
+      }
+      // Faint tiled "NAME · PHONE" mark — light enough to read through, matching
+      // the explanation sheet so every student download is traceable.
+      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.08 }))
+      doc.setTextColor(...VIOLET_RGB)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(26)
+      for (let yy = 70; yy < pageH; yy += 120)
+        for (let xx = -10; xx < pageW; xx += 280) doc.text(watermark, xx, yy, { angle: 30 })
+      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
+    }
     const fy = pageH - 26
     doc.setDrawColor(...LINE_RGB)
     doc.setLineWidth(0.7)
@@ -221,6 +250,6 @@ export async function generateMagazinePdf({ items, title, subtitle, lang }: Maga
     doc.text(`Page ${p} of ${total}`, pageW - margin, fy, { align: 'right' })
   }
 
-  const safe = title.replace(/[^a-z0-9]+/gi, '_').slice(0, 60)
-  await savePdfDoc(doc, `TNPSC_Mentors_${safe || 'CA_Magazine'}.pdf`)
+  const safe = (fileLabel ?? title).replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '').slice(0, 60)
+  await savePdfDoc(doc, `TNPSC_Mentors_Current_Affair${safe ? `_${safe}` : ''}.pdf`)
 }

@@ -9,6 +9,7 @@ import { useEntitlementsStore } from '../../store/entitlementsStore'
 import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
+import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
 
 // ─── Vettri Nichayam pricing (mirrors server pricing.ts) ─────────────────────
@@ -161,6 +162,8 @@ export default function VettriCard({
     if (paying) return
     setConfirmOpen(false)
     setPaying(true)
+    // Meta: buyer confirmed the recap and Razorpay is opening (high-intent lead).
+    trackCheckoutConfirmed({ value: finalPaise / 100, description: sel.descr })
     try {
       const result = await startCheckout({
         amount: sel.paise,
@@ -370,6 +373,8 @@ export default function VettriCard({
                 void applyCoupon()
                 return
               }
+              // Meta: buyer initiated checkout (opened the recap popup).
+              trackInitiateCheckout({ value: finalPaise / 100, description: sel.descr })
               setConfirmOpen(true)
             }}
             disabled={paying}

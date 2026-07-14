@@ -30,6 +30,8 @@ export function kindLabel(kind: MaterialKind): string {
       return 'PDF'
     case 'magazine':
       return 'Magazine'
+    case 'questions':
+      return 'Questions'
     default:
       return 'Document'
   }
