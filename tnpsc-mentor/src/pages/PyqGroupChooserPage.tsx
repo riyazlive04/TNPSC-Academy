@@ -1,14 +1,15 @@
 import { useNavigate } from 'react-router-dom'
-import { Layers, BookCopy } from 'lucide-react'
+import { Layers, BookCopy, ClipboardList } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useT } from '../lib/i18n'
 
 /**
- * The PYQ entry point. Splits Previous-Year Questions into the two exam banks:
- * Group 1 (the existing subject-wise GS bank, category='pyq') and Group 2 / 2A
- * (the section-wise bank, category='pyq2'). Each row drills into its own flow.
+ * The PYQ entry point. Splits Previous-Year Questions into the three exam banks:
+ * Group 1 (the subject-wise GS bank, category='pyq'), Group 2 / 2A ('pyq2') and
+ * Group 4 / VAO ('pyq4'). Group 1 has its own flow; the two section-wise groups
+ * share theirs (see PYQ_GROUPS in lib/constants).
  */
 export default function PyqGroupChooserPage() {
   const navigate = useNavigate()
@@ -45,6 +46,17 @@ export default function PyqGroupChooserPage() {
           }
           title={t('group2Pyq')}
           subtitle={t('group2PyqSub')}
+        />
+        <ListRow
+          onClick={() => navigate('/test-arena/pyq/group4')}
+          style={{ '--i': 2 } as React.CSSProperties}
+          leading={
+            <IconTile tint="green">
+              <ClipboardList size={19} strokeWidth={2} />
+            </IconTile>
+          }
+          title={t('group4Pyq')}
+          subtitle={t('group4PyqSub')}
         />
       </List>
     </PickerPage>

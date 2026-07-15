@@ -19,7 +19,7 @@ export interface GateConfigLike {
   mock?: boolean
 }
 
-const GATED_CATEGORIES = new Set(['pyq', 'pyq2', 'current_affairs'])
+const GATED_CATEGORIES = new Set(['pyq', 'pyq2', 'pyq4', 'current_affairs'])
 
 const str = (v: unknown): string | null =>
   typeof v === 'string' && v.trim() ? v.trim() : null
@@ -38,9 +38,11 @@ export function deriveGateKey(cfg: GateConfigLike | null | undefined): string | 
   const aptitudeType = str(cfg.aptitude_type)
 
   if (category === 'pyq') return subject ? `pyq:${subject}` : null
-  if (category === 'pyq2') {
+  // The section-wise groups key on section + sub-type, so one free test is
+  // granted per sub-type rather than per whole section.
+  if (category === 'pyq2' || category === 'pyq4') {
     if (!subject) return null
-    return `pyq2:${subject}:${topic ?? aptitudeType ?? 'all'}`
+    return `${category}:${subject}:${topic ?? aptitudeType ?? 'all'}`
   }
   const leaf = topic ?? caTopic
   if (caMonth) return leaf ? `ca:m:${caMonth}:${leaf}` : `ca:m:${caMonth}`

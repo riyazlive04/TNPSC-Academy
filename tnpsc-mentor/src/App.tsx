@@ -47,8 +47,8 @@ const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
 const PyqGroupChooserPage = lazy(() => import('./pages/PyqGroupChooserPage'))
 const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
-const PyqGroup2Page = lazy(() => import('./pages/PyqGroup2Page'))
-const PyqGroup2SectionPage = lazy(() => import('./pages/PyqGroup2SectionPage'))
+const PyqGroupPage = lazy(() => import('./pages/PyqGroupPage'))
+const PyqSectionPage = lazy(() => import('./pages/PyqSectionPage'))
 const HistoryPeriodsPage = lazy(() => import('./pages/HistoryPeriodsPage'))
 const PyqAptitudePage = lazy(() => import('./pages/PyqAptitudePage'))
 const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
@@ -86,10 +86,14 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/test-arena', element: <TestArenaPage /> },
   { path: '/test-arena/pyq', element: <PyqGroupChooserPage /> },
   { path: '/test-arena/pyq/group1', element: <PreviousYearPage /> },
-  { path: '/test-arena/pyq/group2', element: <PyqGroup2Page /> },
-  { path: '/test-arena/pyq/group2/:section', element: <PyqGroup2SectionPage /> },
   { path: '/test-arena/pyq/history', element: <HistoryPeriodsPage /> },
   { path: '/test-arena/pyq/aptitude', element: <PyqAptitudePage /> },
+  // The section-wise groups (group2 | group4) share one pair of pages, driven by
+  // PYQ_GROUPS. Declared after the static /pyq/* routes above; React Router ranks
+  // static segments over dynamic ones, so those keep winning. An unknown :group
+  // redirects to the chooser.
+  { path: '/test-arena/pyq/:group', element: <PyqGroupPage /> },
+  { path: '/test-arena/pyq/:group/:section', element: <PyqSectionPage /> },
   { path: '/test-arena/subjects', element: <SubjectPracticePage /> },
   // Samacheer is hidden from the dashboard but its route is kept for direct/admin
   // access (its data currently lives in questions_backup).

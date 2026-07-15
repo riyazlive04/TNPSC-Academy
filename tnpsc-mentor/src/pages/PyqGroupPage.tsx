@@ -1,64 +1,89 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
 import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
-import { PYQ2_SECTIONS, pyq2SectionSlug, subjectName, type Pyq2Section } from '../lib/constants'
+import {
+  PYQ_GROUPS,
+  isPyqGroupKey,
+  pyqSectionSlug,
+  subjectName,
+  type PyqSection,
+} from '../lib/constants'
 import { useT } from '../lib/i18n'
 
 // Section → row presentation (icon + tint). The data behind each is fetched as a
-// single count per section (category='pyq2', subject=section).
-const SECTION_UI: Record<Pyq2Section, { icon: LucideIcon; tint: Tint }> = {
+// single count per section (category=<group>, subject=section).
+const SECTION_UI: Record<PyqSection, { icon: LucideIcon; tint: Tint }> = {
   Aptitude: { icon: Calculator, tint: 'violet' },
   English: { icon: Type, tint: 'blue' },
   Tamil: { icon: Languages, tint: 'green' },
   'General Studies': { icon: GraduationCap, tint: 'coral' },
 }
 
-// Cache the per-section counts so re-entering the page is instant.
-let countsCache: Record<string, number> | null = null
+// Cache the per-section counts so re-entering a group is instant. Keyed by group
+// so switching between Group 2 and Group 4 doesn't show the other's numbers.
+const countsCache = new Map<string, Record<string, number>>()
 
 /**
- * Group 2 / 2A PYQ — the four section papers (Aptitude, English, Tamil, General
- * Studies). Each row shows its total question count and opens the section page
- * (sub-types + exam-year filter).
+ * A section-wise PYQ group's paper list (Group 2 / 2A or Group 4 / VAO — see
+ * PYQ_GROUPS). Each row shows its total question count and opens the section
+ * page (sub-types + exam-year filter).
  */
-export default function PyqGroup2Page() {
+export default function PyqGroupPage() {
+  const { group: groupSlug } = useParams<{ group: string }>()
   const navigate = useNavigate()
   const { t, lang } = useT()
-  const [counts, setCounts] = useState<Record<string, number> | null>(countsCache)
+
+  const group = isPyqGroupKey(groupSlug) ? PYQ_GROUPS[groupSlug] : undefined
+  const [counts, setCounts] = useState<Record<string, number> | null>(
+    group ? countsCache.get(group.key) ?? null : {}
+  )
+
+  // Unknown group → back to the chooser.
+  useEffect(() => {
+    if (!group) navigate('/test-arena/pyq', { replace: true })
+  }, [group, navigate])
 
   useEffect(() => {
-    if (countsCache) return
+    if (!group) return
+    const cached = countsCache.get(group.key)
+    if (cached) {
+      setCounts(cached)
+      return
+    }
+    setCounts(null)
     let cancelled = false
     Promise.all(
-      PYQ2_SECTIONS.map((s) =>
+      group.sections.map((s) =>
         api
-          .countQuestions({ category: 'pyq2', subject: s })
+          .countQuestions({ category: group.category, subject: s })
           .then((n) => [s, n] as const)
           .catch(() => [s, 0] as const)
       )
     ).then((pairs) => {
       if (cancelled) return
       const map = Object.fromEntries(pairs)
-      countsCache = map
+      countsCache.set(group.key, map)
       setCounts(map)
     })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [group])
+
+  if (!group) return null
 
   return (
-    <PickerPage badge={t('pyq2Badge')}>
+    <PickerPage badge={t(group.i18n.badge)}>
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
-          {t('pyq2PickSection')}
+          {t('pyqPickSection')}
         </h2>
-        <p className="tamil mt-1 font-body text-[15px] text-muted">{t('pyq2SectionHint')}</p>
+        <p className="tamil mt-1 font-body text-[15px] text-muted">{t(group.i18n.hint)}</p>
       </div>
 
       {counts === null ? (
@@ -67,14 +92,14 @@ export default function PyqGroup2Page() {
         </div>
       ) : (
         <List>
-          {PYQ2_SECTIONS.map((s, i) => {
+          {group.sections.map((s, i) => {
             const { icon: Icon, tint } = SECTION_UI[s]
             const n = counts[s] ?? 0
             return (
               <ListRow
                 key={s}
                 disabled={n === 0}
-                onClick={() => navigate(`/test-arena/pyq/group2/${pyq2SectionSlug(s)}`)}
+                onClick={() => navigate(`/test-arena/pyq/${group.key}/${pyqSectionSlug(s)}`)}
                 style={{ '--i': i } as React.CSSProperties}
                 leading={
                   <IconTile tint={tint}>

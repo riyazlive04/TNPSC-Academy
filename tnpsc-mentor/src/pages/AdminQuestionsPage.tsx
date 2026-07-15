@@ -46,10 +46,11 @@ export default function AdminQuestionsPage() {
   // The "Outer" bank is browsed subject-by-subject (each subject can hold
   // thousands of rows), so we expose per-subject chips and refetch on change.
   const isOuter = config?.category === 'outer'
-  // The PYQ bank is browsed the same way (subject chips, server-side refetch),
+  // The PYQ banks are browsed the same way (subject chips, server-side refetch),
   // plus client-side Year and Difficulty filters - PYQ rows carry a `year`
-  // (2019-2025) which is the defining "previous year" dimension.
-  const isPyq = config?.category === 'pyq'
+  // (2014-2025) which is the defining "previous year" dimension.
+  const isPyq =
+    config?.category === 'pyq' || config?.category === 'pyq2' || config?.category === 'pyq4'
 
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)

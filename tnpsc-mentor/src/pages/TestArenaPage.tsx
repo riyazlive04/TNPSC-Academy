@@ -82,7 +82,7 @@ const CARDS: ArenaCard[] = [
   {
     to: '/test-arena/pyq',
     titleKey: 'pyqTitle',
-    subtitle: 'Group 1 · Group 2 / 2A',
+    subtitle: 'Group 1 · Group 2 / 2A · Group 4',
     icon: <BookOpen size={19} />,
     tint: 'blue',
   },

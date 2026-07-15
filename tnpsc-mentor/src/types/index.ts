@@ -42,6 +42,9 @@ export type Category =
   | 'pyq'
   // Group 2 / 2A previous-year bank (separate from the Group 1 'pyq' bank).
   | 'pyq2'
+  // Group 4 / VAO previous-year bank. Same section-wise shape as 'pyq2'; both
+  // are driven by the PYQ_GROUPS registry in lib/constants.
+  | 'pyq4'
   | 'samacheer'
   | 'current_affairs'
   | 'aptitude'

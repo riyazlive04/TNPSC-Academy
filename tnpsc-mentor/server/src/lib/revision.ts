@@ -132,6 +132,8 @@ function prettyType(t?: string | null): string | null {
 function prettyCategory(c: string): string {
   const map: Record<string, string> = {
     pyq: 'Previous Year',
+    pyq2: 'Previous Year · Group 2',
+    pyq4: 'Previous Year · Group 4',
     samacheer: 'Samacheer',
     current_affairs: 'Current Affairs',
     aptitude: 'Aptitude',

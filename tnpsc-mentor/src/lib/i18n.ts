@@ -250,7 +250,8 @@ const STRINGS = {
   // Section badges
   pyqBadge: { en: 'Previous Year Question Paper', ta: 'முந்தைய ஆண்டு வினாத்தாள்' },
 
-  // PYQ group chooser (Group 1 vs Group 2 / 2A) + Group 2 section flow
+  // PYQ group chooser (Group 1 / Group 2 / 2A / Group 4) + the section flow the
+  // Group 2 and Group 4 banks share (see PYQ_GROUPS in lib/constants).
   pyqChooseGroup: { en: 'Choose a Group', ta: 'குழுவைத் தேர்ந்தெடுக்கவும்' },
   pyqChooseGroupHint: {
     en: 'Pick which exam’s previous-year questions to practise.',
@@ -260,14 +261,27 @@ const STRINGS = {
   group1PyqSub: { en: 'General Studies, subject-wise (2019–2025)', ta: 'பொதுப் படிப்பு, பாட வாரியாக (2019–2025)' },
   group2Pyq: { en: 'Group 2 / 2A Prelims PYQ', ta: 'குரூப் 2 / 2A முதனிலை வினாக்கள்' },
   group2PyqSub: { en: 'Prelims · Aptitude, English, Tamil & GS', ta: 'முதனிலை · திறனாய்வு, ஆங்கிலம், தமிழ் & பொது அறிவு' },
+  group4Pyq: { en: 'Group 4 / VAO PYQ', ta: 'குரூப் 4 / VAO முந்தைய ஆண்டு வினாக்கள்' },
+  group4PyqSub: {
+    en: 'General Tamil, GS & Aptitude (2018–2025)',
+    ta: 'பொதுத் தமிழ், பொது அறிவு & திறனாய்வு (2018–2025)',
+  },
   pyq2Badge: { en: 'Group 2 / 2A Prelims - Previous Year Questions', ta: 'குரூப் 2 / 2A முதனிலை - முந்தைய ஆண்டு வினாக்கள்' },
-  pyq2PickSection: { en: 'Pick a Section', ta: 'ஒரு பிரிவைத் தேர்ந்தெடுக்கவும்' },
   pyq2SectionHint: {
     en: 'Choose a paper to begin a Group 2 / 2A test.',
     ta: 'குரூப் 2 / 2A தேர்வைத் தொடங்க ஒரு தாளைத் தேர்ந்தெடுக்கவும்.',
   },
-  pyq2AllQuestions: { en: 'All Questions', ta: 'அனைத்து வினாக்கள்' },
-  pyq2AllQuestionsSub: { en: 'Mix every sub-type', ta: 'அனைத்து உட்பிரிவுகளையும் கலந்து' },
+  pyq4Badge: {
+    en: 'Group 4 / VAO - Previous Year Questions',
+    ta: 'குரூப் 4 / VAO - முந்தைய ஆண்டு வினாக்கள்',
+  },
+  pyq4SectionHint: {
+    en: 'Choose a paper to begin a Group 4 / VAO test.',
+    ta: 'குரூப் 4 / VAO தேர்வைத் தொடங்க ஒரு தாளைத் தேர்ந்தெடுக்கவும்.',
+  },
+  pyqPickSection: { en: 'Pick a Section', ta: 'ஒரு பிரிவைத் தேர்ந்தெடுக்கவும்' },
+  pyqAllQuestions: { en: 'All Questions', ta: 'அனைத்து வினாக்கள்' },
+  pyqAllQuestionsSub: { en: 'Mix every sub-type', ta: 'அனைத்து உட்பிரிவுகளையும் கலந்து' },
   allYears: { en: 'All Years', ta: 'அனைத்து ஆண்டுகள்' },
   filterByYear: { en: 'Exam Year', ta: 'தேர்வு ஆண்டு' },
   samacheerBadge: { en: 'Samacheer Based', ta: 'சமச்சீர் அடிப்படையில்' },

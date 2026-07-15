@@ -1,5 +1,6 @@
-import type { GroupType, MockBlueprint } from '../types'
+import type { Category, GroupType, MockBlueprint } from '../types'
 import type { Lang } from '../store/languageStore'
+import type { StringKey } from './i18n'
 
 // ─── Subject display names (English → Tamil) ────────────────────────────────
 // The question bank stores subjects in English. This map lets the pickers and
@@ -298,46 +299,96 @@ export const PYQ_SUBJECTS: string[] = [
   'Aptitude',
 ]
 
-// ─── Group 2 / 2A Previous-Year Questions (category='pyq2') ──────────────────
-// A self-contained bank: `subject` is the SECTION, `topic` the SUB-TYPE, and
-// `aptitude_type` ('numerics' | 'reasoning') splits the Aptitude section. The
-// picker drills: Group 2 → section → (All + sub-types) with an exam-year filter.
-export type Pyq2Section = 'Aptitude' | 'English' | 'Tamil' | 'General Studies'
+// ─── Section-wise Previous-Year Question groups ──────────────────────────────
+// Group 2 / 2A ('pyq2') and Group 4 / VAO ('pyq4') are self-contained banks that
+// share one shape: `subject` is the SECTION, `topic` the SUB-TYPE, and
+// `aptitude_type` ('numerics' | 'reasoning') splits the Aptitude section. Both
+// drill: group → section → (All + sub-types) with an exam-year filter, so one
+// pair of pages renders either — this registry is the only thing that differs.
+//
+// Group 1 ('pyq') is NOT here: it is subject-wise with its own History/Aptitude
+// special cases, and keeps its own page.
+export type PyqSection = 'Aptitude' | 'English' | 'Tamil' | 'General Studies'
+export type PyqGroupKey = 'group2' | 'group4'
 
-export const PYQ2_SECTIONS: Pyq2Section[] = ['Aptitude', 'English', 'Tamil', 'General Studies']
-
-// Exam years present in the bank, newest first. A year with no questions for the
-// current section is disabled at render time (its count is 0).
-export const PYQ2_YEARS: number[] = [2025, 2024, 2022, 2018, 2017, 2016, 2014]
-
-// Sub-type (topic) display order per section. Aptitude is split by aptitude_type
-// instead of topic, so it isn't listed here.
-export const PYQ2_SECTION_TOPICS: Record<Exclude<Pyq2Section, 'Aptitude'>, string[]> = {
-  English: ['Grammar', 'Vocabulary', 'Literature', 'Comprehension'],
-  Tamil: ['Grammar', 'Vocabulary', 'Literature', 'Author & Work', 'Language History', 'Tamil GK'],
-  'General Studies': [
-    'History',
-    'Polity',
-    'Geography',
-    'Economics',
-    'Culture',
-    'Development Administration',
-    'Biology',
-    'Physics',
-    'Chemistry',
-    'Current Affairs & GK',
-  ],
+export interface PyqGroupDef {
+  key: PyqGroupKey
+  category: Extract<Category, 'pyq2' | 'pyq4'>
+  /** Quiz-label segment, e.g. "PYQ · Group 4 · Tamil". */
+  label: string
+  /** Section rows, in paper order. */
+  sections: PyqSection[]
+  /** Exam years present in the bank, newest first. A year with no questions for
+   *  the current section is disabled at render time (its count is 0). */
+  years: number[]
+  /** Sub-type (topic) display order per section. Aptitude splits by
+   *  aptitude_type instead of topic, so it is never listed here. */
+  sectionTopics: Partial<Record<Exclude<PyqSection, 'Aptitude'>, string[]>>
+  /** Group-specific chrome. Generic strings (pyqPickSection, pyqAllQuestions)
+   *  are shared and live on the pages. */
+  i18n: { badge: StringKey; hint: StringKey }
 }
 
-// URL slug ↔ section (the section page route param). Kept short + lowercase.
-export const PYQ2_SECTION_SLUGS: Record<string, Pyq2Section> = {
-  aptitude: 'Aptitude',
-  english: 'English',
-  tamil: 'Tamil',
-  'general-studies': 'General Studies',
+const GS_TOPICS = [
+  'History',
+  'Polity',
+  'Geography',
+  'Economics',
+  'Culture',
+  'Development Administration',
+  'Biology',
+  'Physics',
+  'Chemistry',
+  'Current Affairs & GK',
+]
+
+export const PYQ_GROUPS: Record<PyqGroupKey, PyqGroupDef> = {
+  group2: {
+    key: 'group2',
+    category: 'pyq2',
+    label: 'Group 2',
+    sections: ['Aptitude', 'English', 'Tamil', 'General Studies'],
+    years: [2025, 2024, 2022, 2018, 2017, 2016, 2014],
+    sectionTopics: {
+      English: ['Grammar', 'Vocabulary', 'Literature', 'Comprehension'],
+      Tamil: ['Grammar', 'Vocabulary', 'Literature', 'Author & Work', 'Language History', 'Tamil GK'],
+      'General Studies': GS_TOPICS,
+    },
+    i18n: { badge: 'pyq2Badge', hint: 'pyq2SectionHint' },
+  },
+  // Group 4 has no English paper: each year is the General Tamil paper (100) and
+  // the GS/Maths paper (100), the latter splitting into General Studies +
+  // Aptitude. Sections are listed in that paper order.
+  group4: {
+    key: 'group4',
+    category: 'pyq4',
+    label: 'Group 4',
+    sections: ['Tamil', 'General Studies', 'Aptitude'],
+    years: [2025, 2024, 2022, 2019, 2018],
+    sectionTopics: {
+      Tamil: [
+        'Grammar',
+        'Vocabulary',
+        'Literature',
+        'Author & Work',
+        'Comprehension',
+        'Language History',
+        'Tamil GK',
+      ],
+      'General Studies': GS_TOPICS,
+    },
+    i18n: { badge: 'pyq4Badge', hint: 'pyq4SectionHint' },
+  },
 }
-export const pyq2SectionSlug = (s: Pyq2Section): string =>
-  Object.keys(PYQ2_SECTION_SLUGS).find((k) => PYQ2_SECTION_SLUGS[k] === s) ?? 'aptitude'
+
+export const isPyqGroupKey = (v: string | undefined): v is PyqGroupKey =>
+  v === 'group2' || v === 'group4'
+
+// URL slug ↔ section (the section page route param). Kept short + lowercase, and
+// resolved WITHIN a group so two groups can share a slug ("tamil") safely.
+export const pyqSectionSlug = (s: PyqSection): string => s.toLowerCase().replace(/\s+/g, '-')
+export const pyqSectionFromSlug = (g: PyqGroupDef, slug: string): PyqSection | undefined =>
+  g.sections.find((s) => pyqSectionSlug(s) === slug)
 
 // Per-group subject availability. Group 1 = full GS; Group 2/4 add the
 // General Tamil / General English qualifying papers.

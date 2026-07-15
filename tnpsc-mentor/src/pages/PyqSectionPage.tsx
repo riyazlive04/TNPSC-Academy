@@ -9,12 +9,13 @@ import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import {
-  PYQ2_SECTION_SLUGS,
-  PYQ2_SECTION_TOPICS,
-  PYQ2_YEARS,
+  PYQ_GROUPS,
+  isPyqGroupKey,
+  pyqSectionFromSlug,
   subjectName,
   topicName,
-  type Pyq2Section,
+  type PyqGroupDef,
+  type PyqSection,
 } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
@@ -26,41 +27,45 @@ const APT_TYPES: { type: 'numerics' | 'reasoning'; titleKey: StringKey; subKey: 
   { type: 'reasoning', titleKey: 'reasoning', subKey: 'reasoningSub', icon: <Brain size={18} />, tint: 'blue' },
 ]
 
-// Cache counts per (section, year) so flicking between years is instant.
+// Cache counts per (group, section, year) so flicking between years is instant.
 const countsCache = new Map<string, Record<string, number>>()
-const cacheKey = (section: Pyq2Section, year: number | null) => `${section}|${year ?? 'all'}`
+const cacheKey = (g: PyqGroupDef, section: PyqSection, year: number | null) =>
+  `${g.key}|${section}|${year ?? 'all'}`
 
 /**
- * One Group 2 / 2A section (Aptitude / English / Tamil / General Studies). Shows
- * an exam-year filter (All + each year), an "All Questions" shortcut, and the
- * section's sub-types — English/Tamil/GS by topic, Aptitude by Numerics/Reasoning.
- * Every test is scoped category='pyq2', subject=section (+ topic|aptitude_type),
- * and the selected year. Each question still shows its year badge in the test.
+ * One section of a section-wise PYQ group (see PYQ_GROUPS) — Group 2 / 2A or
+ * Group 4 / VAO. Shows an exam-year filter (All + each year), an "All Questions"
+ * shortcut, and the section's sub-types: English/Tamil/GS by topic, Aptitude by
+ * Numerics/Reasoning. Every test is scoped category=<group>, subject=section
+ * (+ topic|aptitude_type) and the selected year. Each question still shows its
+ * year badge in the test.
  */
-export default function PyqGroup2SectionPage() {
-  const { section: slug } = useParams<{ section: string }>()
+export default function PyqSectionPage() {
+  const { group: groupSlug, section: slug } = useParams<{ group: string; section: string }>()
   const navigate = useNavigate()
   const startTest = useStartTest()
   const { t, lang } = useT()
 
-  const section: Pyq2Section | undefined = slug ? PYQ2_SECTION_SLUGS[slug] : undefined
+  const group = isPyqGroupKey(groupSlug) ? PYQ_GROUPS[groupSlug] : undefined
+  const section = group && slug ? pyqSectionFromSlug(group, slug) : undefined
   const isAptitude = section === 'Aptitude'
 
   const [year, setYear] = useState<number | null>(null)
   const [counts, setCounts] = useState<Record<string, number> | null>(
-    section ? countsCache.get(cacheKey(section, null)) ?? null : {}
+    group && section ? countsCache.get(cacheKey(group, section, null)) ?? null : {}
   )
 
-  // Free-tier gate: one pyq2 test per sub-type. `unlimited` (premium/vettri) has
-  // no locks; otherwise `usedKeys` lists the sub-type keys already spent.
+  // Free-tier gate: one test per sub-type. `unlimited` (premium/vettri) has no
+  // locks; otherwise `usedKeys` lists the sub-type keys already spent.
   const [unlimited, setUnlimited] = useState(true)
   const [usedKeys, setUsedKeys] = useState<Set<string>>(new Set())
   const [showUpsell, setShowUpsell] = useState(false)
 
-  // Unknown slug → back to the section list.
+  // Unknown group → the chooser; unknown section → that group's section list.
   useEffect(() => {
-    if (!section) navigate('/test-arena/pyq/group2', { replace: true })
-  }, [section, navigate])
+    if (!group) navigate('/test-arena/pyq', { replace: true })
+    else if (!section) navigate(`/test-arena/pyq/${group.key}`, { replace: true })
+  }, [group, section, navigate])
 
   // Lock state (which sub-types have used their one free test).
   useEffect(() => {
@@ -78,10 +83,10 @@ export default function PyqGroup2SectionPage() {
     }
   }, [])
 
-  // (Re)load the per-sub-type counts whenever the section or year changes.
+  // (Re)load the per-sub-type counts whenever the group, section or year changes.
   useEffect(() => {
-    if (!section) return
-    const key = cacheKey(section, year)
+    if (!group || !section) return
+    const key = cacheKey(group, section, year)
     const cached = countsCache.get(key)
     if (cached) {
       setCounts(cached)
@@ -94,7 +99,12 @@ export default function PyqGroup2SectionPage() {
         const pairs = await Promise.all(
           (['numerics', 'reasoning'] as const).map((aptitude_type) =>
             api
-              .countQuestions({ category: 'pyq2', subject: 'Aptitude', aptitude_type, year: year ?? undefined })
+              .countQuestions({
+                category: group.category,
+                subject: 'Aptitude',
+                aptitude_type,
+                year: year ?? undefined,
+              })
               .then((n) => [aptitude_type, n] as const)
               .catch(() => [aptitude_type, 0] as const)
           )
@@ -102,7 +112,7 @@ export default function PyqGroup2SectionPage() {
         return Object.fromEntries(pairs)
       }
       return api
-        .topicCounts({ category: 'pyq2', subject: section, year: year ?? undefined })
+        .topicCounts({ category: group.category, subject: section, year: year ?? undefined })
         .catch(() => ({}))
     }
     load().then((map) => {
@@ -113,22 +123,22 @@ export default function PyqGroup2SectionPage() {
     return () => {
       cancelled = true
     }
-  }, [section, year])
+  }, [group, section, year])
 
   const allCount = useMemo(
     () => (counts ? Object.values(counts).reduce((a, b) => a + b, 0) : undefined),
     [counts]
   )
 
-  if (!section) return null
+  if (!group || !section) return null
 
-  // Build a reactive label: PYQ · Group 2 · <section> · <sub-type?> · <year?>
-  const baseLabel: QuizLabelSeg[] = ['PYQ', 'Group 2', { subject: section }]
+  // Build a reactive label: PYQ · <group> · <section> · <sub-type?> · <year?>
+  const baseLabel: QuizLabelSeg[] = ['PYQ', group.label, { subject: section }]
   const yearSeg: QuizLabelSeg[] = year ? [String(year)] : []
 
-  // Gate helpers. The pyq2 key ignores year (a sub-type across years = one topic).
+  // Gate helpers. The key ignores year (a sub-type across years = one topic).
   const gateCfg = (extra: Record<string, unknown>): GateConfigLike => ({
-    category: 'pyq2',
+    category: group.category,
     subject: section,
     ...(extra as Partial<GateConfigLike>),
   })
@@ -146,7 +156,7 @@ export default function PyqGroup2SectionPage() {
       return
     }
     startTest({
-      category: 'pyq2',
+      category: group.category,
       subject: section,
       year: year ?? undefined,
       labelParts: [...baseLabel, ...labelMid, ...yearSeg],
@@ -163,15 +173,15 @@ export default function PyqGroup2SectionPage() {
   // Sub-type rows to render (skip empties for the selected year).
   const topicRows = isAptitude
     ? []
-    : PYQ2_SECTION_TOPICS[section as Exclude<Pyq2Section, 'Aptitude'>].filter(
+    : (group.sectionTopics[section as Exclude<PyqSection, 'Aptitude'>] ?? []).filter(
         (tp) => (counts?.[tp] ?? (counts ? 0 : 1)) > 0
       )
 
   return (
-    <PickerPage badge={t('pyq2Badge')}>
+    <PickerPage badge={t(group.i18n.badge)}>
       <div className="mb-5 flex items-center gap-2">
         <button
-          onClick={() => navigate('/test-arena/pyq/group2')}
+          onClick={() => navigate(`/test-arena/pyq/${group.key}`)}
           className="inline-flex items-center gap-1 font-heading text-sm font-semibold text-primary transition-opacity hover:opacity-80"
         >
           <ArrowLeft size={16} /> {t('back')}
@@ -195,7 +205,7 @@ export default function PyqGroup2SectionPage() {
         </p>
         <div className="-mx-1 flex flex-wrap gap-2 px-1">
           <YearChip label={t('allYears')} active={year === null} onClick={() => setYear(null)} />
-          {PYQ2_YEARS.map((y) => (
+          {group.years.map((y) => (
             <YearChip key={y} label={String(y)} active={year === y} onClick={() => setYear(y)} />
           ))}
         </div>
@@ -209,8 +219,8 @@ export default function PyqGroup2SectionPage() {
         <div className="space-y-4">
           {/* "All Questions" shortcut (whole section, selected year). */}
           <AllHero
-            label={t('pyq2AllQuestions')}
-            sub={t('pyq2AllQuestionsSub')}
+            label={t('pyqAllQuestions')}
+            sub={t('pyqAllQuestionsSub')}
             count={allCount}
             word={t('questionsCount')}
             disabled={(allCount ?? 0) === 0}

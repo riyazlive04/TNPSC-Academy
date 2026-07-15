@@ -1141,6 +1141,7 @@ function formatStudyTime(sec: number): string {
 const SECTION_LABELS: Record<string, string> = {
   pyq: 'PYQ · Group 1',
   pyq2: 'PYQ · Group 2',
+  pyq4: 'PYQ · Group 4',
   subject: 'Subject practice',
   current_affairs: 'Current Affairs',
   aptitude: 'Aptitude',

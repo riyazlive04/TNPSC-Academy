@@ -373,7 +373,7 @@ router.post(
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const { category = 'subject', subject, standard, aptitude_type, ca_month, year } = req.body ?? {}
-    const known = ['aptitude', 'samacheer', 'pyq', 'pyq2', 'subject', 'current_affairs']
+    const known = ['aptitude', 'samacheer', 'pyq', 'pyq2', 'pyq4', 'subject', 'current_affairs']
     if (!known.includes(category)) return res.json({ counts: {} })
 
     // Current Affairs scoped to a single month: the RPC has no ca_month param,
