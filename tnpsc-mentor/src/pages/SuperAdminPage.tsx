@@ -347,7 +347,7 @@ function OverviewTab() {
   )
 }
 
-function SignupsChart({ data }: { data: { date: string; count: number }[] }) {
+function SignupsChart({ data = [] }: { data?: { date: string; count: number }[] }) {
   const { t } = useT()
   const max = Math.max(1, ...data.map((d) => d.count))
   return (
@@ -356,27 +356,38 @@ function SignupsChart({ data }: { data: { date: string; count: number }[] }) {
       {data.length === 0 ? (
         <p className="py-6 text-center font-body text-sm text-ink2">{t('noData')}</p>
       ) : (
-        <div className="flex h-32 items-end gap-1.5">
-          {data.map((d, i) => (
-            <div key={d.date} className="group flex flex-1 flex-col items-center justify-end gap-1">
-              <span className="font-heading text-[10px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
-                {d.count}
+        <>
+          {/* Bars: the track row stretches each column to its full height (default
+              items-stretch) so a bar's percentage height resolves against a
+              definite parent — the previous items-end collapsed every bar to 0. */}
+          <div className="flex h-32 gap-1.5">
+            {data.map((d) => (
+              <div key={d.date} className="group relative flex flex-1 items-end">
+                <div
+                  style={{ height: `${(d.count / max) * 100}%` }}
+                  className="w-full min-h-[3px] rounded-t-md bg-brand/80 transition-colors duration-200 group-hover:bg-brand"
+                  title={`${d.date}: ${d.count}`}
+                />
+                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-[10px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
+                  {d.count}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-1.5 flex gap-1.5">
+            {data.map((d) => (
+              <span key={d.date} className="flex-1 text-center font-body text-[9px] text-ink2/70">
+                {d.date.slice(8, 10)}
               </span>
-              <div
-                style={{ height: `${(d.count / max) * 100}%`, '--i': i } as React.CSSProperties}
-                className="w-full origin-bottom rounded-t-md bg-brand/80 transition-all duration-300 hover:bg-brand"
-                title={`${d.date}: ${d.count}`}
-              />
-              <span className="font-body text-[9px] text-ink2/70">{d.date.slice(8, 10)}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
 }
 
-function BreakdownCard({ title, data }: { title: string; data: Record<string, number> }) {
+function BreakdownCard({ title, data = {} }: { title: string; data?: Record<string, number> }) {
   const entries = Object.entries(data)
   const total = Math.max(1, entries.reduce((s, [, v]) => s + v, 0))
   return (
@@ -529,30 +540,40 @@ function RevenueTab() {
   )
 }
 
-function RevenueChart({ data }: { data: { month: string; revenue: number }[] }) {
+function RevenueChart({ data = [] }: { data?: { month: string; revenue: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.revenue))
-  const allZero = data.every((d) => d.revenue === 0)
+  const allZero = data.length === 0 || data.every((d) => d.revenue === 0)
   return (
     <div className="card p-5">
       <h2 className="mb-4 font-heading text-sm font-semibold text-ink">Revenue - last 12 months</h2>
       {allZero ? (
         <p className="py-6 text-center font-body text-sm text-ink2">No revenue recorded yet.</p>
       ) : (
-        <div className="flex h-40 items-end gap-1.5">
-          {data.map((d, i) => (
-            <div key={d.month} className="group flex flex-1 flex-col items-center justify-end gap-1">
-              <span className="font-heading text-[9px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
-                {formatINR(d.revenue)}
+        <>
+          {/* items-stretch (default) gives each column a definite height so the
+              percentage-height bars render; labels sit in a separate row below. */}
+          <div className="flex h-40 gap-1.5">
+            {data.map((d) => (
+              <div key={d.month} className="group relative flex flex-1 items-end">
+                <div
+                  style={{ height: `${(d.revenue / max) * 100}%` }}
+                  className="w-full min-h-[3px] rounded-t-md bg-brand/80 transition-colors duration-200 group-hover:bg-brand"
+                  title={`${d.month}: ${formatINR(d.revenue)}`}
+                />
+                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-[9px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
+                  {formatINR(d.revenue)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-1.5 flex gap-1.5">
+            {data.map((d) => (
+              <span key={d.month} className="flex-1 text-center font-body text-[9px] text-ink2/70">
+                {d.month.slice(5)}
               </span>
-              <div
-                style={{ height: `${(d.revenue / max) * 100}%`, '--i': i } as React.CSSProperties}
-                className="w-full origin-bottom rounded-t-md bg-brand/80 transition-all duration-300 hover:bg-brand"
-                title={`${d.month}: ${formatINR(d.revenue)}`}
-              />
-              <span className="font-body text-[9px] text-ink2/70">{d.month.slice(5)}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
