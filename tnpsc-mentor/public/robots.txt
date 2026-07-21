@@ -1,0 +1,20 @@
+# TNPSC Mentors — https://tnpscmentors.in
+# This file ships in the SPA build (public/ → dist/) and is served on the MAIN
+# domain (the public, indexable marketing site). The logged-in app host,
+# app.tnpscmentors.in, serves its OWN "Disallow: /" robots.txt and an
+# X-Robots-Tag: noindex header from nginx, so the app is kept out of search.
+
+User-agent: *
+Allow: /
+
+# Thin / auth-only routes — no unique content to index.
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /test-arena
+Disallow: /profile
+Disallow: /superadmin
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://tnpscmentors.in/sitemap.xml

@@ -137,6 +137,13 @@ const T = {
   chipGraded: { ta: 'நேர்மையான score', en: 'Honest scoring' },
   chipBilingual: { ta: 'முழுமையா இருமொழி', en: 'Fully bilingual' },
 
+  // "What you can practise" — the offerings section (named for search).
+  offeringsTitle: { ta: 'எதை practice பண்ணலாம்?', en: 'What you can practise' },
+  offeringsSub: {
+    ta: 'TNPSC test series, Group 2 தேர்வுகள், விளக்கத்துடன் PYQ, தினசரி current affairs test — எல்லாமே ஒரே இடத்துல, தமிழ் & English-ல.',
+    en: 'TNPSC test series, Group 2 tests, previous year questions with explanations, and a daily current affairs test — all in one place, in Tamil and English.',
+  },
+
   // Section 2 - dream / cost of inaction
   s2Title: {
     ta: 'ஒரு அரசு வேலை உங்க குடும்பத்தோட வாழ்க்கையையே மாத்தும். 2 மார்க்-ல தவறவிட்டா, இன்னொரு முழு வருட மே போயிடும்.',
@@ -432,6 +439,60 @@ const PLATFORMS: {
     action: 'download',
     ta: { t: 'Tablet', d: 'Android tablet-ல APK install பண்ணுங்க; iPad-ல browser-ல திறங்க. அதிக இடத்துல படிக்க வசதி.' },
     en: { t: 'Tablet', d: 'Android tablet: install the APK. iPad: open it in your browser. More room to read and practise.' },
+  },
+]
+
+// Concrete offerings, named exactly the way aspirants search for them. This is
+// the page's main on-page SEO surface: TNPSC test series, Group 2 (General
+// English / General Tamil), PYQ with explanations, and the daily CA test. Keep
+// the English titles verbatim — they are the target search phrases.
+const OFFERINGS: {
+  icon: typeof FileText
+  tint: (typeof TINTS)[number]
+  ta: { t: string; d: string }
+  en: { t: string; d: string }
+}[] = [
+  {
+    icon: Trophy,
+    tint: TINTS[0],
+    ta: { t: 'TNPSC Test Series', d: 'எல்லா Group தேர்வுகளுக்குமான முழு TNPSC test series — தமிழ் & English.' },
+    en: { t: 'TNPSC Test Series', d: 'A complete TNPSC test series covering every Group exam, in Tamil and English.' },
+  },
+  {
+    icon: ListChecks,
+    tint: TINTS[2],
+    ta: { t: 'Group 2 Test Series', d: 'சமீபத்திய blueprint அடிப்படையிலான TNPSC Group 2 & 2A test series.' },
+    en: { t: 'Group 2 Test Series', d: 'A TNPSC Group 2 & 2A test series built on the latest prelims blueprint.' },
+  },
+  {
+    icon: Languages,
+    tint: TINTS[3],
+    ta: { t: 'Group 2 General English Test Series', d: 'Grammar, comprehension, literature — Group 2 General English பகுதிக்கான தேர்வுகள்.' },
+    en: { t: 'Group 2 General English Test Series', d: 'Grammar, comprehension and literature tests for the Group 2 General English paper.' },
+  },
+  {
+    icon: Languages,
+    tint: TINTS[1],
+    ta: { t: 'Group 2 General Tamil Test Series', d: 'இலக்கணம், இலக்கியம், மொழித்திறன் — Group 2 பொது தமிழ் தேர்வுகள்.' },
+    en: { t: 'Group 2 General Tamil Test Series', d: 'Grammar, literature and language tests for the Group 2 General Tamil paper.' },
+  },
+  {
+    icon: FileText,
+    tint: TINTS[2],
+    ta: { t: 'Previous Year Questions with Explanation', d: 'ஒவ்வொரு கேள்விக்கும் விரிவான, இருமொழி விளக்கத்துடன் PYQ.' },
+    en: { t: 'Previous Year Questions with Explanation', d: 'Every previous year question comes with a detailed bilingual explanation.' },
+  },
+  {
+    icon: Bookmark,
+    tint: TINTS[0],
+    ta: { t: 'TNPSC Previous Year Questions', d: 'Group 1, 2 & 4 — கடந்த பல வருட TNPSC previous year questions.' },
+    en: { t: 'TNPSC Previous Year Questions', d: 'Genuine TNPSC previous year questions from Group 1, 2 and 4, across many years.' },
+  },
+  {
+    icon: Newspaper,
+    tint: TINTS[3],
+    ta: { t: 'Daily Current Affairs Test', d: 'தினமும் புதுப்பிக்கப்படும் current affairs test — சமீபத்திய நடப்பு நிகழ்வுகள்.' },
+    en: { t: 'Daily Current Affairs Test', d: 'A fresh daily current affairs test with the latest events for TNPSC exams.' },
   },
 ]
 
@@ -921,6 +982,35 @@ export default function LandingPage() {
                 </div>
                 <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{card[lang].t}</h3>
                 <p className="mt-2 font-body text-[15px] leading-relaxed text-ink2">{card[lang].d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── What you can practise (offerings, named for search) ──────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        <Reveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-heading text-2xl font-bold tracking-tight text-ink sm:text-4xl">
+              {t('offeringsTitle')}
+            </h2>
+            <p className="mx-auto mt-4 font-body text-base leading-relaxed text-ink2">
+              {t('offeringsSub')}
+            </p>
+          </div>
+        </Reveal>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {OFFERINGS.map(({ icon: Icon, tint, ...card }, i) => (
+            <Reveal key={card.en.t} delay={i * 0.05}>
+              <div className="card interactive group h-full p-6">
+                <span
+                  className={`grid h-12 w-12 place-items-center rounded-tile ${tint.bg} ${tint.fg} transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}
+                >
+                  <Icon size={22} />
+                </span>
+                <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{card[lang].t}</h3>
+                <p className="mt-2 font-body text-[14px] leading-relaxed text-ink2">{card[lang].d}</p>
               </div>
             </Reveal>
           ))}
