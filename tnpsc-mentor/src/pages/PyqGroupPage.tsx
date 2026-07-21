@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile, { type Tint } from '../components/UI/IconTile'
-import { List, ListRow } from '../components/UI/ListRow'
+import { type Tint } from '../components/UI/IconTile'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
   PYQ_GROUPS,
@@ -78,7 +79,7 @@ export default function PyqGroupPage() {
   if (!group) return null
 
   return (
-    <PickerPage badge={t(group.i18n.badge)}>
+    <PickerPage badge={t(group.i18n.badge)} backTo="/test-arena/pyq">
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
           {t('pyqPickSection')}
@@ -91,34 +92,25 @@ export default function PyqGroupPage() {
           <LogoLoader size={56} />
         </div>
       ) : (
-        <List>
+        <ChoiceGrid>
           {group.sections.map((s, i) => {
             const { icon: Icon, tint } = SECTION_UI[s]
             const n = counts[s] ?? 0
             return (
-              <ListRow
+              <ChoiceCard
                 key={s}
+                index={i}
                 disabled={n === 0}
                 onClick={() => navigate(`/test-arena/pyq/${group.key}/${pyqSectionSlug(s)}`)}
-                style={{ '--i': i } as React.CSSProperties}
-                leading={
-                  <IconTile tint={tint}>
-                    <Icon size={19} strokeWidth={2} />
-                  </IconTile>
-                }
+                icon={iconFor(s) ?? <Icon strokeWidth={2} />}
+                tint={tint}
                 title={subjectName(s, lang)}
-                subtitle={
-                  <span className="flex items-baseline gap-1">
-                    <span className="font-heading font-bold tabular-nums text-primary">
-                      {n.toLocaleString()}
-                    </span>
-                    <span>{t('questionsCount')}</span>
-                  </span>
-                }
+                count={n}
+                countLabel={t('questionsCount')}
               />
             )
           })}
-        </List>
+        </ChoiceGrid>
       )}
     </PickerPage>
   )

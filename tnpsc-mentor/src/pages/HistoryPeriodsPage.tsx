@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Landmark, Castle, Flag, ChevronRight } from 'lucide-react'
+import { Landmark, Castle, Flag } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile, { type Tint } from '../components/UI/IconTile'
-import { List, ListRow } from '../components/UI/ListRow'
+import { type Tint } from '../components/UI/IconTile'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
@@ -58,7 +58,7 @@ export default function HistoryPeriodsPage() {
   }
 
   return (
-    <PickerPage badge={t('historyPeriodBadge')}>
+    <PickerPage badge={t('historyPeriodBadge')} backTo="/test-arena/pyq/group1">
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
           {t('historyPickPeriod')}
@@ -71,33 +71,35 @@ export default function HistoryPeriodsPage() {
           <LogoLoader size={56} />
         </div>
       ) : (
-        <List>
-          {PERIODS.map(({ unit, titleKey, subKey, icon, tint }) => {
+        <ChoiceGrid>
+          {PERIODS.map(({ unit, titleKey, subKey, icon, tint }, i) => {
             const n = counts[unit] ?? 0
             const title = t(titleKey)
             return (
-              <ListRow
+              <ChoiceCard
                 key={unit}
+                index={i}
                 disabled={n === 0}
                 onClick={() => begin(unit, title)}
-                leading={<IconTile tint={tint}>{icon}</IconTile>}
+                icon={icon}
+                tint={tint}
                 title={title}
-                subtitle={t(subKey)}
-                trailing={
-                  <span className="flex flex-shrink-0 items-center gap-2">
-                    <span className="font-heading text-sm font-semibold text-primary">
-                      {n}{' '}
-                      <span className="font-body text-xs font-normal text-muted">
+                subtitle={
+                  <>
+                    {t(subKey)}
+                    {n > 0 && (
+                      <>
+                        {' · '}
+                        <span className="font-heading font-bold tabular-nums text-primary">{n}</span>{' '}
                         {t('questionsCount')}
-                      </span>
-                    </span>
-                    <ChevronRight size={18} className="text-muted/40" />
-                  </span>
+                      </>
+                    )}
+                  </>
                 }
               />
             )
           })}
-        </List>
+        </ChoiceGrid>
       )}
     </PickerPage>
   )

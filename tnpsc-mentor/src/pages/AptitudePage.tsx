@@ -9,9 +9,9 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile from '../components/UI/IconTile'
-import { List, ListRow } from '../components/UI/ListRow'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
   topicName,
@@ -207,6 +207,7 @@ export default function AptitudePage() {
         {CATEGORIES.map((c) => {
           const active = type === c.id
           const n = sumCounts(counts?.[c.id])
+          const art = iconFor(c.id)
           return (
             <button
               key={c.id}
@@ -220,11 +221,16 @@ export default function AptitudePage() {
             >
               <span
                 className={[
-                  'grid h-11 w-11 flex-shrink-0 place-items-center rounded-tile',
-                  active ? 'bg-white/15 text-white' : 'bg-tint-violet text-primary',
+                  'grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-tile',
+                  art ? 'p-1' : '',
+                  active ? 'bg-white/90 text-primary' : 'bg-tint-violet text-primary',
                 ].join(' ')}
               >
-                {c.icon}
+                {art ? (
+                  <img src={art} alt="" className="h-full w-full object-contain" loading="lazy" />
+                ) : (
+                  c.icon
+                )}
               </span>
               <span className="min-w-0">
                 <span className="tamil block font-display text-sm font-bold">{t(c.labelKey)}</span>
@@ -284,68 +290,37 @@ export default function AptitudePage() {
                 questionsWord={t('questionsCount')}
                 onClick={() => beginSection(avSection)}
               />
-              <List>
-                {AV_SECTION_SHAPES[avSection].map((shape, i) => {
-                  const n = shapeCounts[shape]
-                  return (
-                    <ListRow
-                      key={shape}
-                      onClick={() => beginShape(avSection, shape)}
-                      style={{ '--i': i } as React.CSSProperties}
-                      leading={
-                        <IconTile tint="violet">
-                          <Shapes size={18} />
-                        </IconTile>
-                      }
-                      title={topicName(shape, lang)}
-                      subtitle={
-                        n != null ? (
-                          <span className="flex items-baseline gap-1">
-                            <span className="font-heading font-bold tabular-nums text-primary">
-                              {n.toLocaleString()}
-                            </span>
-                            <span>{t('questionsCount')}</span>
-                          </span>
-                        ) : undefined
-                      }
-                    />
-                  )
-                })}
-              </List>
+              <ChoiceGrid>
+                {AV_SECTION_SHAPES[avSection].map((shape, i) => (
+                  <ChoiceCard
+                    key={shape}
+                    index={i}
+                    onClick={() => beginShape(avSection, shape)}
+                    icon={iconFor(shape) ?? <Shapes />}
+                    title={topicName(shape, lang)}
+                    count={shapeCounts[shape]}
+                    countLabel={t('questionsCount')}
+                  />
+                ))}
+              </ChoiceGrid>
             </div>
           )}
 
           {/* Level 1 - the three Area and Volume sections */}
           {!loading && !error && avOpen && !avSection && (
-            <List>
-              {AV_SECTIONS.map((section, i) => {
-                const n = counts?.numerics?.[section]
-                return (
-                  <ListRow
-                    key={section}
-                    onClick={() => openSection(section)}
-                    style={{ '--i': i } as React.CSSProperties}
-                    leading={
-                      <IconTile tint="violet">
-                        <Layers size={18} />
-                      </IconTile>
-                    }
-                    title={topicName(section, lang)}
-                    subtitle={
-                      n != null ? (
-                        <span className="flex items-baseline gap-1">
-                          <span className="font-heading font-bold tabular-nums text-primary">
-                            {n.toLocaleString()}
-                          </span>
-                          <span>{t('questionsCount')}</span>
-                        </span>
-                      ) : undefined
-                    }
-                    trailing={<ChevronRight size={18} className="flex-shrink-0 text-muted/40" />}
-                  />
-                )
-              })}
-            </List>
+            <ChoiceGrid>
+              {AV_SECTIONS.map((section, i) => (
+                <ChoiceCard
+                  key={section}
+                  index={i}
+                  onClick={() => openSection(section)}
+                  icon={iconFor(section) ?? <Layers />}
+                  title={topicName(section, lang)}
+                  count={counts?.numerics?.[section]}
+                  countLabel={t('questionsCount')}
+                />
+              ))}
+            </ChoiceGrid>
           )}
 
           {/* Level 0 - the topic list */}
@@ -360,58 +335,31 @@ export default function AptitudePage() {
                 hero
               />
 
-              <List>
+              <ChoiceGrid>
                 {rows.map((row, i) =>
                   row.kind === 'group' ? (
-                    <ListRow
+                    <ChoiceCard
                       key="__av__"
+                      index={i}
                       onClick={() => setAvOpen(true)}
-                      style={{ '--i': i } as React.CSSProperties}
-                      leading={
-                        <IconTile tint="violet">
-                          <Shapes size={18} />
-                        </IconTile>
-                      }
+                      icon={iconFor(AREA_VOLUME_GROUP) ?? <Shapes />}
                       title={topicName(AREA_VOLUME_GROUP, lang)}
-                      subtitle={
-                        avGroupTotal > 0 ? (
-                          <span className="flex items-baseline gap-1">
-                            <span className="font-heading font-bold tabular-nums text-primary">
-                              {avGroupTotal.toLocaleString()}
-                            </span>
-                            <span>{t('questionsCount')}</span>
-                          </span>
-                        ) : undefined
-                      }
-                      trailing={
-                        <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
-                      }
+                      count={avGroupTotal}
+                      countLabel={t('questionsCount')}
                     />
                   ) : (
-                    <ListRow
+                    <ChoiceCard
                       key={row.topic}
+                      index={i}
                       onClick={() => begin(row.topic)}
-                      style={{ '--i': i } as React.CSSProperties}
-                      leading={
-                        <IconTile tint="violet">
-                          <Layers size={18} />
-                        </IconTile>
-                      }
+                      icon={iconFor(row.topic) ?? <Layers />}
                       title={topicName(row.topic, lang)}
-                      subtitle={
-                        counts?.[type]?.[row.topic] != null ? (
-                          <span className="flex items-baseline gap-1">
-                            <span className="font-heading font-bold tabular-nums text-primary">
-                              {counts[type][row.topic].toLocaleString()}
-                            </span>
-                            <span>{t('questionsCount')}</span>
-                          </span>
-                        ) : undefined
-                      }
+                      count={counts?.[type]?.[row.topic]}
+                      countLabel={t('questionsCount')}
                     />
                   )
                 )}
-              </List>
+              </ChoiceGrid>
             </div>
           )}
         </section>

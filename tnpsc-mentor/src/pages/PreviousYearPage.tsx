@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  ChevronRight,
   Landmark,
   Palette,
   Scale,
@@ -13,14 +12,13 @@ import {
   TrendingUp,
   Calculator,
   BookOpen,
-  Lock,
   type LucideIcon,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
-import { List, ListRow } from '../components/UI/ListRow'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey } from '../lib/freeGate'
 import { PYQ_SUBJECTS, subjectName } from '../lib/constants'
@@ -155,7 +153,7 @@ export default function PreviousYearPage() {
   }
 
   return (
-    <PickerPage badge={t('pyqBadge')}>
+    <PickerPage badge={t('pyqBadge')} backTo="/test-arena/pyq">
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
         <p className="tamil mt-1 font-body text-[15px] text-muted">{t('subjectStepHint')}</p>
@@ -186,51 +184,41 @@ export default function PreviousYearPage() {
           <LogoLoader size={56} />
         </div>
       ) : (
-        // Subjects as a hairline-divided list with small tint tiles + chevron.
-        <List>
+        // Subjects as a tactile card grid, each fronted by its subject icon.
+        <ChoiceGrid>
           {PYQ_SUBJECTS.map((s, i) => {
             const Icon = subjectIcon(s)
             const n = counts[s] ?? 0
             const isHistory = s === HISTORY_SUBJECT
             const isAptitude = s === APTITUDE_SUBJECT
-            const locked = isLocked(s)
+            const extra =
+              year === null && isHistory
+                ? ` · ${t('byPeriod')}`
+                : year === null && isAptitude
+                  ? ` · ${t('byType')}`
+                  : ''
             return (
-              <ListRow
+              <ChoiceCard
                 key={s}
+                index={i}
                 onClick={() => begin(s)}
-                style={{ '--i': i } as React.CSSProperties}
-                leading={
-                  <IconTile tint="violet">
-                    <Icon size={19} strokeWidth={2} />
-                  </IconTile>
-                }
-                trailing={
-                  locked ? (
-                    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
-                      <Lock size={11} /> {t('lockedLabel')}
-                    </span>
-                  ) : undefined
-                }
+                icon={iconFor(s) ?? <Icon strokeWidth={2} />}
+                locked={isLocked(s)}
+                lockedLabel={t('lockedLabel')}
                 title={subjectName(s, lang)}
                 subtitle={
-                  <span className="flex items-baseline gap-1">
+                  <>
                     <span className="font-heading font-bold tabular-nums text-primary">
                       {n.toLocaleString()}
-                    </span>
-                    <span>
-                      {t('questionsCount')}
-                      {year === null && isHistory
-                        ? ` · ${t('byPeriod')}`
-                        : year === null && isAptitude
-                          ? ` · ${t('byType')}`
-                          : ''}
-                    </span>
-                  </span>
+                    </span>{' '}
+                    {t('questionsCount')}
+                    {extra}
+                  </>
                 }
               />
             )
           })}
-        </List>
+        </ChoiceGrid>
       )}
     </PickerPage>
   )

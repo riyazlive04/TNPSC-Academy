@@ -7,6 +7,7 @@ import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
 import LogoLoader from '../components/UI/LogoLoader'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName, type MonthDef } from '../lib/constants'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import { useStartTest } from '../hooks/useStartTest'
@@ -322,9 +323,7 @@ export default function CurrentAffairsPage() {
                         onClick={() => startMonthTopic(selectedMonth, topic)}
                         style={{ '--i': i } as React.CSSProperties}
                         leading={
-                          <IconTile tint="green">
-                            <Newspaper size={18} />
-                          </IconTile>
+                          <TopicTile topic={topic} />
                         }
                         trailing={locked ? <LockPill label={t('lockedLabel')} /> : undefined}
                         title={topicName(topic, lang)}
@@ -454,9 +453,7 @@ export default function CurrentAffairsPage() {
                     onClick={() => handleTopic(topic)}
                     style={{ '--i': i } as React.CSSProperties}
                     leading={
-                      <IconTile tint="green">
-                        <Newspaper size={18} />
-                      </IconTile>
+                      <TopicTile topic={topic} />
                     }
                     trailing={locked ? <LockPill label={t('lockedLabel')} /> : undefined}
                     title={topicName(topic, lang)}
@@ -480,6 +477,23 @@ export default function CurrentAffairsPage() {
       </>
       )}
     </PickerPage>
+  )
+}
+
+/** Leading tile for a CA topic row: the theme's illustration when we have one
+ *  (Sports, Environment, Defence…), otherwise the generic newspaper glyph. */
+function TopicTile({ topic }: { topic: string }) {
+  const art = iconFor(topic)
+  if (!art)
+    return (
+      <IconTile tint="green">
+        <Newspaper size={18} />
+      </IconTile>
+    )
+  return (
+    <span className="grid h-[38px] w-[38px] flex-shrink-0 place-items-center overflow-hidden rounded-tile bg-tint-green p-1">
+      <img src={art} alt="" className="h-full w-full object-contain" loading="lazy" />
+    </span>
   )
 }
 

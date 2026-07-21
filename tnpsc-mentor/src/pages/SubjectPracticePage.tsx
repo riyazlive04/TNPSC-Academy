@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
   ChevronRight,
@@ -23,15 +22,14 @@ import {
   Lightbulb,
   ListChecks,
   Target,
-  Lock,
   type LucideIcon,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
-import IconTile from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import PremiumCard from '../components/UI/PremiumCard'
-import { List, ListRow } from '../components/UI/ListRow'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { toast } from '../store/toastStore'
 import {
@@ -48,6 +46,7 @@ import {
   type HistoryPeriod,
 } from '../lib/constants'
 import { useStartTest } from '../hooks/useStartTest'
+import { useSmartBack } from '../hooks/useSmartBack'
 import { useT, type StringKey } from '../lib/i18n'
 import type { SubjectQType } from '../types'
 
@@ -111,7 +110,7 @@ const qKey = (subject: string, topic?: string) => `${subject}|${topic ?? ALL_TOP
 
 export default function SubjectPracticePage() {
   const startTest = useStartTest()
-  const navigate = useNavigate()
+  const exitToPrevious = useSmartBack('/test-arena')
   const { t, lang } = useT()
 
   const [step, setStep] = useState<Step>('subject')
@@ -323,7 +322,9 @@ export default function SubjectPracticePage() {
       setPeriod(null)
       return setStep('subject')
     }
-    navigate('/test-arena')
+    // At the first step there are no in-page steps left to rewind, so step out to
+    // the immediately previous screen in the navigation stack.
+    exitToPrevious()
   }
 
   const handleType = (qtype: SubjectQType | null, labelKey: StringKey) => {
@@ -371,7 +372,7 @@ export default function SubjectPracticePage() {
             onClick={back}
             className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
           >
-            <ArrowLeft size={16} /> {step === 'subject' ? t('testArena') : t('back')}
+            <ArrowLeft size={16} /> {t('back')}
           </button>
           <Breadcrumb
             step={step}
@@ -548,42 +549,26 @@ function SubjectStep({
   if (error) return <ErrorText text={error} />
 
   return (
-    <List>
+    <ChoiceGrid>
       {subjects.map((s, i) => {
         const Icon = subjectIcon(s.subject)
-        const locked = isLocked(s.subject)
+        // A spent subject shows a premium lock chip; tapping it still fires
+        // onPick, which routes to the upsell.
         return (
-          <ListRow
+          <ChoiceCard
             key={s.subject}
+            index={i}
             onClick={() => onPick(s.subject)}
-            style={{ '--i': i } as React.CSSProperties}
-            leading={
-              <IconTile tint="violet">
-                <Icon size={19} strokeWidth={2} />
-              </IconTile>
-            }
+            icon={iconFor(s.subject) ?? <Icon strokeWidth={2} />}
             title={nameOf(s.subject)}
-            subtitle={
-              <span className="flex items-baseline gap-1">
-                <span className="font-heading font-bold tabular-nums text-primary">
-                  {s.total.toLocaleString()}
-                </span>
-                <span>{questionsWord}</span>
-              </span>
-            }
-            // A spent subject shows a premium lock pill instead of the chevron;
-            // tapping it still fires onPick, which routes to the upsell.
-            trailing={
-              locked ? (
-                <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-accentwarmsoft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-accentwarm">
-                  <Lock size={11} /> {lockedLabel}
-                </span>
-              ) : undefined
-            }
+            count={s.total}
+            countLabel={questionsWord}
+            locked={isLocked(s.subject)}
+            lockedLabel={lockedLabel}
           />
         )
       })}
-    </List>
+    </ChoiceGrid>
   )
 }
 
@@ -606,39 +591,35 @@ function PeriodStep({
   onPick: (p: HistoryPeriod) => void
 }) {
   return (
-    <List>
+    <ChoiceGrid>
       {periods.map(({ unit, titleKey, subKey, icon: Icon }, i) => {
         const n = counts[unit] ?? 0
         return (
-          <ListRow
+          <ChoiceCard
             // The three periods always exist; only disable one once counts have
             // loaded and it's genuinely empty.
             key={unit}
+            index={i}
             disabled={countsReady && n === 0}
             onClick={() => onPick(unit)}
-            style={{ '--i': i } as React.CSSProperties}
-            leading={
-              <IconTile tint="violet">
-                <Icon size={19} strokeWidth={2} />
-              </IconTile>
-            }
+            icon={<Icon strokeWidth={2} />}
             title={label(titleKey)}
-            subtitle={label(subKey)}
-            trailing={
-              <span className="flex flex-shrink-0 items-center gap-2">
-                {countsReady && (
-                  <span className="font-heading text-sm font-semibold text-primary">
-                    {n}{' '}
-                    <span className="font-body text-xs font-normal text-muted">{questionsWord}</span>
-                  </span>
+            subtitle={
+              <>
+                {label(subKey)}
+                {countsReady && n > 0 && (
+                  <>
+                    {' · '}
+                    <span className="font-heading font-bold tabular-nums text-primary">{n}</span>{' '}
+                    {questionsWord}
+                  </>
                 )}
-                <ChevronRight size={18} className="text-muted/40" />
-              </span>
+              </>
             }
           />
         )
       })}
-    </List>
+    </ChoiceGrid>
   )
 }
 
@@ -712,39 +693,24 @@ function TopicStep({
       </button>
       )}
 
-      {/* Topic rows, grouped into syllabus sections when configured */}
+      {/* Topic cards, grouped into syllabus sections when configured */}
       {groups.map((g, gi) => (
-        <section key={g.heading ?? `g${gi}`} className="space-y-1">
+        <section key={g.heading ?? `g${gi}`} className="space-y-2">
           {g.heading && <SectionHeader title={topicLabel(g.heading)} className="px-1" />}
-          <List>
-            {g.topics.map((tp, i) => {
-              const n = topicCounts[tp]
-              return (
-                <ListRow
-                  key={tp}
-                  onClick={() => onPick(tp)}
-                  style={{ '--i': i } as React.CSSProperties}
-                  className={topic === tp ? 'rounded-field ring-2 ring-primary/40' : ''}
-                  leading={
-                    <IconTile tint="violet">
-                      <Layers size={18} />
-                    </IconTile>
-                  }
-                  title={topicLabel(tp)}
-                  subtitle={
-                    n != null ? (
-                      <span className="flex items-baseline gap-1">
-                        <span className="font-heading font-bold tabular-nums text-primary">
-                          {n.toLocaleString()}
-                        </span>
-                        <span>{questionsWord}</span>
-                      </span>
-                    ) : undefined
-                  }
-                />
-              )
-            })}
-          </List>
+          <ChoiceGrid>
+            {g.topics.map((tp, i) => (
+              <ChoiceCard
+                key={tp}
+                index={i}
+                onClick={() => onPick(tp)}
+                active={topic === tp}
+                icon={iconFor(tp) ?? <Layers />}
+                title={topicLabel(tp)}
+                count={topicCounts[tp]}
+                countLabel={questionsWord}
+              />
+            ))}
+          </ChoiceGrid>
         </section>
       ))}
     </div>
@@ -763,66 +729,26 @@ function TypeStep({
   label: (k: StringKey) => string
   onPick: (k: SubjectQType | null, labelKey: StringKey) => void
 }) {
-  const [mixed, ...rest] = qtypes
-  const mixedCount = totalForType(mixed.key)
-  const MixedIcon = mixed.icon
-
   return (
-    <div className="space-y-3">
-      {/* Mixed - the recommended, highlighted option */}
-      <button
-        onClick={() => onPick(mixed.key, mixed.labelKey)}
-        disabled={mixedCount === 0}
-        className="hero-panel interactive group relative flex w-full items-center gap-4 p-5 text-left disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        <span
-          className="pointer-events-none absolute inset-0 bg-hero-grid opacity-50"
-          style={{ backgroundSize: '18px 18px' }}
-        />
-        <span className="relative grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
-          <MixedIcon size={20} />
-        </span>
-        <span className="relative min-w-0 flex-1">
-          <span className="tamil block font-heading text-base font-semibold text-white">
-            {label(mixed.labelKey)}
-          </span>
-          {mixedCount > 0 && (
-            <span className="block font-body text-xs text-white/70">
-              {mixedCount} {label('questionsCount')}
-            </span>
-          )}
-        </span>
-        <ChevronRight
-          size={18}
-          className="relative flex-shrink-0 text-white/50 transition group-hover:translate-x-0.5 group-hover:text-white"
-        />
-      </button>
-
-      <List>
-        {rest.map(({ key, labelKey, icon: Icon }, i) => {
-          const n = totalForType(key)
-          return (
-            <ListRow
-              key={labelKey}
-              onClick={() => onPick(key, labelKey)}
-              disabled={n === 0}
-              style={{ '--i': i } as React.CSSProperties}
-              leading={
-                <IconTile tint="violet">
-                  <Icon size={18} />
-                </IconTile>
-              }
-              title={label(labelKey)}
-              trailing={
-                <span className="flex-shrink-0 font-heading text-sm font-semibold text-muted">
-                  {n > 0 ? n : '-'}
-                </span>
-              }
-            />
-          )
-        })}
-      </List>
-    </div>
+    <ChoiceGrid>
+      {qtypes.map(({ key, labelKey, icon: Icon }, i) => {
+        const n = totalForType(key)
+        return (
+          <ChoiceCard
+            key={labelKey}
+            index={i}
+            onClick={() => onPick(key, labelKey)}
+            disabled={n === 0}
+            // Mixed (key === null) is the recommended default — highlight it.
+            active={key === null}
+            icon={iconFor(key ?? 'mixed') ?? <Icon />}
+            title={label(labelKey)}
+            count={n}
+            countLabel={label('questionsCount')}
+          />
+        )
+      })}
+    </ChoiceGrid>
   )
 }
 

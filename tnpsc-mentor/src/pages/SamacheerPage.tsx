@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react'
+import { BookOpen, GraduationCap } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import LogoLoader from '../components/UI/LogoLoader'
-import { SUBJECTS, STANDARDS, standardLabel } from '../lib/constants'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
+import { SUBJECTS, STANDARDS, standardLabel, subjectName } from '../lib/constants'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
 
+const STEP_HEADING =
+  'tamil mb-3 font-heading text-sm font-bold uppercase tracking-widest text-muted'
+
 export default function SamacheerPage() {
   const startTest = useStartTest()
-  const { t } = useT()
+  const { t, lang } = useT()
 
   const [subject, setSubject] = useState<string | null>(null)
   const [standard, setStandard] = useState<number | null>(null)
@@ -60,32 +66,43 @@ export default function SamacheerPage() {
   return (
     <PickerPage badge={t('samacheerBadge')}>
       {/* Row 1 - subject */}
-      <PillSection title={t('step1Subject')} className="mb-8">
-        {SUBJECTS.map((s) => (
-          <PillButton
-            key={s}
-            size="sm"
-            active={subject === s}
-            onClick={() => {
-              setSubject(s)
-              setStandard(null)
-              setTopics([])
-            }}
-          >
-            {s.toUpperCase()}
-          </PillButton>
-        ))}
-      </PillSection>
+      <section className="mb-8">
+        <h3 className={STEP_HEADING}>{t('step1Subject')}</h3>
+        <ChoiceGrid>
+          {SUBJECTS.map((s, i) => (
+            <ChoiceCard
+              key={s}
+              index={i}
+              active={subject === s}
+              onClick={() => {
+                setSubject(s)
+                setStandard(null)
+                setTopics([])
+              }}
+              icon={iconFor(s) ?? <BookOpen />}
+              title={subjectName(s, lang)}
+            />
+          ))}
+        </ChoiceGrid>
+      </section>
 
       {/* Row 2 - standard */}
       {subject && (
-        <PillSection title={t('step2Standard')} className="mb-8 animate-fadeIn">
-          {STANDARDS.map((n) => (
-            <PillButton key={n} active={standard === n} onClick={() => setStandard(n)}>
-              {standardLabel(n)}
-            </PillButton>
-          ))}
-        </PillSection>
+        <section className="mb-8 animate-fadeIn">
+          <h3 className={STEP_HEADING}>{t('step2Standard')}</h3>
+          <ChoiceGrid>
+            {STANDARDS.map((n, i) => (
+              <ChoiceCard
+                key={n}
+                index={i}
+                active={standard === n}
+                onClick={() => setStandard(n)}
+                icon={iconFor(standardLabel(n)) ?? <GraduationCap />}
+                title={standardLabel(n)}
+              />
+            ))}
+          </ChoiceGrid>
+        </section>
       )}
 
       {/* Row 3 - topics from DB */}

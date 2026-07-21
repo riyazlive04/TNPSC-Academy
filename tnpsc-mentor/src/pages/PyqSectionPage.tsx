@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Layers, Calculator, Brain, ChevronRight, Shuffle, Lock } from 'lucide-react'
+import { Layers, Calculator, Brain, ChevronRight, Shuffle } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile, { type Tint } from '../components/UI/IconTile'
+import { type Tint } from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
-import { List, ListRow } from '../components/UI/ListRow'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
 import {
@@ -178,14 +179,8 @@ export default function PyqSectionPage() {
       )
 
   return (
-    <PickerPage badge={t(group.i18n.badge)}>
-      <div className="mb-5 flex items-center gap-2">
-        <button
-          onClick={() => navigate(`/test-arena/pyq/${group.key}`)}
-          className="inline-flex items-center gap-1 font-heading text-sm font-semibold text-primary transition-opacity hover:opacity-80"
-        >
-          <ArrowLeft size={16} /> {t('back')}
-        </button>
+    <PickerPage badge={t(group.i18n.badge)} backTo={`/test-arena/pyq/${group.key}`}>
+      <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
           {subjectName(section, lang)}
         </h2>
@@ -228,82 +223,62 @@ export default function PyqSectionPage() {
           />
 
           {isAptitude ? (
-            <List>
+            <ChoiceGrid>
               {APT_TYPES.map(({ type, titleKey, subKey, icon, tint }, i) => {
                 const n = counts[type] ?? 0
-                const locked = keyLocked({ aptitude_type: type })
                 return (
-                  <ListRow
+                  <ChoiceCard
                     key={type}
+                    index={i}
                     disabled={n === 0}
                     onClick={() => beginType(type)}
-                    style={{ '--i': i } as React.CSSProperties}
-                    leading={<IconTile tint={tint}>{icon}</IconTile>}
+                    icon={iconFor(type) ?? icon}
+                    tint={tint}
+                    locked={keyLocked({ aptitude_type: type })}
+                    lockedLabel={t('lockedLabel')}
                     title={t(titleKey)}
-                    subtitle={t(subKey)}
-                    trailing={
-                      locked ? (
-                        <LockPill label={t('lockedLabel')} />
-                      ) : (
-                        <span className="flex flex-shrink-0 items-center gap-2">
-                          <span className="font-heading text-sm font-semibold text-primary">
-                            {n}{' '}
-                            <span className="font-body text-xs font-normal text-muted">
-                              {t('questionsCount')}
-                            </span>
-                          </span>
-                          <ChevronRight size={18} className="text-muted/40" />
-                        </span>
-                      )
+                    subtitle={
+                      <>
+                        {t(subKey)}
+                        {n > 0 && (
+                          <>
+                            {' · '}
+                            <span className="font-heading font-bold tabular-nums text-primary">
+                              {n}
+                            </span>{' '}
+                            {t('questionsCount')}
+                          </>
+                        )}
+                      </>
                     }
                   />
                 )
               })}
-            </List>
+            </ChoiceGrid>
           ) : topicRows.length === 0 ? (
             <p className="tamil py-8 text-center font-body text-sm text-muted">
               {t('noQuestions')}
             </p>
           ) : (
-            <List>
+            <ChoiceGrid>
               {topicRows.map((tp, i) => (
-                <ListRow
+                <ChoiceCard
                   key={tp}
+                  index={i}
                   onClick={() => beginTopic(tp)}
-                  style={{ '--i': i } as React.CSSProperties}
-                  leading={
-                    <IconTile tint="violet">
-                      <Layers size={18} />
-                    </IconTile>
-                  }
-                  trailing={keyLocked({ topic: tp }) ? <LockPill label={t('lockedLabel')} /> : undefined}
+                  icon={iconFor(tp) ?? <Layers />}
+                  locked={keyLocked({ topic: tp })}
+                  lockedLabel={t('lockedLabel')}
                   title={topicName(tp, lang)}
-                  subtitle={
-                    counts[tp] != null ? (
-                      <span className="flex items-baseline gap-1">
-                        <span className="font-heading font-bold tabular-nums text-primary">
-                          {counts[tp].toLocaleString()}
-                        </span>
-                        <span>{t('questionsCount')}</span>
-                      </span>
-                    ) : undefined
-                  }
+                  count={counts[tp]}
+                  countLabel={t('questionsCount')}
                 />
               ))}
-            </List>
+            </ChoiceGrid>
           )}
         </div>
       )}
     </PickerPage>
-  )
-}
-
-/** Small "locked" chip shown on a sub-type whose one free test is spent. */
-function LockPill({ label }: { label: string }) {
-  return (
-    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
-      <Lock size={11} /> {label}
-    </span>
   )
 }
 

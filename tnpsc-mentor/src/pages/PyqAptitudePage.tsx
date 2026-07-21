@@ -9,9 +9,10 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile, { type Tint } from '../components/UI/IconTile'
-import { List, ListRow } from '../components/UI/ListRow'
+import { type Tint } from '../components/UI/IconTile'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import LogoLoader from '../components/UI/LogoLoader'
+import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
   topicName,
@@ -176,7 +177,7 @@ export default function PyqAptitudePage() {
         : t('pyqAptitudePickType')
 
   return (
-    <PickerPage badge={t('pyqAptitudeBadge')}>
+    <PickerPage badge={t('pyqAptitudeBadge')} backTo="/test-arena/pyq/group1">
       <div className="mb-5 flex items-center gap-2">
         {(type || avOpen) && (
           <button
@@ -199,106 +200,100 @@ export default function PyqAptitudePage() {
         </div>
       ) : !type ? (
         // ── Step 1: style (Numerics / Reasoning) ──
-        <List>
-          {TYPES.map(({ type: ty, titleKey, subKey, icon, tint }) => {
+        <ChoiceGrid>
+          {TYPES.map(({ type: ty, titleKey, subKey, icon, tint }, i) => {
             const n = typeTotal(ty)
             return (
-              <ListRow
+              <ChoiceCard
                 key={ty}
+                index={i}
                 disabled={n === 0}
                 onClick={() => chooseType(ty)}
-                leading={<IconTile tint={tint}>{icon}</IconTile>}
+                icon={iconFor(ty) ?? icon}
+                tint={tint}
                 title={t(titleKey)}
-                subtitle={t(subKey)}
-                trailing={
-                  <span className="flex flex-shrink-0 items-center gap-2">
-                    <span className="font-heading text-sm font-semibold text-primary">
-                      {n}{' '}
-                      <span className="font-body text-xs font-normal text-muted">
+                subtitle={
+                  <>
+                    {t(subKey)}
+                    {n > 0 && (
+                      <>
+                        {' · '}
+                        <span className="font-heading font-bold tabular-nums text-primary">{n}</span>{' '}
                         {t('questionsCount')}
-                      </span>
-                    </span>
-                    <ChevronRight size={18} className="text-muted/40" />
-                  </span>
+                      </>
+                    )}
+                  </>
                 }
               />
             )
           })}
-        </List>
+        </ChoiceGrid>
       ) : avOpen && avSection ? (
         // ── Shapes within a section ──
         <div className="space-y-4">
           <Hero label={t('allTopics')} count={counts[avSection]} word={t('questionsCount')} onClick={() => beginSection(avSection)} />
-          <List>
+          <ChoiceGrid>
             {AV_SECTION_SHAPES[avSection].map((shape, i) => (
-              <ListRow
+              <ChoiceCard
                 key={shape}
+                index={i}
                 disabled={(shapeCounts[shape] ?? -1) === 0}
                 onClick={() => beginShape(avSection, shape)}
-                style={{ '--i': i } as React.CSSProperties}
-                leading={<IconTile tint="violet"><Shapes size={18} /></IconTile>}
+                icon={iconFor(shape) ?? <Shapes />}
                 title={topicName(shape, lang)}
-                subtitle={<Count n={shapeCounts[shape]} word={t('questionsCount')} />}
+                count={shapeCounts[shape]}
+                countLabel={t('questionsCount')}
               />
             ))}
-          </List>
+          </ChoiceGrid>
         </div>
       ) : avOpen ? (
         // ── The three Area-and-Volume sections ──
-        <List>
+        <ChoiceGrid>
           {AV_SECTIONS.filter((sec) => (counts[sec] ?? 0) > 0).map((section, i) => (
-            <ListRow
+            <ChoiceCard
               key={section}
+              index={i}
               onClick={() => openSection(section)}
-              style={{ '--i': i } as React.CSSProperties}
-              leading={<IconTile tint="violet"><Layers size={18} /></IconTile>}
+              icon={iconFor(section) ?? <Layers />}
               title={topicName(section, lang)}
-              subtitle={<Count n={counts[section]} word={t('questionsCount')} />}
-              trailing={<ChevronRight size={18} className="flex-shrink-0 text-muted/40" />}
+              count={counts[section]}
+              countLabel={t('questionsCount')}
             />
           ))}
-        </List>
+        </ChoiceGrid>
       ) : (
         // ── Step 2: topics for the chosen style ──
         <div className="space-y-4">
           <Hero hero label={t('allTopics')} count={typeTotal(type)} word={t('questionsCount')} onClick={() => beginAll(type)} />
-          <List>
+          <ChoiceGrid>
             {topicRows.map((tp, i) =>
               isAreaVolumeSection(tp) || tp === AREA_VOLUME_GROUP ? (
-                <ListRow
+                <ChoiceCard
                   key="__av__"
+                  index={i}
                   onClick={() => setAvOpen(true)}
-                  style={{ '--i': i } as React.CSSProperties}
-                  leading={<IconTile tint="violet"><Shapes size={18} /></IconTile>}
+                  icon={iconFor(AREA_VOLUME_GROUP) ?? <Shapes />}
                   title={topicName(AREA_VOLUME_GROUP, lang)}
-                  subtitle={<Count n={avTotal} word={t('questionsCount')} />}
-                  trailing={<ChevronRight size={18} className="flex-shrink-0 text-muted/40" />}
+                  count={avTotal}
+                  countLabel={t('questionsCount')}
                 />
               ) : (
-                <ListRow
+                <ChoiceCard
                   key={tp}
+                  index={i}
                   onClick={() => beginTopic(tp)}
-                  style={{ '--i': i } as React.CSSProperties}
-                  leading={<IconTile tint="violet"><Layers size={18} /></IconTile>}
+                  icon={iconFor(tp) ?? <Layers />}
                   title={topicName(tp, lang)}
-                  subtitle={<Count n={counts[tp]} word={t('questionsCount')} />}
+                  count={counts[tp]}
+                  countLabel={t('questionsCount')}
                 />
               )
             )}
-          </List>
+          </ChoiceGrid>
         </div>
       )}
     </PickerPage>
-  )
-}
-
-function Count({ n, word }: { n?: number; word: string }) {
-  if (n == null) return null
-  return (
-    <span className="flex items-baseline gap-1">
-      <span className="font-heading font-bold tabular-nums text-primary">{n.toLocaleString()}</span>
-      <span>{word}</span>
-    </span>
   )
 }
 

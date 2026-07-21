@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Layers, BookCopy, ClipboardList } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
-import IconTile from '../components/UI/IconTile'
-import { List, ListRow } from '../components/UI/ListRow'
+import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
+import { iconUrl } from '../lib/subjectIcons'
 import { useT } from '../lib/i18n'
 
 /**
@@ -24,41 +23,32 @@ export default function PyqGroupChooserPage() {
         <p className="tamil mt-1 font-body text-[15px] text-muted">{t('pyqChooseGroupHint')}</p>
       </div>
 
-      <List>
-        <ListRow
+      <ChoiceGrid>
+        <ChoiceCard
+          index={0}
           onClick={() => navigate('/test-arena/pyq/group1')}
-          style={{ '--i': 0 } as React.CSSProperties}
-          leading={
-            <IconTile tint="violet">
-              <Layers size={19} strokeWidth={2} />
-            </IconTile>
-          }
+          icon={iconUrl('pyq-group-1')}
+          tint="violet"
           title={t('group1Pyq')}
           subtitle={t('group1PyqSub')}
         />
-        <ListRow
+        <ChoiceCard
+          index={1}
           onClick={() => navigate('/test-arena/pyq/group2')}
-          style={{ '--i': 1 } as React.CSSProperties}
-          leading={
-            <IconTile tint="blue">
-              <BookCopy size={19} strokeWidth={2} />
-            </IconTile>
-          }
+          icon={iconUrl('pyq-group-2')}
+          tint="blue"
           title={t('group2Pyq')}
           subtitle={t('group2PyqSub')}
         />
-        <ListRow
+        <ChoiceCard
+          index={2}
           onClick={() => navigate('/test-arena/pyq/group4')}
-          style={{ '--i': 2 } as React.CSSProperties}
-          leading={
-            <IconTile tint="green">
-              <ClipboardList size={19} strokeWidth={2} />
-            </IconTile>
-          }
+          icon={iconUrl('pyq-group-4')}
+          tint="green"
           title={t('group4Pyq')}
           subtitle={t('group4PyqSub')}
         />
-      </List>
+      </ChoiceGrid>
     </PickerPage>
   )
 }

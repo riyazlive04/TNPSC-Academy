@@ -50,6 +50,7 @@ import PushNudge from '../components/PushNudge'
 import RewardOverlay from '../components/RewardOverlay'
 import { toast } from '../store/toastStore'
 import { tapScaleSubtle } from '../lib/motion'
+import { iconUrl } from '../lib/subjectIcons'
 import type { GroupType } from '../types'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -58,6 +59,8 @@ interface ArenaCard {
   titleKey: StringKey
   subtitle: string
   icon: React.ReactNode
+  /** PNG illustration (public/subject-icons) shown in place of the Lucide glyph. */
+  iconSrc?: string
   tint: Tint
 }
 
@@ -70,6 +73,7 @@ const CARDS: ArenaCard[] = [
     titleKey: 'mockTests',
     subtitle: 'Group exam · subject · timed',
     icon: <ShieldCheck size={20} />,
+    iconSrc: iconUrl('mock-test'),
     tint: 'coral',
   },
   {
@@ -77,6 +81,7 @@ const CARDS: ArenaCard[] = [
     titleKey: 'subjectPracticeTitle',
     subtitle: 'Subject · topic · question type',
     icon: <Layers size={19} />,
+    iconSrc: iconUrl('general-studies'),
     tint: 'violet',
   },
   {
@@ -84,6 +89,7 @@ const CARDS: ArenaCard[] = [
     titleKey: 'pyqTitle',
     subtitle: 'Group 1 · Group 2 / 2A · Group 4',
     icon: <BookOpen size={19} />,
+    iconSrc: iconUrl('pyq-group-1'),
     tint: 'blue',
   },
   {
@@ -91,6 +97,7 @@ const CARDS: ArenaCard[] = [
     titleKey: 'currentAffairsTitle',
     subtitle: 'Month & topic wise',
     icon: <Newspaper size={19} />,
+    iconSrc: iconUrl('current-affairs-hub'),
     tint: 'green',
   },
   {
@@ -98,6 +105,7 @@ const CARDS: ArenaCard[] = [
     titleKey: 'aptitudeTitle',
     subtitle: 'Numerics · Reasoning',
     icon: <Calculator size={19} />,
+    iconSrc: iconUrl('aptitude'),
     tint: 'coral',
   },
 ]
@@ -114,6 +122,15 @@ const GRADIENTS: Record<Tint, string> = {
   coral: 'from-accentwarm to-coral',
   blue: 'from-sky to-brand',
   green: 'from-mint to-sky',
+}
+
+// Soft pastel tile behind a PNG illustration (the artwork carries its own colour,
+// so it sits on a light tint rather than the brand gradient used for glyphs).
+const SOFT_TINT: Record<Tint, string> = {
+  violet: 'bg-tint-violet',
+  coral: 'bg-tint-coral',
+  blue: 'bg-tint-blue',
+  green: 'bg-tint-green',
 }
 
 export default function TestArenaPage() {
@@ -363,6 +380,7 @@ export default function TestArenaPage() {
         <div data-tour="mock">
           <Hero
             icon={featured.icon}
+            iconSrc={featured.iconSrc}
             title={t(featured.titleKey)}
             subtitle={featured.subtitle}
             cta={t('start')}
@@ -384,6 +402,8 @@ export default function TestArenaPage() {
               <CategoryCard
                 onClick={() => navigate('/vettri')}
                 icon={<Trophy />}
+                iconSrc={iconUrl('vettri')}
+                tint="coral"
                 gradient="from-gold to-accentwarm"
                 title={t('vettriTitle')}
                 subtitle={t('vettriArenaSub')}
@@ -406,6 +426,8 @@ export default function TestArenaPage() {
                 key={card.to}
                 onClick={() => navigate(card.to)}
                 icon={card.icon}
+                iconSrc={card.iconSrc}
+                tint={card.tint}
                 gradient={GRADIENTS[card.tint]}
                 title={t(card.titleKey)}
                 subtitle={card.subtitle}
@@ -417,6 +439,8 @@ export default function TestArenaPage() {
             <CategoryCard
               onClick={() => navigate('/test-arena/ca-questions')}
               icon={<ListChecks />}
+              iconSrc={iconUrl('ca-questions')}
+              tint="blue"
               gradient={GRADIENTS.blue}
               title={t('caQuestionsTitle')}
               subtitle={t('caQuestionsArenaSub')}
@@ -426,6 +450,8 @@ export default function TestArenaPage() {
             <CategoryCard
               onClick={() => navigate('/test-arena/thirukural')}
               icon={<ScrollText />}
+              iconSrc={iconUrl('thirukkural')}
+              tint="green"
               gradient={GRADIENTS.green}
               title={t('tkQuizTitle')}
               subtitle={t('tkQuizSub')}
@@ -450,12 +476,16 @@ export default function TestArenaPage() {
             <CategoryCard
               onClick={() => navigate('/revision')}
               icon={<RefreshCw />}
+              iconSrc={iconUrl('revision')}
+              tint="violet"
               gradient={GRADIENTS.violet}
               title={t('revision')}
             />
             <CategoryCard
               onClick={() => navigate('/insights')}
               icon={<BarChart3 />}
+              iconSrc={iconUrl('insights')}
+              tint="blue"
               gradient={GRADIENTS.blue}
               title={t('insights')}
             />
@@ -524,6 +554,8 @@ export default function TestArenaPage() {
 function CategoryCard({
   onClick,
   icon,
+  iconSrc,
+  tint = 'violet',
   gradient,
   title,
   subtitle,
@@ -531,6 +563,9 @@ function CategoryCard({
 }: {
   onClick: () => void
   icon: React.ReactNode
+  /** PNG illustration; when set it replaces the Lucide glyph + gradient chip. */
+  iconSrc?: string
+  tint?: Tint
   /** Tailwind gradient stops, e.g. 'from-brand to-brand-deep'. */
   gradient: string
   title: string
@@ -546,11 +581,19 @@ function CategoryCard({
       className="stagger-item group focus-ring flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
       {...tapScaleSubtle}
     >
-      <span
-        className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-sm`}
-      >
-        {cloneElement(glyph, { size: 20 })}
-      </span>
+      {iconSrc ? (
+        <span
+          className={`grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-xl p-1 ${SOFT_TINT[tint]}`}
+        >
+          <img src={iconSrc} alt="" className="h-full w-full object-contain" loading="lazy" />
+        </span>
+      ) : (
+        <span
+          className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-sm`}
+        >
+          {cloneElement(glyph, { size: 20 })}
+        </span>
+      )}
       <span className="min-w-0">
         <span className="tamil block font-heading text-sm font-semibold leading-tight text-ink">
           {title}
@@ -570,12 +613,15 @@ function CategoryCard({
  * overlay, white "Start" pill. Tactile press via motion. */
 function Hero({
   icon,
+  iconSrc,
   title,
   subtitle,
   cta,
   onClick,
 }: {
   icon: React.ReactNode
+  /** PNG illustration; sits on a solid white tile so it reads on the gradient. */
+  iconSrc?: string
   title: string
   subtitle: string
   cta: string
@@ -592,9 +638,15 @@ function Hero({
         className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
         style={{ backgroundSize: '18px 18px' }}
       />
-      <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
-        {icon}
-      </span>
+      {iconSrc ? (
+        <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center overflow-hidden rounded-tile bg-white/90 p-1 ring-1 ring-white/30">
+          <img src={iconSrc} alt="" className="h-full w-full object-contain" />
+        </span>
+      ) : (
+        <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
+          {icon}
+        </span>
+      )}
       <span className="relative min-w-0 flex-1">
         <span className="tamil block font-display text-lg font-semibold tracking-tight text-white">
           {title}
