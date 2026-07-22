@@ -19,8 +19,14 @@ npm ci --omit=optional
 # Rollup 4 ships its platform binary as an optionalDependency too, so the flag
 # above also strips @rollup/rollup-linux-x64-gnu and the Vite build dies with
 # MODULE_NOT_FOUND (npm/cli#4828). Reinstall just that binary, version-matched
-# to the installed rollup; --no-save keeps package.json/lock untouched.
-npm i --no-save "@rollup/rollup-linux-x64-gnu@$(node -p "require('rollup/package.json').version")"
+# to the installed rollup.
+#
+# --no-save keeps package.json clean but does NOT spare package-lock.json: npm
+# still rewrites it, which left the checkout permanently dirty and made every
+# subsequent `git pull` fail. Because the pull is a separate command from this
+# script, that failure was silent — the deploy then rebuilt stale source and
+# looked successful. --no-package-lock is what actually keeps the tree clean.
+npm i --no-save --no-package-lock "@rollup/rollup-linux-x64-gnu@$(node -p "require('rollup/package.json').version")"
 npm run build                       # outputs to dist/
 
 echo "==> Publishing SPA to $WEB_ROOT…"
@@ -37,4 +43,15 @@ pm2 reload tnpsc-api || pm2 start "$APP_DIR/deploy/ecosystem.config.cjs"
 pm2 save
 
 echo "==> Done. Health check:"
-curl -fsS http://127.0.0.1:4000/api/health && echo
+# `pm2 reload` returns as soon as it has signalled the process, before the new
+# one has bound the port — a single immediate curl reports a connection refused
+# on a perfectly healthy deploy. Poll instead.
+for _ in $(seq 1 15); do
+  if curl -fsS http://127.0.0.1:4000/api/health; then
+    echo
+    exit 0
+  fi
+  sleep 1
+done
+echo "API did not answer on 127.0.0.1:4000 within 15s — check: pm2 logs tnpsc-api" >&2
+exit 1
