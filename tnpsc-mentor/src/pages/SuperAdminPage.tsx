@@ -52,6 +52,7 @@ import {
   CheckCircle2,
   ListChecks,
   FileDown,
+  Presentation,
 } from 'lucide-react'
 import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
@@ -91,7 +92,7 @@ import MagazineEditor from '../components/Materials/MagazineEditor'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caquestions'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -113,6 +114,7 @@ export default function SuperAdminPage() {
     { id: 'vettri', label: 'vettriTab', icon: Trophy },
     { id: 'materials', label: 'materialsTab', icon: Library },
     { id: 'camagazine', label: 'caMagazineTab', icon: Newspaper },
+    { id: 'caslides', label: 'caSlidesTab', icon: Presentation },
     { id: 'caquestions', label: 'caQuestionsTab', icon: ListChecks },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
@@ -206,6 +208,7 @@ export default function SuperAdminPage() {
             {tab === 'vettri' && <VettriExamsTab />}
             {tab === 'materials' && <MaterialsTab />}
             {tab === 'camagazine' && <CaMagazineTab />}
+            {tab === 'caslides' && <CaSlidesTab />}
             {tab === 'caquestions' && <CaQuestionsTab />}
             {tab === 'app' && <AppReleasesTab />}
           </div>
@@ -4863,6 +4866,156 @@ function CaMagazineTab() {
         onConfirm={confirmRemove}
         onCancel={() => setPendingRemove(null)}
       />
+    </div>
+  )
+}
+
+// ─── CA Slides ───────────────────────────────────────────────────────────────
+// Every pushed issue as a downloadable class deck, in the layout the team
+// hand-built in PowerPoint: branded background, issue date top-right, a title
+// slide per section, then one item per slide with English left / Tamil right.
+// Both formats come from one shared model (src/lib/caSlides) and are generated
+// entirely in the browser — nothing is stored and the VPS is not involved.
+function CaSlidesTab() {
+  const [issues, setIssues] = useState<CaMagazineIssue[] | null>(null)
+  const [error, setError] = useState(false)
+  // `${ca_type}|${date}|${format}` of the export currently running, if any.
+  const [busy, setBusy] = useState<string | null>(null)
+  const [progress, setProgress] = useState('')
+
+  const load = () => {
+    setError(false)
+    setIssues(null)
+    api.caMagazine.adminIssues().then(setIssues).catch(() => setError(true))
+  }
+  useEffect(load, [])
+
+  const keyOf = (i: CaMagazineIssue) => `${i.ca_type}|${i.date}`
+
+  const download = async (issue: CaMagazineIssue, format: 'pptx' | 'pdf') => {
+    if (busy) return
+    setBusy(`${keyOf(issue)}|${format}`)
+    setProgress('')
+    try {
+      const items = await api.caMagazine.adminItems(issue.ca_type, issue.date)
+      if (!items.length) {
+        toast.error('No items in this issue.')
+        return
+      }
+      const { buildCaSlides, slidesFileLabel } = await import('../lib/caSlides')
+      const slides = buildCaSlides(items, issue.ca_type, issue.date)
+      const filename = slidesFileLabel(issue.ca_type, issue.date)
+
+      if (format === 'pptx') {
+        const [{ buildCaSlidesPptx }, { saveBlob }] = await Promise.all([
+          import('../lib/caSlidesPptx'),
+          import('../lib/saveBlob'),
+        ])
+        setProgress(`${slides.length} slides…`)
+        await saveBlob(await buildCaSlidesPptx(slides), filename, '.pptx')
+      } else {
+        const { generateCaSlidesPdf } = await import('../lib/caSlidesPdf')
+        // The PDF rasterises slide by slide, so it is worth narrating.
+        await generateCaSlidesPdf(slides, filename, (done, total) => setProgress(`${done} / ${total}`))
+      }
+      toast.success(`Downloaded ${slides.length} slides.`)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not build the deck.')
+    } finally {
+      setBusy(null)
+      setProgress('')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="card flex items-start gap-3 p-5">
+        <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <Presentation size={18} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">Current-affairs class slides</h2>
+          <p className="font-body text-xs text-ink2">
+            Any issue as a ready-to-teach bilingual deck — a title slide per section, then one news item per
+            slide with English on the left and Tamil on the right. PPTX keeps the text editable; PDF is the
+            same deck fixed for sharing. Built in your browser from the issue's live content, so edits made in
+            the CA Magazine tab show up here immediately.
+          </p>
+        </div>
+      </div>
+
+      {issues === null && !error && (
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="skeleton h-16 w-full" />
+          ))}
+        </div>
+      )}
+
+      {error && <ErrorState onRetry={load} />}
+
+      {issues !== null && issues.length === 0 && (
+        <p className="py-10 text-center font-body text-ink2">
+          No magazine issues have arrived yet. The pipeline pushes the first one at ~06:00 IST.
+        </p>
+      )}
+
+      {issues !== null && issues.length > 0 && (
+        <div className="space-y-2">
+          {issues.map((issue, i) => {
+            const pptxBusy = busy === `${keyOf(issue)}|pptx`
+            const pdfBusy = busy === `${keyOf(issue)}|pdf`
+            const thisBusy = pptxBusy || pdfBusy
+            return (
+              <div
+                key={keyOf(issue)}
+                style={{ '--i': i } as React.CSSProperties}
+                className="card stagger-item flex items-center gap-3 p-3"
+              >
+                <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-lg bg-tint-violet text-primary">
+                  <Presentation size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-heading text-sm font-semibold text-ink">
+                    {issueDateLabel(issue.ca_type, issue.date)}
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                      {issue.ca_type === 'day_wise' ? 'Daily' : 'Monthly'}
+                    </span>
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                      {issue.items} items
+                    </span>
+                    {thisBusy && progress && (
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                        {progress}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-shrink-0 items-center gap-1.5">
+                  <button
+                    onClick={() => download(issue, 'pptx')}
+                    disabled={!!busy}
+                    className="btn-soft press h-8 gap-1.5 px-2.5 text-xs disabled:opacity-50"
+                    title="Download the editable PowerPoint deck"
+                  >
+                    {pptxBusy ? <Spinner size={13} /> : <Presentation size={14} />} PPTX
+                  </button>
+                  <button
+                    onClick={() => download(issue, 'pdf')}
+                    disabled={!!busy}
+                    className="btn-soft press h-8 gap-1.5 px-2.5 text-xs disabled:opacity-50"
+                    title="Download the same deck as a PDF"
+                  >
+                    {pdfBusy ? <Spinner size={13} /> : <FileDown size={14} />} PDF
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

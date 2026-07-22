@@ -1515,6 +1515,7 @@ const STRINGS = {
   appTab: { en: 'App', ta: 'ஆப்' },
   materialsTab: { en: 'Materials', ta: 'பொருட்கள்' },
   caMagazineTab: { en: 'CA Magazine', ta: 'CA இதழ்' },
+  caSlidesTab: { en: 'CA Slides', ta: 'CA ஸ்லைடுகள்' },
   caQuestionsTab: { en: 'CA Questions', ta: 'CA வினாக்கள்' },
   caMagazineNoItems: {
     en: 'No items in this issue yet.',
