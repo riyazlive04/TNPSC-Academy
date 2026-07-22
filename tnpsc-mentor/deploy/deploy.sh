@@ -47,7 +47,9 @@ echo "==> Done. Health check:"
 # one has bound the port — a single immediate curl reports a connection refused
 # on a perfectly healthy deploy. Poll instead.
 for _ in $(seq 1 15); do
-  if curl -fsS http://127.0.0.1:4000/api/health; then
+  # -s without -S: a refused connection on an early attempt is expected and must
+  # not print an alarming error on an otherwise healthy deploy.
+  if curl -fs http://127.0.0.1:4000/api/health; then
     echo
     exit 0
   fi
