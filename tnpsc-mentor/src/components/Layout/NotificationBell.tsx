@@ -5,6 +5,7 @@ import {
   useNotificationStore,
   startNotificationPolling,
 } from '../../store/notificationStore'
+import { SkeletonList } from '../UI/Skeleton'
 import { useT } from '../../lib/i18n'
 
 /** Compact "3h ago" / "2d ago" relative time. */
@@ -90,7 +91,13 @@ export default function NotificationBell() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {items.length === 0 ? (
+            {loading && items.length === 0 ? (
+              // Never flash "no notifications" at someone whose feed is still
+              // loading - hold the row shape until the answer is real.
+              <div className="px-4">
+                <SkeletonList rows={3} />
+              </div>
+            ) : items.length === 0 ? (
               <p className="px-4 py-10 text-center font-body text-sm text-ink2">{t('noNotifications')}</p>
             ) : (
               items.map((n) => {

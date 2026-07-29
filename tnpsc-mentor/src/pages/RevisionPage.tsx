@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, RefreshCw, Check } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { Skeleton, SkeletonCards } from '../components/UI/Skeleton'
 import { fetchDueItems, gradeReview, type ReviewItem } from '../lib/srs'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
@@ -70,7 +69,7 @@ export default function RevisionPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -99,8 +98,10 @@ export default function RevisionPage() {
         </div>
 
         {loading && (
-          <div className="flex justify-center py-16">
-            <LogoLoader size={56} />
+          // The due-counter bar over the question card that follows it.
+          <div className="space-y-4">
+            <Skeleton className="h-1.5 w-full rounded-pill" />
+            <SkeletonCards count={1} height="h-64" />
           </div>
         )}
 
@@ -174,6 +175,6 @@ export default function RevisionPage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }

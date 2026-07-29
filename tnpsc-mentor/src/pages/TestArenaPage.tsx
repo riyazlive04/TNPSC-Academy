@@ -18,15 +18,13 @@ import {
   Sparkles,
   ListChecks,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import StarterTestPrompt from '../components/Onboarding/StarterTestPrompt'
 import MarathonFreeAlert from '../components/Onboarding/MarathonFreeAlert'
 import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
-import PremiumCard from '../components/UI/PremiumCard'
-import VettriCard from '../components/UI/VettriCard'
+import CreditWall from '../components/UI/CreditWall'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
@@ -286,7 +284,7 @@ export default function TestArenaPage() {
   const showFirstTestHero = analytics !== null && analytics.overview.testsTaken === 0
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
         {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
         <header className="px-1">
@@ -460,14 +458,12 @@ export default function TestArenaPage() {
           </div>
         </section>
 
-        {/* Vettri Nichayam upsell (carries the Test Marathon banner as its
-            header) - the ₹899 route into the Test Marathon; hides itself for
-            paid users, and its marathon strip hides when the feature is off. */}
-        <VettriCard />
-
-        {/* Premium upsell - the one deliberately distinct surface (its own coral
-            identity), kept as a self-contained monetisation unit. */}
-        <PremiumCard dismissible />
+        {/* Payment banner - deliberately NOT permanent. It appears only when the
+            credit balance actually blocks practice: a quiet strip while running
+            low, the full Vettri + Premium cards once the balance hits zero.
+            Plans stay discoverable meanwhile via the Vettri tile above and the
+            Profile screen. */}
+        <CreditWall />
 
         {/* Keep going - study-loop quick links, matching the practice cards. */}
         <section className="space-y-3" data-tour="progress">
@@ -545,7 +541,7 @@ export default function TestArenaPage() {
         onFinish={finishOnboarding}
         onStartTest={showFirstTestHero ? launchStarterTest : undefined}
       />
-    </AppLayout>
+    </>
   )
 }
 
@@ -687,7 +683,7 @@ function AdminDashboard({
   t: (key: StringKey) => string
 }) {
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
         {/* Admin greeting - bare, role-aware, no gamification, no gradient panel. */}
         <header className="px-1">
@@ -743,6 +739,6 @@ function AdminDashboard({
           </List>
         </section>
       </div>
-    </AppLayout>
+    </>
   )
 }

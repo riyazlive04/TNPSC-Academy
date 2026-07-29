@@ -9,11 +9,10 @@ import {
   FileText,
   Lock,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonAnalytics, SkeletonCards } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
 import { fetchTestSeriesAnalytics, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
 import { useEntitlementsStore } from '../store/entitlementsStore'
@@ -111,7 +110,7 @@ export default function TestSeriesPage() {
   const seriesLocked = !premium
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -162,11 +161,7 @@ export default function TestSeriesPage() {
           </div>
         )}
 
-        {loading && (
-          <div className="flex justify-center py-10">
-            <LogoLoader size={56} />
-          </div>
-        )}
+        {loading && <SkeletonCards count={4} height="h-28" />}
 
         {!loading && error && <p className="text-center font-body text-sm text-wrong">{error}</p>}
 
@@ -175,9 +170,7 @@ export default function TestSeriesPage() {
           (analytics ? (
             <TestSeriesAnalyticsView analytics={analytics} />
           ) : (
-            <div className="flex justify-center py-10">
-              <LogoLoader size={48} />
-            </div>
+            <SkeletonAnalytics />
           ))}
 
         {/* ── PAPERS TAB ── */}
@@ -310,7 +303,7 @@ export default function TestSeriesPage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }
 

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
@@ -272,11 +272,7 @@ export default function AptitudePage() {
             </span>
           </h3>
 
-          {loading && (
-            <div className="flex justify-center py-12">
-              <LogoLoader size={56} />
-            </div>
-          )}
+          {loading && <SkeletonChoiceGrid count={8} />}
           {!loading && error && (
             <p className="py-8 text-center font-body text-sm text-wrong">{error}</p>
           )}

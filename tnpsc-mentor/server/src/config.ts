@@ -99,6 +99,16 @@ export const config = {
   // /api/telegram endpoints return 503 and signup offers WhatsApp only.
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? '',
   telegramBotUsername: (process.env.TELEGRAM_BOT_USERNAME ?? '').replace(/^@/, ''),
+  // ─── Telegram channel broadcast — CA magazine PDFs (optional) ──────────────
+  // A superadmin posts an approved current-affairs issue to the public channel
+  // (see lib/telegramChannel.ts). By default the SAME bot that does signup
+  // verification posts, so nothing extra is needed beyond adding it to the
+  // channel as an admin with "Post Messages"; set TELEGRAM_CA_BOT_TOKEN only if
+  // a separate publishing bot is preferred. The channel itself is normally
+  // edited in the superadmin console (app_settings.telegram_ca_channel) — this
+  // env var is the fallback for a fresh environment.
+  telegramCaBotToken: process.env.TELEGRAM_CA_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '',
+  telegramCaChannel: (process.env.TELEGRAM_CA_CHANNEL ?? '').trim(),
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -124,3 +134,7 @@ export const whatsappOtpEnabled = Boolean(
 export const telegramVerifyEnabled = Boolean(
   config.telegramBotToken && config.telegramBotUsername
 )
+
+/** True when a bot token exists to post CA issues to the channel. The channel
+ * id itself is settings-first, so it is checked at send time, not here. */
+export const telegramChannelEnabled = Boolean(config.telegramCaBotToken)

@@ -25,11 +25,11 @@ import {
   Bell,
   BellOff,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
 import PremiumCard from '../components/UI/PremiumCard'
+import VettriCard from '../components/UI/VettriCard'
 import ProfileVideos from '../components/Profile/ProfileVideos'
-import LogoLoader from '../components/UI/LogoLoader'
+import { Skeleton, SkeletonStatGrid } from '../components/UI/Skeleton'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -216,7 +216,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-6">
         <button
           onClick={() => navigate('/test-arena')}
@@ -226,8 +226,10 @@ export default function ProfilePage() {
         </button>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <LogoLoader size={56} />
+          // Identity header, then the stats overview - the two blocks that land.
+          <div className="space-y-5">
+            <Skeleton className="h-28 w-full rounded-card" />
+            <SkeletonStatGrid count={6} />
           </div>
         ) : (
           <div className="space-y-5">
@@ -421,8 +423,11 @@ export default function ProfilePage() {
                 Free learners only; hidden for unlimited (paid/staff). */}
             <CreditsCard />
 
-            {/* Premium upsell - 3-month plan (₹1,699). Profile is the ONE place
-                a Vettri owner still sees the Premium upgrade path. */}
+            {/* Plans. Vettri (₹899 / ₹499 monthly) leads as the cheaper entry
+                and hides itself once any paid plan is owned; Premium (₹1,699,
+                3 months) follows - Profile is the ONE place a Vettri owner
+                still sees the Premium upgrade path. */}
+            <VettriCard />
             <PremiumCard showForVettri />
 
             {/* Saved Questions - moved here from the top bar so the toolbar stays
@@ -480,7 +485,7 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }
 

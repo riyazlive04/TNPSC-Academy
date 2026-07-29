@@ -93,6 +93,10 @@ export const tokens = {
   clear() {
     localStorage.removeItem(ACCESS_KEY)
     localStorage.removeItem(REFRESH_KEY)
+    // Cached reads belong to the session that fetched them. Dropping them here
+    // means a sign-out (or a dead session) can never leave one account's data
+    // in memory for whoever signs in next on this device.
+    invalidateReads()
   },
 }
 
@@ -168,10 +172,52 @@ interface RequestOptions {
   body?: unknown
   auth?: boolean // attach bearer token (default true)
   query?: Record<string, string | number | undefined>
+  /**
+   * Serve this GET from the in-memory read cache for `swr` milliseconds
+   * (stale-while-revalidate). Opt-in per endpoint — see the SWR block below for
+   * when it is appropriate.
+   */
+  swr?: number
+}
+
+// ─── Read cache (stale-while-revalidate) ────────────────────────────────────
+// The API sits in front of Supabase in another region: a data read costs
+// ~300-600 ms end to end. Without a cache, every visit to a tab re-pays that
+// and shows a skeleton, which is what makes moving around the app feel slow.
+//
+// So GETs marked `swr` are answered from memory when a recent copy exists, and
+// refreshed in the background when that copy is past its TTL — the screen
+// paints instantly with real data and quietly corrects itself. Only list/summary
+// reads opt in. Anything the user can change from inside the app and must see
+// exactly (credits, an in-progress test, payment state) does NOT, and writes
+// invalidate what they affect via invalidateReads().
+//
+// Memory-only and per-tab: a reload starts cold, and signing out clears it.
+interface CacheEntry {
+  at: number
+  data: unknown
+}
+const readCache = new Map<string, CacheEntry>()
+/** In-flight GETs by cache key, so N mounts of the same screen share one call. */
+const readInflight = new Map<string, Promise<unknown>>()
+
+/**
+ * Drop cached reads whose path starts with any of `prefixes` (or everything
+ * when called with none). Call after a write that changes what a cached read
+ * would return — a submitted test, a new bookmark, a published material.
+ */
+export function invalidateReads(...prefixes: string[]): void {
+  if (!prefixes.length) {
+    readCache.clear()
+    return
+  }
+  for (const key of [...readCache.keys()]) {
+    if (prefixes.some((p) => key.startsWith(p))) readCache.delete(key)
+  }
 }
 
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, auth = true, query } = opts
+  const { method = 'GET', body, auth = true, query, swr } = opts
 
   let url = `${API_URL}${path}`
   if (query) {
@@ -180,6 +226,40 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
       .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
       .join('&')
     if (qs) url += `?${qs}`
+  }
+
+  // Cached reads are keyed by path + query (never the absolute URL), so a
+  // different query is a different entry AND invalidateReads('/api/analytics')
+  // matches the way a caller would write it.
+  const cacheKey = url.slice(API_URL.length)
+  const cacheable = swr !== undefined && method === 'GET'
+  if (cacheable) {
+    // The real network call, storing what it gets. `swr: undefined` on the inner
+    // call is what stops this from recursing.
+    const fetchAndStore = (): Promise<T> =>
+      request<T>(path, { ...opts, swr: undefined }).then((data) => {
+        readCache.set(cacheKey, { at: Date.now(), data })
+        return data
+      })
+
+    const hit = readCache.get(cacheKey)
+    if (hit) {
+      // Past its TTL: hand back the stale copy now and refresh behind it, so the
+      // next visit is already correct. A failed refresh keeps the old value.
+      if (Date.now() - hit.at > swr && !readInflight.has(cacheKey)) {
+        const p = fetchAndStore()
+          .catch(() => hit.data as T)
+          .finally(() => readInflight.delete(cacheKey))
+        readInflight.set(cacheKey, p)
+      }
+      return hit.data as T
+    }
+    // Cold: share one request across every caller that asks while it is open.
+    const pending = readInflight.get(cacheKey)
+    if (pending) return pending as Promise<T>
+    const p = fetchAndStore().finally(() => readInflight.delete(cacheKey))
+    readInflight.set(cacheKey, p)
+    return p
   }
 
   const send = async (): Promise<Response> => {
@@ -444,10 +524,15 @@ export const api = {
     return data.months
   },
   async submitTest(session: Record<string, unknown>, answers: unknown[]): Promise<SubmitResult> {
-    return request<SubmitResult>('/api/tests/submit', {
+    const result = await request<SubmitResult>('/api/tests/submit', {
       method: 'POST',
       body: { session, answers },
     })
+    // A finished test changes the dashboard, Insights, the revision queue and
+    // every exam list's attempt state — drop those so the next screen reads
+    // fresh rather than showing the user a total that excludes what they just did.
+    invalidateReads('/api/analytics', '/api/revisions', '/api/questions/')
+    return result
   },
   async abandonTest(session: Record<string, unknown>): Promise<void> {
     await request('/api/tests/abandon', { method: 'POST', body: { session } })
@@ -552,7 +637,9 @@ export const api = {
   },
   /** Full mock exams visible to this user (enabled only) + lock/attempt state. */
   async mockExams(): Promise<{ exams: MockExam[]; premium: boolean }> {
-    return request<{ exams: MockExam[]; premium: boolean }>('/api/questions/mock-exams')
+    return request<{ exams: MockExam[]; premium: boolean }>('/api/questions/mock-exams', {
+      swr: 60_000,
+    })
   },
   /** The fixed question set for one exam. Server re-checks tier/enabled/attempts. */
   async mockExamQuestions(examId: string): Promise<Question[]> {
@@ -573,7 +660,9 @@ export const api = {
   },
   /** Scheduled test-series papers visible to this user + lock/schedule/attempts. */
   async testSeries(): Promise<{ tests: TestSeriesItem[]; premium: boolean }> {
-    return request<{ tests: TestSeriesItem[]; premium: boolean }>('/api/questions/test-series')
+    return request<{ tests: TestSeriesItem[]; premium: boolean }>('/api/questions/test-series', {
+      swr: 60_000,
+    })
   },
   /** The fixed question set for one test. Server re-checks premium/date/attempts. */
   async testSeriesQuestions(testId: string): Promise<Question[]> {
@@ -594,11 +683,15 @@ export const api = {
   },
   /** This user's Test Marathon attempt history + per-answer weak-area breakdown. */
   async testSeriesAnalytics(): Promise<TestSeriesAnalyticsResponse> {
-    return request<TestSeriesAnalyticsResponse>('/api/questions/test-series/analytics')
+    return request<TestSeriesAnalyticsResponse>('/api/questions/test-series/analytics', {
+      swr: 60_000,
+    })
   },
   /** Vettri Nichayam exams visible to this user (enabled only) + lock state. */
   async vettriExams(): Promise<{ exams: VettriExam[]; unlocked: boolean }> {
-    return request<{ exams: VettriExam[]; unlocked: boolean }>('/api/questions/vettri-exams')
+    return request<{ exams: VettriExam[]; unlocked: boolean }>('/api/questions/vettri-exams', {
+      swr: 60_000,
+    })
   },
   /** The fixed question set for one Vettri exam. Server re-checks the bundle gate. */
   async vettriExamQuestions(examId: string): Promise<Question[]> {
@@ -623,8 +716,11 @@ export const api = {
   },
 
   // ─── Analytics ─────────────────────────────────────────────────────────────
+  // The dashboard AND the Insights tab both derive everything from this one
+  // read, so it is the single most re-fetched call in the app. Cached briefly:
+  // revisiting a tab paints from memory, and submitTest() invalidates it.
   async analytics(): Promise<{ sessions: unknown[]; answers: unknown[] }> {
-    return request('/api/analytics')
+    return request('/api/analytics', { swr: 60_000 })
   },
 
   // ─── Bookmarks ─────────────────────────────────────────────────────────────
@@ -661,11 +757,13 @@ export const api = {
 
   // ─── Topic revision (study-gate + similar-question re-tests) ────────────────
   async revisions(): Promise<RevisionTopic[]> {
-    const data = await request<{ items: RevisionTopic[] }>('/api/revisions')
+    const data = await request<{ items: RevisionTopic[] }>('/api/revisions', { swr: 60_000 })
     return data.items
   },
   async revisionAnalytics(): Promise<RevisionAnalytics> {
-    const data = await request<{ analytics: RevisionAnalytics }>('/api/revisions/analytics')
+    const data = await request<{ analytics: RevisionAnalytics }>('/api/revisions/analytics', {
+      swr: 60_000,
+    })
     return data.analytics
   },
   /** Open the study gate: returns a ready QuizConfig + similar questions, or throws
@@ -747,16 +845,21 @@ export const api = {
     const data = await request<{ count: number }>('/api/admin/question-reports/count')
     return data.count
   },
-  /** Admin/superadmin: set a reported question's triage state. */
+  /**
+   * Admin/superadmin: set a reported question's triage state. Resolving also
+   * messages the students who flagged it (copy is superadmin-editable); the
+   * returned `notified` is how many were reached.
+   */
   async adminSetReportStatus(
     questionId: string,
     status: ReportStatus,
     note?: string
-  ): Promise<void> {
-    await request('/api/admin/question-reports/status', {
+  ): Promise<{ notified: number }> {
+    const data = await request<{ notified?: number }>('/api/admin/question-reports/status', {
       method: 'POST',
       body: { questionId, status, note },
     })
+    return { notified: data.notified ?? 0 }
   },
 
   // ─── Superadmin console ──────────────────────────────────────────────────
@@ -959,7 +1062,12 @@ export const api = {
   materials: {
     /** Active items for a placement: 'materials' (nav tab) or 'profile' screen. */
     async list(placement: MaterialPlacement = 'materials'): Promise<Material[]> {
-      const data = await request<{ materials: Material[] }>(`/api/materials?placement=${placement}`)
+      // Superadmin-curated and rarely changed, but read by the Materials tab,
+      // the CA-questions page and the nav's "has materials" check — worth a
+      // longer window than the per-user reads.
+      const data = await request<{ materials: Material[] }>(`/api/materials?placement=${placement}`, {
+        swr: 5 * 60_000,
+      })
       return data.materials
     },
     /** A short-lived signed URL for an uploaded file. 'download' is gated server-side. */
@@ -969,6 +1077,9 @@ export const api = {
     },
     /** Superadmin: every item (active or hidden), all placements. */
     async adminList(): Promise<Material[]> {
+      // Never cached: this is the console's working list, and it must reflect an
+      // edit the moment it is made. `invalidateMaterials()` below keeps the
+      // STUDENT-facing list() honest after any change made here.
       const data = await request<{ materials: Material[] }>('/api/materials/admin')
       return data.materials
     },
@@ -982,6 +1093,7 @@ export const api = {
       sort_order?: number
     }): Promise<Material> {
       const data = await request<{ material: Material }>('/api/materials/video', { method: 'POST', body: input })
+      invalidateReads('/api/materials')
       return data.material
     },
     /**
@@ -1010,15 +1122,18 @@ export const api = {
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      invalidateReads('/api/materials')
       return (data as { material: Material }).material
     },
     /** Superadmin: edit fields / toggle active+downloadable / change placement / reorder. */
     async update(id: string, patch: Partial<MaterialPatch>): Promise<Material> {
       const data = await request<{ material: Material }>(`/api/materials/${id}`, { method: 'PATCH', body: patch })
+      invalidateReads('/api/materials')
       return data.material
     },
     async remove(id: string): Promise<void> {
       await request(`/api/materials/${id}`, { method: 'DELETE' })
+      invalidateReads('/api/materials')
     },
   },
 
@@ -1067,12 +1182,46 @@ export const api = {
       const data = await request<{ url: string | null }>(`/api/ca-magazine/admin/news-image?${qs.toString()}`)
       return data.url
     },
+    /**
+     * Superadmin: set the issue's thumbnail from a picked image. Sent as the raw
+     * body (not JSON), so it bypasses request() — same shape as the materials
+     * upload. Returns the new signed URL, ready to drop into an <img src>.
+     */
+    async uploadNewsImage(caType: CaMagazineType, date: string, file: File): Promise<string | null> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const headers: Record<string, string> = { 'Content-Type': file.type || 'application/octet-stream' }
+      if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`
+      const res = await fetch(`${API_URL}/api/ca-magazine/admin/news-image?${qs.toString()}`, {
+        method: 'POST',
+        headers,
+        credentials: CREDENTIALS,
+        body: file,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      invalidateReads('/api/ca-magazine/recent')
+      return (data as { url: string | null }).url
+    },
+    /** Superadmin: drop the custom thumbnail. Returns what the issue falls back
+     * to — the pipeline's own image for a daily issue, or null. */
+    async removeNewsImage(caType: CaMagazineType, date: string): Promise<string | null> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const data = await request<{ url: string | null }>(
+        `/api/ca-magazine/admin/news-image?${qs.toString()}`,
+        { method: 'DELETE' }
+      )
+      invalidateReads('/api/ca-magazine/recent')
+      return data.url
+    },
     /** Superadmin: approve an issue → it appears in the Materials tab. */
     async publish(caType: CaMagazineType, date: string): Promise<Material> {
       const data = await request<{ material: Material }>('/api/ca-magazine/admin/publish', {
         method: 'POST',
         body: { ca_type: caType, date },
       })
+      // Approving adds a materials row students read — don't let them keep a
+      // cached list that predates it.
+      invalidateReads('/api/materials', '/api/ca-magazine/recent')
       return data.material
     },
     /** Superadmin: add a new item to an issue. */
@@ -1105,6 +1254,73 @@ export const api = {
     /** Superadmin: delete an item. */
     async adminDeleteItem(id: string): Promise<void> {
       await request(`/api/ca-magazine/admin/items/${id}`, { method: 'DELETE' })
+    },
+  },
+
+  // ─── CA → Telegram channel (superadmin broadcast) ──────────────────────────
+  // An issue goes out as two documents — the English PDF and the Tamil PDF —
+  // each with its own caption. The PDFs are rendered HERE (only the browser can
+  // shape Tamil), uploaded raw, then posted by the server.
+  caTelegram: {
+    /** Channel + saved caption templates for the send dialog. */
+    async config(): Promise<CaTelegramConfig> {
+      return request<CaTelegramConfig>('/api/ca-telegram/admin/config')
+    },
+    /** Save the channel and/or the default caption templates. */
+    async saveConfig(patch: {
+      channel?: string
+      caption_en?: string
+      caption_ta?: string
+    }): Promise<CaTelegramConfig> {
+      return request<CaTelegramConfig>('/api/ca-telegram/admin/config', { method: 'PUT', body: patch })
+    },
+    /** The send history of one issue (newest first). */
+    async posts(caType: CaMagazineType, date: string): Promise<CaTelegramPost[]> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const data = await request<{ posts: CaTelegramPost[] }>(`/api/ca-telegram/admin/posts?${qs.toString()}`)
+      return data.posts
+    },
+    /** Latest send per issue+language, keyed `${ca_type}|${date}` — list chips. */
+    async sent(): Promise<Record<string, { en?: string; ta?: string }>> {
+      const data = await request<{ sent: Record<string, { en?: string; ta?: string }> }>(
+        '/api/ca-telegram/admin/sent'
+      )
+      return data.sent
+    },
+    /**
+     * Upload one language's rendered PDF. Raw body (not JSON), so it bypasses
+     * request() — same shape as the materials upload.
+     */
+    async upload(
+      caType: CaMagazineType,
+      date: string,
+      lang: 'en' | 'ta',
+      pdf: Blob
+    ): Promise<{ path: string; size: number }> {
+      const qs = new URLSearchParams({ ca_type: caType, date, lang })
+      const headers: Record<string, string> = { 'Content-Type': 'application/pdf' }
+      if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`
+      const res = await fetch(`${API_URL}/api/ca-telegram/admin/upload?${qs.toString()}`, {
+        method: 'POST',
+        headers,
+        credentials: CREDENTIALS,
+        body: pdf,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      return data as { path: string; size: number }
+    },
+    /** Post the uploaded PDFs to the channel, one message per language. */
+    async send(input: {
+      ca_type: CaMagazineType
+      date: string
+      langs: ('en' | 'ta')[]
+      captions: Partial<Record<'en' | 'ta', string>>
+    }): Promise<CaTelegramSendResponse> {
+      return request<CaTelegramSendResponse>('/api/ca-telegram/admin/send', {
+        method: 'POST',
+        body: input,
+      })
     },
   },
 
@@ -1205,7 +1421,15 @@ export const api = {
       razorpay_payment_id: string
       razorpay_signature: string
     }): Promise<{ verified: boolean }> {
-      return request('/api/payments/verify', { method: 'POST', body: params })
+      const result = await request<{ verified: boolean }>('/api/payments/verify', {
+        method: 'POST',
+        body: params,
+      })
+      // A successful purchase unlocks content: every gated list (mock exams,
+      // test series, Vettri) must be re-read rather than served from the copy
+      // fetched while the user was still locked.
+      if (result.verified) invalidateReads('/api/questions/', '/api/payments')
+      return result
     },
     /** The signed-in user's payment history. */
     async list(): Promise<PaymentRow[]> {
@@ -1402,6 +1626,36 @@ export interface CaMagazineItem {
   title_ta: string | null
   content: string
   content_ta: string | null
+}
+
+// ─── CA → Telegram shapes ───────────────────────────────────────────────────────
+/** The channel + the saved caption templates, with server defaults applied. */
+export interface CaTelegramConfig {
+  /** False when no bot token is configured — the send action is unavailable. */
+  enabled: boolean
+  /** '@tnpscmentors', or a numeric id for a private channel. */
+  channel: string
+  captions: { en: string; ta: string }
+  /** Telegram's caption limit, so the dialog can count down to it. */
+  captionMax: number
+}
+
+/** One document that actually reached the channel. */
+export interface CaTelegramPost {
+  id: string
+  lang: 'en' | 'ta'
+  chat_id: string
+  message_id: number | null
+  caption: string | null
+  file_name: string | null
+  file_size: number | null
+  sent_at: string
+}
+
+/** Per-language outcome — languages succeed or fail independently. */
+export interface CaTelegramSendResponse {
+  chatId: string
+  results: { lang: 'en' | 'ta'; ok: boolean; messageId?: number; error?: string }[]
 }
 
 // ─── CA Questions shapes ────────────────────────────────────────────────────────
@@ -1826,4 +2080,28 @@ export interface ReportedQuestion {
   resolver_name: string | null
   /** The full question row, or null if it has since been deleted. */
   question: Question | null
+}
+
+/**
+ * Superadmin-editable copy for the message students receive when the question
+ * they reported is marked resolved. Stored as one jsonb row in app_settings
+ * under `report_resolved_message`; `{subject}` and `{note}` are substituted at
+ * send time. Blank Tamil fields mean "send English only".
+ */
+export interface ReportResolvedMessage {
+  enabled: boolean
+  title: string
+  body: string
+  title_ta: string
+  body_ta: string
+}
+
+/** Server-side defaults, mirrored for the editor's "Reset to default" action. */
+export const REPORT_RESOLVED_MESSAGE_DEFAULT: ReportResolvedMessage = {
+  enabled: true,
+  title: 'The question you reported has been fixed',
+  body: 'Thanks for flagging it. Our team reviewed the question and made the correction. Please keep reporting anything that looks wrong.',
+  title_ta: 'நீங்கள் தெரிவித்த வினா சரிசெய்யப்பட்டது',
+  body_ta:
+    'தவறைச் சுட்டிக்காட்டியதற்கு நன்றி. எங்கள் குழு அந்த வினாவைப் பரிசீலித்துத் திருத்தியுள்ளது. தவறாகத் தோன்றும் எதையும் தொடர்ந்து தெரிவியுங்கள்.',
 }

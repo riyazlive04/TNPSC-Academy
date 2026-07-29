@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireAdmin, type AuthedRequest } from '../middleware/auth.js'
+import { notifyReportResolved } from '../lib/reportResolved.js'
 
 const router = Router()
 
@@ -126,7 +127,12 @@ router.post(
       p_note: note,
     })
     if (error) return sendDbError(res, error)
-    res.json({ status: data })
+
+    // Close the loop with the students who flagged it. Awaited so the console can
+    // report how many were messaged; the helper never throws, so a notification
+    // failure can't turn a successful triage into an error response.
+    const notified = status === 'resolved' ? await notifyReportResolved(questionId, note) : 0
+    res.json({ status: data, notified })
   })
 )
 

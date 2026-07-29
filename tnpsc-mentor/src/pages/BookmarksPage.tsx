@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import YouTubeEmbed from '../components/Quiz/YouTubeEmbed'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonCards } from '../components/UI/Skeleton'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
@@ -47,7 +46,7 @@ export default function BookmarksPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
         <button
           onClick={() => navigate(-1)}
@@ -64,12 +63,11 @@ export default function BookmarksPage() {
         </header>
 
         {loading && (
-          <div className="flex flex-col items-center gap-3 py-16">
-            <LogoLoader size={56} />
-            <p className="font-heading font-semibold uppercase tracking-widest text-muted">
-              Loading saved questions…
-            </p>
-          </div>
+          <SkeletonCards
+            count={4}
+            height="h-52"
+            className="grid gap-4 lg:grid-cols-2 lg:items-start"
+          />
         )}
 
         {!loading && error && <p className="py-12 text-center font-body text-muted">{error}</p>}
@@ -154,6 +152,6 @@ export default function BookmarksPage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }

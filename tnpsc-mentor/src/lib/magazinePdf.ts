@@ -1,7 +1,8 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { savePdfDoc } from './savePdf'
-import { groupBySection, sectionLabel } from './caMagazine'
+import { SITE_URL } from './pdfWatermark'
+import { groupBySection, isSectionEcho, sectionLabel } from './caMagazine'
 import { markdownToHtml } from './caMagazineMarkdown'
 import type { CaMagazineItem } from './api'
 
@@ -44,7 +45,7 @@ type Lang = 'en' | 'ta' | 'both'
 /** One item as an HTML block (title + English and/or Tamil content). */
 function itemHtml(item: CaMagazineItem, topic: string, lang: Lang): string {
   const ta = item.title_ta?.trim()
-  const showTitle = item.title.trim().toUpperCase() !== topic.toUpperCase()
+  const showTitle = !isSectionEcho(item.title, topic)
   const showEn = lang !== 'ta' || !item.content_ta
   const showTa = (lang === 'ta' || lang === 'both') && !!item.content_ta
 
@@ -140,14 +141,20 @@ interface MagazinePdfParams {
   watermark?: string
 }
 
-export async function generateMagazinePdf({
+/**
+ * Render an issue and hand back the finished jsPDF document.
+ *
+ * Callers that want a file use `generateMagazinePdf` below; the Telegram
+ * broadcast needs the bytes instead (`doc.output('blob')`), which is the only
+ * reason building and saving are separate.
+ */
+export async function buildMagazinePdfDoc({
   items,
   title,
   subtitle,
   lang,
-  fileLabel,
   watermark,
-}: MagazinePdfParams): Promise<void> {
+}: MagazinePdfParams): Promise<jsPDF> {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
@@ -229,8 +236,9 @@ export async function generateMagazinePdf({
         GState?: new (o: { opacity: number }) => unknown
         setGState?: (s: unknown) => void
       }
-      // Faint tiled "NAME · PHONE" mark — light enough to read through, matching
-      // the explanation sheet so every student download is traceable.
+      // Faint tiled mark — light enough to read through, matching the
+      // explanation sheet. "NAME · PHONE" on a student download (traceable);
+      // the brand + site URL on a copy published to the Telegram channel.
       if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.08 }))
       doc.setTextColor(...VIOLET_RGB)
       doc.setFont('helvetica', 'bold')
@@ -246,10 +254,19 @@ export async function generateMagazinePdf({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...GREY)
-    doc.text('TNPSC Mentors  ·  Prepare smart. Score high.', margin, fy)
+    doc.text(`TNPSC Mentors  ·  ${SITE_URL}  ·  Prepare smart. Score high.`, margin, fy)
     doc.text(`Page ${p} of ${total}`, pageW - margin, fy, { align: 'right' })
   }
 
-  const safe = (fileLabel ?? title).replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '').slice(0, 60)
+  return doc
+}
+
+/** The issue as a saved file (browser download / native share sheet). */
+export async function generateMagazinePdf(params: MagazinePdfParams): Promise<void> {
+  const doc = await buildMagazinePdfDoc(params)
+  const safe = (params.fileLabel ?? params.title)
+    .replace(/[^a-z0-9]+/gi, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 60)
   await savePdfDoc(doc, `TNPSC_Mentors_Current_Affair${safe ? `_${safe}` : ''}.pdf`)
 }

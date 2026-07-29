@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import RewardOverlay, { type DailyReward } from '../components/RewardOverlay'
 import ResultCard from '../components/Quiz/ResultCard'
 import CircularProgress from '../components/UI/CircularProgress'
@@ -331,7 +330,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
         {/* Score moment - one of the three gradient beats (design-system.md).
             The single elevated element: circular ring + score count-up + verdict,
@@ -627,7 +626,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
           onClose={() => setRewards(null)}
         />
       )}
-    </AppLayout>
+    </>
   )
 }
 

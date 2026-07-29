@@ -3,7 +3,7 @@ import { Landmark, Castle, Flag } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import { type Tint } from '../components/UI/IconTile'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT, type StringKey } from '../lib/i18n'
@@ -67,9 +67,7 @@ export default function HistoryPeriodsPage() {
       </div>
 
       {counts === null ? (
-        <div className="flex justify-center py-10">
-          <LogoLoader size={56} />
-        </div>
+        <SkeletonChoiceGrid count={PERIODS.length} />
       ) : (
         <ChoiceGrid>
           {PERIODS.map(({ unit, titleKey, subKey, icon, tint }, i) => {

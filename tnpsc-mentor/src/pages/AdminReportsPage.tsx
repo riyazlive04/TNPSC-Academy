@@ -1,5 +1,4 @@
 import { Flag } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
 import { useT } from '../lib/i18n'
 
@@ -11,7 +10,7 @@ import { useT } from '../lib/i18n'
 export default function AdminReportsPage() {
   const { t } = useT()
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         <header className="mb-6 flex items-center gap-3 animate-slideDown">
           <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-coralsoft text-coral">
@@ -26,6 +25,6 @@ export default function AdminReportsPage() {
         </header>
         <ReportedQuestions />
       </div>
-    </AppLayout>
+    </>
   )
 }

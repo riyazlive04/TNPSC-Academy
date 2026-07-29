@@ -138,9 +138,21 @@ export async function notifyAdmins(
  */
 export async function notifyUser(
   userId: string,
-  opts: { title: string; body: string; url?: string | null; push?: boolean }
+  opts: {
+    title: string
+    body: string
+    url?: string | null
+    push?: boolean
+    /** Optional Tamil copy. Stored on the row (the bell localizes by the user's
+     *  LIVE language) and used to pick the Web Push variant at send time. */
+    title_ta?: string | null
+    body_ta?: string | null
+  }
 ): Promise<string | null> {
   const { title, body, url = null, push = true } = opts
+  // Blank strings mean "no Tamil variant" — normalize so the row stays NULL.
+  const titleTa = opts.title_ta?.trim() || null
+  const bodyTa = opts.body_ta?.trim() || null
   try {
     const { data, error } = await supabaseAdmin
       .from('notifications')
@@ -148,6 +160,8 @@ export async function notifyUser(
         kind: push ? 'push' : 'system',
         title,
         body,
+        title_ta: titleTa,
+        body_ta: bodyTa,
         url,
         audience: 'all', // ignored for matching once target_user_id is set
         audience_value: null,
@@ -162,7 +176,14 @@ export async function notifyUser(
     }
     const id = (data?.id as string) ?? null
     if (push && id) {
-      const sent = await sendPushTo([userId], { id, title, body, url })
+      const sent = await sendPushTo([userId], {
+        id,
+        title,
+        body,
+        url,
+        title_ta: titleTa,
+        body_ta: bodyTa,
+      })
       if (sent > 0) {
         await supabaseAdmin.from('notifications').update({ push_sent: sent }).eq('id', id)
       }

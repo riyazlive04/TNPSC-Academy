@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Target } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
@@ -46,7 +45,7 @@ export default function SetupPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-md px-4 py-8">
         <div className="mb-8 text-center">
           <YellowBadge>{t('setupTitle')}</YellowBadge>
@@ -95,6 +94,6 @@ export default function SetupPage() {
           </button>
         </form>
       </div>
-    </AppLayout>
+    </>
   )
 }

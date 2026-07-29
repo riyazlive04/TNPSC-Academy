@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import AppLayout from './AppLayout'
 import { useSmartBack } from '../../hooks/useSmartBack'
 import { useT } from '../../lib/i18n'
 
@@ -34,7 +33,7 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
   const { t } = useT()
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         <button
           onClick={goBack}
@@ -51,6 +50,6 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
 
         {children}
       </div>
-    </AppLayout>
+    </>
   )
 }

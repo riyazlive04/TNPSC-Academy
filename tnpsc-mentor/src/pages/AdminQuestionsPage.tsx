@@ -14,7 +14,6 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
 import QuestionEditor from '../components/Admin/QuestionEditor'
@@ -22,7 +21,7 @@ import BulkImportPanel from '../components/Admin/BulkImportPanel'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import MathText from '../components/UI/MathText'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonCards } from '../components/UI/Skeleton'
 import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
@@ -215,7 +214,7 @@ export default function AdminQuestionsPage() {
   if (!config) return null
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate(-1)}
@@ -346,14 +345,7 @@ export default function AdminQuestionsPage() {
           </div>
         )}
 
-        {loading && (
-          <div className="flex flex-col items-center gap-3 py-16">
-            <LogoLoader size={56} />
-            <p className="font-heading font-semibold uppercase tracking-widest text-ink2">
-              Loading questions…
-            </p>
-          </div>
-        )}
+        {loading && <SkeletonCards count={5} height="h-44" className="flex flex-col gap-4" />}
 
         {!loading && error && (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
@@ -533,7 +525,7 @@ export default function AdminQuestionsPage() {
         onConfirm={handleDelete}
         onCancel={() => !deletingId && setPendingDelete(null)}
       />
-    </AppLayout>
+    </>
   )
 }
 

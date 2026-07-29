@@ -4,19 +4,27 @@ import {
   Bold,
   Check,
   Eye,
+  Image as ImageIcon,
   List,
   Loader2,
   Newspaper,
   Pencil,
   Plus,
   Trash2,
+  Upload,
   X,
 } from 'lucide-react'
 import LogoLoader from '../UI/LogoLoader'
 import MagazineSections, { MagazineEmpty } from './MagazineContent'
 import type { CaMagazineIssue, CaMagazineItem } from '../../lib/api'
 import { api } from '../../lib/api'
-import { MAGAZINE_SECTION_ORDER, groupBySection, issueDateLabel, sectionLabel } from '../../lib/caMagazine'
+import {
+  MAGAZINE_SECTION_ORDER,
+  displayItemTitle,
+  groupBySection,
+  issueDateLabel,
+  sectionLabel,
+} from '../../lib/caMagazine'
 import { htmlToMarkdown, markdownToHtml } from '../../lib/caMagazineMarkdown'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
@@ -215,6 +223,12 @@ export default function MagazineEditor({
                 <p className="mt-0.5 font-body text-sm text-ink2">{meta}</p>
               </div>
 
+              <ThumbnailEditor
+                issue={issue}
+                url={newsImage}
+                onChange={setNewsImage}
+              />
+
               {items.length === 0 && !adding && (
                 <div className="py-10">
                   <MagazineEmpty />
@@ -261,6 +275,133 @@ export default function MagazineEditor({
   )
 }
 
+// ─── Thumbnail ─────────────────────────────────────────────────────────────────
+// The image students see on the dashboard carousel and at the top of the issue.
+// A DAILY issue gets one from the pipeline automatically; uploading here
+// overrides it (and is the only way to give a MONTHLY issue one). "Use the
+// original" deletes the override, which falls the issue back to the pipeline's
+// image — so a bad pick is never destructive.
+const THUMB_MIME = ['image/jpeg', 'image/png', 'image/webp']
+const THUMB_MAX_MB = 8
+
+function ThumbnailEditor({
+  issue,
+  url,
+  onChange,
+}: {
+  issue: CaMagazineIssue
+  url: string | null
+  onChange: (url: string | null) => void
+}) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState<'upload' | 'remove' | null>(null)
+  // Whether the CURRENT image came from an upload here. Only known for sure
+  // after acting in this session, so the fallback hint stays honest.
+  const [custom, setCustom] = useState<boolean | null>(null)
+
+  const pick = () => fileRef.current?.click()
+
+  const upload = async (file: File) => {
+    if (!THUMB_MIME.includes(file.type)) {
+      toast.error('Use a JPG, PNG or WebP image.')
+      return
+    }
+    if (file.size > THUMB_MAX_MB * 1024 * 1024) {
+      toast.error(`That image is too large (max ${THUMB_MAX_MB} MB).`)
+      return
+    }
+    setBusy('upload')
+    try {
+      const next = await api.caMagazine.uploadNewsImage(issue.ca_type, issue.date, file)
+      onChange(next)
+      setCustom(true)
+      toast.success('Thumbnail updated.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not upload the image.')
+    } finally {
+      setBusy(null)
+      // Let the same file be picked again after a failed attempt.
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
+  const remove = async () => {
+    setBusy('remove')
+    try {
+      const next = await api.caMagazine.removeNewsImage(issue.ca_type, issue.date)
+      onChange(next)
+      setCustom(false)
+      toast.success(next ? 'Reverted to the original image.' : 'Thumbnail removed.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not remove the image.')
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <div className="mt-5 rounded-xl border border-line p-3 sm:p-4">
+      <div className="flex items-start gap-3">
+        {url ? (
+          <img
+            src={url}
+            alt=""
+            className="h-16 w-24 flex-shrink-0 rounded-lg border border-line object-cover sm:h-20 sm:w-32"
+          />
+        ) : (
+          <span className="grid h-16 w-24 flex-shrink-0 place-items-center rounded-lg border border-dashed border-line text-ink2 sm:h-20 sm:w-32">
+            <ImageIcon size={20} />
+          </span>
+        )}
+
+        <div className="min-w-0 flex-1">
+          <p className="font-heading text-sm font-semibold text-ink">Thumbnail</p>
+          <p className="mt-0.5 font-body text-xs leading-snug text-ink2">
+            {url
+              ? 'Shown on the dashboard carousel and above the issue.'
+              : issue.ca_type === 'day_wise'
+                ? 'No image for this date yet. Upload one to give the issue a thumbnail.'
+                : 'Monthly issues have no image of their own — upload one here.'}
+          </p>
+
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <button
+              onClick={pick}
+              disabled={busy !== null}
+              className="btn-soft press h-8 gap-1.5 px-3 text-xs disabled:opacity-50"
+            >
+              {busy === 'upload' ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+              {url ? 'Replace' : 'Upload'}
+            </button>
+            {url && custom !== false && (
+              <button
+                onClick={remove}
+                disabled={busy !== null}
+                className="press inline-flex h-8 items-center gap-1.5 rounded-lg px-3 font-heading text-xs font-semibold text-ink2 transition hover:bg-coralsoft hover:text-coral disabled:opacity-50"
+              >
+                {busy === 'remove' ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                {issue.ca_type === 'day_wise' ? 'Use the original' : 'Remove'}
+              </button>
+            )}
+            <span className="font-body text-[11px] text-ink2">JPG, PNG or WebP · max {THUMB_MAX_MB} MB</span>
+          </div>
+        </div>
+      </div>
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept={THUMB_MIME.join(',')}
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) void upload(file)
+        }}
+      />
+    </div>
+  )
+}
+
 // ─── Save-state pill ───────────────────────────────────────────────────────────
 function SaveStatus({ state }: { state: SaveState }) {
   if (state === 'idle') return null
@@ -289,9 +430,19 @@ function DocItem({
   onDeleted: (id: string) => void
   reportSave: (s: SaveState) => void
 }) {
+  // A round-up row is titled after its own section, and the pipeline keeps
+  // pushing the section's OLD name. Show it under the section's current name so
+  // the editor never contradicts the heading above it — seeded into the
+  // dirty-detection baseline too, so merely opening an issue saves nothing; the
+  // corrected title only persists if something in the item is actually edited.
+  // The Tamil twin of these round-up rows is stored as the English name too, so
+  // it is renamed the same way rather than swapped to the Tamil section label.
+  const shownTitle = displayItemTitle(item.title, item.topic)
+  const shownTitleTa = displayItemTitle(item.title_ta ?? '', item.topic)
+
   const [topic, setTopic] = useState(item.topic)
-  const [title, setTitle] = useState(item.title)
-  const [titleTa, setTitleTa] = useState(item.title_ta ?? '')
+  const [title, setTitle] = useState(shownTitle)
+  const [titleTa, setTitleTa] = useState(shownTitleTa)
   const [content, setContent] = useState(item.content)
   const [contentTa, setContentTa] = useState(item.content_ta ?? '')
   const [confirmDel, setConfirmDel] = useState(false)
@@ -299,8 +450,8 @@ function DocItem({
   // Last-saved snapshot — drives dirty detection so blurs don't re-save no-ops.
   const base = useRef({
     topic: item.topic,
-    title: item.title,
-    titleTa: item.title_ta ?? '',
+    title: shownTitle,
+    titleTa: shownTitleTa,
     content: item.content,
     contentTa: item.content_ta ?? '',
   })

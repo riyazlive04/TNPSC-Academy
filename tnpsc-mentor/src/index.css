@@ -396,17 +396,31 @@ h4,
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-1 focus-visible:ring-offset-canvas;
   }
-  /* Skeleton placeholder - shimmering blue-gray block for loading states. */
+  /* Skeleton placeholder - a hairline-toned block with a light sweep, used by
+   * components/UI/Skeleton.tsx to draw the SHAPE of content while it loads.
+   * Theme-aware: the sweep is a bright wash on light surfaces and a faint one in
+   * dark mode, where a 65%-white band would flare. Under prefers-reduced-motion
+   * the global rule above freezes the sweep and the block stays a calm slab. */
   .skeleton {
-    @apply rounded-lg bg-line/70;
+    @apply rounded-lg;
+    background-color: rgb(var(--c-line) / 0.75);
     background-image: linear-gradient(
       90deg,
-      rgba(228, 234, 244, 0) 0%,
-      rgba(255, 255, 255, 0.65) 50%,
-      rgba(228, 234, 244, 0) 100%
+      transparent 0%,
+      rgb(255 255 255 / 0.55) 50%,
+      transparent 100%
     );
     background-size: 200% 100%;
+    background-repeat: no-repeat;
     @apply animate-shimmer;
+  }
+  .dark .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.07) 50%,
+      transparent 100%
+    );
   }
   /* Indeterminate top-loading bar track + sweep. */
   .progress-indeterminate {

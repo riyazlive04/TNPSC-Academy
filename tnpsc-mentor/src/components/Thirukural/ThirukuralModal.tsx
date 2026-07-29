@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, Search, X } from 'lucide-react'
 import { List, ListRow } from '../UI/ListRow'
-import LogoLoader from '../UI/LogoLoader'
+import { Skeleton, SkeletonList, SkeletonPills } from '../UI/Skeleton'
 import { useFocusTrap } from '../UI/useFocusTrap'
 import Couplet from './Couplet'
 import {
@@ -142,9 +142,12 @@ export default function ThirukuralModal({
           {error ? (
             <p className="py-12 text-center font-body text-sm text-muted">{t('couldNotLoad')}</p>
           ) : kurals === null ? (
-            <div className="flex justify-center py-12">
-              <LogoLoader size={56} />
-            </div>
+            // Filter chips + search field + the couplet rows behind them.
+            <>
+              <SkeletonPills count={5} className="mb-3 justify-start" />
+              <Skeleton className="mb-4 h-11 w-full rounded-field" />
+              <SkeletonList rows={7} leading={false} />
+            </>
           ) : current ? (
             <KuralDetail k={current} lang={lang} />
           ) : (

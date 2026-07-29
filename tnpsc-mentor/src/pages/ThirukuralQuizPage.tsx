@@ -11,7 +11,6 @@ import {
   PenLine,
   Shuffle,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import SectionHeader from '../components/UI/SectionHeader'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
@@ -92,7 +91,7 @@ export default function ThirukuralQuizPage() {
   const hint = step === 'adhigaram' ? t('tkChapterHint') : t('typeStepHint')
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         {/* Back + breadcrumb */}
         <div className="mb-5 flex items-center justify-between gap-3">
@@ -249,6 +248,6 @@ export default function ThirukuralQuizPage() {
           )}
         </div>
       </div>
-    </AppLayout>
+    </>
   )
 }

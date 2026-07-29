@@ -36,6 +36,13 @@ const res = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
       'application/msword',
       'application/pdf',
       'application/octet-stream',
+      // Issue thumbnails: the pipeline's daily news image, and the one a
+      // superadmin uploads to override it (see routes/caMagazine.ts). Added to
+      // the live bucket on 2026-07-28 — without them an upload is rejected with
+      // "mime type image/png is not supported".
+      'image/jpeg',
+      'image/png',
+      'image/webp',
     ],
   }),
 })

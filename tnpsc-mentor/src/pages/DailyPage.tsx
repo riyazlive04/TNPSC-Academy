@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Newspaper, Flame, Gift, Check, Target } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import ProgressBar from '../components/UI/ProgressBar'
 import StreakCalendar from '../components/StreakCalendar'
@@ -57,7 +56,7 @@ export default function DailyPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-md px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -171,6 +170,6 @@ export default function DailyPage() {
           </button>
         </div>
       </div>
-    </AppLayout>
+    </>
   )
 }

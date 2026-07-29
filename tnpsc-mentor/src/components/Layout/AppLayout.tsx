@@ -10,6 +10,7 @@ import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
 import { api } from '../../lib/api'
+import { prefetchRoute } from '../../lib/routePrefetch'
 import { useT } from '../../lib/i18n'
 import { getTestsCompleted, TESTS_BEFORE_FEEDBACK } from '../../lib/testProgress'
 import Avatar from '../UI/Avatar'
@@ -20,7 +21,12 @@ import AlertPopup from './AlertPopup'
 
 interface AppLayoutProps {
   children: ReactNode
-  /** Hide the chrome (top bar + bottom nav) for the immersive quiz screen. */
+  /**
+   * Render the shell without its chrome (top bar + bottom nav). Nothing passes
+   * this today — immersive screens (a live test) are declared outside the shell
+   * in App.tsx, so they never mount this at all — but it stays as the escape
+   * hatch for a screen that needs the shell's frame without its navigation.
+   */
   bare?: boolean
 }
 
@@ -61,6 +67,10 @@ const ADMIN_NAV = [
 /**
  * Shared app shell - soft light canvas, a clean top brand bar, and a responsive
  * bottom tab bar (the primary navigation on phones; centred on larger screens).
+ *
+ * Mounted ONCE, by the AppShell route in App.tsx, and kept alive across every
+ * navigation inside it: pages render into `children`, so a tab switch re-renders
+ * only the content. Nothing here should be written as if it re-mounts per page.
  */
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
@@ -167,6 +177,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
       ? location.pathname === '/test-arena'
       : location.pathname.startsWith(to)
 
+  // Start fetching a tab's chunk the moment the finger lands (or the cursor
+  // arrives on desktop) — a tap takes long enough that the download is usually
+  // finished before the click fires, so the screen never waits on Suspense.
+  const warm = (to: string) => ({
+    onPointerEnter: () => prefetchRoute(to),
+    onPointerDown: () => prefetchRoute(to),
+  })
+
   return (
     <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial">
       {!bare && (
@@ -190,6 +208,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   <button
                     key={to}
                     onClick={() => navigate(to)}
+                    {...warm(to)}
                     aria-current={active}
                     className={[
                       'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
@@ -277,6 +296,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               )}
               <button
                 onClick={() => navigate('/profile')}
+                {...warm('/profile')}
                 title={t('profile')}
                 aria-label={t('profile')}
                 className={[
@@ -335,6 +355,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 <button
                   key={to}
                   onClick={() => navigate(to)}
+                  {...warm(to)}
                   aria-label={t(short)}
                   aria-current={active}
                   className="group focus-ring relative flex min-h-[3rem] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 py-1"

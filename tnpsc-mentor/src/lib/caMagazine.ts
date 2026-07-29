@@ -22,8 +22,13 @@ export const MAGAZINE_SECTION_ORDER = [
 
 // Uppercase magazine label → the Title-Case CA topic name (which already has a
 // Tamil twin in TOPIC_NAME_TA, shared with the CA question bank).
+//
+// These are DISPLAY names only. The keys are what the pipeline pushes into
+// ca_magazine.topic and must not change: renaming a section here re-labels it
+// everywhere students see it (reader, editor, PDF, slides) while every existing
+// row and every future push keeps matching.
 const SECTION_EN: Record<string, string> = {
-  'TNPSC BITS': 'TNPSC Bits',
+  'TNPSC BITS': 'TNPSC CABITS',
   'TAMIL NADU': 'Tamil Nadu',
   NATIONAL: 'National',
   INTERNATIONAL: 'International',
@@ -50,6 +55,38 @@ export function sectionLabel(topic: string, lang: 'en' | 'ta' | 'both'): string 
   if (lang === 'ta') return ta
   if (lang === 'both') return `${en} / ${ta}`
   return en
+}
+
+// ─── Section-echo titles ─────────────────────────────────────────────────────
+// The round-up row of a section (TNPSC CABITS) is pushed titled after its own
+// section, so its title is redundant with the heading above it and is hidden
+// everywhere it renders. The match has to accept EVERY name the section has
+// gone by — the pipeline still pushes the key ('TNPSC BITS') while the app now
+// shows 'TNPSC CABITS' — otherwise a rename resurrects the duplicate heading.
+
+const norm = (s: string) => s.trim().toUpperCase().replace(/\s+/g, ' ')
+
+/** Every name this section is known by: its stored key and its display labels. */
+function sectionAliases(topic: string): string[] {
+  const en = SECTION_EN[topic]
+  return [topic, en, SECTION_TA_EXTRA[topic], en ? TOPIC_NAME_TA[en] : undefined].filter(
+    (v): v is string => !!v
+  )
+}
+
+/** True when an item's title merely repeats its section's name. */
+export function isSectionEcho(title: string, topic: string): boolean {
+  const t = norm(title)
+  return sectionAliases(topic).some((alias) => norm(alias) === t)
+}
+
+/**
+ * What an item's title should READ as. An echo is shown under the section's
+ * current name, so a renamed section is never contradicted by stale data the
+ * pipeline keeps pushing; every other title is its own.
+ */
+export function displayItemTitle(title: string, topic: string, lang: 'en' | 'ta' | 'both' = 'en'): string {
+  return isSectionEcho(title, topic) ? sectionLabel(topic, lang) : title
 }
 
 /** Items grouped into sections, in canonical order (unknown topics last). */

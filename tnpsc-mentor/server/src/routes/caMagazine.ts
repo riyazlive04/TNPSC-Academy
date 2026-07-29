@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
@@ -44,28 +44,54 @@ function issueDateLabel(caType: string, date: string, caMonth: string): string {
   return caType === 'day_wise' ? `${d} ${monthEn} ${y}` : `${monthEn} ${y}`
 }
 
-// ─── News image ──────────────────────────────────────────────────────────────
-// The CA pipeline drops one news image per DAILY issue into the private
-// `ca-deliverables` bucket. Nothing in the DB records it — the path is derived
-// entirely from the issue's date, so we just try to sign it. A missing object is
-// NORMAL (a holiday, or before the ~06:00 IST push): the sign call 400/404s and
-// we report "no image" rather than an error. Monthly issues have none.
+// ─── News image (the issue's thumbnail) ──────────────────────────────────────
+// Two sources, in priority order:
+//   1. an image a superadmin uploaded for this issue (any ca_type), and
+//   2. the one the CA pipeline drops for each DAILY issue.
+// Neither is recorded in the DB — both paths are derived from the issue's date,
+// so we just try to sign them in turn. A missing object is NORMAL (a holiday,
+// before the ~06:00 IST push, or simply no custom image): the sign call 400/404s
+// and we report "no image" rather than an error.
+//
+// Keeping the admin upload on its OWN path is what makes the two safe together:
+// the morning push can never overwrite a hand-picked thumbnail, and removing the
+// custom one falls straight back to the pipeline's image.
 const CA_DELIVERABLES_BUCKET = 'ca-deliverables'
 const NEWS_IMAGE_TTL_SECONDS = 3600
+/** A thumbnail is displayed a few hundred pixels wide — this is already generous. */
+const MAX_THUMB_MB = 8
+const ALLOWED_THUMB_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
 
-/** '2026-07-09' → '2026-07/daily/newsimage_2026-07-09.jpg'. */
+/** '2026-07-09' → '2026-07/daily/newsimage_2026-07-09.jpg' (pipeline). */
 function newsImagePath(date: string): string {
   return `${date.slice(0, 7)}/daily/newsimage_${date}.jpg`
 }
 
-/** A 1-hour signed URL for a daily issue's news image, or null when there is none. */
-async function signNewsImage(caType: string, date: string): Promise<string | null> {
-  if (caType !== 'day_wise' || !DATE_RE.test(date)) return null
+/** The superadmin-uploaded thumbnail for an issue. Extension-less: the object's
+ * stored content-type is what the browser renders it by, so one path serves a
+ * JPEG, PNG or WebP and a replacement never leaves an orphan behind. */
+function customThumbPath(caType: string, date: string): string {
+  const kind = caType === 'day_wise' ? 'daily' : 'monthly'
+  return `${date.slice(0, 7)}/${kind}/custom-thumb_${date}`
+}
+
+/** Sign one object, or null when it isn't there. */
+async function signObject(path: string): Promise<string | null> {
   const { data, error } = await supabaseAdmin.storage
     .from(CA_DELIVERABLES_BUCKET)
-    .createSignedUrl(newsImagePath(date), NEWS_IMAGE_TTL_SECONDS)
+    .createSignedUrl(path, NEWS_IMAGE_TTL_SECONDS)
   if (error || !data?.signedUrl) return null
   return data.signedUrl
+}
+
+/** A 1-hour signed URL for an issue's thumbnail: the custom one if a superadmin
+ * uploaded it, else the pipeline's daily image, else null. */
+async function signNewsImage(caType: string, date: string): Promise<string | null> {
+  if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) return null
+  const custom = await signObject(customThumbPath(caType, date))
+  if (custom) return custom
+  if (caType !== 'day_wise') return null
+  return signObject(newsImagePath(date))
 }
 
 const admin = [requireAuth, requireSuperadmin] as const
@@ -137,6 +163,71 @@ router.get(
     if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) {
       return res.status(400).json({ error: 'Invalid issue reference.' })
     }
+    res.json({ url: await signNewsImage(caType, date) })
+  })
+)
+
+// ─── POST /api/ca-magazine/admin/news-image?ca_type=&date= ───────────────────
+// Replace the issue's thumbnail with an uploaded image. The binary is the raw
+// body (Content-Type = the image's mime), mirroring the materials/APK uploads so
+// the global JSON parser skips it. Upserted onto the fixed custom path, so
+// re-uploading simply replaces it. Responds with the new signed URL.
+router.post(
+  '/admin/news-image',
+  ...admin,
+  express.raw({ type: () => true, limit: `${MAX_THUMB_MB + 1}mb` }),
+  asyncH(async (req: AuthedRequest, res) => {
+    const caType = String(req.query.ca_type ?? '')
+    const date = String(req.query.date ?? '')
+    if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) {
+      return res.status(400).json({ error: 'Invalid issue reference.' })
+    }
+    const mime = String(req.headers['content-type'] ?? '')
+    if (!ALLOWED_THUMB_MIME.has(mime)) {
+      return res.status(415).json({ error: 'Use a JPG, PNG or WebP image.' })
+    }
+    const body = req.body
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      return res.status(400).json({ error: 'No image was uploaded.' })
+    }
+    if (body.length > MAX_THUMB_MB * 1024 * 1024) {
+      return res.status(413).json({ error: `That image is too large (max ${MAX_THUMB_MB} MB).` })
+    }
+
+    const { error } = await supabaseAdmin.storage
+      .from(CA_DELIVERABLES_BUCKET)
+      .upload(customThumbPath(caType, date), body, {
+        contentType: mime,
+        upsert: true,
+        // Short: a replacement should reach students in about a minute, not an
+        // hour — these are small files and read through signed URLs anyway.
+        cacheControl: '60',
+      })
+    if (error) {
+      console.error('[ca-magazine thumb upload]', error)
+      return res.status(502).json({ error: 'Could not store the image. Please try again.' })
+    }
+    res.status(201).json({ url: await signNewsImage(caType, date) })
+  })
+)
+
+// ─── DELETE /api/ca-magazine/admin/news-image?ca_type=&date= ─────────────────
+// Drop the custom thumbnail. The response carries whatever the issue falls back
+// to — the pipeline's own image for a daily issue, or null.
+router.delete(
+  '/admin/news-image',
+  ...admin,
+  asyncH(async (req: AuthedRequest, res) => {
+    const caType = String(req.query.ca_type ?? '')
+    const date = String(req.query.date ?? '')
+    if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) {
+      return res.status(400).json({ error: 'Invalid issue reference.' })
+    }
+    const { error } = await supabaseAdmin.storage
+      .from(CA_DELIVERABLES_BUCKET)
+      .remove([customThumbPath(caType, date)])
+    // Removing something that was never there is not a failure.
+    if (error) console.error('[ca-magazine thumb remove]', error)
     res.json({ url: await signNewsImage(caType, date) })
   })
 )
@@ -319,8 +410,9 @@ router.get(
         newsImage: await signNewsImage('day_wise', r.magazine_date as string),
       }))
     )
-    // Well inside the signed URLs' 1-hour lifetime.
-    res.set('Cache-Control', 'private, max-age=600')
+    // Well inside the signed URLs' 1-hour lifetime, and short enough that a
+    // replaced thumbnail shows up on the dashboard within minutes.
+    res.set('Cache-Control', 'private, max-age=300')
     res.json({ issues })
   })
 )
@@ -383,7 +475,9 @@ router.get(
     }
 
     const url = await signNewsImage(mat.magazine_ca_type as string, mat.magazine_date as string)
-    res.set('Cache-Control', 'private, max-age=1800')
+    // Short enough that a thumbnail a superadmin just replaced reaches readers
+    // within minutes, and still well inside the signed URL's 1-hour lifetime.
+    res.set('Cache-Control', 'private, max-age=300')
     res.json({ url })
   })
 )

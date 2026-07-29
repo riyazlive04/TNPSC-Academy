@@ -5,7 +5,7 @@ import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { List, ListRow } from '../components/UI/ListRow'
-import LogoLoader from '../components/UI/LogoLoader'
+import { Skeleton, SkeletonList } from '../components/UI/Skeleton'
 import { CA_MONTHS, CA_TOPIC_CATEGORIES, topicName, type MonthDef } from '../lib/constants'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
@@ -265,8 +265,10 @@ export default function CurrentAffairsPage() {
             {t('selectTopic')}
           </h3>
           {loadingMonthTopics ? (
-            <div className="flex justify-center py-12">
-              <LogoLoader size={56} />
+            // The "All topics" hero above the topic list, same as the real view.
+            <div className="space-y-6">
+              <Skeleton className="h-[84px] w-full rounded-card" />
+              <SkeletonList rows={6} />
             </div>
           ) : (
             <div className="space-y-6">
@@ -439,9 +441,7 @@ export default function CurrentAffairsPage() {
             <p className="mb-4 text-center font-body text-sm text-wrong">{topicError}</p>
           )}
           {loadingTopics ? (
-            <div className="flex justify-center py-12">
-              <LogoLoader size={56} />
-            </div>
+            <SkeletonList rows={7} />
           ) : (
             <List>
               {topics.map((topic, i) => {

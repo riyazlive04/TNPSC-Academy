@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library, Newspaper, ListChecks } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import MaterialViewer from '../components/Materials/MaterialViewer'
 import MagazineReader from '../components/Materials/MagazineReader'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonCards } from '../components/UI/Skeleton'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
 import { issueDateLabel, magazineName } from '../lib/caMagazine'
@@ -54,7 +53,7 @@ export default function MaterialsPage() {
   const filtered = (items ?? []).filter((m) => filter === 'all' || m.kind === filter)
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-4xl px-4 py-6">
         {/* Header */}
         <div className="mb-5 flex items-center gap-3">
@@ -89,9 +88,12 @@ export default function MaterialsPage() {
         )}
 
         {items === null && !error && (
-          <div className="flex justify-center py-20">
-            <LogoLoader size={56} />
-          </div>
+          // Same responsive card grid the materials land in.
+          <SkeletonCards
+            count={8}
+            height="h-40"
+            className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+          />
         )}
 
         {error && (
@@ -133,7 +135,7 @@ export default function MaterialsPage() {
           downloadable={active.downloadable}
         />
       )}
-    </AppLayout>
+    </>
   )
 }
 

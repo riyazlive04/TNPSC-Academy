@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ArrowLeft, Clock, Copy, ListChecks, Loader2, Maximize2 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import YellowBadge from '../components/UI/YellowBadge'
 import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
 import { useCreditsStore } from '../store/creditsStore'
@@ -137,7 +136,7 @@ export default function QuizInstructionsPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate(-1)}
@@ -299,7 +298,7 @@ export default function QuizInstructionsPage() {
         }}
         onCancel={() => setCreditPopup(false)}
       />
-    </AppLayout>
+    </>
   )
 }
 

@@ -17,7 +17,7 @@ import {
 import PickerPage from '../components/Layout/PickerPage'
 import VettriCard from '../components/UI/VettriCard'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey } from '../lib/freeGate'
@@ -51,7 +51,8 @@ function subjectIcon(name: string): LucideIcon {
 // Exam years present in the Group 1 PYQ bank (newest first); null = all years.
 const PYQ_YEARS = [2025, 2024, 2022, 2021, 2019]
 
-// Cache per-subject counts per year so flicking between years is instant.
+// Cache per-subject counts per year so flicking between years is instant. Only
+// FULLY successful loads are cached — see the loader below.
 const countsCache = new Map<number | 'all', Record<string, number>>()
 const yearKey = (y: number | null): number | 'all' => y ?? 'all'
 
@@ -62,7 +63,9 @@ export default function PreviousYearPage() {
 
   // Selected exam year (null = all years). Scopes every test + the subject counts.
   const [year, setYear] = useState<number | null>(null)
-  const [counts, setCounts] = useState<Record<string, number> | null>(
+  // subject → count, or null for a subject whose count request failed (rendered
+  // as "—", never as a misleading "0 questions").
+  const [counts, setCounts] = useState<Record<string, number | null> | null>(
     countsCache.get('all') ?? null
   )
 
@@ -87,12 +90,17 @@ export default function PreviousYearPage() {
         api
           .countQuestions({ category: 'pyq', subject: s, year: year ?? undefined })
           .then((n) => [s, n] as const)
-          .catch(() => [s, 0] as const)
+          // A failed request must NOT become a cached 0 — that pins "0 questions"
+          // on every card for the rest of the session (the bank has ~1,000 rows).
+          .catch(() => [s, null] as const)
       )
     ).then((pairs) => {
       if (cancelled) return
       const map = Object.fromEntries(pairs)
-      countsCache.set(key, map)
+      // Cache only a clean load, so a transient failure retries on the next visit.
+      if (pairs.every(([, n]) => n !== null)) {
+        countsCache.set(key, map as Record<string, number>)
+      }
       setCounts(map)
     })
     return () => {
@@ -148,12 +156,12 @@ export default function PreviousYearPage() {
       subject: subj,
       year: year ?? undefined,
       labelParts: year ? ['PYQ', { subject: subj }, String(year)] : ['PYQ', { subject: subj }],
-      availableCount: counts?.[subj],
+      availableCount: counts?.[subj] ?? undefined,
     })
   }
 
   return (
-    <PickerPage badge={t('pyqBadge')} backTo="/test-arena/pyq">
+    <PickerPage badge={t('pyq1Badge')} backTo="/test-arena/pyq">
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
         <p className="tamil mt-1 font-body text-[15px] text-muted">{t('subjectStepHint')}</p>
@@ -180,15 +188,13 @@ export default function PreviousYearPage() {
       )}
 
       {counts === null ? (
-        <div className="flex justify-center py-16">
-          <LogoLoader size={56} />
-        </div>
+        <SkeletonChoiceGrid count={PYQ_SUBJECTS.length} />
       ) : (
         // Subjects as a tactile card grid, each fronted by its subject icon.
         <ChoiceGrid>
           {PYQ_SUBJECTS.map((s, i) => {
             const Icon = subjectIcon(s)
-            const n = counts[s] ?? 0
+            const n = counts[s]
             const isHistory = s === HISTORY_SUBJECT
             const isAptitude = s === APTITUDE_SUBJECT
             const extra =
@@ -209,7 +215,7 @@ export default function PreviousYearPage() {
                 subtitle={
                   <>
                     <span className="font-heading font-bold tabular-nums text-primary">
-                      {n.toLocaleString()}
+                      {n === null ? '—' : n.toLocaleString()}
                     </span>{' '}
                     {t('questionsCount')}
                     {extra}

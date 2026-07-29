@@ -266,6 +266,10 @@ const STRINGS = {
     en: 'General Tamil, GS & Aptitude (2018–2025)',
     ta: 'பொதுத் தமிழ், பொது அறிவு & திறனாய்வு (2018–2025)',
   },
+  pyq1Badge: {
+    en: 'Group 1 Prelims - Previous Year Question Paper',
+    ta: 'குரூப் 1 முதனிலை - முந்தைய ஆண்டு வினாத்தாள்',
+  },
   pyq2Badge: { en: 'Group 2 / 2A Prelims - Previous Year Questions', ta: 'குரூப் 2 / 2A முதனிலை - முந்தைய ஆண்டு வினாக்கள்' },
   pyq2SectionHint: {
     en: 'Choose a paper to begin a Group 2 / 2A test.',
@@ -440,6 +444,24 @@ const STRINGS = {
   mockFreeUsed: {
     en: "You've used your one free mock exam. Go Premium / Vettri Nichayam for all mock exams.",
     ta: 'உங்கள் ஒரு இலவச மாதிரித் தேர்வைப் பயன்படுத்திவிட்டீர்கள். அனைத்து மாதிரித் தேர்வுகளுக்கும் பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
+  },
+  // Dashboard credit wall - the payment banner shown ONLY once credits run out.
+  // {b} is replaced with the live balance.
+  creditWallTitle: {
+    en: 'Your practice is paused - not your exam date.',
+    ta: 'உங்கள் பயிற்சி நின்றுவிட்டது - ஆனால் தேர்வுத் தேதி நிற்கவில்லை.',
+  },
+  creditWallBody: {
+    en: 'You have 0 credits left, so no new test can start right now. Aspirants who go unlimited practise every single day - no counting, no waiting. Pick a plan and get straight back to work.',
+    ta: 'உங்களிடம் 0 கிரெடிட்கள் உள்ளன, எனவே இப்போது புதிய தேர்வைத் தொடங்க முடியாது. வரம்பற்ற திட்டம் வாங்கிய மாணவர்கள் ஒவ்வொரு நாளும் தடையின்றிப் பயிற்சி செய்கிறார்கள். ஒரு திட்டத்தைத் தேர்ந்தெடுத்து உடனே பயிற்சியைத் தொடருங்கள்.',
+  },
+  creditsLowTitle: {
+    en: 'Only {b} credits left',
+    ta: 'இன்னும் {b} கிரெடிட்கள் மட்டுமே',
+  },
+  creditsLowBody: {
+    en: "That's not enough for one full test. Go unlimited before your preparation stops mid-way.",
+    ta: 'இது ஒரு முழுத் தேர்வுக்குக் கூடப் போதாது. உங்கள் தயாரிப்பு இடையில் நின்றுவிடும் முன் வரம்பற்ற திட்டத்தைப் பெறுங்கள்.',
   },
 
   // Profile: role badge, footer, and "last active" relative time.

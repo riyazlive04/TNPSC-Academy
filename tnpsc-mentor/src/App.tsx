@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import type { ReactElement } from 'react'
-import { Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useLocation, useOutlet } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Compass, Home } from 'lucide-react'
 import { useAuthStore } from './store/authStore'
@@ -10,8 +10,10 @@ import { warmApi } from './lib/api'
 import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
 import { trackPageView } from './lib/tracking'
-import { pageVariants, pageTransition } from './lib/motion'
+import { pageVariants } from './lib/motion'
+import AppLayout from './components/Layout/AppLayout'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
+import { prefetchRoutes, PREFETCH_ON_BOOT } from './lib/routePrefetch'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
@@ -79,10 +81,20 @@ const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
-/** Every authenticated route. Wrapped in <ProtectedRoute> via the map below. */
-const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 'superadmin' }[] = [
-  { path: '/complete-profile', element: <CompleteProfilePage /> },
-  { path: '/language', element: <LanguageScreen /> },
+interface RouteDef {
+  path: string
+  element: ReactElement
+  role?: 'admin' | 'superadmin'
+}
+
+/**
+ * Authenticated routes that render inside the app chrome (header + tab bar).
+ * The shell is mounted ONCE for all of them (see AppShell) — switching tabs
+ * swaps only the content, so the nav never unmounts, re-renders its whole tree
+ * or flashes. Every page here renders its own content directly; none of them
+ * mount AppLayout themselves.
+ */
+const SHELL_ROUTES: RouteDef[] = [
   { path: '/test-arena', element: <TestArenaPage /> },
   { path: '/test-arena/pyq', element: <PyqGroupChooserPage /> },
   { path: '/test-arena/pyq/group1', element: <PreviousYearPage /> },
@@ -103,7 +115,6 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/test-arena/aptitude', element: <AptitudePage /> },
   { path: '/test-arena/thirukural', element: <ThirukuralQuizPage /> },
   { path: '/quiz/instructions', element: <QuizInstructionsPage /> },
-  { path: '/quiz', element: <QuizPage /> },
   { path: '/admin/questions', element: <AdminQuestionsPage /> },
   { path: '/admin/reports', element: <AdminReportsPage />, role: 'admin' },
   { path: '/result', element: <ResultPage /> },
@@ -113,14 +124,25 @@ const PROTECTED_ROUTES: { path: string; element: ReactElement; role?: 'admin' | 
   { path: '/revision', element: <RevisionPage /> },
   { path: '/mock', element: <MockTestPage /> },
   { path: '/mock/instructions', element: <MockInstructionsPage /> },
-  { path: '/mock/quiz', element: <MockQuizPage /> },
   { path: '/test-series', element: <TestSeriesPage /> },
   { path: '/vettri', element: <VettriPage /> },
-  { path: '/payment-success', element: <PaymentSuccessPage /> },
   { path: '/setup', element: <SetupPage /> },
   { path: '/daily', element: <DailyPage /> },
   { path: '/bookmarks', element: <BookmarksPage /> },
   { path: '/superadmin', element: <SuperAdminPage />, role: 'superadmin' },
+]
+
+/**
+ * Authenticated routes that own the whole viewport — the live test screens and
+ * the one-off setup steps. No chrome, and no cross-fade either: a test must
+ * appear the instant it is ready.
+ */
+const BARE_ROUTES: RouteDef[] = [
+  { path: '/complete-profile', element: <CompleteProfilePage /> },
+  { path: '/language', element: <LanguageScreen /> },
+  { path: '/quiz', element: <QuizPage /> },
+  { path: '/mock/quiz', element: <MockQuizPage /> },
+  { path: '/payment-success', element: <PaymentSuccessPage /> },
 ]
 
 export default function App() {
@@ -140,16 +162,10 @@ export default function App() {
   // Warm the chunks for the most-likely next screens during browser idle time,
   // so moving between pages is instant instead of hitting the Suspense spinner.
   // Vite dedupes these against the lazy() loaders above - no double download.
+  // Every nav tab is covered, because a tab tap is the navigation that must
+  // never wait on a download (routePrefetch also warms one on tap/hover).
   useEffect(() => {
-    const prefetch = () => {
-      void import('./pages/TestArenaPage')
-      void import('./pages/SubjectPracticePage')
-      void import('./pages/PreviousYearPage')
-      void import('./pages/QuizInstructionsPage')
-      void import('./pages/QuizPage')
-      void import('./pages/ResultPage')
-      void import('./pages/MockTestPage')
-    }
+    const prefetch = () => prefetchRoutes(PREFETCH_ON_BOOT)
     const ric = window.requestIdleCallback
     if (ric) {
       const id = ric(prefetch)
@@ -174,13 +190,55 @@ export default function App() {
   )
 }
 
-/** The route table, with a native-feeling cross-fade between screens. Keyed on
- * the pathname so AnimatePresence runs an exit→enter on every navigation; honours
- * prefers-reduced-motion by rendering the routes statically. Motion tokens drive
- * the timing (lib/motion). */
-function AnimatedRoutes() {
+/**
+ * The persistent app shell. Mounted once for every chrome route, so the header
+ * and tab bar survive navigation: only the content inside cross-fades. That is
+ * what makes a tab tap feel instant — nothing in the chrome unmounts, refetches
+ * or re-animates.
+ */
+function AppShell() {
+  return (
+    <AppLayout>
+      {/* A Suspense boundary INSIDE the shell: when a page's chunk still has to
+          be fetched, only the content area waits — the chrome stays on screen
+          instead of the whole app dropping to a full-screen loader. */}
+      <Suspense fallback={<ContentLoader />}>
+        <AnimatedOutlet />
+      </Suspense>
+    </AppLayout>
+  )
+}
+
+/** The matched child route, cross-faded on change. `useOutlet()` (not <Outlet/>)
+ * is what makes this correct: it hands us the element for the CURRENT match, so
+ * the outgoing screen AnimatePresence is still holding keeps rendering its own
+ * content instead of flipping to the incoming page mid-exit. */
+function AnimatedOutlet() {
   const location = useLocation()
   const reduce = useReducedMotion()
+  const outlet = useOutlet()
+
+  if (reduce) return outlet
+
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        {outlet}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+/** The route table. Chrome routes are nested under the shell (which owns the
+ * transition); immersive screens render straight, with no animation at all. */
+function AnimatedRoutes() {
+  const location = useLocation()
 
   // SPA page-view tracking: GTM/GA4/Meta only fire a pageview on the initial
   // HTML load, so every client-side route change here must be reported by hand.
@@ -189,7 +247,7 @@ function AnimatedRoutes() {
     trackPageView(location.pathname + location.search)
   }, [location.pathname, location.search])
 
-  const routes = (
+  return (
     <Routes location={location}>
       {/* Root is auth-aware: logged-in users go straight to the app, logged-out
           web visitors see the public marketing/APK-download landing page. */}
@@ -204,8 +262,19 @@ function AnimatedRoutes() {
       <Route path="/payment-policy" element={<PolicyPage slug="payment" />} />
       <Route path="/refund-policy" element={<PolicyPage slug="refund" />} />
 
-      {/* Protected */}
-      {PROTECTED_ROUTES.map(({ path, element, role }) => (
+      {/* Protected, inside the persistent chrome */}
+      <Route element={<AppShell />}>
+        {SHELL_ROUTES.map(({ path, element, role }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRoute role={role}>{element}</ProtectedRoute>}
+          />
+        ))}
+      </Route>
+
+      {/* Protected, full-viewport */}
+      {BARE_ROUTES.map(({ path, element, role }) => (
         <Route
           key={path}
           path={path}
@@ -216,23 +285,6 @@ function AnimatedRoutes() {
       {/* Fallback */}
       <Route path="*" element={<NotFound />} />
     </Routes>
-  )
-
-  if (reduce) return routes
-
-  return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location.pathname}
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={pageTransition}
-      >
-        {routes}
-      </motion.div>
-    </AnimatePresence>
   )
 }
 
@@ -253,11 +305,23 @@ function RootRedirect() {
   return <LandingPage />
 }
 
-/** Full-screen fallback shown while a route's lazy chunk is being fetched. */
+/** Full-screen fallback — only for screens that own the whole viewport (auth,
+ * landing, live tests) and for the initial boot. */
 function PageLoader() {
   return (
     <div className="grid min-h-screen place-items-center bg-canvas">
       <LogoLoader size={64} />
+    </div>
+  )
+}
+
+/** In-shell fallback: fills the content area only, so the header and tab bar
+ * stay put while a page chunk arrives. Sized to roughly a screen so the layout
+ * doesn't collapse and bounce when the page lands. */
+function ContentLoader() {
+  return (
+    <div className="grid min-h-[60vh] place-items-center">
+      <LogoLoader size={56} />
     </div>
   )
 }

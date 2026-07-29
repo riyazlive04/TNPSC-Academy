@@ -9,7 +9,7 @@
 // renders the same model to a PDF, so the two exports can never drift apart.
 
 import type { CaMagazineItem, CaMagazineType } from './api'
-import { groupBySection, issueDateLabel, parseBullets, type MagazineLine } from './caMagazine'
+import { groupBySection, isSectionEcho, issueDateLabel, parseBullets, type MagazineLine } from './caMagazine'
 
 // ─── Geometry (inches, 16:9) ─────────────────────────────────────────────────
 // The background art carries the header band (ends ~0.67") and the social
@@ -47,7 +47,7 @@ export const LATIN_FONT = 'Aptos'
 // Every group opens with one. A topic the pipeline invents later still gets a
 // slide — it just falls back to the label as pushed.
 const DIVIDER_LABELS: Record<string, string> = {
-  'TNPSC BITS': 'TNPSC BITS',
+  'TNPSC BITS': 'TNPSC CABITS',
   'TAMIL NADU': 'STATE CURRENT AFFAIRS',
   NATIONAL: 'NATIONAL CURRENT AFFAIRS',
   INTERNATIONAL: 'INTERNATIONAL CURRENT AFFAIRS',
@@ -249,7 +249,7 @@ export function buildCaSlides(items: CaMagazineItem[], caType: CaMagazineType, d
     for (const item of group) {
       // The Bits round-up's "title" is just the section name — drop it and
       // number the points instead, as the template does on its opening slide.
-      const numbered = item.title.trim().toUpperCase() === topic.toUpperCase()
+      const numbered = isSectionEcho(item.title, topic)
       const titleEn = numbered ? null : item.title.trim()
       const titleTa = numbered ? null : (item.title_ta?.trim() || null)
       const bulEn = parseBullets(item.content)

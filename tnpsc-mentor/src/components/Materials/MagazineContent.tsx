@@ -1,5 +1,5 @@
 import type { CaMagazineItem } from '../../lib/api'
-import { groupBySection, parseBullets, sectionLabel } from '../../lib/caMagazine'
+import { groupBySection, isSectionEcho, parseBullets, sectionLabel } from '../../lib/caMagazine'
 import { useT } from '../../lib/i18n'
 
 /**
@@ -44,8 +44,8 @@ function MagazineItemView({
   lang: 'en' | 'ta' | 'both'
 }) {
   const ta = item.title_ta?.trim()
-  // TNPSC BITS arrives as one row titled like its section — skip the echo.
-  const showTitle = item.title.trim().toUpperCase() !== topic.toUpperCase()
+  // The round-up row is titled after its own section — skip the echo.
+  const showTitle = !isSectionEcho(item.title, topic)
   const showEn = lang !== 'ta' || !item.content_ta
   const showTa = (lang === 'ta' || lang === 'both') && !!item.content_ta
 

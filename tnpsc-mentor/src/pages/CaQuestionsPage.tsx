@@ -3,7 +3,7 @@ import { ListChecks, CalendarDays, Download, Loader2 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonList } from '../components/UI/Skeleton'
 import SectionHeader from '../components/UI/SectionHeader'
 import { api, type Material } from '../lib/api'
 import { issueDateLabel } from '../lib/caMagazine'
@@ -103,11 +103,7 @@ export default function CaQuestionsPage() {
     <PickerPage badge={t('caQuestionsTitle')}>
       <p className="tamil mb-6 text-center font-body text-sm text-muted">{t('caQuestionsPageSub')}</p>
 
-      {sets === null && !error && (
-        <div className="flex justify-center py-20">
-          <LogoLoader size={56} />
-        </div>
-      )}
+      {sets === null && !error && <SkeletonList rows={6} />}
 
       {error && (
         <div className="flex flex-col items-center gap-3 py-16 text-center">

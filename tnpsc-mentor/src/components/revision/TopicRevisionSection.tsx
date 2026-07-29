@@ -9,7 +9,7 @@ import { useCreditsStore } from '../../store/creditsStore'
 import { upsell } from '../../store/upsellStore'
 import type { QuizConfig, RevisionAnalytics, RevisionTopic } from '../../types'
 import ConfirmDialog from '../UI/ConfirmDialog'
-import LogoLoader from '../UI/LogoLoader'
+import { SkeletonCards } from '../UI/Skeleton'
 import RevisionCard from './RevisionCard'
 import RevisionAnalyticsPanel from './RevisionAnalyticsPanel'
 
@@ -97,13 +97,7 @@ export default function TopicRevisionSection() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-10">
-        <LogoLoader size={48} />
-      </div>
-    )
-  }
+  if (loading) return <SkeletonCards count={3} height="h-24" />
 
   const available = items.filter((i) => i.status === 'available')
   const locked = items.filter((i) => i.status === 'locked')

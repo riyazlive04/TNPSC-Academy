@@ -5,7 +5,7 @@ import PickerPage from '../components/Layout/PickerPage'
 import { type Tint } from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { Skeleton, SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
@@ -207,8 +207,10 @@ export default function PyqSectionPage() {
       </div>
 
       {counts === null ? (
-        <div className="flex justify-center py-12">
-          <LogoLoader size={56} />
+        // Mirrors the real layout: the "All questions" hero over the type grid.
+        <div className="space-y-4">
+          <Skeleton className="h-[84px] w-full rounded-card" />
+          <SkeletonChoiceGrid count={6} />
         </div>
       ) : (
         <div className="space-y-4">

@@ -11,7 +11,7 @@ import {
 import PickerPage from '../components/Layout/PickerPage'
 import { type Tint } from '../components/UI/IconTile'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
@@ -195,9 +195,7 @@ export default function PyqAptitudePage() {
       </div>
 
       {counts === null ? (
-        <div className="flex justify-center py-10">
-          <LogoLoader size={56} />
-        </div>
+        <SkeletonChoiceGrid count={TYPES.length} />
       ) : !type ? (
         // ── Step 1: style (Numerics / Reasoning) ──
         <ChoiceGrid>

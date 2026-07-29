@@ -13,10 +13,9 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import ProgressBar from '../components/UI/ProgressBar'
 import StatStrip from '../components/UI/StatStrip'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonAnalytics } from '../components/UI/Skeleton'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, fetchPercentile, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
@@ -106,7 +105,7 @@ export default function InsightsPage() {
   }, [subjectSort])
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-4xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -121,11 +120,7 @@ export default function InsightsPage() {
           </h1>
         </header>
 
-        {loading && (
-          <div className="flex flex-col items-center gap-3 py-24">
-            <LogoLoader size={56} />
-          </div>
-        )}
+        {loading && <SkeletonAnalytics />}
 
         {!loading && !hasData && (
           <div className="flex flex-col items-center gap-5 py-16 text-center">
@@ -386,7 +381,7 @@ export default function InsightsPage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }
 

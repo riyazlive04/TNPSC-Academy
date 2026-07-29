@@ -54,11 +54,11 @@ import {
   FileDown,
   Presentation,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
+import ReportResolvedMessageEditor from '../components/SuperAdmin/ReportResolvedMessageEditor'
 import {
   api,
   type PlatformMetrics,
@@ -89,6 +89,7 @@ import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
 import { issueDateLabel, magazineName } from '../lib/caMagazine'
 import { ALERT_KIND, ALERT_KINDS, alertKindOf } from '../lib/alertKinds'
 import MagazineEditor from '../components/Materials/MagazineEditor'
+import CaTelegramDialog from '../components/Materials/CaTelegramDialog'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
@@ -160,7 +161,7 @@ export default function SuperAdminPage() {
   )
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-6xl px-4 py-6 lg:py-8">
         <header className="mb-6 flex items-center gap-3 animate-slideDown">
           {/* Mobile menu trigger — opens the tab drawer. */}
@@ -201,7 +202,13 @@ export default function SuperAdminPage() {
             {tab === 'coupons' && <CouponsTab />}
             {tab === 'notifications' && <NotificationsTab />}
             {tab === 'feedback' && <FeedbackTab />}
-            {tab === 'reports' && <ReportedQuestions />}
+            {tab === 'reports' && (
+              <>
+                {/* Superadmin-only: the copy students get when a report is resolved. */}
+                <ReportResolvedMessageEditor />
+                <ReportedQuestions />
+              </>
+            )}
             {tab === 'notes' && <StudyNotesTab />}
             {tab === 'mockexams' && <MockExamsTab />}
             {tab === 'testseries' && <TestSeriesTab />}
@@ -248,7 +255,7 @@ export default function SuperAdminPage() {
           </div>
         </div>
       )}
-    </AppLayout>
+    </>
   )
 }
 
@@ -4600,6 +4607,18 @@ function CaMagazineTab() {
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
   const [preview, setPreview] = useState<CaMagazineIssue | null>(null)
   const [pendingRemove, setPendingRemove] = useState<CaMagazineIssue | null>(null)
+  // Issue to broadcast to the Telegram channel, and the latest send per issue
+  // and language (`${ca_type}|${date}` → { en, ta }) behind the row chips.
+  const [telegramFor, setTelegramFor] = useState<CaMagazineIssue | null>(null)
+  const [sent, setSent] = useState<Record<string, { en?: string; ta?: string }>>({})
+
+  // Non-blocking: the list still works if the send log can't be read.
+  const loadSent = () => {
+    api.caTelegram
+      .sent()
+      .then(setSent)
+      .catch(() => undefined)
+  }
 
   const load = () => {
     setError(false)
@@ -4608,6 +4627,7 @@ function CaMagazineTab() {
       .adminIssues()
       .then(setIssues)
       .catch(() => setError(true))
+    loadSent()
   }
   useEffect(load, [])
 
@@ -4706,7 +4726,8 @@ function CaMagazineTab() {
           <p className="font-body text-xs text-ink2">
             The pipeline pushes a daily issue every morning (and a monthly compilation on the 1st). Preview an
             issue, then approve it to publish it in the students' Materials tab. Hide or remove a published
-            issue to take it down — the underlying data is never deleted.
+            issue to take it down — the underlying data is never deleted. The send icon posts the issue to the
+            Telegram channel as an English and a Tamil PDF, with a caption you can edit before it goes out.
           </p>
         </div>
       </div>
@@ -4767,9 +4788,26 @@ function CaMagazineTab() {
                         Pending review
                       </span>
                     )}
+                    {(() => {
+                      const tg = sent[keyOf(issue)]
+                      if (!tg) return null
+                      const langs = [tg.en && 'EN', tg.ta && 'TA'].filter(Boolean).join(' + ')
+                      return (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                          <Send size={10} /> {langs}
+                        </span>
+                      )
+                    })()}
                   </div>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-1">
+                  <button
+                    onClick={() => setTelegramFor(issue)}
+                    className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-brand"
+                    title="Send to the Telegram channel (English + Tamil PDF)"
+                  >
+                    <Send size={15} />
+                  </button>
                   <button
                     onClick={() => setPreview(issue)}
                     className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-ink"
@@ -4849,6 +4887,14 @@ function CaMagazineTab() {
                 ) ?? prev
             )
           }
+        />
+      )}
+
+      {telegramFor && (
+        <CaTelegramDialog
+          issue={telegramFor}
+          onClose={() => setTelegramFor(null)}
+          onSent={loadSent}
         />
       )}
 

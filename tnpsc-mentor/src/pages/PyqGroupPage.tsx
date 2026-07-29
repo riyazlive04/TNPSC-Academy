@@ -4,7 +4,7 @@ import { Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'luc
 import PickerPage from '../components/Layout/PickerPage'
 import { type Tint } from '../components/UI/IconTile'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import {
@@ -88,9 +88,8 @@ export default function PyqGroupPage() {
       </div>
 
       {counts === null ? (
-        <div className="flex justify-center py-16">
-          <LogoLoader size={56} />
-        </div>
+        // Same grid the sections land in, so nothing shifts when they arrive.
+        <SkeletonChoiceGrid count={group.sections.length} />
       ) : (
         <ChoiceGrid>
           {group.sections.map((s, i) => {

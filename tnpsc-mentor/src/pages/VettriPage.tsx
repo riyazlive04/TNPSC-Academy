@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Infinity as InfinityIcon, Lock } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import VettriCard from '../components/UI/VettriCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonCards } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { upsell } from '../store/upsellStore'
@@ -77,7 +76,7 @@ export default function VettriPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -93,11 +92,7 @@ export default function VettriPage() {
           <p className="tamil mt-1 font-body text-[15px] text-muted">{t('vettriSub')}</p>
         </header>
 
-        {loading && (
-          <div className="flex justify-center py-10">
-            <LogoLoader size={56} />
-          </div>
-        )}
+        {loading && <SkeletonCards count={5} height="h-24" />}
 
         {!loading && error && <p className="text-center font-body text-sm text-wrong">{error}</p>}
 
@@ -169,7 +164,7 @@ export default function VettriPage() {
           </div>
         )}
       </div>
-    </AppLayout>
+    </>
   )
 }
 

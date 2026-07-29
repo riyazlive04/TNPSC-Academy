@@ -8,8 +8,8 @@ import { useLanguageStore } from '../../store/languageStore'
 import { useOnboardingStore } from '../../store/onboardingStore'
 import { useFocusTrap } from '../UI/useFocusTrap'
 
-// Fetched once per SPA session; the remaining queue lives at module scope so it
-// survives AppLayout remounts on navigation without refetching.
+// Fetched once per SPA session; the remaining queue lives at module scope so a
+// re-mount (sign-out and back in, say) never refetches or replays it.
 let loadedOnce = false
 let queue: ActiveAlert[] = []
 
@@ -19,8 +19,8 @@ let queue: ActiveAlert[] = []
  * one alert at a time, oldest first; "Got it" records a per-ACCOUNT dismissal on
  * the server so an alert never repeats, on any device. Bilingual: the composer's
  * optional Tamil copy is shown per the learner's language setting. Mounted in
- * AppLayout (chrome screens only) — never over the immersive quiz (bare pages)
- * or the first-run tour.
+ * AppLayout, i.e. only on chrome screens — never over a live test (those routes
+ * render outside the shell) or the first-run tour.
  */
 export default function AlertPopup() {
   const { t } = useT()

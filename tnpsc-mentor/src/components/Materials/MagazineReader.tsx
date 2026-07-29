@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AlertTriangle, Download, Loader2, Newspaper, X } from 'lucide-react'
 import { useFocusTrap } from '../UI/useFocusTrap'
-import LogoLoader from '../UI/LogoLoader'
+import { Skeleton, SkeletonText } from '../UI/Skeleton'
 import type { CaMagazineItem, CaMagazineType } from '../../lib/api'
 import MagazineSections from './MagazineContent'
 import { issueDateLabel, magazineName } from '../../lib/caMagazine'
@@ -204,8 +204,11 @@ export default function MagazineReader({
         {/* Body */}
         <div className="min-h-0 flex-1 overflow-y-auto bg-canvas">
           {items === null && !failed && (
-            <div className="flex justify-center py-20">
-              <LogoLoader size={56} />
+            // The lead news image over the first article blocks.
+            <div className="space-y-4 px-4 py-4 sm:px-6">
+              <Skeleton className="h-40 w-full rounded-xl" />
+              <SkeletonText lines={3} />
+              <SkeletonText lines={4} />
             </div>
           )}
 

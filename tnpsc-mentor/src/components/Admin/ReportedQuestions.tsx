@@ -53,12 +53,16 @@ export default function ReportedQuestions() {
   const setStatus = async (r: ReportedQuestion, status: ReportStatus) => {
     setBusyId(r.question_id)
     try {
-      await api.adminSetReportStatus(r.question_id, status)
+      const { notified } = await api.adminSetReportStatus(r.question_id, status)
       // Moving an item to another bucket removes it from the current view.
       setItems((prev) => prev.filter((x) => x.question_id !== r.question_id))
       toast.success(
         status === 'resolved'
-          ? 'Marked resolved.'
+          ? // Resolving messages the students who flagged it; 0 means they were
+            // already told (or the message is switched off in the console).
+            notified > 0
+            ? `Marked resolved. ${notified} student${notified === 1 ? '' : 's'} notified.`
+            : 'Marked resolved.'
           : status === 'dismissed'
             ? 'Report dismissed.'
             : 'Report reopened.'

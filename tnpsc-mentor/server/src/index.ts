@@ -24,6 +24,7 @@ import thirukuralRoutes from './routes/thirukural.js'
 import materialRoutes from './routes/materials.js'
 import caMagazineRoutes from './routes/caMagazine.js'
 import caQuestionsRoutes from './routes/caQuestions.js'
+import caTelegramRoutes from './routes/caTelegram.js'
 import creditRoutes from './routes/credits.js'
 import appRoutes from './routes/app.js'
 import telegramRoutes from './routes/telegram.js'
@@ -85,6 +86,7 @@ app.use('/api/thirukural', thirukuralRoutes)
 app.use('/api/materials', materialRoutes)
 app.use('/api/ca-magazine', caMagazineRoutes)
 app.use('/api/ca-questions', caQuestionsRoutes)
+app.use('/api/ca-telegram', caTelegramRoutes)
 app.use('/api/credits', creditRoutes)
 app.use('/api/app', appRoutes)
 app.use('/api/telegram', telegramRoutes)

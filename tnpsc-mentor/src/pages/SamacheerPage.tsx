@@ -3,7 +3,7 @@ import { BookOpen, GraduationCap } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonPills } from '../components/UI/Skeleton'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import { SUBJECTS, STANDARDS, standardLabel, subjectName } from '../lib/constants'
 import { iconFor } from '../lib/subjectIcons'
@@ -112,11 +112,7 @@ export default function SamacheerPage() {
           className="animate-fadeIn"
           wrap={false}
         >
-          {loading && (
-            <div className="flex justify-center py-8">
-              <LogoLoader size={56} />
-            </div>
-          )}
+          {loading && <SkeletonPills count={8} />}
 
           {!loading && error && (
             <p className="text-center font-body text-sm text-wrong">{error}</p>

@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2, Clock, FileText, Layers, ListChecks, Lock, Minus, Plus, Trophy } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import PremiumCard from '../components/UI/PremiumCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonCards, SkeletonPills } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
 import { upsell } from '../store/upsellStore'
@@ -82,7 +81,7 @@ export default function MockTestPage() {
   }, [visibleTabs, tab])
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-8">
         <button
           onClick={() => navigate('/test-arena')}
@@ -121,7 +120,7 @@ export default function MockTestPage() {
         {tab === 'subject' && subjectOn && <SubjectExamTab />}
         {tab === 'exam' && <FullMockExamTab />}
       </div>
-    </AppLayout>
+    </>
   )
 }
 
@@ -275,9 +274,7 @@ function SubjectExamTab() {
       {/* Step 1 - subject */}
       <PillSection title={t('step1Subject')} className="mb-8" wrap={false}>
         {loadingSubjects ? (
-          <div className="flex justify-center py-8">
-            <LogoLoader size={56} />
-          </div>
+          <SkeletonPills count={8} />
         ) : (
           <div className="flex flex-wrap justify-center gap-3">
             {subjects.map((s) => (
@@ -300,11 +297,7 @@ function SubjectExamTab() {
       {/* Step 2 - topic */}
       {subject && (
         <PillSection title={t('step3Topic')} className="mb-8 animate-fadeIn" wrap={false}>
-          {loadingTopics && (
-            <div className="flex justify-center py-8">
-              <LogoLoader size={56} />
-            </div>
-          )}
+          {loadingTopics && <SkeletonPills count={10} />}
           {!loadingTopics && error && (
             <p className="text-center font-body text-sm text-wrong">{error}</p>
           )}
@@ -457,11 +450,7 @@ function FullMockExamTab() {
     <div className="animate-fadeIn">
       <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('mockFullSub')}</p>
 
-      {loading && (
-        <div className="flex justify-center py-10">
-          <LogoLoader size={56} />
-        </div>
-      )}
+      {loading && <SkeletonCards count={4} height="h-28" />}
 
       {!loading && error && <p className="text-center font-body text-sm text-wrong">{error}</p>}
 

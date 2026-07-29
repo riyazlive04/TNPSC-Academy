@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, ArrowLeft, BookOpen, Clock, Copy, FileText, Flag, Maximize2 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
 import { useCreditsStore } from '../store/creditsStore'
 import { upsell } from '../store/upsellStore'
@@ -78,7 +77,7 @@ export default function MockInstructionsPage() {
   }
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-2xl px-4 py-8">
         <button
           onClick={() => navigate('/mock')}
@@ -191,7 +190,7 @@ export default function MockInstructionsPage() {
         }}
         onCancel={() => setCreditPopup(false)}
       />
-    </AppLayout>
+    </>
   )
 }
 

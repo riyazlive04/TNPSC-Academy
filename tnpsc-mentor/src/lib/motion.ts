@@ -11,8 +11,12 @@ export const DURATION = {
   micro: 0.15,
   /** Standard: state changes, reveals, entrances. */
   standard: 0.25,
-  /** Page / route transitions. */
-  page: 0.4,
+  /** A screen arriving. Keep it short — the shell stays put, so this is the
+   * whole perceived cost of a tab switch. */
+  page: 0.16,
+  /** A screen leaving. Runs BEFORE the entrance (AnimatePresence mode="wait"),
+   * so it is pure dead time: fast enough to read as immediate. */
+  pageOut: 0.09,
 } as const
 
 /** Standard easing - symmetric in/out (cubic-bezier(0.4, 0, 0.2, 1)). */
@@ -22,11 +26,17 @@ export const EASE_OUT = [0, 0, 0.2, 1] as const
 
 // ─── Route transition ───────────────────────────────────────────────────────
 // A restrained cross-fade with a small vertical drift - enough to read as
-// "native screen change" without sliding the whole shell around.
+// "native screen change" without sliding the whole shell around. Only the
+// CONTENT moves: the header and tab bar are rendered once by the shell and
+// never re-enter (see AppShell in App.tsx).
+//
+// The exit is deliberately faster than the entrance and drops the drift: with
+// mode="wait" the outgoing screen must finish before the new one starts, so
+// every millisecond spent there is felt as lag on a tab tap. Total ≈ 250 ms.
 export const pageVariants = {
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -6 },
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0, transition: { duration: DURATION.page, ease: EASE_OUT } },
+  exit: { opacity: 0, transition: { duration: DURATION.pageOut, ease: EASE_STANDARD } },
 }
 export const pageTransition = { duration: DURATION.page, ease: EASE_STANDARD }
 

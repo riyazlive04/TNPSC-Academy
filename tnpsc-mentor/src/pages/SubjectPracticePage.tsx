@@ -24,11 +24,10 @@ import {
   Target,
   type LucideIcon,
 } from 'lucide-react'
-import AppLayout from '../components/Layout/AppLayout'
 import SectionHeader from '../components/UI/SectionHeader'
 import PremiumCard from '../components/UI/PremiumCard'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
-import LogoLoader from '../components/UI/LogoLoader'
+import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { toast } from '../store/toastStore'
@@ -364,7 +363,7 @@ export default function SubjectPracticePage() {
           : t('typeStepHint')
 
   return (
-    <AppLayout>
+    <>
       <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
         {/* Back + breadcrumb */}
         <div className="mb-5 flex items-center justify-between gap-3">
@@ -464,7 +463,7 @@ export default function SubjectPracticePage() {
           )}
         </div>
       </div>
-    </AppLayout>
+    </>
   )
 }
 
@@ -753,12 +752,10 @@ function TypeStep({
 }
 
 // ─── Small shared bits ───────────────────────────────────────────────────────
+/** Both callers (subject step, topic step) land on a ChoiceGrid, so the wait
+ *  holds that exact grid rather than collapsing to a centred spinner. */
 function CenterSpinner() {
-  return (
-    <div className="flex justify-center py-16">
-      <LogoLoader size={56} />
-    </div>
-  )
+  return <SkeletonChoiceGrid count={6} />
 }
 function ErrorText({ text }: { text: string }) {
   return <p className="py-12 text-center font-body text-sm text-wrong">{text}</p>
