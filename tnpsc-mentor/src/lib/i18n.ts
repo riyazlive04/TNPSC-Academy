@@ -471,6 +471,29 @@ const STRINGS = {
   privacyPolicy: { en: 'Privacy Policy', ta: 'தனியுரிமைக் கொள்கை' },
   termsOfUse: { en: 'Terms of Use', ta: 'பயன்பாட்டு விதிமுறைகள்' },
   refundPolicyLink: { en: 'Refunds', ta: 'பணத்திரும்பப்பெறுதல்' },
+  // ─── Signup consent (DPDP: consent by clear affirmative action; a child is
+  // anyone under 18, so the age affirmation rides along with it) ─────────────
+  // ─── Cookie consent (website only) ────────────────────────────────────────
+  cookieTitle: { en: 'Cookies', ta: 'குக்கீகள்' },
+  cookieBody: {
+    en: 'We use analytics and advertising cookies on this website to understand how it is used. They are optional — the site works fully without them, and the mobile apps use none at all. Details in our',
+    ta: 'இந்த இணையதளம் எவ்வாறு பயன்படுத்தப்படுகிறது என்பதைப் புரிந்துகொள்ள பகுப்பாய்வு மற்றும் விளம்பரக் குக்கீகளைப் பயன்படுத்துகிறோம். இவை விருப்பத்தேர்வு — இவை இல்லாமலும் தளம் முழுமையாகச் செயல்படும்; மொபைல் செயலிகளில் இவை எதுவும் இல்லை. விவரங்கள்:',
+  },
+  cookieAccept: { en: 'Accept', ta: 'ஏற்கிறேன்' },
+  cookieReject: { en: 'Reject', ta: 'வேண்டாம்' },
+  consentIntro: {
+    en: 'I am 18 years or older and I agree to the',
+    ta: 'எனக்கு 18 வயது அல்லது அதற்கு மேல் ஆகிறது; நான் ஏற்றுக்கொள்கிறேன்:',
+  },
+  consentAnd: { en: 'and the', ta: 'மற்றும்' },
+  consentAgeSuffix: {
+    en: ', including the collection and use of my data as described there.',
+    ta: '. அதில் விவரிக்கப்பட்டுள்ளபடி எனது தரவைச் சேகரித்துப் பயன்படுத்துவதற்கும் சம்மதிக்கிறேன்.',
+  },
+  errConsentRequired: {
+    en: 'Please confirm you are 18 or older and accept the Terms and Privacy Policy.',
+    ta: 'உங்களுக்கு 18 வயது நிரம்பியுள்ளது என்பதையும், விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள் என்பதையும் உறுதிப்படுத்தவும்.',
+  },
   allRightsReserved: { en: 'All rights reserved.', ta: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.' },
   // Independence notice. Required reading for Play's Impersonation policy and
   // Apple 5.2: an app named after a government exam body must not imply it is

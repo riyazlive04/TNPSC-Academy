@@ -20,11 +20,18 @@
 type DataLayerObject = Record<string, unknown>
 
 /**
- * Set in index.html before any tag runs. True inside the Capacitor WebView (and
- * on a local dev server, which should never reach production analytics either).
+ * True whenever nothing should be emitted:
+ *
+ *  • native / dev  — set in index.html; the tags are never loaded there.
+ *  • no consent    — the visitor has not accepted, or has rejected. GTM and the
+ *                    Pixel are not loaded in that case, so an ungated push would
+ *                    quietly accumulate a dataLayer that a later "accept" would
+ *                    then flush to Google — replaying events gathered while the
+ *                    visitor had refused. Checking here is what stops that.
  */
 function trackingDisabled(): boolean {
-  return typeof window === 'undefined' || window.__IS_NATIVE__ === true
+  if (typeof window === 'undefined' || window.__IS_NATIVE__ === true) return true
+  return window.__trackersLoaded !== true
 }
 
 declare global {

@@ -94,6 +94,13 @@ export default function RegisterPage() {
   // in-flight verification, and whether to offer the button under the error.
   const [tg, setTg] = useState<{ token: string; url: string } | null>(null)
   const [offerTelegram, setOfferTelegram] = useState(false)
+  // DPDP consent. The Act requires consent to be a free, specific, informed and
+  // UNAMBIGUOUS indication given by clear affirmative action — a passive "by
+  // using this app you agree" does not qualify. It also defines a child as
+  // anyone under 18, so an explicit age affirmation is what lets us apply the
+  // children's rules at all. One tick covers both, and the submit is blocked
+  // until it is given.
+  const [consented, setConsented] = useState(false)
   const [showTgHelp, setShowTgHelp] = useState(false)
 
   // Top of the signup funnel: fire Meta's ViewContent once when the register
@@ -203,6 +210,7 @@ export default function RegisterPage() {
     if (!isValidIndianMobile(form.phone)) return setError(t('errMobileInvalid'))
     if (form.password.length < 6) return setError(t('errPasswordShort'))
     if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
+    if (!consented) return setError(t('errConsentRequired'))
 
     setLoading(true)
     if (!isSignupWaOtpConfigured) {
@@ -659,7 +667,33 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-brand press mt-2 px-6 py-3.5 text-base">
+          {/* Consent + age. Recorded as an affirmative action, and the policies
+              are reachable from here rather than buried in a footer. */}
+          <label className="mt-1 flex cursor-pointer items-start gap-2.5">
+            <input
+              type="checkbox"
+              checked={consented}
+              onChange={(e) => setConsented(e.target.checked)}
+              className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer accent-brand"
+            />
+            <span className="tamil font-body text-xs leading-relaxed text-ink2">
+              {t('consentIntro')}{' '}
+              <Link to="/guidelines" target="_blank" className="text-brand hover:underline">
+                {t('termsOfUse')}
+              </Link>{' '}
+              {t('consentAnd')}{' '}
+              <Link to="/privacy" target="_blank" className="text-brand hover:underline">
+                {t('privacyPolicy')}
+              </Link>
+              {t('consentAgeSuffix')}
+            </span>
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading || !consented}
+            className="btn-brand press mt-2 px-6 py-3.5 text-base"
+          >
             {loading && <Spinner size={18} />}
             {loading
               ? isSignupWaOtpConfigured

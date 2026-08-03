@@ -29,9 +29,18 @@
       window.__IS_NATIVE__ =
         location.protocol === 'capacitor:' || location.hostname === 'localhost'
     </script>
+    <!-- Trackers load on CONSENT, not on page load. Under the DPDP Act consent
+         must be free, specific, informed and given by clear affirmative action
+         before processing begins, and the same is true under GDPR for any EU
+         visitor. So the tags are wrapped in a function the cookie banner calls,
+         and auto-run only for someone who already accepted on a previous visit.
+         Rejecting simply never calls it, so nothing is ever loaded. -->
     <script>
-      if (!window.__IS_NATIVE__) {
-        // Google Tag Manager
+      window.__loadTrackers = function () {
+        if (window.__IS_NATIVE__ || window.__trackersLoaded) return
+        window.__trackersLoaded = true
+
+        // Google Tag Manager (also loads Microsoft Clarity via the container)
         ;(function (w, d, s, l, i) {
           w[l] = w[l] || []
           w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
@@ -62,6 +71,16 @@
         })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
         fbq('init', '1006796038910199')
         fbq('track', 'PageView')
+      }
+
+      // Someone who already accepted should not be asked again, and their tags
+      // should load as early as they always did.
+      try {
+        if (!window.__IS_NATIVE__ && localStorage.getItem('tnpsc:cookie-consent') === 'accepted') {
+          window.__loadTrackers()
+        }
+      } catch (e) {
+        /* storage blocked — treat as "not yet consented" and show the banner */
       }
     </script>
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -226,19 +245,11 @@
     />
   </head>
   <body>
-    <!-- noscript fallbacks are web-only by construction: the app is a JavaScript
-         bundle, so a WebView with JS disabled renders nothing at all and these
-         tags could never fire inside it. Left unconditional because <noscript>
-         cannot be gated by script. -->
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P4WXHVR8"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <!-- Meta Pixel Code (noscript) -->
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1006796038910199&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code (noscript) -->
+    <!-- The <noscript> tracking fallbacks have been REMOVED. They cannot be
+         gated by script, so they would have fired before any consent — the one
+         thing the banner exists to prevent. They were also dead weight: this app
+         is a JavaScript bundle, so a visitor with JS disabled sees an empty page
+         and there is nothing to measure. -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

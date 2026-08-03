@@ -20,6 +20,7 @@ import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
 import OfflineBanner from './components/OfflineBanner'
+import CookieBanner from './components/CookieBanner'
 import Toaster from './components/UI/Toaster'
 import LogoLoader from './components/UI/LogoLoader'
 
@@ -191,6 +192,7 @@ export default function App() {
     </Suspense>
     <UpdatePrompt />
     <OfflineBanner />
+    <CookieBanner />
     <BackButtonGuard />
     <Toaster />
     <UpsellOutlet />
