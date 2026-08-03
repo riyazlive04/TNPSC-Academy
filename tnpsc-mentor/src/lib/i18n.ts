@@ -470,7 +470,17 @@ const STRINGS = {
   contactSupport: { en: 'Contact support', ta: 'ஆதரவைத் தொடர்புகொள்ளுங்கள்' },
   privacyPolicy: { en: 'Privacy Policy', ta: 'தனியுரிமைக் கொள்கை' },
   termsOfUse: { en: 'Terms of Use', ta: 'பயன்பாட்டு விதிமுறைகள்' },
+  refundPolicyLink: { en: 'Refunds', ta: 'பணத்திரும்பப்பெறுதல்' },
   allRightsReserved: { en: 'All rights reserved.', ta: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.' },
+  // Independence notice. Required reading for Play's Impersonation policy and
+  // Apple 5.2: an app named after a government exam body must not imply it is
+  // run or endorsed by one. The landing page carries this too, but the landing
+  // page is web-only — app users are routed straight to /login and would
+  // otherwise never see it.
+  notAffiliated: {
+    en: 'An independent preparation app. Not affiliated with, endorsed by, or connected to the Tamil Nadu Public Service Commission.',
+    ta: 'இது ஒரு சுயாதீனமான தயாரிப்பு செயலி. தமிழ்நாடு அரசுப் பணியாளர் தேர்வாணையத்துடன் (TNPSC) எந்தத் தொடர்பும் இல்லை; அதன் அங்கீகாரமும் இல்லை.',
+  },
   relJustNow: { en: 'just now', ta: 'இப்போது' },
   relAgo: { en: 'ago', ta: 'முன்' },
 

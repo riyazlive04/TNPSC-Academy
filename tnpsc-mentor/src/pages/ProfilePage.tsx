@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft,
   Loader2,
@@ -582,6 +582,11 @@ function AppFooter() {
         </a>
       </p>
 
+      {/* Policy links point at THIS app's own pages, not sirahdigital.in. Those
+          external URLs were the ones a store reviewer would open from the
+          listing, and they are not the policies that actually govern this app —
+          the routes below are (see PolicyPage). In-app <Link> also keeps a
+          reviewer inside the app instead of bouncing them to a browser. */}
       <div className="tamil flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-body text-[12px] text-muted">
         <a
           href="mailto:support@sirahdigital.in"
@@ -590,24 +595,23 @@ function AppFooter() {
           {t('contactSupport')}
         </a>
         <span className="text-muted/40">·</span>
-        <a
-          href="https://sirahdigital.in/privacy"
-          target="_blank"
-          rel="noreferrer"
-          className="transition-colors hover:text-ink"
-        >
+        <Link to="/privacy" className="transition-colors hover:text-ink">
           {t('privacyPolicy')}
-        </a>
+        </Link>
         <span className="text-muted/40">·</span>
-        <a
-          href="https://sirahdigital.in/terms"
-          target="_blank"
-          rel="noreferrer"
-          className="transition-colors hover:text-ink"
-        >
+        <Link to="/guidelines" className="transition-colors hover:text-ink">
           {t('termsOfUse')}
-        </a>
+        </Link>
+        <span className="text-muted/40">·</span>
+        <Link to="/refund-policy" className="transition-colors hover:text-ink">
+          {t('refundPolicyLink')}
+        </Link>
       </div>
+
+      {/* Independence notice — Play Impersonation / Apple 5.2. */}
+      <p className="tamil max-w-sm font-body text-[11px] leading-relaxed text-muted/70">
+        {t('notAffiliated')}
+      </p>
 
       <p className="tamil font-body text-[11px] text-muted/70">
         Version {APP_VERSION} · © {year} Sirah Digital. {t('allRightsReserved')}
