@@ -13,6 +13,7 @@ import TelegramHelpModal from '../components/Auth/TelegramHelpModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
+import { trackViewContent } from '../lib/tracking'
 import { useT, type StringKey } from '../lib/i18n'
 
 /**
@@ -94,6 +95,12 @@ export default function RegisterPage() {
   const [tg, setTg] = useState<{ token: string; url: string } | null>(null)
   const [offerTelegram, setOfferTelegram] = useState(false)
   const [showTgHelp, setShowTgHelp] = useState(false)
+
+  // Top of the signup funnel: fire Meta's ViewContent once when the register
+  // page is reached (no-ops in the native apps / dev — see lib/tracking).
+  useEffect(() => {
+    trackViewContent({ contentName: 'Register', contentCategory: 'signup' })
+  }, [])
 
   // Tick the resend-cooldown counter down once per second while it's running.
   useEffect(() => {

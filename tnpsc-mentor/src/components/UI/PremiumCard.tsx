@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck, Download } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useVettriEnabled } from '../../hooks/useVettriEnabled'
-import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
+import { startPurchase, couponMode, PURCHASE_ERR_KEY } from '../../lib/purchase'
+import { useStorePrice } from '../../hooks/useStorePrice'
 import { toast } from '../../store/toastStore'
 import { usePremiumStore } from '../../store/premiumStore'
 import { useEntitlementsStore } from '../../store/entitlementsStore'
@@ -13,6 +14,7 @@ import { useT } from '../../lib/i18n'
 import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
 import VettriSuggestModal from './VettriSuggestModal'
+import StoreCodeRow from './StoreCodeRow'
 
 // ─── Premium plan pricing ───────────────────────────────────────────────────
 // Single source of truth for the 3-month plan. `PRICE_PAISE` is what the order is
@@ -45,14 +47,6 @@ const BONUS_KEYS = [
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
 
-/** Checkout failure code → translated toast key. */
-const PAY_ERR_KEY: Record<CheckoutErrorCode, 'payErrStart' | 'payErrSdk' | 'payErrVerify' | 'payErrPay'> = {
-  start: 'payErrStart',
-  sdk: 'payErrSdk',
-  verify: 'payErrVerify',
-  pay: 'payErrPay',
-}
-
 /** ₹ from paise, no trailing .00 for whole rupees. */
 function rupees(paise: number): string {
   const r = paise / 100
@@ -78,7 +72,9 @@ export default function PremiumCard({
    *  paywall modal (which must still answer a Premium-only lock) opt in. */
   showForVettri?: boolean
 }) {
-  const { profile, isAdmin, isSuperAdmin } = useAuth()
+  const { user, profile, isAdmin, isSuperAdmin } = useAuth()
+  const { priceString: storePriceString } = useStorePrice('premium_annual')
+  const showCoupon = couponMode() === 'input'
   const { t } = useT()
   const navigate = useNavigate()
   const [paying, setPaying] = useState(false)
@@ -159,15 +155,16 @@ export default function PremiumCard({
     if (paying) return
     setConfirmOpen(false)
     setPaying(true)
-    // Meta: buyer confirmed the recap and Razorpay is opening (high-intent lead).
+    // Meta: buyer confirmed the recap and checkout is opening (high-intent lead).
     trackCheckoutConfirmed({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 3 months' })
     try {
-      const result = await startCheckout({
+      const result = await startPurchase({
+        plan: 'premium_annual',
         amount: PREMIUM_PRICE_PAISE,
         profile,
         description: 'TNPSC Mentors Premium - 3 months',
-        notes: { plan: 'premium_annual' },
         couponCode: applied?.code,
+        userId: user?.id ?? null,
       })
       if (result.status === 'paid') {
         // Optimistically flip every entitlement surface, then reconcile with the
@@ -180,8 +177,12 @@ export default function PremiumCard({
         // Land on the success screen (it re-pulls the stores again on mount).
         navigate('/payment-success?plan=premium')
       } else if (result.status === 'failed')
-        toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
-      // 'dismissed' → user closed the modal; stay silent.
+        toast.error(
+          result.code && result.code !== 'cancelled'
+            ? t(PURCHASE_ERR_KEY[result.code])
+            : result.error
+        )
+      // 'dismissed' → user closed the sheet; stay silent.
     } finally {
       setPaying(false)
     }
@@ -200,6 +201,9 @@ export default function PremiumCard({
 
   const finalPaise = applied ? applied.finalAmount : PREMIUM_PRICE_PAISE
   const isFree = finalPaise === 0
+  // Inside the apps the store charges its OWN price, so show that instead of the
+  // website's rupee figure. Falls back to the web price if the store is unreachable.
+  const displayPrice = storePriceString ?? `₹${rupees(finalPaise)}`
 
   // "Get Premium" → pitch Vettri first when it's actually a live alternative:
   // the bundle is enabled, the buyer doesn't already own it, and this is a real
@@ -307,7 +311,7 @@ export default function PremiumCard({
                 </span>
               )}
               <span className="font-display text-4xl font-bold tracking-tight text-ink">
-                {isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
+                {isFree ? t('premiumFree') : displayPrice}
               </span>
               {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
             </div>
@@ -328,8 +332,13 @@ export default function PremiumCard({
 
           <div className="my-3.5 border-t border-dashed border-line" />
 
-          {/* Coupon row */}
-          {applied ? (
+          {/* Coupon row. Web gets our own promoter-code field; the apps get the
+              STORE's redemption path instead (Apple 3.1.1 bars a self-issued
+              code that unlocks paid content — an Apple/Play-issued one is fine).
+              See lib/purchase.ts couponMode(). */}
+          {!showCoupon ? (
+            <StoreCodeRow onRedeemed={() => navigate('/payment-success?plan=premium')} />
+          ) : applied ? (
             <div className="flex items-center justify-between gap-2 rounded-field bg-mintsoft px-3 py-2 ring-1 ring-mint/25">
               <span className="flex min-w-0 items-center gap-2">
                 <Tag size={14} className="flex-shrink-0 text-mint" />
@@ -421,7 +430,7 @@ export default function PremiumCard({
         planName={t('premiumBadge')}
         validity={t('premiumValidity')}
         perks={[...PERK_KEYS, ...BONUS_KEYS].map((k) => t(k))}
-        priceLabel={isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
+        priceLabel={isFree ? t('premiumFree') : displayPrice}
         strikePrice={applied ? `₹${PREMIUM_PRICE_RUPEES}` : undefined}
         isFree={isFree}
         accent="warm"

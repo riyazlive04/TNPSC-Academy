@@ -1,31 +1,79 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-P4WXHVR8');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Meta Pixel Code -->
-    <script>
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1006796038910199');
-      fbq('track', 'PageView');
-    </script>
-    <!-- End Meta Pixel Code -->
     <meta charset="UTF-8" />
+    <!-- ─── Third-party tags: WEB ONLY ───────────────────────────────────────
+         GTM (which also loads Clarity) and the Meta Pixel are loaded here for
+         the website and deliberately NOT inside the installed apps. Three
+         reasons, all of them blocking if ignored:
+
+           1. The Meta Pixel correlates a user with Meta's own data for
+              advertising, which is "tracking" under Apple's definition. Shipping
+              it would force an App Tracking Transparency prompt AND a "Data Used
+              to Track You" privacy label on an exam-prep app that has no need
+              for either.
+           2. Apple 2.5.2 bars an app from downloading and running code that
+              changes its behaviour. A GTM container is exactly that — arbitrary
+              JavaScript, editable in a dashboard after review.
+           3. The privacy manifest declares NSPrivacyTracking=false. Loading
+              these would make that declaration false, and Apple cross-checks it.
+
+         `__IS_NATIVE__` is decided before any tag runs, by URL rather than by a
+         build flag, so one build artifact serves web and native:
+           Android Capacitor → https://localhost   (no port)
+           iOS Capacitor     → capacitor://localhost
+         A dev server is localhost WITH a port, so it is treated as native here
+         too — which is what we want, since dev traffic should never hit
+         production analytics either. -->
+    <script>
+      window.__IS_NATIVE__ =
+        location.protocol === 'capacitor:' || location.hostname === 'localhost'
+    </script>
+    <script>
+      if (!window.__IS_NATIVE__) {
+        // Google Tag Manager
+        ;(function (w, d, s, l, i) {
+          w[l] = w[l] || []
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : ''
+          j.async = true
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+          f.parentNode.insertBefore(j, f)
+        })(window, document, 'script', 'dataLayer', 'GTM-P4WXHVR8')
+
+        // Meta Pixel
+        ;(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return
+          n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+          }
+          if (!f._fbq) f._fbq = n
+          n.push = n
+          n.loaded = !0
+          n.version = '2.0'
+          n.queue = []
+          t = b.createElement(e)
+          t.async = !0
+          t.src = v
+          s = b.getElementsByTagName(e)[0]
+          s.parentNode.insertBefore(t, s)
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js')
+        fbq('init', '1006796038910199')
+        fbq('track', 'PageView')
+      }
+    </script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover is what makes env(safe-area-inset-*) report real
+         values. Without it they resolve to 0 on iOS, and on Android 16 — where
+         targetSdk 36 forces edge-to-edge with no opt-out — the app header would
+         sit underneath the status bar and the tab bar under the gesture pill. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
     <meta name="theme-color" content="#7C6FE8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#181527" media="(prefers-color-scheme: dark)" />
     <!-- Apply the saved/system theme before paint so there's no light flash. -->
@@ -178,6 +226,10 @@
     />
   </head>
   <body>
+    <!-- noscript fallbacks are web-only by construction: the app is a JavaScript
+         bundle, so a WebView with JS disabled renders nothing at all and these
+         tags could never fire inside it. Left unconditional because <noscript>
+         cannot be gated by script. -->
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P4WXHVR8"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>

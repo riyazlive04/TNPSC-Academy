@@ -799,6 +799,15 @@ export const api = {
   async recordActivity(questions: number, tests = 1): Promise<void> {
     await request('/api/profile/activity', { method: 'POST', body: { questions, tests } })
   },
+  /**
+   * Permanently delete the signed-in account and every row that hangs off it.
+   * Required in-app by Apple 5.1.1(v) and Google Play's User Data policy. The
+   * caller is expected to sign out immediately after — the session it is holding
+   * refers to a user that no longer exists.
+   */
+  async deleteAccount(): Promise<void> {
+    await request('/api/profile/account', { method: 'DELETE' })
+  },
 
   // ─── Admin ─────────────────────────────────────────────────────────────────
   async adminListQuestions(config: QuizConfig): Promise<Question[]> {
@@ -1444,6 +1453,30 @@ export const api = {
     async entitlements(): Promise<BundleEntitlement> {
       return request<BundleEntitlement>('/api/payments/entitlements')
     },
+    /**
+     * Hand an App Store / Play receipt to the server, which verifies it with the
+     * store and writes the `paid` row. The native counterpart of `verify()`.
+     *
+     * `plan` and `productId` are hints for logging and Play's lookup; the server
+     * re-derives the granted plan from the verified receipt, so a tampered body
+     * cannot buy the cheap SKU and claim the expensive plan.
+     */
+    async verifyIap(params: {
+      platform: 'ios' | 'android'
+      plan: string
+      productId: string
+      transactionId?: string
+      jws?: string
+      purchaseToken?: string
+    }): Promise<{ verified: boolean; plan?: string; alreadyRecorded?: boolean }> {
+      const result = await request<{
+        verified: boolean
+        plan?: string
+        alreadyRecorded?: boolean
+      }>('/api/iap/verify', { method: 'POST', body: params })
+      if (result.verified) invalidateReads('/api/questions/', '/api/payments')
+      return result
+    },
   },
 
   // ─── Credits (free-tier test balance) ────────────────────────────────────
@@ -1507,6 +1540,18 @@ export const api = {
     },
     async unsubscribe(endpoint: string): Promise<void> {
       await request('/api/notifications/unsubscribe', { method: 'POST', body: { endpoint } })
+    },
+    /**
+     * Register this device's APNs/FCM token — the native counterpart of
+     * `subscribe`. The installed apps cannot use Web Push (no Push API in
+     * WKWebView), so they go through the OS push service instead.
+     */
+    async registerDevice(params: { token: string; platform: 'ios' | 'android' }): Promise<void> {
+      await request('/api/notifications/device', { method: 'POST', body: params })
+    },
+    /** Stop pushing to this account's devices (all of them when no token given). */
+    async unregisterDevice(token?: string): Promise<void> {
+      await request('/api/notifications/device', { method: 'DELETE', body: { token } })
     },
     /** The user's in-app feed + unread count. */
     async feed(): Promise<{ notifications: NotificationItem[]; unread: number }> {

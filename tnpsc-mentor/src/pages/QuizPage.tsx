@@ -31,6 +31,7 @@ import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProct
 import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
 import { useT, translate } from '../lib/i18n'
+import { hapticSelect } from '../lib/haptics'
 import type { AnswerLetter, QuizConfig } from '../types'
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
@@ -236,6 +237,9 @@ export default function QuizPage() {
 
   const handleSelect = (letter: AnswerLetter) => {
     if (!currentQuestion) return
+    // A light tap confirms the choice registered — the option's colour change is
+    // easy to miss mid-scroll on a phone.
+    hapticSelect()
     store.selectAnswer(currentQuestion.id, letter)
   }
 

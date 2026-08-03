@@ -122,6 +122,51 @@ router.post(
   })
 )
 
+// ─── POST /api/notifications/device ──────────────────────────────────────────
+// Register an APNs/FCM device token for the installed app. The web build uses
+// /subscribe (Web Push) instead; the two coexist because a user can be on both.
+//
+// Upsert on `token`, not on (user, platform): the token is what the transport
+// addresses, it rotates on its own, and the SAME device can be handed to a
+// different account. Conflicting on the token therefore re-points a reused token
+// at whoever is signed in now, instead of silently pushing one user's
+// notifications to another's phone.
+router.post(
+  '/device',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const token = String(req.body?.token ?? '').trim()
+    const platform = String(req.body?.platform ?? '')
+    if (!token) return res.status(400).json({ error: 'Missing device token.' })
+    if (platform !== 'ios' && platform !== 'android') {
+      return res.status(400).json({ error: 'Unknown platform.' })
+    }
+
+    const { error } = await supabaseAdmin
+      .from('push_devices')
+      .upsert({ user_id: req.userId, token, platform }, { onConflict: 'token' })
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true })
+  })
+)
+
+// ─── DELETE /api/notifications/device ────────────────────────────────────────
+// Stop pushing to this user's devices. A specific `token` unregisters just that
+// device; without one, every device on the account is dropped (the Profile
+// toggle's "turn notifications off" for this account).
+router.delete(
+  '/device',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const token = String(req.body?.token ?? '').trim()
+    let q = supabaseAdmin.from('push_devices').delete().eq('user_id', req.userId)
+    if (token) q = q.eq('token', token)
+    const { error } = await q
+    if (error) return sendDbError(res, error)
+    res.json({ ok: true })
+  })
+)
+
 // ─── GET /api/notifications ──────────────────────────────────────────────────
 // The signed-in user's in-app feed: notifications whose audience matches them,
 // each flagged read/unread, plus the unread count for the bell badge.

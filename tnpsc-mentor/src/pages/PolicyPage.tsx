@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, ShieldCheck, BookOpen, CreditCard, RotateCcw } from 'lucide-react'
+import { ArrowLeft, ShieldCheck, BookOpen, CreditCard, RotateCcw, Trash2 } from 'lucide-react'
 
 // ─── Policy content ──────────────────────────────────────────────────────────
 // Plain-English legal/policy copy for the public site, grounded in how the app
@@ -36,8 +36,16 @@ const PRIVACY: Policy = {
       list: [
         'Account details you provide: name, email, phone, preferred language, target group and (optionally) gender.',
         'Usage data: tests attempted, answers, scores, streaks, bookmarks and progress - used to power your analytics and revision.',
-        'Device & session data: a device label and session identifiers to enforce the 2-device login limit and keep your account secure.',
-        'Payment data: when you upgrade, payments are handled by Razorpay; we store the order/payment reference and status, not your full card details.',
+        'Device & session data: a randomly generated installation identifier and a device label, used to enforce the 2-device login limit and keep your account secure. This is not an advertising identifier and is not shared with anyone.',
+        'Payment data: on the website, payments are handled by Razorpay. In the Android and iOS apps, payments are handled by Google Play and the App Store respectively. In every case we store only the order/payment reference, amount and status - never your card details.',
+        'Notification tokens: if you turn notifications on, the push token issued by your browser or by Apple/Google, so we can send you the alerts you asked for.',
+      ],
+    },
+    {
+      h: '1a. Tracking and advertising',
+      p: [
+        'The Android and iOS apps contain NO third-party advertising, analytics or tracking SDKs. We do not track you across other companies’ apps or websites, and we do not share your data with data brokers or advertising networks.',
+        'The website (tnpscmentors.in) does use Google Analytics via Google Tag Manager, Microsoft Clarity and the Meta Pixel to understand how the site is used and to measure our own advertising. You can opt out with any standard browser tracking blocker.',
       ],
     },
     {
@@ -52,21 +60,23 @@ const PRIVACY: Policy = {
     {
       h: '3. Sharing',
       p: [
-        'We do not sell your personal data. We share data only with service providers that run the product - e.g., Supabase (database/auth), Razorpay (payments), and hosting/analytics providers - under their terms, and only as needed to operate the service or comply with law.',
+        'We do not sell your personal data. We share data only with the service providers that run the product - Supabase (database and authentication), Razorpay (website payments), Apple and Google (in-app purchases and push delivery), and our hosting provider - under their terms, and only as needed to operate the service or comply with law.',
       ],
     },
     {
-      h: '4. Data retention',
+      h: '4. Data retention and deletion',
       p: [
-        'We keep your data while your account is active. You can request deletion of your account and associated data by contacting us; some records may be retained where required for legal, tax or fraud-prevention purposes.',
+        'We keep your data while your account is active. You can delete your account and all associated data yourself at any time from Profile → Account → Delete account; deletion is immediate and irreversible. Full details, including how to request deletion if you cannot sign in, are on the "Delete account" page.',
+        'Payment and invoice records are retained afterwards for as long as Indian tax and accounting law requires, for statutory compliance only.',
       ],
     },
     {
       h: '5. Your choices',
       list: [
         'Access or correct your profile details inside the app.',
-        'Turn notifications on or off.',
-        'Request export or deletion of your data by email.',
+        'Turn notifications on or off at any time, in the app and in your device settings.',
+        'Delete your account and all your data from Profile → Account, without contacting us.',
+        'Request a copy of your data by email.',
       ],
     },
     {
@@ -232,11 +242,64 @@ const REFUND: Policy = {
   ],
 }
 
+// Google Play's User Data policy requires BOTH an in-app deletion path (Profile →
+// Account → Delete account) and a publicly reachable web URL where deletion can be
+// requested WITHOUT installing the app. This page is that URL, and it is what goes
+// in the Play Console Data safety form's "Account deletion URL" field.
+const DELETE_ACCOUNT: Policy = {
+  slug: 'delete-account',
+  title: 'Delete your account',
+  icon: Trash2,
+  intro:
+    'You can permanently delete your TNPSC Mentors account and all data associated with it at any time. Deletion is immediate and cannot be undone.',
+  blocks: [
+    {
+      h: '1. Delete it yourself, in the app',
+      list: [
+        'Open the TNPSC Mentors app (or tnpscmentors.in) and sign in.',
+        'Go to Profile → Account.',
+        'Tap "Delete account", type DELETE to confirm, and confirm again.',
+        'Your account is removed straight away and you are signed out.',
+      ],
+    },
+    {
+      h: '2. Or ask us to delete it',
+      p: [
+        `If you cannot sign in, email ${SUPPORT_EMAIL} from the address registered on the account, with the subject "Delete my account". We verify ownership of the address and complete the deletion within 7 working days, and confirm by email when it is done.`,
+      ],
+    },
+    {
+      h: '3. What gets deleted',
+      list: [
+        'Your profile: name, email, phone number, language, target group and exam date.',
+        'Your work: every test attempt, answer, score, bookmark, revision deck and progress record.',
+        'Your credit balance and streak history.',
+        'Your notification subscriptions and registered devices.',
+        'Any question reports or feedback you submitted, and their link to you.',
+      ],
+    },
+    {
+      h: '4. What we keep, and for how long',
+      p: [
+        'Payment and invoice records are retained for as long as Indian tax and accounting law requires (currently 8 financial years). These are kept for statutory compliance only, are not used to profile you, and hold no test data — just the transaction reference, amount and date.',
+      ],
+    },
+    {
+      h: '5. Paid plans and refunds',
+      p: [
+        'Deleting your account ends any active Premium or Vettri Nichayam plan immediately and does NOT trigger a refund. If you believe you are owed one, read the Refund & Cancellation policy and contact support BEFORE deleting — once the account is gone we can no longer verify your entitlement.',
+        'Purchases made through the App Store or Google Play are refunded by Apple or Google under their own policies, not by us.',
+      ],
+    },
+  ],
+}
+
 const POLICIES: Record<string, Policy> = {
   privacy: PRIVACY,
   guidelines: GUIDELINES,
   payment: PAYMENT,
   refund: REFUND,
+  'delete-account': DELETE_ACCOUNT,
 }
 
 const NAV: { slug: string; label: string }[] = [
@@ -244,6 +307,7 @@ const NAV: { slug: string; label: string }[] = [
   { slug: 'guidelines', label: 'Guidelines' },
   { slug: 'payment', label: 'Payment' },
   { slug: 'refund', label: 'Refund & Cancellation' },
+  { slug: 'delete-account', label: 'Delete account' },
 ]
 
 // ─── Page ────────────────────────────────────────────────────────────────────

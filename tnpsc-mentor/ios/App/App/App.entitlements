@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Push. Left as `development` on purpose: with "Automatically manage signing"
+	     on, Xcode rewrites this to `production` when it archives against a
+	     Distribution profile, so one file covers both. Enable the Push
+	     Notifications capability on the App ID in the Developer portal too. -->
+	<key>aps-environment</key>
+	<string>development</string>
+
+	<!-- Universal Links, the iOS twin of the Android App Links intent-filter.
+	     Needs /.well-known/apple-app-site-association served from that host over
+	     HTTPS as application/json with NO redirect (see deploy/). -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app.tnpscmentors.in</string>
+	</array>
+</dict>
+</plist>

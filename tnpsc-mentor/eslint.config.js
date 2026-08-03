@@ -9,7 +9,11 @@ import reactHooks from 'eslint-plugin-react-hooks'
 export default tseslint.config(
   // Paths we never lint (build output, deps, native shell, server has its own tsconfig).
   {
-    ignores: ['dist/**', 'node_modules/**', 'android/**', 'server/**'],
+    // `ios/**` alongside `android/**`: both native projects contain a COPY of the
+    // built web bundle (ios/App/App/public, android/.../assets/public) that
+    // `cap sync` refreshes. Linting generated bundles produces thousands of
+    // meaningless errors and hides the real ones in src/.
+    ignores: ['dist/**', 'node_modules/**', 'android/**', 'ios/**', 'server/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

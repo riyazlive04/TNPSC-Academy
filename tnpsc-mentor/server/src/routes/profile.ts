@@ -5,6 +5,8 @@ import { normalizeMobile } from '../lib/msg91.js'
 import { phoneTakenByOther } from '../lib/phone.js'
 import { whatsappOtpEnabled } from '../config.js'
 import { verifyPhoneVerifyTicket } from '../lib/otpTicket.js'
+import { supabaseAdmin } from '../supabase.js'
+import { notifyAdmins } from '../notify.js'
 
 const router = Router()
 
@@ -133,6 +135,58 @@ router.post(
     )
     if (e2) return sendDbError(res, e2)
     res.json({ ok: true })
+  })
+)
+
+// ─── DELETE /api/profile/account ─────────────────────────────────────────────
+// Self-service account deletion. MANDATORY for both stores: Apple guideline
+// 5.1.1(v) and Google Play's User Data policy each require an app that offers
+// account creation to also offer in-app deletion of the account AND its data —
+// deactivation or "email us" is explicitly not enough.
+//
+// Deleting the auth user is sufficient to delete everything: every user-owned
+// table references auth.users(id) ON DELETE CASCADE, including profiles once
+// supabase/delete_user.sql has been applied. That single call therefore takes
+// test attempts, answers, bookmarks, revision decks, credits, seen-question
+// ledgers, device sessions, push subscriptions and payment rows with it.
+//
+// Staff are refused: an admin deleting themselves through the learner UI is
+// almost certainly a mistake, and a superadmin doing it can lock the platform
+// out of its own console.
+router.delete(
+  '/account',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const userId = req.userId!
+
+    const { data: me, error: lookupErr } = await supabaseAdmin
+      .from('profiles')
+      .select('role, email')
+      .eq('id', userId)
+      .single()
+    if (lookupErr) return sendDbError(res, lookupErr)
+
+    if (me?.role === 'admin' || me?.role === 'superadmin') {
+      return res.status(403).json({
+        error:
+          'Staff accounts cannot be deleted from the app. Ask a superadmin to remove this account.',
+      })
+    }
+
+    // Deleting the auth user invalidates every issued refresh token for it, so a
+    // session still live on the user's other device dies with this call — no
+    // separate revocation pass needed.
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    if (error) return res.status(500).json({ error: error.message })
+
+    // Passive audit trail — the row itself is gone, so this is the only record
+    // that the deletion happened at the user's own request.
+    await notifyAdmins(
+      'Account deleted by user',
+      `${me?.email ?? userId} deleted their own account from the app.`
+    ).catch(() => {})
+
+    res.json({ deleted: true })
   })
 )
 

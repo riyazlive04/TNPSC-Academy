@@ -20,6 +20,7 @@ import { useCreditsStore } from '../store/creditsStore'
 import { upsell } from '../store/upsellStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useT } from '../lib/i18n'
+import { hapticSelect } from '../lib/haptics'
 import { optionLetters, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
 
@@ -400,8 +401,10 @@ export default function MockQuizPage() {
       document.getElementById(`omr-q-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     )
   }
-  const setAnswer = (q: Question, letter: AnswerLetter) =>
+  const setAnswer = (q: Question, letter: AnswerLetter) => {
+    hapticSelect()
     setAnswers((a) => ({ ...a, [q.id]: letter }))
+  }
   const clearAnswer = (q: Question) =>
     setAnswers((a) => {
       const next = { ...a }

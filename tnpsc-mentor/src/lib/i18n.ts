@@ -1198,6 +1198,102 @@ const STRINGS = {
     en: 'Payment failed. Please try again.',
     ta: 'பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.',
   },
+  // In-app purchase (App Store / Play) specific failures.
+  payErrUnavailable: {
+    en: 'In-app purchases are unavailable on this device. Please sign in to the store and try again.',
+    ta: 'இந்தச் சாதனத்தில் ஆப்-உள் கொள்முதல் கிடைக்கவில்லை. ஸ்டோரில் உள்நுழைந்து மீண்டும் முயற்சிக்கவும்.',
+  },
+  payErrUnsupported: {
+    en: 'Purchases are not supported here. Please buy on tnpscmentors.in instead.',
+    ta: 'இங்கு கொள்முதல் ஆதரிக்கப்படவில்லை. tnpscmentors.in இல் வாங்கவும்.',
+  },
+  // Restore purchases (Apple requires a way to recover a paid plan).
+  restorePurchases: {
+    en: 'Restore purchases',
+    ta: 'கொள்முதல்களை மீட்டெடுக்கவும்',
+  },
+  restoreRunning: {
+    en: 'Checking the store…',
+    ta: 'ஸ்டோரைச் சரிபார்க்கிறது…',
+  },
+  restoreFound: {
+    en: 'Your purchase was restored.',
+    ta: 'உங்கள் கொள்முதல் மீட்டெடுக்கப்பட்டது.',
+  },
+  restoreNone: {
+    en: 'No purchases to restore on this account.',
+    ta: 'இந்தக் கணக்கில் மீட்டெடுக்க கொள்முதல் எதுவும் இல்லை.',
+  },
+  // ─── Store offer codes (the native stand-in for promoter coupons) ─────────
+  haveACode: {
+    en: 'Have a code?',
+    ta: 'கோடு உள்ளதா?',
+  },
+  offerCodeRedeemed: {
+    en: 'Code applied — your plan is active.',
+    ta: 'கோடு பயன்படுத்தப்பட்டது — உங்கள் திட்டம் செயலில் உள்ளது.',
+  },
+  offerCodeUnsupported: {
+    en: 'Redeeming codes needs iOS 16 or later. Update iOS, or redeem on tnpscmentors.in.',
+    ta: 'கோடுகளைப் பயன்படுத்த iOS 16 அல்லது அதற்கு மேல் தேவை. iOS-ஐப் புதுப்பிக்கவும், அல்லது tnpscmentors.in இல் பயன்படுத்தவும்.',
+  },
+  playRedeemHint: {
+    en: 'Have a code? Tap "Redeem code" in the Google Play payment screen when you check out.',
+    ta: 'கோடு உள்ளதா? பணம் செலுத்தும்போது Google Play திரையில் "Redeem code" என்பதைத் தட்டவும்.',
+  },
+  offlineBanner: {
+    en: "You're offline — questions and results need a connection.",
+    ta: 'நீங்கள் ஆஃப்லைனில் உள்ளீர்கள் — கேள்விகளுக்கும் முடிவுகளுக்கும் இணைப்பு தேவை.',
+  },
+  restorePurchasesSub: {
+    en: 'Recover a plan you already bought on another device.',
+    ta: 'வேறு சாதனத்தில் ஏற்கனவே வாங்கிய திட்டத்தை மீட்டெடுக்கவும்.',
+  },
+  // ─── Account controls (Apple 5.1.1(v) + Play User Data policy) ─────────────
+  accountTitle: {
+    en: 'Account',
+    ta: 'கணக்கு',
+  },
+  accountSub: {
+    en: 'Manage your purchases and your account data.',
+    ta: 'உங்கள் கொள்முதல்கள் மற்றும் கணக்குத் தரவை நிர்வகிக்கவும்.',
+  },
+  deleteAccount: {
+    en: 'Delete account',
+    ta: 'கணக்கை நீக்கு',
+  },
+  deleteAccountSub: {
+    en: 'Permanently remove your account and all your data.',
+    ta: 'உங்கள் கணக்கையும் அனைத்துத் தரவையும் நிரந்தரமாக நீக்கும்.',
+  },
+  deleteAccountTitle: {
+    en: 'Delete your account permanently?',
+    ta: 'உங்கள் கணக்கை நிரந்தரமாக நீக்கவா?',
+  },
+  deleteAccountWarning: {
+    en: 'This cannot be undone. Your test history, scores, bookmarks, revision decks, credits and any active paid plan will be deleted immediately and cannot be recovered. Refunds are not automatic — contact support first if you have an active plan.',
+    ta: 'இதைத் திரும்பப் பெற முடியாது. உங்கள் தேர்வு வரலாறு, மதிப்பெண்கள், புக்மார்க்குகள், திருப்புதல் பட்டியல்கள், கிரெடிட்கள் மற்றும் செயலில் உள்ள கட்டணத் திட்டம் அனைத்தும் உடனடியாக நீக்கப்படும்; மீட்டெடுக்க முடியாது. பணத்திரும்பப்பெறுதல் தானாக நடக்காது — செயலில் திட்டம் இருந்தால் முதலில் ஆதரவைத் தொடர்பு கொள்ளவும்.',
+  },
+  deleteAccountConfirmWord: {
+    en: 'DELETE',
+    ta: 'DELETE',
+  },
+  deleteAccountConfirmLabel: {
+    en: 'Type DELETE to confirm',
+    ta: 'உறுதிப்படுத்த DELETE எனத் தட்டச்சு செய்யவும்',
+  },
+  deleteAccountConfirm: {
+    en: 'Delete',
+    ta: 'நீக்கு',
+  },
+  deleteAccountDone: {
+    en: 'Your account has been deleted.',
+    ta: 'உங்கள் கணக்கு நீக்கப்பட்டது.',
+  },
+  deleteAccountError: {
+    en: 'Could not delete the account. Please try again or contact support.',
+    ta: 'கணக்கை நீக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும் அல்லது ஆதரவைத் தொடர்பு கொள்ளவும்.',
+  },
   couponCheckError: {
     en: 'Could not check that coupon. Please try again.',
     ta: 'அந்தக் கூப்பனைச் சரிபார்க்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',

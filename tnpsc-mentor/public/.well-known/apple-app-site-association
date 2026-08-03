@@ -1,0 +1,37 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["REPLACE_TEAM_ID.com.tnpscmentor.app"],
+        "components": [
+          {
+            "/": "/delete-account",
+            "exclude": true,
+            "comment": "Account deletion must stay reachable in a browser without the app installed — Google Play requires that URL to work standalone, and a user deleting their account may be doing it precisely because they removed the app."
+          },
+          {
+            "/": "/privacy",
+            "exclude": true,
+            "comment": "Policy pages are linked from the store listings and must open in a browser."
+          },
+          {
+            "/": "/guidelines",
+            "exclude": true
+          },
+          {
+            "/": "/payment-policy",
+            "exclude": true
+          },
+          {
+            "/": "/refund-policy",
+            "exclude": true
+          },
+          {
+            "/": "/*",
+            "comment": "Everything else opens in the app when it is installed."
+          }
+        ]
+      }
+    ]
+  }
+}

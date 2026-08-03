@@ -14,10 +14,12 @@ import { pageVariants } from './lib/motion'
 import AppLayout from './components/Layout/AppLayout'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import { prefetchRoutes, PREFETCH_ON_BOOT } from './lib/routePrefetch'
+import { useNativeBootstrap } from './hooks/useNativeBootstrap'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
+import OfflineBanner from './components/OfflineBanner'
 import Toaster from './components/UI/Toaster'
 import LogoLoader from './components/UI/LogoLoader'
 
@@ -148,6 +150,11 @@ const BARE_ROUTES: RouteDef[] = [
 export default function App() {
   const init = useAuthStore((s) => s.init)
 
+  // Native-only launch work: edge-to-edge chrome, splash dismissal, recovery of
+  // any purchase the store charged for but our server never recorded, push-token
+  // refresh, and deep-link handling. No-ops entirely on the web build.
+  useNativeBootstrap()
+
   // Bootstrap the Supabase session once on mount, and warm the API connection
   // in parallel (DNS/TLS pre-connect — the VPS API is always-on). Also wire
   // the theme store (re-apply + listen for OS light/dark changes).
@@ -183,6 +190,7 @@ export default function App() {
       <AnimatedRoutes />
     </Suspense>
     <UpdatePrompt />
+    <OfflineBanner />
     <BackButtonGuard />
     <Toaster />
     <UpsellOutlet />
@@ -261,6 +269,10 @@ function AnimatedRoutes() {
       <Route path="/guidelines" element={<PolicyPage slug="guidelines" />} />
       <Route path="/payment-policy" element={<PolicyPage slug="payment" />} />
       <Route path="/refund-policy" element={<PolicyPage slug="refund" />} />
+      {/* Google Play's User Data policy requires a PUBLIC, no-install-needed URL
+          where account deletion can be requested. This route is the value that
+          goes in the Play Console Data safety form. */}
+      <Route path="/delete-account" element={<PolicyPage slug="delete-account" />} />
 
       {/* Protected, inside the persistent chrome */}
       <Route element={<AppShell />}>

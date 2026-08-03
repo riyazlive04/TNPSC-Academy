@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { Trophy, Check, Download, Loader2, Tag, X, AlertCircle, CalendarDays, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
-import { startCheckout, type CheckoutErrorCode } from '../../lib/razorpay'
+import { startPurchase, couponMode, PURCHASE_ERR_KEY } from '../../lib/purchase'
+import { useStorePrice } from '../../hooks/useStorePrice'
+import type { PlanId } from '../../lib/iapCatalog'
 import { toast } from '../../store/toastStore'
 import { useEntitlementsStore } from '../../store/entitlementsStore'
 import { useCreditsStore } from '../../store/creditsStore'
@@ -11,6 +13,7 @@ import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
+import StoreCodeRow from './StoreCodeRow'
 
 // ─── Vettri Nichayam pricing (mirrors server pricing.ts) ─────────────────────
 // Display only — the server always recomputes the price from the plan + coupon.
@@ -26,7 +29,8 @@ type VettriPlan = 'full' | 'month'
 const PLANS: Record<
   VettriPlan,
   {
-    id: string
+    /** Ledger plan id; also the key into the store product catalog. */
+    id: PlanId
     paise: number
     rupees: number
     labelKey: 'vettriPlanFull' | 'vettriPlanMonth'
@@ -63,14 +67,6 @@ const BONUS_KEYS = ['vettriBonus1', 'vettriBonus2', 'vettriBonus3'] as const
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
 
-/** Checkout failure code → translated toast key. */
-const PAY_ERR_KEY: Record<CheckoutErrorCode, 'payErrStart' | 'payErrSdk' | 'payErrVerify' | 'payErrPay'> = {
-  start: 'payErrStart',
-  sdk: 'payErrSdk',
-  verify: 'payErrVerify',
-  pay: 'payErrPay',
-}
-
 /** ₹ from paise, no trailing .00 for whole rupees. */
 function rupees(paise: number): string {
   const r = paise / 100
@@ -93,7 +89,7 @@ export default function VettriCard({
   /** Show a close button that hides the card for the current view only. */
   dismissible?: boolean
 }) {
-  const { profile, isAdmin, isSuperAdmin } = useAuth()
+  const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const { t } = useT()
   const navigate = useNavigate()
   const seriesOn = useTestSeriesEnabled()
@@ -117,6 +113,9 @@ export default function VettriCard({
   // coupon, since its discount was computed against the other plan's base price.
   const [plan, setPlan] = useState<VettriPlan>('full')
   const sel = PLANS[plan]
+  // Native charges the STORE price for the selected plan, not the rupee constant.
+  const { priceString: storePriceString } = useStorePrice(sel.id)
+  const showCoupon = couponMode() === 'input'
   const choosePlan = (p: VettriPlan) => {
     if (p === plan) return
     setPlan(p)
@@ -165,12 +164,13 @@ export default function VettriCard({
     // Meta: buyer confirmed the recap and Razorpay is opening (high-intent lead).
     trackCheckoutConfirmed({ value: finalPaise / 100, description: sel.descr })
     try {
-      const result = await startCheckout({
+      const result = await startPurchase({
+        plan: sel.id,
         amount: sel.paise,
         profile,
         description: sel.descr,
-        notes: { plan: sel.id },
         couponCode: applied?.code,
+        userId: user?.id ?? null,
       })
       if (result.status === 'paid') {
         markVettri() // hide the card immediately…
@@ -179,7 +179,11 @@ export default function VettriCard({
         // Land on the success screen (it re-pulls the stores again on mount).
         navigate(`/payment-success?plan=${plan === 'month' ? 'vettri_month' : 'vettri_full'}`)
       } else if (result.status === 'failed')
-        toast.error(result.code ? t(PAY_ERR_KEY[result.code]) : result.error)
+        toast.error(
+          result.code && result.code !== 'cancelled'
+            ? t(PURCHASE_ERR_KEY[result.code])
+            : result.error
+        )
     } finally {
       setPaying(false)
     }
@@ -193,6 +197,9 @@ export default function VettriCard({
 
   const finalPaise = applied ? applied.finalAmount : sel.paise
   const isFree = finalPaise === 0
+  // Inside the apps the store's own localized price is what will be charged.
+  const displayPrice = storePriceString ?? `₹${rupees(finalPaise)}`
+  const basePrice = storePriceString ?? `₹${sel.rupees}`
 
   return (
     <div className={`card relative overflow-hidden p-6 pl-7 ${className}`}>
@@ -309,19 +316,22 @@ export default function VettriCard({
               <>
                 <span className="font-body text-base text-ink2 line-through">₹{sel.rupees}</span>
                 <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                  {isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
+                  {isFree ? t('premiumFree') : displayPrice}
                 </span>
               </>
             ) : (
               <span className="font-display text-3xl font-bold tracking-tight text-ink">
-                ₹{sel.rupees}
+                {basePrice}
               </span>
             )}
             {!isFree && <span className="font-body text-sm text-ink2">{t(sel.suffixKey)}</span>}
           </div>
 
-          {/* Coupon row */}
-          {applied ? (
+          {/* Coupon row. Web = our promoter codes; native = the store's own
+              redemption path (see lib/purchase.ts couponMode()). */}
+          {!showCoupon ? (
+            <StoreCodeRow onRedeemed={() => navigate('/payment-success?plan=vettri_full')} />
+          ) : applied ? (
             <div className="flex items-center gap-2 rounded-field bg-brand-soft px-3 py-2 ring-1 ring-brand/25">
               <Tag size={14} className="text-brand" />
               <span className="font-heading text-xs font-semibold text-ink">

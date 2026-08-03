@@ -1,25 +1,57 @@
 // ─── Native (Capacitor) Google Sign-In ───────────────────────────────────────
-// Inside the Android app the WebView loads from https://localhost, where Google
-// Identity Services refuses to run (embedded-webview + unauthorized origin). The
-// native plugin runs the real Google account picker and hands back an ID token
-// whose audience is our WEB client ID - the exact token shape the server accepts.
+// Inside the native app the WebView loads from https://localhost (Android) or
+// capacitor://localhost (iOS), where Google Identity Services refuses to run
+// (embedded-webview + unauthorized origin). The native plugin runs the real
+// Google account picker and hands back an ID token, which POST /api/auth/google
+// forwards to Supabase's signInWithIdToken.
+//
+// AUDIENCE NOTE — the returned token's `aud` differs per platform:
+//   • Android → VITE_GOOGLE_CLIENT_ID (the WEB client id)
+//   • iOS     → VITE_GOOGLE_IOS_CLIENT_ID (Google's iOS SDK always signs for the
+//               iOS client, regardless of iOSServerClientId)
+// BOTH ids must therefore be listed in Supabase → Authentication → Providers →
+// Google → "Authorized Client IDs", or iOS sign-in fails with a bare 401. See
+// docs/MOBILE_RELEASE.md.
 
 import { Capacitor } from '@capacitor/core'
 
-// The WEB OAuth client ID (same value the server verifies). It must be passed to
-// the native plugin's `initialize({ clientId })` so the returned ID token's
-// audience is this web client, which Supabase already trusts.
 const WEB_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
+const IOS_CLIENT_ID = import.meta.env.VITE_GOOGLE_IOS_CLIENT_ID as string | undefined
 
 /** True only when running inside the packaged Capacitor app (not the web build). */
 export function isNativeApp(): boolean {
   return Capacitor.isNativePlatform()
 }
 
-// The plugin's Android `load()` is empty - it only builds the sign-in client in
-// `initialize()`. Calling `signIn()` before that NPEs and crashes the app, so we
-// always initialize once first.
-let initialized = false
+/** 'ios' | 'android' | 'web' — drives store-specific copy and IAP routing. */
+export function nativePlatform(): 'ios' | 'android' | 'web' {
+  const p = Capacitor.getPlatform()
+  return p === 'ios' || p === 'android' ? p : 'web'
+}
+
+// initialize() is idempotent on the plugin side but cheap to guard, and the
+// promise is cached so two concurrent sign-in taps can't race two inits.
+let initPromise: Promise<void> | null = null
+
+async function ensureInitialized(): Promise<void> {
+  if (initPromise) return initPromise
+  initPromise = (async () => {
+    const { SocialLogin } = await import('@capgo/capacitor-social-login')
+    await SocialLogin.initialize({
+      google: {
+        webClientId: WEB_CLIENT_ID,
+        // Only consulted on iOS; harmless on Android.
+        iOSClientId: IOS_CLIENT_ID,
+        iOSServerClientId: WEB_CLIENT_ID,
+        mode: 'online',
+      },
+    })
+  })().catch((e) => {
+    initPromise = null // let a later attempt retry a transient failure
+    throw e
+  })
+  return initPromise
+}
 
 /**
  * Run the native Google account picker and return the ID token, or null if the
@@ -27,26 +59,38 @@ let initialized = false
  * native code paths.
  */
 export async function nativeGoogleIdToken(): Promise<string | null> {
-  const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth')
-  if (!initialized) {
-    await GoogleAuth.initialize({
-      clientId: WEB_CLIENT_ID,
-      scopes: ['profile', 'email'],
-      grantOfflineAccess: false,
-    })
-    initialized = true
-  }
-  // Force the account chooser to appear every time. Without this the plugin
-  // silently returns the last-used Google account (no picker), which traps a
-  // user on an account that's already at the device limit with no way to pick a
-  // different one. Signing out of the plugin's cached account first makes
-  // signIn() show the chooser. Best-effort - ignore if there's nothing to clear.
+  const { SocialLogin } = await import('@capgo/capacitor-social-login')
+  await ensureInitialized()
+
+  // Force the account chooser every time. Without it the picker silently reuses
+  // the last-used Google account, trapping a user whose account is already at the
+  // 2-device limit with no way to switch. (Capacitor 6 needed a signOut() first;
+  // this plugin exposes it as an explicit prompt.)
+  const res = await SocialLogin.login({
+    provider: 'google',
+    options: {
+      scopes: ['email', 'profile'],
+      forcePrompt: true,
+      prompt: 'select_account',
+      filterByAuthorizedAccounts: false,
+      autoSelectEnabled: false,
+    },
+  })
+
+  const result = res?.result as { idToken?: string | null } | undefined
+  return result?.idToken ?? null
+}
+
+/**
+ * Drop the plugin's cached Google session so the next sign-in shows the picker
+ * from a clean slate. Called on sign-out; best-effort and never throws.
+ */
+export async function nativeGoogleSignOut(): Promise<void> {
+  if (!isNativeApp()) return
   try {
-    await GoogleAuth.signOut()
+    const { SocialLogin } = await import('@capgo/capacitor-social-login')
+    await SocialLogin.logout({ provider: 'google' })
   } catch {
-    /* not signed in yet - nothing to clear */
+    /* nothing cached, or the plugin was never initialized */
   }
-  const user = await GoogleAuth.signIn()
-  const idToken = user?.authentication?.idToken
-  return idToken ?? null
 }

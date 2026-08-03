@@ -109,6 +109,23 @@ export const config = {
   // env var is the fallback for a fresh environment.
   telegramCaBotToken: process.env.TELEGRAM_CA_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '',
   telegramCaChannel: (process.env.TELEGRAM_CA_CHANNEL ?? '').trim(),
+  // ─── In-app purchases (App Store / Google Play) ────────────────────────────
+  // The mobile apps cannot bill through Razorpay — Apple 3.1.1 and Play's
+  // Payments policy both mandate store billing for digital content. Each store's
+  // proof is verified here before any entitlement is written.
+  //
+  // Apple: the StoreKit 2 signed transaction is checked against Apple's root CA
+  // offline, so no App Store Connect API key is needed — only the bundle id, and
+  // the numeric app id (App Store Connect → App Information → Apple ID) which
+  // Apple requires when verifying Production transactions.
+  appleBundleId: process.env.APPLE_BUNDLE_ID ?? 'com.tnpscmentor.app',
+  appleAppAppleId: Number(process.env.APPLE_APP_APPLE_ID ?? 0) || undefined,
+  // Play: a Google Cloud service account with the "View financial data" +
+  // "Manage orders" grant on the Play Console, used to call
+  // androidpublisher.purchases.products.get. Paste the JSON key verbatim (or a
+  // base64 of it) — it is server-only and never reaches a client.
+  googlePlayPackageName: process.env.GOOGLE_PLAY_PACKAGE_NAME ?? 'com.tnpscmentor.app',
+  googlePlayServiceAccountJson: process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON ?? '',
 }
 
 /** True when both Razorpay credentials are present — gates the payment routes. */
@@ -116,6 +133,16 @@ export const razorpayEnabled = Boolean(config.razorpayKeyId && config.razorpayKe
 
 /** True when a Google OAuth Client ID is configured — gates Google sign-in. */
 export const googleEnabled = Boolean(config.googleClientId)
+
+/** App Store receipt checking needs only the bundle id, which always has a
+ *  default — so iOS IAP verification is always available. */
+export const appleIapEnabled = Boolean(config.appleBundleId)
+
+/** Play receipt checking needs the service-account key; without it the Android
+ *  IAP route returns 503 rather than trusting an unverified purchase token. */
+export const googleIapEnabled = Boolean(
+  config.googlePlayServiceAccountJson && config.googlePlayPackageName
+)
 
 /** True when VAPID keys are present — gates Web Push (in-app feed works regardless). */
 export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateKey)

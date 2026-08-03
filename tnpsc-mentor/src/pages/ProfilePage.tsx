@@ -29,6 +29,7 @@ import Avatar from '../components/UI/Avatar'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
 import ProfileVideos from '../components/Profile/ProfileVideos'
+import AccountSection from '../components/Profile/AccountSection'
 import { Skeleton, SkeletonStatGrid } from '../components/UI/Skeleton'
 import { toast } from '../store/toastStore'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
@@ -475,6 +476,12 @@ export default function ProfilePage() {
 
             {/* Devices - manage the 2-device limit (sign out a lost/old device) */}
             <DevicesSection />
+
+            {/* Account - Restore purchases (native) + Delete account. Both are
+                store requirements: Apple 5.1.1(v) and Play's User Data policy
+                make in-app account deletion mandatory, and Apple expects a
+                restore path in any app that sells through the store. */}
+            <AccountSection />
 
             {/* Sign out */}
             <button onClick={handleSignOut} className="btn-ghost w-full">

@@ -7,16 +7,33 @@
 //            live in index.html, id 1006796038910199), firing the equivalent
 //            standard/custom event next to each dataLayer push.
 //
+// WEB ONLY. Neither tag is loaded inside the installed apps (see the reasoning
+// in index.html — App Tracking Transparency, guideline 2.5.2, and the
+// NSPrivacyTracking=false declaration in the privacy manifest all depend on it).
+// Every emitter below therefore short-circuits on native rather than each call
+// site having to remember: `window.fbq` and the GTM container simply don't exist
+// there, so an ungated call would silently build a dataLayer nothing consumes.
+//
 // NOTE: this is *page/usage* analytics. It is deliberately separate from
 // `lib/analytics.ts`, which is internal test-score aggregation, not web tracking.
 
 type DataLayerObject = Record<string, unknown>
+
+/**
+ * Set in index.html before any tag runs. True inside the Capacitor WebView (and
+ * on a local dev server, which should never reach production analytics either).
+ */
+function trackingDisabled(): boolean {
+  return typeof window === 'undefined' || window.__IS_NATIVE__ === true
+}
 
 declare global {
   interface Window {
     dataLayer?: DataLayerObject[]
     /** Meta (Facebook) Pixel — initialised in index.html (id 1006796038910199). */
     fbq?: (...args: unknown[]) => void
+    /** Set in index.html: true inside the Capacitor WebView (and in local dev). */
+    __IS_NATIVE__?: boolean
   }
 }
 
@@ -27,6 +44,7 @@ declare global {
 
 /** Fire a Meta standard event (PageView, CompleteRegistration, Purchase, …). */
 function metaTrack(event: string, params?: Record<string, unknown>): void {
+  if (trackingDisabled()) return
   try {
     window.fbq?.('track', event, params)
   } catch {
@@ -36,6 +54,7 @@ function metaTrack(event: string, params?: Record<string, unknown>): void {
 
 /** Fire a Meta custom event (app-specific actions with no standard equivalent). */
 function metaTrackCustom(event: string, params?: Record<string, unknown>): void {
+  if (trackingDisabled()) return
   try {
     window.fbq?.('trackCustom', event, params)
   } catch {
@@ -50,6 +69,7 @@ function metaTrackCustom(event: string, params?: Record<string, unknown>): void 
  * a sticky value like `user_id`, or clearing `ecommerce`).
  */
 function pushRaw(obj: DataLayerObject): void {
+  if (trackingDisabled()) return
   try {
     const w = window as Window & typeof globalThis
     w.dataLayer = w.dataLayer || []
@@ -95,6 +115,26 @@ export function trackPageView(path: string, title?: string): void {
   } else {
     metaTrack('PageView')
   }
+}
+
+/**
+ * A key content page was reached (currently the register page). Fires Meta's
+ * ViewContent standard event — the top of the signup funnel, so ad campaigns can
+ * optimise for people who actually land on the form, not just the site. Also
+ * pushed to the dataLayer as `view_content` for GA4 parity.
+ */
+export function trackViewContent(params: {
+  contentName: string
+  contentCategory?: string
+}): void {
+  track('view_content', {
+    content_name: params.contentName,
+    content_category: params.contentCategory ?? undefined,
+  })
+  metaTrack('ViewContent', {
+    content_name: params.contentName,
+    content_category: params.contentCategory ?? undefined,
+  })
 }
 
 /** A returning user signed in. `method` = password | google | otp. */

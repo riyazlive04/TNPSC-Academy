@@ -3,6 +3,7 @@ import { api, tokens, isApiConfigured, canTryRefresh, ApiError, type DeviceSessi
 import { useLanguageStore } from './languageStore'
 import { armMomentumPanel } from './momentumStore'
 import { trackLogin, trackSignUp, setUserId } from '../lib/tracking'
+import { nativeGoogleSignOut } from '../lib/nativeAuth'
 import type { Profile, UserRole } from '../types'
 
 /** Result of a sign-in attempt. `deviceLimit` means the account is already on
@@ -346,6 +347,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signOut: async () => {
     api.auth.logout()
+    // Native only: also clear the Google plugin's cached account, otherwise the
+    // next "Continue with Google" silently re-signs the same user in with no
+    // picker — a dead end on a device that just hit the 2-device cap.
+    await nativeGoogleSignOut()
     set({ user: null, profile: null })
   },
 }))

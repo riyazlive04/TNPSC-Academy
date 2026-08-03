@@ -17,6 +17,7 @@ import adminRoutes from './routes/admin.js'
 import superadminRoutes from './routes/superadmin.js'
 import feedbackRoutes from './routes/feedback.js'
 import paymentRoutes from './routes/payments.js'
+import iapRoutes from './routes/iap.js'
 import couponRoutes from './routes/coupons.js'
 import notificationRoutes from './routes/notifications.js'
 import alertRoutes from './routes/alerts.js'
@@ -79,6 +80,10 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/superadmin', superadminRoutes)
 app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payments', paymentRoutes)
+// Store billing (App Store / Play). Mounted separately from /api/payments so it
+// stays reachable when Razorpay is unconfigured — the native apps have no
+// Razorpay fallback to degrade to.
+app.use('/api/iap', iapRoutes)
 app.use('/api/coupons', couponRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/alerts', alertRoutes)

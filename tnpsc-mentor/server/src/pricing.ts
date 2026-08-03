@@ -72,3 +72,7 @@ export function baseAmountForPlan(plan: string | undefined, clientAmount: number
 
 /** Plan ids the order route will honour (anything else → generic contribution). */
 export const KNOWN_PLANS = new Set(['premium_annual', 'vettri_nichayam', 'vettri_month'])
+
+/** The three paid plans, as a type. Shared with the IAP catalog so a store
+ *  product can only ever map onto a plan the ledger already understands. */
+export type PlanId = 'premium_annual' | 'vettri_nichayam' | 'vettri_month'

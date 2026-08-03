@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup / device-transfer policy.
+
+  The WebView's localStorage holds the Supabase refresh token and the device id
+  used by the 2-device session cap. Letting either ride along in a cloud backup or
+  a device-to-device transfer would clone a logged-in session onto a machine that
+  never passed the device check, so both channels are emptied outright. Nothing in
+  the app is worth restoring: every byte of user state (progress, credits,
+  entitlements, bookmarks) lives server-side and returns on next sign-in.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>
