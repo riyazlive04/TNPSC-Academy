@@ -36,8 +36,13 @@ export default function PolicyPage({ slug }: { slug: string }) {
   // Dev-only. A policy that still says "to be confirmed" where a registered
   // address or Grievance Officer belongs is not publishable, and the failure
   // mode is that nobody notices — so it is made loud during development and
-  // invisible to users.
-  const outstanding = import.meta.env.DEV ? outstandingCompanyFacts() : []
+  // absent from production.
+  //
+  // `import.meta.env.DEV` is written inline in the JSX guard below, not hoisted
+  // into a variable: Vite substitutes the literal `false` there, which lets
+  // Rollup drop the whole branch. Assigning it to a const first defeats that and
+  // ships the banner's markup to every visitor.
+  const outstanding = outstandingCompanyFacts()
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -62,7 +67,7 @@ export default function PolicyPage({ slug }: { slug: string }) {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-        {outstanding.length > 0 && (
+        {import.meta.env.DEV && outstanding.length > 0 && (
           <div className="mb-8 rounded-card border border-coral/40 bg-coral/5 p-4">
             <p className="flex items-center gap-2 font-heading text-sm font-semibold text-ink">
               <AlertTriangle size={16} className="flex-shrink-0 text-coral" />
