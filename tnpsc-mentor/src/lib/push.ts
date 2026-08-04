@@ -16,6 +16,7 @@ import {
   enableNativePush,
   disableNativePush,
   nativePushGranted,
+  nativePushConfigured,
 } from './nativePush'
 
 const isNative = Capacitor.isNativePlatform()
@@ -28,7 +29,10 @@ let nativePermission: NotificationPermission = 'default'
 
 /** True when this build can deliver push at all. */
 export function isPushSupported(): boolean {
-  if (isNative) return true
+  // Native: only when FCM is actually wired up (see nativePush.ts). Reporting
+  // false hides the entire notifications section rather than showing a toggle
+  // that cannot work.
+  if (isNative) return nativePushConfigured()
   return (
     typeof window !== 'undefined' &&
     typeof navigator !== 'undefined' &&

@@ -882,11 +882,32 @@ export const api = {
       const data = await request<{ revenue: RevenueMetrics }>('/api/superadmin/revenue')
       return data.revenue
     },
-    async users(search?: string, limit = 200): Promise<AdminUserRow[]> {
-      const data = await request<{ users: AdminUserRow[] }>('/api/superadmin/users', {
-        query: { search: search || undefined, limit },
+    /** One page of accounts + the size of the whole (optionally searched) set. */
+    async users(
+      search?: string,
+      limit = 200,
+      offset = 0
+    ): Promise<{ users: AdminUserRow[]; total: number }> {
+      return request<{ users: AdminUserRow[]; total: number }>('/api/superadmin/users', {
+        query: { search: search || undefined, limit, offset },
       })
-      return data.users
+    },
+    /**
+     * EVERY account, fetched a page at a time. The console filters and sorts
+     * across the whole user base client-side, so it needs the full set in hand;
+     * asking for one fixed page was what hid every user past the first 200.
+     * The loop is bounded by the server-reported total and stops on a short page.
+     */
+    async allUsers(search?: string): Promise<AdminUserRow[]> {
+      const PAGE = 1000 // the server's per-request ceiling
+      const first = await this.users(search, PAGE, 0)
+      const out = [...first.users]
+      while (out.length < first.total && first.users.length === PAGE) {
+        const next = await this.users(search, PAGE, out.length)
+        if (!next.users.length) break // nothing more to read - don't spin
+        out.push(...next.users)
+      }
+      return out
     },
     async setRole(userId: string, role: UserRole): Promise<void> {
       await request('/api/superadmin/users/role', { method: 'POST', body: { userId, role } })

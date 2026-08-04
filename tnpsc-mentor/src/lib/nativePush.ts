@@ -13,6 +13,28 @@ import { api } from './api'
 
 const isNative = Capacitor.isNativePlatform()
 
+/**
+ * Native push is OFF unless explicitly switched on at build time.
+ *
+ * Both platforms deliver through Firebase Cloud Messaging, which needs
+ * android/app/google-services.json (and, for iOS, the APNs key uploaded to the
+ * same Firebase project). Without those, register() cannot obtain a token — so
+ * with the flag off we never call it, and isPushSupported() reports false so the
+ * whole notifications UI hides rather than offering a switch that fails.
+ *
+ * A missing feature is fine. A visibly broken one is what gets a one-star review
+ * and a reviewer's attention.
+ *
+ * To enable: drop in google-services.json, set VITE_NATIVE_PUSH=true, rebuild.
+ */
+export const NATIVE_PUSH_ENABLED =
+  (import.meta.env.VITE_NATIVE_PUSH as string | undefined) === 'true'
+
+/** True only when this build can actually obtain a push token. */
+export function nativePushConfigured(): boolean {
+  return isNative && NATIVE_PUSH_ENABLED
+}
+
 /** 'ios' | 'android' — only meaningful when isNative. */
 function platform(): 'ios' | 'android' {
   return Capacitor.getPlatform() === 'ios' ? 'ios' : 'android'
@@ -31,7 +53,7 @@ let listenersBound = false
  * nudge) once the user knows what they're agreeing to.
  */
 export async function enableNativePush(): Promise<NativePushResult> {
-  if (!isNative) return 'unsupported'
+  if (!nativePushConfigured()) return 'unsupported'
   try {
     const { PushNotifications } = await import('@capacitor/push-notifications')
 
@@ -54,7 +76,7 @@ export async function enableNativePush(): Promise<NativePushResult> {
 
 /** Whether the OS currently allows this app to post notifications. */
 export async function nativePushGranted(): Promise<boolean> {
-  if (!isNative) return false
+  if (!nativePushConfigured()) return false
   try {
     const { PushNotifications } = await import('@capacitor/push-notifications')
     const { receive } = await PushNotifications.checkPermissions()
@@ -67,7 +89,7 @@ export async function nativePushGranted(): Promise<boolean> {
 /** Forget this device server-side. The OS-level permission is the user's to
  *  revoke in Settings; we simply stop sending. */
 export async function disableNativePush(): Promise<void> {
-  if (!isNative) return
+  if (!nativePushConfigured()) return
   try {
     const { PushNotifications } = await import('@capacitor/push-notifications')
     await PushNotifications.unregister().catch(() => {})
@@ -115,7 +137,7 @@ function bindListeners(): void {
  * because it returns early unless permission is already granted.
  */
 export async function refreshNativePushToken(): Promise<void> {
-  if (!isNative) return
+  if (!nativePushConfigured()) return
   if (!(await nativePushGranted())) return
   try {
     const { PushNotifications } = await import('@capacitor/push-notifications')

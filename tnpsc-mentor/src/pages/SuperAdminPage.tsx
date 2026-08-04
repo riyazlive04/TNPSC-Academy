@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Users as UsersIcon,
   Activity,
@@ -609,6 +609,9 @@ function parseDayLocal(s: string): number | null {
   return new Date(y, m - 1, d).getTime()
 }
 
+/** Rows per page in the Users tab - filters still span every account. */
+const USERS_PER_PAGE = 50
+
 function UsersTab() {
   const { t } = useT()
   const [users, setUsers] = useState<AdminUserRow[]>([])
@@ -633,8 +636,10 @@ function UsersTab() {
   const load = () => {
     setLoading(true)
     setError(false)
+    // EVERY account, not the newest page: the filters below run client-side over
+    // the whole set, so a server-side page would silently narrow what they see.
     api.superadmin
-      .users()
+      .allUsers()
       .then(setUsers)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -685,6 +690,19 @@ function UsersTab() {
     setJoinedFrom('')
     setJoinedTo('')
   }
+
+  // ── Paging over the filtered set ───────────────────────────────────────────
+  // The rows are rendered a page at a time so the tab stays fast with thousands
+  // of accounts, while search and the filters still consider every one of them.
+  const [page, setPage] = useState(1)
+  const pageCount = Math.max(1, Math.ceil(filtered.length / USERS_PER_PAGE))
+  // Any change to what is being filtered can shrink the list under the current
+  // page - snap back rather than showing an empty one.
+  useEffect(() => {
+    setPage(1)
+  }, [search, roleFilter, planFilter, activityFilter, joinedFrom, joinedTo])
+  const pageStart = (Math.min(page, pageCount) - 1) * USERS_PER_PAGE
+  const visible = filtered.slice(pageStart, pageStart + USERS_PER_PAGE)
 
   const confirmRoleChange = async () => {
     if (!pending) return
@@ -818,7 +836,10 @@ function UsersTab() {
         </div>
         <div className="flex items-center justify-between">
           <p className="font-body text-xs text-ink2">
-            Showing {filtered.length} of {users.length} users
+            {filtered.length === 0
+              ? `0 of ${users.length} users`
+              : `Showing ${pageStart + 1}-${pageStart + visible.length} of ${filtered.length}` +
+                (filtered.length === users.length ? ' users' : ` matching (${users.length} total)`)}
           </p>
           {filtersActive && (
             <button
@@ -836,7 +857,7 @@ function UsersTab() {
         <p className="py-12 text-center font-body text-ink2">{t('noUsers')}</p>
       ) : (
         <div className="space-y-2">
-          {filtered.map((u, i) => (
+          {visible.map((u, i) => (
             <div
               key={u.id}
               style={{ '--i': i } as React.CSSProperties}
@@ -927,6 +948,10 @@ function UsersTab() {
             </div>
           ))}
         </div>
+      )}
+
+      {pageCount > 1 && (
+        <Pager page={Math.min(page, pageCount)} pageCount={pageCount} onChange={setPage} />
       )}
 
       <ConfirmDialog
@@ -2371,6 +2396,72 @@ const EMPTY_COUPON_FORM = {
   maxDiscount: '',
   maxRedemptions: '',
   expiresAt: '',
+}
+
+/**
+ * Pager for a long client-side list. Shows first/last and a window around the
+ * current page, so 60 pages don't produce 60 buttons. Rendered only when there
+ * is more than one page.
+ */
+function Pager({
+  page,
+  pageCount,
+  onChange,
+}: {
+  page: number
+  pageCount: number
+  onChange: (p: number) => void
+}) {
+  // First, last, and up to two either side of the current page - gaps become "…".
+  const window = new Set<number>([1, pageCount])
+  for (let p = page - 2; p <= page + 2; p++) if (p >= 1 && p <= pageCount) window.add(p)
+  const pages = [...window].sort((a, b) => a - b)
+
+  const step = (delta: number) => onChange(Math.min(Math.max(page + delta, 1), pageCount))
+  const btn =
+    'focus-ring press grid h-9 min-w-9 place-items-center rounded-lg px-2.5 font-heading text-sm font-semibold transition disabled:opacity-40'
+
+  return (
+    <nav className="mt-5 flex items-center justify-center gap-1.5" aria-label="Pagination">
+      <button
+        type="button"
+        onClick={() => step(-1)}
+        disabled={page === 1}
+        aria-label="Previous page"
+        className={`${btn} border border-line bg-card text-ink2 hover:text-ink`}
+      >
+        ‹
+      </button>
+      {pages.map((p, i) => (
+        <Fragment key={p}>
+          {i > 0 && p - pages[i - 1] > 1 && (
+            <span className="px-1 font-body text-xs text-ink2">…</span>
+          )}
+          <button
+            type="button"
+            onClick={() => onChange(p)}
+            aria-current={p === page ? 'page' : undefined}
+            className={`${btn} ${
+              p === page
+                ? 'bg-brand text-white'
+                : 'border border-line bg-card text-ink2 hover:text-ink'
+            }`}
+          >
+            {p}
+          </button>
+        </Fragment>
+      ))}
+      <button
+        type="button"
+        onClick={() => step(1)}
+        disabled={page === pageCount}
+        aria-label="Next page"
+        className={`${btn} border border-line bg-card text-ink2 hover:text-ink`}
+      >
+        ›
+      </button>
+    </nav>
+  )
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {

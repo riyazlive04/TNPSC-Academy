@@ -32,18 +32,31 @@ router.get(
   })
 )
 
-// ─── GET /api/superadmin/users?search=&limit= ────────────────────────────────
+// ─── GET /api/superadmin/users?search=&limit=&offset= ────────────────────────
+// One page of accounts plus `total`, the size of the whole filtered set. The
+// console pages until it holds every account — before this it asked for 200 and
+// had no way to learn that there were more, so the tail of the user table was
+// invisible.
 router.get(
   '/users',
   asyncH(async (req: AuthedRequest, res) => {
     const limit = Math.min(Math.max(Math.trunc(Number(req.query.limit)) || 200, 1), 1000)
+    const offset = Math.max(Math.trunc(Number(req.query.offset)) || 0, 0)
     const search = req.query.search ? String(req.query.search) : null
     const { data, error } = await req.db!.rpc('superadmin_list_users', {
       p_limit: limit,
       p_search: search,
+      p_offset: offset,
     })
     if (error) return sendDbError(res, error)
-    res.json({ users: data ?? [] })
+    // `total` rides on every row (a window function); lift it out rather than
+    // repeating it down the wire to the client.
+    const rows = (data ?? []) as ({ total?: number | string } & Record<string, unknown>)[]
+    const total = rows.length ? Number(rows[0].total ?? rows.length) : 0
+    res.json({
+      users: rows.map(({ total: _total, ...u }) => u),
+      total,
+    })
   })
 )
 
