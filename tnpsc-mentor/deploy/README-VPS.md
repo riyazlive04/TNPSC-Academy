@@ -85,6 +85,44 @@ git clone YOUR_REPO_URL .
 > The paths in `deploy/ecosystem.config.cjs` and `deploy/deploy.sh` assume the
 > app at `/var/www/tnpsc-app/tnpsc-mentor`. Adjust if you put it elsewhere.
 
+### 2a. Exclude the mobile projects (do this once, right after cloning)
+
+The repo carries the `android/` and `ios/` Capacitor projects because they hold
+hand-written store-compliance config that `cap sync` cannot regenerate. The VPS
+serves the web app only and never builds either of them, so it has no reason to
+check them out — about 4.6 MB of source that would just sit there.
+
+Sparse checkout keeps them out of this working tree without changing the repo,
+so a Mac clone still gets the full iOS project:
+
+```bash
+cd /var/www/tnpsc-app          # the GIT ROOT, one level above tnpsc-mentor
+
+git config core.sparseCheckout true
+cat > .git/info/sparse-checkout <<'EOF'
+/*
+!/tnpsc-mentor/android/
+!/tnpsc-mentor/ios/
+EOF
+
+git read-tree -mu HEAD
+
+# Verify — neither directory should be listed:
+ls tnpsc-mentor/
+```
+
+This is persistent local config: every later `git pull` keeps excluding them,
+and `deploy/deploy.sh` never touches those paths.
+
+> **Note on `node_modules`.** The Capacitor plugin packages (~23 MB, mostly Swift
+> and Java source inside the npm tarballs) DO still install here, and cannot be
+> dropped. Vite has to *resolve* the dynamic `import('@capgo/native-purchases')`
+> at build time to emit its chunk; without the package the web build fails. They
+> are install-time only — nothing native is ever served to a browser beyond a
+> ~10 KB lazy chunk that is never fetched. Removing them would mean maintaining
+> a separate stubbed web build, and the risk of shipping that stub to a store is
+> worse than the disk.
+
 ---
 
 ## 3. Environment files
