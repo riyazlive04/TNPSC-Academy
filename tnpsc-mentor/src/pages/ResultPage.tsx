@@ -597,8 +597,13 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                     index={index}
                     answer={answers[q.id]}
                     showExplanation={pdfUnlocked}
-                    bookmarked={bookmarkIds.has(q.id)}
-                    onToggleBookmark={user ? () => toggleBookmark(q.id) : undefined}
+                    // Daily CA questions aren't rows of the main bank, so the
+                    // bookmarks table can't reference them — hide the control
+                    // (an undefined `bookmarked` drops the button entirely).
+                    bookmarked={config.caDailyId ? undefined : bookmarkIds.has(q.id)}
+                    onToggleBookmark={
+                      user && !config.caDailyId ? () => toggleBookmark(q.id) : undefined
+                    }
                   />
                 ))
               )}

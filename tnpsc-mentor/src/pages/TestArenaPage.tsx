@@ -29,6 +29,7 @@ import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
 import CaMagazineCarousel from '../components/Home/CaMagazineCarousel'
+import DailyCaSheet from '../components/Home/DailyCaSheet'
 import { List, ListRow } from '../components/UI/ListRow'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
@@ -142,6 +143,8 @@ export default function TestArenaPage() {
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
   const [thirukuralOpen, setThirukuralOpen] = useState(false)
   const [dailyKural, setDailyKural] = useState<Kural | null>(null)
+  // The Daily CA card opens its day picker as a popup rather than a screen.
+  const [dailyCaOpen, setDailyCaOpen] = useState(false)
 
   // First-run sequence - shown ONLY to a freshly created account (signup arms
   // both flags; existing users never had them, admins skip the aspirant layer).
@@ -347,6 +350,13 @@ export default function TestArenaPage() {
           )}
         </header>
 
+        {/* Daily Current-Affairs magazines - the last 7 published issues, swiped
+            horizontally. Sits directly under the kural: the day's reading is the
+            reason most aspirants open the app, so it never waits below a fold.
+            Publication-driven (superadmin-approved); renders nothing until at
+            least one daily issue is live. */}
+        <CaMagazineCarousel />
+
         {/* First-test funnel - shown only while the account has ZERO completed
             tests, then gone forever. Leads the page so a brand-new aspirant has
             exactly one obvious next action: the Starter Challenge. */}
@@ -386,15 +396,25 @@ export default function TestArenaPage() {
           />
         </div>
 
-        {/* Daily Current-Affairs magazines - the last 7 published issues, swiped
-            horizontally. Publication-driven (superadmin-approved); renders
-            nothing until at least one daily issue is live. */}
-        <CaMagazineCarousel />
-
         {/* Practice - a two-column grid of tactile category cards. */}
         <section className="space-y-3" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
           <div className="grid grid-cols-2 gap-3">
+            {/* Daily CA test - leads the grid: it's the one card that changes
+                every morning, and it pairs with the magazine strip above. Opens
+                its day picker as a popup instead of routing away. */}
+            {/* Deliberately a glyph chip, not a PNG: the CA hub and CA Questions
+                cards both carry the newspaper artwork, and a third would be
+                indistinguishable at a glance. */}
+            <CategoryCard
+              onClick={() => setDailyCaOpen(true)}
+              icon={<ListChecks />}
+              tint="green"
+              gradient={GRADIENTS.green}
+              title={t('caDailyTitle')}
+              subtitle={t('caDailyCardSub')}
+              index={0}
+            />
             {/* Vettri Nichayam bundle - gold to signal the flagship paid product. */}
             {vettriOn && (
               <CategoryCard
@@ -405,7 +425,7 @@ export default function TestArenaPage() {
                 gradient="from-gold to-accentwarm"
                 title={t('vettriTitle')}
                 subtitle={t('vettriArenaSub')}
-                index={0}
+                index={1}
               />
             )}
             {/* Test Marathon - only once the superadmin has enabled it. */}
@@ -416,7 +436,7 @@ export default function TestArenaPage() {
                 gradient={GRADIENTS.coral}
                 title={t('testSeriesTitle')}
                 subtitle={t('testSeriesArenaSub')}
-                index={1}
+                index={2}
               />
             )}
             {restCards.map((card, i) => (
@@ -429,7 +449,7 @@ export default function TestArenaPage() {
                 gradient={GRADIENTS[card.tint]}
                 title={t(card.titleKey)}
                 subtitle={card.subtitle}
-                index={i + 2}
+                index={i + 3}
               />
             ))}
             {/* CA Questions - superadmin-published daily/monthly sets, each a
@@ -442,7 +462,7 @@ export default function TestArenaPage() {
               gradient={GRADIENTS.blue}
               title={t('caQuestionsTitle')}
               subtitle={t('caQuestionsArenaSub')}
-              index={restCards.length + 2}
+              index={restCards.length + 3}
             />
             {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
             <CategoryCard
@@ -453,7 +473,7 @@ export default function TestArenaPage() {
               gradient={GRADIENTS.green}
               title={t('tkQuizTitle')}
               subtitle={t('tkQuizSub')}
-              index={restCards.length + 3}
+              index={restCards.length + 4}
             />
           </div>
         </section>
@@ -488,6 +508,9 @@ export default function TestArenaPage() {
           </div>
         </section>
       </div>
+
+      {/* The Daily CA day picker - today's paper + every earlier published day. */}
+      <DailyCaSheet open={dailyCaOpen} onClose={() => setDailyCaOpen(false)} />
 
       <ThirukuralModal
         open={thirukuralOpen}

@@ -626,8 +626,11 @@ export default function QuizPage() {
           </div>
         )}
 
-        {/* Report this question for correction (does not affect the score) */}
-        <div className="mt-5 flex justify-center">
+        {/* Report this question for correction (does not affect the score).
+            Hidden for a daily CA set: those rows live in ca_daily_questions, so
+            question_reports (keyed on public.questions) can't hold a report for
+            them - the superadmin curates that bank in the CA Questions console. */}
+        <div className={['mt-5 flex justify-center', config?.caDailyId ? 'hidden' : ''].join(' ')}>
           <button
             onClick={onReportClick}
             aria-pressed={Boolean(reported[currentQuestion.id])}

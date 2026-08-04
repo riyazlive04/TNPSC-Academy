@@ -35,17 +35,26 @@ export default function QuestionStem({ question, lang, textClassName, prefix }: 
     const texts =
       lang === 'ta' ? [ta ?? en] : lang === 'both' ? [en, ...(ta ? [ta] : [])] : [en]
     const parsed = texts.map(parseMatchQuestion)
-    if (parsed.every(Boolean)) {
+    // Each language stands on its own: in bilingual mode a malformed Tamil twin
+    // used to drag the (perfectly parseable) English back to a flat paragraph.
+    if (parsed.some(Boolean)) {
       return (
         <div className="mb-5 space-y-4 sm:mb-6">
-          {(parsed as ParsedMatch[]).map((p, i) => (
-            <MatchBlock
-              key={i}
-              parsed={p}
-              textClassName={textClassName}
-              prefix={i === 0 ? prefix : undefined}
-            />
-          ))}
+          {texts.map((text, i) =>
+            parsed[i] ? (
+              <MatchBlock
+                key={i}
+                parsed={parsed[i] as ParsedMatch}
+                textClassName={textClassName}
+                prefix={i === 0 ? prefix : undefined}
+              />
+            ) : (
+              <p key={i} className={`tamil whitespace-pre-line ${textClassName}`}>
+                {i === 0 ? prefix : null}
+                <MathText text={text} />
+              </p>
+            )
+          )}
         </div>
       )
     }
@@ -138,9 +147,13 @@ function ItemCell({
     >
       {item && (
         <>
-          <span className="font-heading font-bold text-navytext/70">
-            {formatMatchLabel(item.label)}
-          </span>
+          {/* Already-paired rows ("(1) NHRC – 1993") number the row once, on the
+              left; the right-hand cell carries no label of its own. */}
+          {item.label && (
+            <span className="font-heading font-bold text-navytext/70">
+              {formatMatchLabel(item.label)}
+            </span>
+          )}
           <span className="min-w-0 flex-1 [overflow-wrap:anywhere]">
             <MathText text={item.text} />
           </span>

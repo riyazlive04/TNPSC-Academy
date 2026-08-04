@@ -91,7 +91,19 @@ export async function submitTest(input: SubmitTestInput): Promise<ResultPayload>
     time_taken_seconds: timeTaken,
   }
 
-  const result = (await api.submitTest(pSession, pAnswers)) as SubmitResult
+  // A daily Current-Affairs set is graded by its own endpoint - its questions
+  // are not rows of `questions`, so submit_test (which joins that table) would
+  // score every answer as unknown. Same response shape, same merge below.
+  const result = config.caDailyId
+    ? await api.caQuestions.dailySubmit(config.caDailyId, {
+        answers: pAnswers.map((a) => ({
+          question_id: a.question_id,
+          selected_answer: a.selected_answer,
+        })),
+        time_limit_seconds: timeLimitSeconds,
+        time_taken_seconds: timeTaken,
+      })
+    : ((await api.submitTest(pSession, pAnswers)) as SubmitResult)
   if (!result) throw new Error('No response from grader')
 
   // The server may have just spent a test credit — refresh the header meter.

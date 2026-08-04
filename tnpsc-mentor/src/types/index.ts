@@ -74,7 +74,9 @@ export interface Question {
   standard?: number
   ca_month?: string
   ca_year?: number
-  ca_type?: 'topic_wise' | 'month_wise'
+  // 'day_wise' rows come from the daily CA drop (ca_daily_questions), served
+  // only by the daily-test endpoints — never by the main bank sampler.
+  ca_type?: 'topic_wise' | 'month_wise' | 'day_wise'
   ca_topic?: string
   // numerics/reasoning are the practice-bank types; data_interpretation +
   // general_studies come from the GOV (TNPSC Group I Mains) bank.
@@ -346,6 +348,15 @@ export interface QuizConfig {
   revision?: boolean
   /** The revision_topics row id, threaded back through submit so a pass clears it. */
   revisionId?: string
+  /**
+   * Daily Current-Affairs test: the publishing materials row id of a superadmin-
+   * approved daily set. Its questions live in `ca_daily_questions` (outside the
+   * main bank), so this routes the draw AND the grading through
+   * /api/ca-questions/daily/* instead of the generic quiz pipeline.
+   */
+  caDailyId?: string
+  /** The daily set's day (YYYY-MM-DD) — heading + result copy only. */
+  caDailyDate?: string
   /** Thirukkural quiz: the chosen adhigaram number (omitted = all chapters). */
   tkAdhigaram?: number
   /** Thirukkural quiz: the chosen question format (omitted = mixed). */
@@ -828,57 +839,222 @@ function parseSideBySideMatch(lines: string[], reversed: boolean): ParsedMatch |
 interface ClassifiedLine {
   label: string
   text: string
-  kind: 'alpha' | 'num'
 }
 function classifyMatchLine(line: string): ClassifiedLine | null {
   const m = line.match(MATCH_ITEM)
   if (!m) return null
-  const label = m[1]
-  return { label, text: m[2].trim(), kind: /^\d+$/.test(label) ? 'num' : 'alpha' }
+  return { label: m[1], text: m[2].trim() }
+}
+
+// ─── Label families ─────────────────────────────────────────────────────────
+// A list is labelled from ONE family, and the paper picks the family freely:
+// (a)-(d), 1-4, (i)-(iv), (p)-(s), Tamil vowels. Either list can use any of
+// them, in either order — an earlier version assumed "letters first, then
+// numbers" and silently fell back to plain text on everything else (numbers
+// first, or a roman-numeral second list, both common in the PYQ banks).
+
+type MatchFamily = 'num' | 'roman' | 'alpha' | 'tamil'
+const MATCH_FAMILIES: MatchFamily[] = ['num', 'roman', 'alpha', 'tamil']
+const TAMIL_VOWELS = 'அஆஇஈஉஊஎஏஐஒஓஔ'
+const ROMAN_DIGITS: Record<string, number> = { i: 1, v: 5, x: 10, l: 50, c: 100, d: 500, m: 1000 }
+
+/** Value of a roman numeral ('iv' → 4), or null if it isn't one. */
+function romanValue(s: string): number | null {
+  if (!/^[ivxlcdm]{1,4}$/i.test(s)) return null
+  const d = s.toLowerCase().split('').map((ch) => ROMAN_DIGITS[ch])
+  let total = 0
+  for (let i = 0; i < d.length; i++) total += d[i] < d[i + 1] ? -d[i] : d[i]
+  return total > 0 ? total : null
+}
+
+/** The label's position within a family, or null when it doesn't belong to it. */
+function ordinalIn(family: MatchFamily, label: string): number | null {
+  switch (family) {
+    case 'num':
+      return /^\d{1,2}$/.test(label) ? Number(label) : null
+    case 'roman':
+      return romanValue(label)
+    case 'alpha': {
+      if (!/^[A-Za-z]$/.test(label)) return null
+      return label.toLowerCase().charCodeAt(0) - 96
+    }
+    case 'tamil': {
+      const i = TAMIL_VOWELS.indexOf(label)
+      return i < 0 ? null : i + 1
+    }
+  }
 }
 
 /**
- * Fallback pass for header-less bodies: List I is the first contiguous run of
- * letter-labelled items ((a)-(d)/A-D), List II the following run of
- * number-labelled items (1-4). Each list's header is the plain line just above
- * it ("Schedule"/"Subject"); a full prompt sentence is the preamble, not a header.
+ * Every family in which these labels form a consecutive run ((a)(b)(c),
+ * (ii)(iii)(iv), 3-4-5…), paired with the run's starting ordinal. A label can
+ * belong to several families at once — 'i' is both roman 1 and the 9th letter,
+ * 'c' both roman 100 and the 3rd — so the caller picks between the candidates
+ * rather than committing per label.
+ */
+function familiesOf(labels: string[]): { family: MatchFamily; start: number }[] {
+  const out: { family: MatchFamily; start: number }[] = []
+  for (const family of MATCH_FAMILIES) {
+    const ords = labels.map((l) => ordinalIn(family, l))
+    if (ords.some((o) => o === null)) continue
+    const nums = ords as number[]
+    if (nums.every((n, i) => i === 0 || n === nums[i - 1] + 1)) out.push({ family, start: nums[0] })
+  }
+  return out
+}
+
+/** Do these labels read as ONE list (a single consecutive run in some family)? */
+function isSingleList(labels: string[]): boolean {
+  return familiesOf(labels).length > 0
+}
+
+/**
+ * Where a single block of labels breaks into two lists, or -1. The two halves
+ * must each be a consecutive run, and must either use different families
+ * ((a)-(d) then (i)-(iv)) or restart the numbering (1-4 then 1-4). Splits are
+ * tried from the balanced midpoint outwards, so an ambiguous block splits the
+ * way the paper prints it — evenly.
+ */
+function findListSplit(labels: string[]): number {
+  const n = labels.length
+  if (n < 4) return -1
+  const order = Array.from({ length: n - 3 }, (_, i) => i + 2).sort(
+    (a, b) => Math.abs(a - n / 2) - Math.abs(b - n / 2)
+  )
+  for (const k of order) {
+    for (const a of familiesOf(labels.slice(0, k))) {
+      for (const b of familiesOf(labels.slice(k))) {
+        if (a.family !== b.family || b.start <= a.start) return k
+      }
+    }
+  }
+  return -1
+}
+
+// A fill-in-the-blank stem ("1. Ring her ____ and tell her") followed by the
+// word bank ((a) out (b) in …) has the shape of a two-list match but is not one.
+// The blank itself is the tell, and it is one no real match item carries.
+const FILL_IN_BLANK = /_{3,}/
+
+/**
+ * Fallback pass for header-less bodies. The two lists are contiguous runs of
+ * labelled items in ANY two label families, in either order — (a)-(d) then
+ * (1)-(4), 1-4 then a-d, (a)-(d) then (i)-(iv). They may be separated by a
+ * plain line, which becomes that list's header ("Schedule"/"Awarder"), or run
+ * straight on from each other, in which case the block is split where the
+ * family or the numbering restarts. A full prompt sentence is the preamble,
+ * not a header.
  */
 function parseRunBasedMatch(lines: string[]): ParsedMatch | null {
   if (lines.length < 5) return null
   const cls = lines.map(classifyMatchLine)
 
-  const i1 = cls.findIndex((c) => c?.kind === 'alpha')
-  if (i1 < 0) return null
-  let i1end = i1
-  while (i1end + 1 < cls.length && cls[i1end + 1]?.kind === 'alpha') i1end++
-
-  let i2 = -1
-  for (let k = i1end + 1; k < cls.length; k++) {
-    if (cls[k]?.kind === 'num') {
-      i2 = k
-      break
-    }
+  // Maximal contiguous runs of labelled item lines.
+  const runs: { start: number; end: number }[] = []
+  for (let i = 0; i < cls.length; i++) {
+    if (!cls[i]) continue
+    const start = i
+    while (i + 1 < cls.length && cls[i + 1]) i++
+    runs.push({ start, end: i })
   }
-  if (i2 < 0) return null
-  let i2end = i2
-  while (i2end + 1 < cls.length && cls[i2end + 1]?.kind === 'num') i2end++
+  const usable = runs.filter((r) => r.end - r.start + 1 >= 2)
+  if (!usable.length) return null
 
-  const toItems = (start: number, end: number): MatchItem[] =>
-    cls.slice(start, end + 1).map((c) => ({ label: c!.label, text: c!.text }))
-  const listIItems = toItems(i1, i1end)
-  const listIIItems = toItems(i2, i2end)
+  const labelsOf = (r: { start: number; end: number }) =>
+    cls.slice(r.start, r.end + 1).map((c) => c!.label)
+  const itemsOf = (from: number, to: number): MatchItem[] =>
+    cls.slice(from, to + 1).map((c) => ({ label: c!.label, text: c!.text }))
+
+  let a: { from: number; to: number }
+  let b: { from: number; to: number }
+
+  if (usable.length >= 2) {
+    // Two runs with something between them (a header line, or a prompt).
+    const [r1, r2] = usable
+    if (!isSingleList(labelsOf(r1)) || !isSingleList(labelsOf(r2))) return null
+    a = { from: r1.start, to: r1.end }
+    b = { from: r2.start, to: r2.end }
+  } else {
+    // One unbroken block holding both lists back-to-back.
+    const r = usable[0]
+    const k = findListSplit(labelsOf(r))
+    if (k < 0) return null
+    a = { from: r.start, to: r.start + k - 1 }
+    b = { from: r.start + k, to: r.end }
+  }
+
+  const listIItems = itemsOf(a.from, a.to)
+  const listIIItems = itemsOf(b.from, b.to)
   if (listIItems.length < 2 || listIIItems.length < 2) return null
+  if (listIItems.some((i) => FILL_IN_BLANK.test(i.text))) return null
 
   const headerAbove = (start: number): number =>
     start > 0 && !cls[start - 1] && !isMatchPrompt(lines[start - 1]) ? start - 1 : -1
-  const hI = headerAbove(i1)
-  const hII = headerAbove(i2)
+  const hI = headerAbove(a.from)
+  const hII = headerAbove(b.from)
 
   return {
-    preamble: lines.slice(0, hI >= 0 ? hI : i1).join(' ').trim(),
+    preamble: lines.slice(0, hI >= 0 ? hI : a.from).join(' ').trim(),
     listI: { header: hI >= 0 ? lines[hI] : '', items: listIItems },
     listII: { header: hII >= 0 ? lines[hII] : '', items: listIIItems },
-    trailing: lines.slice(i2end + 1).join(' ').trim(),
+    trailing: lines.slice(b.to + 1).join(' ').trim(),
+  }
+}
+
+// The separator in an already-paired line: a spaced dash or a pipe. Spacing is
+// required so a hyphenated term ("Heart-lung machine") is never a split point.
+const PAIR_SEP = /\s+[-–—]\s+|\s*\|\s*/
+
+/**
+ * Last pass: the pairs are already made, one per line — "(1) NHRC – 1993",
+ * "(i) Hematite Ore - Oxide of iron". These are the "which pair is wrongly
+ * matched?" items, and the paper prints them as two columns like any other
+ * match, so we lay them out that way instead of dropping to a flat paragraph.
+ * The right-hand column carries no label of its own (the left one numbers the
+ * row), and a header line above splits on the same separator.
+ */
+function parsePairedMatch(lines: string[]): ParsedMatch | null {
+  const listI: MatchItem[] = []
+  const listII: MatchItem[] = []
+  const rowIdx: number[] = []
+  for (let i = 0; i < lines.length; i++) {
+    const m = classifyMatchLine(lines[i])
+    if (!m) {
+      if (rowIdx.length) break // the run of pairs has ended
+      continue
+    }
+    const at = m.text.search(PAIR_SEP)
+    const sep = m.text.match(PAIR_SEP)
+    if (at <= 0 || !sep) return null // an item line that isn't a pair → not this shape
+    const left = m.text.slice(0, at).trim()
+    const right = m.text.slice(at + sep[0].length).trim()
+    if (!left || !right) return null
+    rowIdx.push(i)
+    listI.push({ label: m.label, text: left })
+    listII.push({ label: '', text: right })
+  }
+  if (listI.length < 3) return null // 2 rows is too thin to be sure of the shape
+  if (!isSingleList(listI.map((i) => i.label))) return null
+  if (listI.some((i) => FILL_IN_BLANK.test(i.text))) return null
+
+  // A header directly above the first pair, itself split by the separator
+  // ("Commission – Year of Establishment"). A prompt sentence is the preamble.
+  const first = rowIdx[0]
+  let hI = ''
+  let hII = ''
+  let headerLine = -1
+  if (first > 0 && !isMatchPrompt(lines[first - 1])) {
+    const parts = lines[first - 1].split(PAIR_SEP).map((s) => s.trim()).filter(Boolean)
+    if (parts.length === 2) {
+      headerLine = first - 1
+      ;[hI, hII] = parts
+    }
+  }
+  return {
+    preamble: lines.slice(0, headerLine >= 0 ? headerLine : first).join(' ').trim(),
+    listI: { header: hI, items: listI },
+    listII: { header: hII, items: listII },
+    trailing: lines.slice(rowIdx[rowIdx.length - 1] + 1).join(' ').trim(),
   }
 }
 
@@ -896,7 +1072,8 @@ export function parseMatchQuestion(text: string | null | undefined): ParsedMatch
     parseHeaderAnchoredMatch(lines) ||
     parseSideBySideMatch(lines, false) ||
     parseSideBySideMatch(lines, true) ||
-    parseRunBasedMatch(lines)
+    parseRunBasedMatch(lines) ||
+    parsePairedMatch(lines)
   )
 }
 

@@ -1382,6 +1382,36 @@ export const api = {
       const data = await request<{ items: CaQuestionItem[] }>(`/api/ca-questions/${materialId}/items`)
       return data.items
     },
+    // ─ Daily CA test (the published daily sets, playable) ────────────────────
+    /** Student: recent published daily sets, newest first (dashboard strip). */
+    async dailyPublished(limit = 7): Promise<CaDailySet[]> {
+      const data = await request<{ sets: CaDailySet[] }>('/api/ca-questions/daily/published', {
+        query: { limit },
+      })
+      return data.sets
+    },
+    /** Start a daily test: that day's questions with the answers stripped. */
+    async dailyQuiz(materialId: string, count?: number): Promise<Question[]> {
+      const data = await request<{ questions: Question[] }>(
+        `/api/ca-questions/daily/${materialId}/quiz`,
+        { method: 'POST', body: count ? { count } : {} }
+      )
+      return data.questions
+    },
+    /** Grade a finished daily test (the server is the only holder of the keys). */
+    async dailySubmit(
+      materialId: string,
+      payload: {
+        answers: { question_id: string; selected_answer: string | null }[]
+        time_limit_seconds: number
+        time_taken_seconds: number
+      }
+    ): Promise<SubmitResult> {
+      return request<SubmitResult>(`/api/ca-questions/daily/${materialId}/submit`, {
+        method: 'POST',
+        body: payload,
+      })
+    },
   },
 
   // ─── Feedback (student-submitted) ────────────────────────────────────────
@@ -1720,6 +1750,17 @@ export interface CaQuestionSet {
 export interface CaQuestionSets {
   daily: CaQuestionSet[]
   monthly: CaQuestionSet[]
+}
+
+/** One PUBLISHED daily set as a student sees it — a day's playable test. */
+export interface CaDailySet {
+  /** The publishing materials row id — addresses the quiz/submit endpoints. */
+  id: string
+  /** The paper's day, YYYY-MM-DD. */
+  date: string
+  /** Whether that day's answer PDF is also offered. */
+  downloadable: boolean
+  total: number
 }
 
 /** One bilingual MCQ as stored (EN fields + *_ta twins in one row). */

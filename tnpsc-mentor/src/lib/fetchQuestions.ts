@@ -43,6 +43,12 @@ export async function fetchQuestionsForConfig(
   if (config.starter) {
     return api.starterQuestions(limit)
   }
+  // A daily Current-Affairs set lives in its own table (ca_daily_questions), so
+  // it is drawn - and later graded - through the daily endpoints. Answers are
+  // stripped server-side there exactly as get_quiz_questions does.
+  if (config.caDailyId) {
+    return api.caQuestions.dailyQuiz(config.caDailyId, limit)
+  }
   return api.quizQuestions({ ...config, limit } as QuizConfig)
 }
 

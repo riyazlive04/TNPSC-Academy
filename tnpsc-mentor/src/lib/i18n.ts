@@ -1674,13 +1674,28 @@ const STRINGS = {
   },
   // ─── Dashboard CA-magazine carousel ─────────────────────────────────────
   caCarouselTitle: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
+  // ─── Daily CA test (dashboard card + its day-picker popup) ──────────────
+  caDailyTitle: { en: 'Daily CA Test', ta: 'தினசரி நடப்பு தேர்வு' },
+  caDailyCardSub: { en: "Today's news · new every day", ta: 'இன்றைய செய்திகள் · தினமும் புதியது' },
+  caDailyToday: { en: 'Today', ta: 'இன்று' },
+  caDailySub: { en: "from today's paper", ta: 'இன்றைய செய்தித்தாளிலிருந்து' },
+  caDailyEmpty: {
+    en: "Today's test isn't out yet. It arrives each morning with the magazine.",
+    ta: 'இன்றைய தேர்வு இன்னும் வெளியாகவில்லை. ஒவ்வொரு காலையிலும் இதழுடன் வரும்.',
+  },
   // ─── Student CA-Questions section (own dashboard row + page) ─────────────
   caQuestionsTitle: { en: 'CA Questions', ta: 'நடப்பு நிகழ்வு வினாக்கள்' },
-  caQuestionsArenaSub: { en: 'Daily & monthly · with answers', ta: 'தினசரி & மாதாந்திரம் · விடைகளுடன்' },
+  caQuestionsArenaSub: { en: 'Take as a test · or get the PDF', ta: 'தேர்வாக எழுது · அல்லது PDF பெறு' },
   caQuestionsPageSub: {
     en: 'Practice sets with answers and explanations — download as PDF',
     ta: 'விடைகள் மற்றும் விளக்கங்களுடன் கூடிய தொகுப்புகள் — PDF ஆகப் பதிவிறக்கவும்',
   },
+  caQuestionsQuizSub: {
+    en: 'Take a set as a timed test — scored, with explanations after',
+    ta: 'ஒரு தொகுப்பை நேரத் தேர்வாக எழுதுங்கள் — மதிப்பெண் + விளக்கங்களுடன்',
+  },
+  caTabQuiz: { en: 'Quiz', ta: 'தேர்வு' },
+  caTabPdf: { en: 'PDF', ta: 'PDF' },
   caQuestionsDaily: { en: 'Daily sets', ta: 'தினசரி தொகுப்புகள்' },
   caQuestionsMonthly: { en: 'Monthly banks', ta: 'மாதாந்திரத் தொகுப்புகள்' },
   caQuestionsEmpty: {

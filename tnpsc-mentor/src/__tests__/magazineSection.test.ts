@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { displayItemTitle, isSectionEcho, sectionLabel } from '../lib/caMagazine'
+import { displayItemTitle, isSectionEcho, sectionLabel, setKeyOrder } from '../lib/caMagazine'
 
 // The round-up row of a section is pushed titled after its own section, and the
 // app hides that echo so the item doesn't repeat the heading above it. The
@@ -36,5 +36,36 @@ describe('magazine section labels', () => {
   it('does not confuse one section with another', () => {
     expect(isSectionEcho('TNPSC BITS', 'NATIONAL')).toBe(false)
     expect(isSectionEcho('National', 'NATIONAL')).toBe(true)
+  })
+})
+
+// CA sets are listed newest-first. The materials list arrives in PUBLICATION
+// order, so a day approved late (or a month label, which never sorts as text)
+// would otherwise appear out of sequence.
+describe('CA set ordering', () => {
+  const desc = (source: 'daily' | 'monthly', keys: string[]) =>
+    [...keys].sort((a, b) => setKeyOrder(source, b) - setKeyOrder(source, a))
+
+  it('orders days by their real date, not publication order', () => {
+    expect(desc('daily', ['2026-07-31', '2026-08-04', '2026-08-01'])).toEqual([
+      '2026-08-04',
+      '2026-08-01',
+      '2026-07-31',
+    ])
+  })
+
+  it('orders month labels chronologically, not alphabetically', () => {
+    // Plain text sorting would put April above July and 2025 above 2026.
+    expect(desc('monthly', ['April 2026', 'July 2026', 'December 2025'])).toEqual([
+      'July 2026',
+      'April 2026',
+      'December 2025',
+    ])
+  })
+
+  it('sinks a key it cannot read', () => {
+    expect(setKeyOrder('daily', null)).toBe(-1)
+    expect(setKeyOrder('monthly', 'Smarch 2026')).toBe(-1)
+    expect(setKeyOrder('monthly', 'July 2026')).toBeGreaterThan(0)
   })
 })

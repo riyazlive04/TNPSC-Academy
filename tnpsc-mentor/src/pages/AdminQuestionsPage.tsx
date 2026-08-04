@@ -26,6 +26,7 @@ import type { Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
 import { useAuth } from '../hooks/useAuth'
+import { pdfWatermark } from '../lib/pdfWatermark'
 import { useT } from '../lib/i18n'
 
 /** Which editor is open: none, a blank new question, or an existing one. */
@@ -39,7 +40,7 @@ type EditorState = { mode: 'new' } | { mode: 'edit'; question: Question } | null
 export default function AdminQuestionsPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { isAdmin, loading: authLoading } = useAuth()
+  const { isAdmin, profile, loading: authLoading } = useAuth()
   const { lang, t } = useT()
   const config = location.state as QuizConfig | null
   // The "Outer" bank is browsed subject-by-subject (each subject can hold
@@ -203,7 +204,15 @@ export default function AdminQuestionsPage() {
           : describeConfig(activeConfig, lang)
       // Lazy-load the heavy jspdf/html2canvas chunk only on demand.
       const { generateQuestionBankPdf } = await import('../lib/pdfGenerator')
-      await generateQuestionBankPdf({ questions: filtered, label, lang })
+      // A whole-topic bank export is the most leakable file the app produces, so
+      // it carries the same personalised mark as every student download (the
+      // generator always supported it; this call was the one that never passed it).
+      await generateQuestionBankPdf({
+        questions: filtered,
+        label,
+        lang,
+        watermark: pdfWatermark(profile),
+      })
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Could not generate the PDF.')
     } finally {

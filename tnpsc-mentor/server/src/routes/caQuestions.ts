@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
-import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, requireSuperadmin, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { bundleAccess } from '../lib/premium.js'
+import { chargeTestStart, FIRST_TEST_BONUS, grantFirstTestBonus } from '../lib/credits.js'
 import { MATERIAL_COLS } from './materials.js'
 
 const router = Router()
@@ -67,6 +69,16 @@ const TEXT_FIELDS = [
   'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'explanation',
   'question_text_ta', 'option_a_ta', 'option_b_ta', 'option_c_ta', 'option_d_ta', 'explanation_ta',
 ] as const
+
+/** Fisher-Yates shuffle (non-mutating). */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 /** Normalize a correct-answer to a single 'A'–'D' (accepts a/b/c/d). */
 function normAnswer(v: unknown): string | null {
@@ -338,6 +350,276 @@ router.post(
       return sendDbError(res, error)
     }
     res.status(201).json({ material: data })
+  })
+)
+
+// ─── Student daily-CA TEST surface ───────────────────────────────────────────
+// The same superadmin-published daily sets the PDF cards expose, playable as a
+// short timed test. `ca_daily_questions` is deliberately outside
+// `public.questions` (see APP_INTEGRATION.md §D), so these rows can never be
+// drawn by get_quiz_questions / the mock samplers — which also means the generic
+// /quiz + submit_test pipeline can't serve or grade them. Hence this dedicated
+// pair: a safe-columns draw (answers stripped, credits charged at start, exactly
+// like /api/questions/quiz) and a server-side grader that writes the same
+// test_sessions row every other test writes, so a daily drill counts towards
+// history, streaks and the daily goal.
+
+/** Columns safe to hand a student mid-test (no answer/explanation). */
+const DAILY_QUIZ_COLS =
+  'id, topic, question_type, difficulty, ca_month, ca_year, ' +
+  'question_text, option_a, option_b, option_c, option_d, ' +
+  'question_text_ta, option_a_ta, option_b_ta, option_c_ta, option_d_ta'
+
+/** Attendance gate shared with submit_test: explanations unlock at 25% attempted. */
+const ATTENDANCE_GATE = 0.25
+
+/** Upper bound on one submission's answers[] — a daily set is ~15 questions. */
+const MAX_DAILY_ANSWERS = 200
+
+/** The answer-side columns the grader reads for one daily question. */
+interface GradableDaily {
+  id: number | string
+  ca_month: string | null
+  correct_answer: string | null
+  explanation: string | null
+  explanation_ta: string | null
+  why_wrong: Record<string, string> | null
+}
+/** One submitted answer resolved against its question. */
+interface GradedDaily {
+  q: GradableDaily
+  selected: string | null
+  correct: boolean
+}
+
+/** premium OR vettri OR staff → the test is free of credit charge. */
+async function isUnlimited(req: AuthedRequest): Promise<boolean> {
+  const role = await roleOf(req.userId!)
+  if (role === 'admin' || role === 'superadmin') return true
+  try {
+    return (await bundleAccess(req.db!)).unlimited
+  } catch {
+    return false // fail closed: treat as a free learner (the gate applies)
+  }
+}
+
+/**
+ * The date behind a PUBLISHED daily question set, or null when the material is
+ * not a live daily card. `downloadable` gates the PDF (answers + explanations)
+ * only — a test needs nothing beyond the set being published and active.
+ */
+async function publishedDailyDate(materialId: string): Promise<string | null> {
+  if (!UUID_RE.test(materialId)) return null
+  const { data } = await supabaseAdmin
+    .from('materials')
+    .select('kind, active, questions_source, questions_key')
+    .eq('id', materialId)
+    .maybeSingle()
+  if (!data || data.kind !== 'questions' || !data.active) return null
+  if (data.questions_source !== 'daily') return null
+  const key = String(data.questions_key ?? '')
+  return DATE_RE.test(key) ? key : null
+}
+
+// ─── GET /api/ca-questions/daily/published?limit=14 ──────────────────────────
+// The recent PUBLISHED daily sets for the dashboard strip — newest first, each
+// with its question count. Publication-driven: only sets the superadmin has
+// approved (active) appear, so nothing is exposed before it has been reviewed.
+// Declared before /:materialId/* so the literal path wins the match.
+router.get(
+  '/daily/published',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 7, 1), 30)
+    const { data, error } = await supabaseAdmin
+      .from('materials')
+      .select('id, downloadable, questions_key')
+      .eq('kind', 'questions')
+      .eq('active', true)
+      .eq('questions_source', 'daily')
+      .not('questions_key', 'is', null)
+      .order('questions_key', { ascending: false })
+      .limit(limit)
+    if (error) return sendDbError(res, error)
+
+    const rows = (data ?? []).filter((r) => DATE_RE.test(String(r.questions_key)))
+    const dates = rows.map((r) => String(r.questions_key))
+    // One grouped count for the whole strip rather than a HEAD count per card.
+    const counts = new Map<string, number>()
+    if (dates.length) {
+      const { data: qs, error: qErr } = await supabaseAdmin
+        .from('ca_daily_questions')
+        .select('date')
+        .in('date', dates)
+        .eq('active', true)
+        .limit(5000)
+      if (qErr) return sendDbError(res, qErr)
+      for (const q of qs ?? []) {
+        const d = String(q.date)
+        counts.set(d, (counts.get(d) ?? 0) + 1)
+      }
+    }
+
+    res.set('Cache-Control', 'private, max-age=300')
+    res.json({
+      sets: rows
+        .map((r) => ({
+          id: r.id as string,
+          date: String(r.questions_key),
+          downloadable: r.downloadable as boolean,
+          total: counts.get(String(r.questions_key)) ?? 0,
+        }))
+        .filter((s) => s.total > 0),
+    })
+  })
+)
+
+// ─── POST /api/ca-questions/daily/:materialId/quiz ───────────────────────────
+// That day's paper, answers stripped. An optional `count` trims the (shuffled)
+// set for aspirants who lower the slider. Charged 1 credit/question at START,
+// atomically, exactly like every other test; premium/Vettri/staff bypass.
+router.post(
+  '/daily/:materialId/quiz',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const date = await publishedDailyDate(req.params.materialId)
+    if (!date) return res.status(404).json({ error: 'Question set not found.' })
+
+    const { data, error } = await supabaseAdmin
+      .from('ca_daily_questions')
+      .select(DAILY_QUIZ_COLS)
+      .eq('date', date)
+      .eq('active', true)
+      .order('external_id', { ascending: true })
+      .limit(1000)
+    if (error) return sendDbError(res, error)
+
+    const all = ((data ?? []) as unknown as Record<string, unknown>[]).map((q) => ({
+      ...q,
+      // The client keys everything on a string id; these rows are bigint-keyed.
+      id: String(q.id),
+      category: 'current_affairs',
+      ca_type: 'day_wise',
+    }))
+    const requested = Math.trunc(Number((req.body ?? {}).count)) || all.length
+    const n = Math.min(Math.max(requested, 1), all.length)
+    // Trim from a shuffled copy so a shortened run isn't always the same first N.
+    const questions = n === all.length ? all : shuffle(all).slice(0, n)
+
+    if (questions.length > 0 && !(await isUnlimited(req))) {
+      const gate = await chargeTestStart(req.db!, req.userId!, 'ca_daily', questions.length)
+      if (gate) return res.status(402).json(gate)
+    }
+    res.json({ questions })
+  })
+)
+
+// ─── POST /api/ca-questions/daily/:materialId/submit ─────────────────────────
+// Server-side grader for a daily set — the browser never holds the answers. It
+// mirrors submit_test: a completed test_sessions row (so the drill shows in
+// history and analytics) plus the IST-day activity bump that drives streaks and
+// the daily goal. It writes NO test_answers / review_items rows: both key on
+// public.questions(id), which these rows deliberately are not.
+router.post(
+  '/daily/:materialId/submit',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const date = await publishedDailyDate(req.params.materialId)
+    if (!date) return res.status(404).json({ error: 'Question set not found.' })
+
+    const body = req.body ?? {}
+    const answers = Array.isArray(body.answers) ? body.answers : null
+    if (!answers) return res.status(400).json({ error: 'answers[] is required' })
+    if (answers.length > MAX_DAILY_ANSWERS) {
+      return res.status(400).json({ error: `Too many answers (max ${MAX_DAILY_ANSWERS}).` })
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('ca_daily_questions')
+      .select('id, ca_month, correct_answer, explanation, explanation_ta, why_wrong')
+      .eq('date', date)
+      .eq('active', true)
+      .limit(1000)
+    if (error) return sendDbError(res, error)
+    const rows = (data ?? []) as GradableDaily[]
+    const byId = new Map(rows.map((q) => [String(q.id), q]))
+
+    // Only answers naming a question from THIS day count — same as submit_test's
+    // inner join, so a padded payload can't inflate the score.
+    const graded = (answers as { question_id?: unknown; selected_answer?: unknown }[])
+      .map((a) => {
+        const q = byId.get(String(a.question_id ?? ''))
+        if (!q) return null
+        const selected = normAnswer(a.selected_answer)
+        return { q, selected, correct: !!selected && selected === q.correct_answer }
+      })
+      .filter((g): g is GradedDaily => !!g)
+
+    const total = graded.length
+    const attempted = graded.filter((g) => g.selected).length
+    const correct = graded.filter((g) => g.correct).length
+    const score = total > 0 ? Math.round((100 * correct) / total) : 0
+    const unlocked = total > 0 && attempted / total >= ATTENDANCE_GATE
+
+    const { data: session, error: sErr } = await supabaseAdmin
+      .from('test_sessions')
+      .insert({
+        user_id: req.userId!,
+        category: 'current_affairs',
+        ca_type: 'day_wise',
+        ca_month: graded[0]?.q.ca_month ?? null,
+        total_questions: total,
+        attempted,
+        correct,
+        score_percentage: score,
+        pdf_unlocked: unlocked,
+        passed_80_percent: unlocked,
+        time_limit_seconds: Math.max(0, Math.trunc(Number(body.time_limit_seconds)) || 0),
+        time_taken_seconds: Math.max(0, Math.trunc(Number(body.time_taken_seconds)) || 0),
+        completed_at: new Date().toISOString(),
+        status: 'completed',
+      })
+      .select('id')
+      .single()
+    if (sErr) return sendDbError(res, sErr)
+
+    // Habit layer: the same IST-day bump submit_test makes. Best-effort — a
+    // failure here must never cost the learner their graded result.
+    const { error: aErr } = await req
+      .db!.rpc('increment_activity', { p_questions: attempted, p_tests: 1 })
+    if (aErr) console.error('[ca-daily] activity bump failed', aErr.code, aErr.message)
+
+    // First-test bonus. The RPC only fires when EXACTLY one completed session
+    // exists, so it has to run here too: if a daily drill is someone's first
+    // test, skipping this would push their session count past one and lose them
+    // the bonus for good. Best-effort, exactly as in POST /api/tests/submit.
+    const bonus = await grantFirstTestBonus(req.db!).catch((e) => {
+      console.error('[ca-daily] first-test-bonus grant failed', e)
+      return null
+    })
+
+    res.json({
+      ...(bonus?.granted
+        ? { first_test_bonus: { amount: FIRST_TEST_BONUS, balance: bonus.balance } }
+        : {}),
+      session_id: session?.id ?? null,
+      total,
+      attempted,
+      correct,
+      score_percentage: score,
+      passed_80: unlocked,
+      unlocked,
+      results: graded.map((g) => ({
+        question_id: String(g.q.id),
+        selected_answer: g.selected,
+        is_correct: g.correct,
+        correct_answer: unlocked ? g.q.correct_answer : null,
+        explanation: unlocked ? g.q.explanation : null,
+        explanation_ta: unlocked ? g.q.explanation_ta : null,
+        explanation_video_url: null,
+        why_wrong: unlocked ? g.q.why_wrong : null,
+      })),
+    })
   })
 )
 

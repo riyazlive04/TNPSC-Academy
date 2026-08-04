@@ -130,6 +130,24 @@ export const MONTHS_TA: Record<string, string> = {
   September: 'செப்டம்பர்', October: 'அக்டோபர்', November: 'நவம்பர்', December: 'டிசம்பர்',
 }
 
+/**
+ * Sort key for a CA set's `questions_key`, newest-first when sorted descending.
+ * Daily keys ('2026-08-04') already sort lexicographically; month labels
+ * ('July 2026') do not — 'April' would beat 'July' — so they're mapped to
+ * year*12+month. Anything unrecognised sorts last.
+ */
+export function setKeyOrder(source: 'daily' | 'monthly' | null, key: string | null): number {
+  if (!key) return -1
+  if (source === 'daily') {
+    const [y, m, d] = key.split('-').map(Number)
+    return Number.isFinite(y) ? y * 10000 + (m ?? 0) * 100 + (d ?? 0) : -1
+  }
+  const [monthEn, year] = key.split(' ')
+  const mi = MONTHS_EN.indexOf(monthEn)
+  const y = Number(year)
+  return mi >= 0 && Number.isFinite(y) ? y * 12 + mi : -1
+}
+
 /** '2026-07-09' → '9 July 2026' (day issues) / 'July 2026' (month issues). */
 export function issueDateLabel(caType: CaMagazineType, date: string, lang: 'en' | 'ta' | 'both' = 'en'): string {
   const [y, mo, d] = date.split('-').map(Number)

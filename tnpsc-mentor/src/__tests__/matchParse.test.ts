@@ -109,6 +109,74 @@ describe('parseMatchQuestion', () => {
     expect(parseMatchQuestion(null)).toBeNull()
   })
 
+  // Header-less bodies: the paper labels the two lists from ANY family, in
+  // either order. Assuming "letters first, then numbers" dropped all of these
+  // to a flat paragraph.
+  it('parses numbers first, then letters (no list headers)', () => {
+    const p = parseMatchQuestion(
+      'Match the following:\n1. Bharathiraja\n2. K. Bhagyaraj\n3. Jaspal Rana\n4. Salim Kumar\na. Malayalam actor\nb. Shooting coach\nc. Tamil film director\nd. Screenplay King\nSelect the correct match.',
+    )
+    expect(p).not.toBeNull()
+    expect(p!.listI.items.map((i) => i.label)).toEqual(['1', '2', '3', '4'])
+    expect(p!.listII.items.map((i) => i.label)).toEqual(['a', 'b', 'c', 'd'])
+  })
+
+  it('parses a roman-numeral second list ((a)-(d) then (i)-(iv))', () => {
+    const p = parseMatchQuestion(
+      "Match List I with List II and select the correct option:\n(a) Simmond's disease\n(b) Diabetes mellitus\n(c) Cushing's disease\n(d) Myxoedema\n(i) Thyroid gland\n(ii) Adrenal gland\n(iii) Pituitary gland\n(iv) Pancreas",
+    )
+    expect(p).not.toBeNull()
+    expect(p!.listI.items.map((i) => i.label)).toEqual(['a', 'b', 'c', 'd'])
+    expect(p!.listII.items.map((i) => i.label)).toEqual(['i', 'ii', 'iii', 'iv'])
+  })
+
+  it('parses lists separated by their own prose headers', () => {
+    const p = parseMatchQuestion(
+      'Match the following :\nTamil Nadu Government Awards\n(a) Tamilthai award\n(b) Kabilar award\n(c) V.O.C. award\nAwarder\n(i) Poet Piraisudan\n(ii) K. Selvan\n(iii) New Mumbai Tamil Sangam',
+    )
+    expect(p).not.toBeNull()
+    expect(p!.listI.header).toBe('Tamil Nadu Government Awards')
+    expect(p!.listII.header).toBe('Awarder')
+  })
+
+  it('does not turn a fill-in-the-blank + word bank into a match', () => {
+    expect(
+      parseMatchQuestion(
+        "Complete the blanks using the phrasal verbs given in the options :\n1. You'd better ring her ___________ and tell her.\n2. I invited her to drop ___________ any time.\n3. If you can't afford it, you'll have to do ___________ it.\n(a) out\n(b) in\n(c) up",
+      ),
+    ).toBeNull()
+  })
+
+  // "Which pair is wrongly matched?" items arrive already paired, one per line.
+  // The paper prints them as two columns, so we lay them out that way too.
+  it('parses one-pair-per-line bodies into two columns', () => {
+    const p = parseMatchQuestion(
+      'Find out Incorrectly paired :\nCommission – Year of Establishment\n(1) NHRC – 1993\n(2) Central Information Commission – 2005\n(3) Central Vigilance Commission – 1963\n(4) Central Bureau of Investigation – 1969',
+    )
+    expect(p).not.toBeNull()
+    expect(p!.listI.header).toBe('Commission')
+    expect(p!.listII.header).toBe('Year of Establishment')
+    expect(p!.listI.items.map((i) => i.text)).toEqual([
+      'NHRC',
+      'Central Information Commission',
+      'Central Vigilance Commission',
+      'Central Bureau of Investigation',
+    ])
+    // The row is numbered once, on the left - the right column has no label.
+    expect(p!.listII.items.map((i) => i.label)).toEqual(['', '', '', ''])
+    expect(p!.listII.items[0].text).toBe('1993')
+  })
+
+  it('does not split a hyphenated term when pairing lines', () => {
+    // "Heart-lung" has no spaces around its hyphen, so it is not a separator;
+    // with no spaced separator at all, this is a plain list, not a pair table.
+    expect(
+      parseMatchQuestion(
+        'Which of the following is correctly paired?\n(1) Heart-lung machine\n(2) X-ray tube\n(3) Semi-conductor diode',
+      ),
+    ).toBeNull()
+  })
+
   it('formats labels: numbers as "1.", letters as "(a)"', () => {
     expect(formatMatchLabel('1')).toBe('1.')
     expect(formatMatchLabel('a')).toBe('(a)')
