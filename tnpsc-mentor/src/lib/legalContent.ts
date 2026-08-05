@@ -36,48 +36,60 @@ export function show(value: string, fallback = 'to be confirmed'): string {
  */
 export const COMPANY = {
   /** Registered legal name, exactly as on the GST/incorporation certificate. */
-  legalName: `${TODO} registered legal name of the entity (e.g. Sirah Digital / Sirah Digital Pvt Ltd)`,
+  legalName: 'Mohamed Riyaz (proprietor, Sirah Digital)',
   /** Brand shown to users. */
   tradeName: 'TNPSC Mentors',
   operator: 'Sirah Digital',
   /** Full registered address including PIN — printed on every policy page. */
-  address: `${TODO} full registered address with PIN code`,
-  gstin: `${TODO} GSTIN`,
-  /** Whether displayed prices include GST. Materially changes the Payment policy. */
-  gstTreatment: `${TODO} 'inclusive of GST' or 'exclusive of GST'`,
+  address:
+    'SY NO 203/10B, Innov8, Featherlite The Address, 200 Feet Radial Rd, ' +
+    'Raja Joseph Colony, Pallavaram, Chennai, Tambaram, Tamil Nadu',
+  // NO GST FIELDS. Nothing is added to the displayed price, and with no GSTIN to
+  // publish the Payment policy states the price is the total and says nothing
+  // further about tax. If the business registers for GST, add `gstin` and
+  // `gstTreatment` back here AND restore the two bullets in PAYMENT §4 — the
+  // Consumer Protection (E-Commerce) Rules require a registered seller to
+  // display its GSTIN.
 
   supportEmail: 'support@tnpscmentors.in',
   supportPhone: '+91 96777 79808',
 
   /** Grievance Officer — must be a real named person, not a role mailbox. */
-  grievanceOfficerName: `${TODO} full name of the Grievance Officer`,
-  grievanceEmail: `${TODO} grievance email (e.g. grievance@tnpscmentors.in)`,
+  grievanceOfficerName: 'Mohamed Riyaz',
+  grievanceEmail: 'support@tnpscmentors.in',
   /** Statutory acknowledgement window. 48 hours is the usual commitment. */
   grievanceAckHours: '48 hours',
   /** Statutory resolution window under the IT Rules. */
   grievanceResolveDays: '15 days',
 
-  /** Courts with exclusive jurisdiction. */
-  jurisdictionCity: `${TODO} city whose courts have exclusive jurisdiction (e.g. Chennai)`,
-  /** Cap on aggregate liability. */
-  liabilityCap: `${TODO} liability cap (e.g. the amount you paid in the 12 months before the claim)`,
+  /** Courts with exclusive jurisdiction. Chennai — where the business is
+   *  registered, which is also the default position without a clause. */
+  jurisdictionCity: 'Chennai',
+  /** Cap on aggregate liability. Deliberately a formula, not a figure, so it
+   *  never goes stale when plan prices change. */
+  liabilityCap: 'the amount you paid for the plan the claim relates to',
 
   /**
    * Where user data physically lives. Not a placeholder — this is a fact about
    * the deployment, and DPDP-era policies are expected to state it.
    */
   dataRegion: 'Sydney, Australia (AWS ap-southeast-2, via Supabase)',
-  serverRegion: 'India (application server)',
+  serverRegion: 'India',
 } as const
 
 /** Per-document effective dates. One shared date across five policies is a tell
  *  that they are not maintained independently. */
 export const EFFECTIVE = {
-  privacy: '3 August 2026',
+  // Privacy + delete-account revised 5 August 2026: operator and Grievance
+  // Officer named, purchase-record retention corrected (it does NOT survive
+  // account deletion — the FK cascades), proctoring described as the on-device
+  // count it actually is, and the analytics identifier, session IP/user-agent,
+  // Google avatar, in-app feedback and new audit trail disclosed.
+  privacy: '5 August 2026',
   guidelines: '3 August 2026',
   payment: '3 August 2026',
   refund: '3 August 2026',
-  'delete-account': '3 August 2026',
+  'delete-account': '5 August 2026',
 } as const
 
 export type Block = { h: string; p?: string[]; list?: string[] }
@@ -115,14 +127,16 @@ const PRIVACY: LegalDoc = {
     {
       h: '2. What we collect',
       list: [
-        'Details you give us at signup: name, email address, mobile number, preferred language and target exam group. Gender is optional.',
-        'Your work in the app: tests attempted, answers selected, scores, time taken, bookmarks, revision decks, streaks and the error reports you file on individual questions.',
+        'Details you give us at signup: name, email address, mobile number, preferred language and target exam group. Gender is optional. If you sign in with Google we also store the profile photo Google gives us, so it can be shown as your avatar.',
+        'Your study plan, if you set one: your target exam date and your daily question goal.',
+        'Your work in the app: tests attempted, answers selected, scores, time taken, bookmarks, revision decks, which questions you have already seen, and your daily activity and streak.',
+        'Feedback you send us: the error reports you file on individual questions, your votes on whether an explanation helped, and any rating or message you submit from the app (including which screen you sent it from).',
         'Purchase records: which plan you bought, when, the amount, and the payment or order reference. We never see or store your card, UPI or bank credentials.',
         'Credit balance and history: the free-tier allowance granted at signup, the daily top-up, and what you have spent.',
-        'Device and session data: a randomly generated installation identifier and a device label (e.g. "Android · Chrome"), used solely to enforce the 2-device sign-in limit. This is not an advertising identifier, is not the IDFA or Android Advertising ID, and is never shared.',
-        'Notification tokens, if you turn notifications on: the push token issued by your browser, or by Apple (APNs) or Google (FCM).',
+        'Device and session data: a randomly generated installation identifier, a device label (e.g. "Android · Chrome"), and the IP address and browser/device identification string recorded against each of your active sign-ins. This is what enforces the 2-device limit and lets you recognise and sign out a device you do not know. It is not an advertising identifier, is not the IDFA or Android Advertising ID, and is never shared.',
+        'Notification tokens, if you turn notifications on: the push token issued by your browser, or by Apple (APNs) or Google (FCM), and the browser identification string sent with it.',
         'Mock-test integrity signals, described in section 4.',
-        'Technical logs: IP address, timestamps and error traces, kept briefly for security and debugging.',
+        'Technical and security logs: IP address, timestamps, which endpoint was called and its outcome, and error traces. Where an administrator opens or changes an account, we log who did it, whose account it was and when — see section 10.',
       ],
     },
     {
@@ -130,13 +144,15 @@ const PRIVACY: LegalDoc = {
       p: [
         'The Android and iOS apps contain NO third-party advertising, analytics, attribution or tracking SDK of any kind. We do not track you across other companies\' apps or websites, we do not build advertising profiles, and we do not sell or share your personal data with data brokers or ad networks. This is why the iOS app shows no App Tracking Transparency prompt.',
         'The website (tnpscmentors.in) uses Google Analytics via Google Tag Manager, Microsoft Clarity and the Meta Pixel to understand how the site is used and to measure our own advertising. These load on the website only, and only after you accept them in the cookie banner. You can change or withdraw that choice at any time from the banner\'s "Cookie settings" link in the footer.',
+        'When those tags are active and you are signed in, the events we send to Google and Meta carry your internal account identifier — a random code, not your name, email or phone — so that visits from the same account can be counted as one person rather than several. The events themselves describe what you did on the site: pages viewed, a test started or submitted and its score, a material downloaded, and a purchase with its amount and order reference. If you do not accept the cookie banner, none of this is sent.',
         'We do not carry out any automated decision-making that produces legal or similarly significant effects about you.',
       ],
     },
     {
       h: '4. Mock-test integrity (proctoring)',
       p: [
-        'Full-length mock exams run in a supervised mode so that practice scores mean something. While a mock test is open we record when you leave the test screen — exiting full screen, switching tabs or apps — and how many times. Repeated violations end and submit the test automatically. These records are attached to that attempt and shown to you on your result page.',
+        'Full-length mock exams run in a supervised mode so that practice scores mean something. While a mock test is open the app counts when you leave the test screen — exiting full screen, switching tabs or apps — and also when you copy, paste or right-click inside the test. Repeated violations end and submit the test automatically.',
+        'This count stays on your own device. It is shown to you on your result page and is then discarded; it is never sent to us, never stored on our servers, and never held against you. Nobody else sees it.',
         'On Android the app asks the operating system to block screenshots and screen recording during a test. On iOS the operating system provides no such block, so the app instead detects that a screenshot or screen recording occurred and records it as a violation, and blurs the app in the task switcher.',
         'This monitoring is limited to the mock-test screen, lasts only as long as that test, and captures nothing about what you do in other apps. No screen content, camera, microphone or location data is ever collected.',
       ],
@@ -162,7 +178,7 @@ const PRIVACY: LegalDoc = {
         'Razorpay — payments made on the website.',
         'Apple and Google — in-app purchases made in the iOS and Android apps, and push notification delivery.',
         'MSG91 and AiSensy — delivery of one-time codes by SMS and WhatsApp, where you use those sign-in or verification options. Telegram, if you choose it to verify your number.',
-        'Google Analytics, Microsoft Clarity and Meta — website analytics and advertising measurement only, and only with your cookie consent (section 3).',
+        'Google Analytics, Microsoft Clarity and Meta — website analytics and advertising measurement only, and only with your cookie consent. They receive the usage events and the pseudonymous account identifier described in section 3, never your name, email or phone number.',
       ],
     },
     {
@@ -176,10 +192,11 @@ const PRIVACY: LegalDoc = {
       h: '8. How long we keep it',
       list: [
         'Account and learning data — for as long as your account exists. Deleting your account removes it immediately (section 9).',
-        'Payment and invoice records — 8 financial years after the transaction, as required by Indian tax and accounting law. These survive account deletion, are used for statutory compliance only, and contain no test or learning data.',
-        'Technical and security logs — up to 90 days, then deleted or aggregated beyond identification.',
+        'Purchase records — we keep the record of a purchase (the plan, amount, date and payment reference) only while your account exists. Delete your account and it goes with everything else; we do not keep a copy. The record of the transaction itself continues to exist with our payment provider and in our own accounts, which is where our tax and accounting obligations are met — that record is the provider\'s and ours, and is not part of your account.',
+        'Technical and security logs — up to 90 days, then deleted.',
+        'Records of administrative access — up to 400 days. These say which administrator opened or changed an account and when. They are deliberately kept beyond the ordinary log window, and they survive the deletion of the account they refer to: an accountability record that anyone could erase by deleting an account would be no accountability at all. They are used only to investigate misuse.',
         'Push notification tokens — until you turn notifications off, the token is rejected by Apple or Google, or you delete your account.',
-        'Backups — encrypted, rotated, and fully overwritten within 35 days, after which deleted data is gone from backups too.',
+        'Backups — our database provider keeps encrypted backups on a rolling schedule and overwrites them as they rotate. Deleted data disappears from the backups as the backups covering that period roll over, within 35 days at the outside.',
       ],
     },
     {
@@ -194,11 +211,14 @@ const PRIVACY: LegalDoc = {
         'All traffic is encrypted in transit with TLS.',
         'Passwords are hashed by our authentication provider; nobody at our end can read them.',
         'Access to production data is restricted to the people who need it, and database access rules restrict every account to its own rows.',
+        'Every administrative action on the service is written to an audit log that records who did it, whose account it concerned, when, and from where. That log cannot be edited or deleted from the app by anyone, including us.',
+        'Sign-ins, failed sign-in attempts, password-reset requests and device changes are logged, so unusual access to an account can be found after the fact.',
+        'Automated monitoring watches for the patterns an attack produces — bursts of failed sign-ins, probing of administrative routes, unusual error rates, unexpected privileged actions — and alerts us when one appears.',
         'The apps disable operating-system backup of local app data, so a signed-in session cannot be cloned onto another device from a cloud backup.',
         'A sign-in is limited to 2 devices at a time, and you can sign out a lost device yourself.',
       ],
       p: [
-        'No system is perfectly secure. If a personal data breach occurs we will notify the Data Protection Board of India and every affected user without undue delay, as the DPDP Act requires, describing what happened and what you should do.',
+        'No system is perfectly secure. If a personal data breach occurs we will notify the Data Protection Board of India and every affected user without undue delay, as the DPDP Act requires, describing what happened, what data was involved and what you should do. Our internal procedure for this — including who is responsible and the deadlines we work to — is written down and followed rather than improvised.',
       ],
     },
     {
@@ -401,8 +421,13 @@ const PAYMENT: LegalDoc = {
     {
       h: '4. Prices and taxes',
       list: [
-        `Prices are in Indian Rupees (₹) and are ${show(COMPANY.gstTreatment, 'stated at checkout as inclusive or exclusive of GST')}.`,
-        `Our GSTIN is ${show(COMPANY.gstin)}.`,
+        // No GST line here by design: nothing is added to the displayed price at
+        // checkout, so saying "the price is the price" is both accurate and the
+        // only claim about tax status we can make without a GSTIN to publish. If
+        // the business registers for GST later, this bullet and a GSTIN line
+        // have to come back — the Consumer Protection (E-Commerce) Rules require
+        // a registered seller to display it.
+        'Prices are in Indian Rupees (₹). The price shown is the total amount payable — nothing is added at checkout.',
         'For purchases through Apple or Google, those companies act as the merchant of record for the transaction and apply tax according to their own rules; your receipt comes from them.',
         'We may change prices or offers at any time for future purchases. A purchase you have already completed is unaffected.',
       ],
@@ -539,18 +564,20 @@ const DELETE_ACCOUNT: LegalDoc = {
     {
       h: '3. What gets deleted',
       list: [
-        'Your profile: name, email, phone number, language, target group, gender and exam date.',
+        'Your profile: name, email, phone number, language, target group, gender, exam date, daily goal and profile photo.',
         'Your work: every test attempt, answer, score, bookmark, revision deck and progress record.',
         'Your credit balance and streak history.',
-        'Your notification subscriptions and registered devices.',
+        'Your notification subscriptions and registered devices, and the sign-in sessions recorded against them.',
         'Question reports and feedback you submitted, and their link to you.',
+        'Your purchase records — which plan you bought, when, the amount and the payment reference. We do not keep a copy after deletion.',
       ],
     },
     {
       h: '4. What we keep, and for how long',
       p: [
-        'Payment and invoice records are retained for 8 financial years, as Indian tax and accounting law requires. They are kept for statutory compliance only, are not used to profile you, and contain no test or learning data — only the transaction reference, amount and date.',
-        'Encrypted backups are overwritten on a rolling basis and deleted data is gone from them within 35 days.',
+        'The record of a payment continues to exist with our payment provider (and in our own accounts), because that is where our tax and accounting obligations sit. That record belongs to the transaction, not to your account, and deleting your account does not and cannot remove it. If you need a copy of an invoice, ask us BEFORE deleting.',
+        'Security logs are kept for up to 90 days, and records of administrative access — which administrator opened or changed an account, and when — for up to 400 days. These may still contain the internal identifier your account used. They are kept so that misuse can be investigated after the fact, which is only possible if deleting an account cannot erase the trail, and they are used for nothing else.',
+        'Encrypted backups are overwritten on a rolling basis and deleted data is gone from them within 35 days at the outside.',
       ],
     },
     {

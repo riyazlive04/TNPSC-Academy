@@ -5,8 +5,8 @@
 
 **Effective:** 3 August 2026
 
-**Operator:** Sirah Digital, trading as TNPSC Mentors
-**Registered address:** to be confirmed
+**Operator:** Mohamed Riyaz (proprietor, Sirah Digital), trading as TNPSC Mentors
+**Registered address:** SY NO 203/10B, Innov8, Featherlite The Address, 200 Feet Radial Rd, Raja Joseph Colony, Pallavaram, Chennai, Tambaram, Tamil Nadu
 **Contact:** support@tnpscmentors.in · +91 96777 79808
 
 ---
@@ -58,7 +58,7 @@ Deleting your account ends any active plan immediately and does not itself trigg
 
 ## 8. Grievances
 
-If you are unhappy with a refund decision, escalate to our Grievance Officer, to be confirmed, at support@tnpscmentors.in. We acknowledge within 48 hours and aim to resolve within 15 days.
+If you are unhappy with a refund decision, escalate to our Grievance Officer, Mohamed Riyaz, at support@tnpscmentors.in. We acknowledge within 48 hours and aim to resolve within 15 days.
 
 ---
 

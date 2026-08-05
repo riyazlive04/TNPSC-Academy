@@ -50,9 +50,14 @@ export default function PolicyPage({ slug }: { slug: string }) {
       <header className="sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="group flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-gradient font-heading text-sm font-bold text-white transition-transform duration-200 group-hover:scale-105">
-              த
-            </span>
+            {/* Same mark, size and hover as the landing page and app shell — a
+                policy page is the one place a visitor is checking who they are
+                dealing with, so the branding must not look improvised. */}
+            <img
+              src="/logo-mark.png"
+              alt="TNPSC Mentors"
+              className="h-9 w-9 shrink-0 object-contain transition-transform duration-200 group-hover:scale-105"
+            />
             <span className="font-heading text-base font-semibold tracking-tight text-ink">
               TNPSC <span className="text-brand">Mentors</span>
             </span>
@@ -152,7 +157,10 @@ export default function PolicyPage({ slug }: { slug: string }) {
           <div className="mt-2 space-y-1 font-body text-sm text-ink2">
             <p>{show(COMPANY.legalName, COMPANY.operator)}, trading as {COMPANY.tradeName}</p>
             <p>{show(COMPANY.address)}</p>
-            {!COMPANY.gstin.startsWith('TODO:') && <p>GSTIN: {COMPANY.gstin}</p>}
+            {/* No GSTIN line: the business does not publish one, and the Payment
+                policy says the displayed price is the total. If it registers for
+                GST, add `gstin` back to COMPANY and print it here — a registered
+                seller must display it under the E-Commerce Rules. */}
             <p>
               <a href={`mailto:${COMPANY.supportEmail}`} className="text-brand hover:text-brand-dark">
                 {COMPANY.supportEmail}

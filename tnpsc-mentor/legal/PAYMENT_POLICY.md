@@ -5,8 +5,8 @@
 
 **Effective:** 3 August 2026
 
-**Operator:** Sirah Digital, trading as TNPSC Mentors
-**Registered address:** to be confirmed
+**Operator:** Mohamed Riyaz (proprietor, Sirah Digital), trading as TNPSC Mentors
+**Registered address:** SY NO 203/10B, Innov8, Featherlite The Address, 200 Feet Radial Rd, Raja Joseph Colony, Pallavaram, Chennai, Tambaram, Tamil Nadu
 **Contact:** support@tnpscmentors.in · +91 96777 79808
 
 ---
@@ -37,8 +37,7 @@ This Payment Policy explains what we sell, what it costs, how long access lasts,
 
 ## 4. Prices and taxes
 
-- Prices are in Indian Rupees (₹) and are stated at checkout as inclusive or exclusive of GST.
-- Our GSTIN is to be confirmed.
+- Prices are in Indian Rupees (₹). The price shown is the total amount payable — nothing is added at checkout.
 - For purchases through Apple or Google, those companies act as the merchant of record for the transaction and apply tax according to their own rules; your receipt comes from them.
 - We may change prices or offers at any time for future purchases. A purchase you have already completed is unaffected.
 

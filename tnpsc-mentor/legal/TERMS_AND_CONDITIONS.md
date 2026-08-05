@@ -5,13 +5,13 @@
 
 **Effective:** 3 August 2026
 
-**Operator:** Sirah Digital, trading as TNPSC Mentors
-**Registered address:** to be confirmed
+**Operator:** Mohamed Riyaz (proprietor, Sirah Digital), trading as TNPSC Mentors
+**Registered address:** SY NO 203/10B, Innov8, Featherlite The Address, 200 Feet Radial Rd, Raja Joseph Colony, Pallavaram, Chennai, Tambaram, Tamil Nadu
 **Contact:** support@tnpscmentors.in · +91 96777 79808
 
 ---
 
-These Terms govern your use of TNPSC Mentors, operated by Sirah Digital. By creating an account or using the app or website you agree to them. If you do not agree, do not use the service.
+These Terms govern your use of TNPSC Mentors, operated by Mohamed Riyaz (proprietor, Sirah Digital). By creating an account or using the app or website you agree to them. If you do not agree, do not use the service.
 
 ## 1. Eligibility
 
@@ -76,7 +76,7 @@ Apple and its subsidiaries are third-party beneficiaries of these Terms and, upo
 
 The service is provided "as is" and "as available". To the maximum extent permitted by law we exclude implied warranties of merchantability, fitness for a particular purpose and non-infringement.
 
-To the maximum extent permitted by law, our aggregate liability arising out of or relating to the service is limited to to be confirmed. We are not liable for indirect, incidental, special or consequential loss, or for loss of opportunity, rank or selection.
+To the maximum extent permitted by law, our aggregate liability arising out of or relating to the service is limited to the amount you paid for the plan the claim relates to. We are not liable for indirect, incidental, special or consequential loss, or for loss of opportunity, rank or selection.
 
 Nothing in these Terms excludes liability that cannot be excluded under Indian law, including for fraud or for death or personal injury caused by negligence.
 
@@ -86,7 +86,7 @@ We may suspend or terminate an account that breaches these Terms, is used fraudu
 
 ## 14. Governing law and disputes
 
-These Terms are governed by the laws of India. The courts at to be confirmed have exclusive jurisdiction, subject to any right you have as a consumer to bring proceedings where you live.
+These Terms are governed by the laws of India. The courts at Chennai have exclusive jurisdiction, subject to any right you have as a consumer to bring proceedings where you live.
 
 Before starting proceedings, please contact our Grievance Officer — most issues are resolved that way.
 

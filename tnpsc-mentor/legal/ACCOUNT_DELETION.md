@@ -3,10 +3,10 @@
 
 # Delete your account — TNPSC Mentors
 
-**Effective:** 3 August 2026
+**Effective:** 5 August 2026
 
-**Operator:** Sirah Digital, trading as TNPSC Mentors
-**Registered address:** to be confirmed
+**Operator:** Mohamed Riyaz (proprietor, Sirah Digital), trading as TNPSC Mentors
+**Registered address:** SY NO 203/10B, Innov8, Featherlite The Address, 200 Feet Radial Rd, Raja Joseph Colony, Pallavaram, Chennai, Tambaram, Tamil Nadu
 **Contact:** support@tnpscmentors.in · +91 96777 79808
 
 ---
@@ -26,17 +26,20 @@ If you cannot sign in, email support@tnpscmentors.in from the address registered
 
 ## 3. What gets deleted
 
-- Your profile: name, email, phone number, language, target group, gender and exam date.
+- Your profile: name, email, phone number, language, target group, gender, exam date, daily goal and profile photo.
 - Your work: every test attempt, answer, score, bookmark, revision deck and progress record.
 - Your credit balance and streak history.
-- Your notification subscriptions and registered devices.
+- Your notification subscriptions and registered devices, and the sign-in sessions recorded against them.
 - Question reports and feedback you submitted, and their link to you.
+- Your purchase records — which plan you bought, when, the amount and the payment reference. We do not keep a copy after deletion.
 
 ## 4. What we keep, and for how long
 
-Payment and invoice records are retained for 8 financial years, as Indian tax and accounting law requires. They are kept for statutory compliance only, are not used to profile you, and contain no test or learning data — only the transaction reference, amount and date.
+The record of a payment continues to exist with our payment provider (and in our own accounts), because that is where our tax and accounting obligations sit. That record belongs to the transaction, not to your account, and deleting your account does not and cannot remove it. If you need a copy of an invoice, ask us BEFORE deleting.
 
-Encrypted backups are overwritten on a rolling basis and deleted data is gone from them within 35 days.
+Security logs are kept for up to 90 days, and records of administrative access — which administrator opened or changed an account, and when — for up to 400 days. These may still contain the internal identifier your account used. They are kept so that misuse can be investigated after the fact, which is only possible if deleting an account cannot erase the trail, and they are used for nothing else.
+
+Encrypted backups are overwritten on a rolling basis and deleted data is gone from them within 35 days at the outside.
 
 ## 5. Paid plans and refunds
 
