@@ -66,12 +66,20 @@ export async function nativeGoogleIdToken(): Promise<string | null> {
   // the last-used Google account, trapping a user whose account is already at the
   // 2-device limit with no way to switch. (Capacitor 6 needed a signOut() first;
   // this plugin exposes it as an explicit prompt.)
+  // Do NOT pass `scopes`. The plugin already requests openid + userinfo.email +
+  // userinfo.profile, which is everything an ID token needs — and passing the
+  // option at all switches it to the Authorization API, which requires
+  // MainActivity to implement ModifiedMainActivityForSocialLoginPlugin. Without
+  // that it rejects outright with "You CANNOT use scopes without modifying the
+  // main activity", which is a sign-in that can never succeed.
+  //
+  // The three flags below are read directly by the Android provider and need no
+  // such change; together they suppress the silent one-tap path so the account
+  // chooser always appears.
   const res = await SocialLogin.login({
     provider: 'google',
     options: {
-      scopes: ['email', 'profile'],
       forcePrompt: true,
-      prompt: 'select_account',
       filterByAuthorizedAccounts: false,
       autoSelectEnabled: false,
     },
