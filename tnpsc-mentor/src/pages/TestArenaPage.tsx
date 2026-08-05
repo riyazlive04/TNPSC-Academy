@@ -37,7 +37,7 @@ import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import { starterTestConfig } from '../lib/starterTest'
 import { fetchHabit, type HabitState } from '../lib/habit'
-import { SHOW_STREAK, isHiddenBadge } from '../lib/features'
+import { SHOW_STREAK, SHOW_MOMENTUM, isHiddenBadge } from '../lib/features'
 import { fetchUserAnalytics, type UserAnalytics } from '../lib/analytics'
 import { computeXp, levelInfo } from '../lib/game'
 import { computeBadges, type Badge, type GameStats } from '../lib/achievements'
@@ -261,7 +261,10 @@ export default function TestArenaPage() {
   const consumeMomentum = useMomentumStore((s) => s.consume)
   const [showMomentum] = useState(momentumPending)
   useEffect(() => {
-    if (showMomentum && habit && stats && !isAdmin) consumeMomentum()
+    // Only spend the once-per-sign-in flag when the panel actually rendered —
+    // while it's hidden the visit stays "unshown", so re-enabling behaves as if
+    // the panel had never been skipped.
+    if (SHOW_MOMENTUM && showMomentum && habit && stats && !isAdmin) consumeMomentum()
   }, [showMomentum, habit, stats, isAdmin, consumeMomentum])
 
   // ─── Admin / superadmin: a focused content-management home (no aspirant
@@ -305,7 +308,7 @@ export default function TestArenaPage() {
               </span>
             )}
           </div>
-          {showMomentum && habit && stats && (
+          {SHOW_MOMENTUM && showMomentum && habit && stats && (
             <MomentumPanel habit={habit} lvl={lvl} stats={stats} />
           )}
           {/* Kural of the day - the actual couplet, rotating daily. Tapping it

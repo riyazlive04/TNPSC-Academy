@@ -58,6 +58,8 @@ export default function MagazineEditor({
   const [previewLang, setPreviewLang] = useState<'en' | 'ta' | 'both'>(lang)
   const [adding, setAdding] = useState(false)
   const [saveState, setSaveState] = useState<SaveState>('idle')
+  // The scrolling column (see the Body comment below).
+  const bodyRef = useRef<HTMLDivElement>(null)
 
   // Commit any focused field before leaving, so Escape/close never drops an edit.
   const requestClose = () => {
@@ -177,8 +179,20 @@ export default function MagazineEditor({
         </div>
       )}
 
-      {/* ─── Body ────────────────────────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      {/* ─── Body ────────────────────────────────────────────────────────────
+          The scroll lives on the CENTRED COLUMN, not on the full-width screen,
+          so the scrollbar sits beside the text instead of way out at the window
+          corner. The empty margins either side would then be inert, so they
+          forward their wheel to the column - no part of the screen feels dead. */}
+      <div
+        className="flex min-h-0 flex-1 justify-center"
+        onWheel={(e) => {
+          const el = bodyRef.current
+          if (!el || el.contains(e.target as Node)) return // the column handles its own
+          el.scrollTop += e.deltaY
+        }}
+      >
+        <div ref={bodyRef} className="min-h-0 w-full max-w-3xl overflow-y-auto">
         {items === null && !failed && (
           <div className="flex justify-center py-20">
             <LogoLoader size={56} />
@@ -197,7 +211,7 @@ export default function MagazineEditor({
 
         {/* Preview — exactly what students see, news image included. */}
         {items !== null && mode === 'preview' && (
-          <div className="mx-auto w-full max-w-3xl">
+          <div className="w-full">
             {newsImage && (
               <figure className="border-b border-line px-4 pb-4 pt-4 sm:px-6">
                 <img
@@ -215,7 +229,7 @@ export default function MagazineEditor({
 
         {/* Edit — the document */}
         {items !== null && mode === 'edit' && (
-          <div className="mx-auto w-full max-w-3xl px-3 py-5 sm:px-6 sm:py-8">
+          <div className="w-full px-3 py-5 sm:px-6 sm:py-8">
             <div className="px-1 py-2 sm:rounded-2xl sm:border sm:border-line sm:bg-card sm:px-10 sm:py-9 sm:shadow-soft">
               {/* Document title (static) */}
               <div className="border-b border-line pb-4">
@@ -270,6 +284,7 @@ export default function MagazineEditor({
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

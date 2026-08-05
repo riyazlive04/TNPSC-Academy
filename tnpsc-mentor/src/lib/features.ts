@@ -9,6 +9,14 @@ export const SHOW_STREAK = true
 /** Daily-question goal + exam-date countdown surfaces (Test Arena & Setup). */
 export const SHOW_GOALS = true
 
+/**
+ * The once-per-sign-in momentum panel on the dashboard: daily-goal ring, the
+ * week strip, the level bar and the habit chips (exam date / goal setup /
+ * awards). Hidden for now; the habit + XP data behind it keeps being recorded,
+ * so flipping this back to `true` restores it exactly as it was.
+ */
+export const SHOW_MOMENTUM = false
+
 /** Badge ids tied to the streak feature - hidden from the grid when SHOW_STREAK is off. */
 export const STREAK_BADGE_IDS = new Set(['consistent', 'onfire', 'unstoppable'])
 
