@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { Check, Crown, Trophy, AlertCircle } from 'lucide-react'
 import Spinner from './Spinner'
 import { useFocusTrap } from './useFocusTrap'
@@ -67,7 +68,11 @@ export default function PurchaseConfirmModal({
   const accentText = warm ? 'text-mint' : 'text-brand'
   const Icon = warm ? Crown : Trophy
 
-  return (
+  // Portalled to <body>: the card that owns this recap can sit inside a
+  // transformed/animated container (the Vettri offer sheet drags on the Y axis),
+  // and a transformed ancestor would otherwise become the containing block for
+  // this `fixed` overlay and pin it inside the sheet.
+  return createPortal(
     <div
       className="fixed inset-0 z-[55] flex items-center justify-center bg-ink/40 p-4 animate-fadeInFast backdrop-blur-sm"
       onClick={() => !busy && onCancel()}
@@ -160,6 +165,7 @@ export default function PurchaseConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -890,6 +890,12 @@ const STRINGS = {
     ta: 'வெற்றி நிச்சயத்திற்கு வரவேற்கிறோம்! அனைத்தும் திறக்கப்பட்டது.',
   },
   vettriEmpty: { en: 'No exams are available yet.', ta: 'இன்னும் தேர்வுகள் எதுவும் கிடைக்கவில்லை.' },
+  // Offer sheet — the paywall popup raised for non-paid learners (Test Marathon).
+  offerSheetHint: {
+    en: 'Swipe down or close to see the tests',
+    ta: 'தேர்வுகளைப் பார்க்க கீழே இழுக்கவும் அல்லது மூடவும்',
+  },
+  offerSheetSkip: { en: 'Skip and see the tests', ta: 'தவிர்த்து தேர்வுகளைப் பார்க்க' },
   vettriOnly: { en: 'Vettri', ta: 'வெற்றி' },
   vettriUnlimited: { en: 'Unlimited attempts', ta: 'வரம்பற்ற முயற்சிகள்' },
   vettriLocked: {

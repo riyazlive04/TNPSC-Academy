@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard from '../components/UI/VettriCard'
+import OfferSheet from '../components/UI/OfferSheet'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { SkeletonAnalytics, SkeletonCards } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
@@ -35,6 +36,9 @@ function formatDate(iso: string | null, lang: Lang): string {
   return `${String(d).padStart(2, '0')} ${months[m - 1]}`
 }
 
+/** Once dismissed, the offer popup stays down for the rest of the session. */
+const OFFER_DISMISSED_KEY = 'tnpsc-mentor-series-offer-dismissed'
+
 export default function TestSeriesPage() {
   const navigate = useNavigate()
   const { t, lang } = useT()
@@ -47,6 +51,7 @@ export default function TestSeriesPage() {
   // Analytics loads in the background (non-blocking): it feeds the prep banner on
   // the Papers tab and the whole Analytics tab.
   const [analytics, setAnalytics] = useState<TestSeriesAnalytics | null>(null)
+  const [offerOpen, setOfferOpen] = useState(false)
 
   // A purchase (Vettri/Premium) flips this to true. The per-paper locks are
   // computed server-side (premium vs date), so re-fetch on unlock rather than
@@ -91,6 +96,33 @@ export default function TestSeriesPage() {
     }
   }, [entitledUnlimited])
 
+  // The whole series is premium-only: surface the upgrade cards when locked out.
+  const seriesLocked = !premium
+
+  // Raise the paywall popup once the papers are in — only for a learner the
+  // server reports as unpaid (`premium: false`; paid users and staff come back
+  // true), and only once per session, so a dismissed offer doesn't nag on every
+  // visit. Dismissing it reveals the papers underneath.
+  useEffect(() => {
+    if (loading || error || !seriesLocked || tests.length === 0) return
+    if (sessionStorage.getItem(OFFER_DISMISSED_KEY)) return
+    setOfferOpen(true)
+  }, [loading, error, seriesLocked, tests.length])
+
+  // A purchase landed while the sheet was up — nothing left to sell.
+  useEffect(() => {
+    if (!seriesLocked) setOfferOpen(false)
+  }, [seriesLocked])
+
+  const closeOffer = () => {
+    setOfferOpen(false)
+    try {
+      sessionStorage.setItem(OFFER_DISMISSED_KEY, '1')
+    } catch {
+      // Private-mode storage failure just means the offer shows again later.
+    }
+  }
+
   const launch = (tst: TestSeriesItem) => {
     const config: QuizConfig = {
       category: 'pyq', // grading is category-agnostic; the engine uses the fetched rows
@@ -105,9 +137,6 @@ export default function TestSeriesPage() {
     }
     navigate('/mock/instructions', { state: config })
   }
-
-  // The whole series is premium-only: surface the upgrade card when locked out.
-  const seriesLocked = !premium
 
   return (
     <>
@@ -176,16 +205,6 @@ export default function TestSeriesPage() {
         {/* ── PAPERS TAB ── */}
         {!loading && !error && tab === 'papers' && tests.length === 0 && (
           <p className="tamil text-center font-body text-sm text-ink2">{t('testSeriesEmpty')}</p>
-        )}
-
-        {/* Whole-series paywall — EITHER paid bundle unlocks the series: the
-            cheaper Vettri option (which carries the Test Marathon banner as its
-            header), then the full Premium kit. */}
-        {!loading && !error && tab === 'papers' && tests.length > 0 && seriesLocked && (
-          <div className="mb-6 space-y-4">
-            <VettriCard />
-            <PremiumCard />
-          </div>
         )}
 
         {!loading && !error && tab === 'papers' && tests.length > 0 && (
@@ -303,6 +322,14 @@ export default function TestSeriesPage() {
           </div>
         )}
       </div>
+
+      {/* Whole-series paywall as a swipe-away popup rather than a banner —
+          EITHER paid bundle unlocks the series: the cheaper Vettri option (which
+          carries the Test Marathon banner as its header), then the Premium kit. */}
+      <OfferSheet open={offerOpen} onClose={closeOffer} title={t('testSeriesTitle')}>
+        <VettriCard />
+        <PremiumCard />
+      </OfferSheet>
     </>
   )
 }
