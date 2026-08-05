@@ -16,8 +16,10 @@ android {
         applicationId "com.tnpscmentor.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "2.0.0"
+        // Play rejects a versionCode it has already seen, even from a deleted
+        // draft — always bump before re-uploading, never reuse.
+        versionCode 6
+        versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     androidResources {
