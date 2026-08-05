@@ -1,0 +1,59 @@
+# ─── Log retention for TNPSC Mentors ─────────────────────────────────────────
+# Install on the VPS as root:
+#
+#   sudo cp /var/www/tnpsc-app/deploy/logrotate-tnpsc /etc/logrotate.d/tnpsc
+#   sudo chmod 644 /etc/logrotate.d/tnpsc
+#   sudo logrotate -d /etc/logrotate.d/tnpsc      # dry run — check the paths
+#   sudo logrotate -f /etc/logrotate.d/tnpsc      # force one rotation now
+#
+# WHY: the Privacy Policy states technical and security logs are kept "up to 90
+# days, then deleted". Nothing enforced that before this file — PM2's logs grew
+# without bound (so the real answer was "forever", which the policy contradicted)
+# and Ubuntu's stock nginx rule keeps only 14 days (shorter than the window an
+# investigation needs). Both are pinned to 90 here. If the policy's number ever
+# changes, change it in BOTH places: src/lib/legalContent.ts and this file.
+#
+# The API access log (server/src/middleware/requestLog.ts) writes one JSON line
+# per request to stdout, which PM2 captures — so rotating PM2's files IS
+# rotating the access log.
+
+# ─── PM2: API stdout (access log) + stderr (errors, security detectors) ───────
+# Adjust the path if PM2 runs as a user other than root: `pm2 info tnpsc-api`
+# prints the real log paths.
+/root/.pm2/logs/*.log {
+    daily
+    rotate 90
+    maxage 90
+    missingok
+    notifempty
+    compress
+    delaycompress
+    # PM2 holds the file handle open, so the file must be truncated in place
+    # rather than renamed — without copytruncate, rotation silently stops
+    # capturing new lines until the process restarts.
+    copytruncate
+    su root root
+    create 0640 root root
+}
+
+# ─── Nginx: access + error logs ──────────────────────────────────────────────
+# Overrides Ubuntu's stock /etc/logrotate.d/nginx (14 days). Keep only ONE rule
+# per path — if both files match, logrotate errors out. Disable the stock one:
+#   sudo mv /etc/logrotate.d/nginx /etc/logrotate.d/nginx.disabled
+/var/log/nginx/*.log {
+    daily
+    rotate 90
+    maxage 90
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    su root adm
+    create 0640 www-data adm
+    postrotate
+        if [ -f /var/run/nginx.pid ]; then
+            kill -USR1 `cat /var/run/nginx.pid`
+        fi
+    endscript
+}

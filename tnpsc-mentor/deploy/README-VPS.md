@@ -265,6 +265,15 @@ bash deploy/deploy.sh        # rebuilds SPA + API, republishes, reloads PM2
 - **Migrations / data scripts** (`server/*.mjs`) still run against Supabase
   Cloud — set the `SUPABASE_DB_*` vars in `server/.env` only if you need them.
 - **Logs**: `pm2 logs tnpsc-api`, Nginx at `/var/log/nginx/{access,error}.log`.
+  The API writes one JSON line per request (method, path, status, ms, user id,
+  IP) to PM2's stdout — that IS the access log. **Install the rotation rule** so
+  it doesn't grow without bound and so the 90-day retention the Privacy Policy
+  states is actually true:
+  `sudo cp deploy/logrotate-tnpsc /etc/logrotate.d/tnpsc && sudo mv /etc/logrotate.d/nginx /etc/logrotate.d/nginx.disabled && sudo logrotate -d /etc/logrotate.d/tnpsc`
+- **Breach detection**: set `SECURITY_ALERT_CHAT_ID` in `server/.env` or nothing
+  pages you when the detectors fire (the API logs a warning at boot if it's
+  missing). Apply `supabase/audit_log.sql` once — without it every audit write
+  fails and the admin action trail is empty. Runbook: `docs/BREACH_RESPONSE.md`.
 - **Memory**: optionally add swap on the VPS if builds ever feel tight (KVM 4's
   16 GB makes this unlikely): `sudo fallocate -l 2G /swapfile && sudo chmod 600
   /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile`.

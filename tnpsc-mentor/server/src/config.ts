@@ -109,6 +109,18 @@ export const config = {
   // env var is the fallback for a fresh environment.
   telegramCaBotToken: process.env.TELEGRAM_CA_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '',
   telegramCaChannel: (process.env.TELEGRAM_CA_CHANNEL ?? '').trim(),
+  // ─── Security alerting (optional but strongly recommended) ─────────────────
+  // Where the detectors in lib/securityAlerts.ts send a page when something
+  // looks like an attack or a breach: a failed-sign-in burst, someone probing
+  // admin routes, a 5xx spike, or a privileged action on a user's account.
+  // Without a chat id the events are still written to audit_log and stderr —
+  // they just wait for someone to go looking, which is the gap the Privacy
+  // Policy's "without undue delay" promise cannot afford. CHAT_ID is your own
+  // numeric Telegram chat (message @userinfobot to get it); the token defaults
+  // to the bot already used for signup verification.
+  securityAlertBotToken:
+    process.env.SECURITY_ALERT_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '',
+  securityAlertChatId: (process.env.SECURITY_ALERT_CHAT_ID ?? '').trim(),
   // ─── In-app purchases (App Store / Google Play) ────────────────────────────
   // The mobile apps cannot bill through Razorpay — Apple 3.1.1 and Play's
   // Payments policy both mandate store billing for digital content. Each store's

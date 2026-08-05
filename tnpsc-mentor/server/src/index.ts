@@ -4,6 +4,10 @@ import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import { config, isAllowedOrigin } from './config.js'
+import { requestLog } from './middleware/requestLog.js'
+import { auditAdmin } from './middleware/auditAdmin.js'
+import { startAuditRetention } from './lib/audit.js'
+import { securityAlertsEnabled } from './lib/securityAlerts.js'
 
 import authRoutes from './routes/auth.js'
 import questionRoutes from './routes/questions.js'
@@ -56,6 +60,11 @@ app.use(
 app.use(express.json({ limit: '2mb' }))
 app.use(cookieParser())
 
+// Access log + live 403/429/5xx detectors. Mounted BEFORE the routes so it sees
+// every request, and it reports on 'finish' so req.userId (set later, by
+// requireAuth) is populated by the time the line is written.
+app.use(requestLog)
+
 // Gentle global rate limit; auth endpoints get a stricter one below.
 app.use(
   '/api',
@@ -76,8 +85,10 @@ app.use('/api/revisions', revisionRoutes)
 app.use('/api/bookmarks', bookmarkRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/analytics', analyticsRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/superadmin', superadminRoutes)
+// Every privileged call is recorded in audit_log — mounted as middleware rather
+// than per-handler so no admin route can be added later without a trail.
+app.use('/api/admin', auditAdmin, adminRoutes)
+app.use('/api/superadmin', auditAdmin, superadminRoutes)
 app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payments', paymentRoutes)
 // Store billing (App Store / Play). Mounted separately from /api/payments so it
@@ -123,4 +134,14 @@ app.use(
 app.listen(config.port, () => {
   // eslint-disable-next-line no-console
   console.log(`TNPSC Mentors API listening on http://localhost:${config.port}`)
+  // Enforces the retention the Privacy Policy states (90 days for technical and
+  // security logs, 400 for the admin trail). Without this the table only grows.
+  startAuditRetention()
+  if (!securityAlertsEnabled) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[security] SECURITY_ALERT_CHAT_ID is not set — breach detectors will write ' +
+        'to audit_log but nobody will be paged. See docs/BREACH_RESPONSE.md.'
+    )
+  }
 })

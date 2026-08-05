@@ -30,6 +30,8 @@ import {
   verifyPhoneVerifyTicket,
 } from '../lib/otpTicket.js'
 import { sendSignupOtp, verifySignupOtp } from '../lib/whatsappOtp.js'
+import { auditAuth, clientIp } from '../lib/audit.js'
+import { recordAuthFailure } from '../lib/securityAlerts.js'
 
 const router = Router()
 
@@ -213,7 +215,11 @@ router.post(
     })
     if (error || !data.session) {
       // Constant, generic message: never echo GoTrue's text (which can distinguish
-      // "wrong password" from "no such user" → account enumeration).
+      // "wrong password" from "no such user" → account enumeration). The audit
+      // entry follows the same rule — it records the attempt and its IP but NOT
+      // whether the address exists, so the trail can't be read as an oracle.
+      auditAuth(req, 'login_failed', { status: 401 })
+      recordAuthFailure(clientIp(req), { route: 'login' })
       return res.status(401).json({ error: 'Invalid email or password' })
     }
     // Concurrent-device limit: block a new device once 2 others are active.
@@ -228,8 +234,14 @@ router.post(
       // sign one out (they've proven ownership with the correct password). The
       // raw device_id is stripped — see publicDevices.
       const devices = publicDevices(await listSessions(data.session.user.id))
+      auditAuth(req, 'login_device_limit', { subjectId: data.session.user.id, status: 403 })
       return res.status(403).json({ error: 'device_limit', devices })
     }
+    auditAuth(req, 'login_success', {
+      subjectId: data.session.user.id,
+      status: 200,
+      detail: { device: deviceLabel(req.headers['user-agent']) },
+    })
     setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
   })
@@ -252,11 +264,15 @@ router.post(
       password: String(password),
     })
     if (error || !data.session) {
+      auditAuth(req, 'login_failed', { status: 401, detail: { route: 'replace-device' } })
+      recordAuthFailure(clientIp(req), { route: 'login/replace-device' })
       return res.status(401).json({ error: 'Invalid email or password' })
     }
     const userId = data.session.user.id
     // revokeSessionById is scoped to userId, so a forged session_id from another
-    // account is a no-op rather than a cross-account sign-out.
+    // account is a no-op rather than a cross-account sign-out. Signing another
+    // device out is exactly what a session hijacker would do, so it is audited.
+    auditAuth(req, 'login_device_replaced', { subjectId: userId, status: 200 })
     await revokeSessionById(userId, String(session_id))
     const { blocked } = await registerLoginSession(
       userId,
@@ -338,8 +354,11 @@ router.post(
     const check = await verifySignupOtp(phone, otp)
     if (!check.ok) {
       // 401 invalid guess (retryable), 410 dead code (expired / guess budget
-      // spent) — the UI sends the user back to "resend" on 410.
+      // spent) — the UI sends the user back to "resend" on 410. A run of wrong
+      // guesses is the same signal as a run of wrong passwords, so it feeds the
+      // same detector.
       const status = check.code === 'invalid' ? 401 : 410
+      recordAuthFailure(clientIp(req), { route: 'register/otp/verify' })
       return res.status(status).json({ error: `otp_${check.code}` })
     }
     res.json({ ticket: issuePhoneVerifyTicket(phone) })
@@ -412,6 +431,8 @@ router.post(
     if (enrichError) {
       console.error('[register] profile enrich failed', data.user.id, enrichError.message)
     }
+
+    auditAuth(req, 'register_success', { subjectId: data.user.id, status: 200 })
 
     // Email-confirmation projects return no session on signup — surface that.
     if (!data.session) {
@@ -503,6 +524,12 @@ router.post(
         console.error('[google] profile enrich failed', data.user.id, enrichError.message)
       }
     }
+
+    auditAuth(req, 'oauth_login_success', {
+      subjectId: data.user.id,
+      status: 200,
+      detail: { method: 'google', device: deviceLabel(req.headers['user-agent']) },
+    })
 
     // Returning user: reuse the row we already have (merged with any enrichment).
     // First sign-in only: the handle_new_user trigger may not have committed the
@@ -632,6 +659,10 @@ router.post(
       String(email).trim(),
       safeRedirect ? { redirectTo: safeRedirect } : undefined
     )
+    // Audited without the address, for the same non-disclosure reason the
+    // response is constant: what matters to an investigation is that a reset was
+    // requested from this IP at this time.
+    auditAuth(req, 'password_reset_requested', { status: 200 })
     // Always answer { ok: true } regardless of outcome: a differential response
     // (or a raw GoTrue error) would reveal whether the email has an account.
     // Log the real error server-side for diagnostics.
@@ -682,6 +713,7 @@ router.post(
     }
     // Drop the web refresh-token cookie so the browser can't silently re-auth.
     clearRtCookie(res)
+    auditAuth(req, 'logout', { status: 200 })
     res.json({ ok: true })
   })
 )
@@ -819,7 +851,15 @@ router.post(
     if ('error' in found) return res.status(404).json({ error: 'phone_not_registered' })
 
     const check = await verifyOtp(phone, otp)
-    if (!check.ok) return res.status(401).json({ error: 'Invalid or expired code' })
+    if (!check.ok) {
+      auditAuth(req, 'login_failed', {
+        subjectId: found.userId,
+        status: 401,
+        detail: { route: 'otp/verify' },
+      })
+      recordAuthFailure(clientIp(req), { route: 'otp/verify' })
+      return res.status(401).json({ error: 'Invalid or expired code' })
+    }
 
     const session = await mintSessionForEmail(found.email)
     if (!session) {
@@ -835,11 +875,17 @@ router.post(
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(session.user.id))
+      auditAuth(req, 'login_device_limit', { subjectId: session.user.id, status: 403 })
       // Ticket lets /otp/replace-device finish without a fresh OTP (already spent).
       return res
         .status(403)
         .json({ error: 'device_limit', devices, ticket: issueOtpTicket(session.user.id) })
     }
+    auditAuth(req, 'login_success', {
+      subjectId: session.user.id,
+      status: 200,
+      detail: { method: 'phone_otp', device: deviceLabel(req.headers['user-agent']) },
+    })
     setRtCookie(res, session.refresh_token)
     res.json(await sessionPayload(session))
   })
