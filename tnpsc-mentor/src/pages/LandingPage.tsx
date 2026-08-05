@@ -36,6 +36,9 @@ import {
   Instagram,
   Youtube,
   Facebook,
+  // Telegram has no brand glyph in lucide, so the paper plane stands in for it —
+  // the same substitution the WhatsApp buttons already make with MessageCircle.
+  Send,
   X,
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
@@ -80,6 +83,8 @@ const REFUND_URL = '/refund-policy'
 const INSTAGRAM_URL = 'https://www.instagram.com/mentorstnpsc/?hl=en'
 const YOUTUBE_URL = 'https://www.youtube.com/@TNPSCMentors4you'
 const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61591260240425&sk=about'
+/** Public Telegram channel — also where the daily current-affairs PDFs are posted. */
+const TELEGRAM_URL = 'https://t.me/tnpscmentors'
 
 // ─── Analytics hook ──────────────────────────────────────────────────────────
 // The page's only KPI is install-rate, so every download fires this. Delegates to
@@ -1183,6 +1188,7 @@ export default function LandingPage() {
                   { href: INSTAGRAM_URL, Icon: Instagram, label: 'Instagram' },
                   { href: YOUTUBE_URL, Icon: Youtube, label: 'YouTube' },
                   { href: FACEBOOK_URL, Icon: Facebook, label: 'Facebook' },
+                  { href: TELEGRAM_URL, Icon: Send, label: 'Telegram' },
                 ].map(({ href, Icon, label }) => (
                   <a
                     key={label}
