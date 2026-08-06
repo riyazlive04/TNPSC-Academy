@@ -10,6 +10,8 @@ const router = Router()
 // touch storage. Private → access only via short-lived signed URLs below.
 const MATERIALS_BUCKET = 'materials'
 const MAX_FILE_BYTES = 50 * 1024 * 1024 // 50 MB, matches the bucket limit
+/** Lifetime of the card thumbnails minted with the list (see below). */
+const THUMB_TTL_SECONDS = 3600
 
 // Metadata returned to clients. No file URLs — those are minted on demand by
 // GET /:id/file so the per-item download gate can't be bypassed. Shared with
@@ -48,9 +50,15 @@ function kindFromFile(mime: string, name: string): Exclude<Kind, 'video'> {
 }
 
 // ─── GET /api/materials?placement=materials|profile ──────────────────────────
-// Active items for a placement, shown to every signed-in user. Metadata only —
-// the client builds YouTube thumbnails from youtube_id and fetches a signed URL
-// for files only when an item is opened/downloaded.
+// Active items for a placement, shown to every signed-in user. Mostly metadata:
+// the client builds YouTube thumbnails from youtube_id, and a file's real URL is
+// still minted on demand by GET /:id/file so the download gate holds.
+//
+// The ONE exception is `thumb_url` on image items: an infographic whose card
+// shows a grey file icon is unreadable as a library, so the picture itself is
+// batch-signed here (one storage round trip for the whole page) as a preview.
+// This is a VIEW url — the same thing tapping the card already mints — never a
+// download one, so the per-item download gate is untouched.
 router.get(
   '/',
   requireAuth,
@@ -58,15 +66,42 @@ router.get(
     const placement: Placement = req.query.placement === 'profile' ? 'profile' : 'materials'
     const { data, error } = await supabaseAdmin
       .from('materials')
-      .select(COLS)
+      // storage_path is fetched for the signing below and stripped from the
+      // response — clients never see raw object paths.
+      .select(`${COLS}, storage_path`)
       .eq('active', true)
       .eq('placement', placement)
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(300)
     if (error) return sendDbError(res, error)
+
+    const rows = (data ?? []) as (Record<string, unknown> & {
+      kind: string
+      storage_path: string | null
+    })[]
+
+    const imagePaths = rows
+      .filter((r) => r.kind === 'image' && r.storage_path)
+      .map((r) => r.storage_path as string)
+    const signedByPath = new Map<string, string>()
+    if (imagePaths.length > 0) {
+      const { data: signed } = await supabaseAdmin.storage
+        .from(MATERIALS_BUCKET)
+        .createSignedUrls(imagePaths, THUMB_TTL_SECONDS)
+      for (const s of signed ?? []) {
+        if (s.path && s.signedUrl) signedByPath.set(s.path, s.signedUrl)
+      }
+    }
+
+    const materials = rows.map(({ storage_path, ...rest }) => ({
+      ...rest,
+      thumb_url:
+        rest.kind === 'image' && storage_path ? signedByPath.get(storage_path) ?? null : null,
+    }))
+
     res.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
-    res.json({ materials: data ?? [] })
+    res.json({ materials })
   })
 )
 

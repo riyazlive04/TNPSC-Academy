@@ -34,13 +34,27 @@ export default function MaterialsPage() {
   const [error, setError] = useState(false)
   const [filter, setFilter] = useState<MaterialKind | 'all'>('all')
   const [active, setActive] = useState<Material | null>(null)
+  // Magazine covers, keyed by materials row id (one batch call, see below).
+  const [covers, setCovers] = useState<Record<string, string>>({})
 
   const load = () => {
     setError(false)
     api.materials
       // CA Questions are surfaced in their own dashboard section, not here.
       .list('materials')
-      .then((all) => setItems(all.filter((m) => m.kind !== 'questions')))
+      .then((all) => {
+        const shown = all.filter((m) => m.kind !== 'questions')
+        setItems(shown)
+        // Magazine cards carry no thumbnail of their own — the issue's cover
+        // lives in the CA deliverables bucket, so pull the whole map at once.
+        // Non-critical: a failure just leaves the icon fallback in place.
+        if (shown.some((m) => m.kind === 'magazine')) {
+          api.caMagazine
+            .thumbnails()
+            .then(setCovers)
+            .catch(() => undefined)
+        }
+      })
       .catch(() => setError(true))
   }
   useEffect(load, [])
@@ -116,7 +130,14 @@ export default function MaterialsPage() {
         {filtered.length > 0 && (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((m, i) => (
-              <MaterialCard key={m.id} m={m} lang={lang} i={i} onOpen={() => openMaterial(m)} />
+              <MaterialCard
+                key={m.id}
+                m={m}
+                lang={lang}
+                i={i}
+                cover={covers[m.id]}
+                onOpen={() => openMaterial(m)}
+              />
             ))}
           </div>
         )}
@@ -143,15 +164,31 @@ function MaterialCard({
   m,
   lang,
   i,
+  cover,
   onOpen,
 }: {
   m: Material
   lang: 'en' | 'ta' | 'both'
   i: number
+  /** kind='magazine': the issue's cover, when it has one. */
+  cover?: string
   onOpen: () => void
 }) {
   const { t } = useT()
   const Icon = KIND_ICON[m.kind]
+  // What this card shows as its picture: a video's YouTube still, an image's own
+  // file, or a magazine's cover. Everything else keeps the kind icon. A URL that
+  // fails to load falls back to the icon too, so an expired signed link or a
+  // deleted video never leaves a broken-image glyph on the shelf.
+  const [imageFailed, setImageFailed] = useState(false)
+  const preview =
+    m.kind === 'video' && m.youtube_id
+      ? youtubeThumb(m.youtube_id)
+      : m.kind === 'image' && m.thumb_url
+        ? m.thumb_url
+        : m.kind === 'magazine'
+          ? cover
+          : null
   // Magazine cards are named and dated from the issue itself (name on one line,
   // date on the next) rather than from whatever title the row was published with.
   const issue = m.kind === 'magazine' && m.magazine_ca_type && m.magazine_date
@@ -165,12 +202,13 @@ function MaterialCard({
     >
       {/* Media / thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden bg-tint">
-        {m.kind === 'video' && m.youtube_id ? (
+        {preview && !imageFailed ? (
           <img
-            src={youtubeThumb(m.youtube_id)}
+            src={preview}
             alt=""
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="grid h-full w-full place-items-center bg-tint-violet text-primary">

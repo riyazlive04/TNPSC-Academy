@@ -417,6 +417,67 @@ router.get(
   })
 )
 
+// ─── GET /api/ca-magazine/thumbnails ─────────────────────────────────────────
+// Every PUBLISHED issue's thumbnail, keyed by the materials row id, so the
+// Materials grid can show the issues as covers instead of a wall of identical
+// newspaper icons. One batch sign call per candidate path set (not two per
+// card), and the same custom → pipeline priority signNewsImage applies.
+// Declared before /:materialId/* so this literal path wins the match.
+router.get(
+  '/thumbnails',
+  requireAuth,
+  asyncH(async (_req: AuthedRequest, res) => {
+    const { data, error } = await supabaseAdmin
+      .from('materials')
+      .select('id, magazine_ca_type, magazine_date')
+      .eq('kind', 'magazine')
+      .eq('active', true)
+      .not('magazine_date', 'is', null)
+      .order('magazine_date', { ascending: false })
+      .limit(300)
+    if (error) return sendDbError(res, error)
+
+    const rows = (data ?? []).filter(
+      (r) => CA_TYPES.has(String(r.magazine_ca_type)) && DATE_RE.test(String(r.magazine_date))
+    ) as { id: string; magazine_ca_type: string; magazine_date: string }[]
+
+    /** Batch-sign a path list; missing objects simply don't land in the map. */
+    const signMany = async (paths: string[]): Promise<Map<string, string>> => {
+      const out = new Map<string, string>()
+      if (paths.length === 0) return out
+      const { data: signed } = await supabaseAdmin.storage
+        .from(CA_DELIVERABLES_BUCKET)
+        .createSignedUrls(paths, NEWS_IMAGE_TTL_SECONDS)
+      for (const s of signed ?? []) {
+        if (s.path && s.signedUrl) out.set(s.path, s.signedUrl)
+      }
+      return out
+    }
+
+    const [customs, pipeline] = await Promise.all([
+      signMany(rows.map((r) => customThumbPath(r.magazine_ca_type, r.magazine_date))),
+      signMany(
+        rows
+          .filter((r) => r.magazine_ca_type === 'day_wise')
+          .map((r) => newsImagePath(r.magazine_date))
+      ),
+    ])
+
+    const thumbs: Record<string, string> = {}
+    for (const r of rows) {
+      const url =
+        customs.get(customThumbPath(r.magazine_ca_type, r.magazine_date)) ??
+        (r.magazine_ca_type === 'day_wise' ? pipeline.get(newsImagePath(r.magazine_date)) : null)
+      if (url) thumbs[r.id] = url
+    }
+
+    // Half the signed URLs' lifetime, so a cached response always has time left
+    // on its URLs, and a replaced thumbnail still reaches readers within minutes.
+    res.set('Cache-Control', 'private, max-age=300')
+    res.json({ thumbs })
+  })
+)
+
 // ─── GET /api/ca-magazine/:materialId/items ──────────────────────────────────
 // Student read: the items of a PUBLISHED (active) issue, addressed by the
 // materials row users see in the Materials tab. Declared after /admin/* so
