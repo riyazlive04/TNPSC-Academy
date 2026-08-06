@@ -13,7 +13,6 @@ import { api } from '../../lib/api'
 import { prefetchRoute } from '../../lib/routePrefetch'
 import { useT } from '../../lib/i18n'
 import { getTestsCompleted, TESTS_BEFORE_FEEDBACK } from '../../lib/testProgress'
-import Avatar from '../UI/Avatar'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
 import BackToTopButton from './BackToTopButton'
@@ -294,26 +293,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   {profile.full_name}
                 </span>
               )}
-              <button
-                onClick={() => navigate('/profile')}
-                {...warm('/profile')}
-                title={t('profile')}
-                aria-label={t('profile')}
-                className={[
-                  'grid h-9 w-9 place-items-center overflow-hidden rounded-lg transition focus-ring active:scale-90',
-                  location.pathname.startsWith('/profile')
-                    ? 'bg-brand text-white'
-                    : 'text-ink2 hover:bg-brand-soft hover:text-brand-dark',
-                ].join(' ')}
-              >
-                <Avatar
-                  src={profile?.avatar_url}
-                  name={profile?.full_name}
-                  className="grid h-full w-full place-items-center rounded-lg"
-                >
-                  <User size={18} />
-                </Avatar>
-              </button>
+              {/* No profile avatar here: the bottom nav already carries a Profile
+                  tab, and two entry points to the same screen in one viewport read
+                  as a duplicate. The name label stays as an identity cue. */}
             </div>
           </div>
         </header>
