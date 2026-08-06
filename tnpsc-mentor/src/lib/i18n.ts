@@ -1884,6 +1884,12 @@ const STRINGS = {
   noFeedback: { en: 'No feedback yet.', ta: 'இன்னும் கருத்துகள் இல்லை.' },
   couldNotLoad: { en: "Couldn't load this data. Try again.", ta: 'இந்தத் தரவை ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
   retry: { en: 'Retry', ta: 'மீண்டும் முயற்சி' },
+  // Shown in place of a server message that turned out to be a database
+  // internal rather than copy meant for a user — see ApiError in lib/api.ts.
+  unexpectedError: {
+    en: 'Something went wrong. Please try again.',
+    ta: 'ஏதோ தவறாகிவிட்டது. மீண்டும் முயற்சிக்கவும்.',
+  },
 } as const
 
 export type StringKey = keyof typeof STRINGS

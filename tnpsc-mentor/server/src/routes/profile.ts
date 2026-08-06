@@ -19,9 +19,38 @@ router.get(
       .from('profiles')
       .select('*')
       .eq('id', req.userId)
-      .single()
+      .maybeSingle()
     if (error) return sendDbError(res, error)
-    res.json({ profile: data })
+    if (data) return res.json({ profile: data })
+
+    // No row. handle_new_user() writes one at signup, so getting here means it
+    // was lost afterwards — which used to brick the account outright, since every
+    // profile-scoped read does .single() (2026-08-05: seven accounts were in this
+    // state; see supabase/backfill_missing_profiles.sql). Rebuild it from the auth
+    // record exactly as the trigger would, so the account heals on next load
+    // instead of needing a manual backfill.
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(req.userId!)
+    // ignoreDuplicates so two concurrent loads can't collide on the primary key,
+    // and so a row that appeared in between is never overwritten.
+    const { error: healErr } = await supabaseAdmin.from('profiles').upsert(
+      {
+        id: req.userId,
+        email: authUser?.user?.email ?? null,
+        full_name: (authUser?.user?.user_metadata?.full_name as string | undefined) ?? null,
+        role: 'user',
+      },
+      { onConflict: 'id', ignoreDuplicates: true }
+    )
+    if (healErr) return sendDbError(res, healErr)
+    console.warn('[profile] rebuilt missing profiles row for', req.userId)
+
+    const { data: healed, error: reReadErr } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', req.userId)
+      .single()
+    if (reReadErr) return sendDbError(res, reReadErr)
+    res.json({ profile: healed })
   })
 )
 

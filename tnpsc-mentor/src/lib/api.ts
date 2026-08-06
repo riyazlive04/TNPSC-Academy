@@ -24,6 +24,8 @@ import type {
 
 import { getDeviceId } from './device'
 import { Capacitor } from '@capacitor/core'
+import { translate } from './i18n'
+import { useLanguageStore } from '../store/languageStore'
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
 
@@ -107,15 +109,34 @@ export function canTryRefresh(): boolean {
   return isNative ? !!tokens.refresh : true
 }
 
+/**
+ * Server error text that is a DATABASE INTERNAL, not copy written for a user.
+ *
+ * Several screens show `err.message` verbatim, which is right for deliberate
+ * server copy ("Invalid coupon code.", "Order not found.") and wrong for
+ * anything that escaped from Postgres. On 5 August 2026 a missing `profiles`
+ * row surfaced PostgREST's "Cannot coerce the result to a single JSON object"
+ * as a toast on the profile screen. The server no longer emits that one (util.ts
+ * maps PGRST116 to a 404), and this is the second line of defence: match here
+ * and the user sees actionable copy instead, wherever the message is rendered.
+ */
+const DB_INTERNAL =
+  /coerce|JSON object|PGRST|postgres|violates .*constraint|relation ".*" does not exist|column .* does not exist|syntax error at or near|null value in column/i
+
 export class ApiError extends Error {
   status: number
   /** The parsed JSON error body, so callers can read extra fields (e.g. the
    * device list returned with a `device_limit` 403). */
   data: unknown
+  /** The server's original text, kept for logs even when `message` is replaced. */
+  rawMessage: string
   constructor(message: string, status: number, data?: unknown) {
-    super(message)
+    const leaked = DB_INTERNAL.test(message)
+    super(leaked ? translate('unexpectedError', useLanguageStore.getState().lang) : message)
+    this.rawMessage = message
     this.status = status
     this.data = data
+    if (leaked) console.error('[api] suppressed DB internal in error message:', message)
   }
 }
 
@@ -1195,6 +1216,15 @@ export const api = {
       const data = await request<{ url: string | null }>(`/api/ca-magazine/${materialId}/news-image`)
       return data.url
     },
+    /**
+     * Every published issue's cover, keyed by its materials row id — one call
+     * for the whole Materials grid instead of a news-image fetch per card.
+     * Issues with no image are simply absent from the map.
+     */
+    async thumbnails(): Promise<Record<string, string>> {
+      const data = await request<{ thumbs: Record<string, string> }>('/api/ca-magazine/thumbnails')
+      return data.thumbs
+    },
     /** Superadmin: every pushed issue with item count + publication state. */
     async adminIssues(): Promise<CaMagazineIssue[]> {
       const data = await request<{ issues: CaMagazineIssue[] }>('/api/ca-magazine/admin/issues')
@@ -1684,6 +1714,12 @@ export interface Material {
   active: boolean
   sort_order: number
   created_at: string
+  /**
+   * kind='image' only: a short-lived signed URL of the picture itself, so the
+   * card can show the infographic instead of a file icon. Null for every other
+   * kind (magazine covers come from caMagazine.thumbnails()).
+   */
+  thumb_url?: string | null
 }
 
 // ─── CA Magazine shapes ─────────────────────────────────────────────────────────

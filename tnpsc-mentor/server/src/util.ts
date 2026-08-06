@@ -49,6 +49,15 @@ export function sendDbError(
   if (code === '42501') {
     return res.status(403).json({ error: 'Not authorized.' })
   }
+  // PGRST116 is `.single()` finding 0 (or >1) rows. Its raw text — "Cannot
+  // coerce the result to a single JSON object" — is PostgREST internals, and it
+  // reached real users as a toast when seven accounts turned up with no profiles
+  // row (see supabase/backfill_missing_profiles.sql). A missing row is a 404 to
+  // the caller, not a sentence about JSON coercion.
+  if (code === 'PGRST116') {
+    console.error('[db error] PGRST116', error?.message)
+    return res.status(404).json({ error: 'Not found.' })
+  }
   if (isClientError) {
     return res.status(400).json({ error: error?.message ?? 'Invalid request.' })
   }
