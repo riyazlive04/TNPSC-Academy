@@ -170,6 +170,12 @@ grant execute on function public.superadmin_revoke_vettri(uuid) to authenticated
 -- then grants access for the plan's own validity window from now. The synthetic
 -- order id keeps the razorpay_order_id NOT NULL UNIQUE constraint happy and is
 -- prefixed 'comp_' so the ledger stays auditable.
+--
+-- gen_random_uuid(), NOT uuid_generate_v4(): this function pins
+-- `search_path = public`, and uuid-ossp lives in the `extensions` schema on
+-- Supabase, so the unqualified uuid_generate_v4() call failed here with
+-- "42883 function uuid_generate_v4() does not exist". gen_random_uuid() is core
+-- (pg_catalog) from PG13 on and resolves under any search_path.
 create or replace function public.superadmin_grant_plan(p_user uuid, p_plan text)
 returns uuid
 language plpgsql
@@ -194,7 +200,7 @@ begin
   insert into public.payments (user_id, razorpay_order_id, amount, currency, receipt, notes, status)
   values (
     p_user,
-    'comp_' || replace(uuid_generate_v4()::text, '-', ''),
+    'comp_' || replace(gen_random_uuid()::text, '-', ''),
     0,
     'INR',
     'superadmin comp',
