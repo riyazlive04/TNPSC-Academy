@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import { savePdfDoc } from './savePdf'
+import { stampWatermark, makeWatermarkLayer } from './pdfWatermark'
 import type { DisplayLang, Question, ParsedMatch } from '../types'
 import {
   optionLetters,
@@ -36,7 +37,6 @@ const MINT_SOFT = '#E7F7EE'
 const LINE = '#E8E6F3'
 const GREY: [number, number, number] = [110, 108, 124]
 const LINE_RGB: [number, number, number] = [232, 230, 243]
-const VIOLET_RGB: [number, number, number] = [124, 92, 255]
 
 // The Tamil-capable font the app already loads (index.html / .tamil class). The
 // browser shapes Tamil correctly with it; html2canvas captures that.
@@ -327,21 +327,62 @@ export async function generateExplanationPdf({
   // JPEG q0.85 is ~0.6 MB with no visible loss on text/UI.
   const toJpeg = (c: HTMLCanvasElement) => c.toDataURL('image/jpeg', 0.85)
 
+  // Canvas pixels per PDF point, taken from the rasteriser so a block image maps
+  // 1:1 onto the page and the background lattice is drawn at the same density.
+  const pxPerPt = (RENDER_W * 2) / contentW
+
+  // Full-page background, painted before anything else on every page so the
+  // mark reaches the margins and the footer band, not just the blocks. Built
+  // once and re-added under a fixed alias, so jsPDF stores ONE copy of it no
+  // matter how many pages a 200-question sheet runs to.
+  const bg = watermark
+    ? makeWatermarkLayer(watermark, { pxPerPt, pageWPt: pageW, pageHPt: pageH })
+    : ''
+  const paintBg = () => {
+    if (bg) doc.addImage(bg, 'JPEG', 0, 0, pageW, pageH, 'wm-bg', 'FAST')
+  }
+  const newPage = () => {
+    doc.addPage()
+    paintBg()
+  }
+
   let y = margin
   const placeCanvas = (canvas: HTMLCanvasElement, topMargin = margin) => {
     const hPt = (canvas.height / canvas.width) * contentW
     if (y + hPt > footerSafe) {
-      doc.addPage()
+      newPage()
       y = topMargin
+    }
+    // Blocks are opaque, so they'd punch holes in the background layer. Stamp
+    // the same lattice into each one, on the same page-space grid, and the two
+    // layers meet without a seam. Rastered rather than drawn as PDF text with
+    // an alpha — see stampWatermark for why.
+    if (watermark) {
+      stampWatermark(canvas, watermark, {
+        pxPerPt: canvas.width / contentW,
+        pageWPt: pageW,
+        pageHPt: pageH,
+        originXPt: margin,
+        originYPt: y,
+      })
     }
     doc.addImage(toJpeg(canvas), 'JPEG', margin, y, contentW, hPt)
     y += hPt
   }
 
+  paintBg()
+
   // Cover (HTML so a Tamil sub-title shapes correctly).
   const cover = await htmlToCanvas(coverHtml(title, label, questions.length))
   // Cover spans full width incl. the colored band - bleed it to the page edges.
   const coverHPt = (cover.height / cover.width) * pageW
+  if (watermark) {
+    stampWatermark(cover, watermark, {
+      pxPerPt: cover.width / pageW,
+      pageWPt: pageW,
+      pageHPt: pageH,
+    })
+  }
   doc.addImage(toJpeg(cover), 'JPEG', 0, 0, pageW, coverHPt)
   y = coverHPt + 10
 
@@ -355,26 +396,10 @@ export async function generateExplanationPdf({
     for (const canvas of canvases) placeCanvas(canvas)
   }
 
-  // Watermark + footer on every page (Latin only → safe in jsPDF's Helvetica).
+  // Footer on every page (the watermark is already baked into each block).
   const total = doc.getNumberOfPages()
   for (let p = 1; p <= total; p++) {
     doc.setPage(p)
-    if (watermark) {
-      const g = doc as unknown as {
-        GState?: new (o: { opacity: number }) => unknown
-        setGState?: (s: unknown) => void
-      }
-      // Higher opacity + larger font so the "NAME · PHONE" mark is clearly
-      // legible (still light enough to read the content through it); spacing
-      // loosened to match the bigger text and keep tiles from overlapping.
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.08 }))
-      doc.setTextColor(...VIOLET_RGB)
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(26)
-      for (let yy = 70; yy < pageH; yy += 120)
-        for (let xx = -10; xx < pageW; xx += 280) doc.text(watermark, xx, yy, { angle: 30 })
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
-    }
     const fy = pageH - 26
     doc.setDrawColor(...LINE_RGB)
     doc.setLineWidth(0.7)

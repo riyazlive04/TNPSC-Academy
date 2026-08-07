@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { savePdfDoc } from './savePdf'
-import { SITE_URL } from './pdfWatermark'
+import { SITE_URL, stampWatermark, makeWatermarkLayer } from './pdfWatermark'
 import { groupBySection, isSectionEcho, sectionLabel } from './caMagazine'
 import { markdownToHtml } from './caMagazineMarkdown'
 import type { CaMagazineItem } from './api'
@@ -23,7 +23,6 @@ const BODY = '#3C3850'
 const LINE = '#E8E6F3'
 const GREY: [number, number, number] = [110, 108, 124]
 const LINE_RGB: [number, number, number] = [232, 230, 243]
-const VIOLET_RGB: [number, number, number] = [124, 92, 255]
 
 const FONT_STACK = "'Noto Sans Tamil','Inter',system-ui,sans-serif"
 const RENDER_W = 760
@@ -165,6 +164,24 @@ export async function buildMagazinePdfDoc({
 
   const toJpeg = (c: HTMLCanvasElement) => c.toDataURL('image/jpeg', 0.85)
 
+  // Full-page background so the mark reaches the margins and footer band, not
+  // just the blocks; built once and re-added under a fixed alias so jsPDF keeps
+  // a single copy. Blocks carry the same lattice on the same page-space grid,
+  // so the layers meet seamlessly.
+  const pxPerPt = (RENDER_W * 2) / contentW
+  const bg = watermark
+    ? makeWatermarkLayer(watermark, { pxPerPt, pageWPt: pageW, pageHPt: pageH })
+    : ''
+  const paintBg = () => {
+    if (bg) doc.addImage(bg, 'JPEG', 0, 0, pageW, pageH, 'wm-bg', 'FAST')
+  }
+  const newPage = () => {
+    doc.addPage()
+    paintBg()
+  }
+
+  paintBg()
+
   const state = { y: margin }
 
   // Draw a portion of a (possibly very tall) canvas, flowing across page breaks.
@@ -173,7 +190,7 @@ export async function buildMagazinePdfDoc({
     let sy = 0
     while (sy < canvas.height) {
       if (state.y >= footerSafe - 4) {
-        doc.addPage()
+        newPage()
         state.y = margin
       }
       const availPx = Math.max(1, Math.floor((footerSafe - state.y) / pxToPt))
@@ -183,11 +200,20 @@ export async function buildMagazinePdfDoc({
       tmp.height = sliceH
       tmp.getContext('2d')!.drawImage(canvas, 0, sy, canvas.width, sliceH, 0, 0, canvas.width, sliceH)
       const hPt = sliceH * pxToPt
+      if (watermark) {
+        stampWatermark(tmp, watermark, {
+          pxPerPt: tmp.width / contentW,
+          pageWPt: pageW,
+          pageHPt: pageH,
+          originXPt: margin,
+          originYPt: state.y,
+        })
+      }
       doc.addImage(toJpeg(tmp), 'JPEG', margin, state.y, contentW, hPt)
       state.y += hPt
       sy += sliceH
       if (sy < canvas.height) {
-        doc.addPage()
+        newPage()
         state.y = margin
       }
     }
@@ -202,8 +228,17 @@ export async function buildMagazinePdfDoc({
       return
     }
     if (state.y + hPt > footerSafe) {
-      doc.addPage()
+      newPage()
       state.y = margin
+    }
+    if (watermark) {
+      stampWatermark(canvas, watermark, {
+        pxPerPt: canvas.width / contentW,
+        pageWPt: pageW,
+        pageHPt: pageH,
+        originXPt: margin,
+        originYPt: state.y,
+      })
     }
     doc.addImage(toJpeg(canvas), 'JPEG', margin, state.y, contentW, hPt)
     state.y += hPt
@@ -212,6 +247,13 @@ export async function buildMagazinePdfDoc({
   // Cover — full-bleed coloured band.
   const cover = await htmlToCanvas(coverHtml(title, subtitle))
   const coverHPt = (cover.height / cover.width) * pageW
+  if (watermark) {
+    stampWatermark(cover, watermark, {
+      pxPerPt: cover.width / pageW,
+      pageWPt: pageW,
+      pageHPt: pageH,
+    })
+  }
   doc.addImage(toJpeg(cover), 'JPEG', 0, 0, pageW, coverHPt)
   state.y = coverHPt + 12
 
@@ -227,26 +269,10 @@ export async function buildMagazinePdfDoc({
     for (const canvas of canvases) placeBlock(canvas)
   }
 
-  // Watermark + footer on every page (Latin only → safe in jsPDF's Helvetica).
+  // Footer on every page (the watermark is already baked into each block).
   const total = doc.getNumberOfPages()
   for (let p = 1; p <= total; p++) {
     doc.setPage(p)
-    if (watermark) {
-      const g = doc as unknown as {
-        GState?: new (o: { opacity: number }) => unknown
-        setGState?: (s: unknown) => void
-      }
-      // Faint tiled mark — light enough to read through, matching the
-      // explanation sheet. "NAME · PHONE" on a student download (traceable);
-      // the brand + site URL on a copy published to the Telegram channel.
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.08 }))
-      doc.setTextColor(...VIOLET_RGB)
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(26)
-      for (let yy = 70; yy < pageH; yy += 120)
-        for (let xx = -10; xx < pageW; xx += 280) doc.text(watermark, xx, yy, { angle: 30 })
-      if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
-    }
     const fy = pageH - 26
     doc.setDrawColor(...LINE_RGB)
     doc.setLineWidth(0.7)

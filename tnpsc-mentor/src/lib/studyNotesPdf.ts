@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { savePdfDoc } from './savePdf'
+import { stampWatermark, makeWatermarkLayer } from './pdfWatermark'
 
 /**
  * Study-notes PDF generator.
@@ -16,8 +17,10 @@ import { savePdfDoc } from './savePdf'
  * the pixels - identical approach to explanationPdf.ts. Each entry is captured
  * as its own image so pagination never cuts an entry mid-line.
  *
- * The watermark is drawn afterwards with jsPDF's own text in Helvetica - it's
- * Latin-only ("TNPSC Mentors") so it shapes fine and stays crisp/selectable.
+ * The watermark is composited into each block's raster rather than drawn over
+ * the page with jsPDF text — PDF-level transparency is ignored by several
+ * Android viewers, which turned the faint mark into a solid violet lattice.
+ * See stampWatermark in pdfWatermark.ts.
  */
 
 // ─── Bilingual content model ──────────────────────────────────────────────────
@@ -63,7 +66,10 @@ const INK2 = '#3C3850'
 const GREY: [number, number, number] = [110, 108, 124]
 const LINE = '#E8E6F3'
 const LINE_RGB: [number, number, number] = [232, 230, 243]
-const VIOLET_RGB: [number, number, number] = [124, 92, 255]
+
+// Study notes are brand material rather than a per-student download, so the
+// mark is the brand name — there is no one to trace a leaked copy back to.
+const NOTES_WATERMARK = 'TNPSC Mentors'
 
 // Tamil-capable font the app already loads (index.html / .tamil class). The
 // browser shapes Tamil correctly with it and html2canvas captures that.
@@ -190,13 +196,39 @@ export async function generateStudyNotePdf(note: StudyNote): Promise<void> {
   // JPEG (not PNG) keeps the file small with no visible loss on text.
   const toJpeg = (c: HTMLCanvasElement) => c.toDataURL('image/jpeg', 0.85)
 
+  // Full-page background so the mark reaches the margins and footer band, not
+  // just the blocks; built once and re-added under a fixed alias so jsPDF keeps
+  // a single copy. Blocks carry the same lattice on the same page-space grid,
+  // so the layers meet seamlessly.
+  const NOTES_MARK = { opacity: 0.06, fontSizePt: 30, stepXPt: 250, stepYPt: 150 }
+  const bg = makeWatermarkLayer(NOTES_WATERMARK, {
+    pxPerPt: (RENDER_W * 2) / contentW,
+    pageWPt: pageW,
+    pageHPt: pageH,
+    ...NOTES_MARK,
+  })
+  const paintBg = () => {
+    if (bg) doc.addImage(bg, 'JPEG', 0, 0, pageW, pageH, 'wm-bg', 'FAST')
+  }
+
+  paintBg()
+
   let y = margin
   const placeCanvas = (canvas: HTMLCanvasElement) => {
     const hPt = (canvas.height / canvas.width) * contentW
     if (y + hPt > footerSafe) {
       doc.addPage()
+      paintBg()
       y = margin
     }
+    stampWatermark(canvas, NOTES_WATERMARK, {
+      pxPerPt: canvas.width / contentW,
+      pageWPt: pageW,
+      pageHPt: pageH,
+      originXPt: margin,
+      originYPt: y,
+      ...NOTES_MARK,
+    })
     doc.addImage(toJpeg(canvas), 'JPEG', margin, y, contentW, hPt)
     y += hPt
   }
@@ -204,6 +236,12 @@ export async function generateStudyNotePdf(note: StudyNote): Promise<void> {
   // Cover (HTML so the Tamil title shapes correctly); bleeds to the page edges.
   const cover = await htmlToCanvas(coverHtml(note))
   const coverHPt = (cover.height / cover.width) * pageW
+  stampWatermark(cover, NOTES_WATERMARK, {
+    pxPerPt: cover.width / pageW,
+    pageWPt: pageW,
+    pageHPt: pageH,
+    ...NOTES_MARK,
+  })
   doc.addImage(toJpeg(cover), 'JPEG', 0, 0, pageW, coverHPt)
   y = coverHPt + 10
 
@@ -213,22 +251,10 @@ export async function generateStudyNotePdf(note: StudyNote): Promise<void> {
     placeCanvas(canvas)
   }
 
-  // Watermark + footer on every page (Latin only → safe in jsPDF's Helvetica).
+  // Footer on every page (the watermark is already baked into each block).
   const total = doc.getNumberOfPages()
   for (let p = 1; p <= total; p++) {
     doc.setPage(p)
-    const g = doc as unknown as {
-      GState?: new (o: { opacity: number }) => unknown
-      setGState?: (s: unknown) => void
-    }
-    if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 0.06 }))
-    doc.setTextColor(...VIOLET_RGB)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(30)
-    for (let yy = 90; yy < pageH; yy += 150)
-      for (let xx = -20; xx < pageW; xx += 250) doc.text('TNPSC Mentors', xx, yy, { angle: 30 })
-    if (g.GState && g.setGState) g.setGState(new g.GState({ opacity: 1 }))
-
     const fy = pageH - 26
     doc.setDrawColor(...LINE_RGB)
     doc.setLineWidth(0.7)
