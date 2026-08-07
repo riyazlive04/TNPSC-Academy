@@ -671,6 +671,74 @@ router.post(
   })
 )
 
+// ─── POST /api/auth/reset-password ───────────────────────────────────────────
+// Completes the flow /forgot-password starts. The browser can't do this itself:
+// the SPA has no Supabase client and no anon key (everything goes through this
+// API), so the recovery credential from the email has to be redeemed here.
+//
+// GoTrue verifies the emailed link on its own /auth/v1/verify and then redirects
+// to our page with the proof attached. Which form it takes depends on the email
+// template, so accept both:
+//   #access_token=…&type=recovery   default template, a real (short-lived) session
+//   ?token_hash=…&type=recovery     {{ .TokenHash }} template, single-use
+router.post(
+  '/reset-password',
+  sensitiveLimiter,
+  asyncH(async (req, res) => {
+    const { access_token: accessTokenIn, token_hash: tokenHash, password } = req.body ?? {}
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ error: 'A new password is required.' })
+    }
+    // Same floor the register form enforces, so a reset can't set a password
+    // that signing up would have rejected.
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters.' })
+    }
+    if (!accessTokenIn && !tokenHash) {
+      return res.status(400).json({ error: 'This reset link is invalid or has expired.' })
+    }
+
+    // Redeem a token_hash into a session; an access_token already is one.
+    let accessToken = typeof accessTokenIn === 'string' ? accessTokenIn : ''
+    if (!accessToken && typeof tokenHash === 'string') {
+      const { data, error } = await supabaseAuthClient.auth.verifyOtp({
+        type: 'recovery',
+        token_hash: tokenHash,
+      })
+      if (error || !data.session) {
+        console.error('[reset-password] verifyOtp failed', error?.message)
+        return res.status(400).json({ error: 'This reset link is invalid or has expired.' })
+      }
+      accessToken = data.session.access_token
+    }
+
+    // Resolve the token to a user. This is the authorisation check — only the
+    // holder of a valid recovery credential for this account gets past here, and
+    // an expired or forged one resolves to nothing.
+    const { data: userData, error: userErr } = await supabaseAuthClient.auth.getUser(accessToken)
+    const user = userData?.user
+    if (userErr || !user) {
+      console.error('[reset-password] token did not resolve to a user', userErr?.message)
+      return res.status(400).json({ error: 'This reset link is invalid or has expired.' })
+    }
+
+    // Service-role write: the recovery session is deliberately low-privilege and
+    // updating a password through it is refused on some projects.
+    const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      password: String(password),
+    })
+    if (updErr) {
+      console.error('[reset-password] update failed', user.id, updErr.message)
+      // GoTrue's own text here is user-facing and useful ("password is too weak",
+      // "New password should be different from the old password").
+      return res.status(400).json({ error: updErr.message })
+    }
+
+    auditAuth(req, 'password_reset_completed', { status: 200, subjectId: user.id })
+    res.json({ ok: true })
+  })
+)
+
 // ─── GET /api/auth/me ────────────────────────────────────────────────────────
 // Re-hydrate the current user + profile from a stored access token on app boot.
 router.get(

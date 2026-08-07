@@ -1,10 +1,32 @@
 import { create } from 'zustand'
+import { Capacitor } from '@capacitor/core'
 import { api, tokens, isApiConfigured, canTryRefresh, ApiError, type DeviceSession } from '../lib/api'
 import { useLanguageStore } from './languageStore'
 import { armMomentumPanel } from './momentumStore'
 import { trackLogin, trackSignUp, setUserId } from '../lib/tracking'
 import { nativeGoogleSignOut } from '../lib/nativeAuth'
 import type { Profile, UserRole } from '../types'
+
+/** The public web origin, for links that have to survive leaving the app. */
+const WEB_ORIGIN = 'https://tnpscmentors.in'
+
+/**
+ * Where the emailed reset link should land.
+ *
+ * Two things this must get right, both of which it previously got wrong:
+ *  • the path has to be the page that can COMPLETE a reset. It pointed at
+ *    /login, which dropped the user on the sign-in form with the recovery token
+ *    sitting unread in the URL and their old password still in force.
+ *  • on native, `window.location.origin` is `https://localhost` — the Capacitor
+ *    WebView's own origin. It's in CORS_ORIGIN (the API must accept it), so the
+ *    server happily honoured it and mailed out a link to `https://localhost/…`,
+ *    which resolves to nothing in the mail client the user opens it from. The
+ *    reset always has to land on the real site.
+ */
+function resetRedirectUrl(): string {
+  const origin = Capacitor.isNativePlatform() ? WEB_ORIGIN : window.location.origin
+  return `${origin}/reset-password`
+}
 
 /** Result of a sign-in attempt. `deviceLimit` means the account is already on
  * the max number of devices - `devices` carries them so the UI can offer to
@@ -338,7 +360,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   resetPassword: async (email) => {
     try {
-      await api.auth.forgotPassword(email.trim(), `${window.location.origin}/login`)
+      await api.auth.forgotPassword(email.trim(), resetRedirectUrl())
       return { error: null }
     } catch (e) {
       return { error: e instanceof Error ? e.message : 'Could not send reset email' }

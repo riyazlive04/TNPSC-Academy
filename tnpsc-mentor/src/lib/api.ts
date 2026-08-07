@@ -462,6 +462,22 @@ export const api = {
         body: { email, redirectTo },
       })
     },
+    /**
+     * Set a new password using the credential the emailed reset link carried
+     * back — an `access_token` from the URL hash, or a `token_hash` from the
+     * query string, depending on the email template. The browser cannot do this
+     * itself: there is no Supabase client here, so the server redeems it.
+     */
+    async resetPassword(
+      creds: { access_token?: string; token_hash?: string },
+      password: string
+    ): Promise<void> {
+      await request('/api/auth/reset-password', {
+        method: 'POST',
+        auth: false,
+        body: { ...creds, password },
+      })
+    },
     // ─── Phone-OTP login (alternate to email/password) ───────────────────────
     /** Send a login code to a registered phone. Throws ApiError(404,
      * 'phone_not_registered') when no account owns the number. */

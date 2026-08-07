@@ -125,6 +125,7 @@ export function auditAuth(
     | 'register_rejected'
     | 'logout'
     | 'password_reset_requested'
+    | 'password_reset_completed'
     | 'oauth_login_success',
   opts: { subjectId?: string | null; status?: number; detail?: Record<string, unknown> } = {}
 ): void {

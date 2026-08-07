@@ -1890,6 +1890,24 @@ const STRINGS = {
     en: 'Something went wrong. Please try again.',
     ta: 'ஏதோ தவறாகிவிட்டது. மீண்டும் முயற்சிக்கவும்.',
   },
+  // Setting a new password from the emailed reset link (ResetPasswordPage).
+  newPasswordTitle: { en: 'Set a new password', ta: 'புதிய கடவுச்சொல்லை அமைக்கவும்' },
+  newPasswordHint: {
+    en: 'Choose a new password for your account.',
+    ta: 'உங்கள் கணக்கிற்கு புதிய கடவுச்சொல்லைத் தேர்ந்தெடுக்கவும்.',
+  },
+  newPassword: { en: 'New password', ta: 'புதிய கடவுச்சொல்' },
+  savePassword: { en: 'Save new password', ta: 'புதிய கடவுச்சொல்லைச் சேமி' },
+  saving: { en: 'Saving…', ta: 'சேமிக்கிறது…' },
+  passwordChanged: {
+    en: 'Your password has been changed. You can sign in with it now.',
+    ta: 'உங்கள் கடவுச்சொல் மாற்றப்பட்டது. இப்போது அதைக் கொண்டு உள்நுழையலாம்.',
+  },
+  resetLinkInvalid: {
+    en: 'This reset link is invalid or has expired. Request a new one.',
+    ta: 'இந்த இணைப்பு தவறானது அல்லது காலாவதியாகிவிட்டது. புதிய ஒன்றைக் கோரவும்.',
+  },
+  requestNewLink: { en: 'Request a new link', ta: 'புதிய இணைப்பைக் கோரவும்' },
 } as const
 
 export type StringKey = keyof typeof STRINGS

@@ -47,6 +47,7 @@ function UpsellOutlet() {
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'))
 const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
@@ -265,6 +266,7 @@ function AnimatedRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />
