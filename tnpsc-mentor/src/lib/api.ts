@@ -2252,8 +2252,22 @@ export interface ReportedQuestion {
   resolved_at: string | null
   /** Name of the admin who last resolved/dismissed it. */
   resolver_name: string | null
+  /**
+   * The students who flagged this question, newest first — superadmin only.
+   * Null for plain admins, who keep the anonymous `reasons` view.
+   */
+  reporters: ReportReporter[] | null
   /** The full question row, or null if it has since been deleted. */
   question: Question | null
+}
+
+/** One student who reported a question, with the note they left. */
+export interface ReportReporter {
+  user_id: string
+  name: string | null
+  email: string | null
+  reason: string | null
+  reported_at: string
 }
 
 /**
