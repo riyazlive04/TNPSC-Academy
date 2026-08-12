@@ -27,11 +27,17 @@ import { join } from 'node:path'
  * untouched rows is preserved. Rows whose answer letter is missing, or whose
  * four options aren't all present (e.g. figure-only questions), are skipped.
  *
- *   node import_pyq2.mjs           # dry-run: counts only
- *   APPLY=1 node import_pyq2.mjs   # insert
+ * A row that IS re-imported gets a NEW id, and the FKs that point at questions
+ * cascade (bookmarks, seen_questions, the SRS deck) — so re-running over a year
+ * that is already live silently wipes that user history. When adding a year,
+ * always scope the run with YEARS so the existing years are left untouched.
+ *
+ *   node import_pyq2.mjs                          # dry-run: counts only
+ *   YEARS=2013,2015 node import_pyq2.mjs          # dry-run, just those years
+ *   YEARS=2013,2015 APPLY=1 node import_pyq2.mjs  # insert just those years
  */
 
-const ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Group_2'
+const ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Content_materials/Group_2'
 const IMG_ROOT = `${ROOT}/_img`
 const APPLY = process.env.APPLY === '1'
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '')
@@ -162,7 +168,23 @@ const summary = {}
 let skipped = 0
 const skipSamples = []
 
-const years = readdirSync(ROOT).filter((d) => /^\d{4}$/.test(d)).sort()
+// Optional YEARS=2013,2015 filter — scopes the run to the named exam years so a
+// year that is already live is not deleted + reinserted (see header note).
+const ONLY_YEARS = (process.env.YEARS || '')
+  .split(',')
+  .map((y) => y.trim())
+  .filter(Boolean)
+
+const years = readdirSync(ROOT)
+  .filter((d) => /^\d{4}$/.test(d))
+  .filter((d) => ONLY_YEARS.length === 0 || ONLY_YEARS.includes(d))
+  .sort()
+
+if (ONLY_YEARS.length && years.length !== ONLY_YEARS.length) {
+  console.error(`! YEARS names a year with no folder under ${ROOT}: got [${years.join(', ')}]`)
+  process.exit(1)
+}
+console.log(`Years: ${years.join(', ')}`)
 
 for (const year of years) {
   for (const [dir, group] of Object.entries(GROUP_DIRS)) {

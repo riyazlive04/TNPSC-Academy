@@ -482,6 +482,56 @@ router.get(
   })
 )
 
+// ─── POST /api/questions/years ───────────────────────────────────────────────
+// Exam years present in a bank (newest first, with counts) — the source for the
+// PYQ year chips on the group and section pages. Sourced from the DB, like
+// /ca-months, so importing a new year's paper puts its chip in the UI without a
+// client redeploy. Optional `subject` narrows to one section, so a section only
+// offers the years it actually has.
+router.post(
+  '/years',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { category, subject, aptitude_type } = req.body ?? {}
+    const known = ['pyq', 'pyq2', 'pyq4', 'aptitude', 'mock', 'testseries', 'subject']
+    if (!known.includes(category)) return res.json({ years: [] })
+
+    // Grouped server-side so a bank larger than 1000 rows stays accurate.
+    const { data, error } = await req.db!.rpc('question_year_counts', {
+      p_config: {
+        category,
+        subject: subject ?? null,
+        aptitude_type: aptitude_type ?? null,
+      },
+    })
+    if (!error) {
+      const years = ((data ?? []) as { year: number; total: number }[]).map((r) => ({
+        year: Number(r.year),
+        count: Number(r.total),
+      }))
+      return res.json({ years })
+    }
+    if (!isMissingFunction(error)) return sendDbError(res, error)
+
+    // Fallback (RPC not migrated yet): distinct years in JS. PostgREST caps one
+    // select at 1000 rows, so counts can undercount on a big bank — the year
+    // LIST is what the chips need, and that survives the cap.
+    let q = req.db!.from('questions').select('year').eq('category', category).not('year', 'is', null)
+    if (subject) q = q.eq('subject', subject)
+    if (aptitude_type) q = q.eq('aptitude_type', aptitude_type)
+    const { data: rows, error: e2 } = await q
+    if (e2) return sendDbError(res, e2)
+    const byYear = new Map<number, number>()
+    for (const r of (rows ?? []) as { year: number }[]) {
+      byYear.set(r.year, (byYear.get(r.year) ?? 0) + 1)
+    }
+    const years = [...byYear]
+      .map(([year, count]) => ({ year, count }))
+      .sort((a, b) => b.year - a.year)
+    res.json({ years })
+  })
+)
+
 // ─── POST /api/questions/history-periods ─────────────────────────────────────
 // Counts the PYQ History bank (category='pyq', subject='History and INM') by
 // historical period — the `unit` column holds 'ancient' | 'medieval' | 'modern'.

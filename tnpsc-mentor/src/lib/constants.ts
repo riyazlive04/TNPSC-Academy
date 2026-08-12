@@ -318,9 +318,10 @@ export interface PyqGroupDef {
   label: string
   /** Section rows, in paper order. */
   sections: PyqSection[]
-  /** Exam years present in the bank, newest first. A year with no questions for
-   *  the current section is disabled at render time (its count is 0). */
-  years: number[]
+  /* Exam years are NOT declared here. They are read from the bank at runtime
+   * (usePyqYears → /api/questions/years), so importing a new year's paper puts
+   * its chip in the UI with no code change. A hardcoded list here would go stale
+   * the moment a paper was loaded, silently hiding it behind "All Years". */
   /** Sub-type (topic) display order per section. Aptitude splits by
    *  aptitude_type instead of topic, so it is never listed here. */
   sectionTopics: Partial<Record<Exclude<PyqSection, 'Aptitude'>, string[]>>
@@ -348,7 +349,6 @@ export const PYQ_GROUPS: Record<PyqGroupKey, PyqGroupDef> = {
     category: 'pyq2',
     label: 'Group 2',
     sections: ['Aptitude', 'English', 'Tamil', 'General Studies'],
-    years: [2025, 2024, 2022, 2018, 2017, 2016, 2014],
     sectionTopics: {
       English: ['Grammar', 'Vocabulary', 'Literature', 'Comprehension'],
       Tamil: ['Grammar', 'Vocabulary', 'Literature', 'Author & Work', 'Language History', 'Tamil GK'],
@@ -364,7 +364,6 @@ export const PYQ_GROUPS: Record<PyqGroupKey, PyqGroupDef> = {
     category: 'pyq4',
     label: 'Group 4',
     sections: ['Tamil', 'General Studies', 'Aptitude'],
-    years: [2025, 2024, 2022, 2019, 2018],
     sectionTopics: {
       Tamil: [
         'Grammar',

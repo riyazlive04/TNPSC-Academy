@@ -17,7 +17,7 @@ import { join } from 'node:path'
  *   APPLY=1 node upload_pyq2_images.mjs    # upload
  */
 
-const IMG_ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Group_2/_img'
+const IMG_ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Content_materials/Group_2/_img'
 const BUCKET = 'question-images'
 const APPLY = process.env.APPLY === '1'
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '')

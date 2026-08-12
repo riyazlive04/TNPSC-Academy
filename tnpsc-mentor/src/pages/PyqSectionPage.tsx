@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Layers, Calculator, Brain, ChevronRight, Shuffle } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import { type Tint } from '../components/UI/IconTile'
 import VettriCard from '../components/UI/VettriCard'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import { Skeleton, SkeletonChoiceGrid } from '../components/UI/Skeleton'
+import { YearFilter, parseYearParam, withYear } from '../components/UI/YearFilter'
+import { usePyqYears } from '../hooks/usePyqYears'
 import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey, type GateConfigLike } from '../lib/freeGate'
@@ -40,10 +42,15 @@ const cacheKey = (g: PyqGroupDef, section: PyqSection, year: number | null) =>
  * Numerics/Reasoning. Every test is scoped category=<group>, subject=section
  * (+ topic|aptitude_type) and the selected year. Each question still shows its
  * year badge in the test.
+ *
+ * The year lives in the URL (`?year=`), shared with the group page: a year
+ * picked there arrives here already applied, and changing it here survives the
+ * step back. Back therefore returns to the group page still on that year.
  */
 export default function PyqSectionPage() {
   const { group: groupSlug, section: slug } = useParams<{ group: string; section: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const startTest = useStartTest()
   const { t, lang } = useT()
 
@@ -51,9 +58,17 @@ export default function PyqSectionPage() {
   const section = group && slug ? pyqSectionFromSlug(group, slug) : undefined
   const isAptitude = section === 'Aptitude'
 
-  const [year, setYear] = useState<number | null>(null)
+  // Years narrowed to this section, so it only offers years it actually has.
+  const years = usePyqYears(group?.category, section)
+  const year = parseYearParam(searchParams.get('year'), years)
+  const setYear = (y: number | null) => {
+    const next = new URLSearchParams(searchParams)
+    if (y) next.set('year', String(y))
+    else next.delete('year')
+    setSearchParams(next, { replace: true })
+  }
   const [counts, setCounts] = useState<Record<string, number> | null>(
-    group && section ? countsCache.get(cacheKey(group, section, null)) ?? null : {}
+    group && section ? countsCache.get(cacheKey(group, section, year)) ?? null : {}
   )
 
   // Free-tier gate: one test per sub-type. `unlimited` (premium/vettri) has no
@@ -65,8 +80,8 @@ export default function PyqSectionPage() {
   // Unknown group → the chooser; unknown section → that group's section list.
   useEffect(() => {
     if (!group) navigate('/test-arena/pyq', { replace: true })
-    else if (!section) navigate(`/test-arena/pyq/${group.key}`, { replace: true })
-  }, [group, section, navigate])
+    else if (!section) navigate(withYear(`/test-arena/pyq/${group.key}`, year), { replace: true })
+  }, [group, section, year, navigate])
 
   // Lock state (which sub-types have used their one free test).
   useEffect(() => {
@@ -179,7 +194,7 @@ export default function PyqSectionPage() {
       )
 
   return (
-    <PickerPage badge={t(group.i18n.badge)} backTo={`/test-arena/pyq/${group.key}`}>
+    <PickerPage badge={t(group.i18n.badge)} backTo={withYear(`/test-arena/pyq/${group.key}`, year)}>
       <div className="mb-5">
         <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
           {subjectName(section, lang)}
@@ -193,18 +208,8 @@ export default function PyqSectionPage() {
         </div>
       )}
 
-      {/* Exam-year filter chips. "All Years" + each year; scopes every test below. */}
-      <div className="mb-5">
-        <p className="tamil mb-2 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
-          {t('filterByYear')}
-        </p>
-        <div className="-mx-1 flex flex-wrap gap-2 px-1">
-          <YearChip label={t('allYears')} active={year === null} onClick={() => setYear(null)} />
-          {group.years.map((y) => (
-            <YearChip key={y} label={String(y)} active={year === y} onClick={() => setYear(y)} />
-          ))}
-        </div>
-      </div>
+      {/* Exam-year filter. "All Years" + each year; scopes every test below. */}
+      <YearFilter years={years} value={year} onChange={setYear} />
 
       {counts === null ? (
         // Mirrors the real layout: the "All questions" hero over the type grid.
@@ -281,22 +286,6 @@ export default function PyqSectionPage() {
         </div>
       )}
     </PickerPage>
-  )
-}
-
-function YearChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-[13px] font-semibold tabular-nums transition-colors ${
-        active
-          ? 'bg-primary text-white'
-          : 'bg-tint-violet text-primary hover:bg-primary/15'
-      }`}
-    >
-      {label}
-    </button>
   )
 }
 

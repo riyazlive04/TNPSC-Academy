@@ -551,6 +551,21 @@ export const api = {
     })
     return data.count
   },
+  /** Exam years present in a bank (newest first) with question counts — sources
+   *  the PYQ year chips from the DB so importing a new year's paper puts its
+   *  chip in the UI without a redeploy. Pass `subject` to get only the years
+   *  that one section has. */
+  async questionYears(params: {
+    category: string
+    subject?: string
+    aptitude_type?: string
+  }): Promise<{ year: number; count: number }[]> {
+    const data = await request<{ years: { year: number; count: number }[] }>(
+      '/api/questions/years',
+      { method: 'POST', body: params }
+    )
+    return data.years
+  },
   /** Months available in the CA bank (chronological) with question counts —
    *  sources the /current-affairs month picker from the DB so a new month
    *  appears without a redeploy. */
