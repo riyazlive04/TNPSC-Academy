@@ -45,6 +45,8 @@ yarn-error.log*
 *.jks
 keystore.properties
 android/keystore.properties
+*.der
+confidential/
 
 # ─── Capacitor native projects ──────────────────────────────────────────────
 # The android/ and ios/ PROJECTS are committed on purpose. They started as

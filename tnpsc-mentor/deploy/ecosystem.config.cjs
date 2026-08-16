@@ -7,14 +7,20 @@
 //
 // Env (PORT, NODE_ENV, SUPABASE_*, etc.) is read from server/.env by the app's
 // own dotenv import — keep secrets there, NOT in this file.
+//
+// instances: 4 matches the VPS's 4 vCPUs. Cluster mode also makes `pm2
+// reload` zero-downtime. Caveat: express-rate-limit uses its default
+// in-memory store (no `store:` configured), which is per-process — with 4
+// instances the effective limit on any given rate-limited route is up to 4x
+// the configured `max`. Add a shared store (e.g. Redis) if that matters.
 module.exports = {
   apps: [
     {
       name: 'tnpsc-api',
       cwd: '/var/www/tnpsc-app/server',
       script: 'dist/index.js',
-      instances: 1,
-      exec_mode: 'fork',
+      instances: 4,
+      exec_mode: 'cluster',
       autorestart: true,
       max_memory_restart: '500M',
       env: {

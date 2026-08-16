@@ -7,12 +7,13 @@ import { join } from 'node:path'
  * Loads the Group 4 / VAO Previous-Year-Question bank into the live DB under
  * category='pyq4' (kept apart from the Group 1 'pyq' and Group 2 'pyq2' banks).
  *
- *   Content_materials/Group_4/<year>_group4_app.json   (200 rows per year)
+ *   Content_materials/Group_4/<year>_group4_app.json   (100 or 200 rows per year)
  *   Content_materials/Group_4/figures/<year>/<qid>.png (figure crops)
  *
- * Each year holds two papers: General_Tamil (100, Tamil-only — that paper has no
- * English version) and GS_Maths (100, bilingual), the latter splitting into the
- * GS and Aptitude sections.
+ * A year holds up to two papers: General_Tamil (100, Tamil-only — that paper has
+ * no English version) and GS_Maths (100, bilingual), the latter splitting into
+ * the GS and Aptitude sections. The 2011/2012/2014/2016 sources carry the
+ * GS_Maths paper only, so those years contribute 100 rows each.
  *
  * Row mapping (drives the Group 4 picker: section -> All + sub-type -> year):
  *   subject = SECTION  : 'Tamil' | 'General Studies' | 'Aptitude'
@@ -35,15 +36,30 @@ import { join } from 'node:path'
  * other bank — no row in `questions` has ever populated option_e.
  *
  * Idempotent by external_id (`pyq4-<year>-<qnum>`): re-running deletes the same
- * external_ids then re-inserts, so user history (FK to id) on untouched rows is
- * preserved.
+ * external_ids then re-inserts. That re-insert mints NEW question ids, and the
+ * FKs on `questions.id` are CASCADE (review_items, bookmarks, seen_questions)
+ * and SET NULL (test_answers) — so re-importing a year that students have
+ * already sat DESTROYS their bookmarks, revision items and no-repeat ledger for
+ * it, and unlinks their per-question answers. Re-running the whole list is not
+ * free. ALWAYS scope a top-up load to the new years with YEARS=...
  *
- *   node import_pyq4.mjs           # dry-run: counts + classification only
- *   APPLY=1 node import_pyq4.mjs   # insert
+ *   node import_pyq4.mjs                        # dry-run over every year
+ *   YEARS=2011,2012 APPLY=1 node import_pyq4.mjs   # load ONLY those years
+ *   APPLY=1 node import_pyq4.mjs                # reload all — see caveat above
  */
 
 const ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Content_materials/Group_4'
-const YEARS = [2018, 2019, 2022, 2024, 2025]
+const ALL_YEARS = [2011, 2012, 2014, 2016, 2018, 2019, 2022, 2024, 2025]
+// YEARS=2011,2012 restricts the run to those papers, leaving every other year's
+// rows — and the user history hanging off their ids — untouched.
+const YEARS = process.env.YEARS
+  ? process.env.YEARS.split(',').map((y) => Number(y.trim()))
+  : ALL_YEARS
+const unknownYears = YEARS.filter((y) => !ALL_YEARS.includes(y))
+if (unknownYears.length) {
+  console.error(`FATAL: no source JSON for year(s) ${unknownYears.join(', ')}`)
+  process.exit(2)
+}
 const APPLY = process.env.APPLY === '1'
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '')
 const BUCKET = 'question-images'
@@ -303,7 +319,11 @@ for (const year of YEARS) {
     whyWrong = dropE(whyWrong)
     whyWrongTa = dropE(whyWrongTa)
 
-    const imgs = q.image && existsSync(join(ROOT, q.image)) ? [imageUrl(q.image)] : null
+    // The 2011–2016 sources carry no `image` key, so fall back to the crop's
+    // conventional path — the same name upload_pyq4_images.mjs pushes to the
+    // bucket. existsSync() is what decides, so a missing crop just stays null.
+    const imgRef = q.image ?? `figures/${year}/${year}_${q.qnum}.png`
+    const imgs = existsSync(join(ROOT, imgRef)) ? [imageUrl(imgRef)] : null
 
     const reason =
       !/^[ABCD]$/.test(letter) ? 'no-answer'

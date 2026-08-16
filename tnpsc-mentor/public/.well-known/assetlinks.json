@@ -5,8 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.tnpscmentor.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_RELEASE_SHA256",
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256"
+        "86:C0:04:B9:56:F6:71:E6:C7:4D:BD:99:88:65:4F:E4:30:1D:00:B0:F5:8E:5B:BC:D5:E5:BA:5A:06:4B:2E:75",
+        "2C:F5:6F:5B:B0:CF:0D:21:76:E4:65:88:9D:BE:97:1C:B3:B7:D1:D6:25:DF:59:2F:58:83:F7:F5:09:63:D3:97"
       ]
     }
   }
