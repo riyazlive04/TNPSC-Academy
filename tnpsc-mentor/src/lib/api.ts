@@ -934,6 +934,25 @@ export const api = {
       const data = await request<{ revenue: RevenueMetrics }>('/api/superadmin/revenue')
       return data.revenue
     },
+    // ─── Direct messaging: one shared thread per student ────────────────────
+    messages: {
+      /** Full thread with one student, oldest first. Marks their messages read. */
+      async thread(userId: string): Promise<{ messages: MessageItem[]; name: string | null }> {
+        return request<{ messages: MessageItem[]; name: string | null }>(
+          `/api/superadmin/messages/${userId}`
+        )
+      },
+      /** Reply in that thread as the acting superadmin; pings the student. */
+      async send(
+        userId: string,
+        params: { body: string; body_ta?: string }
+      ): Promise<{ message: MessageItem }> {
+        return request<{ message: MessageItem }>(`/api/superadmin/messages/${userId}`, {
+          method: 'POST',
+          body: params,
+        })
+      },
+    },
     /** One page of accounts + the size of the whole (optionally searched) set. */
     async users(
       search?: string,
@@ -1686,6 +1705,22 @@ export const api = {
     },
   },
 
+  // ─── Direct messages (two-way thread with the admin team) ─────────────────
+  messages: {
+    /** My own thread, oldest first. Marks the admin team's messages read. */
+    async thread(): Promise<{ messages: MessageItem[] }> {
+      return request<{ messages: MessageItem[] }>('/api/messages')
+    },
+    async send(body: string): Promise<{ message: MessageItem }> {
+      return request<{ message: MessageItem }>('/api/messages', { method: 'POST', body: { body } })
+    },
+    /** Cheap poll target for the header icon's unread badge. */
+    async unreadCount(): Promise<number> {
+      const data = await request<{ count: number }>('/api/messages/unread-count')
+      return data.count
+    },
+  },
+
   // ─── Popup alerts (superadmin-authored modal announcements) ───────────────
   alerts: {
     /** Pending popup alerts for the signed-in user (active, audience-matched, undismissed). */
@@ -1906,6 +1941,16 @@ export interface NotificationItem {
   url: string | null
   created_at: string
   read: boolean
+}
+
+// ─── Direct-message thread shapes ───────────────────────────────────────────
+/** One message in a student's shared thread with the admin team. */
+export interface MessageItem {
+  id: string
+  sender: 'user' | 'admin'
+  body: string
+  body_ta: string | null
+  created_at: string
 }
 
 /** Body sent by the superadmin composer. Tamil fields are optional — Tamil-
@@ -2266,6 +2311,8 @@ export interface ReportReporter {
   user_id: string
   name: string | null
   email: string | null
+  /** Used for the WhatsApp / call links; null on accounts with no phone. */
+  phone: string | null
   reason: string | null
   reported_at: string
 }

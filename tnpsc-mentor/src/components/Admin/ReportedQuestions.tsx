@@ -16,6 +16,7 @@ import type { Question } from '../../types'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
 import QuestionEditor from './QuestionEditor'
+import ContactReporter from './ContactReporter'
 
 const TABS: { id: ReportStatus; label: string; icon: typeof Flag }[] = [
   { id: 'open', label: 'Open', icon: Flag },
@@ -269,6 +270,7 @@ function ReportCard({
               {rep.reason && (
                 <p className="tamil mt-1 font-body text-xs text-ink">“{rep.reason}”</p>
               )}
+              <ContactReporter reporter={rep} />
             </div>
           ))}
         </div>

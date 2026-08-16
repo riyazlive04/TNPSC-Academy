@@ -1390,6 +1390,24 @@ const STRINGS = {
   },
   start: { en: 'Start', ta: 'தொடங்கு' },
 
+  // ─── Direct messages (student ↔ admin team thread) ─────────────────────────
+  messagesNav: { en: 'Messages', ta: 'செய்திகள்' },
+  messagesTitle: { en: 'Messages', ta: 'செய்திகள்' },
+  messagesSubtitle: {
+    en: 'A direct line to the TNPSC Mentors team.',
+    ta: 'TNPSC Mentors குழுவுடன் நேரடித் தொடர்பு.',
+  },
+  messagesEmpty: {
+    en: 'No messages yet - send one if you need help.',
+    ta: 'இன்னும் செய்திகள் இல்லை - உதவி தேவைப்பட்டால் அனுப்புங்கள்.',
+  },
+  messagesPlaceholder: { en: 'Type a message…', ta: 'செய்தியை உள்ளிடவும்…' },
+  messagesSend: { en: 'Send', ta: 'அனுப்பு' },
+  messagesSendError: {
+    en: 'Could not send that. Check your connection and try again.',
+    ta: 'அனுப்ப முடியவில்லை. இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+  },
+
   // ─── Notifications ────────────────────────────────────────────────────────
   notifications: { en: 'Notifications', ta: 'அறிவிப்புகள்' },
   unread: { en: 'unread', ta: 'படிக்காதவை' },

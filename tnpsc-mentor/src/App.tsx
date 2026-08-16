@@ -81,6 +81,7 @@ const SetupPage = lazy(() => import('./pages/SetupPage'))
 const ThirukuralQuizPage = lazy(() => import('./pages/ThirukuralQuizPage'))
 const DailyPage = lazy(() => import('./pages/DailyPage'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
+const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
@@ -133,6 +134,7 @@ const SHELL_ROUTES: RouteDef[] = [
   { path: '/setup', element: <SetupPage /> },
   { path: '/daily', element: <DailyPage /> },
   { path: '/bookmarks', element: <BookmarksPage /> },
+  { path: '/messages', element: <MessagesPage /> },
   { path: '/superadmin', element: <SuperAdminPage />, role: 'superadmin' },
 ]
 

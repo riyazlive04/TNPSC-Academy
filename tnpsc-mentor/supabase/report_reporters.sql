@@ -7,9 +7,11 @@
 -- resolver_name, the admin who closed the item. That made it impossible to
 -- follow up with a reporter, or to spot one account mass-flagging questions.
 --
--- Adds a `reporters` array (name, email, their reason, when). Populated only for
--- superadmins — plain admins keep the existing anonymous triage view, since the
--- reasons alone are enough to fix a question and this is student PII.
+-- Adds a `reporters` array (name, email, phone, their reason, when). Populated
+-- only for superadmins — plain admins keep the existing anonymous triage view,
+-- since the reasons alone are enough to fix a question and this is student PII.
+-- email/phone are what the console's contact buttons (mail, WhatsApp, call)
+-- build their links from, so a superadmin can follow up on an unclear report.
 --
 -- The return signature changes, so the old function must be dropped first;
 -- create-or-replace cannot alter `returns table`.
@@ -64,6 +66,7 @@ begin
           'user_id',     r.user_id,
           'name',        pr.full_name,
           'email',       pr.email,
+          'phone',       pr.phone,
           'reason',      r.reason,
           'reported_at', r.updated_at
         )

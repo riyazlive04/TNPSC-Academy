@@ -5,6 +5,7 @@ import { supabaseAdmin } from '../supabase.js'
 import { listSessions, revokeSessionById } from '../sessions.js'
 import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
 import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
+import { notifyUser } from '../notify.js'
 
 const router = Router()
 
@@ -549,6 +550,87 @@ router.post(
     }
     const stored = await writeSetting(String(key), value)
     res.json({ key, value: stored })
+  })
+)
+
+// ─── Direct messaging: superadmin ↔ one student, a shared thread ────────────
+// Replaces the old one-way POST /message-user (single fire-and-forget note,
+// used by ContactReporter to clarify a question report). This is the general
+// "message any user" surface for the Users tab, and a real two-way thread: the
+// student can reply from their own /messages page (see routes/messages.ts),
+// and ContactReporter now posts into the SAME thread so a report follow-up and
+// a Users-tab conversation are one inbox per student, not two.
+
+const THREAD_COLUMNS = 'id, sender, sender_id, body, body_ta, created_at'
+
+// ─── GET /api/superadmin/messages/:userId ────────────────────────────────────
+router.get(
+  '/messages/:userId',
+  asyncH(async (req: AuthedRequest, res) => {
+    const userId = req.params.userId
+
+    const { data: target, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', userId)
+      .maybeSingle()
+    if (profileError) return sendDbError(res, profileError)
+    if (!target) return res.status(404).json({ error: 'No such user.' })
+
+    const { data, error } = await supabaseAdmin
+      .from('user_messages')
+      .select(THREAD_COLUMNS)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+    if (error) return sendDbError(res, error)
+
+    await supabaseAdmin
+      .from('user_messages')
+      .update({ read_by_admin_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('sender', 'user')
+      .is('read_by_admin_at', null)
+
+    res.json({ messages: data ?? [], name: target.full_name ?? null })
+  })
+)
+
+// ─── POST /api/superadmin/messages/:userId ───────────────────────────────────
+// Sends as the acting superadmin (sender_id), and pings the student via the
+// existing notifyUser bell + Web Push, deep-linked to their Messages page.
+router.post(
+  '/messages/:userId',
+  asyncH(async (req: AuthedRequest, res) => {
+    const userId = req.params.userId
+    const body = String(req.body?.body ?? '').trim()
+    const bodyTa = String(req.body?.body_ta ?? '').trim() || null
+    if (!body) return res.status(400).json({ error: 'Message is required.' })
+    if (body.length > 4000) return res.status(400).json({ error: 'Message is too long.' })
+
+    const { data: target, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', userId)
+      .maybeSingle()
+    if (profileError) return sendDbError(res, profileError)
+    if (!target) return res.status(404).json({ error: 'No such user.' })
+
+    const { data, error } = await supabaseAdmin
+      .from('user_messages')
+      .insert({ user_id: userId, sender: 'admin', sender_id: req.userId, body, body_ta: bodyTa })
+      .select(THREAD_COLUMNS)
+      .single()
+    if (error) return sendDbError(res, error)
+
+    await notifyUser(userId, {
+      title: 'New message from TNPSC Mentors',
+      title_ta: 'TNPSC Mentors இடமிருந்து புதிய செய்தி',
+      body: body.slice(0, 200),
+      body_ta: bodyTa ? bodyTa.slice(0, 200) : null,
+      url: '/messages',
+    })
+
+    res.status(201).json({ message: data })
   })
 )
 

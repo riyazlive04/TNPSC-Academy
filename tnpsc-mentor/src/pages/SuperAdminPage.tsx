@@ -83,6 +83,7 @@ import {
   type CaQuestionSets,
   type CaQuestionItem,
   type UserInsights,
+  type MessageItem,
 } from '../lib/api'
 import { useT, type StringKey } from '../lib/i18n'
 import { youtubeThumb, kindLabel, formatFileSize } from '../lib/materials'
@@ -1476,6 +1477,8 @@ function UserDetailModal({
           })}
         </div>
 
+        <MessageThreadSection userId={user.id} />
+
         {/* ── Targeting / activity / weakness / credits (superadmin_user_insights RPC) ── */}
         <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
           Insights
@@ -1681,6 +1684,115 @@ function UserDetailModal({
         )}
       </div>
     </div>
+  )
+}
+
+/** Compact "3h ago" / "2d ago" — relativeTime() above is worded for "last
+ *  active" status ("active now") and reads oddly under a chat bubble. */
+function msgTime(iso: string): string {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000)
+  if (s < 60) return 'just now'
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  return `${d}d ago`
+}
+
+/** The shared thread with one student — same data ContactReporter's "Send
+ *  in-app" writes into, so a Reports follow-up and a Users-tab conversation
+ *  are one inbox, not two. Bubbles keep it scannable at a glance; a student
+ *  replies from their own /messages page. */
+function MessageThreadSection({ userId }: { userId: string }) {
+  const [messages, setMessages] = useState<MessageItem[] | null>(null)
+  const [draft, setDraft] = useState('')
+  const [sending, setSending] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setMessages(null)
+    api.superadmin.messages
+      .thread(userId)
+      .then((d) => !cancelled && setMessages(d.messages))
+      .catch(() => !cancelled && setMessages([]))
+    return () => {
+      cancelled = true
+    }
+  }, [userId])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [messages])
+
+  const send = async () => {
+    const body = draft.trim()
+    if (!body || sending) return
+    setSending(true)
+    try {
+      const { message } = await api.superadmin.messages.send(userId, { body })
+      setMessages((prev) => [...(prev ?? []), message])
+      setDraft('')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not send the message.')
+    } finally {
+      setSending(false)
+    }
+  }
+
+  return (
+    <>
+      <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+        Messages
+      </h3>
+      <div className="rounded-card border border-line bg-surface p-3">
+        <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+          {messages === null ? (
+            <p className="py-4 text-center font-body text-xs text-ink2">Loading…</p>
+          ) : messages.length === 0 ? (
+            <p className="py-4 text-center font-body text-xs text-ink2">
+              No messages yet — say hello.
+            </p>
+          ) : (
+            messages.map((m) => (
+              <div key={m.id} className={`flex ${m.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[80%] rounded-lg px-3 py-2 font-body text-xs ${
+                    m.sender === 'admin' ? 'bg-brand text-white' : 'bg-tint text-ink'
+                  }`}
+                >
+                  <p className="whitespace-pre-line">{m.body}</p>
+                  <p className={`mt-1 text-[10px] ${m.sender === 'admin' ? 'text-white/70' : 'text-ink2'}`}>
+                    {msgTime(m.created_at)}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={bottomRef} />
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') send()
+            }}
+            placeholder="Type a message…"
+            className="focus-ring flex-1 rounded-lg border border-line bg-card px-3 py-2 font-body text-xs text-ink outline-none transition hover:border-brand/40"
+          />
+          <button
+            onClick={send}
+            disabled={sending || !draft.trim()}
+            aria-label="Send"
+            className="focus-ring grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand text-white transition hover:bg-brand-dark disabled:opacity-50"
+          >
+            {sending ? <Spinner size={14} /> : <Send size={14} />}
+          </button>
+        </div>
+      </div>
+    </>
   )
 }
 

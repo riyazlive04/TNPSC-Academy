@@ -14,6 +14,7 @@ import questionRoutes from './routes/questions.js'
 import testRoutes from './routes/tests.js'
 import reviewRoutes from './routes/reviews.js'
 import revisionRoutes from './routes/revisions.js'
+import messageRoutes from './routes/messages.js'
 import bookmarkRoutes from './routes/bookmarks.js'
 import profileRoutes from './routes/profile.js'
 import analyticsRoutes from './routes/analytics.js'
@@ -82,6 +83,7 @@ app.use('/api/questions', questionRoutes)
 app.use('/api/tests', testRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/revisions', revisionRoutes)
+app.use('/api/messages', messageRoutes)
 app.use('/api/bookmarks', bookmarkRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/analytics', analyticsRoutes)

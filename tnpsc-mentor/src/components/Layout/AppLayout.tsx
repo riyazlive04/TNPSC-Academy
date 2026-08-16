@@ -15,6 +15,7 @@ import { useT } from '../../lib/i18n'
 import { getTestsCompleted, TESTS_BEFORE_FEEDBACK } from '../../lib/testProgress'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
+import MessagesIcon from './MessagesIcon'
 import BackToTopButton from './BackToTopButton'
 import AlertPopup from './AlertPopup'
 
@@ -247,6 +248,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               {user && <CreditPill />}
+              {user && !isAdmin && <MessagesIcon />}
               {user && <NotificationBell />}
               {/* Preview toggle (real admins only) - switch between the admin and
                   the student experience. Visible in both modes so it's reversible. */}
