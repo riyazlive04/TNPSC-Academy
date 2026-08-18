@@ -22,9 +22,9 @@ import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import MathText from '../components/UI/MathText'
 import { SkeletonCards } from '../components/UI/Skeleton'
-import type { Question, QuizConfig } from '../types'
+import type { DisplayLang, Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
-import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName } from '../lib/constants'
+import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName, topicName } from '../lib/constants'
 import { useAuth } from '../hooks/useAuth'
 import { pdfWatermark } from '../lib/pdfWatermark'
 import { useT } from '../lib/i18n'
@@ -197,22 +197,55 @@ export default function AdminQuestionsPage() {
     setDownloading(true)
     setActionError('')
     try {
-      const label = isOuter
-        ? `Outer Questions${subject ? ` · ${subject}` : ''}`
-        : isPyq
-          ? `PYQ${subject ? ` · ${subjectName(subject, lang)}` : ''}${yearFilter ? ` · ${yearFilter}` : ''}`
-          : describeConfig(activeConfig, lang)
-      // Lazy-load the heavy jspdf/html2canvas chunk only on demand.
-      const { generateQuestionBankPdf } = await import('../lib/pdfGenerator')
+      // Lazy-load the heavy jspdf/html2canvas/katex chunk only on demand. This
+      // renders each question as real HTML and rasterises it, so Tamil shapes
+      // correctly (jsPDF's old text-drawing path had no complex-script support)
+      // and LaTeX explanations typeset as proper fractions/roots instead of raw
+      // source text - see explanationPdf.ts for the full rationale.
+      const { generateExplanationPdf } = await import('../lib/explanationPdf')
+
+      // Aptitude sheets always go out bilingual (EN+TA together), regardless of
+      // the site's current display language, since that's the whole point of a
+      // printable explanation sheet for this bank.
+      const isAptitude = config?.category === 'aptitude'
+      const pdfLang: DisplayLang = isAptitude ? 'both' : lang
+
       // A whole-topic bank export is the most leakable file the app produces, so
-      // it carries the same personalised mark as every student download (the
-      // generator always supported it; this call was the one that never passed it).
-      await generateQuestionBankPdf({
-        questions: filtered,
-        label,
-        lang,
-        watermark: pdfWatermark(profile),
-      })
+      // it carries the same personalised mark as every student download.
+      const watermark = pdfWatermark(profile)
+
+      // Browsing "All Topics" mixes every aptitude_topic into one list; split
+      // that into one PDF per topic ("section") instead of one giant file. A
+      // single-topic drill-in (only one distinct aptitude_topic present) still
+      // produces just the one file, same as before.
+      const aptitudeTopics = isAptitude
+        ? [...new Set(filtered.map((q) => q.aptitude_topic).filter((tp): tp is string => !!tp))]
+        : []
+
+      if (isAptitude && aptitudeTopics.length > 1) {
+        for (const topic of aptitudeTopics) {
+          await generateExplanationPdf({
+            questions: filtered.filter((q) => q.aptitude_topic === topic),
+            label: `${describeConfig(activeConfig, pdfLang)} · ${topicName(topic, pdfLang)}`,
+            title: 'Explanation Sheet',
+            lang: pdfLang,
+            watermark,
+          })
+        }
+      } else {
+        const label = isOuter
+          ? `Outer Questions${subject ? ` · ${subject}` : ''}`
+          : isPyq
+            ? `PYQ${subject ? ` · ${subjectName(subject, lang)}` : ''}${yearFilter ? ` · ${yearFilter}` : ''}`
+            : describeConfig(activeConfig, pdfLang)
+        await generateExplanationPdf({
+          questions: filtered,
+          label,
+          title: 'Explanation Sheet',
+          lang: pdfLang,
+          watermark,
+        })
+      }
     } catch (e) {
       setActionError(e instanceof Error ? e.message : 'Could not generate the PDF.')
     } finally {
