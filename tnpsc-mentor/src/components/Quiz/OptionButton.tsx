@@ -87,7 +87,7 @@ export default function OptionButton({
           />
         </span>
       ) : (
-        <span className="tamil min-w-0 flex-1 text-[15px] leading-relaxed [overflow-wrap:anywhere]">
+        <span className="tamil min-w-0 flex-1 text-base leading-relaxed [overflow-wrap:anywhere]">
           <MathText text={text} />
         </span>
       )}

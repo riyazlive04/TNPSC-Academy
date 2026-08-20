@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import Lenis from 'lenis'
+import { frame, cancelFrame } from 'motion'
 
 // Routes that run their own immersive scroll behaviour - the proctored quiz and
 // mock engines go fullscreen and track scroll for the per-question view, so we
@@ -32,13 +33,18 @@ export default function SmoothScroll() {
     })
     lenisRef.current = lenis
 
-    let frame = requestAnimationFrame(function raf(time) {
-      lenis.raf(time)
-      frame = requestAnimationFrame(raf)
-    })
+    // Drive Lenis from Motion's own frame scheduler instead of a separate raw
+    // requestAnimationFrame loop. Two independent rAF loops (Lenis's + every
+    // scroll-linked useScroll()/useTransform() in the app) can land on
+    // different frames, so a stacked-card banner reads a scroll position
+    // that's a tick behind Lenis's smoothed one - the "not moving fluidly"
+    // stutter. Ticking Lenis inside Motion's "update" step keeps both in the
+    // same frame, so scroll-linked transforms always see the current value.
+    const update = ({ timestamp }: { timestamp: number }) => lenis.raf(timestamp)
+    frame.update(update, true)
 
     return () => {
-      cancelAnimationFrame(frame)
+      cancelFrame(update)
       lenis.destroy()
       lenisRef.current = null
     }

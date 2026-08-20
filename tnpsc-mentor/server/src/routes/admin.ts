@@ -13,7 +13,17 @@ router.use(requireAuth, requireAdmin)
 router.post(
   '/questions/list',
   asyncH(async (req: AuthedRequest, res) => {
-    const config = req.body?.config ?? {}
+    // admin_list_questions itself hard-caps at 500 rows server-side (see
+    // supabase/admin_list_filters.sql), but clamp any client-supplied
+    // limit/pageSize here too — same defensive pattern as /question-reports'
+    // `limit` clamp above — so a stray huge value is never trusted as-is.
+    const config: Record<string, unknown> = { ...(req.body?.config ?? {}) }
+    if ('limit' in config) {
+      config.limit = Math.min(Math.max(Math.trunc(Number(config.limit)) || 500, 1), 500)
+    }
+    if ('pageSize' in config) {
+      config.pageSize = Math.min(Math.max(Math.trunc(Number(config.pageSize)) || 500, 1), 500)
+    }
     const { data, error } = await req.db!.rpc('admin_list_questions', { p_config: config })
     if (error) return sendDbError(res, error)
     res.json({ questions: data ?? [] })

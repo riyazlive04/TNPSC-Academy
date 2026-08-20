@@ -87,7 +87,7 @@ export default function MockInstructionsPage() {
         </button>
 
         <header className="mb-6 mt-4">
-          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+          <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
             {t('examInstructions')}
           </h1>
           <p className="tamil mt-1 font-heading text-base font-semibold text-primary">{describeConfig(config, lang)}</p>

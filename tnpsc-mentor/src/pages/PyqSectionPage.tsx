@@ -196,14 +196,14 @@ export default function PyqSectionPage() {
   return (
     <PickerPage badge={t(group.i18n.badge)} backTo={withYear(`/test-arena/pyq/${group.key}`, year)}>
       <div className="mb-5">
-        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-ink">
           {subjectName(section, lang)}
         </h2>
       </div>
 
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
-          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <p className="tamil mb-3 font-body text-base text-muted">{t('topicFreeUsed')}</p>
           <VettriCard />
         </div>
       )}

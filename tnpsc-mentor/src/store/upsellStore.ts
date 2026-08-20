@@ -8,10 +8,12 @@ import { create } from 'zustand'
 //               unlock it, so only the Premium card is pitched.
 //   'bundle'  — unlocks with ANY paid plan (Test Marathon, Vettri arena,
 //               unlimited PYQ/CA); both cards are pitched, Vettri first.
+//   'rankbooster' — Group II/IIA Rank Booster only; Vettri does NOT unlock
+//               this one, so RankBoosterCard is pitched instead of Vettri's.
 // Same store+imperative-helper pattern as toastStore, so api/error paths can
 // open it without React context.
 
-export type UpsellVariant = 'credits' | 'premium' | 'bundle'
+export type UpsellVariant = 'credits' | 'premium' | 'bundle' | 'rankbooster'
 
 interface UpsellState {
   open: boolean
@@ -35,4 +37,5 @@ export const upsell = {
   credits: (cost?: number) => useUpsellStore.getState().show('credits', { cost }),
   premium: () => useUpsellStore.getState().show('premium'),
   bundle: () => useUpsellStore.getState().show('bundle'),
+  rankBooster: () => useUpsellStore.getState().show('rankbooster'),
 }

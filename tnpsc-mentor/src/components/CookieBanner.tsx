@@ -45,7 +45,7 @@ export default function CookieBanner() {
         <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
           <Cookie size={18} />
         </span>
-        <p className="tamil flex-1 font-body text-[13px] leading-relaxed text-ink2">
+        <p className="tamil flex-1 font-body text-sm leading-relaxed text-ink2">
           {t('cookieBody')}{' '}
           <Link to="/privacy" className="text-brand hover:underline">
             {t('privacyPolicy')}

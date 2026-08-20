@@ -126,7 +126,7 @@ export function SubjectBarChart({
   return (
     <div className="space-y-3">
       {avg > 0 && (
-        <p className="text-right font-body text-[10px] text-ink2">
+        <p className="text-right font-body text-2xs text-ink2">
           <span className="mr-1 inline-block h-0 w-3 border-t border-dashed border-ink2/70 align-middle" />
           {avgLabel} {avg}%
         </p>
@@ -134,8 +134,8 @@ export function SubjectBarChart({
       {rows.map((r) => (
         <div key={r.key}>
           <div className="flex items-baseline justify-between gap-2">
-            <span className="tamil min-w-0 truncate font-heading text-[13px] font-semibold text-ink">{r.key}</span>
-            <span className={`shrink-0 font-display text-[13px] font-bold ${toneText(r.accuracy)}`}>{r.accuracy}%</span>
+            <span className="tamil min-w-0 truncate font-heading text-sm font-semibold text-ink">{r.key}</span>
+            <span className={`shrink-0 font-display text-sm font-bold ${toneText(r.accuracy)}`}>{r.accuracy}%</span>
           </div>
           <div className="mt-1 flex items-center gap-2">
             <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-tint">
@@ -145,10 +145,10 @@ export function SubjectBarChart({
                 <span className="absolute top-0 h-full border-l border-dashed border-ink2/70" style={{ left: `${avg}%` }} />
               )}
             </div>
-            <span className="shrink-0 font-body text-[10px] tabular-nums text-ink2">{r.correct}/{r.attempted}</span>
+            <span className="shrink-0 font-body text-2xs tabular-nums text-ink2">{r.correct}/{r.attempted}</span>
           </div>
           {r.weak && (
-            <button onClick={() => onPractice(r.key)} className="mt-1 font-heading text-[11px] font-semibold text-primary transition-opacity hover:opacity-80">
+            <button onClick={() => onPractice(r.key)} className="mt-1 font-heading text-2xs font-semibold text-primary transition-opacity hover:opacity-80">
               {practiceLabel} →
             </button>
           )}
@@ -200,10 +200,10 @@ export function QuestionTypeDonut({
         {slices.map((s, i) => (
           <div key={s.label} className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ backgroundColor: catFill(i) }} />
-            <span className="tamil min-w-0 flex-1 truncate font-heading text-[12px] font-semibold text-ink">{s.label}</span>
-            <span className="w-8 shrink-0 text-right font-body text-[11px] tabular-nums text-ink2">{s.value}</span>
-            <span className="w-9 shrink-0 text-right font-body text-[11px] tabular-nums text-ink2">{Math.round((s.value / total) * 100)}%</span>
-            <span className={`w-9 shrink-0 text-right font-display text-[11px] font-bold tabular-nums ${toneText(s.accuracy)}`}>{s.accuracy}%</span>
+            <span className="tamil min-w-0 flex-1 truncate font-heading text-xs font-semibold text-ink">{s.label}</span>
+            <span className="w-8 shrink-0 text-right font-body text-2xs tabular-nums text-ink2">{s.value}</span>
+            <span className="w-9 shrink-0 text-right font-body text-2xs tabular-nums text-ink2">{Math.round((s.value / total) * 100)}%</span>
+            <span className={`w-9 shrink-0 text-right font-display text-2xs font-bold tabular-nums ${toneText(s.accuracy)}`}>{s.accuracy}%</span>
           </div>
         ))}
       </div>

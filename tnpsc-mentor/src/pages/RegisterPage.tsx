@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Info, Send } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
-import { api, isSignupWaOtpConfigured, isTelegramVerifyConfigured } from '../lib/api'
+import { api } from '../lib/api'
+import { postAuthDestination, postAuthState, isAutoEnrollPath } from '../lib/authRouting'
+import { useAuthConfigStore } from '../store/authConfigStore'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
-import GoogleSignInButton, { isGoogleConfigured } from '../components/Auth/GoogleSignInButton'
+import GoogleSignInButton, { useIsGoogleConfigured } from '../components/Auth/GoogleSignInButton'
 import TelegramHelpModal from '../components/Auth/TelegramHelpModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
@@ -60,10 +62,14 @@ const STRENGTH_META: { key: StringKey; color: string }[] = [
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { signUp, sendSignupOtp, verifySignupOtp, startTelegramVerify, checkTelegramVerify } =
     useAuth()
   const { t } = useT()
   const setLang = useLanguageStore((s) => s.setLang)
+  const isSignupWaOtpConfigured = useAuthConfigStore((s) => s.whatsappOtp)
+  const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
+  const isGoogleConfigured = useIsGoogleConfigured()
 
   const [form, setForm] = useState({
     fullName: '',
@@ -102,6 +108,10 @@ export default function RegisterPage() {
   // until it is given.
   const [consented, setConsented] = useState(false)
   const [showTgHelp, setShowTgHelp] = useState(false)
+
+  // A deep link the user was bounced from (e.g. a marketing landing page CTA) —
+  // resolved the same way LoginPage does, via the shared postAuthDestination().
+  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
 
   // Top of the signup funnel: fire Meta's ViewContent once when the register
   // page is reached (no-ops in the native apps / dev — see lib/tracking).
@@ -163,7 +173,7 @@ export default function RegisterPage() {
     setLang(form.language)
     if (useAuthStore.getState().user) {
       api.updateProfile({ language: form.language }).catch(() => {})
-      navigate('/test-arena', { replace: true })
+      navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
     } else {
       setStep('form')
       setInfo(t('confirmEmailSent'))
@@ -208,7 +218,7 @@ export default function RegisterPage() {
     if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
     if (!form.phone.trim()) return setError(t('errPhoneRequired'))
     if (!isValidIndianMobile(form.phone)) return setError(t('errMobileInvalid'))
-    if (form.password.length < 6) return setError(t('errPasswordShort'))
+    if (form.password.length < 8) return setError(t('errPasswordShort'))
     if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
     if (!consented) return setError(t('errConsentRequired'))
 
@@ -339,6 +349,22 @@ export default function RegisterPage() {
           {t('createYourAccount')}
         </h2>
         <p className="mb-6 text-center font-body text-sm text-ink2">{t('startPreparing')}</p>
+
+        {/* Promoted fast path: arriving with purchase intent (e.g. Rank
+            Booster's "Enroll now") skips straight past the full form —
+            Google is one tap, and fromPath (threaded through
+            GoogleSignInButton → postAuthState) brings them right back to
+            resume checkout, detouring through /complete-profile only for the
+            still-mandatory phone number. */}
+        {isGoogleConfigured && step === 'form' && isAutoEnrollPath(fromPath) && (
+          <div className="mb-6">
+            <p className="tamil mb-3 text-center font-heading text-xs font-bold uppercase tracking-wide text-gold">
+              {t('fastestWayToEnroll')}
+            </p>
+            <GoogleSignInButton onError={setError} fromPath={fromPath} text="signup_with" />
+            <AuthDivider label={t('orSignUpWithEmail')} />
+          </div>
+        )}
 
         {step === 'otp' ? (
           /* WhatsApp phone verification — the code was sent to the number's
@@ -530,9 +556,9 @@ export default function RegisterPage() {
               id="reg-password"
               value={form.password}
               onChange={(v) => update('password', v)}
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               autoComplete="new-password"
-              invalid={touched && form.password.length > 0 && form.password.length < 6}
+              invalid={touched && form.password.length > 0 && form.password.length < 8}
             />
             {/* Password strength meter - animates as the user types. */}
             {form.password.length > 0 && (
@@ -547,7 +573,7 @@ export default function RegisterPage() {
                     />
                   ))}
                 </div>
-                <span className="font-heading text-[11px] font-semibold text-ink2">
+                <span className="font-heading text-2xs font-semibold text-ink2">
                   {t(STRENGTH_META[strength].key)}
                 </span>
               </div>
@@ -704,10 +730,10 @@ export default function RegisterPage() {
         </form>
         )}
 
-        {isGoogleConfigured && step === 'form' && (
+        {isGoogleConfigured && step === 'form' && !isAutoEnrollPath(fromPath) && (
           <>
             <AuthDivider label={t('orDivider')} />
-            <GoogleSignInButton onError={setError} text="signup_with" />
+            <GoogleSignInButton onError={setError} fromPath={fromPath} text="signup_with" />
           </>
         )}
 

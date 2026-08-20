@@ -1,0 +1,204 @@
+[
+ {
+  "id": "532127ae-cf8e-45f6-9ad8-039a9f2469e0",
+  "action": "update",
+  "option_d": "20",
+  "explanation": "Given:\n+ means × (Plus becomes Multiplication)\n- means ÷ (Minus becomes Division)\n÷ means + (Division becomes Addition)\n× means - (Multiplication becomes Subtraction)\nExpression: 15 + 5 - 5 ÷ 10 × 5\nKey point: Replace each operator with its substitute, then apply BODMAS rule\nFrom question:\nRule: BODMAS - after operator substitution, solve Division → Multiplication → Addition → Subtraction\nReplace operators: 15 + 5 - 5 ÷ 10 × 5 → 15 × 5 ÷ 5 + 10 - 5\nStep 1 (Division first): 15 × 5 ÷ 5 - process left to right: 15 × 5 = 75, then 75 ÷ 5 = 15\nExpression becomes: 15 + 10 - 5\nStep 2 (Addition): 15 + 10 = 25\nStep 3 (Subtraction): 25 - 5 = 20\nAsked:\nValue of 15 + 5 - 5 ÷ 10 × 5 (after substitution) = ?\n= 20 → Option (D)",
+  "explanation_ta": "Given:\n+ என்றால் × (கூட்டல் பெருக்கலாக மாறும்)\n- என்றால் ÷ (கழித்தல் வகுத்தலாக மாறும்)\n÷ என்றால் + (வகுத்தல் கூட்டலாக மாறும்)\n× என்றால் - (பெருக்கல் கழித்தலாக மாறும்)\nதொடர்: 15 + 5 - 5 ÷ 10 × 5\nமுக்கியக் குறிப்பு: ஒவ்வொரு குறியீட்டையும் மாற்றி BODMAS விதியைப் பயன்படுத்தவும்\nFrom question:\nவிதி: BODMAS - குறியீடு மாற்றத்திற்குப் பிறகு, வகுத்தல் → பெருக்கல் → கூட்டல் → கழித்தல் வரிசையில் தீர்க்கவும்\nகுறியீடுகளை மாற்றவும்: 15 + 5 - 5 ÷ 10 × 5 → 15 × 5 ÷ 5 + 10 - 5\nபடி 1 (வகுத்தல் மற்றும் பெருக்கல் - இடமிருந்து வலமாக): 15 × 5 = 75, 75 ÷ 5 = 15\nதொடர் ஆகிறது: 15 + 10 - 5\nபடி 2 (கூட்டல்): 15 + 10 = 25\nபடி 3 (கழித்தல்): 25 - 5 = 20\nAsked:\nகுறியீடு மாற்றத்திற்குப் பிறகு தொடரின் மதிப்பு = ?\n= 20 → விடை (D)",
+  "verification_note": "correct_answer stays D; option_d now '20' matches the explanation's genuine derivation (15×5÷5+10-5=20), which now ends '→ Option (D)' and Tamil ends 'விடை (D)'; fabricated 200 sentence removed."
+ },
+ {
+  "id": "83571ac9-2175-43ad-a04f-83a0facfa465",
+  "action": "update",
+  "option_d": "19",
+  "explanation": "Given:\n+ means – (Plus becomes Minus)\n– means × (Minus becomes Multiplication)\n× means + (Multiplication becomes Addition)\n÷ means ÷ (Division stays Division)\nExpression: 5 – 4 + 3 × 2 ÷ 1\nKey point: Replace each operator with its substitute, then apply BODMAS rule\nFrom question:\nRule: BODMAS — after operator substitution, solve Division → Multiplication → Addition → Subtraction\nReplace operators: 5 – 4 + 3 × 2 ÷ 1 → 5 × 4 – 3 + 2 ÷ 1\nStep 1 (Division first): 2 ÷ 1 = 2\nExpression becomes: 5 × 4 – 3 + 2\nStep 2 (Multiplication next): 5 × 4 = 20\nExpression becomes: 20 – 3 + 2\nStep 3 (left to right — subtraction): 20 – 3 = 17\nStep 4 (Addition): 17 + 2 = 19\nAsked: Value of the expression after operator substitution = ?\n= 19 → Option (D)",
+  "explanation_ta": "Given:\n+ என்றால் – (கூட்டல் கழித்தலாக மாறும்)\n– என்றால் × (கழித்தல் பெருக்கலாக மாறும்)\n× என்றால் + (பெருக்கல் கூட்டலாக மாறும்)\n÷ என்றால் ÷ (வகுத்தல் மாறாது)\nமுக்கியக் குறிப்பு: ஒவ்வொரு குறியீட்டையும் மாற்றி BODMAS விதியைப் பயன்படுத்தவும்\nFrom question:\nவிதி: BODMAS — குறியீடு மாற்றத்திற்குப் பிறகு, வகுத்தல் → பெருக்கல் → கூட்டல் → கழித்தல் வரிசையில் தீர்க்கவும்\nகுறியீடுகளை மாற்றவும்: 5 – 4 + 3 × 2 ÷ 1 → 5 × 4 – 3 + 2 ÷ 1\nபடி 1 (வகுத்தல் முதலில்): 2 ÷ 1 = 2\nதொடர் ஆகிறது: 5 × 4 – 3 + 2\nபடி 2 (பெருக்கல்): 5 × 4 = 20\nதொடர் ஆகிறது: 20 – 3 + 2\nபடி 3 (கழித்தல் - இடமிருந்து வலமாக): 20 – 3 = 17\nபடி 4 (கூட்டல்): 17 + 2 = 19\nAsked: குறியீடு மாற்றத்திற்குப் பிறகு தொடரின் மதிப்பு = ?\n= 19 → விடை (D)",
+  "verification_note": "correct_answer stays D; option_d now '19' matches the explanation's genuine derivation (5×4-3+2÷1=19); fabricated '80-80=0' tangent removed, both languages end at Option (D)/விடை (D)."
+ },
+ {
+  "id": "b2620a0d-c10e-4a56-a54c-9d866868f33e",
+  "action": "update",
+  "option_c": "25",
+  "explanation": "Given:\nR = – (Subtraction)\nQ = × (Multiplication)\nW = ÷ (Division)\nA = + (Addition)\nExpression: 36 W 4 Q 3 R 7 A 5\nKey point: Replace each letter with its corresponding operator, then apply BODMAS rule\nFrom question:\nRule: BODMAS — Brackets → Of → Division → Multiplication → Addition → Subtraction\nReplace letters: 36 W 4 Q 3 R 7 A 5 → 36 ÷ 4 × 3 – 7 + 5\nStep 1 (Division first): 36 ÷ 4 = 9\nExpression becomes: 9 × 3 – 7 + 5\nStep 2 (Multiplication next): 9 × 3 = 27\nExpression becomes: 27 – 7 + 5\nStep 3 (left to right — subtraction): 27 – 7 = 20\nStep 4 (Addition): 20 + 5 = 25\nAsked: Value of 36 W 4 Q 3 R 7 A 5 (after substitution) = ?\n= 25 → Option (C)",
+  "explanation_ta": "Given:\nR = – (கழித்தல்)\nQ = × (பெருக்கல்)\nW = ÷ (வகுத்தல்)\nA = + (கூட்டல்)\nதொடர்: 36 W 4 Q 3 R 7 A 5\nமுக்கியக் குறிப்பு: ஒவ்வொரு எழுத்தையும் அதற்குரிய குறியீட்டால் மாற்றி, BODMAS விதியைப் பயன்படுத்தவும்\nFrom question:\nவிதி: BODMAS — அடைப்புக்குறி → Of → வகுத்தல் → பெருக்கல் → கூட்டல் → கழித்தல்\nஎழுத்துகளை மாற்றவும்: 36 W 4 Q 3 R 7 A 5 → 36 ÷ 4 × 3 – 7 + 5\nபடி 1 (வகுத்தல் முதலில்): 36 ÷ 4 = 9\nதொடர் ஆகிறது: 9 × 3 – 7 + 5\nபடி 2 (பெருக்கல்): 9 × 3 = 27\nதொடர் ஆகிறது: 27 – 7 + 5\nபடி 3 (கழித்தல் - இடமிருந்து வலமாக): 27 – 7 = 20\nபடி 4 (கூட்டல்): 20 + 5 = 25\nAsked: மாற்றத்திற்குப் பிறகு தொடரின் மதிப்பு = ?\n= 25 → விடை (C)",
+  "verification_note": "correct_answer stays C; option_c now '25' matches the actual stated expression's derivation (36÷4×3-7+5=25); Tamil explanation rewritten from scratch (was cross-contaminated with a different question's numbers) to solve the actual expression and end 'விடை (C)'."
+ },
+ {
+  "id": "c85a505b-c965-416f-b5fc-ec4adca47d42",
+  "action": "update",
+  "option_b": "10",
+  "explanation": "Given:\nM = ÷ (Division)\nR = + (Addition)\nT = – (Subtraction)\nK = × (Multiplication)\nExpression: 16 M 4 K 3 R 2 T 4\nKey point: Replace each letter with its corresponding operator, then apply BODMAS rule\nFrom question:\nRule: BODMAS — Brackets → Of → Division → Multiplication → Addition → Subtraction\nReplace letters with operators: 16 M 4 K 3 R 2 T 4 → 16 ÷ 4 × 3 + 2 − 4\nStep 1 (Division first): 16 ÷ 4 = 4\nExpression becomes: 4 × 3 + 2 − 4\nStep 2 (Multiplication next): 4 × 3 = 12\nExpression becomes: 12 + 2 − 4\nStep 3 (Addition): 12 + 2 = 14\nStep 4 (Subtraction): 14 − 4 = 10\nAsked: Value of 16 M 4 K 3 R 2 T 4 = ?\n= 10 → Option (B)",
+  "explanation_ta": "Given:\nM = ÷ (வகுத்தல்)\nR = + (கூட்டல்)\nT = – (கழித்தல்)\nK = × (பெருக்கல்)\nதொடர்: 16 M 4 K 3 R 2 T 4\nமுக்கியக் குறிப்பு: ஒவ்வொரு எழுத்தையும் அதற்குரிய குறியீட்டால் மாற்றி, BODMAS விதியைப் பயன்படுத்தவும்\nFrom question:\nவிதி: BODMAS — அடைப்புக்குறி → Of → வகுத்தல் → பெருக்கல் → கூட்டல் → கழித்தல்\nஎழுத்துகளை குறியீடுகளால் மாற்றவும்: 16 M 4 K 3 R 2 T 4 → 16 ÷ 4 × 3 + 2 − 4\nபடி 1 (வகுத்தல் முதலில்): 16 ÷ 4 = 4\nதொடர் ஆகிறது: 4 × 3 + 2 − 4\nபடி 2 (பெருக்கல் அடுத்து): 4 × 3 = 12\nதொடர் ஆகிறது: 12 + 2 − 4\nபடி 3 (கூட்டல்): 12 + 2 = 14\nபடி 4 (கழித்தல்): 14 − 4 = 10\nAsked: 16 M 4 K 3 R 2 T 4 இன் மதிப்பு = ?\n= 10 → விடை (B)",
+  "verification_note": "correct_answer stays B; option_b now '10' matches the actual stated expression (16÷4×3+2-4=10); Tamil explanation rewritten to solve the actual expression (was solving an altered '16 M 4 K 5 R 2 T 2') and now ends 'விடை (B)'."
+ },
+ {
+  "id": "f37fabd6-e00a-42c2-b6e4-0cf7950b8558",
+  "action": "update",
+  "option_a": "19",
+  "explanation": "Given:\n+ means ÷ (Plus becomes Division)\n÷ means × (Division becomes Multiplication)\n× means – (Multiplication becomes Subtraction)\n– means + (Minus becomes Addition)\nExpression: 12 + 3 ÷ 4 × 2 – 5\nKey point: Substitute each operator with its replacement, then solve using BODMAS\nFrom question:\nRule: BODMAS — after operator substitution, solve Division → Multiplication → Addition → Subtraction\nReplace operators: 12 + 3 ÷ 4 × 2 – 5 → 12 ÷ 3 × 4 – 2 + 5\nStep 1 (Division): 12 ÷ 3 = 4\nExpression becomes: 4 × 4 – 2 + 5\nStep 2 (Multiplication): 4 × 4 = 16\nExpression becomes: 16 – 2 + 5\nStep 3 (left to right — subtraction first): 16 – 2 = 14\nStep 4 (Addition): 14 + 5 = 19\nAsked: Value of 12 + 3 ÷ 4 × 2 – 5 (after substitution) = ?\n= 19 → Option (A)",
+  "explanation_ta": "Given:\n+ என்றால் ÷ (கூட்டல் வகுத்தலாக மாறும்)\n÷ என்றால் × (வகுத்தல் பெருக்கலாக மாறும்)\n× என்றால் – (பெருக்கல் கழித்தலாக மாறும்)\n– என்றால் + (கழித்தல் கூட்டலாக மாறும்)\nமுக்கியக் குறிப்பு: ஒவ்வொரு குறியீட்டையும் மாற்றி BODMAS விதியைப் பயன்படுத்தவும்\nFrom question:\nவிதி: BODMAS — குறியீடு மாற்றத்திற்குப் பிறகு, வகுத்தல் → பெருக்கல் → கூட்டல் → கழித்தல் வரிசையில் தீர்க்கவும்\nகுறியீடுகளை மாற்றவும்: 12 + 3 ÷ 4 × 2 – 5 → 12 ÷ 3 × 4 – 2 + 5\nபடி 1 (வகுத்தல்): 12 ÷ 3 = 4\nதொடர் ஆகிறது: 4 × 4 – 2 + 5\nபடி 2 (பெருக்கல்): 4 × 4 = 16\nதொடர் ஆகிறது: 16 – 2 + 5\nபடி 3 (கழித்தல் - இடமிருந்து வலமாக): 16 – 2 = 14\nபடி 4 (கூட்டல்): 14 + 5 = 19\nAsked: குறியீடு மாற்றத்திற்குப் பிறகு தொடரின் மதிப்பு = ?\n= 19 → விடை (A)",
+  "verification_note": "correct_answer stays A; option_a now '19' matches the genuine derivation (12÷3×4-2+5=19); fabricated '18+6÷5×2-3' tangent removed, both languages end at Option (A)/விடை (A)."
+ },
+ {
+  "id": "24c14be1-9c7b-4c72-98f1-75c439928261",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\n6 days (Mon–Sat); each customer picks a day independently\n\\( n(S) = 6 \\times 6 = 36 \\)\nWorking:\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\ni) Same day: favourable pairs \\( = \\{(\\text{Mon,Mon}),\\dots,(\\text{Sat,Sat})\\} \\), \\( n = 6 \\)\n\\( P = \\dfrac{6}{36} = \\dfrac{1}{6} \\)\nii) Different days: \\( n = 36 - 6 = 30 \\)\n\\( P = \\dfrac{30}{36} = \\dfrac{5}{6} \\)\niii) Consecutive days: 5 adjacent pairs, each in 2 orders, \\( n = 5 \\times 2 = 10 \\)\n\\( P = \\dfrac{10}{36} = \\dfrac{5}{18} \\)\nAsked:\n\\( P = \\dfrac{1}{6},\\ \\dfrac{5}{6},\\ \\dfrac{5}{18} \\)\n→ Option (C)",
+  "explanation_ta": "தரவுகள்:\n6 நாட்கள் (திங்கள்–சனி); ஒவ்வொரு வாடிக்கையாளரும் சுயாதீனமாக ஒரு நாளைத் தேர்ந்தெடுக்கிறார்\n\\( n(S) = 6 \\times 6 = 36 \\)\nசெயல்முறை:\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\ni) ஒரே நாள்: சாதகச் சோடிகள் \\( n = 6 \\)\n\\( P = \\dfrac{6}{36} = \\dfrac{1}{6} \\)\nii) வெவ்வேறு நாட்கள்: \\( n = 36 - 6 = 30 \\)\n\\( P = \\dfrac{30}{36} = \\dfrac{5}{6} \\)\niii) தொடர்ச்சியான நாட்கள்: 5 அடுத்தடுத்த சோடிகள், ஒவ்வொன்றும் 2 வரிசைகளில், \\( n = 5 \\times 2 = 10 \\)\n\\( P = \\dfrac{10}{36} = \\dfrac{5}{18} \\)\nகேட்டது:\n\\( P = \\dfrac{1}{6},\\ \\dfrac{5}{6},\\ \\dfrac{5}{18} \\)\nவிடை (C)",
+  "verification_note": "correct_answer changed D→C; option_c already holds (1/6, 5/6, 5/18); the explanation's own math (10/36=5/18) matches option C exactly, trailing label fixed to Option (C)/விடை (C)."
+ },
+ {
+  "id": "746ab34f-344f-46d3-85bc-df7ca0a39a3c",
+  "action": "update",
+  "explanation": "Given:\nTwo unbiased dice are rolled once.\n\\( n(S) = 6 \\times 6 = 36 \\)\nWorking:\nPrime sums possible: 2, 3, 5, 7, 11\nWays to get each sum:\nSum = 2: (1,1) → 1 way\nSum = 3: (1,2),(2,1) → 2 ways\nSum = 5: (1,4),(4,1),(2,3),(3,2) → 4 ways\nSum = 7: (1,6),(6,1),(2,5),(5,2),(3,4),(4,3) → 6 ways\nSum = 11: (5,6),(6,5) → 2 ways\nTotal favourable outcomes \\( = 1+2+4+6+2 = 15 \\)\nAsked:\n\\( P(\\text{prime sum}) = \\dfrac{15}{36} = \\dfrac{5}{12} \\)\n→ Option (C)",
+  "explanation_ta": "தரவுகள்:\nஇரண்டு சார்பற்ற பகடைகள் ஒருமுறை உருட்டப்படுகின்றன.\n\\( n(S) = 6 \\times 6 = 36 \\)\nசெயல்முறை:\nசாத்தியமான பகா கூட்டுத்தொகைகள்: 2, 3, 5, 7, 11\nஒவ்வொரு கூட்டுத்தொகைக்கும் வழிகள்:\nகூட்டுத்தொகை = 2: (1,1) → 1 வழி\nகூட்டுத்தொகை = 3: (1,2),(2,1) → 2 வழிகள்\nகூட்டுத்தொகை = 5: (1,4),(4,1),(2,3),(3,2) → 4 வழிகள்\nகூட்டுத்தொகை = 7: (1,6),(6,1),(2,5),(5,2),(3,4),(4,3) → 6 வழிகள்\nகூட்டுத்தொகை = 11: (5,6),(6,5) → 2 வழிகள்\nமொத்த சாதக விளைவுகள் \\( = 1+2+4+6+2 = 15 \\)\nகேட்டது:\n\\( P(\\text{பகா கூட்டுத்தொகை}) = \\dfrac{15}{36} = \\dfrac{5}{12} \\)\nவிடை (C)",
+  "verification_note": "correct_answer unchanged (C, already correct); explanation/explanation_ta fully replaced with a genuine dice-probability derivation (15/36=5/12) matching option C, removing the unrelated compound-interest content."
+ },
+ {
+  "id": "06177fe1-15f7-4d92-901a-2462d9388f56",
+  "action": "update",
+  "question_text": "A, B and C enter into a partnership in the ratio $\\dfrac{7}{2}$ : $\\dfrac{4}{3}$ : $\\dfrac{6}{5}$. After 4 months, A increases his share 50%. If the total profit at the end of one year be Rs: 21,600; then B's share in the profit is",
+  "question_text_ta": "A, B மற்றும் C $\\dfrac{7}{2}$ : $\\dfrac{4}{3}$ : $\\dfrac{6}{5}$ என்ற விகிதத்தில் ஒரு கூட்டாண்மைக்குள் நுழைகின்றன. 4 மாதங்களுக்குப் பிறகு, A தனது பங்கை 50% அதிகரிக்கிறது. ஒரு வருடத்தின் முடிவில் மொத்த லாபம் ரூ: 21,600-ஆக இருந்தால் ; லாபத்தில் B இன் பங்கு எவ்வளவு ?",
+  "verification_note": "Filled the blank ratio (7/2 : 4/3 : 6/5) into question_text and question_text_ta, matching the duplicate row 6a6a9ef7; options, correct_answer (D=4000) and explanation were already correct and consistent with this ratio, so left untouched."
+ },
+ {
+  "id": "193294da-5824-45d0-b182-29188877c67b",
+  "action": "update",
+  "question_text": "If A:B = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ and B:C = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ then A:B:C is equal to",
+  "question_text_ta": "A:B = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ மற்றும் B:C = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ என்றால் A:B:C = ?",
+  "verification_note": "Filled the blank ratios (A:B and B:C = 1/2 : 1/3) into question_text and question_text_ta, matching the duplicate row c7a93086; options, correct_answer (D=9:6:4) and explanation were already correct and consistent, so left untouched."
+ },
+ {
+  "id": "42af1cf2-91ad-47b3-b4d3-9cffeb4ae861",
+  "action": "deactivate",
+  "verification_note": "Row is unrecoverable: the expression to evaluate was never captured in question_text, and option_b/option_d are empty strings with option_a/option_c holding leftover label fragments ('B)','D)'). No source data exists to reconstruct a valid question. Confirmed already active=false in the live DB; this fix keeps it deactivated rather than fabricating content."
+ },
+ {
+  "id": "cface1eb-2900-40a2-8307-89f1a22e036f",
+  "action": "update",
+  "option_d": "$\\dfrac{2}{3}$",
+  "explanation": "Given:\nx : y = 3 : 4, so x = 3k and y = 4k\na : b = 1 : 2, so a = m and b = 2m\nWorking:\nUsing representative values x = 3, y = 4, a = 1, b = 2:\nxa = 3 × 1 = 3, yb = 4 × 2 = 8\nNumerator: 2xa + yb = 2(3) + 8 = 6 + 8 = 14\nDenominator: 3yb − xa = 3(8) − 3 = 24 − 3 = 21\nValue = \\( \\dfrac{14}{21} = \\dfrac{2}{3} \\)\nAsked:\nValue of \\( \\dfrac{2xa + yb}{3yb - xa} \\) = ?\n= \\( \\dfrac{2}{3} \\) → Option (D)",
+  "explanation_ta": "தரவுகள்:\nx : y = 3 : 4, எனவே x = 3k, y = 4k\na : b = 1 : 2, எனவே a = m, b = 2m\nசெயல்முறை:\nx = 3, y = 4, a = 1, b = 2 எனப் பிரதியிடுக:\nxa = 3 × 1 = 3, yb = 4 × 2 = 8\nதொகுதி: 2xa + yb = 2(3) + 8 = 6 + 8 = 14\nபகுதி: 3yb − xa = 3(8) − 3 = 24 − 3 = 21\nமதிப்பு = \\( \\dfrac{14}{21} = \\dfrac{2}{3} \\)\nகேட்டது:\n\\( \\dfrac{2xa + yb}{3yb - xa} \\) இன் மதிப்பு = ?\n= \\( \\dfrac{2}{3} \\) → விடை (D)",
+  "verification_note": "correct_answer stays D; option_d now 2/3 matches the actually-asked expression's true value (2xa+yb)/(3yb-xa)=14/21=2/3, verified independently; explanation replaced since it previously computed the wrong sub-expressions and asserted the answer without derivation. NOTE: this row is currently active=false in the live DB — content is now fixed but reactivation (active=true) is outside this fix's field scope and should be confirmed separately."
+ },
+ {
+  "id": "79b9b21a-b11b-4644-8eaf-76d4488d8e4e",
+  "action": "update",
+  "question_text": "A milkman bought 15 L of milk and mixed 3 L of water in it. If the price per litre of the mixture becomes Rs: 22, what is the cost price of milk per liter?",
+  "verification_note": "Only wording fixed ('price per kg' → 'price per litre') to match the all-litre problem and the Tamil text (which already said லிட்டர்); numeric answer (B=26.40) was already correct and untouched."
+ },
+ {
+  "id": "82990880-b304-4f66-9fd9-f64b8b136bf7",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nAbove the line: palette | easel | brush\nBelow the line: textbook | lesson plan | ?\n(A) artist  (B) teacher  (C) report card  (D) paint\nWorking:\nRelationship: each set lists OBJECTS associated with a profession, not the professional. Palette, easel, brush are all objects used by an artist — the artist itself is not part of this object group.\nFor the same object-only pattern, textbook and lesson plan are objects associated with a teacher, so the third item must also be an object linked to teaching, not the teacher.\n(A) artist → a person, not an object; breaks the object-only pattern (same error as picking 'teacher'). ✗\n(B) teacher → a person, not an object; breaks the object-only pattern seen in the top row. ✗\n(C) report card → a teaching-related object, correctly paralleling the object-only top row. ✓\n(D) paint → an art-related object, wrong theme (belongs with the top group, not this one). ✗\nAsked:\nThe object that completes textbook, lesson plan, ?\n→ Option (C)",
+  "explanation_ta": "தரவுகள்:\nகோட்டுக்கு மேலே: palette | easel | brush\nகோட்டுக்கு கீழே: textbook | lesson plan | ?\n(A) artist  (B) teacher  (C) report card  (D) paint\nசெயல்முறை:\nஉறவு: ஒவ்வொரு தொகுப்பும் ஒரு தொழிலுடன் தொடர்புடைய பொருட்களைக் குறிக்கிறது, தொழிலாளியை அல்ல. palette, easel, brush அனைத்தும் artist பயன்படுத்தும் பொருட்கள் — artist இந்தத் தொகுப்பில் இல்லை.\nஅதே பொருள்-மட்டும் வடிவத்தைப் பின்பற்றி, textbook மற்றும் lesson plan ஆகியவை teacher-உடன் தொடர்புடைய பொருட்கள், எனவே மூன்றாவது உருப்படியும் கற்பித்தலுடன் தொடர்புடைய ஒரு பொருளாக இருக்க வேண்டும், teacher அல்ல.\n(A) artist → ஒரு நபர், பொருள் அல்ல; பொருள்-மட்டும் வடிவத்தை உடைக்கிறது. ✗\n(B) teacher → ஒரு நபர், பொருள் அல்ல; மேல் வரிசையில் காணப்படும் பொருள்-மட்டும் வடிவத்தை உடைக்கிறது. ✗\n(C) report card → கற்பித்தலுடன் தொடர்புடைய பொருள், மேல் வரிசையின் பொருள்-மட்டும் வடிவத்திற்கு சரியாக இணையாக உள்ளது. ✓\n(D) paint → ஓவியத் தொடர்பான பொருள், தவறான கருப்பொருள் (மேல் தொகுப்புடன் தொடர்புடையது, இதனுடன் அல்ல). ✗\nகேட்டது:\ntextbook, lesson plan, ? ஐ நிறைவு செய்யும் பொருள்\nவிடை (C)",
+  "verification_note": "correct_answer changed B→C per the object-only structural parity (top row has no worker, only tools); option_c 'report card' already exists as the object-type option; explanation rewritten to be internally consistent (no longer picks a person 'teacher' while claiming an object-only rule). Confidence was medium in the source finding — flagged for review."
+ },
+ {
+  "id": "a5f928ed-979c-4c19-a999-be5de2deb2fe",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nTop row: candle | lamp | floodlight — light sources, small → large.\nBottom row: hut | cottage | ? — types of housing, small → large.\nWorking:\nThe bottom row must keep growing into a bigger, specific type of dwelling, just like the top row grows into a bigger, specific light source (floodlight).\ntent — a small, temporary shelter; not larger than a cottage, so it breaks the growth. ✗\ncity — a whole settlement of many homes; overshoots the housing progression (not a single dwelling type). ✗\ndwelling — a generic classifier for 'a place lived in', not a specific bigger housing type; floodlight itself is a specific object, not a generic classifier like 'light source', so this breaks the parallel. ✗\nhouse — a bigger, specific type of dwelling than a cottage, correctly paralleling floodlight being a bigger, specific light source than a lamp. ✓\nAsked:\nWord that completes hut → cottage → ?\n→ Option (D)",
+  "explanation_ta": "தரவுகள்:\nமேல் வரிசை: candle | lamp | floodlight — ஒளி மூலங்கள், சிறியது → பெரியது.\nகீழ் வரிசை: hut | cottage | ? — வீட்டு வகைகள், சிறியது → பெரியது.\nசெயல்முறை:\nமேல் வரிசை ஒரு பெரிய, குறிப்பிட்ட ஒளி மூலமாக (floodlight) வளர்வது போல, கீழ் வரிசையும் ஒரு பெரிய, குறிப்பிட்ட வீட்டு வகையாக வளர வேண்டும்.\ntent — சிறிய, தற்காலிக தங்குமிடம்; cottage-ஐ விட பெரியதல்ல, எனவே வளர்ச்சியை உடைக்கிறது. ✗\ncity — பல வீடுகள் கொண்ட முழு ஊர்; வீட்டு முன்னேற்றத்தை மிகைப்படுத்துகிறது (ஒரு தனி வீட்டு வகை அல்ல). ✗\ndwelling — 'வசிக்கும் இடம்' என்ற பொதுவான வகைப்பாடு, ஒரு குறிப்பிட்ட பெரிய வீட்டு வகை அல்ல; floodlight ஒரு பொதுவான வகைப்பாடு அல்ல, ஒரு குறிப்பிட்ட பொருள், எனவே இது இணையை உடைக்கிறது. ✗\nhouse — cottage-ஐ விட பெரிய, குறிப்பிட்ட வீட்டு வகை, floodlight ஒரு பெரிய, குறிப்பிட்ட ஒளி மூலமாக இருப்பதற்கு சரியாக இணையாக உள்ளது. ✓\nகேட்டது:\nhut → cottage → ? ஐ நிறைவு செய்யும் சொல்\nவிடை (D)",
+  "verification_note": "correct_answer changed C→D, removing the self-contradiction where the old explanation rejected 'house' (D) for being 'a kind of house' while accepting 'dwelling' despite hut also being 'a kind of dwelling'; option_d 'house' already exists. Confidence was medium in the source finding — flagged for review."
+ },
+ {
+  "id": "0640fd86-c80f-46dd-8a24-8f91907160bc",
+  "action": "update",
+  "option_a": "65 70",
+  "correct_answer": "A",
+  "explanation": "Given:\nSeries: 10 20 25 35 40 50 55 ?\nKey point: An alternating addition series — add 10, then 5, then 10, then 5, and so on.\nFrom question:\nRule: +10, +5 alternately\n→ 10 + 10 = 20\n→ 20 + 5 = 25\n→ 25 + 10 = 35\n→ 35 + 5 = 40\n→ 40 + 10 = 50\n→ 50 + 5 = 55\n→ 55 + 10 = 65 (first missing term)\n→ 65 + 5 = 70 (second missing term)\nAsked: Next two terms = ?\n= 65 70 → Option (A)",
+  "explanation_ta": "Given:\nதொடர்: 10 20 25 35 40 50 55 ?\nமுக்கியக் குறிப்பு: மாறி மாறி வரும் கூட்டல் தொடர் — 10 கூட்டு, பிறகு 5, பிறகு 10, பிறகு 5, இவ்வாறே.\nFrom question:\nவிதி: +10, +5 மாறி மாறி\n→ 10 + 10 = 20\n→ 20 + 5 = 25\n→ 25 + 10 = 35\n→ 35 + 5 = 40\n→ 40 + 10 = 50\n→ 50 + 5 = 55\n→ 55 + 10 = 65 (முதல் விடுபட்ட உறுப்பு)\n→ 65 + 5 = 70 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 65 70 → விடை (A)",
+  "verification_note": "No option held the true value (65,70) — option A held it reversed ('70 65'). Fixed by reordering option_a to '65 70' and marking A correct (minimal fix vs. rewriting a different option); explanation rewritten to consistently apply the stated +10/+5 alternation through both missing terms and end at Option (A)."
+ },
+ {
+  "id": "0e5d12cc-eb13-4984-8b10-b385c2ab9599",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 15, ___, 27, 27, 39, 39, ...\nKey point: addition with repetition — each number repeats, then increases by 12.\nFrom question:\nRule: each number repeats itself, then 12 is added to reach the next number (which also repeats).\n→ Pattern: 15, 15, 27, 27, 39, 39\n→ 15 + 12 = 27; 27 + 12 = 39 (each value appears twice)\n→ The blank is the repeat of the first term, 15\nAsked: Missing term = ?\n= 15 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 15, ___, 27, 27, 39, 39, ...\nமுக்கியக் குறிப்பு: மீளுருவாக்கத்துடன் கூட்டல் — ஒவ்வொரு எண்ணும் மீண்டும் வரும், பின் 12 ஆல் கூடுகிறது.\nFrom question:\nவிதி: ஒவ்வொரு எண்ணும் தன்னை மீண்டும் எழுதுகிறது, பின் 12 கூட்டப்பட்டு அடுத்த எண் வருகிறது (அதுவும் மீண்டும் வரும்).\n→ வடிவம்: 15, 15, 27, 27, 39, 39\n→ 15 + 12 = 27 ; 27 + 12 = 39 (ஒவ்வொரு மதிப்பும் இருமுறை வருகிறது)\n→ காலியிடம் என்பது முதல் உறுப்பின் மீள்வரல் = 15\nAsked: விடுபட்ட உறுப்பு = ?\n= 15 → விடை (D)",
+  "verification_note": "correct_answer changed C→D; option_d already holds the correct value '15'; explanation rewritten to cleanly derive 15 as the repeat of the first term, removing the unexplained 'IndiaBix answer is 23' override."
+ },
+ {
+  "id": "1151dc05-d529-4eab-a2ee-7f90c78d7a80",
+  "action": "update",
+  "correct_answer": "C",
+  "verification_note": "Simple field mismatch: explanation and explanation_ta already correctly derive 4.7 and already end '→ Option (C)' / 'விடை (C)'; only the correct_answer field (was A) needed to be changed to C, which already holds '4.7'."
+ },
+ {
+  "id": "16f329fd-c8c0-4e1a-90a8-6286cf3cc544",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 42 40 38 35 33 31 28 ? ?\nKey point: An alternating subtraction series — subtract 2 twice, then subtract 3 once, then repeat.\nFrom question:\nRule: −2, −2, −3 repeating\n→ 42 − 2 = 40\n→ 40 − 2 = 38\n→ 38 − 3 = 35\n→ 35 − 2 = 33\n→ 33 − 2 = 31\n→ 31 − 3 = 28\n→ 28 − 2 = 26 (first missing term)\n→ 26 − 2 = 24 (second missing term)\nAsked: Next two terms = ?\n= 26 24 → Option (C)",
+  "explanation_ta": "Given:\nதொடர்: 42 40 38 35 33 31 28 ? ?\nமுக்கியக் குறிப்பு: மாறி மாறி வரும் கழித்தல் தொடர் — இருமுறை 2 கழி, பிறகு ஒருமுறை 3 கழி, பிறகு மீண்டும்.\nFrom question:\nவிதி: −2, −2, −3 மீண்டும் மீண்டும்\n→ 42 − 2 = 40\n→ 40 − 2 = 38\n→ 38 − 3 = 35\n→ 35 − 2 = 33\n→ 33 − 2 = 31\n→ 31 − 3 = 28\n→ 28 − 2 = 26 (முதல் விடுபட்ட உறுப்பு)\n→ 26 − 2 = 24 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 26 24 → விடை (C)",
+  "verification_note": "correct_answer changed D→C; option_c already holds the correct pair '26 24'; explanation rewritten to consistently apply the stated −2,−2,−3 cycle through both missing terms, removing the unexplained '−4' override that had produced 22."
+ },
+ {
+  "id": "1d562a41-e8b6-4f25-b6d3-7a0033954ea8",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 3 5 35 10 12 35 17 ? ?\nKey point: An alternating addition series (add 2, add 5, add 2, …) with the random number 35 interpolated as every third number, appearing after each 'add 2' step.\nFrom question:\nRule: +2, +5 alternately, with 35 inserted as every third term\n→ 3 + 2 = 5\n→ 35 inserted (every third position)\n→ 5 + 5 = 10\n→ 10 + 2 = 12\n→ 35 inserted (every third position)\n→ 12 + 5 = 17\n→ 17 + 2 = 19 (first missing term)\n→ 35 inserted (every third position) (second missing term)\nAsked: Next two terms = ?\n= 19 35 → Option (C)",
+  "explanation_ta": "Given:\nதொடர்: 3 5 35 10 12 35 17 ? ?\nமுக்கியக் குறிப்பு: மாறி மாறி வரும் கூட்டல் தொடர் (2 கூட்டு, 5 கூட்டு, 2 கூட்டு, …); ஒவ்வொரு மூன்றாவது எண்ணாக சீரற்ற எண் 35, ஒவ்வொரு '2 கூட்டு' படிக்குப் பின் இடைச்செருகப்படுகிறது.\nFrom question:\nவிதி: +2, +5 மாறி மாறி; ஒவ்வொரு மூன்றாவது உறுப்பாக 35 செருகப்படும்\n→ 3 + 2 = 5\n→ 35 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 5 + 5 = 10\n→ 10 + 2 = 12\n→ 35 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 12 + 5 = 17\n→ 17 + 2 = 19 (முதல் விடுபட்ட உறுப்பு)\n→ 35 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்) (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 19 35 → விடை (C)",
+  "verification_note": "correct_answer changed A→C; option_c already holds the correct pair '19 35'; explanation rewritten so the last step correctly applies the alternating +2 (not a repeated +5), consistent with the stated +2/+5 rule."
+ },
+ {
+  "id": "1f4dbfb5-1fc6-4fd4-b595-6b9b472b7e3b",
+  "action": "deactivate",
+  "verification_note": "Question shows only one blank but all 4 options are number pairs — an unresolvable format mismatch. Applying the stated −3/−4 alternating rule to the single blank gives 7, which no option contains in a usable form; recommended_fix itself calls for re-authoring rather than offering a specific corrected option, so deactivated instead of guessing a fabricated fix."
+ },
+ {
+  "id": "20706bdc-d0e7-46c2-a76e-8c9047e86e53",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 17 32 19 29 21 26 23 ___ ___\nKey point: two alternating patterns — one adds 2, the other subtracts 3.\nFrom question:\nRule: First series (17, 19, 21, 23, ...) adds 2; second series (32, 29, 26, ...) subtracts 3.\n→ Positions: [17] 32 [19] 29 [21] 26 [23] ? ?\n→ Subtracting series: 32 −3 = 29 ; 29 −3 = 26 ; 26 −3 = 23 (first missing term, position 8)\n→ Adding series: 17 +2 = 19 ; 19 +2 = 21 ; 21 +2 = 23 ; 23 +2 = 25 (second missing term, position 9)\nAsked: Next two terms = ?\n= 23 25 → Option (C)",
+  "explanation_ta": "Given:\nதொடர்: 17 32 19 29 21 26 23 ___ ___\nமுக்கியக் குறிப்பு: இரு மாறி மாறி வரும் வடிவங்கள் — ஒன்று 2 கூட்டுகிறது, மற்றொன்று 3 கழிக்கிறது.\nFrom question:\nவிதி: முதல் தொடர் (17, 19, 21, 23, ...) 2 கூட்டுகிறது; இரண்டாம் தொடர் (32, 29, 26, ...) 3 கழிக்கிறது.\n→ இடங்கள்: [17] 32 [19] 29 [21] 26 [23] ? ?\n→ குறையும் தொடர்: 32 −3 = 29 ; 29 −3 = 26 ; 26 −3 = 23 (முதல் விடுபட்ட உறுப்பு, இடம் 8)\n→ கூடும் தொடர்: 17 +2 = 19 ; 19 +2 = 21 ; 21 +2 = 23 ; 23 +2 = 25 (இரண்டாம் விடுபட்ட உறுப்பு, இடம் 9)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 23 25 → விடை (C)",
+  "verification_note": "correct_answer changed D→C; option_c already holds the correct pair '23 25' (subtract-series term then add-series term, in that position order); explanation rewritten to remove the hedging 'Wait... IndiaBix gives 25 22' language."
+ },
+ {
+  "id": "21ae4303-acc1-4955-a478-9ae5ddae6140",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 1 10 7 20 13 30 19 ?\nKey point: Two alternating series — the first adds 6 (1, 7, 13, 19, …) and the second adds 10 (10, 20, 30, 40, …).\nFrom question:\nRule: series 1 = +6; series 2 (alternate term) = +10\n→ 1 (series 1)\n→ 10 (series 2)\n→ 1 + 6 = 7 (series 1)\n→ 10 + 10 = 20 (series 2)\n→ 7 + 6 = 13 (series 1)\n→ 20 + 10 = 30 (series 2)\n→ 13 + 6 = 19 (series 1)\n→ 30 + 10 = 40 (series 2, first missing term)\n→ 19 + 6 = 25 (series 1, second missing term)\nAsked: Next two terms = ?\n= 40 25 → Option (C)",
+  "explanation_ta": "Given:\nதொடர்: 1 10 7 20 13 30 19 ?\nமுக்கியக் குறிப்பு: இரண்டு மாறி மாறி வரும் தொடர்கள் — முதல் தொடர் 6 கூட்டுகிறது (1, 7, 13, 19, …), இரண்டாம் தொடர் 10 கூட்டுகிறது (10, 20, 30, 40, …).\nFrom question:\nவிதி: தொடர் 1 = +6; தொடர் 2 (மாற்று உறுப்பு) = +10\n→ 1 (தொடர் 1)\n→ 10 (தொடர் 2)\n→ 1 + 6 = 7 (தொடர் 1)\n→ 10 + 10 = 20 (தொடர் 2)\n→ 7 + 6 = 13 (தொடர் 1)\n→ 20 + 10 = 30 (தொடர் 2)\n→ 13 + 6 = 19 (தொடர் 1)\n→ 30 + 10 = 40 (தொடர் 2, முதல் விடுபட்ட உறுப்பு)\n→ 19 + 6 = 25 (தொடர் 1, இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 40 25 → விடை (C)",
+  "verification_note": "correct_answer changed A→C; option_c already holds the correct pair '40 25' (series-2 term then series-1 term, in that position order); explanation rewritten to end at the genuine derivation, removing the unexplained '26'."
+ },
+ {
+  "id": "277f114b-4b71-4b6a-849c-cca308b6544d",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries: 53, 53, 40, 40, 27, 27, ...\nKey point: This is a subtraction-with-repetition series — each number repeats, then 13 is subtracted.\nFrom question:\nRule: repeat each term, then −13\n→ 53, 53 (repeat)\n→ 53 − 13 = 40, 40 (repeat)\n→ 40 − 13 = 27, 27 (repeat)\n→ 27 − 13 = 14, 14 (repeat) → next term = 14\nAsked: Next term = ?\n= 14 → Option (B)",
+  "explanation_ta": "Given:\nதொடர்: 53, 53, 40, 40, 27, 27, ...\nமுக்கியக் குறிப்பு: இது மீள்வரும் கழித்தல் தொடர் — ஒவ்வொரு எண்ணும் மீண்டும் வரும், பின் 13 கழிக்கப்படும்.\nFrom question:\nவிதி: ஒவ்வொரு உறுப்பும் மீண்டும் வரும், பின் −13\n→ 53, 53 (மீள்வரல்)\n→ 53 − 13 = 40, 40 (மீள்வரல்)\n→ 40 − 13 = 27, 27 (மீள்வரல்)\n→ 27 − 13 = 14, 14 (மீள்வரல்) → அடுத்த உறுப்பு = 14\nAsked: அடுத்த உறுப்பு = ?\n= 14 → விடை (B)",
+  "verification_note": "correct_answer changed A→B; option_b already holds the correct value '14'; explanation's own math was already right (27-13=14), only the trailing label was wrong ('Option (A)') — fixed to Option (B)/விடை (B)."
+ },
+ {
+  "id": "34ca9ad4-9e2d-4acf-aa9c-d9c41015b145",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries: 7, 10, 8, 11, 9, 12, ...\nKey point: This is an alternating addition and subtraction series — add 3, then subtract 2.\nFrom question:\nRule: alternately +3 and −2\n→ 7 + 3 = 10\n→ 10 − 2 = 8\n→ 8 + 3 = 11\n→ 11 − 2 = 9\n→ 9 + 3 = 12\n→ 12 − 2 = 10\nAsked: Next term = ?\n= 10 → Option (B)",
+  "explanation_ta": "Given:\nதொடர்: 7, 10, 8, 11, 9, 12, ...\nமுக்கியக் குறிப்பு: இது மாறிமாறி கூட்டல்–கழித்தல் தொடர் — 3 கூட்டப்படும், பின் 2 கழிக்கப்படும்.\nFrom question:\nவிதி: மாறிமாறி +3 மற்றும் −2\n→ 7 + 3 = 10\n→ 10 − 2 = 8\n→ 8 + 3 = 11\n→ 11 − 2 = 9\n→ 9 + 3 = 12\n→ 12 − 2 = 10\nAsked: அடுத்த உறுப்பு = ?\n= 10 → விடை (B)",
+  "verification_note": "correct_answer changed D→B; option_b already holds the correct value '10'; explanation rewritten to apply the stated +3/−2 alternation through the final step, removing the nonsensical, unexplained '+1'."
+ },
+ {
+  "id": "40034e1e-448c-4b29-a426-0a6cfacb2de4",
+  "action": "update",
+  "correct_answer": "B",
+  "verification_note": "Simple field mismatch: explanation and explanation_ta already correctly derive 28 and already end '→ Option (B)' / 'விடை (B)'; only the correct_answer field (was A) needed to be changed to B, which already holds '28'."
+ },
+ {
+  "id": "44a3175e-5904-496e-87d7-c8bc4662fbef",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: \\( 3\\ \\ 8\\ \\ 10\\ \\ 15\\ \\ 17\\ \\ 22\\ \\ 24\\ \\ ?\\ \\ ? \\)\nWorking:\nRule: alternating \\( +5,\\ +2,\\ +5,\\ +2,\\ \\ldots \\)\n\\( 17 + 5 = 22 \\)\n\\( 22 + 2 = 24 \\)\n\\( 24 + 5 = 29 \\)\n\\( 29 + 2 = 31 \\)\nAsked: next two terms = ?\n→ Option (C)",
+  "explanation_ta": "தரவுகள்:\nதொடர்: \\( 3\\ \\ 8\\ \\ 10\\ \\ 15\\ \\ 17\\ \\ 22\\ \\ 24\\ \\ ?\\ \\ ? \\)\nசெயல்முறை:\nவிதி: மாறி மாறி \\( +5,\\ +2,\\ +5,\\ +2,\\ \\ldots \\)\n\\( 17 + 5 = 22 \\)\n\\( 22 + 2 = 24 \\)\n\\( 24 + 5 = 29 \\)\n\\( 29 + 2 = 31 \\)\nகேட்டது: அடுத்த இரு உறுப்புகள் = ?\nவிடை (C)",
+  "verification_note": "correct_answer changed B→C; option_c already holds the correct pair '29 31'; explanation's own math was already right (29, 31), only the trailing label was wrong ('Option (B)', whose actual value is 34) — fixed to Option (C)/விடை (C)."
+ },
+ {
+  "id": "4854afec-568a-40e3-914a-d984f602cc9d",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 21 25 18 29 33 18 ? ?\nKey point: A simple +4 addition series with the random number 18 interpolated as every third number.\nFrom question:\nRule: +4 to each term (except 18), with 18 inserted as every third term\n→ 21 + 4 = 25\n→ 18 inserted (every third position)\n→ 25 + 4 = 29\n→ 29 + 4 = 33\n→ 18 inserted (every third position)\n→ 33 + 4 = 37 (first missing term)\n→ 37 + 4 = 41 (second missing term; the next 18 insert is not due until position 9)\nAsked: Next two terms = ?\n= 37 41 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 21 25 18 29 33 18 ? ?\nமுக்கியக் குறிப்பு: எளிய +4 கூட்டல் தொடர்; ஒவ்வொரு மூன்றாவது எண்ணாக சீரற்ற எண் 18 இடைச்செருகப்படுகிறது.\nFrom question:\nவிதி: ஒவ்வொரு உறுப்புக்கும் +4 (18 தவிர); ஒவ்வொரு மூன்றாவது உறுப்பாக 18 செருகப்படும்\n→ 21 + 4 = 25\n→ 18 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 25 + 4 = 29\n→ 29 + 4 = 33\n→ 18 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 33 + 4 = 37 (முதல் விடுபட்ட உறுப்பு)\n→ 37 + 4 = 41 (இரண்டாம் விடுபட்ட உறுப்பு; அடுத்த 18 செருகல் இடம் 9 வரை தேவையில்லை)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 37 41 → விடை (D)",
+  "verification_note": "correct_answer changed A→D; option_d already holds the correct pair '37 41'; explanation rewritten to consistently apply the stated +4 rule for both missing terms (both are main-series terms since the next '18' insert isn't due until position 9), removing the unexplained '39'."
+ }
+]

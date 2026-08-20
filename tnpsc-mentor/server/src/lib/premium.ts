@@ -1,5 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { PREMIUM_VALIDITY_MS, VETTRI_VALIDITY_MS, VETTRI_MONTH_VALIDITY_MS } from '../pricing.js'
+import {
+  PREMIUM_VALIDITY_MS,
+  VETTRI_VALIDITY_MS,
+  VETTRI_MONTH_VALIDITY_MS,
+  RANK_BOOSTER_VALIDITY_MS,
+  MOCK_PACK_VALIDITY_MS,
+} from '../pricing.js'
 
 export interface PremiumEntitlement {
   premium: boolean
@@ -18,8 +24,28 @@ export interface BundleEntitlement {
   premiumUntil: string | null
   vettri: boolean
   vettriUntil: string | null
-  /** premium || vettri — unlocks the vettri bank + unlimited PYQ/CA. */
+  /** premium || vettri — unlocks the vettri bank (Test Marathon). Deliberately
+   *  does NOT include rankBooster — see creditsUnlimited for the credit gate. */
   unlimited: boolean
+  /** The standalone ₹1,249/90-day "Group II/IIA Rank Booster" plan. */
+  rankBooster: boolean
+  rankBoosterUntil: string | null
+  /** premium || rankBooster — deliberately does NOT include vettri: Rank
+   *  Booster is its own purchase, only Premium (the superset plan) includes
+   *  it for free. Unlocks the Rank Booster test series. */
+  rankBoosterUnlocked: boolean
+  /** unlimited || rankBooster — the credit-gate bypass ("never spends credits,
+   *  unlimited PYQ/CA/Subject-practice"). Rank Booster grants this bonus for
+   *  its own 90-day window WITHOUT unlocking the Vettri Test Marathon bank
+   *  (that stays on `unlimited` alone) — the two gates are intentionally
+   *  different unions of the same three plans. */
+  creditsUnlimited: boolean
+  /** The standalone ₹399/80-day "Group 1 Mock Test Pack". Deliberately NOT
+   *  folded into `creditsUnlimited` — it grants a bigger DAILY credit
+   *  allowance (see credits.ts DAILY_CREDIT_GRANT_BOOSTED), not unlimited
+   *  credits, so it stays its own field. */
+  mockPack: boolean
+  mockPackUntil: string | null
 }
 
 /**
@@ -48,13 +74,19 @@ export async function premiumEntitlement(db: SupabaseClient): Promise<PremiumEnt
 }
 
 /**
- * Resolve premium AND vettri entitlement in a single ledger read. Both plans use
- * a 90-day window (see pricing.ts), so one `since` bound covers both — the widest
- * of the two validities is used defensively in case they ever diverge. Throws on
- * a DB read error so callers can fail closed.
+ * Resolve premium AND vettri entitlement in a single ledger read. Premium is a
+ * 180-day window and Vettri a 60-day one (see pricing.ts) — they already
+ * diverge, so `window` takes the widest of all three plans defensively, then
+ * bounds each plan against its own validity below. Throws on a DB read error
+ * so callers can fail closed.
  */
 export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlement> {
-  const window = Math.max(PREMIUM_VALIDITY_MS, VETTRI_VALIDITY_MS)
+  const window = Math.max(
+    PREMIUM_VALIDITY_MS,
+    VETTRI_VALIDITY_MS,
+    RANK_BOOSTER_VALIDITY_MS,
+    MOCK_PACK_VALIDITY_MS
+  )
   const since = new Date(Date.now() - window).toISOString()
   const { data, error } = await db
     .from('payments')
@@ -90,11 +122,27 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
   )
   const vettriActive = vettriUntilMs > now
 
+  // Rank Booster: single ₹1,249/90-day plan, same shape as premium's own check.
+  const rankBoosterRow = latestFor('rank_booster_g2')
+  const rankBoosterActive =
+    !!rankBoosterRow && now - new Date(rankBoosterRow.created_at).getTime() < RANK_BOOSTER_VALIDITY_MS
+
+  // Mock Pack: single ₹399/80-day plan, same shape again.
+  const mockPackRow = latestFor('group1_mock_pack')
+  const mockPackActive =
+    !!mockPackRow && now - new Date(mockPackRow.created_at).getTime() < MOCK_PACK_VALIDITY_MS
+
   return {
     premium: premiumActive,
     premiumUntil: premiumActive ? untilFor(premiumRow, PREMIUM_VALIDITY_MS) : null,
     vettri: vettriActive,
     vettriUntil: vettriActive ? new Date(vettriUntilMs).toISOString() : null,
     unlimited: premiumActive || vettriActive,
+    rankBooster: rankBoosterActive,
+    rankBoosterUntil: rankBoosterActive ? untilFor(rankBoosterRow, RANK_BOOSTER_VALIDITY_MS) : null,
+    rankBoosterUnlocked: premiumActive || rankBoosterActive,
+    creditsUnlimited: premiumActive || vettriActive || rankBoosterActive,
+    mockPack: mockPackActive,
+    mockPackUntil: mockPackActive ? untilFor(mockPackRow, MOCK_PACK_VALIDITY_MS) : null,
   }
 }

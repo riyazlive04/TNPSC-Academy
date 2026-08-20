@@ -72,7 +72,7 @@ export function ErrorScreen({
       </span>
 
       <div>
-        <h1 className="font-display text-[24px] font-bold tracking-tight text-ink">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
           Something went wrong
         </h1>
         <p className="mx-auto mt-2 max-w-sm font-body text-sm leading-relaxed text-muted">
@@ -84,18 +84,18 @@ export function ErrorScreen({
       {/* The actual issue, shown directly. */}
       <div className="w-full max-w-md rounded-card border border-line bg-card p-4 text-left">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+          <span className="font-heading text-2xs font-bold uppercase tracking-wide text-muted">
             Error details
           </span>
           <button
             onClick={copy}
-            className="inline-flex items-center gap-1 font-body text-[12px] font-medium text-accent transition-opacity hover:opacity-80"
+            className="inline-flex items-center gap-1 font-body text-xs font-medium text-accent transition-opacity hover:opacity-80"
           >
             {copied ? <Check size={13} /> : <Copy size={13} />}
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
-        <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-relaxed text-wrong">
+        <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-wrong">
           {error.message || 'Unknown error'}
         </pre>
       </div>

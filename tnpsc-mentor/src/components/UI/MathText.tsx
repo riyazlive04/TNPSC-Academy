@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, memo, type ReactNode } from 'react'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 
@@ -14,12 +14,23 @@ import 'katex/dist/katex.min.css'
  */
 const MATH_RE = /\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g
 
+// Cache is keyed by the source TeX string alone — displayMode/output below are
+// fixed constants for every call, so `tex` is the only input that affects the
+// result. Never evicted: the question bank is finite per session, so this stays
+// bounded in practice.
+const renderCache = new Map<string, string>()
+
 function renderTeX(tex: string): string {
+  const cached = renderCache.get(tex)
+  if (cached !== undefined) return cached
+  let html: string
   try {
-    return katex.renderToString(tex, { throwOnError: false, displayMode: false, output: 'html' })
+    html = katex.renderToString(tex, { throwOnError: false, displayMode: false, output: 'html' })
   } catch {
-    return tex
+    html = tex
   }
+  renderCache.set(tex, html)
+  return html
 }
 
 /**
@@ -37,7 +48,7 @@ function isLiteralDollarSpan(s: string): boolean {
   return (s.match(/[A-Za-z]{3,}/g) ?? []).length >= 2
 }
 
-export default function MathText({
+function MathText({
   text,
   className,
 }: {
@@ -76,3 +87,5 @@ export default function MathText({
   if (last < text.length) nodes.push(<Fragment key={key++}>{text.slice(last)}</Fragment>)
   return <>{nodes}</>
 }
+
+export default memo(MathText)

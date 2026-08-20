@@ -1,0 +1,643 @@
+[
+ {
+  "sig": "arisilkizhar|associated|kabilar|kakkaipadiniyar|pathitruppathu|perunkundrurkizhar",
+  "classification": "false_positive",
+  "notes": "Different Tens (7th vs 9th) of Pathitruppathu -- different underlying facts with correctly different answers (Kabilar for the 7th Ten; Perunkundrurkizhar for the 9th Ten). They only share vocabulary because both reuse the same 4-poet option list."
+ },
+ {
+  "sig": "buddha|lumbini|preached|sanchi|saranath|sermon",
+  "classification": "true_duplicate",
+  "notes": "Both ask where Buddha preached his first sermon; both correctly answer Saranath. Kept row 6578d5d9 (equally clean text, slightly fuller explanation); rewrote e46d7b8e into a different, verified Buddhism fact (place of enlightenment = Bodh Gaya) on the same topic (History / Growth of Jainism and Buddhism).",
+  "keep_id": "6578d5d9-e523-47fd-8f41-e7536d3606bc",
+  "rewrites": [
+   {
+    "id": "e46d7b8e-71ab-439f-8e18-c46a3c12b8e7",
+    "question_text": "Buddha attained enlightenment (Nirvana) under the Bodhi tree at which place?",
+    "question_text_ta": "புத்தர் போதி மரத்தின் கீழ் ஞானோதயம் (நிர்வாணம்) அடைந்த இடம் எது?",
+    "option_a": "Bodh Gaya", "option_b": "Kushinagar", "option_c": "Sarnath", "option_d": "Lumbini",
+    "option_a_ta": "போத் கயா", "option_b_ta": "குசிநகர்", "option_c_ta": "சரநாத்", "option_d_ta": "லும்பினி",
+    "correct_answer": "A",
+    "explanation": "Buddha attained enlightenment under a peepal (Bodhi) tree at Bodh Gaya on the banks of the river Niranjana, after which he came to be known as the \"Buddha\" (the Enlightened One). Kushinagar is where he attained Mahaparinirvana (death); Sarnath is where he preached his first sermon; Lumbini is his birthplace.",
+    "explanation_ta": "புத்தர் நிரஞ்சனா நதிக்கரையில் உள்ள போத் கயாவில் ஒரு அரச மரத்தின் (போதி மரம்) கீழ் ஞானோதயம் அடைந்தார்; அதன் பின்னரே அவர் 'புத்தர்' (ஞானம் பெற்றவர்) என அழைக்கப்பட்டார். குசிநகர் அவர் மகாபரிநிர்வாணம் (இறப்பு) அடைந்த இடம்; சரநாத் அவர் முதல் உபதேசம் வழங்கிய இடம்; லும்பினி அவரது பிறந்த இடம் ஆகும்."
+   }
+  ]
+ },
+ {
+  "sig": "dharmakirti|dingnaga|exponent|mahayanism|nagarjuna|vasubandhu",
+  "classification": "true_duplicate",
+  "notes": "Both ask for the great exponent of Mahayanism; both correctly answer Nagarjuna. Kept row c0e0956b; rewrote 96f9a0da into a different, verified Buddhism fact (the Fourth Buddhist Council under Kanishka) on the same topic.",
+  "keep_id": "c0e0956b-2314-4cde-9df2-10e6bb4c7738",
+  "rewrites": [
+   {
+    "id": "96f9a0da-5e23-4797-829f-e4815d5ef13b",
+    "question_text": "The Fourth Buddhist Council, held during the reign of Emperor Kanishka, at which Buddhism formally split into the Mahayana and Hinayana sects, was held at",
+    "question_text_ta": "பேரரசர் கனிஷ்கரின் ஆட்சிக் காலத்தில் நடைபெற்று, புத்த மதம் மஹாயானம் மற்றும் ஹீனயானம் என இரு பிரிவுகளாகப் பிரிந்த நான்காவது புத்த மாநாடு எங்கு நடைபெற்றது?",
+    "option_a": "Rajagriha", "option_b": "Vaishali", "option_c": "Pataliputra", "option_d": "Kundalvana (Kashmir)",
+    "option_a_ta": "ராஜகிரிஹா", "option_b_ta": "வைசாலி", "option_c_ta": "பாடலிபுத்திரம்", "option_d_ta": "குண்டல்வனா (காஷ்மீர்)",
+    "correct_answer": "D",
+    "explanation": "Emperor Kanishka convened the Fourth Buddhist Council at Kundalvana in Kashmir, presided over by Vasumitra (with Ashvaghosha as vice-president). It was at this council that Buddhism formally split into the Mahayana and Hinayana sects. The First Council was held at Rajagriha, the Second at Vaishali, and the Third at Pataliputra.",
+    "explanation_ta": "பேரரசர் கனிஷ்கர், வசுமித்திரரின் தலைமையில் (துணைத் தலைவராக அஷ்வகோஷர்) காஷ்மீரிலுள்ள குண்டல்வனாவில் நான்காவது புத்த மாநாட்டைக் கூட்டினார். இந்த மாநாட்டிலேயே புத்த மதம் மஹாயானம் மற்றும் ஹீனயானம் என இரு பிரிவுகளாக முறைப்படி பிரிந்தது. முதல் மாநாடு ராஜகிரிஹாவிலும், இரண்டாவது வைசாலியிலும், மூன்றாவது பாடலிபுத்திரத்திலும் நடைபெற்றன."
+   }
+  ]
+ },
+ {
+  "sig": "against|consider|revival|ritualism|system|worship",
+  "classification": "true_duplicate",
+  "notes": "Both list the same four statements about Arya Samaj (reworded) and both correctly answer 'all correct'. Kept row 60e3d305 (cleaner, consistently formatted numbered statements); rewrote 1059d54d into a different, verified 19th-century reform-movement fact (founding of Brahmo Samaj) on the same topic.",
+  "keep_id": "60e3d305-e648-49fe-aba6-a09839581c00",
+  "rewrites": [
+   {
+    "id": "1059d54d-e535-4d8d-83ab-53232b899d76",
+    "question_text": "Who founded the Brahmo Samaj in Calcutta in 1828?",
+    "question_text_ta": "1828 ஆம் ஆண்டு கல்கத்தாவில் பிரம்ம சமாஜத்தை நிறுவியவர் யார்?",
+    "option_a": "Raja Ram Mohan Roy", "option_b": "Swami Dayananda Saraswati", "option_c": "Ishwar Chandra Vidyasagar", "option_d": "Keshab Chandra Sen",
+    "option_a_ta": "ராஜா ராம் மோகன் ராய்", "option_b_ta": "சுவாமி தயானந்த சரஸ்வதி", "option_c_ta": "ஈஸ்வர சந்திர வித்யாசாகர்", "option_d_ta": "கேசப் சந்திர சென்",
+    "correct_answer": "A",
+    "explanation": "Raja Ram Mohan Roy founded the Brahmo Samaj in Calcutta in 1828 to reform Hindu society by opposing idol worship, sati, and rigid caste distinctions while promoting monotheism and rational thought. He is often called the \"Father of Modern India\" for his pioneering socio-religious reform efforts. Swami Dayananda Saraswati later founded the Arya Samaj in 1875.",
+    "explanation_ta": "ராஜா ராம் மோகன் ராய் 1828 ஆம் ஆண்டு கல்கத்தாவில் பிரம்ம சமாஜத்தை நிறுவினார்; சிலைவழிபாடு, சதி, கடுமையான சாதிக் கட்டுப்பாடுகளை எதிர்த்து, ஒரே இறைவன் கொள்கையையும் பகுத்தறிவு சிந்தனையையும் ஊக்குவிப்பதே இதன் நோக்கமாக இருந்தது. முன்னோடி சமூக-மத சீர்திருத்தப் பணிகளுக்காக அவர் 'நவீன இந்தியாவின் தந்தை' என அழைக்கப்படுகிறார். பின்னர் 1875 இல் சுவாமி தயானந்த சரஸ்வதி ஆர்ய சமாஜத்தை நிறுவினார்."
+   }
+  ]
+ },
+ {
+  "sig": "conference|front|national|party|regional",
+  "classification": "true_duplicate",
+  "notes": "Both ask which of the same four options is a regional party; both correctly answer National Conference. Kept row c0149204 (better topic fit: Polity/Election); rewrote d1b03f23 into a different, verified 19th-century reform-movement fact so it fits its own topic (Social And Religious Movements In The Nineteenth Century).",
+  "keep_id": "c0149204-7396-40c0-80b6-7b926639680f",
+  "rewrites": [
+   {
+    "id": "d1b03f23-abe1-4c15-9247-82da07625a29",
+    "question_text": "The Prarthana Samaj, a socio-religious reform organisation, was founded in Bombay in 1867 by",
+    "question_text_ta": "சமூக-மத சீர்திருத்த அமைப்பான பிரார்த்தனா சமாஜம், 1867 ஆம் ஆண்டு பம்பாயில் யாரால் நிறுவப்பட்டது?",
+    "option_a": "Atmaram Pandurang", "option_b": "Jyotirao Phule", "option_c": "Ishwar Chandra Vidyasagar", "option_d": "Swami Vivekananda",
+    "option_a_ta": "ஆத்மாராம் பாண்டுரங்", "option_b_ta": "ஜோதிராவ் புலே", "option_c_ta": "ஈஸ்வர சந்திர வித்யாசாகர்", "option_d_ta": "சுவாமி விவேகானந்தர்",
+    "correct_answer": "A",
+    "explanation": "Inspired by the ideas of Brahmo Samaj leader Keshab Chandra Sen, Atmaram Pandurang founded the Prarthana Samaj in Bombay in 1867. It worked against caste distinctions and child marriage and promoted widow remarriage and women's education; Mahadev Govind Ranade later became one of its most influential leaders.",
+    "explanation_ta": "பிரம்ம சமாஜத் தலைவரான கேசப் சந்திர சென்னின் கருத்துகளால் ஈர்க்கப்பட்டு, ஆத்மாராம் பாண்டுரங் 1867 ஆம் ஆண்டு பம்பாயில் பிரார்த்தனா சமாஜத்தை நிறுவினார். இது சாதி வேறுபாடுகளுக்கும் குழந்தை திருமணத்திற்கும் எதிராகச் செயல்பட்டு, விதவை மறுமணத்தையும் பெண்கள் கல்வியையும் ஊக்குவித்தது; பின்னர் மகாதேவ் கோவிந்த ரானடே இதன் மிக முக்கியமான தலைவர்களில் ஒருவரானார்."
+   }
+  ]
+ },
+ {
+  "sig": "celebrated|congress|freedom|january|national|struggle",
+  "classification": "true_duplicate",
+  "notes": "Both ask when INC celebrated Poorna Swaraj; both correctly answer 26 January 1930. Kept row 2716cfaf (better topic fit: Indian Freedom Struggle); rewrote a3a6378e into a different, verified fact so it fits its own topic (Social And Religious Movements In The Nineteenth Century).",
+  "keep_id": "2716cfaf-3966-487b-9a54-2eb758e8a885",
+  "rewrites": [
+   {
+    "id": "a3a6378e-1766-4540-9403-2fd00cfc1232",
+    "question_text": "Who founded the Ramakrishna Mission in 1897 to promote the ideals of practical Vedanta and social service?",
+    "question_text_ta": "நடைமுறை வேதாந்தத்தையும் சமூக சேவையையும் ஊக்குவிக்க, 1897 ஆம் ஆண்டு ராமகிருஷ்ண மிஷனை நிறுவியவர் யார்?",
+    "option_a": "Swami Vivekananda", "option_b": "Raja Ram Mohan Roy", "option_c": "Swami Dayananda Saraswati", "option_d": "Debendranath Tagore",
+    "option_a_ta": "சுவாமி விவேகானந்தர்", "option_b_ta": "ராஜா ராம் மோகன் ராய்", "option_c_ta": "சுவாமி தயானந்த சரஸ்வதி", "option_d_ta": "தேவேந்திரநாத் தாகூர்",
+    "correct_answer": "A",
+    "explanation": "Swami Vivekananda founded the Ramakrishna Mission in 1897 in honour of his guru, Sri Ramakrishna Paramahamsa, combining spiritual practice with social service such as education, healthcare, and disaster relief. Vivekananda had earlier gained international recognition for his address at the World's Parliament of Religions in Chicago in 1893.",
+    "explanation_ta": "சுவாமி விவேகானந்தர், தமது குருவான ஸ்ரீ ராமகிருஷ்ண பரமஹம்சரின் நினைவாக 1897 ஆம் ஆண்டு ராமகிருஷ்ண மிஷனை நிறுவினார்; ஆன்மீக பயிற்சியையும் கல்வி, சுகாதாரம், பேரிடர் நிவாரணம் போன்ற சமூக சேவைகளையும் இணைப்பதே இதன் நோக்கம். 1893 இல் சிகாகோவில் நடைபெற்ற உலக மதங்களின் மாநாட்டில் ஆற்றிய உரையின் மூலம் விவேகானந்தர் ஏற்கெனவே சர்வதேச அங்கீகாரம் பெற்றிருந்தார்."
+   }
+  ]
+ },
+ {
+  "sig": "commission|economic|educational|established|judicial|reforms",
+  "classification": "true_duplicate",
+  "notes": "Both ask why the 1882 Hunter Commission was established; both correctly answer educational reforms. Kept row ca981762 (better topic fit); rewrote 5d99fbc5 into a different, verified fact (Regulating Act 1773) to fit its own topic (British East India Company And The British Rule).",
+  "keep_id": "ca981762-9681-459f-84af-2f95a4c32802",
+  "rewrites": [
+   {
+    "id": "5d99fbc5-f5f9-499a-bd68-41ba7e7ea93e",
+    "question_text": "The Regulating Act, which for the first time provided for British parliamentary control over the affairs of the East India Company in India, was passed in which year?",
+    "question_text_ta": "இந்தியாவில் கிழக்கிந்திய கம்பெனியின் நிர்வாகத்தின் மீது பிரிட்டிஷ் பாராளுமன்றத்தின் நேரடிக் கட்டுப்பாட்டை முதன்முதலில் ஏற்படுத்திய ஒழுங்குமுறைச் சட்டம் (Regulating Act) எந்த ஆண்டு நிறைவேற்றப்பட்டது?",
+    "option_a": "1773", "option_b": "1784", "option_c": "1793", "option_d": "1813",
+    "option_a_ta": "1773", "option_b_ta": "1784", "option_c_ta": "1793", "option_d_ta": "1813",
+    "correct_answer": "A",
+    "explanation": "The Regulating Act of 1773 was the first act of the British Parliament to regulate the affairs of the East India Company and provide direct oversight of its administration in India. It created the post of Governor-General of Bengal (first held by Warren Hastings) and established a Supreme Court at Calcutta, marking the beginning of parliamentary control over Company rule in India.",
+    "explanation_ta": "1773 ஆம் ஆண்டின் ஒழுங்குமுறைச் சட்டம், இந்தியாவில் கிழக்கிந்திய கம்பெனியின் நிர்வாகத்தை ஒழுங்குபடுத்திய பிரிட்டிஷ் பாராளுமன்றத்தின் முதல் சட்டமாகும்; இது கம்பெனியின் நிர்வாகத்தின் மீது நேரடி மேற்பார்வையை ஏற்படுத்தியது. இது வங்காளத்தின் கவர்னர்-ஜெனரல் பதவியை உருவாக்கியது (முதலாமவராக வாரன் ஹேஸ்டிங்ஸ் பதவியேற்றார்) மற்றும் கல்கத்தாவில் உச்ச நீதிமன்றத்தையும் நிறுவியது; இந்தியாவில் கம்பெனி ஆட்சியின் மீது பாராளுமன்றக் கட்டுப்பாட்டின் தொடக்கத்தை இது குறித்தது."
+   }
+  ]
+ },
+ {
+  "sig": "academy|assembly|collection|denotes|history|scholarly",
+  "classification": "conflict",
+  "notes": "Row 4e16ae37 (correct_answer A, 'Academy of learned men') and row 1740c722 (correct_answer B, 'Assembly of poets') give different correct answers to essentially the same question ('what does the word Sangam denote'). No changes made -- flagged for review.",
+  "conflict_details": "Web research on this exact recurring quiz question finds reference sources describing 'Sangam' as 'an assembly, a college, or an academy of learned people/men' (a Sanskrit-derived term for 'coming together'), which most precisely matches 'Academy of learned men' (row 4e16ae37's answer). 'Assembly of poets' (row 1740c722's answer) is a plausible looser paraphrase but less precise. This looks like genuine definitional ambiguity in the source material rather than a hard factual error, so I lean toward row 4e16ae37 being the more standard/textbook-correct phrasing, but recommend human review before changing either row -- both are internally self-consistent and this hinges on interpretation rather than a clear-cut fact."
+ },
+ {
+  "sig": "august|movement|october|september|started",
+  "classification": "true_duplicate",
+  "notes": "Both ask when the Quit India Movement started; both correctly answer August 1942. Kept row 934a9141 (more specific/fitting topic: Quit India Movement); rewrote 6dd2eea8 into a different, verified freedom-struggle fact (Non-Cooperation Movement, 1920) to fit its own topic (Indian Freedom Struggle).",
+  "keep_id": "934a9141-edd8-4fca-b155-e0cbe59ee419",
+  "rewrites": [
+   {
+    "id": "6dd2eea8-7527-4f1c-baed-9e41152d59c9",
+    "question_text": "The Non-Cooperation Movement, launched by Mahatma Gandhi as India's first mass movement against British rule, began in which year?",
+    "question_text_ta": "பிரிட்டிஷ் ஆட்சிக்கு எதிரான இந்தியாவின் முதல் வெகுஜன இயக்கமாகிய ஒத்துழையாமை இயக்கத்தை மகாத்மா காந்தி தொடங்கிய ஆண்டு எது?",
+    "option_a": "1920", "option_b": "1922", "option_c": "1930", "option_d": "1942",
+    "option_a_ta": "1920", "option_b_ta": "1922", "option_c_ta": "1930", "option_d_ta": "1942",
+    "correct_answer": "A",
+    "explanation": "Following the Jallianwala Bagh massacre and in support of the Khilafat Movement, Mahatma Gandhi launched the Non-Cooperation Movement in 1920, calling on Indians to boycott British goods, institutions, and titles. Gandhi called off the movement in February 1922 after the Chauri Chaura incident, in which a violent mob killed policemen.",
+    "explanation_ta": "ஜாலியன்வாலாபாக் படுகொலைக்குப் பின்னரும், கிலாபத் இயக்கத்திற்கு ஆதரவாகவும், மகாத்மா காந்தி 1920 ஆம் ஆண்டு ஒத்துழையாமை இயக்கத்தைத் தொடங்கினார். பிரிட்டிஷ் பொருட்கள், நிறுவனங்கள் மற்றும் பட்டங்களைப் புறக்கணிக்குமாறு இது இந்தியர்களை வேண்டியது. சவுரி சவுரா சம்பவத்தில் ஒரு வன்முறைக் கும்பல் காவல்துறையினரைக் கொன்றதைத் தொடர்ந்து, 1922 பிப்ரவரியில் காந்தி இந்த இயக்கத்தை கைவிட்டார்."
+   }
+  ]
+ },
+ {
+  "sig": "attended|conference|conferences|consider|gandhi|second",
+  "classification": "conflict",
+  "notes": "Row fb8d803e (answer C: First and Second RTCs) vs row 77206e82 (answer B: Second RTC only) disagree. No changes made -- flagged for review/fix.",
+  "conflict_details": "Verified via multiple historical sources (Britannica, UPSC prep sources, mkgandhi.org): the Indian National Congress boycotted the First Round Table Conference (Nov 1930-Jan 1931) and Gandhi was in jail until the Gandhi-Irwin Pact of March 1931; he attended ONLY the Second Round Table Conference (Sept-Dec 1931) as the sole INC representative, and did not attend the Third (he was again imprisoned by then). So row 77206e82 ('Second RTC only') is FACTUALLY CORRECT and row fb8d803e ('First and Second RTCs') is factually WRONG. Recommend a human fix fb8d803e's correct_answer to match option B's content (Second RTC only) rather than treating it as an equally-valid duplicate."
+ },
+ {
+  "sig": "assertion|concessions|explanation|immediate|proposals|resolution",
+  "classification": "conflict",
+  "notes": "Row b03a18da (answer A: R is the correct explanation of A) vs row 817f070b (answer B: R is true but NOT the correct explanation of A) disagree. No changes made -- flagged for review/fix.",
+  "conflict_details": "Historical consensus (multiple sources on the Cripps Mission and Quit India Movement) confirms the Cripps Mission's failure to offer immediate self-government was a direct, well-documented precipitating cause of the INC adopting the Quit India Resolution in August 1942 (Gandhi famously called the Cripps proposals 'a post-dated cheque on a crumbling bank'). So Reason R DOES correctly explain Assertion A, meaning row b03a18da's answer (A) is FACTUALLY CORRECT and row 817f070b's answer (B) is factually WRONG. Recommend a human fix 817f070b's correct_answer to A rather than treating it as an equally-valid duplicate."
+ },
+ {
+  "sig": "assembly|constituent|december|january|meeting|november",
+  "classification": "true_duplicate",
+  "notes": "Both ask when the Constituent Assembly's first meeting was held; both correctly answer 9 December 1946. Kept row fd150698 (better topic fit: Constitution of India); rewrote 855fc452 into a different, verified fact (permanent President of the Constituent Assembly) to fit its own topic (Indian Freedom Struggle).",
+  "keep_id": "fd150698-e7da-4d91-9ad3-7163049b6969",
+  "rewrites": [
+   {
+    "id": "855fc452-edf8-4d4c-90fc-87fd6e0493a9",
+    "question_text": "Who was elected as the permanent President of the Constituent Assembly of India on 11 December 1946?",
+    "question_text_ta": "1946 டிசம்பர் 11 அன்று அரசியலமைப்புச் சபையின் நிரந்தரத் தலைவராக தேர்ந்தெடுக்கப்பட்டவர் யார்?",
+    "option_a": "Dr. Rajendra Prasad", "option_b": "Jawaharlal Nehru", "option_c": "Dr. B.R. Ambedkar", "option_d": "Sachchidananda Sinha",
+    "option_a_ta": "டாக்டர் இராஜேந்திர பிரசாத்", "option_b_ta": "ஜவஹர்லால் நேரு", "option_c_ta": "டாக்டர் பி.ஆர். அம்பேத்கர்", "option_d_ta": "சச்சிதானந்த சின்ஹா",
+    "correct_answer": "A",
+    "explanation": "Dr. Rajendra Prasad was elected as the permanent President of the Constituent Assembly on 11 December 1946, two days after its first meeting. Sachchidananda Sinha, the oldest member present, had chaired the Assembly's first sitting on 9 December 1946 as a temporary/interim chairman. Dr. Rajendra Prasad later became independent India's first President.",
+    "explanation_ta": "அரசியலமைப்புச் சபையின் முதல் கூட்டம் நடைபெற்ற இரு நாட்களுக்குப் பின், 1946 டிசம்பர் 11 அன்று டாக்டர் இராஜேந்திர பிரசாத் அதன் நிரந்தரத் தலைவராகத் தேர்ந்தெடுக்கப்பட்டார். சபையின் மூத்த உறுப்பினரான சச்சிதானந்த சின்ஹா, 1946 டிசம்பர் 9 அன்று நடைபெற்ற முதல் கூட்டத்திற்கு தற்காலிகத் தலைவராகத் தலைமை தாங்கியிருந்தார். டாக்டர் இராஜேந்திர பிரசாத் பின்னர் சுதந்திர இந்தியாவின் முதல் குடியரசுத் தலைவரானார்."
+   }
+  ]
+ },
+ {
+  "sig": "bannerman|expedition|kattabomman|panchalamkuruchi|sivasubramania|wellesley",
+  "classification": "false_positive",
+  "notes": "Different questions sharing the same 4-name option list: who ISSUED orders for the Panchalamkuruchi expedition (Lord Wellesley, correct) vs who ASSUMED COMMAND of it (Major Bannerman, correct). Both are distinct, correct facts about the same historical campaign; not duplicates."
+ },
+ {
+  "sig": "bhishnuram|governor|january|jayachamaraja|maharaja|presidency",
+  "classification": "false_positive",
+  "notes": "Same 4-option governor list reused across a series; these two ask about two different, non-overlapping tenure periods (1958-64 vs 1966-69) with correctly different answers (Bhishnuram Medhi vs Sardar Ujjal Singh)."
+ },
+ {
+  "sig": "aiadmk|founded|party|political|puducherry",
+  "classification": "false_positive",
+  "notes": "Three rows ask about parties founded in three different years (1949 -> DMK, 1972 -> AIADMK, 1989 -> PMK); different facts, correctly different answers, sharing only the same 4-party option list."
+ },
+ {
+  "sig": "alexander|archibald|davidson|february|governor|macartney",
+  "classification": "false_positive",
+  "notes": "Same governor-list options reused for two different, non-overlapping tenure periods (Feb-Jun 1785 vs Apr 1786-Feb 1789); different facts, correctly different answers (George MaCartney vs Sir Archibald Campbell)."
+ },
+ {
+  "sig": "anaparambil|bhavsinhji|kumarasinhji|lieutenant|presidency|september",
+  "classification": "false_positive",
+  "notes": "Same governor-list options for two different, non-overlapping tenure periods (1946-48 vs 1948-52); different facts, correctly different answers."
+ },
+ {
+  "sig": "assembly|chellapandian|legislative|presidency|shanmugam|speaker",
+  "classification": "false_positive",
+  "notes": "Same Speaker-list options for two different, non-overlapping tenure periods (1962-67 vs 1952-55); different facts, correctly different answers."
+ },
+ {
+  "sig": "bombay|calcutta|courts|established|madras",
+  "classification": "false_positive",
+  "notes": "Row1 tests the YEAR the Bombay/Madras/Calcutta High Courts were established (1861); row2 tests the NAME of the Act that established them (Indian High Courts Act, 1861). Related to the same historical event but they quiz genuinely different specific knowledge (a date vs a piece of legislation's name) -- comparable to the earlier-noted pattern of related-but-distinct questions that should not be merged."
+ },
+ {
+  "sig": "association|consider|founders|hindustan|republican|socialist",
+  "classification": "true_duplicate",
+  "notes": "Both list the same two statements about Bose's Forward Bloc and Bhagat Singh's HRSA involvement; both correctly answer 'both correct'. Kept row 6769288f (correct spelling 'Forward Bloc'; clean Tamil). Row 1cae8284 has script corruption in its Tamil fields -- Telugu characters mixed into question_text_ta ('హిందుస్తాన్ రెపబ్లికన్ సోసలిస్టు అసోసియేషన్') and Cyrillic text mixed into explanation_ta ('బ్రిటానిय' / 'британиय'-style garbling) -- so it was rewritten.",
+  "keep_id": "6769288f-3fcc-4002-8482-6d077a882eab",
+  "rewrites": [
+   {
+    "id": "1cae8284-13c2-4981-a4a3-5cbd265a2c23",
+    "question_text": "The East India Association, founded in London in 1866 to place Indian views before the British public and Parliament, was established by",
+    "question_text_ta": "இந்தியா தொடர்பான பார்வைகளை பிரிட்டிஷ் பொதுமக்கள் மற்றும் பாராளுமன்றத்தின் முன் வைக்க, 1866 ஆம் ஆண்டு லண்டனில் நிறுவப்பட்ட கிழக்கிந்திய சங்கம் (East India Association) ஐ நிறுவியவர் யார்?",
+    "option_a": "Dadabhai Naoroji", "option_b": "Surendranath Banerjee", "option_c": "W.C. Bonnerjee", "option_d": "Allan Octavian Hume",
+    "option_a_ta": "தாதாபாய் நௌரோஜி", "option_b_ta": "சுரேந்திரநாத் பானர்ஜி", "option_c_ta": "டபிள்யூ.சி. பானர்ஜி", "option_d_ta": "ஏ.ஓ. ஹியூம்",
+    "correct_answer": "A",
+    "explanation": "Dadabhai Naoroji founded the East India Association in London in 1866 to counter misinformation about India and place Indian views before the British public and Parliament. It was among the earliest political organisations working for Indian interests, predating the Indian National Congress (founded 1885), of which Naoroji later served as president three times.",
+    "explanation_ta": "தாதாபாய் நௌரோஜி, இந்தியா குறித்த தவறான தகவல்களை எதிர்கொள்ளவும், இந்தியர்களின் கருத்துகளை பிரிட்டிஷ் பொதுமக்கள் மற்றும் பாராளுமன்றத்தின் முன் வைக்கவும் 1866 ஆம் ஆண்டு லண்டனில் கிழக்கிந்திய சங்கத்தை நிறுவினார். 1885 ஆம் ஆண்டு இந்திய தேசிய காங்கிரஸ் நிறுவப்படுவதற்கு முன்பே இருந்த ஆரம்பகால அரசியல் அமைப்புகளில் இதுவும் ஒன்றாகும்; பின்னர் நௌரோஜி மூன்று முறை காங்கிரசின் தலைவராகவும் பணியாற்றினார்."
+   }
+  ]
+ },
+ {
+  "sig": "conspiracy|hanging|lahore|rajguru|resulted|sukhdev",
+  "classification": "true_duplicate",
+  "notes": "Both list the same five names for the Lahore Conspiracy Case hangings; both correctly answer Bhagat Singh, Sukhdev, Rajguru. Kept row 0de67835 (clean Tamil, well-formatted numbered list). Row ff6b8fe3's question_text_ta and explanation_ta contain Cyrillic-script corruption ('змைகான்ச' embedded mid-word), so it was rewritten.",
+  "keep_id": "0de67835-5ae9-4564-a512-8d7f95d8167d",
+  "rewrites": [
+   {
+    "id": "ff6b8fe3-973a-478d-8582-63b26955e181",
+    "question_text": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 as the Hindustan Socialist Republican Association (HSRA) mainly at the initiative of",
+    "question_text_ta": "1924 இல் நிறுவப்பட்ட இந்துஸ்தான் குடியரசுக் கழகம் (HRA), 1928 ஆம் ஆண்டு இந்துஸ்தான் சோசலிச குடியரசுச் சங்கமாக (HSRA) முதன்மையாக யாரது முயற்சியால் மறுசீரமைக்கப்பட்டது?",
+    "option_a": "Chandrashekhar Azad and Bhagat Singh", "option_b": "Khudiram Bose and Prafulla Chaki", "option_c": "Rash Behari Bose and Sachindra Nath Sanyal", "option_d": "Madan Lal Dhingra and V.D. Savarkar",
+    "option_a_ta": "சந்திரசேகர் ஆசாத் மற்றும் பகத் சிங்", "option_b_ta": "குதிராம் போஸ் மற்றும் பிரஃபுல்ல சாக்கி", "option_c_ta": "ராஷ் பிஹாரி போஸ் மற்றும் சச்சிந்திரநாத் சான்யால்", "option_d_ta": "மதன்லால் திங்ரா மற்றும் வி.டி. சாவர்க்கர்",
+    "correct_answer": "A",
+    "explanation": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 mainly through the efforts of Chandrashekhar Azad and Bhagat Singh as the Hindustan Socialist Republican Association (HSRA), adding socialism to the organisation's revolutionary nationalist goals. The HSRA carried out major actions including the assassination of J.P. Saunders and the Central Legislative Assembly bombing of 1929.",
+    "explanation_ta": "1924 இல் நிறுவப்பட்ட இந்துஸ்தான் குடியரசுக் கழகம் (HRA), 1928 ஆம் ஆண்டு சந்திரசேகர் ஆசாத் மற்றும் பகத் சிங் ஆகியோரின் முயற்சியால் இந்துஸ்தான் சோசலிச குடியரசுச் சங்கமாக (HSRA) மறுசீரமைக்கப்பட்டது; புரட்சிகர தேசியவாத நோக்கங்களுடன் சோசலிசக் கருத்துகளையும் இது சேர்த்துக் கொண்டது. ஜே.பி. சாண்டர்ஸ் படுகொலை மற்றும் 1929 மத்திய சட்டமன்ற குண்டுவெடிப்பு உள்ளிட்ட முக்கிய நடவடிக்கைகளை HSRA மேற்கொண்டது."
+   }
+  ]
+ },
+ {
+  "sig": "assembly|batukeshwar|british|central|government|legislative",
+  "classification": "true_duplicate",
+  "notes": "Both ask who threw the bomb in the Central Legislative Assembly on 8 April 1929; both correctly answer Bhagat Singh and Batukeshwar Dutt. Kept row 6c438693 (clean Tamil). Row 28876889's explanation_ta contains Thai-script corruption ('เสียง' embedded mid-word), so it was rewritten.",
+  "keep_id": "6c438693-4051-44b8-8400-e55f5b4c0577",
+  "rewrites": [
+   {
+    "id": "28876889-3551-499f-a02c-69404a7ef508",
+    "question_text": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 as the Hindustan Socialist Republican Association (HSRA), placing greater emphasis on socialism, mainly at the initiative of",
+    "question_text_ta": "1924 இல் நிறுவப்பட்ட இந்துஸ்தான் குடியரசுக் கழகம் (HRA), 1928 ஆம் ஆண்டு சோசலிசத்திற்கு அதிக முக்கியத்துவம் அளிக்கும் வகையில், இந்துஸ்தான் சோசலிச குடியரசுச் சங்கமாக (HSRA) முதன்மையாக யாரது முயற்சியால் மறுசீரமைக்கப்பட்டது?",
+    "option_a": "Khudiram Bose and Prafulla Chaki", "option_b": "Chandrashekhar Azad and Bhagat Singh", "option_c": "Rash Behari Bose and Sachindra Nath Sanyal", "option_d": "Madan Lal Dhingra and V.D. Savarkar",
+    "option_a_ta": "குதிராம் போஸ் மற்றும் பிரஃபுல்ல சாக்கி", "option_b_ta": "சந்திரசேகர் ஆசாத் மற்றும் பகத் சிங்", "option_c_ta": "ராஷ் பிஹாரி போஸ் மற்றும் சச்சிந்திரநாத் சான்யால்", "option_d_ta": "மதன்லால் திங்ரா மற்றும் வி.டி. சாவர்க்கர்",
+    "correct_answer": "B",
+    "explanation": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 mainly through the efforts of Chandrashekhar Azad and Bhagat Singh as the Hindustan Socialist Republican Association (HSRA), adding socialism to the organisation's revolutionary nationalist goals. The HSRA carried out major actions including the assassination of J.P. Saunders and the Central Legislative Assembly bombing of 1929.",
+    "explanation_ta": "1924 இல் நிறுவப்பட்ட இந்துஸ்தான் குடியரசுக் கழகம் (HRA), 1928 ஆம் ஆண்டு சந்திரசேகர் ஆசாத் மற்றும் பகத் சிங் ஆகியோரின் முயற்சியால் இந்துஸ்தான் சோசலிச குடியரசுச் சங்கமாக (HSRA) மறுசீரமைக்கப்பட்டது; புரட்சிகர தேசியவாத நோக்கங்களுடன் சோசலிசக் கருத்துகளையும் இது சேர்த்துக் கொண்டது. ஜே.பி. சாண்டர்ஸ் படுகொலை மற்றும் 1929 மத்திய சட்டமன்ற குண்டுவெடிப்பு உள்ளிட்ட முக்கிய நடவடிக்கைகளை HSRA மேற்கொண்டது."
+   }
+  ]
+ },
+ {
+  "sig": "between|comes|earth|eclipse|occurs|solar",
+  "classification": "true_duplicate",
+  "notes": "Both describe a solar eclipse as the moon coming between the sun and earth; both correctly agree on this. Kept row b9f51116; rewrote 2ba760f3 into a different, verified fact (lunar eclipse mechanism) on the same topic (Physics/Nature of Universe).",
+  "keep_id": "b9f51116-c6b0-4631-925c-4c08263b4851",
+  "rewrites": [
+   {
+    "id": "2ba760f3-9c6c-49ff-a0a2-55e37aac2233",
+    "question_text": "A lunar eclipse occurs when",
+    "question_text_ta": "சந்திர கிரகணம் எப்போது ஏற்படுகிறது?",
+    "option_a": "The earth comes between the sun and the moon", "option_b": "The moon comes between the sun and the earth", "option_c": "The moon is at right angles to the earth", "option_d": "None of these",
+    "option_a_ta": "பூமி சூரியனுக்கும் சந்திரனுக்கும் இடையில் வரும்போது", "option_b_ta": "சந்திரன் சூரியனுக்கும் பூமிக்கும் இடையில் வரும்போது", "option_c_ta": "சந்திரன் பூமிக்கு செங்கோணத்தில் இருக்கும்போது", "option_d_ta": "மேற்கண்டவை எதுவும் இல்லை",
+    "correct_answer": "A",
+    "explanation": "A lunar eclipse occurs when the earth comes directly between the sun and the moon, blocking sunlight from reaching the moon and casting the earth's shadow on it. This can only happen during a full moon, when the sun, earth, and moon are aligned. In contrast, a solar eclipse occurs when the moon comes between the sun and the earth.",
+    "explanation_ta": "சூரியனிலிருந்து வரும் ஒளி சந்திரனை அடையாமல் தடுக்கப்பட்டு, பூமியின் நிழல் சந்திரன் மீது படரும்படி, பூமி நேரடியாக சூரியனுக்கும் சந்திரனுக்கும் இடையில் வரும்போது சந்திர கிரகணம் ஏற்படுகிறது. சூரியன், பூமி, சந்திரன் ஒரே கோட்டில் அமையும் முழு நிலா காலத்தில் மட்டுமே இது நிகழ முடியும். இதற்கு மாறாக, சந்திரன் சூரியனுக்கும் பூமிக்கும் இடையில் வரும்போது சூரிய கிரகணம் ஏற்படுகிறது."
+   }
+  ]
+ },
+ {
+  "sig": "number|primary|secondary|transformer|turns",
+  "classification": "false_positive",
+  "notes": "Row1 tests the step-up transformer winding ratio (secondary > primary turns); row2 tests the step-down transformer winding ratio (primary > secondary turns). These are two distinct, mirror-image facts a student must separately know, not a reworded repeat of the same question."
+ },
+ {
+  "sig": "ammeter|connecting|converted|galvanometer|parallel|resistance",
+  "classification": "true_duplicate",
+  "notes": "Both ask how to convert a galvanometer into an ammeter; both correctly answer 'low resistance in parallel'. Kept row 674ccbb0; rewrote 6590a0ff into a different, verified fact (galvanometer to voltmeter conversion) on the same topic.",
+  "keep_id": "674ccbb0-9582-46f2-826e-9d830d08cef2",
+  "rewrites": [
+   {
+    "id": "6590a0ff-b3ee-48a9-946b-ec1d20743928",
+    "question_text": "A galvanometer can be converted into a voltmeter by connecting",
+    "question_text_ta": "ஒரு கேல்வனோமீட்டரை வோல்ட்மீட்டராக மாற்ற, அதனுடன் எதை இணைக்க வேண்டும்?",
+    "option_a": "A high resistance in series with the galvanometer", "option_b": "A low resistance in series with the galvanometer", "option_c": "A low resistance in parallel with the galvanometer", "option_d": "A high resistance in parallel with the galvanometer",
+    "option_a_ta": "கேல்வனோமீட்டருடன் தொடர்முறையில் அதிக எதிர்ப்பை இணைப்பது", "option_b_ta": "கேல்வனோமீட்டருடன் தொடர்முறையில் குறைந்த எதிர்ப்பை இணைப்பது", "option_c_ta": "கேல்வனோமீட்டருடன் இணைமுறையில் குறைந்த எதிர்ப்பை இணைப்பது", "option_d_ta": "கேல்வனோமீட்டருடன் இணைமுறையில் அதிக எதிர்ப்பை இணைப்பது",
+    "correct_answer": "A",
+    "explanation": "A galvanometer can be converted into a voltmeter by connecting a high resistance in series with it. This high resistance limits the current through the galvanometer and allows it to measure the potential difference (voltage) across a component without significantly affecting the circuit. In contrast, converting a galvanometer into an ammeter requires connecting a low resistance in parallel (a shunt).",
+    "explanation_ta": "ஒரு கேல்வனோமீட்டரை வோல்ட்மீட்டராக மாற்ற, அதனுடன் தொடர்முறையில் அதிக எதிர்ப்பை இணைக்க வேண்டும். இந்த அதிக எதிர்ப்பு கேல்வனோமீட்டர் வழியாகச் செல்லும் மின்னோட்டத்தைக் கட்டுப்படுத்தி, சுற்றை பெருமளவு பாதிக்காமல் ஒரு பாகத்தின் மின்னழுத்த வேறுபாட்டை அளவிட உதவுகிறது. இதற்கு மாறாக, கேல்வனோமீட்டரை அம்மீட்டராக மாற்ற, இணைமுறையில் குறைந்த எதிர்ப்பை (shunt) இணைக்க வேண்டும்."
+   }
+  ]
+ },
+ {
+  "sig": "human|kelvin|normal|scale|temperature",
+  "classification": "true_duplicate",
+  "notes": "Both ask the normal human body temperature on the Kelvin scale; both correctly answer 310 K. Kept row 2a3af3c0; rewrote 8c17b271 into a different, verified fact (boiling point of water in Kelvin) on the same topic.",
+  "keep_id": "2a3af3c0-fe9f-4509-bd25-d115dbc564d5",
+  "rewrites": [
+   {
+    "id": "8c17b271-9da9-4b1e-bfb9-87e7f1677fec",
+    "question_text": "The boiling point of water at standard atmospheric pressure, expressed on the Kelvin scale, is approximately",
+    "question_text_ta": "நிலையான வளிமண்டல அழுத்தத்தில், நீரின் கொதிநிலை கெல்வின் அளவுகோலில் தோராயமாக என்ன?",
+    "option_a": "273 K", "option_b": "300 K", "option_c": "373 K", "option_d": "400 K",
+    "option_a_ta": "273 K", "option_b_ta": "300 K", "option_c_ta": "373 K", "option_d_ta": "400 K",
+    "correct_answer": "C",
+    "explanation": "Water boils at 100 degrees Celsius at standard atmospheric pressure. Converting to the Kelvin scale by adding 273 gives 100 + 273 = 373 K. Similarly, water freezes at 0 degrees Celsius, which corresponds to 273 K on the Kelvin scale.",
+    "explanation_ta": "நிலையான வளிமண்டல அழுத்தத்தில் நீர் 100°C இல் கொதிக்கும். இதை கெல்வின் அளவுகோலாக மாற்ற 273 ஐ கூட்ட வேண்டும்: 100 + 273 = 373 K. இதேபோல், நீர் 0°C இல் உறைகிறது; இது கெல்வின் அளவுகோலில் 273 K க்கு சமமாகும்."
+   }
+  ]
+ },
+ {
+  "sig": "executive|fundamental|guardian|judiciary|legislature|political",
+  "classification": "true_duplicate",
+  "notes": "Both ask who is the guardian of Fundamental Rights; both correctly answer Judiciary. Kept row eea9e4ae; rewrote eb49d543 into a different, verified fact (Article 32) on the same topic.",
+  "keep_id": "eea9e4ae-36e9-4485-90dc-cb3329c15045",
+  "rewrites": [
+   {
+    "id": "eb49d543-96f3-44e5-87bc-6f4f0b296526",
+    "question_text": "Which Article of the Indian Constitution empowers a person to move the Supreme Court directly for the enforcement of Fundamental Rights?",
+    "question_text_ta": "அடிப்படை உரிமைகளை அமல்படுத்துவதற்காக நேரடியாக உச்ச நீதிமன்றத்தை அணுக ஒரு நபருக்கு அதிகாரம் அளிக்கும் இந்திய அரசியலமைப்பின் பிரிவு எது?",
+    "option_a": "Article 32", "option_b": "Article 19", "option_c": "Article 21", "option_d": "Article 226",
+    "option_a_ta": "பிரிவு 32", "option_b_ta": "பிரிவு 19", "option_c_ta": "பிரிவு 21", "option_d_ta": "பிரிவு 226",
+    "correct_answer": "A",
+    "explanation": "Article 32 empowers an individual to move the Supreme Court directly for the enforcement of Fundamental Rights through writs such as habeas corpus, mandamus, and certiorari. Dr. B.R. Ambedkar called Article 32 the \"heart and soul\" of the Constitution. Article 226 confers a similar, wider writ jurisdiction on the High Courts.",
+    "explanation_ta": "ஹேபியஸ் கார்பஸ், மாண்டமஸ், சர்ட்டியோரரி போன்ற ரிட்களின் மூலம் அடிப்படை உரிமைகளை அமல்படுத்துவதற்காக நேரடியாக உச்ச நீதிமன்றத்தை அணுக பிரிவு 32 அதிகாரம் அளிக்கிறது. டாக்டர் பி.ஆர். அம்பேத்கர் பிரிவு 32 ஐ அரசியலமைப்பின் 'இதயமும் ஆன்மாவும்' என அழைத்தார். பிரிவு 226, உயர் நீதிமன்றங்களுக்கு இதேபோன்ற, ஆனால் விரிவான ரிட் அதிகார வரம்பை வழங்குகிறது."
+   }
+  ]
+ },
+ {
+  "sig": "advocate|appointed|commission|general|governor|minister",
+  "classification": "true_duplicate",
+  "notes": "Both ask which office is NOT appointed by the Governor; both correctly answer Judges of the High Court. Kept row e19a29b8 (topic: State Executive); rewrote 7d6cc7c8 into a different, verified fact to fit its own topic (Judiciary in India).",
+  "keep_id": "e19a29b8-25d7-4ec1-976f-52d0fd25fa6b",
+  "rewrites": [
+   {
+    "id": "7d6cc7c8-d3fc-473b-9463-7663d7d2e06c",
+    "question_text": "The Chief Justice of India is appointed by",
+    "question_text_ta": "இந்தியத் தலைமை நீதிபதி யாரால் நியமிக்கப்படுகிறார்?",
+    "option_a": "The President of India", "option_b": "The Prime Minister", "option_c": "The Parliament", "option_d": "The outgoing Chief Justice alone",
+    "option_a_ta": "இந்தியக் குடியரசுத் தலைவரால்", "option_b_ta": "பிரதமரால்", "option_c_ta": "பாராளுமன்றத்தால்", "option_d_ta": "பதவி விலகும் தலைமை நீதிபதி மட்டும்",
+    "correct_answer": "A",
+    "explanation": "Under Article 124 of the Constitution, the Chief Justice of India is appointed by the President of India, in consultation with such judges of the Supreme Court and the High Courts as the President deems necessary. By convention, the senior-most judge of the Supreme Court is usually appointed as the next Chief Justice.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 124 இன்படி, இந்தியத் தலைமை நீதிபதி, உச்ச நீதிமன்றம் மற்றும் உயர் நீதிமன்றங்களின் நீதிபதிகளுடன் தேவையான அளவு ஆலோசனை செய்த பின்னர், இந்தியக் குடியரசுத் தலைவரால் நியமிக்கப்படுகிறார். மரபுப்படி, உச்ச நீதிமன்றத்தின் மூத்த நீதிபதியே அடுத்த தலைமை நீதிபதியாக பொதுவாக நியமிக்கப்படுகிறார்."
+   }
+  ]
+ },
+ {
+  "sig": "consists|constitution|directive|policy|principles|state",
+  "classification": "true_duplicate",
+  "notes": "Both ask which Part of the Constitution contains the Directive Principles of State Policy; both correctly answer Part IV. Kept row d5a7e0e3 (simpler, direct question); rewrote 7c84fee9 into a different, verified fact (Irish origin of DPSP) on the same topic.",
+  "keep_id": "d5a7e0e3-212d-4c6b-8201-bbe9c1b2d25f",
+  "rewrites": [
+   {
+    "id": "7c84fee9-26c6-4d07-b22b-d069648cadca",
+    "question_text": "The concept of the Directive Principles of State Policy in the Indian Constitution was borrowed from the Constitution of which country?",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் அரசுக் கொள்கையின் வழிகாட்டு நெறிமுறைகள் (Directive Principles) என்ற கருத்து எந்த நாட்டின் அரசியலமைப்பிலிருந்து பெறப்பட்டது?",
+    "option_a": "Ireland", "option_b": "United Kingdom", "option_c": "United States of America", "option_d": "Canada",
+    "option_a_ta": "அயர்லாந்து", "option_b_ta": "ஐக்கிய இராச்சியம்", "option_c_ta": "அமெரிக்க ஐக்கிய நாடு", "option_d_ta": "கனடா",
+    "correct_answer": "A",
+    "explanation": "The Directive Principles of State Policy were borrowed from the Constitution of Ireland (the Irish Free State Constitution of 1937), which itself had borrowed the idea from Spain. While the Fundamental Rights are largely borrowed from the US Constitution, the Directive Principles reflect the Irish model of non-justiciable guiding principles for governance.",
+    "explanation_ta": "அரசுக் கொள்கையின் வழிகாட்டு நெறிமுறைகள் என்ற கருத்து அயர்லாந்தின் அரசியலமைப்பிலிருந்து (1937 ஆம் ஆண்டு அயர்லாந்து சுதந்திர நாட்டின் அரசியலமைப்பு) பெறப்பட்டது; அயர்லாந்தும் இந்தக் கருத்தை ஸ்பெயினிலிருந்து பெற்றிருந்தது. அடிப்படை உரிமைகள் பெரும்பாலும் அமெரிக்க அரசியலமைப்பிலிருந்து பெறப்பட்டிருக்க, வழிகாட்டு நெறிமுறைகள் நீதிமன்றத்தால் அமல்படுத்த முடியாத, ஆட்சிக்கு வழிகாட்டும் அயர்லாந்து மாதிரியைப் பிரதிபலிக்கின்றன."
+   }
+  ]
+ },
+ {
+  "sig": "constitution|executive|judicial|legislature|restricted|transferable",
+  "classification": "true_duplicate",
+  "notes": "Both ask why judicial review is restricted in India; both correctly answer 'the constitution is supreme'. Kept row 597532af; rewrote 12048510 into a different, verified fact (Kesavananda Bharati case / Basic Structure Doctrine) on the same topic.",
+  "keep_id": "597532af-7ab2-494d-bedd-73b01cdf3e28",
+  "rewrites": [
+   {
+    "id": "12048510-9a63-4703-bf79-59dfeab852b0",
+    "question_text": "The 'Basic Structure Doctrine', which limits Parliament's power to amend the Constitution, was propounded by the Supreme Court in which landmark case?",
+    "question_text_ta": "பாராளுமன்றத்தின் அரசியலமைப்பைத் திருத்தும் அதிகாரத்தைக் கட்டுப்படுத்தும் 'அடிப்படைக் கட்டமைப்புக் கோட்பாடு' (Basic Structure Doctrine) எந்த முக்கிய வழக்கில் உச்ச நீதிமன்றத்தால் முன்வைக்கப்பட்டது?",
+    "option_a": "Kesavananda Bharati vs State of Kerala (1973)", "option_b": "Golaknath vs State of Punjab (1967)", "option_c": "Minerva Mills vs Union of India (1980)", "option_d": "Shankari Prasad vs Union of India (1951)",
+    "option_a_ta": "கேசவானந்த பாரதி vs கேரள மாநிலம் (1973)", "option_b_ta": "கோலக்நாத் vs பஞ்சாப் மாநிலம் (1967)", "option_c_ta": "மினர்வா மில்ஸ் vs இந்திய ஒன்றியம் (1980)", "option_d_ta": "சங்கரி பிரசாத் vs இந்திய ஒன்றியம் (1951)",
+    "correct_answer": "A",
+    "explanation": "In the landmark Kesavananda Bharati vs State of Kerala case (1973), the Supreme Court held that while Parliament has wide powers to amend the Constitution under Article 368, it cannot alter its \"basic structure\" or fundamental framework. This doctrine has since been used to review the validity of several constitutional amendments.",
+    "explanation_ta": "கேசவானந்த பாரதி vs கேரள மாநிலம் (1973) என்ற முக்கிய வழக்கில் உச்ச நீதிமன்றம் அடிப்படைக் கட்டமைப்புக் கோட்பாட்டை முன்வைத்தது. பிரிவு 368 இன் கீழ் அரசியலமைப்பைத் திருத்த பாராளுமன்றத்திற்கு பரந்த அதிகாரம் இருந்தாலும், அதன் 'அடிப்படைக் கட்டமைப்பை' அல்லது அடிப்படை வடிவமைப்பை மாற்ற முடியாது என நீதிமன்றம் தீர்ப்பளித்தது. பல அரசியலமைப்புத் திருத்தங்களின் செல்லுபடியை மறுஆய்வு செய்ய இக்கோட்பாடு பின்னர் பயன்படுத்தப்பட்டுள்ளது."
+   }
+  ]
+ },
+ {
+  "sig": "commission|disputes|election|parliament|president|regarding",
+  "classification": "true_duplicate",
+  "notes": "Both ask who settles disputes over the President's election; both correctly answer the Supreme Court. Kept row bb3cd0d7 (clean Tamil). Row 3fb71a8f's option_d_ta mistranslates 'Attorney General' as a state-level advocate general, so it was rewritten.",
+  "keep_id": "bb3cd0d7-7d7d-4376-a821-4fee117ad5af",
+  "rewrites": [
+   {
+    "id": "3fb71a8f-c4dd-46ae-9627-4028fef11ac3",
+    "question_text": "Who administers the oath of office to the President of India at the commencement of their term?",
+    "question_text_ta": "இந்தியக் குடியரசுத் தலைவரின் பதவிக்காலம் தொடங்கும்போது, அவருக்குப் பதவிப் பிரமாணம் செய்து வைப்பவர் யார்?",
+    "option_a": "The Chief Justice of India", "option_b": "The Prime Minister", "option_c": "The Vice-President of India", "option_d": "The Speaker of the Lok Sabha",
+    "option_a_ta": "இந்தியத் தலைமை நீதிபதி", "option_b_ta": "பிரதமர்", "option_c_ta": "துணைக் குடியரசுத் தலைவர்", "option_d_ta": "மக்களவை சபாநாயகர்",
+    "correct_answer": "A",
+    "explanation": "Under Article 60 of the Constitution, the oath of office is administered to the President of India by the Chief Justice of India, or in their absence, the senior-most judge of the Supreme Court available. Through this oath, the President pledges to preserve, protect, and defend the Constitution and the law.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 60 இன்படி, இந்தியக் குடியரசுத் தலைவருக்கு பதவிப் பிரமாணம் செய்து வைப்பவர் இந்தியத் தலைமை நீதிபதி ஆவார்; அவர் இல்லாத பட்சத்தில், கிடைக்கக்கூடிய உச்ச நீதிமன்றத்தின் மூத்த நீதிபதி இதைச் செய்வார். இந்தப் பிரமாணத்தின் மூலம், அரசியலமைப்பையும் சட்டத்தையும் காக்கவும் பாதுகாக்கவும் குடியரசுத் தலைவர் உறுதிமொழி அளிக்கிறார்."
+   }
+  ]
+ },
+ {
+  "sig": "courts|enjoyed|judicial|power|review|supreme",
+  "classification": "true_duplicate",
+  "notes": "Both ask who enjoys judicial review power in India; both correctly answer Supreme Court and High Courts. Kept row 9cad1bf6; rewrote 5f723988 into a different, verified fact (US origin of judicial review) on the same topic.",
+  "keep_id": "9cad1bf6-53eb-443a-98f9-9bb6413f5773",
+  "rewrites": [
+   {
+    "id": "5f723988-4a88-4f24-8e1d-d7b7f74eef66",
+    "question_text": "The concept of judicial review, as adopted in the Indian Constitution, was mainly drawn from the Constitution of which country?",
+    "question_text_ta": "இந்திய அரசியலமைப்பில் ஏற்றுக்கொள்ளப்பட்ட நீதித்துறை மறுஆய்வு (Judicial Review) என்ற கருத்து முதன்மையாக எந்த நாட்டின் அரசியலமைப்பிலிருந்து பெறப்பட்டது?",
+    "option_a": "United States of America", "option_b": "United Kingdom", "option_c": "Canada", "option_d": "Ireland",
+    "option_a_ta": "அமெரிக்க ஐக்கிய நாடு", "option_b_ta": "ஐக்கிய இராச்சியம்", "option_c_ta": "கனடா", "option_d_ta": "அயர்லாந்து",
+    "correct_answer": "A",
+    "explanation": "The concept of judicial review was mainly adopted from the Constitution of the United States of America, where the principle was established in the case of Marbury vs Madison (1803). While the US applies the \"due process of law\" standard, the Indian Constitution instead uses the narrower \"procedure established by law\" standard under Article 21, though judicial interpretation has since expanded its scope.",
+    "explanation_ta": "நீதித்துறை மறுஆய்வு என்ற கருத்து முதன்மையாக அமெரிக்க ஐக்கிய நாட்டின் அரசியலமைப்பிலிருந்து பெறப்பட்டது; மார்பரி vs மேடிசன் (1803) வழக்கில் இக்கோட்பாடு நிறுவப்பட்டது. அமெரிக்கா 'சட்டத்தின் முறையான செயல்முறை' (due process of law) என்ற தரத்தைப் பயன்படுத்தும் அதேவேளையில், இந்திய அரசியலமைப்பு பிரிவு 21 இன் கீழ் குறுகிய 'சட்டத்தால் நிறுவப்பட்ட முறை' (procedure established by law) என்ற தரத்தைப் பயன்படுத்துகிறது; எனினும் நீதித்துறை விளக்கம் அதன் எல்லையை பின்னர் விரிவுபடுத்தியுள்ளது."
+   }
+  ]
+ },
+ {
+  "sig": "conduct|constitution|governor|minister|president|responsible",
+  "classification": "true_duplicate",
+  "notes": "Both ask to whom the Governor is responsible for their conduct; both correctly answer the President. Kept row 3e1b8072 (topic: Union Executive); rewrote ed7a2da1 into a different, verified fact to fit its own topic (Constitution of India).",
+  "keep_id": "3e1b8072-4a81-4389-888d-7c61af2652f2",
+  "rewrites": [
+   {
+    "id": "ed7a2da1-5d69-4f58-802a-6fe2bd80237d",
+    "question_text": "The Constitution of India, the longest written constitution in the world, was framed by the Constituent Assembly over a period of approximately",
+    "question_text_ta": "உலகின் மிக நீளமான எழுதப்பட்ட அரசியலமைப்பான இந்திய அரசியலமைப்பை அரசியலமைப்புச் சபை வடிவமைக்க எடுத்துக் கொண்ட காலம் தோராயமாக என்ன?",
+    "option_a": "2 years, 11 months and 18 days", "option_b": "1 year and 6 months", "option_c": "5 years", "option_d": "7 years",
+    "option_a_ta": "2 ஆண்டுகள், 11 மாதங்கள் மற்றும் 18 நாட்கள்", "option_b_ta": "1 ஆண்டு 6 மாதங்கள்", "option_c_ta": "5 ஆண்டுகள்", "option_d_ta": "7 ஆண்டுகள்",
+    "correct_answer": "A",
+    "explanation": "From its first sitting on 9 December 1946 to its adoption on 26 November 1949, the Constituent Assembly took approximately 2 years, 11 months and 18 days to draft the Constitution of India. The Constitution finally came into force on 26 January 1950, celebrated since as Republic Day.",
+    "explanation_ta": "1946 டிசம்பர் 9 அன்று நடைபெற்ற முதல் கூட்டத்திலிருந்து 1949 நவம்பர் 26 அன்று ஏற்றுக்கொள்ளப்பட்ட வரை, இந்திய அரசியலமைப்பை வரைவதற்கு அரசியலமைப்புச் சபை தோராயமாக 2 ஆண்டுகள், 11 மாதங்கள் மற்றும் 18 நாட்கள் எடுத்துக் கொண்டது. அரசியலமைப்பு இறுதியாக 1950 ஜனவரி 26 அன்று நடைமுறைக்கு வந்தது; அன்று முதல் அது குடியரசு தினமாகக் கொண்டாடப்படுகிறது."
+   }
+  ]
+ },
+ {
+  "sig": "council|minister|ministers|parliament|president|responsible",
+  "classification": "true_duplicate",
+  "notes": "Both ask to whom the Council of Ministers is responsible; both correctly answer Parliament. Kept row 5325bb45; rewrote 933de71b into a different, verified fact (ex-officio Chairman of Rajya Sabha) on the same topic.",
+  "keep_id": "5325bb45-b340-43bd-8daf-b90eaf8b6034",
+  "rewrites": [
+   {
+    "id": "933de71b-fbc0-4c27-8d78-b27a8740f958",
+    "question_text": "Who is the ex-officio Chairman of the Rajya Sabha (Council of States)?",
+    "question_text_ta": "மாநிலங்களவையின் (Rajya Sabha) பதவிரீதியான தலைவர் (ex-officio Chairman) யார்?",
+    "option_a": "The Vice-President of India", "option_b": "The President of India", "option_c": "The Prime Minister", "option_d": "The Deputy Chairman of the Rajya Sabha",
+    "option_a_ta": "இந்தியத் துணைக் குடியரசுத் தலைவர்", "option_b_ta": "இந்தியக் குடியரசுத் தலைவர்", "option_c_ta": "பிரதமர்", "option_d_ta": "மாநிலங்களவையின் துணைத் தலைவர்",
+    "correct_answer": "A",
+    "explanation": "Under Article 64 of the Constitution, the Vice-President of India is the ex-officio Chairman of the Rajya Sabha. The Vice-President presides over the sittings of the Rajya Sabha but is not a member of that House. The Deputy Chairman, elected from among the Rajya Sabha's own members, presides in the Chairman's absence.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 64 இன்படி, இந்தியத் துணைக் குடியரசுத் தலைவரே மாநிலங்களவையின் பதவிரீதியான தலைவராவார். துணைக் குடியரசுத் தலைவர் மாநிலங்களவையின் கூட்டங்களுக்குத் தலைமை தாங்குகிறார்; ஆனால் அவர் அவை உறுப்பினர் அல்ல. மாநிலங்களவை உறுப்பினர்களிடமிருந்தே தேர்ந்தெடுக்கப்படும் துணைத் தலைவர், தலைவர் இல்லாதபோது தலைமை தாங்குகிறார்."
+   }
+  ]
+ },
+ {
+  "sig": "adopted|constitution|december|january|november|preamble",
+  "classification": "true_duplicate",
+  "notes": "Both ask when the Preamble was adopted; both correctly answer 26 November 1949. Kept row aa136e75; rewrote 7496ffea into a different, verified fact (42nd Amendment additions to the Preamble) on the same topic.",
+  "keep_id": "aa136e75-f0ae-4216-a286-d2fe1e6e99b5",
+  "rewrites": [
+   {
+    "id": "7496ffea-a9a9-4d68-a17a-34bb7143125e",
+    "question_text": "Which two words were added to the Preamble of the Indian Constitution by the 42nd Constitutional Amendment Act, 1976?",
+    "question_text_ta": "42வது அரசியலமைப்புத் திருத்தச் சட்டம், 1976 மூலம் இந்திய அரசியலமைப்பின் முகவுரையில் சேர்க்கப்பட்ட இரண்டு சொற்கள் யாவை?",
+    "option_a": "'Socialist' and 'Secular'", "option_b": "'Sovereign' and 'Democratic'", "option_c": "'Republic' and 'Fraternity'", "option_d": "'Liberty' and 'Equality'",
+    "option_a_ta": "'சமதர்ம' மற்றும் 'மதச்சார்பற்ற'", "option_b_ta": "'இறையாண்மை' மற்றும் 'ஜனநாயக'", "option_c_ta": "'குடியரசு' மற்றும் 'சகோதரத்துவம்'", "option_d_ta": "'சுதந்திரம்' மற்றும் 'சமத்துவம்'",
+    "correct_answer": "A",
+    "explanation": "The 42nd Constitutional Amendment Act, 1976, added the words 'Socialist' and 'Secular' to the Preamble, along with the word 'Integrity' (changing \"unity of the nation\" to \"unity and integrity of the nation\"). This amendment, passed during the Emergency, is often referred to as a \"Mini-Constitution\" due to the scale of changes it introduced.",
+    "explanation_ta": "42வது அரசியலமைப்புத் திருத்தச் சட்டம், 1976 மூலம் முகவுரையில் 'சமதர்ம' (Socialist) மற்றும் 'மதச்சார்பற்ற' (Secular) என்ற சொற்கள் சேர்க்கப்பட்டன; மேலும் 'நாட்டின் ஒற்றுமை' என்பதை 'நாட்டின் ஒற்றுமையும் ஒருமைப்பாடும்' என மாற்ற 'ஒருமைப்பாடு' (Integrity) என்ற சொல்லும் சேர்க்கப்பட்டது. அவசரகாலத்தின்போது நிறைவேற்றப்பட்ட இந்தத் திருத்தம், அது கொண்டுவந்த மாற்றங்களின் பரப்பளவு காரணமாக 'சிறு அரசியலமைப்பு' (Mini-Constitution) என அழைக்கப்படுகிறது."
+   }
+  ]
+ },
+ {
+  "sig": "constitution|democratic|preamble|republic|socialist|sovereign",
+  "classification": "false_positive",
+  "notes": "Row1 tests the exact word-order of terms in the Preamble; row2 tests the Preamble's opening phrase ('We, the People of India...'). Different specific Preamble facts, not a reworded repeat of the same question."
+ },
+ {
+  "sig": "assembly|congress|federal|legislature|parliament|supreme",
+  "classification": "false_positive",
+  "notes": "Row1 asks the name of India's legislature (Parliament); row2 asks the name of Russia's legislature (Federal Assembly). Different countries and different facts, correctly different answers."
+ },
+ {
+  "sig": "constitution|government|independence|judiciary|parliamentary|presidential",
+  "classification": "true_duplicate",
+  "notes": "Both ask which listed item is NOT a feature of the Indian Constitution; both correctly answer Presidential Government. Kept row 3b1696c5 (topic: Constitution of India); rewrote 584d123c into a different, verified fact to fit its own topic (Preamble to the Constitution).",
+  "keep_id": "3b1696c5-82d8-470c-9c02-cc82832f2e65",
+  "rewrites": [
+   {
+    "id": "584d123c-8fbd-4d66-afec-88f089617e0d",
+    "question_text": "According to the Preamble of the Indian Constitution, the Constitution secures to all its citizens Justice, Liberty, Equality and",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் முகவுரையின்படி, அது அனைத்து குடிமக்களுக்கும் நீதி, சுதந்திரம், சமத்துவம் மற்றும் எதை உறுதி செய்கிறது?",
+    "option_a": "Fraternity", "option_b": "Sovereignty", "option_c": "Secularism", "option_d": "Federalism",
+    "option_a_ta": "சகோதரத்துவம்", "option_b_ta": "இறையாண்மை", "option_c_ta": "மதச்சார்பின்மை", "option_d_ta": "கூட்டாட்சி",
+    "correct_answer": "A",
+    "explanation": "The Preamble of the Indian Constitution declares that it secures to all citizens Justice (social, economic, and political), Liberty (of thought, expression, belief, faith, and worship), Equality (of status and opportunity), and Fraternity (assuring the dignity of the individual and the unity and integrity of the nation).",
+    "explanation_ta": "இந்திய அரசியலமைப்பின் முகவுரை, அனைத்து குடிமக்களுக்கும் நீதி (சமூக, பொருளாதார, அரசியல்), சுதந்திரம் (சிந்தனை, கருத்து வெளிப்பாடு, நம்பிக்கை, மத நம்பிக்கை, வழிபாடு), சமத்துவம் (அந்தஸ்து மற்றும் வாய்ப்பு) மற்றும் சகோதரத்துவம் (தனிநபர் கண்ணியத்தையும் நாட்டின் ஒற்றுமை, ஒருமைப்பாட்டையும் உறுதி செய்தல்) ஆகியவற்றை உறுதி செய்வதாக அறிவிக்கிறது."
+   }
+  ]
+ },
+ {
+  "sig": "appointed|auditor|comptroller|general|minister|president",
+  "classification": "true_duplicate",
+  "notes": "Both ask who appoints the CAG; both correctly answer the President. Kept row 37a978bc; rewrote a747e604 into a different, verified fact (CAG's tenure) on the same topic.",
+  "keep_id": "37a978bc-fd3d-4b10-9eaf-22527898e828",
+  "rewrites": [
+   {
+    "id": "a747e604-24a7-44f8-a598-1638785aa75b",
+    "question_text": "What is the normal tenure of the Comptroller and Auditor General (CAG) of India?",
+    "question_text_ta": "இந்தியாவின் கட்டுப்பாட்டாளர் மற்றும் தணிக்கைத் தலைவரின் (CAG) இயல்பான பதவிக்காலம் என்ன?",
+    "option_a": "6 years or until the age of 65 years, whichever is earlier", "option_b": "5 years, with no age limit", "option_c": "A single term of 10 years", "option_d": "There is no fixed tenure",
+    "option_a_ta": "6 ஆண்டுகள் அல்லது 65 வயது வரை, எது முதலில் வருகிறதோ அது", "option_b_ta": "5 ஆண்டுகள், வயது வரம்பு இல்லை", "option_c_ta": "10 ஆண்டுகள் ஒற்றை பதவிக்காலம்", "option_d_ta": "நிலையான பதவிக்காலம் இல்லை",
+    "correct_answer": "A",
+    "explanation": "Under Article 148 of the Constitution, the Comptroller and Auditor General of India holds office for a term of 6 years or until attaining the age of 65 years, whichever is earlier. The CAG can be removed from office only in a manner similar to that of a Supreme Court judge, ensuring independence from the executive.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 148 இன்படி, இந்தியாவின் கட்டுப்பாட்டாளர் மற்றும் தணிக்கைத் தலைவர் 6 ஆண்டுகள் அல்லது 65 வயது அடையும் வரை, இவற்றில் எது முதலில் வருகிறதோ அது வரை பதவியில் இருப்பார். உச்ச நீதிமன்ற நீதிபதியை நீக்குவதைப் போன்ற முறையிலேயே CAGவையும் பதவியிலிருந்து நீக்க முடியும்; இது நிர்வாகத்திலிருந்து அவரது சுயாதீனத்தை உறுதி செய்கிறது."
+   }
+  ]
+ },
+ {
+  "sig": "constitution|directive|fundamental|independent|judiciary|principles",
+  "classification": "true_duplicate",
+  "notes": "Both ask which feature is called the 'Magna Carta' of the Indian people; both correctly answer Fundamental Rights. Kept row a75a2bcb (topic: Constitution of India); rewrote 3ec6c241 into a different, verified fact to fit its own topic (Other Topics).",
+  "keep_id": "a75a2bcb-0b3e-45a1-9e70-13d1124d41c6",
+  "rewrites": [
+   {
+    "id": "3ec6c241-1698-4e27-a7bc-71c850c78cbf",
+    "question_text": "Which Schedule of the Indian Constitution contains the list of officially recognised languages of India?",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் எந்த அட்டவணையில் இந்தியாவின் அதிகாரப்பூர்வமாக அங்கீகரிக்கப்பட்ட மொழிகளின் பட்டியல் உள்ளது?",
+    "option_a": "Eighth Schedule", "option_b": "Seventh Schedule", "option_c": "Ninth Schedule", "option_d": "Tenth Schedule",
+    "option_a_ta": "எட்டாவது அட்டவணை", "option_b_ta": "ஏழாவது அட்டவணை", "option_c_ta": "ஒன்பதாவது அட்டவணை", "option_d_ta": "பத்தாவது அட்டவணை",
+    "correct_answer": "A",
+    "explanation": "The Eighth Schedule of the Indian Constitution lists the officially recognised languages of India, currently numbering 22. The list has been expanded over time through constitutional amendments; for example, Sindhi was added in 1967, and Konkani, Manipuri, and Nepali in 1992.",
+    "explanation_ta": "இந்திய அரசியலமைப்பின் எட்டாவது அட்டவணையில் தற்போது 22 மொழிகள் அதிகாரப்பூர்வமாக அங்கீகரிக்கப்பட்டு பட்டியலிடப்பட்டுள்ளன. அரசியலமைப்புத் திருத்தங்கள் மூலம் காலப்போக்கில் இப்பட்டியல் விரிவுபடுத்தப்பட்டுள்ளது; எடுத்துக்காட்டாக, 1967 இல் சிந்தியும், 1992 இல் கொங்கணி, மணிப்புரி, நேபாளி மொழிகளும் சேர்க்கப்பட்டன."
+   }
+  ]
+ },
+ {
+  "sig": "fundamental|information|legal|neither|right",
+  "classification": "conflict",
+  "notes": "Row 8aa2c409 (answer B: 'Legal Right' only) vs row 28ad3e10 (answer A: 'Fundamental Right' only) disagree. No changes made -- flagged for review.",
+  "conflict_details": "Research indicates the widely-cited authoritative position (per Supreme Court rulings including Raj Narain v. State of UP and PUCL v. Union of India) is that the Right to Information is BOTH: a Fundamental Right flowing from Article 19(1)(a)/21, and formally codified as a statutory/Legal Right via the RTI Act, 2005. Neither existing row's single-category answer ('Legal Right only' / 'Fundamental Right only') matches this commonly accepted 'Both' characterization -- row 28ad3e10 even has 'Both Fundamental and Legal Right' as its own option C, but its correct_answer is set to A instead. Recommend human review: it is likely both rows' correct_answer should point to the 'Both' option rather than either single-category answer being treated as correct."
+ },
+ {
+  "sig": "amendment|constitutional|creation|majority|ratification|requires",
+  "classification": "true_duplicate",
+  "notes": "Both ask what majority is needed to create a new state; both correctly answer 'simple majority'. Kept row 74a50571 (its explanation correctly discusses India). Row 6371c1f4's explanation incorrectly discusses the US Congress/Constitution instead of India (a pre-existing factual defect in that row, unrelated to duplication, fixed as a byproduct of the rewrite) so it was rewritten.",
+  "keep_id": "74a50571-1398-4485-a4ac-e0932d1716b6",
+  "rewrites": [
+   {
+    "id": "6371c1f4-5beb-4271-9f39-3c9253fc56e6",
+    "question_text": "Under Article 3 of the Indian Constitution, the power to form a new State or alter the boundaries of an existing State primarily rests with",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் பிரிவு 3 இன்படி, ஒரு புதிய மாநிலத்தை உருவாக்குதல் அல்லது ஏற்கெனவே உள்ள மாநிலத்தின் எல்லைகளை மாற்றுதல் ஆகியவற்றிற்கான அதிகாரம் முதன்மையாக யாருக்கு உள்ளது?",
+    "option_a": "Parliament", "option_b": "The President acting alone", "option_c": "The Supreme Court", "option_d": "The concerned State Legislature acting alone",
+    "option_a_ta": "பாராளுமன்றம்", "option_b_ta": "குடியரசுத் தலைவர் மட்டும்", "option_c_ta": "உச்ச நீதிமன்றம்", "option_d_ta": "சம்பந்தப்பட்ட மாநில சட்டமன்றம் மட்டும்",
+    "correct_answer": "A",
+    "explanation": "Under Article 3, Parliament has the power to form a new State, alter its boundaries, or change its name by a simple majority (an ordinary law, not a constitutional amendment). However, such a Bill can only be introduced in Parliament on the recommendation of the President, who must first refer it to the concerned State Legislature(s) for their views (though not their consent).",
+    "explanation_ta": "பிரிவு 3 இன்படி, எளிய பெரும்பான்மையுடன் (சாதாரண சட்டம், அரசியலமைப்புத் திருத்தமல்ல) ஒரு புதிய மாநிலத்தை உருவாக்கவோ, எல்லைகளை மாற்றவோ அல்லது பெயரை மாற்றவோ பாராளுமன்றத்திற்கு அதிகாரம் உள்ளது. எனினும், குடியரசுத் தலைவரின் பரிந்துரையின் பேரில் மட்டுமே இத்தகைய மசோதாவை பாராளுமன்றத்தில் அறிமுகப்படுத்த முடியும்; அதற்கு முன், சம்பந்தப்பட்ட மாநில சட்டமன்ற(ங்க)ளின் கருத்தை (ஒப்புதலை அல்ல) குடியரசுத் தலைவர் பெற வேண்டும்."
+   }
+  ]
+ },
+ {
+  "sig": "ascending|chronological|created|formation|meghalaya|nagaland",
+  "classification": "true_duplicate",
+  "notes": "Both ask for the chronological order of Nagaland/Haryana/Meghalaya/Sikkim's formation; both correctly answer the same order. Kept row de5b5387; rewrote 75c5ef2e into a different, verified fact (Goa statehood, 1987) on the same topic.",
+  "keep_id": "de5b5387-8dee-4ece-ba1c-907a3a73e336",
+  "rewrites": [
+   {
+    "id": "75c5ef2e-f42b-4a99-9f4a-206f321ff687",
+    "question_text": "Which of the following was granted full statehood in 1987, becoming independent India's 25th state, while its neighbouring territory remained a Union Territory?",
+    "question_text_ta": "1987 ஆம் ஆண்டு முழு மாநிலத் தகுதி பெற்று, சுதந்திர இந்தியாவின் 25வது மாநிலமாக மாறிய பிரதேசம் எது? அதன் அருகிலிருந்த பிரதேசம் ஒன்றியப் பிரதேசமாகவே தொடர்ந்தது.",
+    "option_a": "Goa", "option_b": "Puducherry", "option_c": "Mizoram", "option_d": "Arunachal Pradesh",
+    "option_a_ta": "கோவா", "option_b_ta": "புதுச்சேரி", "option_c_ta": "மிசோரம்", "option_d_ta": "அருணாசலப் பிரதேசம்",
+    "correct_answer": "A",
+    "explanation": "Goa was granted full statehood on 30 May 1987, becoming India's 25th state; Daman and Diu, which had earlier been administered together with Goa, remained a separate Union Territory. Mizoram and Arunachal Pradesh also became states in 1987 (on 20 February), but they attained statehood as whole former Union Territories rather than being split from a shared one.",
+    "explanation_ta": "கோவா 1987 மே 30 அன்று முழு மாநிலத் தகுதி பெற்று, இந்தியாவின் 25வது மாநிலமாக மாறியது; இதற்கு முன்பு கோவாவுடன் இணைந்து நிர்வகிக்கப்பட்ட தாமன் மற்றும் தியூ ஒன்றியப் பிரதேசமாகவே தொடர்ந்தது. அதே ஆண்டு பிப்ரவரி 20 அன்று மிசோரமும் அருணாசலப் பிரதேசமும் மாநிலங்களாயின்; ஆனால் அவை பிரிக்கப்படாத முழு ஒன்றியப் பிரதேசங்களாக இருந்தே மாநில அந்தஸ்து பெற்றன."
+   }
+  ]
+ },
+ {
+  "sig": "appropriate|between|changed|liberty|reflects|relationship",
+  "classification": "true_duplicate",
+  "notes": "Both ask for the most appropriate relationship between law and liberty; both correctly answer 'if there are no laws, there is no liberty'. Kept row 251023fe (grammatically cleaner English than row2's 'more law, there is loss liberty'); rewrote 68688f3d into a different, verified fact to fit its own topic (Judiciary in India).",
+  "keep_id": "251023fe-815d-4088-ab64-9318214af884",
+  "rewrites": [
+   {
+    "id": "68688f3d-498b-42af-9bc9-4f8fc98663a7",
+    "question_text": "Which landmark Supreme Court case held that a procedure depriving a person of their personal liberty under Article 21 must be 'right, just and fair', significantly expanding the scope of the Right to Life and Personal Liberty?",
+    "question_text_ta": "பிரிவு 21 இன் கீழ் ஒரு நபரின் தனிநபர் சுதந்திரத்தைப் பறிக்கும் நடைமுறை 'சரியானதாகவும், நேர்மையானதாகவும், நியாயமானதாகவும்' இருக்க வேண்டும் என்று தீர்ப்பளித்து, உயிர் மற்றும் தனிநபர் சுதந்திர உரிமையின் எல்லையை பெருமளவு விரிவுபடுத்திய முக்கிய உச்ச நீதிமன்ற வழக்கு எது?",
+    "option_a": "Maneka Gandhi vs Union of India (1978)", "option_b": "A.K. Gopalan vs State of Madras (1950)", "option_c": "Kesavananda Bharati vs State of Kerala (1973)", "option_d": "Minerva Mills vs Union of India (1980)",
+    "option_a_ta": "மேனகா காந்தி vs இந்திய ஒன்றியம் (1978)", "option_b_ta": "ஏ.கே. கோபாலன் vs மெட்ராஸ் மாநிலம் (1950)", "option_c_ta": "கேசவானந்த பாரதி vs கேரள மாநிலம் (1973)", "option_d_ta": "மினர்வா மில்ஸ் vs இந்திய ஒன்றியம் (1980)",
+    "correct_answer": "A",
+    "explanation": "In Maneka Gandhi vs Union of India (1978), the Supreme Court held that the \"procedure established by law\" under Article 21 must be right, just, and fair, and not arbitrary or oppressive -- effectively reading elements of \"due process of law\" into Article 21. This overturned the narrower view taken earlier in A.K. Gopalan's case (1950) and greatly expanded the interpretation of personal liberty in India.",
+    "explanation_ta": "மேனகா காந்தி vs இந்திய ஒன்றியம் (1978) வழக்கில், பிரிவு 21 இன் கீழ் உள்ள 'சட்டத்தால் நிறுவப்பட்ட முறை' என்பது சரியானதாகவும், நேர்மையானதாகவும், நியாயமானதாகவும் இருக்க வேண்டுமே தவிர, தன்னிச்சையாகவோ ஒடுக்குமுறையாகவோ இருக்கக்கூடாது என உச்ச நீதிமன்றம் தீர்ப்பளித்தது; இதன்மூலம் 'சட்டத்தின் முறையான செயல்முறை' (due process) கூறுகளை பிரிவு 21 இல் மறைமுகமாக உள்ளடக்கியது. இது 1950 இல் ஏ.கே. கோபாலன் வழக்கில் எடுக்கப்பட்ட குறுகிய பார்வையை மாற்றி, இந்தியாவில் தனிநபர் சுதந்திரத்தின் விளக்கத்தை பெருமளவு விரிவுபடுத்தியது."
+   }
+  ]
+ },
+ {
+  "sig": "இடங்களில்|எத்தனை|எழுத்து|ஒலிக்கும்|தனித்து|மாத்திரை",
+  "classification": "false_positive",
+  "notes": "Different Tamil letters tested (ஔகாரம் vs ஐகாரம் standalone matra duration) -- different grammar facts, coincidentally sharing the same numeric answer options and answer value."
+ },
+ {
+  "sig": "இல்லார்|காட்டிச்|கொடையைக்|சொல்லின்|நெஞ்சில்|ழைப்பைக்",
+  "classification": "false_positive",
+  "notes": "Same couplet, but each row asks the meaning of a different word within it (ஈரம் vs நாணம்); different vocabulary facts, different correct answers."
+ },
+ {
+  "sig": "எனப்படுவது|கூறியது|செறாஅமை|சொல்நோன்றல்|தன்கிளை|பேதையார்",
+  "classification": "false_positive",
+  "notes": "Different terms defined (செறிவு vs நிறை), sharing the same option set but with different correct answers."
+ },
+ {
+  "sig": "இவ்வரியில்|உருகெழும்|குறிப்பிடப்படும்|சொல்லின்|பெடையோடு|பெருக்கம்",
+  "classification": "false_positive",
+  "notes": "Same poem line, but each row asks the meaning of a different word within it (ஓதை vs வெரீஇப்); different correct answers."
+ },
+ {
+  "sig": "ஆராய்ந்து|இடம்பெற்றுள்ள|இவ்வரியில்|குணங்கள்எல்லாம்|கொடுக்கும்|மறவிஒர்ப்பு",
+  "classification": "false_positive",
+  "notes": "Same poem line, but each row asks the meaning of a different word within it (மன்னும் vs ஓர்ப்பு); different correct answers. (Unrelated aside: row 3a6c820a's own explanation text contains an odd embedded self-correction note about a prior wrong answer -- a pre-existing data-quality issue, not a duplication issue, so no action was taken on it here.)"
+ },
+ {
+  "sig": "அழைக்கப்படுகிறது|எவ்வாறு|கன்னடம்|தமிழ்ச்|முறையே|மொழிகளில்",
+  "classification": "false_positive",
+  "notes": "Different Tamil number-words tested for their Kannada/Tulu equivalents (ஒன்று 'one' vs நூறு 'hundred'); different facts, different correct answers."
+ },
+ {
+  "sig": "கருத்துகளை|கீழ்க்கணக்கு|சிறுபஞ்ச|திரிகடுகம்|நூல்களுள்|பாடலிலும்",
+  "classification": "false_positive",
+  "notes": "Different Pathinen Keezhkanakku texts and different concept-counts-per-verse tested (six concepts -> Elathi vs three concepts -> Thirikadugam); different facts, different correct answers."
+ },
+ {
+  "sig": "குறிப்புத்|பெயரெச்சம்|வினைத்தொகை|வினைமுற்று|வினையெச்சம்|வியங்கோள்",
+  "classification": "false_positive",
+  "notes": "Three rows each ask the grammatical classification of a different Tamil word (இறைஞ்சி / விளைக / தேர்ந்த); different facts, different correct answers."
+ }
+]

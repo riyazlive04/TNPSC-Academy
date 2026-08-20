@@ -4,6 +4,7 @@ import { Navigate, Route, Routes, useNavigate, useLocation, useOutlet } from 're
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Compass, Home } from 'lucide-react'
 import { useAuthStore } from './store/authStore'
+import { useAuthConfigStore } from './store/authConfigStore'
 import { useThemeStore } from './store/themeStore'
 import { useUpsellStore } from './store/upsellStore'
 import { warmApi } from './lib/api'
@@ -21,6 +22,7 @@ import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
 import OfflineBanner from './components/OfflineBanner'
 import CookieBanner from './components/CookieBanner'
+import PushPrimer from './components/Onboarding/PushPrimer'
 import Toaster from './components/UI/Toaster'
 import LogoLoader from './components/UI/LogoLoader'
 
@@ -84,6 +86,7 @@ const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
+const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
 interface RouteDef {
@@ -166,6 +169,7 @@ export default function App() {
     useThemeStore.getState().init()
     warmApi()
     init()
+    void useAuthConfigStore.getState().init()
     // Block copy/cut/paste/long-press selection app-wide in the installed app.
     installCopyGuard()
   }, [init])
@@ -197,6 +201,7 @@ export default function App() {
     <OfflineBanner />
     <CookieBanner />
     <BackButtonGuard />
+    <PushPrimer />
     <Toaster />
     <UpsellOutlet />
     </>
@@ -269,6 +274,11 @@ function AnimatedRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Standalone public enrollment page for the Group II/IIA Rank Booster
+          test series (marketing/ad landing target) — purchasable directly
+          once signed in, or via sign-up-then-return for a brand-new visitor. */}
+      <Route path="/rank-booster" element={<RankBoosterLandingPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />
@@ -352,7 +362,7 @@ function NotFound() {
         <Compass size={30} className="text-primary" />
       </span>
       <div>
-        <h1 className="font-display text-[28px] font-bold tracking-tight text-ink">Page not found</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">Page not found</h1>
         <p className="mx-auto mt-2 max-w-xs font-body text-sm leading-relaxed text-muted">
           The page you're looking for doesn't exist or may have moved.
         </p>

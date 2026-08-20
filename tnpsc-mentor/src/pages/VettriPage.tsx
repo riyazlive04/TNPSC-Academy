@@ -86,10 +86,10 @@ export default function VettriPage() {
         </button>
 
         <header className="mb-6 mt-4">
-          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+          <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
             {t('vettriTitle')}
           </h1>
-          <p className="tamil mt-1 font-body text-[15px] text-muted">{t('vettriSub')}</p>
+          <p className="tamil mt-1 font-body text-base text-muted">{t('vettriSub')}</p>
         </header>
 
         {loading && <SkeletonCards count={5} height="h-24" />}
@@ -127,7 +127,7 @@ export default function VettriPage() {
                           {title}
                         </h3>
                         {e.locked && (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-brand-soft px-2 py-0.5 font-heading text-[11px] font-semibold text-brand-dark">
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-brand-soft px-2 py-0.5 font-heading text-2xs font-semibold text-brand-dark">
                             <Lock size={11} /> {t('vettriOnly')}
                           </span>
                         )}
@@ -139,7 +139,7 @@ export default function VettriPage() {
                         <Tag>
                           <Clock size={12} /> {minutes} {t('minutesUnit')}
                         </Tag>
-                        <span className="inline-flex items-center gap-1 font-body text-[11px] text-ink2">
+                        <span className="inline-flex items-center gap-1 font-body text-2xs text-ink2">
                           <InfinityIcon size={12} className="text-brand" /> {t('vettriUnlimited')}
                         </span>
                       </div>
@@ -170,7 +170,7 @@ export default function VettriPage() {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-[11px] font-medium uppercase tracking-wide text-ink2">
+    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-2xs font-medium uppercase tracking-wide text-ink2">
       {children}
     </span>
   )

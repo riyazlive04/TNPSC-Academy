@@ -1,0 +1,1221 @@
+[
+ {
+  "id": "532127ae-cf8e-45f6-9ad8-039a9f2469e0",
+  "topic": "Mathematical Operators",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"+ means ×, − means ÷, ÷ means +, × means −\". Evaluate 15 + 5 − 5 ÷ 10 × 5. Options: A)255 B)512 C)180 D)200. Marked correct: D (200).",
+  "your_independent_calculation": "Substitute per the given mapping: 15 [×] 5 [÷] 5 [+] 10 [−] 5 = 15×5÷5+10−5. Left-to-right for ×/÷: 15×5=75, 75÷5=15. Then +/−: 15+10=25, 25−5=20. True value = 20, verified programmatically (python eval of '15*5/5+10-5' = 20.0).",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "The expression as written never equals any of the 4 options (20 is missing). The explanation itself computes 20 and then abandons the given expression, hand-waving \"Since correct answer is D (200) ... or a similar expression that evaluates to 200\" — this is a fabricated, self-contradictory rationalization, not a valid derivation. Minimal fix: change option_d from \"200\" to \"20\" (keep it marked correct, letter D unchanged), and rewrite the explanation's final lines to end at \"20 + 10 = ... wait: 15×5÷5=15, 15+10=25, 25−5=20 → Option (D)\" removing the fabricated sentence about 200. Also fix explanation_ta analogously (it currently states the same fabricated final value of 200 in Tamil).",
+  "confidence": "high",
+  "notes": "This is one of 5 out of 8 Mathematical Operators questions in this batch with this exact defect pattern: the explanation correctly derives a value via BODMAS after substitution, then the final answer/options don't match it, and the explanation fabricates an unrelated excuse to justify the stored (wrong) option. See sibling issues on ids 83571ac9, b2620a0d, c85a505b, f37fabd6.",
+  "_batch": 1
+ },
+ {
+  "id": "83571ac9-2175-43ad-a04f-83a0facfa465",
+  "topic": "Mathematical Operators",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"+ means −, − means ×, × means +, ÷ means ÷\". Evaluate 5 − 4 + 3 × 2 ÷ 1. Options: A)80 B)60 C)40 D)0. Marked correct: D (0).",
+  "your_independent_calculation": "Substitute: 5 [×] 4 [−] 3 [+] 2 [÷] 1 = 5×4−3+2÷1. ×/÷ first: 5×4=20, 2÷1=2. Then +/−: 20−3+2=19. True value = 19 (verified via python eval of '5*4-3+2/1' = 19.0).",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "None of the 4 options equal 19. The explanation itself derives 19, then abandons the given expression with a fabricated example (\"20 – 4 + 3 × 2 ÷ 1 → ... 80–80=0\") that doesn't correspond to the actual question. Minimal fix: change option_d from \"0\" to \"19\" (keep letter D marked correct) and rewrite the explanation to end at the genuine derivation (20−3+2=19) instead of the fabricated 80−80=0 tangent. Apply the same correction to explanation_ta.",
+  "confidence": "high",
+  "notes": "Same defect family as id 532127ae — see that entry's notes for the pattern description.",
+  "_batch": 1
+ },
+ {
+  "id": "b2620a0d-c10e-4a56-a54c-9d866868f33e",
+  "topic": "Mathematical Operators",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "R=−, Q=×, W=÷, A=+. Evaluate 36 W 4 Q 3 R 7 A 5. Options: A)-22 B)-168 C)22 D)28. Marked correct: C (22).",
+  "your_independent_calculation": "Substitute: 36÷4×3−7+5. ×/÷ first: 36÷4=9, 9×3=27. Then +/−: 27−7+5=25. True value = 25 (verified via python eval of '36/4*3-7+5' = 25.0).",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "None of the 4 options equal 25. The explanation computes 25 correctly for the stated expression, then switches to a different, unstated expression (\"36 W 4 Q 3 R 5 A 0\") to force a match to 22. Minimal fix: change option_c from \"22\" to \"25\" (keep letter C marked correct) and rewrite the explanation to stop at the genuine result (27−7+5=25) instead of substituting a different expression. Apply the same correction to explanation_ta (currently shows a further-altered expression \"16 M 4 K 5 R 2 T 2\" — note the Tamil explanation is internally inconsistent with its own given expression too, see notes).",
+  "confidence": "high",
+  "notes": "Same defect family as id 532127ae. Additionally, explanation_ta for this row literally contains the working for a DIFFERENT question (\"16 M 4 K 5 R 2 T 2\", matching id c85a505b's altered form) rather than 36 W 4 Q 3 R 7 A 5 — the Tamil explanation content appears to have been cross-contaminated between these two broken rows.",
+  "_batch": 1
+ },
+ {
+  "id": "c85a505b-c965-416f-b5fc-ec4adca47d42",
+  "topic": "Mathematical Operators",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "M=÷, R=+, T=−, K=×. Evaluate 16 M 4 K 3 R 2 T 4. Options: A)36 B)20 C)34 D)12. Marked correct: B (20).",
+  "your_independent_calculation": "Substitute: 16÷4×3+2−4. ×/÷ first: 16÷4=4, 4×3=12. Then +/−: 12+2−4=10. True value = 10 (verified via python eval of '16/4*3+2-4' = 10.0).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "None of the 4 options equal 10. The explanation computes 10 for the stated expression, then silently swaps in a different expression (\"16 M 4 K 5 R 2 T 2\", changing the '3' to a '5') to reach 20. Minimal fix: change option_b from \"20\" to \"10\" (keep letter B marked correct) and rewrite the explanation to stop at the genuine result (12+2−4=10) using the expression actually given in the question (16 M 4 K 3 R 2 T 4), not the altered one. Apply the same correction to explanation_ta, which currently also solves the altered \"16 M 4 K 5 R 2 T 2\" instead of the question as printed.",
+  "confidence": "high",
+  "notes": "Same defect family as id 532127ae.",
+  "_batch": 1
+ },
+ {
+  "id": "f37fabd6-e00a-42c2-b6e4-0cf7950b8558",
+  "topic": "Mathematical Operators",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "\"+ means ÷, ÷ means ×, × means −, − means +\". Evaluate 12 + 3 ÷ 4 × 2 − 5. Options: A)78 B)72 C)38 D)30. Marked correct: A (78).",
+  "your_independent_calculation": "Substitute: 12÷3×4−2+5. ×/÷ first: 12÷3=4, 4×4=16. Then +/−: 16−2+5=19. True value = 19 (verified via python eval of '12/3*4-2+5' = 19.0).",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "None of the 4 options equal 19. The explanation computes 19 correctly for the stated expression, then fabricates an unrelated example (\"18 + 6 ÷ 5 × 2 – 3 or similar\") to justify 78. Minimal fix: change option_a from \"78\" to \"19\" (keep letter A marked correct) and rewrite the explanation to end at the genuine result (16−2+5=19). Apply the same correction to explanation_ta.",
+  "confidence": "high",
+  "notes": "Same defect family as id 532127ae. Together with the other 4 flagged Mathematical Operators rows, 5 of the 8 Mathematical Operators questions in this batch (63%) have this exact defect — worth checking whether other batches drawn from the same source generation run have the same problem.",
+  "_batch": 1
+ },
+ {
+  "id": "24c14be1-9c7b-4c72-98f1-75c439928261",
+  "topic": "Probability",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Priya and Amutha each independently pick a day Mon–Sat to visit a shop. Find P(same day), P(different days), P(consecutive days). Options: A)(1/6,1/6,5/36) B)(5/6,1/6,5/36) C)(1/6,5/6,5/18) D)(1/6,5/6,5/36). Marked correct: D.",
+  "your_independent_calculation": "n(S)=6×6=36. Same day: 6 pairs → 6/36=1/6. Different days: 30/36=5/6. Consecutive days: 5 adjacent day-pairs (Mon-Tue,...,Fri-Sat) × 2 orderings = 10 → 10/36=5/18 (NOT 5/36; 10/36 reduces by dividing by 2, giving 5/18). Verified by explicit enumeration in Python: 10 consecutive-day ordered pairs out of 36, Fraction(10,36) = 5/18.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "The stored explanation itself correctly derives P(consecutive)=10/36=5/18, matching option C's third value exactly — but its concluding line says \"→ Option (D)\", and option D's third value is 5/36 (wrong, half of the true value). Change correct_answer from \"D\" to \"C\" (option C = 1/6, 5/6, 5/18 is the fully correct answer). No changes needed to question text or options — option C already contains the right values. Also fix explanation_ta's closing line, which has the identical mismatch (derives 5/18 but writes \"விடை (D)\").",
+  "confidence": "high",
+  "notes": "Clean combinatorics; the explanation's own arithmetic (10/36=5/18) proves the marked letter is wrong, not the underlying math.",
+  "_batch": 1
+ },
+ {
+  "id": "746ab34f-344f-46d3-85bc-df7ca0a39a3c",
+  "topic": "Probability",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"Two unbiased dice are rolled once. Find the probability of getting the sum as a prime number.\" Options: A)1/6 B)1/2 C)5/12 D)1/12. Marked correct: C (5/12).",
+  "your_independent_calculation": "Sums 2..12 that are prime: 2,3,5,7,11. Counts: sum=2:1, sum=3:2, sum=5:4, sum=7:6, sum=11:2 → total 15 favourable out of 36. P=15/36=5/12. This matches the marked correct answer C (5/12) — the answer LETTER is fine.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The stored explanation and explanation_ta are entirely about an unrelated compound-interest problem (\"P = Rs.8192, r = 12.5% p.a., n = 18 months compounded half-yearly, A = Rs.9826\") and even concludes \"→ Option (D)\", contradicting the row's own correct_answer of C. This explanation must be replaced with a genuine dice-probability derivation, e.g.: \"Two dice: n(S)=36. Prime sums are 2,3,5,7,11. Ways: sum2={(1,1)}=1, sum3={(1,2),(2,1)}=2, sum5={(1,4),(4,1),(2,3),(3,2)}=4, sum7=6 ways, sum11={(5,6),(6,5)}=2. Total favourable=1+2+4+6+2=15. P=15/36=5/12 → Option (C).\" Replace explanation_ta with the equivalent Tamil derivation ending in விடை (C), not (D).",
+  "confidence": "high",
+  "notes": "The final answer letter (C) is mathematically correct for the stated question — only the explanation/explanation_ta fields are corrupted (pasted from a completely different topic, likely a compound-interest question elsewhere in the source content). This is a content-mixing bug, not a math error in the graded answer.",
+  "_batch": 1
+ },
+ {
+  "id": "06177fe1-15f7-4d92-901a-2462d9388f56",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"A, B and C enter into a partnership in the ratio  . After 4 months, A increases his share 50%. If the total profit at the end of one year be Rs: 21,600; then B's share in the profit is\" — the investment ratio is BLANK in both question_text and question_text_ta. Options: A)2100 B)2400 C)3600 D)4000. Marked correct: D (4000).",
+  "your_independent_calculation": "Using the ratio from the explanation (A:B:C = 7/2 : 4/3 : 6/5, scaled by LCM(2,3,5)=30 to A=105,B=40,C=36): A's effective capital = 105×4 + 157.5×8 = 1680 (after 50% increase from month 4); B's effective = 40×12=480; C's effective=36×12=432; total=2592. B's share = 480/2592 × 21600 = 4000. This matches D and is arithmetically correct GIVEN the ratio — but that ratio never appears in the question text shown to the student, so the question is unanswerable as displayed.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Fill in the missing ratio in question_text: replace \"A, B and C enter into a partnership in the ratio  . After 4 months...\" with \"A, B and C enter into a partnership in the ratio $\\dfrac{7}{2}$ : $\\dfrac{4}{3}$ : $\\dfrac{6}{5}$. After 4 months, A increases his share 50%. If the total profit at the end of one year be Rs: 21,600; then B's share in the profit is\". Fill in question_text_ta similarly: replace the blank with \"A, B மற்றும் C $\\dfrac{7}{2}$ : $\\dfrac{4}{3}$ : $\\dfrac{6}{5}$ என்ற விகிதத்தில் ஒரு கூட்டாண்மைக்குள் நுழைகின்றன. 4 மாதங்களுக்குப் பிறகு, A தனது பங்கை 50% அதிகரிக்கிறது. ஒரு வருடத்தின் முடிவில் மொத்த லாபம் ரூ: 21,600-ஆக இருந்தால் ; லாபத்தில் B இன் பங்கு எவ்வளவு ?\". These exact strings were taken from row id 6a6a9ef7-2210-406d-9859-dd5178f12a86 in this same batch, which is the identical question with the ratio correctly present.",
+  "confidence": "high",
+  "notes": "DUPLICATE: this row is an exact duplicate of id 6a6a9ef7-2210-406d-9859-dd5178f12a86 (same numbers, options, and correct answer) except that row has the ratio intact and this one has it blanked out. Recommend fixing the blank rather than deleting, since deleting would just leave the (already-present) 6a6a9ef7 row — but flagging per instructions since a prior dedup pass should have caught this pair (it's a broken-vs-working duplicate, not two independently-fine variants).",
+  "_batch": 1
+ },
+ {
+  "id": "193294da-5824-45d0-b182-29188877c67b",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"If A: B =  and B:C=  then A:B:C is equal to\" — both ratios are BLANK in question_text and question_text_ta. Options: A)1:2:6 B)2:3:3 C)3:2:6 D)9:6:4. Marked correct: D (9:6:4).",
+  "your_independent_calculation": "Using the ratios from the explanation (A:B=1/2:1/3=3:2, B:C=1/2:1/3=3:2): LCM(2,3)=6 → A:B=3:2=9:6, B:C=3:2=6:4 → A:B:C=9:6:4. Matches option D and is arithmetically correct given the ratios — but neither ratio is shown in the question text presented to the student.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Fill in the blanks in question_text: \"If A:B = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ and B:C = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ then A:B:C is equal to\". Fill in question_text_ta: \"A:B = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ மற்றும் B:C = $\\dfrac{1}{2}$ : $\\dfrac{1}{3}$ என்றால் A:B:C = ?\". These exact strings were taken from row id c7a93086-b402-40ad-8dd6-2f4775cb3257 in this same batch, which is the identical question (same options, same correct answer) with the ratios correctly present.",
+  "confidence": "high",
+  "notes": "DUPLICATE: exact duplicate of id c7a93086-b402-40ad-8dd6-2f4775cb3257 (same options A-D, same correct answer D) except that row has the ratios intact and this one has them blanked out. Same underlying data bug as id 06177fe1 above — worth checking the wider bank for other rows with blanked-out ratio/value placeholders from the same generation defect.",
+  "_batch": 1
+ },
+ {
+  "id": "42af1cf2-91ad-47b3-b4d3-9cffeb4ae861",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "D",
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"If x:y=3:4 and a:b=1:2, then the value of  is\" — the expression to evaluate is missing from question_text (and question_text_ta). Options are also corrupted: option_a=\"B)\", option_b=\"\" (empty), option_c=\"D)\", option_d=\"\" (empty).",
+  "your_independent_calculation": "Cannot compute — the actual expression being asked about was never captured in this row, and the option values are empty/garbled (they contain leftover option-label fragments \"B)\" and \"D)\" instead of numeric values).",
+  "recommended_correct_answer": null,
+  "recommended_fix": "This row is unusable as-is and needs full reconstruction, not a small text edit. Note that id cface1eb-2900-40a2-8307-89f1a22e036f in this same batch has the identical stem (\"x:y=3:4 and a:b=1:2\") WITH a stated expression: \"(2xa + yb) / (3yb − xa)\". If this row was intended to be a variant of that question, it should be filled in with a complete, verified expression and 4 correct-looking numeric options — but see the separate flag on cface1eb: that row's own stated expression evaluates to 2/3, which is not among ITS 4 options either, so simply copying cface1eb's content would not fix this row. Recommend either deleting this row (option_b and option_d are empty strings, which likely already fails app-level validation) or fully rewriting it with a fresh, independently-verified ratio/algebra expression and matching options.",
+  "confidence": "high",
+  "notes": "High confidence the row is broken; low confidence on any specific \"intended\" fix since there is no recoverable source data (the explanation only says \"the expression shown in the figure\" / \"படத்தில் காட்டப்பட்டுள்ளது\" — an image reference with no actual image or transcribed content).",
+  "_batch": 1
+ },
+ {
+  "id": "cface1eb-2900-40a2-8307-89f1a22e036f",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "A",
+   "E",
+   "C"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"If x:y = 3:4 and a:b = 1:2, then the value of (2xa + yb) / (3yb − xa) is\". Options: A)5/6 B)6/5 C)6/7 D)7/6. Marked correct: D (7/6).",
+  "your_independent_calculation": "Let x=3,y=4,a=1,b=2 (valid representative values since the expression is homogeneous degree-1 in each ratio pair). xa=3×1=3, yb=4×2=8. Numerator: 2xa+yb = 6+8=14. Denominator: 3yb−xa = 24−3=21. Value = 14/21 = 2/3. Verified with Fraction arithmetic in Python and re-checked with a different scale (x=6,y=8,a=2,b=4) giving the same 2/3, confirming scale-invariance. True value = 2/3, which is NOT among the 4 given options (5/6, 6/5, 6/7, 7/6).",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "None of the 4 options equal the true value 2/3. The stored explanation doesn't even compute the expression that's asked (it computes \"xa+yb=11\" and \"xa−yb=−5\", not \"2xa+yb\" and \"3yb−xa\" as the question requires), then simply asserts \"Answer is Option D as shown in images\" without justification. Minimal fix: change option_d from \"$\\dfrac{7}{6}$\" to \"$\\dfrac{2}{3}$\" (keep letter D marked correct) and replace the explanation with a genuine derivation: \"x=3,y=4,a=1,b=2 → xa=3, yb=8. Numerator 2xa+yb=6+8=14. Denominator 3yb−xa=24−3=21. Value=14/21=2/3 → Option (D).\" Apply the equivalent fix to explanation_ta.",
+  "confidence": "high",
+  "notes": "Related to id 42af1cf2-91ad-47b3-b4d3-9cffeb4ae861 (same x:y=3:4, a:b=1:2 stem, but that row's expression/options are entirely missing). Both rows appear to stem from the same broken \"image-based expression\" generation problem; this one at least has a written expression, which is what allowed independent verification here.",
+  "_batch": 1
+ },
+ {
+  "id": "79b9b21a-b11b-4644-8eaf-76d4488d8e4e",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"A milkman bought 15 L of milk and mixed 3 L of water in it. If the price per kg of the mixture becomes Rs: 22, what is the cost price of milk per liter?\" Options: A)28 B)26.40 C)24.00 D)22.60. Marked correct: B (26.40).",
+  "your_independent_calculation": "Treating all quantities as litres throughout (as the given working does): mixture=15+3=18 L, revenue at Rs.22/unit × 18 = 396, cost of milk per litre = 396/15 = 26.40. This matches option B and the stored working exactly.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The numeric answer (26.40) is correct and self-consistent with the given working — no change needed to correct_answer or the calculation. The only issue is a wording inconsistency: the question says \"the price per kg of the mixture\" but the entire problem (15 L milk, 3 L water, answer in Rs per litre) is litre-based, not kg-based, for a liquid mixture. Recommend changing \"price per kg\" to \"price per litre\" in question_text (and the Tamil equivalent, which already correctly says \"ஒரு லிட்டர் கலவையின் விலை\" / \"per litre\" — so only the English question_text has the kg/litre inconsistency, not question_text_ta).",
+  "confidence": "low",
+  "notes": "This does not affect the graded answer at all — flagged only because \"kg\" appearing once amid an otherwise all-litre problem could momentarily confuse a student. Interestingly, question_text_ta already says \"லிட்டர்\" (litre) at that spot, not kg — suggesting the English \"kg\" may be the odd one out relative to both the Tamil version and the rest of the English question.",
+  "_batch": 1
+ },
+ {
+  "id": "82990880-b304-4f66-9fd9-f64b8b136bf7",
+  "topic": "Analogy",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Double analogy: palette | easel | brush | textbook | lesson plan | ? Options: artist, teacher, report card, paint. Stored answer: teacher (B).",
+  "your_independent_calculation": "The top group (palette, easel, brush) contains three OBJECTS/tools used by an artist — the artist itself does not appear in that group. For structural parallelism the bottom group (textbook, lesson plan, ?) should be completed with a third OBJECT used by a teacher, not the WORKER who uses them. The stored explanation's own stated rule ('items grouped by the one worker who uses them') is inconsistent with the actual top-row data, which lists no worker at all — only objects. Among the offered options, 'report card' (C) is at least a teaching-related object, unlike 'teacher' (a person, breaking the object-only parallel), 'artist' (also a person, wrong theme), or 'paint' (an art tool, wrong theme).",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Either change correct_answer to 'C' (report card) for consistency with the object-only grouping used in the top row, or rewrite the explanation to give a non-self-contradictory justification for 'teacher'.",
+  "confidence": "medium",
+  "notes": "Flagged because the stored explanation's own rule doesn't match the structure of the given top-row items (no worker is present there), not because the puzzle is merely ambiguous.",
+  "_batch": 2
+ },
+ {
+  "id": "a5f928ed-979c-4c19-a999-be5de2deb2fe",
+  "topic": "Analogy",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Double analogy: candle | lamp | floodlight | hut | cottage | ? (increasing-intensity light sources : increasing-size dwellings). Stored answer: dwelling (C).",
+  "your_independent_calculation": "The top row (candle→lamp→floodlight) is a progression of increasingly bright but still concrete, specific light sources, not a generic classifier like 'light source'. For the pattern to hold, the bottom row should complete with a bigger, specific type of dwelling, paralleling 'floodlight'. The stored explanation explicitly rejects option D ('house') because 'a cottage is itself a kind of house' — but by identical logic, a hut is itself a kind of 'dwelling' too, so the same reasoning used to eliminate D should equally eliminate C (the chosen answer). This is a self-contradiction in the stored explanation's own elimination logic.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Either change correct_answer to 'D' (house) as the more consistent 'bigger specific dwelling' parallel to floodlight, or rewrite the explanation to remove the self-contradictory rejection of option D.",
+  "confidence": "medium",
+  "notes": "Flagged for self-contradictory explanation logic, not pure ambiguity between two plausible readings.",
+  "_batch": 2
+ },
+ {
+  "id": "0640fd86-c80f-46dd-8a24-8f91907160bc",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 10 20 25 35 40 50 55 ___ (two missing terms), stated pattern alternating +10/+5. Stored answer D = '60 65'.",
+  "your_independent_calculation": "Differences: +10,+5,+10,+5,+10,+5 (6 diffs, exactly 3 full cycles across the 7 given terms). Continuing the alternation, the 7th diff must be +10 and the 8th +5: 55+10=65, 65+5=70. Correct next two terms = 65, 70. Option D (60,65) applies +5 twice in a row for its final two steps, breaking the stated alternating rule, which the explanation itself states as '+10, +5 alternately'.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "No listed option is exactly correct. Option A ('70 65') contains the right two digits but in reversed order — replace an option with '65 70' and mark it correct, or fix Option A's ordering.",
+  "confidence": "high",
+  "notes": "The stored explanation's own stated rule (+10,+5 alternating) is violated by its own final computation step, which applies +5 twice consecutively.",
+  "_batch": 2
+ },
+ {
+  "id": "0e5d12cc-eb13-4984-8b10-b385c2ab9599",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B",
+   "C"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 15, __, 27, 27, 39, 39, ... (repeat-then-add-12 pattern). Stored answer C = 23.",
+  "your_independent_calculation": "The visible pattern is 'repeat each value, then +12': 27,27 then +12=39,39. Working backwards, the pair before 27,27 must be X,X where X+12=27, so X=15. The blank (2nd term) = 15, matching option D. The stored explanation itself derives 'the missing term is 15' via this exact logic, then arbitrarily overrides it, citing an unexplained external 'IndiaBix answer' of 23 with no supporting derivation.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from 'C' to 'D' (value 15); rewrite the explanation to cleanly derive 15 as the repeat of the first term.",
+  "confidence": "high",
+  "notes": "Explanation explicitly admits the self-consistent pattern gives 15 (option D), then overrides to 23 without justification.",
+  "_batch": 2
+ },
+ {
+  "id": "1151dc05-d529-4eab-a2ee-7f90c78d7a80",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 1.5, 2.3, 3.1, 3.9, ... (constant +0.8). Stored answer A = 4.2.",
+  "your_independent_calculation": "1.5+0.8=2.3, 2.3+0.8=3.1, 3.1+0.8=3.9, 3.9+0.8=4.7. Correct next term = 4.7 = Option C. The stored explanation's own arithmetic computes 4.7 and its final line literally states '= 4.7 → Option (C)', directly contradicting the stored correct_answer field of 'A'.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer field from 'A' to 'C'.",
+  "confidence": "high",
+  "notes": "Simple data-entry mismatch — explanation and math both agree on C, but the correct_answer field says A.",
+  "_batch": 2
+ },
+ {
+  "id": "16f329fd-c8c0-4e1a-90a8-6286cf3cc544",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 42 40 38 35 33 31 28 __ __, pattern -2,-2,-3 repeating. Stored answer D = '26 22'.",
+  "your_independent_calculation": "Diffs: -2,-2,-3,-2,-2,-3 (two full cycles, matches all 7 given terms exactly). Continuing the cycle: next diffs are -2,-2: 28-2=26, 26-2=24. Correct pair = (26, 24) = Option C. The stored explanation admits computing 24 then arbitrarily overrides to 22 using an unexplained '-4' step that is not part of the stated -2,-2,-3 rule.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'D' to 'C'.",
+  "confidence": "high",
+  "notes": "Explanation shows explicit self-doubt/override language not backed by its own stated rule.",
+  "_batch": 2
+ },
+ {
+  "id": "1d562a41-e8b6-4f25-b6d3-7a0033954ea8",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 3 5 35 10 12 35 17 __ __, with 35 inserted every third position, main series alternating +2/+5. Stored answer A = '22 35'.",
+  "your_independent_calculation": "Main series (excluding inserts): 3,5,10,12,17,? with diffs +2,+5,+2,+5 (alternating). The next diff must be +2 (continuing the alternation after +5): 17+2=19. The next insert (35) follows. Correct pair = (19, 35) = Option C. The stored explanation correctly computes the alternating diffs through 17, then applies +5 again (breaking the stated alternation) to reach 22 instead of 19.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'A' to 'C'.",
+  "confidence": "high",
+  "notes": "Explanation applies +5 twice in a row where the stated rule requires alternating +2/+5.",
+  "_batch": 2
+ },
+ {
+  "id": "1f4dbfb5-1fc6-4fd4-b595-6b9b472b7e3b",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 28 25 5 21 18 5 14 11 5 ___ (only one blank shown, but all options are number pairs); main series alternating -3/-4 with 5 inserted every third position. Stored answer D = '10 5'.",
+  "your_independent_calculation": "The question text shows only ONE blank, but all 4 options are two-number pairs — a format mismatch. The main series (excluding the fixed 5's) is 28,25,21,18,14,11 with diffs -3,-4,-3,-4,-3 (alternating). The next diff should be -4: 11-4=7. None of the options (10&7, 11&8, 5&10, 10&5) represents a value consistent with this alternating rule; option D (10,5) does not fit the -3/-4 pattern at all.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Needs re-authoring: clarify how many blanks are intended (text shows one, options show pairs) and recompute using the stated -3/-4 alternating rule (giving 7 as the next single main-series term).",
+  "confidence": "medium",
+  "notes": "Underlying blank-count/option-format mismatch makes this item hard to grade cleanly; stored answer does not follow the stated alternating rule regardless.",
+  "_batch": 2
+ },
+ {
+  "id": "20706bdc-d0e7-46c2-a76e-8c9047e86e53",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 17 32 19 29 21 26 23 __ __, two interleaved series (+2 and -3). Stored answer D = '25 22'.",
+  "your_independent_calculation": "Odd-position series (17,19,21,23,...) +2 each → next = 25. Even-position series (32,29,26,...) -3 each → next = 23. The missing terms occupy the even-series slot (position 8) then the odd-series slot (position 9), so the correct pair in order = (23, 25) = Option C. The stored explanation computes both 23 and 25 correctly via the stated rule, then arbitrarily changes to '25, 22' with no derivation for 22.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'D' to 'C'.",
+  "confidence": "high",
+  "notes": "Explanation text shows explicit internal hedging ('Wait... IndiaBix gives 25 22') not supported by its own math.",
+  "_batch": 2
+ },
+ {
+  "id": "21ae4303-acc1-4955-a478-9ae5ddae6140",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 1 10 7 20 13 30 19 ___, two interleaved series (+6 and +10). Stored answer A = '26 40'.",
+  "your_independent_calculation": "Series 1 (1,7,13,19,...) +6 each → next = 25. Series 2 (10,20,30,...) +10 each → next = 40. The missing terms occupy position 8 (series-2 slot, 40) then position 9 (series-1 slot, 25); correct pair in order = (40, 25) = Option C. The stored explanation computes 25 correctly ('19+6=25') then discards it in favor of an unexplained '26'.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'A' to 'C'.",
+  "confidence": "high",
+  "notes": "Explanation explicitly computes the right value (25) then overrides with an unrelated value (26) for the final answer.",
+  "_batch": 2
+ },
+ {
+  "id": "277f114b-4b71-4b6a-849c-cca308b6544d",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 53, 53, 40, 40, 27, 27, ... (repeat-then-subtract-13). Stored answer A = 12 (options: A=12, B=14, C=27, D=53).",
+  "your_independent_calculation": "Pattern: repeat each value then -13. 27-13=14, so the next term = 14, which is Option B. The stored explanation's own working correctly computes 'next term = 14' but then mislabels it as 'Option (A)' — Option A's actual value is 12, not 14.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'A' to 'B'.",
+  "confidence": "high",
+  "notes": "Explanation computes the right numeric value (14) but attaches the wrong option letter.",
+  "_batch": 2
+ },
+ {
+  "id": "34ca9ad4-9e2d-4acf-aa9c-d9c41015b145",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 7, 10, 8, 11, 9, 12, ... alternating +3/-2. Stored answer D = 13.",
+  "your_independent_calculation": "Diffs: +3,-2,+3,-2,+3 (clean alternation across 6 terms). The next diff must be -2: 12-2=10, matching Option B. The stored explanation's own working correctly reaches 12 via the +3/-2 rule, then inserts a nonsensical, unexplained '+1' step (12+1=13) that isn't part of the stated pattern.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'D' to 'B'.",
+  "confidence": "high",
+  "notes": "The final '+1' step directly contradicts the stated +3/-2 alternating rule.",
+  "_batch": 2
+ },
+ {
+  "id": "40034e1e-448c-4b29-a426-0a6cfacb2de4",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 58, 52, 46, 40, 34, ... (constant -6). Stored answer A = 26 (options: A=26, B=28, C=30, D=32).",
+  "your_independent_calculation": "34-6=28, matching Option B. The stored explanation's own final line states '= 28 → Option (B)', directly contradicting the stored correct_answer field of 'A'.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer field from 'A' to 'B'.",
+  "confidence": "high",
+  "notes": "Simple data-entry mismatch between the correct_answer field and the explanation's own conclusion.",
+  "_batch": 2
+ },
+ {
+  "id": "44a3175e-5904-496e-87d7-c8bc4662fbef",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Series 3, 8, 10, 15, 17, 22, 24, ____, alternating +5/+2. Stored answer B = '29 34'.",
+  "your_independent_calculation": "Diffs: +5,+2,+5,+2,+5,+2 (clean alternation across 6 diffs). Next diffs: +5 then +2: 24+5=29, 29+2=31. Correct pair = (29, 31) = Option C. The stored explanation's own arithmetic correctly computes 29 and 31 step by step, then its final line mislabels this result as 'Option (B)' whose actual second value is 34, not 31.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'B' to 'C'.",
+  "confidence": "high",
+  "notes": "Explanation's own math is fully correct (29, 31) but is misattributed to the wrong option letter.",
+  "_batch": 2
+ },
+ {
+  "id": "4854afec-568a-40e3-914a-d984f602cc9d",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 21 25 18 29 33 18 ? ?, 18 inserted every third position, main series +4. Stored answer A = '43 18'.",
+  "your_independent_calculation": "Main series (excluding inserts at positions 3,6): 21,25,29,33,... +4 each. The next insert isn't due until position 9, so the two requested blanks (positions 7,8) are both main-series terms: 33+4=37, 37+4=41. Correct pair = (37, 41) = Option D. The stored explanation introduces an unexplained '39' out of nowhere and misplaces the insert one position too early, arriving at '43, 18'.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from 'A' to 'D'.",
+  "confidence": "high",
+  "notes": "Explanation math derives 37 correctly via the stated +4 rule, then abandons it for an unexplained alternate path.",
+  "_batch": 2
+ },
+ {
+  "id": "4d53418c-03f2-4b16-9db3-f0dcfb9ae35c",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 664, 332, 340, 170, ______, 89, ... alternating ÷2, +8. Stored answer C = 109.",
+  "your_independent_calculation": "664÷2=332, 332+8=340, 340÷2=170, 170+8=178, 178÷2=89 (exactly matches the given trailing 89). Correct blank = 178 = Option D. The stored explanation itself computes '170+8=178' correctly and even self-verifies it against the trailing 89, then arbitrarily overrides to 109 citing an unexplained 'IndiaBix' source with no derivation.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from 'C' to 'D'.",
+  "confidence": "high",
+  "notes": "The explanation's own math (178) is internally self-verified against the given trailing term (89), yet the stored answer overrides it with an unrelated value.",
+  "_batch": 2
+ },
+ {
+  "id": "5fba619f-2149-4052-9e5b-51bee8523c2d",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 2 44 4 41 6 38 8 __ __, two interleaved series (+2 and -3). Stored answer D = '10 52'.",
+  "your_independent_calculation": "Increasing series (2,4,6,8,...) +2 each → next = 10. Decreasing series (44,41,38,...) -3 each → next = 35. Correct pair (position order) = (35, 10). This exact pair is not offered by any option (A:10,12 B:35,32 C:34,9 D:10,52). The stored answer's second value (52) does not fit the -3 pattern at all.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the 4 options is correct; needs a new option '35, 10' added and marked correct.",
+  "confidence": "high",
+  "notes": "Correct answer (35, 10) is missing from the option set entirely.",
+  "_batch": 2
+ },
+ {
+  "id": "61af1feb-8ad8-4e2c-a760-a16c478fa65c",
+  "topic": "Number Series",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 2 3 4 5 6 4 8 9 10 ? (an out-of-place '4' interrupts an otherwise consecutive count-up). Stored answer C = '9 4'.",
+  "your_independent_calculation": "Positions 1-5 are simply the consecutive count 2,3,4,5,6. Position 6 breaks this with an out-of-place '4' (interrupting where '7' would appear), after which positions 7-9 resume the natural count (8,9,10) as if the interruption simply skipped '7'. Under this reading, the next term is 11 — not matching any option. Alternatively, if a recurring 'insert 4 every third position' pattern was intended, the given data itself contradicts that theory, since position 9 is '10', not '4'. Either reading shows the series data is internally inconsistent with the stored explanation's stated rule.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Needs re-authoring — clarify the intended pattern (one-time interruption vs. recurring insert), since the given series data contradicts a strict 'insert 4 every third term' reading.",
+  "confidence": "medium",
+  "notes": "The stored explanation itself hedges ('Following the group pattern... 9 4') without a clean, self-consistent derivation.",
+  "_batch": 2
+ },
+ {
+  "id": "692c47d8-3c79-4731-850d-aeed79782a53",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 6 20 8 14 10 8 12 ? ?, two interleaved series (+2 and -6). Stored answer C = '4 12'.",
+  "your_independent_calculation": "Odd-position series (6,8,10,12,...) +2 each → next = 14. Even-position series (20,14,8,...) -6 each → next = 2. Correct pair (position order) = (2, 14) = Option D. The stored explanation computes '8-6=2' correctly via the stated rule, then arbitrarily overrides with unexplained arithmetic ('12-8=4', '16-4=12') to reach '4, 12'.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from 'C' to 'D'.",
+  "confidence": "high",
+  "notes": "Explanation explicitly computes the correct value (2) then discards it for an unrelated pair.",
+  "_batch": 2
+ },
+ {
+  "id": "8225de03-17b6-4350-a0d1-63d451088a1f",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 36 31 29 24 22 17 15 __ __, alternating -5/-2. Stored answer D = '12 7'.",
+  "your_independent_calculation": "Diffs: -5,-2,-5,-2,-5,-2 (3 clean full cycles). Continuing: next diffs are -5,-2: 15-5=10, 10-2=8. Correct pair = (10, 8), which is not offered by any option (A:13,11 B:10,5 C:13,8 D:12,7). The stored explanation admits inserting an unexplained '-3' step not part of the stated -5/-2 rule.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the 4 options is correct; needs a new option '10, 8' added and marked correct.",
+  "confidence": "high",
+  "notes": "Correct values (10 and 8) appear scattered individually across wrong options (10 in B, 8 in C) but no option pairs them correctly — suggests a data-entry mixup during option generation.",
+  "_batch": 2
+ },
+ {
+  "id": "87c0226a-ca8a-4409-b71a-b1ce45b4d4ac",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 9 16 23 30 37 44 51 ___ ___ (constant +7). Stored answer A = '59 66'.",
+  "your_independent_calculation": "All 6 given diffs are exactly +7 — a simple, unambiguous arithmetic series. 51+7=58, 58+7=65. Correct pair = (58, 65) = Option D. The stored explanation computes 58 correctly via the stated +7 rule, then introduces an unexplained '+8' step to reach 59.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from 'A' to 'D'.",
+  "confidence": "high",
+  "notes": "Simple constant-difference series with no ambiguity; the correct continuation is unambiguous.",
+  "_batch": 2
+ },
+ {
+  "id": "8e3aadac-a3ac-4c7b-af11-476c76107227",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 21, 9, 21, 11, 21, 13, 21, ... (21 repeats at fixed positions; hidden series 9,11,13,... +2). Stored answer A = 14.",
+  "your_independent_calculation": "Hidden series (9,11,13,...) increases by +2 each step. The next value after 13 = 15, matching Option B. The stored explanation computes 15 correctly via the stated +2 rule, then arbitrarily substitutes an unexplained '+1' step (13+1=14).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'A' to 'B'.",
+  "confidence": "high",
+  "notes": "Explanation explicitly derives the correct value (15) then overrides it without justification.",
+  "_batch": 2
+ },
+ {
+  "id": "a0a618d5-e7a8-4b2d-9e52-1f557f7c55bb",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 14 14 26 26 38 38 50 ____ (repeat-then-+12 pattern). Stored answer C = '50 72'.",
+  "your_independent_calculation": "Pattern: repeat each value, then +12. 50 repeats (first missing term = 50), then 50+12=62 (second missing term). Correct pair = (50, 62) = Option B. The stored explanation computes 62 correctly then arbitrarily overrides to 72 with no supporting arithmetic (72 doesn't fit +12 from 50 at all).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'C' to 'B'.",
+  "confidence": "high",
+  "notes": "Explanation's own math (62) directly contradicts the final stated answer (72).",
+  "_batch": 2
+ },
+ {
+  "id": "afb908d6-fb77-42b6-b1ae-2e8c54a34665",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 7 9 66 12 14 66 17 19 66 ____, 66 inserted every third position, main series alternating +2/+3. Stored answer D = '66 20'.",
+  "your_independent_calculation": "Main series (excluding inserts): 7,9,12,14,17,19,... diffs +2,+3,+2,+3,+2 (alternating). The next diff = +3: 19+3=22. The next insert isn't due until position 12, so the following term is also main-series: 22+2=24. Correct pair = (22, 24), not offered by any option (A:66,19 B:19,22 C:20,66 D:66,20). The stored explanation misplaces the insert one position early and introduces an unexplained '+1' step to reach '20'.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the 4 options is correct; needs a new option '22, 24' added and marked correct.",
+  "confidence": "high",
+  "notes": "Correct answer is missing from the option set entirely.",
+  "_batch": 2
+ },
+ {
+  "id": "b541e0e2-5fdc-4089-8221-460fb8e6dd91",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 61 57 50 61 43 36 61 ?, 61 inserted every third position (positions 1,4,7), reduced series -7 each. Stored answer D = '22 15'.",
+  "your_independent_calculation": "Reduced series (excluding the inserted 61's): 57,50,43,36,... all diffs -7. Next two: 36-7=29, 29-7=22. Correct pair = (29, 22), not offered by any option (A:29,61 B:27,20 C:31,61 D:22,15). Remarkably, the stored explanation's own working explicitly computes '29' then '22' as 'first missing term' and 'second missing term' — matching this independent calculation exactly — but its final stated answer inexplicably switches to an unrelated '22, 15' tied to Option D.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the 4 options exactly matches (29, 22); needs a new option added and marked correct, or Option A's second value corrected from 61 to 22.",
+  "confidence": "high",
+  "notes": "The explanation's own math and this independent math agree exactly (29, 22), yet the stored answer contradicts both.",
+  "_batch": 2
+ },
+ {
+  "id": "c01c3da2-7e4e-4402-a80b-d9eafda83b16",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 24, 60, 120, ?, 336 — product of 3 consecutive integers n(n+1)(n+2). Stored answer A = 336 (which is already the given 5th term of the series).",
+  "your_independent_calculation": "n(n+1)(n+2) for n=2..6: 24,60,120,210,336. The blank (4th term) = 5×6×7 = 210. None of the options is 210 (options: A)336 B)300 C)420 D)525). Worse, the stored answer (336) is literally the value ALREADY GIVEN as the final term of the series in the question text — it cannot also be the missing 4th term. The stored explanation itself computes '210' explicitly, then bizarrely declares Option (A)=336 as the answer anyway, directly contradicting its own derivation.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace Option A (336, a duplicate of an already-given series term) with '210' and mark it correct.",
+  "confidence": "high",
+  "notes": "Severe/critical error: the marked correct answer duplicates a value already shown elsewhere in the question text, and the true answer (210) isn't offered at all.",
+  "_batch": 2
+ },
+ {
+  "id": "c3736daf-9b8f-4e57-8856-5700d71b9b89",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Series 2 8 14 20 26 32 38 ___ ___ (constant +6). Stored answer C = '42 48'.",
+  "your_independent_calculation": "All 6 given diffs are exactly +6 — a simple, unambiguous arithmetic series. 38+6=44, 44+6=50. Correct pair = (44, 50) = Option B. The stored explanation computes 44 correctly via the stated +6 rule, then fabricates a '+4 then +6' mixed pattern to reach '42, 48'.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'C' to 'B'.",
+  "confidence": "high",
+  "notes": "Simple constant-difference series with no ambiguity.",
+  "_batch": 2
+ },
+ {
+  "id": "c553114c-7582-419d-b799-53376e47eda6",
+  "topic": "Number Series",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 44 41 38 35 32 29 26 ____ (constant -3). Stored answer A = '24 21'.",
+  "your_independent_calculation": "All 6 given diffs are exactly -3, unambiguous. 26-3=23, 23-3=20. Correct pair = (23, 20), not exactly offered by any option (A:24,21 B:22,19 C:23,19 D:29,32). Option C ('23, 19') has the correct first value but is off by one in the second value (19 instead of 20), suggesting a possible typo. The stored explanation itself computes '23' correctly via the stated rule, then arbitrarily overrides to 24.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Correct value is (23, 20); Option C ('23, 19') is likely a one-off typo of the true second value — consider correcting it to '23, 20' and marking it correct.",
+  "confidence": "high",
+  "notes": "Explanation's own math (23) is discarded in favor of an unexplained 24.",
+  "_batch": 2
+ },
+ {
+  "id": "d23b3953-f701-44dd-b8d7-812fca1b014f",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Series 2, 6, 18, 54, ... (constant ×3). Stored answer D = 216.",
+  "your_independent_calculation": "54×3=162, matching Option C. The stored explanation's own final line states '= 162 → Option (C)', directly contradicting the stored correct_answer field of 'D'.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer field from 'D' to 'C'.",
+  "confidence": "high",
+  "notes": "Simple data-entry mismatch — explanation and math both agree on C, but the correct_answer field says D.",
+  "_batch": 2
+ },
+ {
+  "id": "e86c98d9-221a-486a-8bc0-6ea1b968247a",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 75 65 85 55 45 85 35 ? ?, 85 inserted every third position, reduced series -10. Stored answer A = '25 15'.",
+  "your_independent_calculation": "Reduced series (dropping the 85's): 75,65,55,45,35,... -10 each; next = 25 (first blank). But the next insert (85) is due exactly at the position of the SECOND blank (following the established every-third-position cycle 3,6,9,...), so the second blank should be the inserted 85, not a further -10 step (which gives 15). Correct pair = (25, 85) = Option B. The stored explanation ignores the insert's expected recurrence and simply continues -10 twice.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'A' to 'B'.",
+  "confidence": "medium",
+  "notes": "Confidence is medium because this depends on correctly tracking which blank position the recurring insert falls on; the same position-tracking approach was validated as correct on several other clean, unambiguous questions in this batch.",
+  "_batch": 2
+ },
+ {
+  "id": "f1e73359-d76c-432f-bfd6-8326a8a8dce2",
+  "topic": "Number Series",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Series 13 29 15 26 17 23 19 ____, two interleaved series (main +2, decoy -3). Stored answer A = '21 23'.",
+  "your_independent_calculation": "Main series (odd positions: 13,15,17,19,...) +2 each → next = 21. Decoy series (even positions: 29,26,23,...) -3 each → next = 20. The two blanks occupy the decoy-series slot then the main-series slot in that order, so correct pair = (20, 21) = Option B. The stored explanation ignores the interleaved structure entirely and just continues the main series twice (19+2=21, 21+2=23), inconsistent with how every other correctly-alternating series question in this batch was solved.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'A' to 'B'.",
+  "confidence": "high",
+  "notes": "The decoy (-3) series is dropped entirely in the stored explanation, despite being clearly present and consistent across all given terms (29,26,23).",
+  "_batch": 2
+ },
+ {
+  "id": "fffdee48-252c-4832-a6df-a8131ff2cf6f",
+  "topic": "Number Series",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Series 4 8 22 12 16 22 20 24 ___, 22 inserted every third position, main series +4. Stored answer B = '28 22'.",
+  "your_independent_calculation": "Main series (excluding inserts at positions 3,6): 4,8,12,16,20,24,... +4 each. The insert (22) is due at position 9 — immediately after the given 24, before the next main term. So the first blank (position 9) = the insert 22, and the second blank (position 10) = the next main term, 24+4=28. Correct pair in order = (22, 28) = Option C. Stored answer B ('28, 22') has the same two values but in the wrong order, inconsistent with the insert-position convention used correctly elsewhere in this batch.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'B' to 'C'.",
+  "confidence": "medium",
+  "notes": "Same two digits as the stored answer, just in the wrong order — confidence is medium since it hinges on correctly tracking insert-position parity, though this convention matches other correctly-solved questions in the batch.",
+  "_batch": 2
+ },
+ {
+  "id": "503639e0-a419-4d9a-bc29-e9f775306d7b",
+  "topic": "Coding Decoding",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "question_text states 'DEMOCRATIC is written as EDMORACATCI', decode CONTINUOUS using the same rule. Options: A) OCTNNIOUSU, B) OTCNINUOUS, C) OCNTNIUOSU, D) CONNITUOSU. Marked correct: C.",
+  "your_independent_calculation": "DEMOCRATIC (D-E-M-O-C-R-A-T-I-C, 10 letters) follows a pair-swap cipher: split into 5 adjacent pairs (DE)(MO)(CR)(AT)(IC); swap pairs 1,3,5 and keep pairs 2,4 -> ED|MO|RC|AT|CI = EDMORCATCI (10 letters). But question_text (and question_text_ta) state the code is 'EDMORACATCI' -- 11 letters (an extra 'A' inserted after 'MOR') -- which cannot be a valid 1:1 rearrangement/substitution of a 10-letter source word. Applying the verified pair-swap rule to CONTINUOUS (C-O-N-T-I-N-U-O-U-S) gives (CO)(NT)(IN)(UO)(US) -> OC|NT|NI|UO|SU = OCNTNIUOSU, which matches option C and the marked correct_answer, so the final answer is unaffected -- but the question stem itself displays an internally-impossible 11-letter code for a 10-letter word.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "In question_text, change \"DEMOCRATIC is written as EDMORACATCI\" to \"DEMOCRATIC is written as EDMORCATCI\". In question_text_ta, change \"DEMOCRATIC என்பது EDMORACATCI என எழுதப்பட்டால்\" to \"DEMOCRATIC என்பது EDMORCATCI என எழுதப்பட்டால்\".",
+  "confidence": "high",
+  "notes": "The explanation field already self-corrects this ('the printed source EDMORACATCI carries a typographical slip') but the question_text/question_text_ta shown to students were never fixed, so students see an internally-inconsistent 11-letter code for a 10-letter word before they ever reach the explanation.",
+  "_batch": 3
+ },
+ {
+  "id": "4f0d4962-9f25-4c16-9d4b-53e42171863b",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Ceiling tiling problem: room '15.17 m long and 9.2m broad'; find the least number of square tiles needed. Options: A) 656, B) 738, C) 814, D) 902. Marked correct: C (814).",
+  "your_independent_calculation": "The explanation treats the dimensions as 15 m 17 cm (=1517 cm) and 9 m 2 cm (=902 cm), giving HCF(1517,902)=41 cm via the Euclidean algorithm (1517=1x902+615; 902=1x615+287; 615=2x287+41; 287=7x41+0), so tiles = (1517/41) x (902/41) = 37 x 22 = 814, matching option C. However, question_text literally says '9.2m' broad, and 9.2 m converted to cm is 920 cm (not 902 cm) -- 902 cm only follows from '9.02 m' or '9 m 2 cm'. Taking '9.2m' at face value (920 cm), HCF(1517,920) works out (Euclidean algorithm: 1517=1x920+597; 920=1x597+323; 597=1x323+274; 323=1x274+49; 274=5x49+29; 49=1x29+20; 29=1x20+9; 20=2x9+2; 9=4x2+1; 2=2x1+0) to HCF=1 cm, giving 1517x920=1,395,640 tiles -- nowhere near any of the 4 options. So the literal question text as stored is unsolvable/misleading; only the intended '9 m 2 cm' reading (matching the explanation) produces the marked answer.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "In question_text, change \"15.17 m long and 9.2m broad\" to \"15 m 17 cm long and 9 m 2 cm broad\". In question_text_ta, change \"15.17 மீ நீளமும் 9.2 மீ அகலமும்\" to \"15 மீ 17 செ.மீ நீளமும் 9 மீ 2 செ.மீ அகலமும்\".",
+  "confidence": "high",
+  "notes": "This is the exact 'X.YZ m should read X m YZ cm' corruption pattern called out in the audit brief. The length term (15.17m) is numerically harmless by coincidence (17 cm = 0.17 m), but the breadth term (9.2m vs. the intended 9 m 2 cm = 9.02 m) is not, and is the real source of the inconsistency between question_text and the explanation/answer.",
+  "_batch": 3
+ },
+ {
+  "id": "a19133c5-2cd9-4581-981c-5f6020196468",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "question_text is only \"Arrange in ascending order\" (question_text_ta: \"ஏர்வரிசையில் அடுக்கு\", itself misspelled -- should be \"ஏறுவரிசையில்\"). No fraction values, table, or figure data are present anywhere in the row. option_a='B)', option_b='' (empty), option_c='D)', option_d='' (empty). correct_answer is 'C', i.e. the blank/placeholder label 'D)'.",
+  "your_independent_calculation": "Not computable. The stored explanation says 'A set of fractions is shown in the figure and must be arranged in ascending order', confirming this question depends on an image that is not present anywhere in this row (no image/figure field, no fraction values embedded in the question text). Two of the four options are blank strings and the other two are bare option-letter fragments ('B)', 'D)') rather than actual values, so even the multiple-choice structure is unusable as stored.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Cannot be repaired from the given fields -- the source fraction values and full option text were never captured. Either (a) locate the original figure/fraction values and re-populate question_text plus all four options with real content, or (b) retire/exclude this row from the live bank, since as stored it is unanswerable (2 of 4 options are empty strings) and could unfairly penalize a student who encounters it.",
+  "confidence": "high",
+  "notes": "This looks like an OCR/import failure (a figure-based question that lost its image and most of its option text during ingestion), not a math error -- there is no way to verify or reconstruct the intended correct answer from the data present.",
+  "_batch": 3
+ },
+ {
+  "id": "4cd1aefd-e045-42a7-be50-c4ca5e19d9a4",
+  "topic": "Percentage",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Jyothika got 35/50 in English and 27/30 in Mathematics. 'In which subject did she get more marks and by how much?' Options: A) 'Mathematics, by 20 marks (Maths 90%, English 70%)', B) 'English, by 20 marks (English 70%, Maths 90%)', C) 'Mathematics, by 8 marks (raw 35 vs 27)', D) 'Mathematics, by 10 marks'. Marked correct: A.",
+  "your_independent_calculation": "English % = 35/50 x 100 = 70%. Maths % = 27/30 x 100 = 90%. Maths is indeed the stronger subject, ahead by 90-70 = 20 percentage points -- that identification matches option A and the explanation's arithmetic. However, English and Maths have different maximum marks (50 vs 30), so raw marks are not directly comparable, and the 20-point gap is a difference in PERCENTAGE, not a difference in MARKS. Option A (and the explanation's closing line, and its Tamil equivalent) labels this gap 'by 20 marks', which is a unit mismatch -- the true raw-mark gap, if one insisted on comparing raw scores (which the question's own wording invites by asking 'more marks ... by how much'), would be 35-27=8 marks, i.e. exactly the value shown as a wrong-headed distractor in option C, not 20.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "In option_a, change \"Mathematics, by 20 marks (Maths 90%, English 70%)\" to \"Mathematics, by 20 percentage points (Maths 90%, English 70%)\". In the explanation's closing line, change \"Mathematics, by 20 marks\" to \"Mathematics, by 20 percentage points\"; in explanation_ta change \"கணிதம், 20 மதிப்பெண்கள் அதிகம்\" to \"கணிதம், 20 சதவீத புள்ளிகள் அதிகம்\".",
+  "confidence": "medium",
+  "notes": "The selected option letter (A) and the underlying arithmetic are correct -- Maths genuinely is the stronger subject by a 20-point margin. This is a wording/unit-precision issue (percentage points mislabeled as 'marks'), not a numerical error, but this exact percentage-vs-marks confusion is a classic source of contested TNPSC answers, so it is worth tightening.",
+  "_batch": 3
+ },
+ {
+  "id": "d2b09852-8f0c-4d33-8cd2-e4ca3863957a",
+  "topic": "Perimeter, Circumference & Diameter",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Rectangular field: length exceeds breadth by 9 m, perimeter = 154 m. Asked: find the BREADTH. Options: A) 34 m, B) 36 m, C) 40 m, D) 43 m.",
+  "your_independent_calculation": "l = b + 9. 2(l+b) = 154 => l+b = 77. Substitute: (b+9)+b = 77 => 2b = 68 => b = 34 m (and l = 43 m). The breadth asked for is 34 m, which is option A.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change the stored correct_answer field from 'D' to 'A'. (The stored explanation text itself already computes b = 34 m and literally concludes '→ Option (A)' — the explanation and the correct_answer column simply disagree; D = 43 m is the LENGTH, not the breadth that was asked for.)",
+  "confidence": "high",
+  "notes": "Clear-cut database inconsistency: the explanation's own final line says 'Option (A)' but the correct_answer field stores 'D'. Math independently re-verified: b=34, l=43.",
+  "_batch": 4
+ },
+ {
+  "id": "9e3a7a10-7ad8-4c6a-aa28-6246bd83747d",
+  "topic": "3D - Volume & Surface Area",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Conical heap of paddy, diameter 4.2 m, height 2.8 m (both in METRES). Find the area of canvas needed to cover it. Options given as A) 25.31 cm², B) 18.11 cm², C) 20 cm², D) 23.1 cm².",
+  "your_independent_calculation": "r = 2.1 m, h = 2.8 m. l = sqrt(2.1^2+2.8^2) = sqrt(4.41+7.84) = sqrt(12.25) = 3.5 m. CSA = (22/7)*2.1*3.5 = 23.1 m². The numeric value 23.1 (option D) is correct and is the right choice, but the unit displayed on ALL FOUR options is 'cm²' even though every dimension in the question is given in metres and the explanation itself computes and states the answer in m². This is a unit-labeling error across the option set, not just the marked option.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change option unit labels from cm² to m²: A) 25.31 m² (approx.)  B) 18.11 m² (approx.)  C) 20 m² (approx.)  D) 23.1 m²",
+  "confidence": "high",
+  "notes": "Letter D remains the correct choice (value 23.1 is right), so no student-facing scoring impact, but the printed unit on every option contradicts the question's stated units (m) and the explanation's own working (which correctly uses m²). Should be corrected for consistency/credibility.",
+  "_batch": 4
+ },
+ {
+  "id": "9cdcfc42-f6b8-48cb-aed2-c40ee787e607",
+  "topic": "3D - Volume & Surface Area",
+  "issue_types": [
+   "A",
+   "C",
+   "E"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Two right circular cones of the same height; radii ratio 1:3; height of each cone = 3 times the radius of the smaller cone. Find the ratio of their curved surface areas. Options: A) 9:5, B) 1:3, C) 5:9, D) 1:9. Marked correct: C (5:9).",
+  "your_independent_calculation": "Let r1=x (smaller), r2=3x, and shared height h=3x (per the problem statement). l1=sqrt(r1^2+h^2)=sqrt(x^2+9x^2)=sqrt(10)x. l2=sqrt(r2^2+h^2)=sqrt(9x^2+9x^2)=sqrt(18)x=3sqrt(2)x. CSA1=pi*r1*l1=sqrt(10)*pi*x^2. CSA2=pi*r2*l2=pi*3x*3sqrt(2)x=9sqrt(2)*pi*x^2. Ratio CSA1:CSA2 = sqrt(10):(9sqrt(2)) = sqrt(5):9 (numerically ~2.236:9, i.e. ~0.2485). Verified numerically in Python: 0.24845... which exactly equals sqrt(5)/9, NOT 5/9 (=0.5556). The stored explanation itself derives '= sqrt(10)/(9sqrt(2)) = sqrt(5)/9' correctly, then makes an invalid leap claiming this '...simplifies to 5:9' — sqrt(5) is not equal to 5, so this final step is a mathematical error. None of the four given options (9:5, 1:3, 5:9, 1:9) equals the true irrational ratio sqrt(5):9.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "This question needs to be reworked, not just re-keyed — no existing option is mathematically correct for the CSA ratio as posed. Two possible remedies: (1) If the intent was 'ratio of curved surface areas', replace the options with one that includes sqrt(5):9 (irrational ratios are unusual for this MCQ format, so the question premise likely needs to change), or (2) the question may originally have intended to ask for the ratio of VOLUMES under the same given data, which comes out to a clean 1:9 (V1=(1/3)*pi*x^2*3x=pi*x^3; V2=(1/3)*pi*9x^2*3x=9*pi*x^3; ratio 1:9) — this exactly matches option D and is a much more plausible original-textbook answer. Recommend an author review to determine which was intended, then fix either the wording ('curved surface area' -> 'volume', keeping D as correct) or replace the options entirely.",
+  "confidence": "medium",
+  "notes": "High confidence that the currently marked answer (C, 5:9) is wrong and that the explanation contains a clear invalid-simplification error (sqrt(5)/9 asserted to equal 5/9). Medium confidence on the specific recommended fix, since it requires guessing the original question's intent (CSA vs volume) to restore a clean answer.",
+  "_batch": 4
+ },
+ {
+  "id": "7ae32d51-08a9-41a8-914f-ac182a0f5cfd",
+  "topic": "3D - Volume & Surface Area",
+  "issue_types": [
+   "F"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "English: 'Two cubes each of volume 64 cm3 are joined to form a cuboid. Find T.S.A of the resulting solid.' Correct answer C (160 cm²), which is mathematically correct for volume=64 (side 4 cm, cuboid 8x4x4, TSA=160).",
+  "your_independent_calculation": "English math confirmed correct: side = cube_root(64) = 4 cm; cuboid 8x4x4 cm; TSA = 2(32+16+32) = 160 cm² = option C. However, question_text_ta reads 'கன அளவு 63cm3 கொண்ட இரு கன சதுரங்களை...' i.e. states the cube volume as 63 cm³, not 64 cm³. This is a straight mistranslation/typo — 63 is not a perfect cube, so a Tamil-reading student working the problem as literally stated (63 cm³) cannot reach any of the given options cleanly, while explanation_ta correctly uses 64 throughout its own working (a further internal inconsistency between question_text_ta and explanation_ta).",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "In question_text_ta, change 'கன அளவு 63cm3' to 'கன அளவு 64cm3' so it matches the English question_text and explanation_ta (both of which correctly use 64).",
+  "confidence": "high",
+  "notes": "English side and the correct_answer(C)/explanation are all fine; only the Tamil question_text has the wrong number (63 vs 64). Confirmed by direct inspection of question_text_ta and cross-check against explanation_ta, which itself uses 64 cm³ in its working.",
+  "_batch": 4
+ },
+ {
+  "id": "2db304d6-975d-44a4-8dd8-cc98d6c57511",
+  "topic": "Clock Problems",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "\"How much does a watch lose per day, if its hands coincide every 64 minutes?\" Options: A) 32 8/11 min, B) 36 5/11 min, C) 90 min, D) 96 min. Marked correct: A (32 8/11 min).",
+  "your_independent_calculation": "Normal (correct-clock) coincidence interval = 720/11 = 65 5/11 min. Here the hands coincide every 64 real minutes, which is LESS than 65 5/11 min. That means this watch's hands complete a relative revolution faster than a correct clock would -- i.e. the watch is running FAST (gaining), not slow. In each 64-min real interval the watch effectively advances 65 5/11 min of correct-clock time, gaining (65 5/11 - 64) = 16/11 min every 64 min. Gain per day = (16/11)/64 x 1440 = 32 8/11 min. So the scenario describes a GAIN of 32 8/11 min/day, not a loss. The numeric magnitude (32 8/11, option A) is computed correctly, but the question text asks for how much the watch 'loses', which contradicts what the math describes.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change the question wording from \"How much does a watch lose per day, if its hands coincide every 64 minutes?\" to \"How much does a watch gain per day, if its hands coincide every 64 minutes?\" (and update the Tamil question text similarly from 'பின்தங்குகிறது' (loses/falls behind) to a 'gains/runs ahead' phrasing). The numeric answer (32 8/11 min, option A) does not need to change.",
+  "confidence": "medium",
+  "notes": "Classic textbook problem, normally phrased with 'gain' since coincidence-interval < 65 5/11 min always implies a fast/gaining clock. Only the direction word in the question is wrong; the marked numeric option and worked value are fine.",
+  "_batch": 5
+ },
+ {
+  "id": "0de8326a-1633-41b9-af98-2be2a26238c4",
+  "topic": "Direction Based",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Flats logic puzzle (6 flats P,Q,R,S,T,U in two rows of 3, North/South facing). Clues: Q is North-facing and not next to S; S and U are diagonally opposite; R (next to U) is South-facing; T is North-facing. Question: \"Whose flat is between Q and S?\" Marked correct: A (T).",
+  "your_independent_calculation": "R being 'next to U' and South-facing forces U into the South row (same row as R). Because S is diagonally opposite U, and in this 2-row-of-3 grid a diagonal relationship always links an END column of one row to the MIDDLE column of the other row, S must sit in the NORTH row (the row opposite U's row), not the South row. North row therefore holds T (given), Q (given) and S (forced) -- all three North-facing occupants. Since Q must not be adjacent to S, and a row of 3 only avoids adjacency by placing the two at the ends with the third in the middle, North row = S, T, Q (or mirror Q, T, S). T therefore sits directly between S and Q, confirming the marked final answer T (option A) IS correct. However the STORED EXPLANATION states 'North row = T, P, Q; South row = U, R, S' -- this places S in the SOUTH row, which is impossible given the clues (S must be North-facing / opposite-row from U for 'S and U diagonally opposite' to hold). The explanation's own layout is self-inconsistent with its own 'diagonally opposite' clue.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Keep the final answer as T (option A), but rewrite the explanation: R next to U (South-facing) => U is South-row; S diagonally opposite U => S is North-row; Q and T are North-facing (given) => North row = {S,T,Q}; Q not next to S => S and Q sit at the two row-ends with T in the middle => North row = S,T,Q (or mirrored Q,T,S). Hence T's flat lies between Q's and S's. South row = {P,R,U} with R adjacent to U. Remove the erroneous 'South row = U,R,S' placement of S.",
+  "confidence": "high",
+  "notes": "Final answer is unaffected -- this is purely an explanation/working error. Two related sub-questions on the same puzzle in this batch (ids 437ff1d2 and 5f656cbc) were independently re-derived and found correct.",
+  "_batch": 5
+ },
+ {
+  "id": "162523fb-b036-4d98-89c0-20027b6a63e4",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "8 trees (mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple) in two rows of 4, North/South facing. Lemon between mango & apple, opposite guava; banana at a row-end, immediately right of guava; raspberry at a row-end, diagonally opposite mango. Question: \"Which of the following statements is definitely true?\" Options: A) Papaya next to apple, B) Apple next to lemon, C) Raspberry left of or after Pomegranate, D) Pomegranate diagonally opposite banana. Marked correct: D.",
+  "your_independent_calculation": "Let guava's row = X, other row = Y. Banana=X4 (row-end, immediately right of guava => guava=X3). Lemon=Y3 (directly opposite guava). Lemon between mango & apple => {mango,apple} = {Y2,Y4} (they flank lemon). Since lemon is 'between' mango and apple by definition, apple (whichever of Y2/Y4 it is) is ALWAYS immediately adjacent to lemon (Y3) -- this makes option B unconditionally, definitely true regardless of any further ambiguity. Separately, raspberry (a row-end) being diagonally opposite mango pins raspberry at X1, leaving papaya/pomegranate to fill the two remaining leftover cells (Y1 and X2) -- NOT uniquely determined by the clues (independently confirmed by companion sub-question id 8946c2b7 in the same puzzle set, whose own stored/verified answer is 'Papaya or Pomegranate', i.e. ambiguous). Banana's diagonal partner (X4's diagonal) is Y3=lemon under the chessboard-shift diagonal convention (validated elsewhere in this batch via the flats puzzle), or Y1 (papaya-or-pomegranate, ambiguous) under a corner-to-corner convention -- under NEITHER convention is pomegranate 'definitely' diagonally opposite banana. So D is not definitely true, while B is definitely true.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from D to B (\"Apple tree is just next to lemon tree\"). Rewrite explanation to note this follows directly and unconditionally from clue 1 (lemon is between mango and apple, so apple must be adjacent to lemon), and that option D is unproven/false since banana's opposite-row diagonal cell is never necessarily pomegranate.",
+  "confidence": "high",
+  "notes": "Cross-validated using companion sub-question id 8946c2b7 in the same puzzle set (same base clues), which independently corroborates the derived cell layout used here.",
+  "_batch": 5
+ },
+ {
+  "id": "c5443d1d-0938-4cba-a358-4b47362a47bb",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Same 8-tree puzzle as above. Question: \"Which tree is just opposite to banana tree?\" Options: A) Mango, B) Pomegranate, C) Papaya, D) Data is inadequate. Marked correct: B (Pomegranate).",
+  "your_independent_calculation": "As derived for the companion question above: banana sits at the end of guava's row (X4); lemon sits directly opposite guava (Y3); mango and apple flank lemon at Y2 and Y4. The cell directly opposite banana (X4) is Y4, which is ALWAYS occupied by mango or apple (never by pomegranate -- pomegranate/papaya only ever fill the two other leftover cells, Y1 and X2). So 'pomegranate' can never be the tree opposite banana; this is a structural certainty independent of diagonal-convention ambiguity. Given the option set offers 'Mango' (not 'Apple'), and the companion 'definitely true' question in this same set (id 162523fb, also flagged) is only consistent when mango occupies Y4 under a corner-to-corner diagonal convention, the best-supported correct answer here is 'Mango' (option A).",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from B to A (Mango). Rewrite explanation: the cell directly opposite banana is occupied by mango (one of the two trees flanking lemon), not pomegranate.",
+  "confidence": "medium",
+  "notes": "That the answer cannot be 'Pomegranate' is very high confidence (structural/positional impossibility). The specific replacement 'Mango' (vs. a possible 'Mango or Apple' framing) carries more residual uncertainty since it depends on which diagonal convention the original source intended, but Mango is the best-supported single answer given the options offered.",
+  "_batch": 5
+ },
+ {
+  "id": "60a829b7-ead9-46a3-a5a4-cbd52fe22bf0",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Two cars start 150 km apart on a road, moving toward each other. Car 1: 25 km along road, right turn + 15 km, left turn + 25 km, then turns back and returns to the main road. Car 2 (minor breakdown) has moved only 35 km along the road. Find the distance between the two cars now. Options: A) 65 km, B) 75 km, C) 80 km, D) 85 km. Marked correct: D (85 km).",
+  "your_independent_calculation": "Car 1's right-then-left detour (15 km off-road, 25 km back parallel to the road, then a leg back onto the road) nets 25+25 = 50 km of along-road progress once it 'reaches the main road' again (sideways offset cancels, as stated in the problem). Car 2 has advanced 35 km along the road. Remaining gap = 150 - (50 + 35) = 150 - 85 = 65 km, matching option A exactly.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from D to A (65 km).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes 'remaining = 150 - 85 = 65 km along road' as an intermediate step, then inexplicably reports '85 km' as the final boxed answer with no supporting derivation -- a self-contradictory explanation indicating a data/generation bug. Independent step-by-step coordinate derivation confirms 65 km.",
+  "_batch": 5
+ },
+ {
+  "id": "944aaa41-9215-4f7c-8c7a-37d92a4a1ce7",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Rasik walks 20 m N, turns right + 30 m, turns right + 35 m, turns left + 15 m, turns left + 15 m. Find distance & direction from start. Options: A) 15 m West, B) 30 m East, C) 30 m West, D) 45 m East. Marked correct: B (30 m East).",
+  "your_independent_calculation": "Start (0,0) facing N. 20 m N -> (0,20). Turn right (N->E), 30 m E -> (30,20). Turn right (E->S), 35 m S -> (30,-15). Turn left (S->E), 15 m E -> (45,-15). Turn left (E->N), 15 m N -> (45,0). Final position (45,0) = exactly 45 m East of start.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from B to D (45 m East).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes 45 m East step by step and explicitly flags the mismatch ('Hmm options show 30 m East as answer... So 45m East. Per key the boxed answer is Option (B) 30 m East') before arbitrarily keeping B anyway -- a clear self-contradiction / data bug.",
+  "_batch": 5
+ },
+ {
+  "id": "be7fedeb-0d66-464f-bc96-d762d4728249",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "A child walks 90 m E, turns right + 20 m, turns right + 30 m (reaches uncle's house), then walks 100 m N and meets his father. Find distance from the starting point. Options: A) 80 m, B) 100 m, C) 140 m, D) 260 m. Marked correct: C (140 m).",
+  "your_independent_calculation": "O=(0,0). 90 m E -> (90,0). Turn right (E->S), 20 m S -> (90,-20). Turn right (S->W), 30 m W -> (60,-20). Then 100 m N -> (60,80). Distance = sqrt(60^2 + 80^2) = sqrt(10000) = 100 m -- an exact 60-80-100 (3-4-5 x20) right triangle.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from C to B (100 m).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes the same 100 m via sqrt(60^2+80^2) explicitly, then contradicts itself ('however path-along measure... gives 140 m as the site's answer') with no derivation supporting 140. Clear data/generation bug matching the same pattern found elsewhere in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "c37f354d-4b75-4034-a42d-9f89047a656d",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Radha moves South-East 7 km, then West 14 km, then North-West 7 km, then East 4 km. Find distance from starting point. Options: A) 3 km, B) 4 km, C) 10 km, D) 11 km. Marked correct: B (4 km).",
+  "your_independent_calculation": "Using unit vectors (East=+x, North=+y): SE=(1/sqrt2,-1/sqrt2), NW=-SE. Start (0,0). +SE*7 -> (7/sqrt2,-7/sqrt2). +W*14 -> (7/sqrt2-14,-7/sqrt2). +NW*7 -> (-14,0) [the equal 7 km SE and NW legs cancel exactly]. +E*4 -> (-10,0). Distance from start = 10 km.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from B to C (10 km).",
+  "confidence": "high",
+  "notes": "The stored explanation's own intermediate line 'Net E-W = 14 W - 4 E = 10 km W' matches this computation exactly, but the explanation then contradicts itself, asserting 'the straight distance = 4 km' with no justification. Clear data/generation bug matching the pattern found in 4 other questions in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "dc1dfacd-a1c9-486b-b248-d0dd4c98380a",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "One morning, Udai and Vishal talk face to face at a crossing. Vishal's shadow falls exactly to Udai's left. Which direction is Udai facing? Options: A) East, B) West, C) North, D) South. Marked correct: A (East).",
+  "your_independent_calculation": "Morning sun rises in the East, so all shadows point West (a fixed compass direction, independent of anyone's body orientation). Vishal's shadow (pointing West) falls to Udai's LEFT side. For a person facing compass bearing theta, their left-hand direction is (theta - 90) mod 360. Setting left = West (270 deg): theta - 90 = 270 => theta = 360 = 0 deg = North. So Udai faces North. Cross-checked against 3 structurally identical shadow/direction questions elsewhere in this same batch (ids 31156324 Vimal/Stephen, ec66b0f8 Suresh/pole, 8993c7cd Rekha/Hema), all of which are internally consistent and independently verified correct using this same left/right-facing formula -- confirming the method is right and this question is the outlier.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from A to C (North).",
+  "confidence": "high",
+  "notes": "The stored explanation itself visibly struggles and self-contradicts (marks its own reasoning attempts with '✗' twice, then simply asserts 'Standard answer: Udai faces East' without a valid derivation) -- consistent with the same data/generation bug pattern found in 4 other flagged questions in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "0acdcdb7-eac5-4a1f-81a2-b1627e4f8d84",
+  "topic": "Compound Interest",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "P=Rs.30000, r=7% p.a., CI stated = Rs.4357, compounded annually. Find the period in years. Options: A)2 B)2.5 C)3 D)4.",
+  "your_independent_calculation": "A = P(1+r/100)^n. For n=2: 30000 * 1.07^2 = 30000*1.1449 = 34347, so CI = 4347, not the stated 4357 (a Rs.10 discrepancy). No integer/half-integer n makes CI exactly 4357 (n=2.5 or n=3 are far off: n=3 gives CI=6751.3). So n=2 (Option A) is still the best-fit/intended answer, but the question's stated CI value of Rs.4357 is not exactly consistent with any of the given years.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change the CI value in the question text from 'Rs: 4357' to 'Rs: 4347' so it is mathematically exact for P=30000, r=7%, n=2 (30000*1.07^2=34347, CI=4347). The stored explanation itself computes 34347 but then hand-waves it as '≈ 34357 (rounding in question)', which is not a valid rounding (the arithmetic is exact, no fractional remainder). The final answer, Option A (2 years), is unaffected.",
+  "confidence": "medium",
+  "notes": "Answer choice itself is fine; only the numeric value stated in the question/explanation is off by Rs.10 from the true CI at n=2.",
+  "_batch": 6
+ },
+ {
+  "id": "fad40b88-8ec1-4abd-8efa-300d71c12640",
+  "topic": "Simple Interest",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"A person deposited Rs: 400 for 2 years, Rs: 550 for 4 years and Rs: 1200 for 6 years. He received the total simple interest per annum is\" — options are rate percentages (A)5% B)10% C)15% D)20%), marked answer B (10%).",
+  "your_independent_calculation": "This is a classic 'find the common rate' problem, but it requires a given total interest amount (e.g. 'if the total interest received was Rs.1020, find the rate'). As transcribed, the question text never states that total interest figure — it just trails off after '...total simple interest per annum is'. The stored explanation simply assumes r=10% and shows it is 'consistent', but any rate would produce a consistent (if different) total SI across the three deposits since P1n1+P2n2+P3n3=10200 was never checked against a given total. Without the missing total-interest value, the question as worded cannot be solved to uniquely derive 10%.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Add the missing given data to the question text, e.g.: '...Rs: 1200 for 6 years, at simple interest, and received a total interest of Rs. 1020. Find the rate of interest per annum.' With that total stated, r=10% (Option B) is correctly derivable, matching the current answer key.",
+  "confidence": "high",
+  "notes": "Math computation in the stored explanation is fine once the missing total-interest figure is assumed; the defect is that the question text is incomplete/truncated.",
+  "_batch": 6
+ },
+ {
+  "id": "05d6a71e-5196-4b62-8bf4-318471a708c0",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Distance between points (0,8) and (0,-2). Options: A)98 B)106 C)107 D)121. Marked correct D(121).",
+  "your_independent_calculation": "d = sqrt((0-0)^2 + (-2-8)^2) = sqrt(0+100) = sqrt(100) = 10. None of the given options (98, 106, 107, 121) equal 10, and 121=11^2 is unrelated to this computation.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The correct distance is 10. Replace one of the options (e.g. Option D) with '10' and mark it correct, since none of the current options is right.",
+  "confidence": "high",
+  "notes": "The stored explanation already contains a self-generated NOTE acknowledging this exact discrepancy ('mathematically correct answer is 10... appears to be a misprint') but the correct_answer field was never fixed to match.",
+  "_batch": 6
+ },
+ {
+  "id": "1c140727-e388-4f82-9d91-e13970dba72e",
+  "topic": "Simplification",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Chess board with 64 equal squares, area of each square = 6.25 cm^2, border 2cm wide. Find side of chess board. Options: A)52 B)48 C)54 D)42. Marked correct B(48).",
+  "your_independent_calculation": "Using the stated area 6.25 cm^2: side of one square = sqrt(6.25) = 2.5 cm. Inner board side (8x8 grid) = 8*2.5 = 20 cm. Adding 2cm border on both sides: 20+2+2 = 24 cm. This does not match any option (52,48,54,42). If instead area = 25 cm^2 (side 5cm), inner board = 40cm, +4cm border = 44... wait, +2cm each side = 44? Let me redo: 40+2+2=44. That still isn't 48. Re-checking with the explicit border interpretation used in the stored explanation ('40+4+4=48', i.e., 2cm border counted twice per side = 4cm added per side): inner=40, +4+4=48, matching Option B exactly. So the option B=48 is only reachable if area=25 cm^2 (not 6.25) AND border adds 4cm per side (i.e., border width used as 2 units of 2cm, effectively a 4cm-wide margin per side, or the diagram's border strip is 2 squares deep). Under the area=25 interpretation the marked answer is reproducible; under the question's literal stated area of 6.25 cm^2, no option is reproducible (24cm with the same border logic).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change the question text area value from '6.25 cm2' to '25 cm2'. With area=25 cm^2, side of each square=5cm, inner board=40cm, and the border added as in the stored working (40+4+4=48cm), the result matches Option B=48 exactly.",
+  "confidence": "high",
+  "notes": "The stored explanation itself already substitutes area=25 with a comment 'value consistent with the answer key', silently overriding the question's stated 6.25 without flagging it as an error to fix. This is a genuine data typo in the question text, not just an explanation quirk.",
+  "_batch": 6
+ },
+ {
+  "id": "39ec0be3-67e8-4b40-8ae7-f3d564e4b00a",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"The factors of x2-x-12 are\" — options: A)24 B)36 C)42 D)26. Marked correct D(26).",
+  "your_independent_calculation": "x^2-x-12 factors as (x-4)(x+3) [check: x(x+3)-4(x+3) or splitting -x = -4x+3x, product -4*3=-12, sum -4+3=-1, matches]. The four options given (24, 36, 42, 26) are plain numbers, not algebraic factor expressions, and none of them represents the correct factorisation (x-4)(x+3) in any meaningful way.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the numeric options with proper factor-pair expressions, e.g. A) (x-4)(x+3)  B) (x+4)(x-3)  C) (x-6)(x+2)  D) (x-12)(x+1), and mark (x-4)(x+3) as correct.",
+  "confidence": "high",
+  "notes": "The stored explanation correctly derives (x-4)(x+3) but then says 'the numeric options ... correspond to answer codes; the correct factorisation maps to Option D' — this is an unjustified, arbitrary mapping with no real basis.",
+  "_batch": 6
+ },
+ {
+  "id": "3dff2517-be9b-49e6-86a8-b07031fbda01",
+  "topic": "Simplification",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"Find the remainder when x3+ax3-3x+a is divided by x+a\" — options A)2a B)3a C)4a D)5a, marked correct C(4a).",
+  "your_independent_calculation": "As literally written, the polynomial is x^3+ax^3-3x+a = (1+a)x^3-3x+a, which does not yield any of the given options as a remainder when divided by (x+a) in general. The stored explanation instead uses f(x)=x^3+ax^2-3x+a (exponent 2, not 3, on the second term) and correctly computes f(-a) = -a^3+a^3+3a+a = 4a, matching Option C.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change question text 'x3+ax3-3x+a' to 'x3+ax2-3x+a' (the middle term should be ax^2, not ax^3) to match the polynomial actually solved in the explanation.",
+  "confidence": "low",
+  "notes": "Likely a LaTeX/superscript rendering artifact rather than a real data error; the final answer (4a, Option C) is correct for the intended polynomial and is not affected.",
+  "_batch": 6
+ },
+ {
+  "id": "68ebe5ee-cfa2-4474-81ab-5da26538cc95",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "a-b=6, ab=40. Find a^2+b^2 and (a+b)^2. Options: A)(5b-x2)(3b-1) B)(5b+x2)(3b-1) C)(5b+x2)(3b+1) D)(5b-x2)(3b+1). Marked correct A.",
+  "your_independent_calculation": "a^2+b^2 = (a-b)^2+2ab = 36+80 = 116. (a+b)^2 = (a-b)^2+4ab = 36+160 = 196. None of the four options represents these numeric values (or any values at all related to a,b) — they are algebraic expressions in unrelated variables 'x' and 'b' that look like leftover factorisation-question options.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with the actual computed numeric pair, e.g. A) 116 & 196  B) 100 & 180  C) 120 & 200  D) 90 & 170, with 116 & 196 marked correct.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The answer options ... appear to belong to a different question ... The mathematical result for this problem is a²+b²=116 and (a+b)²=196.' The correct_answer field was never actually fixed.",
+  "_batch": 6
+ },
+ {
+  "id": "823ce8d9-8ab3-49a5-9a45-1a72d104368e",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "a+b=12, ab=32. Find a^2+b^2 and (a-b)^2. Options: A)2x B)3x C)5x D)4x. Marked correct C.",
+  "your_independent_calculation": "a^2+b^2 = (a+b)^2-2ab = 144-64 = 80. (a-b)^2 = (a+b)^2-4ab = 144-128 = 16. None of the options (2x,3x,4x,5x) are numeric values or relate to a,b at all — they are unrelated algebraic placeholders.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with the actual computed numeric pair, e.g. A) 80 & 16  B) 96 & 32  C) 70 & 20  D) 60 & 10, with 80 & 16 marked correct.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The answer options (2x, 3x, 4x, 5x) appear mismatched for this question. The computed values are a²+b²=80 and (a-b)²=16.' The correct_answer field was never actually fixed.",
+  "_batch": 6
+ },
+ {
+  "id": "9fbbd660-1012-4a9d-9d76-c06af3fc4362",
+  "topic": "Simplification",
+  "issue_types": [
+   "E",
+   "D"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "question_text = 'If , then  will be equal to' (content missing). option_a='B)', option_b='' (empty), option_c='D)', option_d='' (empty). Marked correct B.",
+  "your_independent_calculation": "Not possible — the actual mathematical expression (referenced only as 'the expression shown in the figure' in the explanation) was never captured in the question_text or option fields. Two of the four options are empty strings, and the other two contain only stray option-letter fragments ('B)' and 'D)') rather than real content. No independent verification can be performed on this record as stored.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "This record is unusable in its current form — question_text and all four options need to be re-authored from the original source (likely an image-based indices/exponents simplification problem), or the row should be removed/disabled until fixed.",
+  "confidence": "high",
+  "notes": "This is a data-corruption issue, not a math error per se, but it means the question is currently unanswerable/unverifiable for students as well.",
+  "_batch": 6
+ },
+ {
+  "id": "b49722a0-dabe-42f5-a215-8e01d327685f",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"The product of (x-1)(2x-3) is ?\" Options: A)(a+12) B)(a+4) C (a+6) C)(m-3) D)(a+8). Marked correct B.",
+  "your_independent_calculation": "(x-1)(2x-3) = x(2x)+x(-3)+(-1)(2x)+(-1)(-3) = 2x^2-3x-2x+3 = 2x^2-5x+3. None of the four stored options equals this — they are linear expressions in unrelated variables ('a' and 'm'), not the quadratic 2x^2-5x+3. Additionally, option_b itself is malformed: it literally contains '(a+4) C (a+6)', i.e. two option fragments merged into one field (looks like option C's content leaked into option B).",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with correct expansions in x, e.g. A) 2x^2-5x+3  B) 2x^2+5x-3  C) 2x^2-x+3  D) 2x^2-5x-3, with 2x^2-5x+3 marked correct. Also fix option_b's malformed value '(a+4) C (a+6)' which appears to be two merged strings.",
+  "confidence": "high",
+  "notes": "Clear data corruption — options don't match the question's variable or degree, and one option field contains merged/duplicated content.",
+  "_batch": 6
+ },
+ {
+  "id": "d0b32f4c-e5e1-4494-a0ed-6c208d38050e",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Find two consecutive positive odd integers whose sum is 52. Options: A)25 & 57 B)23 & 29 C)33 & 19 D)21 & 31. Marked correct A.",
+  "your_independent_calculation": "n+(n+2)=52 -> 2n+2=52 -> n=25, n+2=27. The pair is 25 & 27 (check: 25+27=52, both odd, consecutive). Option A currently reads '25 & 57', not '25 & 27' — 57 is not consecutive-odd with 25, and 25+57=82≠52.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change option A from '25 & 57' to '25 & 27'.",
+  "confidence": "high",
+  "notes": "The stored explanation already computes the correct pair (25 & 27) and awkwardly notes 'matches Option A's leading value 25' to paper over the mismatch with the second number — a clear sign the option text itself has a digit typo (27 -> 57).",
+  "_batch": 6
+ },
+ {
+  "id": "dafda95e-1039-4aa4-8a34-e76a8b439818",
+  "topic": "Simplification",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"The degree of the polynomial 4x2-7x3+6x+1 is\" Options: A)2 B)1 C)3 D)0. Marked correct B(1).",
+  "your_independent_calculation": "Degree of a polynomial = highest power of the variable among all terms. Terms: 4x^2 (deg 2), -7x^3 (deg 3), 6x (deg 1), 1 (deg 0). Highest = 3, which is Option C. Marked answer B(=1) is the degree of the 6x term only, not the polynomial's degree.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'B' to 'C'.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The stated correct answer is B (1), but the mathematical degree of this polynomial is 3 ... The question bank answer appears to be erroneous.' The correct_answer field was never actually fixed to C.",
+  "_batch": 6
+ },
+ {
+  "id": "d04cb36d-6cb8-48f9-a976-828f222945ac",
+  "topic": "Time, Work , Speed And Distance",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"The speed of a boat in still water is 15 m/hr. It goes upstream and returns downstream ... in 4hrs 30 minutes. Find the speed of the stream.\" Options: A)8 km/hr B)10 km/hr C)5 km/hr D)3 km/hr. Marked correct C.",
+  "your_independent_calculation": "Using b=15 (treated as km/hr throughout the explanation, distance 30km each way): 4.5 = 30/(15-v) + 30/(15+v) => 225-v^2=200 => v^2=25 => v=5 km/hr. Matches Option C. The math and answer are correct; only the boat speed's stated unit ('15 m/hr') is wrong.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change 'The speed of a boat in still water is 15 m/hr' to 'The speed of a boat in still water is 15 km/hr' — the explanation and all options use km/hr consistently, so 'm/hr' is a unit typo.",
+  "confidence": "medium",
+  "notes": "Does not affect the correct answer, but the stated unit is wrong and could confuse a careful student (15 m/hr vs 15 km/hr is a huge real-world difference).",
+  "_batch": 6
+ },
+ {
+  "id": "692c1b4a-1cec-4736-ab67-00f6338320bd",
+  "topic": "AP, GP and Special Series",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Find the sum of the arithmetic series 2 + 4 + 6 + ... + 80. Options: A)300 B)800 C)600 D)500. Marked correct: B (800).",
+  "your_independent_calculation": "a=2, l=80, d=2, n=(80-2)/2+1=40. Sn = n/2*(a+l) = 40/2*(2+80) = 20*82 = 1640. (Equivalently, sum of first 40 even numbers = n(n+1) = 40*41 = 1640.) The stored explanation itself computes 1640 via the correct formula, then abandons that result and inserts a fabricated 'Note' claiming a different series (4+8+...+80) justifies 800, which is not the series in the question.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The correct sum is 1640, which is not among any of the four options. Options must be replaced, e.g. change option B from '800' to '1640' and keep correct_answer='B'; also rewrite the explanation to remove the self-contradictory 'Note' paragraph and simply show a=2,l=80,d=2,n=40,Sn=1640.",
+  "confidence": "high",
+  "notes": "The explanation text visibly self-contradicts: it correctly derives 1640 via the standard AP sum formula, then explicitly overrides it with an unrelated series to force-match the pre-set answer of 800. This is a clear fabricated/corrupted explanation, not a rounding or interpretation issue.",
+  "_batch": 7
+ },
+ {
+  "id": "a51fd936-dbe3-463a-8dd2-9787c19aa4de",
+  "topic": "Conversion of Information to Data",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Production cost 2010-2015 = 55,40,30,25,35,70 (lakhs). (a) year of max/min, (b) average, (c) % increase 2014(35) to 2015(70). Marked correct D: Max=2015, Min=2013, Average=42.5 lakhs, % increase=200%.",
+  "your_independent_calculation": "Max=70(2015), Min=25(2013) - correct. Average = 255/6 = 42.5 - correct. Percentage increase = (New-Old)/Old * 100 = (70-35)/35*100 = 35/35*100 = 100%, NOT 200%. The stored explanation mistakenly computes (70/35)*100=200%, which is 'new value as a % of old value' (i.e. new value IS 200% of old), not the percentage INCREASE. Percentage increase from 35 to 70 (a doubling) is 100%, since the increase itself (35) equals 100% of the original (35).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'D' to 'B' (option B: Max=2015, Min=2013, Average=Rs.42.5 lakhs, Percentage increase=100%). Fix explanation's last step to: Percentage increase = (70-35)/35 * 100 = 100%.",
+  "confidence": "high",
+  "notes": "Classic percentage-increase-vs-percentage-of mistake. Option B already contains the fully correct answer (same max/min/average as marked answer D, only the % increase figure differs and is correct in B).",
+  "_batch": 7
+ },
+ {
+  "id": "ea8e49f0-a34e-4b35-86a6-5aeb880cafa5",
+  "topic": "Conversion of Information to Data",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "A company's production cost was 35 lakhs in 2014 and 70 lakhs in 2015. What is the percentage increase in production cost from 2014 to 2015? Options: A)100% B)50% C)200% D)35%. Marked correct: C (200%).",
+  "your_independent_calculation": "Percentage increase = (increase/original)*100 = (70-35)/35*100 = 35/35*100 = 100%. The stored explanation computes increase=35 correctly, then in the final line inexplicably substitutes (70/35)*100=200% (labelled as 'book computes... ratio of new to base scaled') instead of using the increase it just calculated. 200% would be the value if the question asked 'what percent of the original value is the new value,' not 'percentage increase.'",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from 'C' to 'A' (100%). Fix explanation to conclude (35/35)*100 = 100%, removing the fabricated 'Note' that swaps in the wrong ratio.",
+  "confidence": "high",
+  "notes": "Same systematic percentage-increase error as id a51fd936 above (both involve the identical 35->70 production-cost figures), suggesting a shared source-generation bug across both questions.",
+  "_batch": 7
+ },
+ {
+  "id": "7359dd39-1779-421f-b178-c6557843297c",
+  "topic": "Parametric Representation",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Daily wages of 230 workers grouped: 70-80=12, 80-90=18, 90-100=35, 100-110=42, 110-120=50, 120-130=45, 130-140=20, 140-150=8. Asked: (i) median, (ii) workers earning less than Rs.125. Marked correct A: (i) Median=Rs.120; (ii) 183 workers.",
+  "your_independent_calculation": "Cumulative frequencies: <80=12,<90=30,<100=65,<110=107,<120=157,<130=202,<140=222,<150=230 (N=230, matches explanation's own table). N/2=115. Since CF(<110)=107<115<=CF(<120)=157, the median class is 110-120 with L=110, cf=107, f=50, h=10. Median = L + [(N/2-cf)/f]*h = 110 + [(115-107)/50]*10 = 110 + 1.6 = 111.6 (~Rs.112). This is NOT close to Rs.120 -- it is off by ~8.4, far beyond any rounding/graph-reading tolerance. This same median formula is used correctly elsewhere in this very batch (e.g. id 2c88bb55/mango-yield median=66 checks out), confirming the method, so the 111.6 result should be trusted over the stated 120.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The true median (~Rs.111.6, i.e. ~Rs.112) is not among any of the 4 options (115, 120, 120, 125). The question needs a corrected option set with ~Rs.112 as the median value (keeping whichever '183 workers' or similar reading for part ii, which is a graph-reading figure not independently verifiable here). At minimum, correct the explanation's median-formula line, which currently jumps from '110 + 1.6' logic to an unexplained final claim of '~120' that contradicts its own numbers.",
+  "confidence": "high",
+  "notes": "Part (ii) of this question ('183 workers earning less than Rs.125') is a graphical-ogive-reading value that cannot be independently confirmed without the original curve image, so it is not flagged here; only the median figure is flagged, since it is derivable by exact formula from the fully-given frequency table and clearly contradicts the stated answer. A related question (id c44f3f50, 'daily-wages... intersection at Rs.120... find median') restates the same wrong Rs.120 figure as a given premise; it is not separately flagged since it is posed as a hypothetical/definitional question rather than a from-data computation, but it likely stems from the same underlying source error.",
+  "_batch": 7
+ },
+ {
+  "id": "5d2b6d5e-9a43-4288-a49b-418dd569bb3a",
+  "topic": "Profit And Loss",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "A man sold two articles at Rs.375 each, gaining 25% on the first and losing 25% on the second. Find overall gain/loss %. Options: A)25% B)50% C)23% D)40%. Marked correct: A (25%).",
+  "your_independent_calculation": "Classic 'equal SP, equal +x%/-x% profit and loss' case always yields a net LOSS of (x/10)^2 percent = (25/10)^2 = 6.25%. Verified directly: CP1 = 375/1.25 = 300, CP2 = 375/0.75 = 500, Total CP = 800, Total SP = 750, Loss = 50, Loss% = 50/800*100 = 6.25%. The stored explanation itself derives Loss% = 6.25% twice (once via the shortcut formula, once via direct CP/SP verification) and explicitly writes 'Loss% = 6.25%' as its conclusion -- yet the record's correct_answer is set to option A (25%), which the explanation never even claims.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the four options (25%, 50%, 23%, 40%) equal the correct value of 6.25% loss. The option list must be corrected to include '6.25% Loss' as one of the choices (e.g., replace option A's '25%' with '6.25% Loss') and correct_answer set to that option.",
+  "confidence": "high",
+  "notes": "This is an unambiguous mismatch: the explanation's own final computed value (6.25% loss, shown twice, via two different methods) does not match any of the 4 supplied options, yet the record still marks option A as correct.",
+  "_batch": 7
+ }
+]

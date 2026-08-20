@@ -102,7 +102,7 @@ export default function AlertPopup() {
           <span className={`mb-3 grid h-12 w-12 place-items-center rounded-full ${kind.badge}`}>
             <KindIcon size={22} />
           </span>
-          <p className="tamil mb-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+          <p className="tamil mb-1 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
             {t(kind.labelKey)}
           </p>
           <h2 id="app-alert-title" className="tamil font-heading text-lg font-semibold text-ink">

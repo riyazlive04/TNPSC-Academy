@@ -54,12 +54,12 @@ export default function ContactReporter({ reporter }: { reporter: ReportReporter
         <button
           type="button"
           onClick={() => setComposing(true)}
-          className="focus-ring inline-flex items-center gap-1 rounded-lg border border-line bg-card px-2 py-1 font-body text-[11px] font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
+          className="focus-ring inline-flex items-center gap-1 rounded-lg border border-line bg-card px-2 py-1 font-body text-2xs font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
         >
           <Send size={12} /> Send in-app
         </button>
         {!reporter.email && !reporter.phone && (
-          <span className="font-body text-[11px] text-ink2">No email or phone on this account</span>
+          <span className="font-body text-2xs text-ink2">No email or phone on this account</span>
         )}
       </div>
 
@@ -82,7 +82,7 @@ function ContactLink({
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="focus-ring inline-flex items-center gap-1 rounded-lg border border-line bg-card px-2 py-1 font-body text-[11px] font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
+      className="focus-ring inline-flex items-center gap-1 rounded-lg border border-line bg-card px-2 py-1 font-body text-2xs font-semibold text-ink transition hover:border-brand/40 hover:text-brand"
     >
       {icon} {label}
     </a>
@@ -196,7 +196,7 @@ function Field({
     'focus-ring mt-1 w-full rounded-lg border border-line bg-card px-3 py-2 font-body text-sm text-ink outline-none transition hover:border-brand/40'
   return (
     <label className="mb-2 block">
-      <span className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+      <span className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
         {label}
       </span>
       {textarea ? (

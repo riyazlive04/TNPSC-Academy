@@ -1,0 +1,123 @@
+[
+ {
+  "sig": "annum|certain|interest|simple|years",
+  "rows": [
+   {
+    "id": "be1b0a07-d292-46f9-9a64-ee363c3a50d2",
+    "question_text": "The simple interest on a certain sum for 2 years at 10% per annum is ₹750. Find the sum.",
+    "option_a": "₹3,750",
+    "option_b": "₹1,500",
+    "option_c": "₹7,500",
+    "option_d": "₹3,000"
+   },
+   {
+    "id": "517959d1-a144-42a3-974a-3a56ef8c0960",
+    "question_text": "The simple interest on a certain sum for 3 years at 8% per annum is ₹960. Find the sum.",
+    "option_a": "₹3,000",
+    "option_b": "₹4,000",
+    "option_c": "₹4,800",
+    "option_d": "₹12,000"
+   }
+  ]
+ },
+ {
+  "sig": "annum|between|compound|difference|interest|simple",
+  "rows": [
+   {
+    "id": "dab432fe-42e2-49d2-9dae-c61b2548477b",
+    "question_text": "The difference between the compound interest and simple interest on a sum of ₹10000 at 10% per annum for 2 years is",
+    "option_a": "₹100",
+    "option_b": "₹200",
+    "option_c": "₹110",
+    "option_d": "₹121"
+   },
+   {
+    "id": "655ed2d4-339a-4d90-b4ea-89107ec75a38",
+    "question_text": "Find the difference between the compound interest and the simple interest on ₹8,000 lent at 10% per annum for 2 years.",
+    "option_a": "₹80",
+    "option_b": "₹160",
+    "option_c": "₹800",
+    "option_d": "₹40"
+   },
+   {
+    "id": "c97902de-40c9-412a-bcc0-f9c30c5c8881",
+    "question_text": "Find the difference between the compound interest and the simple interest on ₹8,000 at 5% per annum for 3 years.",
+    "option_a": "₹40",
+    "option_b": "₹61",
+    "option_c": "₹20",
+    "option_d": "₹80"
+   }
+  ]
+ },
+ {
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "rows": [
+   {
+    "id": "05765b32-e4b3-4a0a-8382-616480b35284",
+    "question_text": "Find the compound interest on ₹8000 at 10% per annum for 2 years, compounded annually.",
+    "option_a": "₹1600",
+    "option_b": "₹1760",
+    "option_c": "₹800",
+    "option_d": "₹1680"
+   },
+   {
+    "id": "5bdbaa4d-af7a-40a4-8c83-8256eae758bd",
+    "question_text": "Find the compound interest on ₹15,625 at 8% per annum for 3 years, compounded annually.",
+    "option_a": "₹4,058",
+    "option_b": "₹3,750",
+    "option_c": "₹19,683",
+    "option_d": "₹4,167"
+   },
+   {
+    "id": "84b3036c-7782-410a-94d3-707eb1904a64",
+    "question_text": "Find the compound interest on ₹20,000 at 15% per annum for 2 years, compounded annually.",
+    "option_a": "₹6,000",
+    "option_b": "₹26,450",
+    "option_c": "₹4,500",
+    "option_d": "₹6,450"
+   }
+  ]
+ },
+ {
+  "sig": "height|parallel|sides|trapezium|whose",
+  "rows": [
+   {
+    "id": "ead887e1-2e35-4076-ba2e-94b3a87e0332",
+    "question_text": "Find the area of a trapezium whose parallel sides are 12 cm and 8 cm and whose height is 10 cm.",
+    "option_a": "200 cm²",
+    "option_b": "100 cm²",
+    "option_c": "50 cm²",
+    "option_d": "960 cm²"
+   },
+   {
+    "id": "476618e1-7b16-4582-b4eb-ce920d35a4b9",
+    "question_text": "Find the area of a trapezium whose height is 14 cm and whose parallel sides are 18 cm and 9 cm.",
+    "option_a": "378 cm²",
+    "option_b": "162 cm²",
+    "option_c": "189 cm²",
+    "option_d": "94.5 cm²"
+   }
+  ]
+ },
+ {
+  "sig": "breadth|cuboid|height|length|respectively|volume",
+  "rows": [
+   {
+    "id": "0bd0fa0e-b23b-4c17-a483-686a9f19efa3",
+    "question_text": "The length, breadth and height of a cuboid are 12 cm, 10 cm and 8 cm respectively. Find its volume.",
+    "option_a": "30 cm³",
+    "option_b": "960 cm³",
+    "option_c": "592 cm³",
+    "option_d": "296 cm³"
+   },
+   {
+    "id": "83b44eb1-7641-4088-a776-20d09bc97c3e",
+    "question_text": "Find the volume of a cuboid whose length, breadth and height are 5 cm, 2 cm and 11 cm respectively.",
+    "option_a": "18 cm³",
+    "option_b": "174 cm³",
+    "option_c": "55 cm³",
+    "option_d": "110 cm³"
+   }
+  ]
+ }
+]

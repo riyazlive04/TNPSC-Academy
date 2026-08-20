@@ -72,7 +72,10 @@ export function useNativeBootstrap(): void {
     }
   }, [userId])
 
-  // ── Keep the push token current for users who already opted in ──
+  // ── Push token: keep it fresh for users who already opted in ──
+  // Never prompts here — the first-ever ask happens via <PushPrimer>, which
+  // shows an in-app explanation before the OS dialog. This effect only
+  // refreshes an already-granted permission's token in case it rotated.
   useEffect(() => {
     if (!Capacitor.isNativePlatform() || !userId) return
     void refreshNativePushToken()

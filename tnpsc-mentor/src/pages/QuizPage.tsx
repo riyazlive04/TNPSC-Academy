@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Maximize2, X } from 'lucide-react'
 import type { Lang } from '../store/languageStore'
@@ -32,7 +32,19 @@ import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
 import { useT, translate } from '../lib/i18n'
 import { hapticSelect } from '../lib/haptics'
-import type { AnswerLetter, QuizConfig } from '../types'
+import type { AnswerLetter, Question, QuizConfig } from '../types'
+
+/** The check_answer response shape - see api.checkAnswer / supabase/check_answer.sql. */
+type AnswerReveal = Pick<
+  Question,
+  'correct_answer' | 'explanation' | 'explanation_ta' | 'explanation_video_url' | 'why_wrong' | 'why_wrong_ta'
+>
+
+// Categories that stay exam-style (no per-question reveal, matching Mock Test):
+// PYQ practice mirrors a real past exam, and config.mock covers any mock-flagged
+// pull through this page. Everything else (Subject Practice, Samacheer, Current
+// Affairs, Aptitude) is a study loop, where instant feedback is the point.
+const EXAM_STYLE_CATEGORIES = new Set(['pyq', 'pyq2', 'pyq4'])
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
 function sameConfig(a: QuizConfig, b: QuizConfig): boolean {
@@ -235,13 +247,54 @@ export default function QuizPage() {
     ? (answers[currentQuestion.id]?.selected_answer ?? null)
     : null
 
-  const handleSelect = (letter: AnswerLetter) => {
-    if (!currentQuestion) return
-    // A light tap confirms the choice registered — the option's colour change is
-    // easy to miss mid-scroll on a phone.
-    hapticSelect()
-    store.selectAnswer(currentQuestion.id, letter)
-  }
+  // Practice-mode instant feedback: keyed by question id so it survives
+  // Prev/Next navigation once fetched. Never populated for PYQ/mock - those
+  // stay exam-style (see EXAM_STYLE_CATEGORIES).
+  const instantFeedback = !config?.mock && !EXAM_STYLE_CATEGORIES.has(config?.category ?? '')
+  const [revealed, setRevealed] = useState<Record<string, AnswerReveal>>({})
+
+  // Memoised: QuestionCard is wrapped in React.memo, and this page re-renders
+  // every second (global countdown + per-question timer below) — an inline
+  // arrow function here would get a fresh identity every render and defeat
+  // that memoization. `store.selectAnswer` is a stable zustand action
+  // reference (only the field it touches changes on `set()`), so it's safe as
+  // a dependency without resubscribing to the whole store object. Deliberately
+  // NOT listing `store` itself: `useQuizStore()` (no selector) hands back a
+  // new object every render - including every second from the countdown's
+  // `tick()` below - so depending on it would recreate this callback every
+  // second and defeat the whole point of memoising it.
+  const handleSelect = useCallback(
+    (letter: AnswerLetter) => {
+      if (!currentQuestion) return
+      // A light tap confirms the choice registered — the option's colour change
+      // is easy to miss mid-scroll on a phone.
+      hapticSelect()
+      store.selectAnswer(currentQuestion.id, letter)
+      if (instantFeedback && !revealed[currentQuestion.id]) {
+        const id = currentQuestion.id
+        api
+          .checkAnswer(id)
+          .then((data) => setRevealed((r) => ({ ...r, [id]: data })))
+          .catch(() => {
+            /* best-effort — the reveal just doesn't show for this question */
+          })
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentQuestion, instantFeedback, revealed, store.selectAnswer]
+  )
+
+  // Merges in the revealed-answer fields once fetched, memoised so this object
+  // keeps a stable identity across the once-a-second re-renders driven by the
+  // countdown timers below — otherwise QuestionCard's React.memo would see a
+  // "changed" prop every second and re-render anyway.
+  const questionForCard = useMemo(
+    () =>
+      currentQuestion && revealed[currentQuestion.id]
+        ? { ...currentQuestion, ...revealed[currentQuestion.id] }
+        : currentQuestion,
+    [currentQuestion, revealed]
+  )
 
   const canAdvance = secondsOnQuestion >= MIN_SECONDS_PER_QUESTION
 
@@ -474,7 +527,10 @@ export default function QuizPage() {
     )
   }
 
-  if (!currentQuestion) return null
+  // `questionForCard` is derived from `currentQuestion` in the memo above, so
+  // whenever `currentQuestion` is non-null in this same render it is too — the
+  // extra check here just gives TypeScript that narrowing for the JSX below.
+  if (!currentQuestion || !questionForCard) return null
 
   const isFlagged = flags[currentQuestion.id] ?? false
   const isLast = currentIndex + 1 >= total
@@ -509,7 +565,7 @@ export default function QuizPage() {
         {timeAnnouncement}
       </div>
       {/* Top bar */}
-      <div className="sticky top-0 z-20 border-b border-line bg-canvas px-4 py-3">
+      <div className="pt-safe sticky top-0 z-20 border-b border-line bg-canvas px-4 py-3">
         {/* On desktop the test name fills the left and everything else - question
             number, language, timer - is grouped on the right. On phones it stays
             split (Q-number left, controls right). */}
@@ -540,7 +596,7 @@ export default function QuizPage() {
         </div>
         <div className="mx-auto mt-2 max-w-2xl">
           <ProgressBar percent={total > 0 ? ((currentIndex + 1) / total) * 100 : 0} />
-          <div className="mt-1 flex justify-between font-body text-[11px] font-medium text-ink2">
+          <div className="mt-1 flex justify-between font-body text-2xs font-medium text-ink2">
             <span>{t('attemptedLabel')}: {attempted}/{total}</span>
             <span>{t('flagged')}: {flaggedCount}</span>
           </div>
@@ -573,7 +629,7 @@ export default function QuizPage() {
               </span>
             )}
             <div className="rounded-2xl border border-line bg-card px-3 py-2.5 text-center">
-              <span className="block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              <span className="block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
                 {t('question')}
               </span>
               <span className="font-heading text-lg font-extrabold text-ink">
@@ -581,7 +637,7 @@ export default function QuizPage() {
               </span>
             </div>
             <div className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-card px-3 py-3">
-              <span className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+              <span className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
                 {t('timeLeft')}
               </span>
               <Timer secondsLeft={totalTimeLeft} />
@@ -598,17 +654,18 @@ export default function QuizPage() {
         </div>
 
         <QuestionCard
-          question={currentQuestion}
+          question={questionForCard}
           index={currentIndex}
           total={total}
           selected={selectedLetter}
           onSelect={handleSelect}
           displayLang={quizLang}
+          reveal={!!(currentQuestion && revealed[currentQuestion.id])}
           bare
         />
 
         {minWarning && !canAdvance && (
-          <div className="pointer-events-none fixed inset-x-0 top-24 z-40 flex justify-center px-4">
+          <div className="pointer-events-none fixed inset-x-0 top-[calc(6rem+env(safe-area-inset-top))] z-40 flex justify-center px-4">
             <div className="animate-slideDown flex w-full max-w-md items-center gap-3 rounded-2xl bg-warn px-5 py-4 text-white shadow-2xl ring-4 ring-warn/25">
               <AlertTriangle size={26} className="flex-shrink-0 animate-pulse" />
               <div className="min-w-0 flex-1">
@@ -647,8 +704,8 @@ export default function QuizPage() {
         </div>
       </div>
 
-      {/* Bottom nav bar - icons always show; text labels appear on wider screens
-          so nothing overflows on phones (Tamil labels are long). */}
+      {/* Bottom nav bar - icon + label always visible on every action, matching
+          Next/Submit's existing always-labelled pattern. */}
       <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-3 py-3">
         <div className="mx-auto flex max-w-2xl items-center justify-between gap-2">
           {/* Previous */}
@@ -659,7 +716,7 @@ export default function QuizPage() {
             className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-pill border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink2 transition-colors hover:border-primary/40 hover:text-ink disabled:opacity-40 sm:px-4"
           >
             <ChevronLeft size={18} className="flex-shrink-0" />
-            <span className="hidden whitespace-nowrap sm:inline">{t('prev')}</span>
+            <span className="whitespace-nowrap">{t('prev')}</span>
           </button>
 
           {/* Centre: close (exit) sits to the LEFT of flag */}
@@ -686,7 +743,7 @@ export default function QuizPage() {
               ].join(' ')}
             >
               <Flag size={16} className={`flex-shrink-0 ${isFlagged ? 'animate-popStar' : ''}`} />
-              <span className="hidden whitespace-nowrap sm:inline">
+              <span className="whitespace-nowrap">
                 {isFlagged ? t('flagged') : t('flag')}
               </span>
             </button>
@@ -759,14 +816,14 @@ export default function QuizPage() {
 
       {/* Report confirmation toast */}
       {reportToast && (
-        <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-xl bg-brand px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
+        <div className="fixed left-1/2 top-[calc(1rem+env(safe-area-inset-top))] z-[60] -translate-x-1/2 rounded-xl bg-brand px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
           {reportToast}
         </div>
       )}
 
       {/* ── Proctoring overlays ── */}
       {proctored && violationToast && (
-        <div className="fixed left-1/2 top-4 z-[60] -translate-x-1/2 rounded-xl bg-coral px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
+        <div className="fixed left-1/2 top-[calc(1rem+env(safe-area-inset-top))] z-[60] -translate-x-1/2 rounded-xl bg-coral px-4 py-2.5 text-center font-heading text-sm font-semibold text-white shadow-lg">
           {violationToast}
         </div>
       )}

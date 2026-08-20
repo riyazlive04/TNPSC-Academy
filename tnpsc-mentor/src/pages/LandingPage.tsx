@@ -7,28 +7,25 @@ import {
   Calculator,
   Timer,
   Newspaper,
-  CalendarDays,
   Check,
   ChevronDown,
+  ChevronRight,
   Sun,
   Moon,
   MessageCircle,
   Mail,
   Phone,
   ArrowRight,
-  TrendingUp,
   ListChecks,
-  Lock,
   Award,
+  Zap,
+  BarChart3,
   Trophy,
   Target,
   TriangleAlert,
   Sparkles,
   Globe,
   Bookmark,
-  ChevronRight,
-  Zap,
-  BarChart3,
   Smartphone,
   Laptop,
   Tablet,
@@ -45,6 +42,7 @@ import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
 import { api } from '../lib/api'
 import { trackApkDownload } from '../lib/tracking'
+import PricingCards from '../components/Landing/PricingCards'
 
 // ─── Open items (founder to supply before launch) ────────────────────────────
 // Replace these placeholders with the real hosted values. Everything else on
@@ -71,6 +69,7 @@ const DownloadIntentContext = createContext<() => void>(() => {})
 const APP_URL = 'https://tnpscmentors.in'
 const APP_LOGIN_URL = `${APP_URL}/login`
 const APP_REGISTER_URL = `${APP_URL}/register`
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.tnpscmentor.app&pcampaignid=web_share'
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 const SUPPORT_PHONE = '+91 96777 79808' // TODO: real WhatsApp/support number
 const SUPPORT_PHONE_TEL = '+91 96777 79808' // TODO: tel:/wa.me digits
@@ -83,8 +82,8 @@ const REFUND_URL = '/refund-policy'
 const INSTAGRAM_URL = 'https://www.instagram.com/mentorstnpsc/?hl=en'
 const YOUTUBE_URL = 'https://www.youtube.com/@TNPSCMentors4you'
 const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61591260240425&sk=about'
-/** Public Telegram channel — also where the daily current-affairs PDFs are posted. */
-const TELEGRAM_URL = 'https://t.me/tnpscmentors'
+/** Private Telegram channel invite link — also where the daily current-affairs PDFs are posted. */
+const TELEGRAM_URL = 'https://t.me/+fnGJ6TbCiI8wNTY1'
 
 // ─── Analytics hook ──────────────────────────────────────────────────────────
 // The page's only KPI is install-rate, so every download fires this. Delegates to
@@ -114,6 +113,10 @@ const T = {
   signIn: { ta: 'உள்நுழைய', en: 'Sign in' },
   signUp: { ta: 'பதிவு செய்', en: 'Sign up' },
   download: { ta: 'App download பண்ணுங்க', en: 'Download the app' },
+  playStoreBanner: {
+    ta: 'இப்போது Google Play Store-ல் கிடைக்கிறது! இங்கே Tap பண்ணி Download பண்ணுங்க',
+    en: 'Now live on Google Play Store! Tap here to download',
+  },
   // Primary CTA while we promote the hosted web app (APK download paused). The
   // Platforms section still offers the APK; everywhere else routes here.
   webCta: { ta: 'Web app-ல try பண்ணுங்க', en: 'Try the web app' },
@@ -170,6 +173,7 @@ const T = {
   // Ribbon band across the top of each pricing card.
   freeRibbon: { ta: 'புதிய கணக்கு சலுகை ', en: 'Signup bonus' },
   vettriRibbon: { ta: 'தேர்வு மாரத்தான்', en: 'Test Marathon' },
+  rankBoosterRibbon: { ta: 'Rank Booster', en: 'Rank Booster' },
   premiumRibbon: { ta: 'பிரீமியம்', en: 'Premium' },
   premiumTitle: {
     ta: 'App-க்குள்ள - TNPSC Premium Prelims Kit (₹1,699, எப்பவும் unlock பண்ணலாம்)',
@@ -291,69 +295,9 @@ const T = {
     en: '13 full mock exams + unlimited PYQ and Current Affairs tests.',
   },
   vettriOneTime: { ta: 'ஒரே கட்டணம் · முழு அணுகல்', en: 'one-time · full access' },
-  vettriInstallment: { ta: 'மாதம் ஒன்றுக்கு', en: 'per month' },
-  vettriInstallmentNote: {
-    ta: '₹499 = 1 மாதம் · அடுத்த மாதத்திற்கு மீண்டும் ₹499',
-    en: '₹499 unlocks 1 month · pay ₹499 again for the next',
-  },
   vettriCta: { ta: 'இப்போது தொடங்குங்கள்', en: 'Get started' },
   vettriScheduleInline: { ta: 'அட்டவணையை பதிவிறக்க (PDF)', en: 'download the schedule (PDF)' },
 } as const
-
-// Mirrors what free accounts actually get (credit system: 50 on signup,
-// 10/day on login expiring at IST end-of-day, 1 credit per question).
-const FREE_ITEMS: { ta: string; en: string }[] = [
-  {
-    ta: 'பதிவு செய்தவுடன் 50 இலவச கிரெடிட்கள் + தினமும் 10 (ஒரு கேள்விக்கு 1 கிரெடிட்)',
-    en: '50 free credits on signup + 10 daily (1 credit per question)',
-  },
-  {
-    ta: 'கிரெடிட்களில் எந்தத் தேர்வும்: பாடங்கள், PYQ, நடப்பு நிகழ்வுகள், அப்டிட்யூட்',
-    en: 'Use credits on any test: subjects, PYQ, Current Affairs, aptitude',
-  },
-  { ta: 'ஒரு முழு மாதிரி தேர்வு (200 வினாக்கள்)', en: '1 full mock exam (200 questions)' },
-  {
-    ta: 'ஒவ்வொரு வினாவிற்கும் திரையிலேயே விளக்கங்கள்',
-    en: 'On-screen explanations for every question',
-  },
-]
-
-// Mirrors the in-app PremiumCard (perks + the bonus extras), so the landing
-// pitch and the in-app upsell always say the same thing.
-const PREMIUM_ITEMS: { ta: string; en: string }[] = [
-  { ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்), அனைத்து 13 தாள்களும்', en: 'Test Marathon series (Vettri Nichayam), all 13 papers' },
-  { ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்', en: 'Unlimited practice tests' },
-  { ta: '6 மாதிரித் தேர்வுகள்', en: '6 mock exams' },
-  { ta: 'முந்தைய ஆண்டு வினாத்தாள்கள் - கடந்த 5 ஆண்டுகள்', en: 'Previous-year papers - last 5 years' },
-  { ta: 'நடப்பு நிகழ்வுகள் (ஆகஸ்ட் 2025 - ஜூன் 2026)', en: 'Current Affairs (Aug 2025 - Jun 2026)' },
-  { ta: 'உங்கள் திட்டக் காலம் வரை அனைத்து எதிர்கால புதுப்பிப்புகளும் அடங்கும்', en: 'All future updates included for your plan duration' },
-  { ta: 'அப்டிட்யூட் & பிற பாடச் சுருக்கக் குறிப்புகள்', en: 'Aptitude & other-subject short notes' },
-  { ta: 'PYQ போக்கு அறிக்கை', en: 'PYQ trend report' },
-  { ta: '45-நாள் திருப்புதல் திட்டம்', en: '45-day revision plan' },
-  { ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்', en: 'Face the exam with confidence' },
-]
-
-// What the Vettri Nichayam bundle unlocks — mirrors the in-app VettriCard
-// (core marathon perk + its Bonus box items). The first item gets an inline
-// "download the schedule" link appended at render time (vettriScheduleInline).
-const VETTRI_ITEMS: { ta: string; en: string }[] = [
-  {
-    ta: '13 மாதிரித் தேர்வுகள் (10 பிரிவு வாரியான / 3 முழு மாதிரி)',
-    en: '13 mock tests (10 sectional / 3 full mock)',
-  },
-  {
-    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
-    en: 'Unlimited PYQ tests (Premium feature · 2-month access)',
-  },
-  {
-    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள் (பிரீமியம் அம்சம் · 2 மாத அணுகல்)',
-    en: 'Unlimited Current Affairs tests (Premium feature · 2-month access)',
-  },
-  {
-    ta: 'பாட வாரியான தேர்வு வினாக்கள் (3000+), வரம்பற்றது · 2 மாத அணுகல் மற்றும் இன்னும் பல',
-    en: 'Subject-wise test questions (3000+), unlimited · 2-month access and much more',
-  },
-]
 
 // ─── Colour system ───────────────────────────────────────────────────────────
 // design-system.md gives four pastel tile tints; we use them semantically so the
@@ -392,12 +336,6 @@ const PAM_CARDS: {
     en: { t: 'Mocks', d: 'Practice realtime mock test here. Defeat your exam fear.' },
   },
 ]
-
-// One icon per PREMIUM_ITEMS row: marathon · practice · mocks · PYQ · CA ·
-// updates · short notes · trend report · revision plan · confidence.
-const PREMIUM_ICONS = [Trophy, ListChecks, Timer, FileText, Newspaper, ShieldCheck, Calculator, TrendingUp, CalendarDays, Award]
-// One icon per VETTRI_ITEMS row: 13 mocks · unlimited PYQ · unlimited CA · subject bank.
-const VETTRI_ICONS = [Timer, FileText, Newspaper, ListChecks]
 
 const INSTALL_STEPS: { ta: string; en: string }[] = [
   { ta: 'App download-ஐ tap பண்ணுங்க.', en: 'Tap Download the app.' },
@@ -624,7 +562,7 @@ export default function LandingPage() {
           navHidden ? '-translate-y-full' : 'translate-y-0'
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
           <a href="#top" className="group flex shrink-0 items-center gap-2.5">
             <img
               src="/logo-mark.png"
@@ -636,15 +574,18 @@ export default function LandingPage() {
             </span>
           </a>
 
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* flex-wrap is a safety net - at very narrow widths this drops to a
+              second row instead of clipping, on top of the tighter mobile
+              gap/padding below that keeps it on one row for real phones. */}
+          <div className="flex flex-wrap items-center justify-end gap-x-1 gap-y-1.5 sm:flex-nowrap sm:gap-x-3">
             {/* Language toggle (spec §6). Phones get a compact single-tap toggle so
                 the auth CTAs always fit; sm+ gets the full segmented control. */}
             <button
               onClick={() => setLang(lang === 'ta' ? 'en' : 'ta')}
-              className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-tint px-2.5 py-2 font-heading text-sm font-medium text-ink2 sm:hidden"
+              className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-tint px-2 py-1.5 font-heading text-xs font-medium text-ink2 sm:hidden"
               aria-label={lang === 'ta' ? 'Switch to English' : 'தமிழுக்கு மாற்று'}
             >
-              <Languages size={15} /> {lang === 'ta' ? 'EN' : 'த'}
+              <Languages size={13} /> {lang === 'ta' ? 'EN' : 'த'}
             </button>
             <div className="seg-wrap hidden sm:inline-flex" role="group" aria-label="Language">
               <button
@@ -674,20 +615,20 @@ export default function LandingPage() {
             </button>
 
             {isAuthed ? (
-              <a href={APP_URL} className="btn-soft shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2">
+              <a href={APP_URL} className="btn-soft shrink-0 px-2 py-1.5 text-xs sm:px-3.5 sm:py-2 sm:text-sm">
                 Dashboard
               </a>
             ) : (
               <>
                 <a
                   href={APP_LOGIN_URL}
-                  className="btn-soft shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2"
+                  className="btn-soft shrink-0 px-2 py-1.5 text-xs sm:px-3.5 sm:py-2 sm:text-sm"
                 >
                   {t('signIn')}
                 </a>
                 <a
                   href={APP_REGISTER_URL}
-                  className="btn-brand shrink-0 px-2.5 py-1.5 text-sm sm:px-3.5 sm:py-2"
+                  className="btn-brand shrink-0 px-2 py-1.5 text-xs sm:px-3.5 sm:py-2 sm:text-sm"
                 >
                   {t('signUp')}
                 </a>
@@ -696,6 +637,24 @@ export default function LandingPage() {
           </div>
         </div>
       </header>
+
+      {/* ─── Play Store banner ────────────────────────────────────────────── */}
+      <a
+        href={PLAY_STORE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent('playstore-banner')}
+        className="group flex items-center justify-center gap-2 bg-brand px-4 py-2.5 text-center transition hover:brightness-105"
+      >
+        <Smartphone size={16} className="shrink-0 text-white" />
+        <span className="font-heading text-sm font-semibold text-white [text-wrap:balance]">
+          {t('playStoreBanner')}
+        </span>
+        <ArrowRight
+          size={15}
+          className="shrink-0 text-white transition-transform duration-200 group-hover:translate-x-1"
+        />
+      </a>
 
       {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden">
@@ -827,144 +786,15 @@ export default function LandingPage() {
 
       {/* ─── Section 3 - starter vs inside ────────────────────────────────── */}
       <section className="border-y border-line bg-card">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="mx-auto max-w-screen-2xl px-4 py-20 sm:px-6">
           <Reveal>
             <h2 className="mx-auto max-w-3xl text-center font-heading text-2xl font-bold leading-[1.35] tracking-tight text-ink sm:text-4xl sm:leading-[1.3]">
               {t('s3Title')}
             </h2>
           </Reveal>
-          <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
-            {/* Free - the hook. Green = free & safe, the immediate reward. */}
-            <Reveal>
-              <div className="card interactive relative flex h-full flex-col overflow-hidden p-7 ring-1 ring-correct/20">
-                <div className="-mx-7 -mt-7 mb-6 bg-correct py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
-                  {t('freeRibbon')}
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-tint-green px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-correct">
-                  <Check size={13} /> {t('freeTitle')}
-                </span>
-                <ul className="mt-6 space-y-3.5">
-                  {FREE_ITEMS.map((it) => (
-                    <li key={it.en} className="flex items-start gap-3">
-                      <span className="mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center rounded-full bg-tint-green text-correct">
-                        <Check size={13} />
-                      </span>
-                      <span className="font-body text-[15px] text-ink">{it[lang]}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-auto pt-7">
-                  <WebAppButton label={t('freeCta')} />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Vettri Nichayam - the centre / featured tier. Violet accent (green =
-                free, gold = the premium kit); ringed so the middle column pops. */}
-            <Reveal>
-              <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/40 p-7 ring-1 ring-brand/25">
-                <div className="-mx-7 -mt-7 mb-6 bg-brand py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
-                  {t('vettriRibbon')}
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-brand-soft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-brand">
-                  <Trophy size={13} /> ₹899 · {t('vettriBadge')}
-                </span>
-                <h3 className="mt-4 font-heading text-base font-semibold text-ink">{t('vettriBannerTitle')}</h3>
-                <ul className="mt-5 space-y-3">
-                  {VETTRI_ITEMS.map((it, i) => {
-                    const Icon = VETTRI_ICONS[i] ?? Check
-                    const tint = TINTS[i % TINTS.length]
-                    return (
-                      <li key={it.en} className="flex items-start gap-3">
-                        <span className={`mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-lg ${tint.bg} ${tint.fg}`}>
-                          <Icon size={13} />
-                        </span>
-                        <span className="font-body text-[15px] text-ink2">
-                          {it[lang]}
-                          {/* First item carries the inline schedule download
-                              (the 13-test timetable flyer, a public/ PDF). */}
-                          {i === 0 && (
-                            <>
-                              {', '}
-                              <a
-                                href="/test-marathon-2026-schedule.pdf"
-                                download="TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf"
-                                target="_blank"
-                                rel="noopener"
-                                onClick={() => trackEvent('schedule-download')}
-                                className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 transition hover:decoration-brand"
-                              >
-                                {t('vettriScheduleInline')}
-                                <Download size={13} className="ml-1 inline-block align-[-1.5px]" />
-                              </a>
-                            </>
-                          )}
-                        </span>
-                      </li>
-                    )
-                  })}
-                </ul>
-
-                {/* Pricing - the single payment + the monthly option - then the CTA. */}
-                <div className="mt-auto border-t border-line pt-5">
-                  <div className="flex items-end gap-2">
-                    <span className="font-display text-3xl font-bold leading-none text-ink">₹499</span>
-                    <span className="mb-0.5 font-body text-xs text-ink2">{t('vettriInstallment')}</span>
-                  </div>
-                  <div className="mt-2 flex items-baseline gap-1.5 rounded-xl bg-brand-soft px-3 py-2">
-                    <span className="font-heading text-base font-bold leading-none text-brand">₹899</span>
-                    <span className="font-body text-xs text-ink2">{t('vettriOneTime')}</span>
-                  </div>
-                  <p className="mt-1.5 font-body text-[11px] text-ink2/80">{t('vettriInstallmentNote')}</p>
-                  <a
-                    href={isAuthed ? APP_URL : APP_REGISTER_URL}
-                    onClick={() => trackEvent('vettri-card')}
-                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-3 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 active:scale-[0.99]"
-                  >
-                    {t('vettriCta')} <ArrowRight size={16} />
-                  </a>
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Inside the app - the full Prelims Kit, framed as "when you're ready".
-                Gold = achievement / the premium kit (design-system accent of value). */}
-            <Reveal>
-              <div className="card interactive relative flex h-full flex-col overflow-hidden border-brand/30 p-7">
-                <div className="-mx-7 -mt-7 mb-6 bg-gold py-1.5 text-center font-heading text-[11px] font-bold uppercase tracking-[0.14em] text-white">
-                  {t('premiumRibbon')}
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-goldsoft px-3 py-1 font-heading text-xs font-bold uppercase tracking-wide text-gold">
-                  <Lock size={13} /> ₹1,699 · Premium Prelims Kit
-                </span>
-                <h3 className="mt-4 font-heading text-base font-semibold text-ink">{t('premiumTitle')}</h3>
-                <ul className="mt-5 space-y-3">
-                  {PREMIUM_ITEMS.map((it, i) => {
-                    const Icon = PREMIUM_ICONS[i] ?? Check
-                    const tint = TINTS[i % TINTS.length]
-                    return (
-                      <li key={it.en} className="flex items-start gap-3">
-                        <span className={`mt-0.5 grid h-6 w-6 flex-shrink-0 place-items-center rounded-lg ${tint.bg} ${tint.fg}`}>
-                          <Icon size={13} />
-                        </span>
-                        <span className="font-body text-[15px] text-ink2">{it[lang]}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-                <div className="mt-auto pt-6">
-                  <p className="font-body text-sm italic text-ink2">{t('premiumCaption')}</p>
-                  <a
-                    href={isAuthed ? APP_URL : APP_REGISTER_URL}
-                    onClick={() => trackEvent('premium-card')}
-                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-pill bg-gold px-5 py-3 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99]"
-                  >
-                    {t('premiumCta')} <ArrowRight size={16} />
-                  </a>
-                </div>
-              </div>
-            </Reveal>
-          </div>
+          <Reveal>
+            <PricingCards lang={lang} webAppHref={isAuthed ? APP_URL : APP_REGISTER_URL} onTrack={trackEvent} />
+          </Reveal>
         </div>
       </section>
 
@@ -986,7 +816,7 @@ export default function LandingPage() {
                   <span className="font-heading text-3xl font-bold text-line transition-colors group-hover:text-brand/30">P{i + 1}</span>
                 </div>
                 <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{card[lang].t}</h3>
-                <p className="mt-2 font-body text-[15px] leading-relaxed text-ink2">{card[lang].d}</p>
+                <p className="mt-2 font-body text-base leading-relaxed text-ink2">{card[lang].d}</p>
               </div>
             </Reveal>
           ))}
@@ -1015,7 +845,7 @@ export default function LandingPage() {
                   <Icon size={22} />
                 </span>
                 <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{card[lang].t}</h3>
-                <p className="mt-2 font-body text-[14px] leading-relaxed text-ink2">{card[lang].d}</p>
+                <p className="mt-2 font-body text-sm leading-relaxed text-ink2">{card[lang].d}</p>
               </div>
             </Reveal>
           ))}
@@ -1039,7 +869,7 @@ export default function LandingPage() {
                     <span className={`grid h-11 w-11 place-items-center rounded-tile ${tint.bg} ${tint.fg} font-heading text-lg font-bold transition-transform duration-300 group-hover:scale-110`}>
                       {i + 1}
                     </span>
-                    <p className="mt-4 font-body text-[15px] leading-relaxed text-ink">{step[lang]}</p>
+                    <p className="mt-4 font-body text-base leading-relaxed text-ink">{step[lang]}</p>
                   </div>
                 </Reveal>
               )
@@ -1079,7 +909,7 @@ export default function LandingPage() {
                   <Icon size={24} />
                 </span>
                 <h3 className="mt-5 font-heading text-lg font-semibold text-ink">{p[lang].t}</h3>
-                <p className="mt-2 flex-1 font-body text-[14px] leading-relaxed text-ink2">{p[lang].d}</p>
+                <p className="mt-2 flex-1 font-body text-sm leading-relaxed text-ink2">{p[lang].d}</p>
                 <div className="mt-5">
                   {action === 'download' ? (
                     apkUrl ? (
@@ -1443,7 +1273,7 @@ function InstallNoticeModal({
             <h3 className="mt-4 pr-8 font-heading text-xl font-bold text-ink">
               {t('dlModalTitle')}
             </h3>
-            <p className="mt-3 font-body text-[15px] leading-relaxed text-ink2">
+            <p className="mt-3 font-body text-base leading-relaxed text-ink2">
               {t('dlModalIntro')}
             </p>
 
@@ -1455,7 +1285,7 @@ function InstallNoticeModal({
               </p>
             </div>
 
-            <p className="mt-3 font-body text-[15px] leading-relaxed text-ink">
+            <p className="mt-3 font-body text-base leading-relaxed text-ink">
               {t('dlModalFix')}
             </p>
             <div className="mt-3 flex items-start gap-2.5 rounded-card border border-correct/25 bg-tint-green px-4 py-3">
@@ -1538,7 +1368,7 @@ function FaqList({ items }: { items: { q: string; a: string }[] }) {
               >
                 {i + 1}
               </span>
-              <span className="min-w-0 flex-1 font-heading text-[15px] font-semibold text-ink">
+              <span className="min-w-0 flex-1 font-heading text-base font-semibold text-ink">
                 {f.q}
               </span>
               <ChevronDown
@@ -1557,7 +1387,7 @@ function FaqList({ items }: { items: { q: string; a: string }[] }) {
                   transition={{ duration: reduce ? 0 : 0.28, ease: [0.22, 1, 0.36, 1] }}
                   className="overflow-hidden"
                 >
-                  <p className="px-5 pb-4 pl-[3.75rem] font-body text-[15px] leading-relaxed text-ink2">
+                  <p className="px-5 pb-4 pl-[3.75rem] font-body text-base leading-relaxed text-ink2">
                     {f.a}
                   </p>
                 </motion.div>

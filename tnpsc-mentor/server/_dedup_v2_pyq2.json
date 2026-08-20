@@ -1,0 +1,94 @@
+[
+ {
+  "sig": "இரண்டைப்|ஒன்றுடன்|தொகுப்பிலிருந்து|பட்டியல்|பட்டியல்களுக்குக்|விடையினைத்",
+  "rows": [
+   {
+    "id": "a2d9b704-32f1-4910-b014-f703118b38c7",
+    "question_text": "பட்டியல் ஒன்றுடன், பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க.\nபட்டியல் ஒன்று\n(a) பெண்மை தாயாய் நின்று\n(b) பெண்மை அயலார் தமக்கும்\n(c) பெண்மை மகளாய்ப் பிறந்து\n(d) பெண்மை தாரமாய் வந்து\nபட்டியல் இரண்டு\n1. அன்பே செய்யும்\n2. தரணியைத் தாங்கும்\n3. தளர்வைப் போக்கும்\n4. சேலையில் மகிழும்",
+    "option_a": "(a)-3 (b)-1 (c)-4 (d)-2",
+    "option_b": "(a)-2 (b)-4 (c)-1 (d)-3",
+    "option_c": "(a)-2 (b)-1 (c)-4 (d)-3",
+    "option_d": "(a)-1 (b)-3 (c)-2 (d)-4"
+   },
+   {
+    "id": "4b65f855-58ee-4b2c-bf2e-de18073b480a",
+    "question_text": "பட்டியல் ஒன்றுடன், பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க.\nபட்டியல் ஒன்று\n(a) கனகம்\n(b) மேழி\n(c) கலிங்கம்\n(d) ஆழி\nபட்டியல் இரண்டு\n1. மோதிரம்\n2. ஆடை\n3. பொன்\n4. கலப்பை",
+    "option_a": "(a)-2 (b)-4 (c)-3 (d)-1",
+    "option_b": "(a)-1 (b)-3 (c)-2 (d)-4",
+    "option_c": "(a)-3 (b)-2 (c)-4 (d)-1",
+    "option_d": "(a)-3 (b)-4 (c)-2 (d)-1"
+   },
+   {
+    "id": "ebe7e303-4acc-4ae2-ade7-9095013bd319",
+    "question_text": "பட்டியல் ஒன்றுடன் பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க :\nபட்டியல் ஒன்று\n(a) சரதம்\n(b) சூளிகை\n(c) மகோததி\n(d) அவனி\nபட்டியல் இரண்டு\n1. நிலா முற்றம்\n2. நாடு\n3. வாய்மை\n4. கடல்",
+    "option_a": "(a)-3 (b)-1 (c)-4 (d)-2",
+    "option_b": "(a)-2 (b)-1 (c)-3 (d)-4",
+    "option_c": "(a)-3 (b)-2 (c)-1 (d)-4",
+    "option_d": "(a)-1 (b)-4 (c)-3 (d)-2"
+   }
+  ]
+ },
+ {
+  "sig": "அம்பேத்கர்|இலக்கணம்|உண்டாக்குவது|கமில்சுவலபில்|கூறியவர்|விருப்பத்தை",
+  "rows": [
+   {
+    "id": "60aaae09-b144-42a8-93df-a7ca691c70a7",
+    "question_text": "தமிழ் இலக்கணம் படிக்க படிக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்",
+    "option_a": "அம்பேத்கர்",
+    "option_b": "கெல்லட்",
+    "option_c": "கமில்சுவலபில்",
+    "option_d": "முனைவர் எமினோ"
+   },
+   {
+    "id": "a89b865a-ad92-4e35-9d36-d4c6d3f424fd",
+    "question_text": "தமிழ் இலக்கணம் பகுக்க பகுக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்",
+    "option_a": "அம்பேத்கர்",
+    "option_b": "கேல்வெட்",
+    "option_c": "கமில்சுவலபில்",
+    "option_d": "முவைஸ் எமினோ"
+   }
+  ]
+ },
+ {
+  "sig": "amount|amounts|increased|interest|simple|years",
+  "rows": [
+   {
+    "id": "30841d8a-4cd1-43fd-9de4-ce20c2e9318e",
+    "question_text": "A sum of Rs. 800 amounts to Rs. 920 in 3 years at a simple interest. If the interest rate is increased by 3%. What would Rs. 800 amount to?",
+    "option_a": "950",
+    "option_b": "970",
+    "option_c": "992",
+    "option_d": "1000"
+   },
+   {
+    "id": "bb514f9f-a12e-4229-9cc8-7229f1d76d3d",
+    "question_text": "Rs. 800 amounts to Rs. 920 in 3 years at simple interest. If the interest rate is increased by 3%, it would amount to",
+    "option_a": "Rs. 1,092",
+    "option_b": "Rs. 992",
+    "option_c": "Rs. 1,882",
+    "option_d": "Rs. 1,182"
+   }
+  ]
+ },
+ {
+  "sig": "amount|annum|compound|interest|years",
+  "rows": [
+   {
+    "id": "7540bc6f-9fd0-41ba-b734-39822804cd96",
+    "question_text": "In how many years will a sum of ₹ 1,600 amount to ₹ 1,852.20 at 5% per annum compound interest?",
+    "option_a": "3",
+    "option_b": "4",
+    "option_c": "5",
+    "option_d": "6"
+   },
+   {
+    "id": "44a30bc5-c84c-4f6e-a042-f17419bf25da",
+    "question_text": "At what rate of interest compound interest per annum will ₹ 640 amount to ₹ 774.40 in 2 years",
+    "option_a": "8%",
+    "option_b": "9%",
+    "option_c": "10%",
+    "option_d": "11%"
+   }
+  ]
+ }
+]

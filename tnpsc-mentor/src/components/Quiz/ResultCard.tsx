@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import type { AnswerLetter, Question, TestAnswer } from '../../types'
 import { optionLetters, displayOption, displayExplanation, whyWrongFor } from '../../types'
 import { Bookmark, Check, X, MinusCircle, Clock, ThumbsUp, ThumbsDown } from 'lucide-react'
@@ -21,13 +21,18 @@ interface ResultCardProps {
   showExplanation: boolean
   /** Whether this question is bookmarked (omit to hide the bookmark button). */
   bookmarked?: boolean
-  onToggleBookmark?: () => void
+  /** Takes the question id: the caller passes one stable callback shared by
+   *  every card (see ResultPage's `toggleBookmark`) rather than a per-card
+   *  closure, so that reference stays constant across renders — required for
+   *  this component's React.memo below to actually skip untouched cards when
+   *  a single card's bookmark is toggled. */
+  onToggleBookmark?: (questionId: string) => void
 }
 
 /**
  * Compact per-question breakdown card on the Result page.
  */
-export default function ResultCard({
+function ResultCard({
   question,
   index,
   answer,
@@ -70,7 +75,7 @@ export default function ResultCard({
       <div className="mb-2 flex items-center justify-end gap-1.5">
         {attempted && (
           <span
-            className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-0.5 font-heading text-[11px] font-semibold text-navytext/55"
+            className="inline-flex items-center gap-1 rounded-md bg-tint px-2 py-0.5 font-heading text-2xs font-semibold text-navytext/55"
             title={`${t('timeTaken')}: ${formatDuration(timeSpent)}`}
           >
             <Clock size={12} /> {formatDuration(timeSpent)}
@@ -78,7 +83,7 @@ export default function ResultCard({
         )}
         {onToggleBookmark && (
           <button
-            onClick={onToggleBookmark}
+            onClick={() => onToggleBookmark(question.id)}
             aria-label={bookmarked ? t('removeBookmark') : t('saveQuestion')}
             title={bookmarked ? t('savedTapRemove') : t('saveForLater')}
             className={[
@@ -102,14 +107,14 @@ export default function ResultCard({
           prefix={<span className="mr-1 text-secondary">Q{index + 1}.</span>}
         />
         {question.topic && (
-          <span className="tamil mt-1.5 inline-block max-w-full truncate rounded-md bg-brand-soft px-2 py-0.5 align-middle font-heading text-[11px] font-semibold text-brand">
+          <span className="tamil mt-1.5 inline-block max-w-full truncate rounded-md bg-brand-soft px-2 py-0.5 align-middle font-heading text-2xs font-semibold text-brand">
             {topicName(question.topic, lang)}
           </span>
         )}
       </div>
 
       {isAptitude && (question.aptitude_type || question.topic) && (
-        <p className="mb-2 font-heading text-[11px] font-semibold uppercase tracking-wide text-secondary/80">
+        <p className="mb-2 font-heading text-2xs font-semibold uppercase tracking-wide text-secondary/80">
           {[question.topic, question.aptitude_type && `Aptitude - ${question.aptitude_type}`]
             .filter(Boolean)
             .join(' · ')}
@@ -162,7 +167,7 @@ export default function ResultCard({
               (question.category === 'pyq' && question.year)) && (
               <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
                 {question.category === 'pyq' && question.year && (
-                  <p className="mb-1 font-heading text-[11px] font-bold uppercase tracking-wide text-secondary">
+                  <p className="mb-1 font-heading text-2xs font-bold uppercase tracking-wide text-secondary">
                     {t('askedInYear')}: {question.year}
                   </p>
                 )}
@@ -200,6 +205,8 @@ export default function ResultCard({
   )
 }
 
+export default memo(ResultCard)
+
 /** Thumbs up/down on a single explanation. 'down' flags it as needing work. */
 function ExplanationVote({ questionId }: { questionId: string }) {
   const { t } = useT()
@@ -223,7 +230,7 @@ function ExplanationVote({ questionId }: { questionId: string }) {
 
   return (
     <div className="mt-2 flex items-center gap-3 border-t border-line/60 pt-2">
-      <span className="font-body text-[11px] text-ink2">{t('explHelpful')}</span>
+      <span className="font-body text-2xs text-ink2">{t('explHelpful')}</span>
       <button
         type="button"
         onClick={() => cast('up')}

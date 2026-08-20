@@ -38,6 +38,9 @@ export interface SignInResult {
   /** Present only on an OTP-login device-limit block — proves the just-verified
    * OTP so the device replace can finish without a fresh code. */
   ticket?: string
+  /** Password/Google succeeded but the account (admin/superadmin) has TOTP
+   * enabled — `ticket` is the step-up ticket verifyTotp() needs. */
+  totpRequired?: boolean
 }
 
 /** Pull the device list off a `device_limit` 403, or null if it's a different error. */
@@ -98,6 +101,16 @@ export interface AuthState {
   /** Google: after a device-limit block, sign out a device and finish by
    * re-verifying the same Google ID token. */
   replaceDeviceGoogle: (idToken: string, sessionId: string) => Promise<SignInResult>
+  /** TOTP step-up: redeem a totpRequired ticket + a 6-digit (or backup) code
+   * into the session /login or /google withheld. */
+  verifyTotp: (ticket: string, code: string) => Promise<SignInResult>
+  /** TOTP: after a device-limit block on the step-up itself, sign out a
+   * device and finish via the fresh ticket that block returned. */
+  replaceDeviceTotp: (ticket: string, sessionId: string) => Promise<SignInResult>
+  /** TOTP enrollment (own account only) — start, confirm, and disable. */
+  totpEnroll: () => Promise<{ error: string | null; secret?: string; qr?: string }>
+  totpConfirm: (code: string) => Promise<{ error: string | null; backupCodes?: string[] }>
+  totpDisable: (params: { password?: string; backupCode?: string }) => Promise<{ error: string | null }>
   signUp: (params: SignUpParams) => Promise<{ error: string | null }>
   /** Signup WhatsApp-OTP: send a code to the number being registered. Flags let
    * the UI give a precise nudge without parsing error strings. */
@@ -181,9 +194,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signIn: async (email, password) => {
     try {
-      const { user, profile } = await api.auth.login(email.trim(), password)
-      applyProfileLanguage(profile)
-      set({ user, profile })
+      const res = await api.auth.login(email.trim(), password)
+      if ('totpRequired' in res) return { error: null, totpRequired: true, ticket: res.ticket }
+      applyProfileLanguage(res.profile)
+      set({ user: res.user, profile: res.profile })
       armMomentumPanel()
       trackLogin('password')
       return { error: null }
@@ -196,9 +210,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signInWithGoogle: async (idToken) => {
     try {
-      const { user, profile } = await api.auth.google(idToken)
-      applyProfileLanguage(profile)
-      set({ user, profile })
+      const res = await api.auth.google(idToken)
+      if ('totpRequired' in res) return { error: null, totpRequired: true, ticket: res.ticket }
+      applyProfileLanguage(res.profile)
+      set({ user: res.user, profile: res.profile })
       armMomentumPanel()
       trackLogin('google')
       return { error: null }
@@ -234,6 +249,64 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const devices = deviceLimitFrom(e)
       if (devices) return { error: null, deviceLimit: true, devices }
       return { error: e instanceof Error ? e.message : 'Could not switch device' }
+    }
+  },
+
+  verifyTotp: async (ticket, code) => {
+    try {
+      const { user, profile } = await api.auth.totpStepUp(ticket, code)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      armMomentumPanel()
+      trackLogin('totp')
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices, ticket: otpTicketFrom(e) }
+      return { error: e instanceof Error ? e.message : 'Verification failed' }
+    }
+  },
+
+  replaceDeviceTotp: async (ticket, sessionId) => {
+    try {
+      const { user, profile } = await api.auth.totpReplaceDevice(ticket, sessionId)
+      applyProfileLanguage(profile)
+      set({ user, profile })
+      armMomentumPanel()
+      return { error: null }
+    } catch (e) {
+      const devices = deviceLimitFrom(e)
+      if (devices) return { error: null, deviceLimit: true, devices, ticket: otpTicketFrom(e) }
+      return { error: e instanceof Error ? e.message : 'Could not switch device' }
+    }
+  },
+
+  totpEnroll: async () => {
+    try {
+      const { secret, qr } = await api.auth.totpEnroll()
+      return { error: null, secret, qr }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Could not start enrollment' }
+    }
+  },
+
+  totpConfirm: async (code) => {
+    try {
+      const { backupCodes } = await api.auth.totpConfirm(code)
+      await get().fetchProfile()
+      return { error: null, backupCodes }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Invalid code. Please try again.' }
+    }
+  },
+
+  totpDisable: async (params) => {
+    try {
+      await api.auth.totpDisable(params)
+      await get().fetchProfile()
+      return { error: null }
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : 'Could not disable two-factor authentication' }
     }
   },
 
@@ -286,7 +359,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const res = await api.auth.register({ ...params, email: params.email.trim() })
       if ('requiresConfirmation' in res) {
-        return { error: 'Check your email to confirm your account, then sign in.' }
+        // Not a failure — RegisterPage's existing `user`-is-still-null branch
+        // already renders this as the green "check your email" success state.
+        // Returning it as an `error` string here previously routed it through
+        // the same red alert banner real failures use.
+        return { error: null }
       }
       applyProfileLanguage(res.profile)
       set({ user: res.user, profile: res.profile })
@@ -306,6 +383,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       if (code === 'phone_not_verified') {
         return { error: 'Phone verification expired. Please verify your number again.' }
+      }
+      if (code === 'password_too_short') {
+        return { error: 'Password must be at least 8 characters.' }
+      }
+      if (code === 'password_breached') {
+        return { error: 'This password has appeared in a known data breach. Please choose a different one.' }
       }
       return { error: code || 'Sign up failed' }
     }

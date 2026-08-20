@@ -95,7 +95,7 @@ export default function AuthShell({ children }: AuthShellProps) {
               {CHIP_KEYS.map((key) => (
                 <span
                   key={key}
-                  className="tamil rounded-full bg-brand-soft px-3 py-1 font-heading text-[11px] font-semibold text-brand-dark"
+                  className="tamil rounded-full bg-brand-soft px-3 py-1 font-heading text-2xs font-semibold text-brand-dark"
                 >
                   {t(key)}
                 </span>

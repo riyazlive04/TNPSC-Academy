@@ -116,7 +116,7 @@ export default function ThirukuralModal({
           ) : null}
           {current ? (
             <div className="flex min-w-0 flex-1 items-baseline gap-2">
-              <span className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-accent">
+              <span className="font-heading text-xs font-bold uppercase tracking-[0.12em] text-accent">
                 Kural No
               </span>
               <span className="font-display text-2xl font-bold leading-none text-ink">
@@ -124,7 +124,7 @@ export default function ThirukuralModal({
               </span>
             </div>
           ) : (
-            <h2 className="tamil min-w-0 flex-1 truncate font-display text-[17px] font-bold text-ink">
+            <h2 className="tamil min-w-0 flex-1 truncate font-display text-lg font-bold text-ink">
               {t('thirukuralTitle')}
             </h2>
           )}
@@ -174,7 +174,7 @@ export default function ThirukuralModal({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t('thirukuralSearch')}
-                  className="focus-ring tamil w-full rounded-tile border border-line bg-surface py-2.5 pl-10 pr-4 font-body text-[15px] text-ink placeholder:text-muted/70"
+                  className="focus-ring tamil w-full rounded-tile border border-line bg-surface py-2.5 pl-10 pr-4 font-body text-base text-ink placeholder:text-muted/70"
                 />
               </div>
 
@@ -187,10 +187,10 @@ export default function ThirukuralModal({
                   {groups.map((g) => (
                     <section key={g.no}>
                       <div className="mb-1 flex items-baseline justify-between gap-3 px-1">
-                        <h3 className="tamil min-w-0 truncate font-display text-[14px] font-bold text-ink">
+                        <h3 className="tamil min-w-0 truncate font-display text-sm font-bold text-ink">
                           {g.no}. {lang === 'en' ? g.en : g.ta}
                         </h3>
-                        <span className="tamil flex-shrink-0 font-heading text-[11px] font-semibold uppercase tracking-wide text-accent">
+                        <span className="tamil flex-shrink-0 font-heading text-2xs font-semibold uppercase tracking-wide text-accent">
                           {lang === 'both' ? g.en : g.translit}
                         </span>
                       </div>
@@ -200,7 +200,7 @@ export default function ThirukuralModal({
                             key={k.kural_no}
                             onClick={() => setSelected(k.kural_no)}
                             leading={
-                              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-tile bg-tint-violet font-heading text-[13px] font-bold text-primary">
+                              <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-tile bg-tint-violet font-heading text-sm font-bold text-primary">
                                 {k.kural_no}
                               </span>
                             }
@@ -255,7 +255,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
           max={19}
         />
         {showEn && (
-          <p className="mt-1.5 font-display text-[13px] font-medium italic leading-relaxed text-muted">
+          <p className="mt-1.5 font-display text-sm font-medium italic leading-relaxed text-muted">
             {translitLines.map((line, i) => (
               <span key={i}>
                 {i > 0 && <br />}
@@ -281,7 +281,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
       {/* பொருள் - Kalaignar's Tamil explanation (ta/both) */}
       {showTa && (
         <DetailRow label="பொருள்" labelTamil>
-          <p className="tamil font-body text-[15px] leading-relaxed text-ink">
+          <p className="tamil font-body text-base leading-relaxed text-ink">
             {k.urai_mu_karunanidhi}
           </p>
         </DetailRow>
@@ -290,7 +290,7 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
       {/* Meaning - English (en/both) */}
       {showEn && (
         <DetailRow label="Meaning">
-          <p className="font-body text-[15px] leading-relaxed text-muted">{k.explanation_en}</p>
+          <p className="font-body text-base leading-relaxed text-muted">{k.explanation_en}</p>
         </DetailRow>
       )}
     </dl>
@@ -299,13 +299,13 @@ function KuralDetail({ k, lang }: { k: Kural; lang: string }) {
 
 /** A row value that shows Tamil, English, or both (Tamil over muted English). */
 function BiValue({ ta, en, lang }: { ta: string; en: string; lang: string }) {
-  if (lang === 'en') return <span className="font-body text-[15px] text-ink">{en}</span>
+  if (lang === 'en') return <span className="font-body text-base text-ink">{en}</span>
   if (lang === 'ta')
-    return <span className="tamil font-body text-[15px] text-ink">{ta}</span>
+    return <span className="tamil font-body text-base text-ink">{ta}</span>
   return (
     <span>
-      <span className="tamil block font-body text-[15px] text-ink">{ta}</span>
-      <span className="block font-body text-[13px] text-muted">{en}</span>
+      <span className="tamil block font-body text-base text-ink">{ta}</span>
+      <span className="block font-body text-sm text-muted">{en}</span>
     </span>
   )
 }
@@ -323,7 +323,7 @@ function DetailRow({
     <div className="flex gap-3 py-4 sm:gap-4">
       <dt className="w-[68px] flex-shrink-0 pt-1 sm:w-24">
         <span
-          className={`font-heading text-[10px] font-bold uppercase tracking-wide text-muted sm:text-[11px] ${
+          className={`font-heading text-2xs font-bold uppercase tracking-wide text-muted sm:text-2xs ${
             labelTamil ? 'tamil' : ''
           }`}
         >

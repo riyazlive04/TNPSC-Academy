@@ -2,21 +2,31 @@ import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { postAuthDestination } from '../../lib/authRouting'
+import { postAuthDestination, postAuthState } from '../../lib/authRouting'
 import { useT } from '../../lib/i18n'
 import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
 import { useThemeStore } from '../../store/themeStore'
+import { useAuthConfigStore } from '../../store/authConfigStore'
 import DeviceLimitModal from './DeviceLimitModal'
+import TotpChallengeModal from './TotpChallengeModal'
 import type { DeviceSession } from '../../lib/api'
 
-// Public OAuth Web Client ID (safe to ship to the browser). When unset the
+// Public OAuth Web Client ID (safe to ship to the browser) — still needed
+// client-side to initialize Google Identity Services itself. When unset the
 // component renders nothing, so the rest of auth works without Google.
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 const GSI_SRC = 'https://accounts.google.com/gsi/client'
 
-/** True when a Google Client ID is configured - host pages use this to hide the
- * "or" divider too, so it never appears stranded above an absent button. */
-export const isGoogleConfigured = Boolean(CLIENT_ID)
+/**
+ * True only when Google is usable end to end: the Client ID is baked into this
+ * build AND the server also reports it configured (its own GOOGLE_CLIENT_ID).
+ * Host pages use this to hide the "or" divider too, so it never appears
+ * stranded above an absent button. Reactive — see authConfigStore.
+ */
+export function useIsGoogleConfigured(): boolean {
+  const serverSide = useAuthConfigStore((s) => s.google)
+  return Boolean(CLIENT_ID) && serverSide
+}
 
 declare global {
   interface Window {
@@ -75,8 +85,9 @@ export default function GoogleSignInButton({
   text = 'continue_with',
 }: GoogleSignInButtonProps) {
   const navigate = useNavigate()
-  const { signInWithGoogle, replaceDeviceGoogle } = useAuth()
+  const { signInWithGoogle, replaceDeviceGoogle, verifyTotp, replaceDeviceTotp } = useAuth()
   const { t } = useT()
+  const configured = useIsGoogleConfigured()
   // Re-render Google's widget with its dark variant when the app is in dark mode,
   // otherwise the official button stays glaring white on a dark surface.
   const resolved = useThemeStore((s) => s.resolved)
@@ -95,6 +106,14 @@ export default function GoogleSignInButton({
   const [deviceLimit, setDeviceLimit] = useState<{ idToken: string; devices: DeviceSession[] } | null>(null)
   const [signingOutId, setSigningOutId] = useState<string | null>(null)
   const [modalError, setModalError] = useState('')
+  // TOTP step-up (admin/superadmin only): Google succeeded but a second
+  // factor is still owed. totpDeviceTicket is the SEPARATE ticket a device-
+  // limit block reached DURING this step returns (distinct from the Google
+  // idToken the deviceLimit state above re-verifies).
+  const [totpTicket, setTotpTicket] = useState<string | null>(null)
+  const [totpBusy, setTotpBusy] = useState(false)
+  const [totpError, setTotpError] = useState('')
+  const [totpDeviceTicket, setTotpDeviceTicket] = useState<string | null>(null)
 
   // GIS registers its callback ONCE; keep the latest deps in a ref so that single
   // callback always sees fresh props/handlers without re-initialising the widget.
@@ -103,6 +122,12 @@ export default function GoogleSignInButton({
     setBusy(true)
     onStart?.()
     const res = await signInWithGoogle(credential)
+    if (res.totpRequired && res.ticket) {
+      setBusy(false)
+      setTotpError('')
+      setTotpTicket(res.ticket)
+      return
+    }
     // The account is already on the max number of devices. Open the same
     // replace-device modal the password/OTP flows use; ownership is re-proven by
     // re-verifying this Google ID token when a device is signed out.
@@ -118,22 +143,26 @@ export default function GoogleSignInButton({
       return
     }
     // Leave the overlay up through navigation; it unmounts with this component.
-    navigate(postAuthDestination(fromPath), { replace: true })
+    navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
   }
   const errorRef = useRef(onError)
   errorRef.current = onError
 
-  // Sign out the chosen device, then finish signing in here by re-verifying the
-  // stored Google ID token. Keep the modal open (refreshing its list) if the
-  // account is somehow still over the limit; surface failures inside the modal.
+  // Sign out the chosen device, then finish signing in here. TOTP-triggered
+  // blocks (already past the code check) use that fresh ticket; Google-
+  // triggered blocks re-verify the stored ID token. Keep the modal open
+  // (refreshing its list) if the account is somehow still over the limit.
   const onSignOutDevice = async (sessionId: string) => {
-    if (!deviceLimit || signingOutId) return
+    if ((!deviceLimit && !totpDeviceTicket) || signingOutId) return
     setSigningOutId(sessionId)
     setModalError('')
-    const res = await replaceDeviceGoogle(deviceLimit.idToken, sessionId)
+    const res = totpDeviceTicket
+      ? await replaceDeviceTotp(totpDeviceTicket, sessionId)
+      : await replaceDeviceGoogle(deviceLimit!.idToken, sessionId)
     if (res.deviceLimit) {
       setSigningOutId(null)
-      setDeviceLimit({ idToken: deviceLimit.idToken, devices: res.devices ?? [] })
+      if (totpDeviceTicket) setTotpDeviceTicket(res.ticket ?? null)
+      else setDeviceLimit({ idToken: deviceLimit!.idToken, devices: res.devices ?? [] })
       return
     }
     if (res.error) {
@@ -143,8 +172,32 @@ export default function GoogleSignInButton({
     }
     setSigningOutId(null)
     setDeviceLimit(null)
+    setTotpDeviceTicket(null)
     setBusy(true) // overlay through navigation
-    navigate(postAuthDestination(fromPath), { replace: true })
+    navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
+  }
+
+  // Verify the TOTP code and finish signing in.
+  const onVerifyTotp = async (code: string) => {
+    if (!totpTicket) return
+    setTotpBusy(true)
+    setTotpError('')
+    const res = await verifyTotp(totpTicket, code)
+    setTotpBusy(false)
+    if (res.deviceLimit) {
+      setTotpTicket(null)
+      setTotpDeviceTicket(res.ticket ?? totpTicket)
+      setModalError('')
+      setDeviceLimit({ idToken: '', devices: res.devices ?? [] })
+      return
+    }
+    if (res.error) {
+      setTotpError(res.error)
+      return
+    }
+    setTotpTicket(null)
+    setBusy(true) // overlay through navigation
+    navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
   }
 
   // Inside the Capacitor app, drive the account picker through the native plugin
@@ -230,7 +283,12 @@ export default function GoogleSignInButton({
     renderRef.current()
   }, [resolved])
 
-  if (!CLIENT_ID) return null
+  // The GSI-loading effect above still gates on CLIENT_ID alone (a static,
+  // synchronous value) to avoid a stale-closure re-run problem with its
+  // mount-once empty deps array; `configured` additionally folds in the
+  // server's async-loaded flag and is safe to read fresh here since render
+  // (unlike that effect) naturally re-runs whenever the store updates.
+  if (!configured) return null
 
   // Native app: GIS can't render in the WebView, so use our own button that
   // triggers the native Google account picker.
@@ -297,7 +355,19 @@ export default function GoogleSignInButton({
         onClose={() => {
           if (signingOutId) return
           setDeviceLimit(null)
+          setTotpDeviceTicket(null)
           setModalError('')
+        }}
+      />
+      <TotpChallengeModal
+        open={!!totpTicket}
+        busy={totpBusy}
+        error={totpError}
+        onVerify={onVerifyTotp}
+        onClose={() => {
+          if (totpBusy) return
+          setTotpTicket(null)
+          setTotpError('')
         }}
       />
     </>

@@ -126,9 +126,16 @@ paywall shows a price and then fails at purchase.
 
 | Plan | Product ID | Type (App Store) | Type (Play) | Price |
 |---|---|---|---|---|
-| Premium, 3 months | `com.tnpscmentor.app.premium90` | Non-Renewing Subscription | One-time product, **consumable** | ₹1,699 |
+| Premium, 6 months | `com.tnpscmentor.app.premium90`¹ | Non-Renewing Subscription | One-time product, **consumable** | ₹1,699 |
 | Vettri Nichayam, full | `com.tnpscmentor.app.vettri60` | Non-Renewing Subscription | One-time product, **consumable** | ₹899 |
 | Vettri Nichayam, monthly | `com.tnpscmentor.app.vettri30` | Non-Renewing Subscription | One-time product, **consumable** | ₹499 |
+| Group II/ IIA- Rank Booster, 90 days | `com.tnpscmentor.app.rankbooster90` | Non-Renewing Subscription | One-time product, **consumable** | ₹1,249 |
+| Group 1 Mock Test Pack, 80 days | `com.tnpscmentor.app.mockpack80` | Non-Renewing Subscription | One-time product, **consumable** | ₹399 |
+
+¹ Product ID kept as-is even though Premium's validity moved from 90 to 180
+days — renaming a live store product ID risks breaking existing purchase
+history/receipts, and the store doesn't enforce duration anyway (the backend
+does, via `PREMIUM_VALIDITY_MS`). The ID is just a label at this point.
 
 **Why non-renewing / consumable rather than auto-renewable:** access is a fixed
 window the server owns, nothing auto-debits, and users re-buy deliberately.
@@ -275,7 +282,7 @@ and track progress with spaced-repetition revision.
 
 PAID CONTENT
 Two plans, both sold through in-app purchase:
-  • Premium — 3 months of full access
+  • Premium — 6 months of full access
   • Vettri Nichayam — a 13-paper scheduled mock-exam programme (full or monthly)
 Both are NON-RENEWING subscriptions: access is a fixed window our server owns,
 nothing auto-renews, and users re-purchase deliberately. This suits a fixed-term

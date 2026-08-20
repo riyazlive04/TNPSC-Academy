@@ -72,7 +72,7 @@ function MagazineItemView({
 function Bullets({ md, tamil = false }: { md: string; tamil?: boolean }) {
   const lines = parseBullets(md)
   return (
-    <div className={`space-y-1.5 font-body text-[13.5px] leading-relaxed text-ink2 ${tamil ? 'tamil' : ''}`}>
+    <div className={`space-y-1.5 font-body text-sm leading-relaxed text-ink2 ${tamil ? 'tamil' : ''}`}>
       {lines.map((line, i) => (
         <div key={i} className="flex gap-2" style={{ paddingLeft: `${line.depth * 16}px` }}>
           <span

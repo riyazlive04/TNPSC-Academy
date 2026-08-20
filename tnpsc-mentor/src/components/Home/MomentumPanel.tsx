@@ -49,7 +49,7 @@ const DAYS_TA = ['ஞாயிறு', 'திங்கள்', 'செவ்வ
 const DAYS_TA_SHORT = ['ஞா', 'தி', 'செ', 'பு', 'வி', 'வெ', 'ச']
 
 const chipClass =
-  'focus-ring press tamil inline-flex items-center gap-1.5 rounded-pill border border-line bg-card px-3.5 py-2 font-heading text-[12.5px] font-semibold text-ink transition-colors hover:border-brand/40 hover:text-brand-dark'
+  'focus-ring press tamil inline-flex items-center gap-1.5 rounded-pill border border-line bg-card px-3.5 py-2 font-heading text-xs font-semibold text-ink transition-colors hover:border-brand/40 hover:text-brand-dark'
 
 export default function MomentumPanel({
   habit,
@@ -153,24 +153,24 @@ export default function MomentumPanel({
                 {met ? (
                   <Check size={24} strokeWidth={3} className="animate-checkPop text-mint" />
                 ) : (
-                  <span className="font-display text-[13px] font-bold leading-none text-ink">
+                  <span className="font-display text-sm font-bold leading-none text-ink">
                     {habit.questionsToday}/{goal}
                   </span>
                 )}
               </CircularProgress>
               <span className="min-w-0 flex-1">
-                <span className="tamil block font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+                <span className="tamil block font-heading text-2xs font-bold uppercase tracking-wide text-muted">
                   {t('dailyGoal')}
                 </span>
                 <span
-                  className={`tamil mt-1 block font-display text-[17px] font-bold leading-tight ${
+                  className={`tamil mt-1 block font-display text-lg font-bold leading-tight ${
                     met ? 'text-mint' : 'text-ink'
                   }`}
                 >
                   {met ? t('goalDone') : `${remaining} ${t('questionsToGo')}`}
                 </span>
                 <span
-                  className={`tamil mt-0.5 block font-body text-[12px] leading-snug ${
+                  className={`tamil mt-0.5 block font-body text-xs leading-snug ${
                     streakAtRisk ? 'font-medium text-accent' : 'text-muted'
                   }`}
                 >
@@ -181,7 +181,7 @@ export default function MomentumPanel({
                       : `${habit.questionsToday}/${goal} ${t('questionsToday')}`}
                 </span>
               </span>
-              <span className="hidden flex-shrink-0 items-center gap-1 rounded-pill bg-brand-soft px-3.5 py-2 font-heading text-[12px] font-semibold text-brand-dark transition-all group-hover:gap-2 sm:inline-flex">
+              <span className="hidden flex-shrink-0 items-center gap-1 rounded-pill bg-brand-soft px-3.5 py-2 font-heading text-xs font-semibold text-brand-dark transition-all group-hover:gap-2 sm:inline-flex">
                 {t('start')} <ChevronRight size={14} />
               </span>
               <ChevronRight
@@ -195,7 +195,7 @@ export default function MomentumPanel({
               aria-label={t('adjustGoal')}
               aria-expanded={editing}
               aria-controls="goal-editor"
-              className="icon-btn focus-ring mr-2 h-9 w-9 flex-shrink-0 self-center"
+              className="icon-btn focus-ring mr-2 h-11 w-11 flex-shrink-0 self-center"
             >
               {editing ? <X size={16} /> : <Pencil size={15} />}
             </button>
@@ -206,7 +206,7 @@ export default function MomentumPanel({
         {SHOW_GOALS && editing && (
           <div id="goal-editor" className="animate-slideDown px-4 py-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="tamil mr-1 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+              <span className="tamil mr-1 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
                 {t('adjustGoal')}
               </span>
               {GOAL_PRESETS.map((p) => (
@@ -215,7 +215,7 @@ export default function MomentumPanel({
                   type="button"
                   onClick={() => applyGoal(p)}
                   aria-pressed={goal === p}
-                  className={`focus-ring press rounded-pill px-3.5 py-1.5 font-heading text-[12.5px] font-semibold transition-colors ${
+                  className={`focus-ring press rounded-pill px-3.5 py-1.5 font-heading text-xs font-semibold transition-colors ${
                     goal === p
                       ? 'bg-brand text-white'
                       : 'border border-line bg-card text-ink hover:border-brand/40 hover:text-brand-dark'
@@ -230,13 +230,13 @@ export default function MomentumPanel({
                   onClick={() => applyGoal(goal - GOAL_STEP)}
                   disabled={goal <= GOAL_MIN}
                   aria-label={`−${GOAL_STEP}`}
-                  className="icon-btn focus-ring h-8 w-8 rounded-lg border border-line disabled:opacity-40"
+                  className="icon-btn focus-ring h-11 w-11 rounded-lg border border-line disabled:opacity-40"
                 >
                   <Minus size={14} />
                 </button>
                 <span
                   aria-live="polite"
-                  className="w-10 text-center font-display text-[15px] font-bold text-ink"
+                  className="w-10 text-center font-display text-base font-bold text-ink"
                 >
                   {goal}
                 </span>
@@ -245,7 +245,7 @@ export default function MomentumPanel({
                   onClick={() => applyGoal(goal + GOAL_STEP)}
                   disabled={goal >= GOAL_MAX}
                   aria-label={`+${GOAL_STEP}`}
-                  className="icon-btn focus-ring h-8 w-8 rounded-lg border border-line disabled:opacity-40"
+                  className="icon-btn focus-ring h-11 w-11 rounded-lg border border-line disabled:opacity-40"
                 >
                   <Plus size={14} />
                 </button>
@@ -258,11 +258,11 @@ export default function MomentumPanel({
         {SHOW_STREAK && (
           <div className="px-4 py-3">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="tamil font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+              <span className="tamil font-heading text-2xs font-bold uppercase tracking-wide text-muted">
                 {t('thisWeek')}
               </span>
               {nextMilestone != null && (
-                <span className="tamil inline-flex items-center gap-1 font-body text-[11.5px] text-muted">
+                <span className="tamil inline-flex items-center gap-1 font-body text-xs text-muted">
                   <Flame size={12} className="text-accent" aria-hidden />
                   <span className="font-heading font-semibold text-ink">
                     {habit.currentStreak}/{nextMilestone}
@@ -285,14 +285,14 @@ export default function MomentumPanel({
                     }`}
                   >
                     <span
-                      className={`tamil font-heading text-[10px] font-semibold uppercase ${
+                      className={`tamil font-heading text-2xs font-semibold uppercase ${
                         d.isToday ? 'text-brand' : 'text-muted'
                       }`}
                     >
                       {dayShort[d.dow]}
                     </span>
                     <span
-                      className={`grid h-7 w-7 place-items-center rounded-full font-display text-[10px] font-bold ${
+                      className={`grid h-7 w-7 place-items-center rounded-full font-display text-2xs font-bold ${
                         d.q >= goal
                           ? 'border border-mint/40 bg-mintsoft text-mint'
                           : d.q > 0
@@ -327,15 +327,15 @@ export default function MomentumPanel({
           onClick={() => navigate('/profile')}
           className="focus-ring group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-tint/30"
         >
-          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl bg-brand-soft font-display text-[13px] font-bold text-brand-dark">
+          <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl bg-brand-soft font-display text-sm font-bold text-brand-dark">
             {lvl.level}
           </span>
           <span className="min-w-0 flex-1">
             <span className="flex items-baseline justify-between gap-2">
-              <span className="tamil truncate font-heading text-[12.5px] font-semibold text-ink">
+              <span className="tamil truncate font-heading text-xs font-semibold text-ink">
                 {t('level')} {lvl.level} · {lvl.title}
               </span>
-              <span className="flex-shrink-0 font-body text-[11px] text-muted">
+              <span className="flex-shrink-0 font-body text-2xs text-muted">
                 {lvl.toNext} {t('xp')} → {lvl.level + 1}
               </span>
             </span>

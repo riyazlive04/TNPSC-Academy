@@ -136,7 +136,7 @@ export default function MagazineEditor({
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="truncate font-heading text-sm font-semibold text-ink sm:text-base">{heading}</h2>
-          <p className="truncate font-body text-[11px] text-ink2 sm:text-xs">{meta}</p>
+          <p className="truncate font-body text-2xs text-ink2 sm:text-xs">{meta}</p>
         </div>
 
         {mode === 'edit' && <SaveStatus state={saveState} />}
@@ -167,7 +167,7 @@ export default function MagazineEditor({
             <button
               key={l}
               onClick={() => setPreviewLang(l)}
-              className={`rounded-full border px-3 py-1 font-heading text-[11px] font-semibold transition ${
+              className={`rounded-full border px-3 py-1 font-heading text-2xs font-semibold transition ${
                 previewLang === l
                   ? 'border-brand bg-brand text-white'
                   : 'border-line bg-card text-ink2 hover:border-brand-ring hover:text-ink'
@@ -398,7 +398,7 @@ function ThumbnailEditor({
                 {issue.ca_type === 'day_wise' ? 'Use the original' : 'Remove'}
               </button>
             )}
-            <span className="font-body text-[11px] text-ink2">JPG, PNG or WebP · max {THUMB_MAX_MB} MB</span>
+            <span className="font-body text-2xs text-ink2">JPG, PNG or WebP · max {THUMB_MAX_MB} MB</span>
           </div>
         </div>
       </div>
@@ -426,7 +426,7 @@ function SaveStatus({ state }: { state: SaveState }) {
     error: { icon: <AlertTriangle size={13} />, text: 'Not saved', cls: 'text-coral' },
   }[state]
   return (
-    <span className={`flex flex-shrink-0 items-center gap-1 font-heading text-[11px] font-semibold ${map.cls}`}>
+    <span className={`flex flex-shrink-0 items-center gap-1 font-heading text-2xs font-semibold ${map.cls}`}>
       {map.icon}
       <span className="hidden sm:inline">{map.text}</span>
     </span>
@@ -545,13 +545,13 @@ function DocItem({
             <button
               onClick={del}
               disabled={deleting}
-              className="press inline-flex items-center gap-1 rounded-full bg-coral px-2.5 py-1 font-heading text-[11px] font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+              className="press inline-flex items-center gap-1 rounded-full bg-coral px-2.5 py-1 font-heading text-2xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
             >
               {deleting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Yes
             </button>
             <button
               onClick={() => setConfirmDel(false)}
-              className="rounded-full px-2 py-1 font-heading text-[11px] font-semibold text-ink2 hover:text-ink"
+              className="rounded-full px-2 py-1 font-heading text-2xs font-semibold text-ink2 hover:text-ink"
             >
               No
             </button>
@@ -573,7 +573,7 @@ function DocItem({
         onChange={setTitle}
         onBlur={commit}
         placeholder="Title"
-        className="font-heading text-[17px] font-semibold leading-snug text-ink"
+        className="font-heading text-lg font-semibold leading-snug text-ink"
       />
       <RichTextEditor
         value={content}
@@ -586,7 +586,7 @@ function DocItem({
 
       {/* Tamil twin */}
       <div className="mt-3 border-l-2 border-line pl-3">
-        <span className="tamil mb-0.5 block font-heading text-[10px] font-bold uppercase tracking-wider text-ink2/50">
+        <span className="tamil mb-0.5 block font-heading text-2xs font-bold uppercase tracking-wider text-ink2/50">
           தமிழ் / Tamil
         </span>
         <AutoTextarea
@@ -595,7 +595,7 @@ function DocItem({
           onBlur={commit}
           placeholder="தலைப்பு (Tamil title)"
           tamil
-          className="font-heading text-[15px] font-semibold leading-snug text-ink"
+          className="font-heading text-base font-semibold leading-snug text-ink"
         />
         <RichTextEditor
           value={contentTa}
@@ -664,7 +664,7 @@ function AddItemComposer({
         value={title}
         onChange={setTitle}
         placeholder="Title"
-        className="font-heading text-[17px] font-semibold leading-snug text-ink"
+        className="font-heading text-lg font-semibold leading-snug text-ink"
       />
       <RichTextEditor
         value={content}
@@ -674,7 +674,7 @@ function AddItemComposer({
         className="mt-1.5"
       />
       <div className="mt-3 border-l-2 border-line pl-3">
-        <span className="tamil mb-0.5 block font-heading text-[10px] font-bold uppercase tracking-wider text-ink2/50">
+        <span className="tamil mb-0.5 block font-heading text-2xs font-bold uppercase tracking-wider text-ink2/50">
           தமிழ் / Tamil (optional)
         </span>
         <AutoTextarea
@@ -682,7 +682,7 @@ function AddItemComposer({
           onChange={setTitleTa}
           placeholder="தலைப்பு"
           tamil
-          className="font-heading text-[15px] font-semibold leading-snug text-ink"
+          className="font-heading text-base font-semibold leading-snug text-ink"
         />
         <RichTextEditor
           value={contentTa}
@@ -776,7 +776,7 @@ function RichTextEditor({
       <div className="relative">
         {empty && placeholder && (
           <div
-            className={`pointer-events-none absolute left-0 top-0 font-body text-[15px] leading-relaxed text-ink2/35 ${
+            className={`pointer-events-none absolute left-0 top-0 font-body text-base leading-relaxed text-ink2/35 ${
               tamil ? 'tamil' : ''
             }`}
           >
@@ -798,7 +798,7 @@ function RichTextEditor({
             focused.current = false
             onBlur?.()
           }}
-          className={`min-h-[1.6em] w-full font-body text-[15px] leading-relaxed text-ink2 outline-none [&_b]:font-semibold [&_b]:text-ink [&_li]:my-0.5 [&_p]:my-1 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_ul_ul]:list-[circle] ${
+          className={`min-h-[1.6em] w-full font-body text-base leading-relaxed text-ink2 outline-none [&_b]:font-semibold [&_b]:text-ink [&_li]:my-0.5 [&_p]:my-1 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_ul_ul]:list-[circle] ${
             tamil ? 'tamil' : ''
           }`}
         />
@@ -881,7 +881,7 @@ function SectionSelect({ value, onChange }: { value: string; onChange: (v: strin
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="tamil max-w-[60vw] truncate rounded-full border border-line bg-card px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2 outline-none transition hover:border-brand-ring focus:border-brand-ring sm:max-w-xs"
+      className="tamil max-w-[60vw] truncate rounded-full border border-line bg-card px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2 outline-none transition hover:border-brand-ring focus:border-brand-ring sm:max-w-xs"
     >
       {options.map((topic) => (
         <option key={topic} value={topic}>

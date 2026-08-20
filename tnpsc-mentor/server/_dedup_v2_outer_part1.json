@@ -1,0 +1,1190 @@
+[
+ {
+  "sig": "adopted|assembly|constituent|constitution|january|november",
+  "rows": [
+   {
+    "id": "81a78d84-e231-4b6b-af43-b4f15f42779a",
+    "question_text": "The Constitution of India was adopted by the Constituent Assembly on",
+    "option_a": "26 January 1950",
+    "option_b": "26 November 1949",
+    "option_c": "15 August 1947",
+    "option_d": "26 January 1949"
+   },
+   {
+    "id": "0bb51c93-2799-42d6-9cef-71ee9a9d73ca",
+    "question_text": "When was the Indian Constitution adopted by the constituent assembly?",
+    "option_a": "15th August 1947",
+    "option_b": "26th January 1948",
+    "option_c": "26th November 1949",
+    "option_d": "26th January 1950"
+   }
+  ]
+ },
+ {
+  "sig": "analogous|general|governor|kingdom|position|president",
+  "rows": [
+   {
+    "id": "6633b4c9-d1d5-4300-9bb8-b1ca7a406c7f",
+    "question_text": "The position of the President of India is analogous to the",
+    "option_a": "Queen of United Kingdom",
+    "option_b": "President of United States",
+    "option_c": "Governor-General of Canada",
+    "option_d": "None of them"
+   },
+   {
+    "id": "75c5201d-3325-4525-8cbd-66c01ee52fb8",
+    "question_text": "The position of the President of the India is analogous to the",
+    "option_a": "President of United States",
+    "option_b": "Queen of United Kingdom",
+    "option_c": "Governor-General of Canada",
+    "option_d": "None of them"
+   }
+  ]
+ },
+ {
+  "sig": "accordance|applicable|constitution|fundamental|jurisdiction|recommendations",
+  "rows": [
+   {
+    "id": "3305afe0-85ae-44ac-bd81-9cc9d7b1504a",
+    "question_text": "Which of the following statements regarding the fundamental duties contained in the Constitution\nof India are correct?\nI. Fundamental duties can be enforced through writ jurisdiction.\nII. Fundamental duties have formed a part of the Constitution of India since its adoption.\nIII. Fundamental duties have become a part of the Constitution of India in accordance with the\nrecommendations of the Swaran Singh Committee.\nIV. Fundamental duties are applicable only to citizens of India.\nOf the Statements:",
+    "option_a": "I, II and III are correct",
+    "option_b": "I, II and IV are correct",
+    "option_c": "II and III are correct",
+    "option_d": "III and IV are correct"
+   },
+   {
+    "id": "bebc3ff5-1c38-426c-9267-26220463a41a",
+    "question_text": "Which of the following statements regarding the Fundamental Duties contained in the Constitution of India V are correct?\nI. Fundamental Duties can be enforced through writ jurisdiction.\nII. Fundamental Duties have formed a part of the Constitution of India since its adoption.\nIII. Fundamental Duties have become a part of the Constitution of India in accordance with the recommendations of the Swarn Singh Committee.\nIV. Fundamental Duties are applicable only to citizens of India.\nCodes",
+    "option_a": "I, II and III",
+    "option_b": "I, II and IV",
+    "option_c": "II and III",
+    "option_d": "III and IV"
+   }
+  ]
+ },
+ {
+  "sig": "aggrieved|applicable|fundamental|infringed|investigated|petitioner",
+  "rows": [
+   {
+    "id": "e5612e4b-3385-4469-b98b-f3935bb19cbd",
+    "question_text": "What is the ground on which the Supreme Court can refuse relief under Article-32?",
+    "option_a": "The aggrieved person can get remedy from another court.",
+    "option_b": "That disputed facts have to be investigated",
+    "option_c": "That no Fundamental Right has been infringed.",
+    "option_d": "That the petitioner has not asked for the proper writ applicable to his/her case."
+   },
+   {
+    "id": "accc86cd-03bb-46e2-9b55-dad87c68471b",
+    "question_text": "What is the ground on which the Supreme Court can refuse relief under Article 327?",
+    "option_a": "The aggrieved person can get remedy from another court.",
+    "option_b": "That disputed facts have to be investigated.",
+    "option_c": "That no Fundamental Right has been infringed.",
+    "option_d": "That the petitioner has not asked for the proper writ applicable to his/her case."
+   }
+  ]
+ },
+ {
+  "sig": "constitution|grounds|impeached|incapacity|misbehaviour|violation",
+  "rows": [
+   {
+    "id": "2fafc1e8-204d-44f0-8b2c-62b7e1def791",
+    "question_text": "On which of the following grounds can a Judge of the Supreme Court be impeached?\nI. Violation of the Constitution.\nII. Proved misbehaviour.\nIII. Incapacity to act as a judge.\nSelect the correct answer using the codes given below",
+    "option_a": "Only I",
+    "option_b": "Only II",
+    "option_c": "I, II and III",
+    "option_d": "II and III"
+   },
+   {
+    "id": "4ba519f4-dc7e-434f-8ca5-dcb6267d2a12",
+    "question_text": "On which of the following grounds can a judge of the High Court be impeached? \nI. Violation of the Constitution\nII. Proved misbehaviour\nIII. Incapacity to act as a judge\nSelect the correct answer using the codes given below.",
+    "option_a": "Only I",
+    "option_b": "Only II",
+    "option_c": "II and III",
+    "option_d": "All of these"
+   }
+  ]
+ },
+ {
+  "sig": "electrons|element|neutrons|number|protons|represents",
+  "rows": [
+   {
+    "id": "1cf1188f-784c-4a34-8d76-b4e0fd2f6c0a",
+    "question_text": "Mass number of an element represents",
+    "option_a": "Number of protons and neutrons",
+    "option_b": "Number of electrons and neutrons",
+    "option_c": "Number of protons and electrons",
+    "option_d": "None of these"
+   },
+   {
+    "id": "d1072cae-651f-4500-b9dc-0680fbe16c3c",
+    "question_text": "Mass number of an element represents number of",
+    "option_a": "Protons and neutrons",
+    "option_b": "Electrons and neutrons",
+    "option_c": "Protons and electrons",
+    "option_d": "None of these"
+   }
+  ]
+ },
+ {
+  "sig": "cathode|magnetron|microwaves|positive|production",
+  "rows": [
+   {
+    "id": "58db508c-dc0c-4d3e-9f33-9bdf90cdceb9",
+    "question_text": "Magnetron is used for the production of",
+    "option_a": "X - rays",
+    "option_b": "Cathode rays",
+    "option_c": "Microwaves",
+    "option_d": "Positive rays"
+   },
+   {
+    "id": "76cc4127-a0cf-441b-8ee7-e4575bf2ea31",
+    "question_text": "Magnetron is used for the production of",
+    "option_a": "X -rays",
+    "option_b": "Cathode rays",
+    "option_c": "Microwaves",
+    "option_d": "Positive rays"
+   }
+  ]
+ },
+ {
+  "sig": "chairman|commission|finance|minister|planning|president",
+  "rows": [
+   {
+    "id": "82ef4c85-aa88-4313-945f-b12637f2d733",
+    "question_text": "Who is the chairman of the Indian Planning Commission?",
+    "option_a": "President",
+    "option_b": "Prime Minister",
+    "option_c": "Finance Minister",
+    "option_d": "Defence Minister"
+   },
+   {
+    "id": "d504ad56-bead-4758-84e1-1f087795675e",
+    "question_text": "Who is the Chairman of Indian Planning Commission?",
+    "option_a": "President of India",
+    "option_b": "Prime Minister of India",
+    "option_c": "Finance Minister of India",
+    "option_d": "Vice President of India"
+   },
+   {
+    "id": "7e01e2c3-4276-42bd-831f-5a1bc29fb248",
+    "question_text": "The Chairman of the Planning commission of India is the",
+    "option_a": "President of India",
+    "option_b": "Prime Minister of India",
+    "option_c": "Finance Minister",
+    "option_d": "Minister of Planning"
+   },
+   {
+    "id": "7fe5a00b-4d17-4285-91a6-730123df0ac5",
+    "question_text": "The chairman of the planning commission is",
+    "option_a": "The President",
+    "option_b": "The Prime Minister",
+    "option_c": "The Finance Minister",
+    "option_d": "The Minister of Planning"
+   }
+  ]
+ },
+ {
+  "sig": "because|polarity|spherical|surface|tension|viscosity",
+  "rows": [
+   {
+    "id": "4a8213f6-8b90-430a-8f5a-65ddbb61af58",
+    "question_text": "Water drops are spherical because of",
+    "option_a": "Surface tension",
+    "option_b": "Viscosity",
+    "option_c": "Density is one",
+    "option_d": "Polarity"
+   },
+   {
+    "id": "4a46571e-92ee-44f0-97e3-2396325fa76e",
+    "question_text": "Water drops are spherical because of its",
+    "option_a": "Surface tension",
+    "option_b": "Viscosity",
+    "option_c": "Density is one",
+    "option_d": "Polarity"
+   }
+  ]
+ },
+ {
+  "sig": "agricultural|assertion|disguised|explanation|generally|unemployment",
+  "rows": [
+   {
+    "id": "0eb240e7-efbc-4f4e-aac1-9d29c5f15c7c",
+    "question_text": "Consider the following statements:\nAssertion(A): Disguised unemployment is generally found in Indian Agricultural sector\nReason(R): More and more people in rural areas are becoming literate\nNow select your answer according to the coding scheme given below",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are correct but (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   },
+   {
+    "id": "9471e9fd-c7a7-470f-81b1-de220433a1fb",
+    "question_text": "Consider the following statements: Assertion(A): Disguised unemployment is generally observed in Indian Agricultural sector Reason(R): More and more people in rural areas are being literates Of these statements",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are true but (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   }
+  ]
+ },
+ {
+  "sig": "electron|energy|ground|hydrogen|state",
+  "rows": [
+   {
+    "id": "a2ff7b7c-5d91-4cec-a1b4-4c21211a3d7a",
+    "question_text": "The ground state energy of the electron in the hydrogen atom is 13.6 eV. The energy of the state n = 2 is",
+    "option_a": "13.6 eV",
+    "option_b": "6.8 eV",
+    "option_c": "4.5 eV",
+    "option_d": "3.4 eV"
+   },
+   {
+    "id": "87d5fe93-ddbd-4c93-8a7e-ec1fb8488e01",
+    "question_text": "The ground state energy of the electron in the Hydrogen atom is",
+    "option_a": "-13.6 eV",
+    "option_b": "-3.41 eV",
+    "option_c": "+13.6 eV",
+    "option_d": "-10.5 eV"
+   }
+  ]
+ },
+ {
+  "sig": "argentine|chief|limestone|mineral|silver",
+  "rows": [
+   {
+    "id": "bde52cdc-51bc-4ab3-aa5e-3b2b97145187",
+    "question_text": "Argentine' is a chief ore/mineral of",
+    "option_a": "Silver",
+    "option_b": "Gold",
+    "option_c": "Mica",
+    "option_d": "Limestone"
+   },
+   {
+    "id": "64ee7e21-6461-4ea2-87b3-96fdfbd60fc3",
+    "question_text": "Argentine' is a chief ore mineral of",
+    "option_a": "Silver",
+    "option_b": "Gold",
+    "option_c": "Mica",
+    "option_d": "Limestone"
+   }
+  ]
+ },
+ {
+  "sig": "autumn|mentioned|season|seasons|spring|summer",
+  "rows": [
+   {
+    "id": "c4b7de51-385d-4906-be78-ddd29f869e13",
+    "question_text": "Name the season mentioned in the poem, \"Indian Seasons\"",
+    "option_a": "summer",
+    "option_b": "rainy",
+    "option_c": "spring and autumn",
+    "option_d": "all the above"
+   },
+   {
+    "id": "c31747fe-0ba6-47c4-8612-b137e5239e52",
+    "question_text": "Find the order of season mentioned in  the poem \"Indian Seasons\"",
+    "option_a": "summer,rainy,spring,autumn",
+    "option_b": "Summer,spring,autumn,winter",
+    "option_c": "rainy,summer,spring,winter",
+    "option_d": "summer,rainy,autumn,spring"
+   }
+  ]
+ },
+ {
+  "sig": "argument|behaviour|conflict|meaning|prepare|unsporting",
+  "rows": [
+   {
+    "id": "7c4da96e-2100-4081-993f-a8222f7090b3",
+    "question_text": "Find the meaning of the given idiom Below the belt",
+    "option_a": "unfair or unsporting behaviour",
+    "option_b": "prepare for a conflict",
+    "option_c": "on your side in an argument or dispute",
+    "option_d": "to give up"
+   },
+   {
+    "id": "3d7b4c3e-eb7b-47cf-8c12-88e1cefd4279",
+    "question_text": "Find the meaning of the given idiom Throw in the towel",
+    "option_a": "unfair or unsporting behaviour",
+    "option_b": "prepare for a conflict",
+    "option_c": "on your side in an argument or dispute",
+    "option_d": "to give up"
+   }
+  ]
+ },
+ {
+  "sig": "first|fourth|global|production|second|third",
+  "rows": [
+   {
+    "id": "d942cb7f-8521-44f5-b0a0-d57e1ace15be",
+    "question_text": "What is India's global rank in fish production?",
+    "option_a": "First",
+    "option_b": "Second",
+    "option_c": "Third",
+    "option_d": "Fourth"
+   },
+   {
+    "id": "f69ccf16-7d37-462a-8d05-669208663856",
+    "question_text": "What is India's rank in the global production of milk in 2010-2011?",
+    "option_a": "First",
+    "option_b": "Second",
+    "option_c": "Third",
+    "option_d": "Fourth"
+   }
+  ]
+ },
+ {
+  "sig": "launched|mantri|mudra|pradhan|yojana",
+  "rows": [
+   {
+    "id": "09205699-ea7e-4194-a9c7-34b6fc059b8f",
+    "question_text": "Pradhan Mantri MUDRA Yojana was launched in",
+    "option_a": "2011",
+    "option_b": "2015",
+    "option_c": "2017",
+    "option_d": "2019"
+   },
+   {
+    "id": "454c2837-971c-48a5-bf02-a569280e2a6b",
+    "question_text": "Pradhan Mantri Mudra Yojana (PMMY) was launched in which year?",
+    "option_a": "2015",
+    "option_b": "2017",
+    "option_c": "2019",
+    "option_d": "2020"
+   }
+  ]
+ },
+ {
+  "sig": "corner|cornered|happen|means|round|waiting",
+  "rows": [
+   {
+    "id": "83b76d4e-6452-44e4-9e7d-8907e3837bd9",
+    "question_text": "In the line, \"Good luck is round the corner\", \"round the corner\" means ____________",
+    "option_a": "In the corner of your house",
+    "option_b": "Just waiting to happen",
+    "option_c": "Near the corner",
+    "option_d": "Cornered"
+   },
+   {
+    "id": "cdaa7972-bb17-4730-b8ab-7a31871293ac",
+    "question_text": "In the line, \"Good luck is round the corner\", \"round the corner\" means",
+    "option_a": "In the corner of your house",
+    "option_b": "Just waiting to happen",
+    "option_c": "Near the corner",
+    "option_d": "Cornered"
+   }
+  ]
+ },
+ {
+  "sig": "contractionary|describes|expansionary|inflationary|maintains|monetary",
+  "rows": [
+   {
+    "id": "2eeb2148-7adb-430c-8b9c-ab0e358cdccd",
+    "question_text": "What term describes a monetary policy that maintains short-term interest rates higher than usual?",
+    "option_a": "Expansionary policy",
+    "option_b": "Contractionary policy",
+    "option_c": "Neutral policy",
+    "option_d": "Inflationary policy"
+   },
+   {
+    "id": "4a3d7a24-7eb5-4edf-ae03-594924673460",
+    "question_text": "What term describes a monetary policy that maintains short-term interest rates lower than usual?",
+    "option_a": "Expansionary policy",
+    "option_b": "Contractionary policy",
+    "option_c": "Neutral policy",
+    "option_d": "Inflationary policy"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|mention|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "5d44d818-7c44-4c6c-ae76-d328ff5062c4",
+    "question_text": "Be a bush, if you can't be a tree'\nMention the figure of speech of the above line",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Alliteration",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "88d40e62-65c7-4db8-b1e2-967f606bf46f",
+    "question_text": "\"Shows only my teeth like a snake's bare fangs!\" Mention the figure of speech in the above sentence",
+    "option_a": "Metaphor",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "anaphora|apostrophe|melancholy|metaphor|oxymoron|solitary",
+  "rows": [
+   {
+    "id": "b6af4fb4-0631-475f-b3df-2f6431a3c5f4",
+    "question_text": "\"And sings a melancholy strain\" - The solitary reaper\nWhat is the figure of speech used here?",
+    "option_a": "Apostrophe",
+    "option_b": "Metaphor",
+    "option_c": "Anaphora",
+    "option_d": "Oxymoron"
+   },
+   {
+    "id": "8877882f-abd7-4a00-aafa-309f68eabbd6",
+    "question_text": "And sings a melancholy strain', - The Solitary Reaper. The figure of speech used here is ____________",
+    "option_a": "Apostrophe",
+    "option_b": "Metaphor",
+    "option_c": "Anaphora",
+    "option_d": "Oxymoron"
+   }
+  ]
+ },
+ {
+  "sig": "figure|flower|metaphor|oxymoron|personification|reddest",
+  "rows": [
+   {
+    "id": "3c53a3c1-fa0b-41bd-ae54-a3f03029f9b4",
+    "question_text": "Choose the best answer given below:\n\"The reddest flower would look as pale as snow\". The figure of speech used is",
+    "option_a": "Personification",
+    "option_b": "Metaphor",
+    "option_c": "Oxymoron",
+    "option_d": "Simile"
+   },
+   {
+    "id": "01601e8e-796a-4ff9-b531-8f74e239f88b",
+    "question_text": "\"The reddest flower will look as pale as snow\".The figure of speech used is _________",
+    "option_a": "Personification",
+    "option_b": "Metaphor",
+    "option_c": "Oxymoron",
+    "option_d": "Simile"
+   }
+  ]
+ },
+ {
+  "sig": "abandoning|difficult|difficulty|rescuing|situation|something",
+  "rows": [
+   {
+    "id": "d896df88-b228-4cb1-8c74-32fe821a76e4",
+    "question_text": "alarm bells ringing Find the meaning of the given idiom",
+    "option_a": "abandoning one who is in difficulty",
+    "option_b": "in serious difficulty",
+    "option_c": "sign of something going wrong",
+    "option_d": "help at the last moment rescuing one from a difficult situation"
+   },
+   {
+    "id": "f1c8d9e6-960c-4f2f-86f3-ffa41d14f384",
+    "question_text": "back to the wall Find the meaning of the given idiom",
+    "option_a": "abandoning one who is in difficulty",
+    "option_b": "in serious difficulty",
+    "option_c": "sign of something going wrong",
+    "option_d": "help at the last moment rescuing one from a difficult situation"
+   }
+  ]
+ },
+ {
+  "sig": "holiday|matching|matilda|necklace|reflowering|rowther",
+  "rows": [
+   {
+    "id": "05a86dc6-352b-4c49-bee2-83dae7aac52b",
+    "question_text": "Match the following\n\nList I:\nA) Noodle vendor\nB) Rowther\nC) Matilda\nD) Phatik\n\nList II:\n1) The necklace\n2) The Refuge\n3) Reflowering\n4) Holiday\n\nSelect the correct matching code:",
+    "option_a": "A-4, B-3, C-2, D-1",
+    "option_b": "A-3, B-1, C-2, D-4",
+    "option_c": "A-2, B-1, C-3, D-4",
+    "option_d": "A-2, B-3, C-1, D-4"
+   },
+   {
+    "id": "ea360aa5-3ad3-4da8-812d-08e660476d9b",
+    "question_text": "Match the following\n\nList I:\nA) Makhan lal\nB) Matilda\nC) Rowther\nD) Vera\n\nList II:\n1) The open window\n2) Reflowering\n3) Holiday\n4) The Necklace\n\nSelect the correct matching code:",
+    "option_a": "A-2, B-4, C-1, D-3",
+    "option_b": "A-1, B-4, C-2, D-3",
+    "option_c": "A-1, B-3, C-2, D-4",
+    "option_d": "A-3, B-4, C-2, D-1"
+   }
+  ]
+ },
+ {
+  "sig": "classrooms|developed|multimedia|resources|specifically|territory",
+  "rows": [
+   {
+    "id": "ebdda093-1654-4045-b01f-2a0951d21102",
+    "question_text": "Business territory was developed ____(a)____ response ____(b)_____ teachers asking ____(c)___ multimedia resources designed specifically _____(d)_____ classrooms",
+    "option_a": "In to the in",
+    "option_b": "In to for for",
+    "option_c": "for in to for",
+    "option_d": "to for in to"
+   },
+   {
+    "id": "e94e6a60-e9f2-41d5-8242-6acef32de25d",
+    "question_text": "The Business territory was developed _______ response _______ teachers asking _______ multimedia resources designed specifically _______ classrooms.",
+    "option_a": "In to the in",
+    "option_b": "In to for for",
+    "option_c": "For in to for",
+    "option_d": "To for in to"
+   }
+  ]
+ },
+ {
+  "sig": "dictated|gathered|ordered|prayer|subjects|summoned",
+  "rows": [
+   {
+    "id": "d7e4b6e5-5706-4aff-97f4-4541877c91eb",
+    "question_text": "The king summoned his subjects for a mass prayer. Here \"summoned\" means ____________",
+    "option_a": "Dictated",
+    "option_b": "Ordered",
+    "option_c": "Gathered",
+    "option_d": "Called"
+   },
+   {
+    "id": "815f3345-c979-4a31-8f0d-d30200a9dc73",
+    "question_text": "The king summoned his subjects for a mass prayer. Here 'summoned' means",
+    "option_a": "Dictated",
+    "option_b": "Ordered",
+    "option_c": "Gathered",
+    "option_d": "Called"
+   }
+  ]
+ },
+ {
+  "sig": "attend|attended|class|special|students",
+  "rows": [
+   {
+    "id": "0501f8b4-fabb-41c7-9924-bc41bbe2b1fa",
+    "question_text": "All the students ____________ the special class last week",
+    "option_a": "Had attended",
+    "option_b": "Attended",
+    "option_c": "Will attend",
+    "option_d": "Would attend"
+   },
+   {
+    "id": "303f407b-3e55-48cf-a040-84ffdc2053ba",
+    "question_text": "All the students _______ the special class last week.",
+    "option_a": "Had attended",
+    "option_b": "Attended",
+    "option_c": "Will attend",
+    "option_d": "Would attend"
+   }
+  ]
+ },
+ {
+  "sig": "about|enemy|friend|mother|wrath",
+  "rows": [
+   {
+    "id": "97c1f383-2c79-4917-a75c-12031b0e5179",
+    "question_text": "I told my wrath, my wrath did end To whom the poet told about his wrath",
+    "option_a": "To his mother",
+    "option_b": "To his enemy",
+    "option_c": "To his friend",
+    "option_d": "To God"
+   },
+   {
+    "id": "634208ae-77d5-4fd0-8a6d-385396773e47",
+    "question_text": "I told it not, my wrath did grow He didn't told about his wrath",
+    "option_a": "To his mother",
+    "option_b": "To his enemy",
+    "option_c": "To his friend",
+    "option_d": "To God"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|metaphor|personification|speech|stopping",
+  "rows": [
+   {
+    "id": "64d3aaff-178f-4042-9b95-8089d8d01104",
+    "question_text": "\"He will not see me stopping here\" Find the figure of speech",
+    "option_a": "Alliteration",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Simile"
+   },
+   {
+    "id": "e7184c97-af90-481d-b9f3-940916d27525",
+    "question_text": "\"He will not see me stopping here\" Find out the figure of speech",
+    "option_a": "Simile",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "heavens|lifetime|rampaging|spectacle|stopping|through",
+  "rows": [
+   {
+    "id": "90d66117-3676-4f1b-9b1a-fb77ce6ba8b9",
+    "question_text": "\"Rampaging through the heavens Never stopping day or night, A spectacle of a lifetime A comet in full flight\" Pick the rhyming words in the above stanza",
+    "option_a": "Night-flight",
+    "option_b": "Heaven-night",
+    "option_c": "Lifetime-night",
+    "option_d": "Full flight"
+   },
+   {
+    "id": "fee18a43-fb33-4dc5-b5f4-55c5f55e501c",
+    "question_text": "\"Rampaging through the heavens Never stopping day or night, A spectacle of a lifetime A comet in full flight\" Write the rhyme scheme of the above stanza",
+    "option_a": "aabb",
+    "option_b": "abcb",
+    "option_c": "abab",
+    "option_d": "abcd"
+   },
+   {
+    "id": "2081fa43-25b1-4f6b-9a8d-691f4e855377",
+    "question_text": "Rampaging through the heavens\nNever stopping day or night,\nA spectacle of a lifetime\nA comet in full flight.\nMention the Rhyming scheme given in the above phrase",
+    "option_a": "ABCB",
+    "option_b": "ABBC",
+    "option_c": "ABAB",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|metaphor|personification|simile|speech",
+  "rows": [
+   {
+    "id": "617706c6-4fef-4d01-8339-e93bbddabe65",
+    "question_text": "\"Witty and you're wise\" Find the figure of speech.",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Metaphor",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "4b881baf-830e-46f4-99dc-21989c5deaed",
+    "question_text": "\"but mine are dull as lead\". Find the figure of speech",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Simile",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "e9997ecc-3735-4ade-8e88-38f520a92c73",
+    "question_text": "What figure of speech is used in\n'And all I ask is a tall ship and a star to steer her by':",
+    "option_a": "Metaphor",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "bc937260-4c6c-48f7-9501-f58659dcddfc",
+    "question_text": "What figure of speech is in 'The voice of the wind is the voice of our fate'?",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Metaphor",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "comrade|fireside|friends|mother|relatives",
+  "rows": [
+   {
+    "id": "a17c5a36-1e34-46f5-8bfc-abe24ce4fc69",
+    "question_text": "\"Come you back unto the fireside and be comrade with your kin\" What do you mean by kin?",
+    "option_a": "Relatives",
+    "option_b": "Love ones",
+    "option_c": "Friends",
+    "option_d": "Mother"
+   },
+   {
+    "id": "f0d5a40b-8af7-4b98-9f94-e92a848ac75e",
+    "question_text": "\"Come you back unto the fireside and be comrade with your kin\" What do you mean by Comrade?",
+    "option_a": "Relatives",
+    "option_b": "Love ones",
+    "option_c": "Friends",
+    "option_d": "Mother"
+   }
+  ]
+ },
+ {
+  "sig": "dream|dreams|empty|extract|hopes|psalm",
+  "rows": [
+   {
+    "id": "e0b2de0e-3706-42f4-8f43-7bc1cecb6659",
+    "question_text": "Life is but an empty dream!\nThis line is an extract from the poem",
+    "option_a": "Hopes and dreams",
+    "option_b": "Is life, but a dream",
+    "option_c": "A psalm of life",
+    "option_d": "Laugh and be merry"
+   },
+   {
+    "id": "9f4af850-901c-4893-982c-689151da5a8f",
+    "question_text": "\" Life is but an empty dream \" is an extract from the poem ____________",
+    "option_a": "Hopes and dreams",
+    "option_b": "Is life, but a dream",
+    "option_c": "A psalm of life",
+    "option_d": "Laugh and be merry"
+   }
+  ]
+ },
+ {
+  "sig": "brook|children|mentioned|search|still|stream",
+  "rows": [
+   {
+    "id": "adb2e133-6776-4361-aeac-5bbab960b23a",
+    "question_text": "To seek the brook if still it ran.\nThe children mentioned in the poem search for ____________",
+    "option_a": "sea",
+    "option_b": "well",
+    "option_c": "stream",
+    "option_d": "lake"
+   },
+   {
+    "id": "5a8f0e1c-06cd-4e6a-a53a-83a78e77de72",
+    "question_text": "\"To see the brook if still it ran\"\nThe children mentioned in the poem search for",
+    "option_a": "Sea",
+    "option_b": "Stream",
+    "option_c": "Well",
+    "option_d": "Lake"
+   }
+  ]
+ },
+ {
+  "sig": "desert|flying|killed|short|story|wonder",
+  "rows": [
+   {
+    "id": "99e32278-bfda-4517-9f01-368d5d809f6d",
+    "question_text": "Which of the following is a short story?",
+    "option_a": "Be the best",
+    "option_b": "The tears of the desert",
+    "option_c": "The flying wonder",
+    "option_d": "The man he killed"
+   },
+   {
+    "id": "6aa56569-0e70-4622-ab28-fe7f8ea4197c",
+    "question_text": "____________ of the following is a short story.",
+    "option_a": "Be the best",
+    "option_b": "The tears of the desert",
+    "option_c": "The flying wonder",
+    "option_d": "The man he killed"
+   }
+  ]
+ },
+ {
+  "sig": "antonio|bassanio|christian|refers|shylock|thrice",
+  "rows": [
+   {
+    "id": "1e2d9053-c5a5-425a-a90f-680e86c6d4a1",
+    "question_text": "I take this offer. \nthen Pay the bond thrice. \nAnd let the Christian go.\n Here the Christian refers to ____________",
+    "option_a": "Bassanio",
+    "option_b": "Portia",
+    "option_c": "Shylock",
+    "option_d": "Antonio"
+   },
+   {
+    "id": "ea405297-58fd-49a5-915a-1d3138065f30",
+    "question_text": "I take this offer and pay the bond thrice\nAnd let the Christian go\nHere the Christian refers to _______________",
+    "option_a": "Bassanio",
+    "option_b": "Portia",
+    "option_c": "Shylock",
+    "option_d": "Antonio"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|identify|metaphor|speech",
+  "rows": [
+   {
+    "id": "2e6e0393-2c02-4de0-9cbe-7a95a4d84ccc",
+    "question_text": "Identify the figure of speech in the line 'Broad, and deep, and still as Time':",
+    "option_a": "Metaphor",
+    "option_b": "Alliteration",
+    "option_c": "Simile",
+    "option_d": "Hyperbole"
+   },
+   {
+    "id": "c3522e1c-6e03-495d-b142-b5db91c3391a",
+    "question_text": "If he hasn’t it now, he will have it not\nIdentify the Figure of Speech?",
+    "option_a": "Hyperbole",
+    "option_b": "Alliteration",
+    "option_c": "Simile",
+    "option_d": "Metaphor"
+   }
+  ]
+ },
+ {
+  "sig": "headlong|mention|rhyming|rounded|sounded|voyage",
+  "rows": [
+   {
+    "id": "ffe4152d-88e9-4619-9e5f-97998a8eeda1",
+    "question_text": "River! river! headlong river!\nDown you dash into the sea;\nSea, that line hath never sounded,\nSea, that voyage hath never rounded,\nMention the Rhyming Words given in the above phrase",
+    "option_a": "Sounded-Rounded",
+    "option_b": "River-Sea",
+    "option_c": "Hath-Headlong",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "7e6bc5c1-599e-4a96-a1a3-24e50e5d37e4",
+    "question_text": "River! river! headlong river!\nDown you dash into the sea;\nSea, that line hath never sounded,\nSea, that voyage hath never rounded,\nMention the Rhyming scheme given in the above phrase",
+    "option_a": "ABCD",
+    "option_b": "ABCC",
+    "option_c": "AABB",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "272195b6-d470-4ab9-b22d-96cf328d986e",
+    "question_text": "What figure of speech is used in\n'When the night had veiled the pole'?",
+    "option_a": "Hyperbole",
+    "option_b": "Alliteration",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "cbcd2b54-b8bb-4da7-9bd9-d75621566c9a",
+    "question_text": "What figure of speech is used in 'Let your limbs sway'?",
+    "option_a": "Hyperbole",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "a31e5195-40bd-4cf1-9359-405ff7d07db3",
+    "question_text": "Which figure of speech is used in 'growl at the rain and growl at the sun'?",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Hyperbole",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "figure|hyperbole|metaphor|personification|simile|speech",
+  "rows": [
+   {
+    "id": "7ae967d5-387a-4ed6-9cfd-0d19bf5e7e33",
+    "question_text": "What figure of speech is used in the line\n'It isn’t a thing that a man can call'?",
+    "option_a": "Hyperbole",
+    "option_b": "Personification",
+    "option_c": "Simile",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "60fe8c23-d883-41a3-95ca-9ceeb67fb6e2",
+    "question_text": "What figure of speech is used in\n'It’s part of a man when his skies are blue'?",
+    "option_a": "Simile",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Hyperbole"
+   },
+   {
+    "id": "75186038-991b-49d7-b22b-6efdf81b9b4c",
+    "question_text": "Which figure of speech is used in\n'It isn’t a thing that can come and go'?",
+    "option_a": "Simile",
+    "option_b": "Hyperbole",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "762aa5ff-6c4a-4aec-816f-39b14b277696",
+    "question_text": "'Or you’ll never win the game;'\nFind the Figure of Speech from the above line",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Metaphor",
+    "option_d": "Personification"
+   },
+   {
+    "id": "fffecc5e-229f-40b3-8781-6d8b6a83ff2a",
+    "question_text": "What figure of speech is used in 'With a tail that’s miles long'?",
+    "option_a": "Simile",
+    "option_b": "Metaphor",
+    "option_c": "Hyperbole",
+    "option_d": "Personification"
+   },
+   {
+    "id": "a0cd0634-0320-46a9-a505-537aa1c82a00",
+    "question_text": "What figure of speech is used in 'you never shut your eye'?",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   }
+  ]
+ },
+ {
+  "sig": "creature|flickered|rhyming|slipping|something|working",
+  "rows": [
+   {
+    "id": "8e605982-42f9-4a5a-a035-f8f68b3da491",
+    "question_text": "it isn’t a creature of flickered hope\nOr the final tug at a slipping rope;\nBut it’s something deep in the soul of man\nThat is working always to serve some plan.\nFind the rhyming scheme of the above stanza",
+    "option_a": "AABB",
+    "option_b": "ABCD",
+    "option_c": "ABAB",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "aa56b65a-c2a3-466d-adbc-e44f3cbe356a",
+    "question_text": "it isn’t a creature of flickered hope\nOr the final tug at a slipping rope;\nBut it’s something deep in the soul of man\nThat is working always to serve some plan.\nFind the rhyming word of the above stanza",
+    "option_a": "hope - rope",
+    "option_b": "man - plan",
+    "option_c": "Both 1) & 2)",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|identify|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "ae12d6b4-cfce-40fb-820f-05a1c587436b",
+    "question_text": "Identify the figure of speech in the line:\n'The woods are lovely, dark and deep.'",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Alliteration",
+    "option_d": "Simile"
+   },
+   {
+    "id": "3d2314e8-acff-4cbd-92a3-a684abd8b555",
+    "question_text": "'Is to set your mind and set your will'\nIdentify the Figure of speech",
+    "option_a": "Alliteration",
+    "option_b": "Metaphor",
+    "option_c": "Simile",
+    "option_d": "Personification"
+   }
+  ]
+ },
+ {
+  "sig": "figure|hyperbole|identify|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "9e006b6b-e98d-4cbf-ace0-8e9dd2f344c3",
+    "question_text": "Identify the figure of speech in the line:\n'My little horse must think it queer.'",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "79e45c6d-a054-4a43-89be-19ca0771a58e",
+    "question_text": "Identify the figure of speech in the line:\n'To watch his woods fill up with snow.'",
+    "option_a": "Metaphor",
+    "option_b": "Hyperbole",
+    "option_c": "Personification",
+    "option_d": "Simile"
+   },
+   {
+    "id": "9be0aa24-f6d1-4ee2-bb50-7ebee5d2956d",
+    "question_text": "'Doesn’t tell the man you are;'\nIdentify the Figure of speech",
+    "option_a": "Irony",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Hyperbole"
+   }
+  ]
+ },
+ {
+  "sig": "agarwal|childhood|malabar|mukuthan|neeraja|raghavan",
+  "rows": [
+   {
+    "id": "58fa68de-6d39-4c59-9192-7067104cb260",
+    "question_text": "Name the writer who spend her childhood in Malabar?",
+    "option_a": "Deepa Agarwal",
+    "option_b": "Neeraja Raghavan",
+    "option_c": "Lakshmi Mukuthan",
+    "option_d": "Kamala  Das"
+   },
+   {
+    "id": "79ad9b2b-43aa-45e2-ad8e-c37d5cd38640",
+    "question_text": "A childhood in Malabar is a short story of",
+    "option_a": "Deepa Agarwal",
+    "option_b": "Neeraja Raghavan",
+    "option_c": "Lakshmi Mukuthan",
+    "option_d": "Kamala  Das"
+   }
+  ]
+ },
+ {
+  "sig": "different|homonyms|homophones|repetition|similar|spelling",
+  "rows": [
+   {
+    "id": "6f61501a-a0bc-4fb4-8d6e-7bf13cc3132f",
+    "question_text": "_______ are the words with similar sound and different spelling and meaning.",
+    "option_a": "Repetition",
+    "option_b": "Homophones",
+    "option_c": "Homonyms",
+    "option_d": "An anagram"
+   },
+   {
+    "id": "ec5970b9-0f32-4f42-9d6a-2e44d4925396",
+    "question_text": "_____ are the words with similar sound and spelling but different meaning.",
+    "option_a": "Repetition",
+    "option_b": "Homophones",
+    "option_c": "Homonyms",
+    "option_d": "An anagram"
+   }
+  ]
+ },
+ {
+  "sig": "andromeda|belongs|called|galaxy|magellanic|system",
+  "rows": [
+   {
+    "id": "84ef6c2d-9c67-44d1-a35f-67e7f12731b8",
+    "question_text": "The solar system that belongs to the galaxy is called",
+    "option_a": "Milky way",
+    "option_b": "Magellanic cloud",
+    "option_c": "Radio galaxy",
+    "option_d": "Andromeda nebula"
+   },
+   {
+    "id": "396cb5f4-a758-4165-b49c-46c243d3b30e",
+    "question_text": "The solar system belongs to the galaxy called",
+    "option_a": "Andromeda nebula",
+    "option_b": "Milky way",
+    "option_c": "Radio galaxy",
+    "option_d": "Magellanic cloud"
+   }
+  ]
+ },
+ {
+  "sig": "coimbatore|district|sankarankoil|situated|tirunelveli|tiruppur",
+  "rows": [
+   {
+    "id": "30df33a4-61d9-4e5a-a0d8-268035f19487",
+    "question_text": "Where is Perur situated?",
+    "option_a": "Coimbatore District",
+    "option_b": "Tirunelveli District",
+    "option_c": "Tiruppur District",
+    "option_d": "Sankarankoil Taluk"
+   },
+   {
+    "id": "b67be025-249e-48a4-845b-83038f5d22fd",
+    "question_text": "Where is Mangudi situated?",
+    "option_a": "Tirunelveli District",
+    "option_b": "Coimbatore District",
+    "option_c": "Sankarankoil Taluk",
+    "option_d": "Tiruppur District"
+   }
+  ]
+ },
+ {
+  "sig": "atmospheric|increasing|stratosphere|temperature|thermosphere|troposphere",
+  "rows": [
+   {
+    "id": "db7409fc-fbbb-4a8c-9dfb-0d9830f75ccd",
+    "question_text": "The lowest layer of the atmospheric, in which the temperature decreases with increasing altitude is called",
+    "option_a": "Mesosphere",
+    "option_b": "Stratosphere",
+    "option_c": "Troposphere",
+    "option_d": "Thermosphere"
+   },
+   {
+    "id": "902e3220-6960-41d8-9e2a-a653da8dec20",
+    "question_text": "Choose the correct answer:\nThe Atmospheric layer where the decrease of temperature with increasing elevation at a Normal \nlapse rate.",
+    "option_a": "Troposphere",
+    "option_b": "Stratosphere",
+    "option_c": "Thermosphere",
+    "option_d": "Exosphere"
+   }
+  ]
+ },
+ {
+  "sig": "karnataka|kerala|largest|natural|producer|rubber",
+  "rows": [
+   {
+    "id": "569a656a-bd07-4e9b-891a-e5f8f3403d48",
+    "question_text": "Which state is the largest producer of natural rubber?",
+    "option_a": "Assam",
+    "option_b": "Tamil Nadu",
+    "option_c": "Kerala",
+    "option_d": "Karnataka"
+   },
+   {
+    "id": "5c047958-2186-4579-8724-042460fec9cc",
+    "question_text": "The largest producer of Natural Rubber is",
+    "option_a": "Karnataka",
+    "option_b": "Kerala",
+    "option_c": "Tamil Nadu",
+    "option_d": "West Bengal"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|lakshmipathi|legislative|presidency|sambamurti|shivashanmugan",
+  "rows": [
+   {
+    "id": "fd7685c2-8332-4072-ade4-5912c6f6e863",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 1937 to 1942?",
+    "option_a": "Bulusu Sambamurti",
+    "option_b": "Rukmini Lakshmipathi",
+    "option_c": "J. Shivashanmugan",
+    "option_d": "Ammanna Raja"
+   },
+   {
+    "id": "ccfd39e4-bd00-4aa3-932b-977703ac12c9",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 1946 to 1952?",
+    "option_a": "Bulusu Sambamurti",
+    "option_b": "Rukmini Lakshmipathi",
+    "option_c": "J. Shivashanmugan",
+    "option_d": "Ammanna Raja"
+   }
+  ]
+ },
+ {
+  "sig": "automobile|detroit|janeiro|nottingham|popularly|workshop",
+  "rows": [
+   {
+    "id": "c5102ade-0674-431d-a6a3-39a2e5412dc7",
+    "question_text": "Which of the following is popularly called as the Automobile workshop of the world",
+    "option_a": "Detroit",
+    "option_b": "Kobe",
+    "option_c": "Nottingham",
+    "option_d": "Rio de Janeiro"
+   },
+   {
+    "id": "a81ab6e0-d40c-46df-881f-fdbaf2b4119f",
+    "question_text": "Which is popularly called as automobile workshop of the world",
+    "option_a": "Detroit",
+    "option_b": "Kobe",
+    "option_c": "Nottingham",
+    "option_d": "Rio de Janeiro"
+   }
+  ]
+ },
+ {
+  "sig": "located|manali|neyveli|petroleum|refinery|vellore",
+  "rows": [
+   {
+    "id": "53b184e5-389d-4000-b8f2-d77b2fcb56dd",
+    "question_text": "In Tamil Nadu, Petroleum Refinery is located at",
+    "option_a": "Neyveli",
+    "option_b": "Vellore",
+    "option_c": "Manali",
+    "option_d": "Avadi"
+   },
+   {
+    "id": "fe3050cd-66a8-461c-801f-216bb5d40892",
+    "question_text": "In Tamil Nadu petroleum Refinery is located at",
+    "option_a": "Neyveli",
+    "option_b": "Manali",
+    "option_c": "Vellore",
+    "option_d": "Avadi"
+   }
+  ]
+ },
+ {
+  "sig": "agananuru|kurinji|landscapes|marudham|numbers|represented",
+  "rows": [
+   {
+    "id": "0c11f4da-c523-4402-88a2-f1a04e533b71",
+    "question_text": "Which thinai (landscapes) is represented by songs with odd numbers in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   },
+   {
+    "id": "d2c349bb-6de4-4a55-8a5b-104d5d3a1838",
+    "question_text": "Which thinai (landscapes) is represented by songs with numbers 4, 14, ... in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   },
+   {
+    "id": "f1d6190e-d123-4f60-89ea-c9024702c98a",
+    "question_text": "Which thinai (landscapes) is represented by songs with numbers 2, 8, ... in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   }
+  ]
+ }
+]

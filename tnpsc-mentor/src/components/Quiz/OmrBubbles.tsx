@@ -12,7 +12,7 @@ interface OmrBubblesProps {
 /**
  * A row of darken-to-fill OMR bubbles (A-D, or A-E for 5-option items), like a
  * printed answer sheet. The chosen option fills solid; the rest stay hollow
- * outlines. Sizes down on phones so the row + actions fit a narrow screen.
+ * outlines. Fixed at 44px (the minimum touch-target size) on every breakpoint.
  */
 export default function OmrBubbles({ selected, onSelect, disabled = false, letters = LETTERS }: OmrBubblesProps) {
   return (
@@ -28,7 +28,7 @@ export default function OmrBubbles({ selected, onSelect, disabled = false, lette
             aria-pressed={on}
             aria-label={`Option ${letter}`}
             className={[
-              'grid h-9 w-9 flex-shrink-0 place-items-center rounded-full border-2 font-heading text-sm font-bold transition-all duration-150 sm:h-10 sm:w-10',
+              'grid h-11 w-11 flex-shrink-0 place-items-center rounded-full border-2 font-heading text-sm font-bold transition-all duration-150',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/35 disabled:cursor-default',
               on
                 ? 'border-brand bg-brand text-white shadow-pill'

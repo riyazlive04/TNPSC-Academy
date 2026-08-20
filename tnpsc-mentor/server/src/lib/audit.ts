@@ -126,7 +126,10 @@ export function auditAuth(
     | 'logout'
     | 'password_reset_requested'
     | 'password_reset_completed'
-    | 'oauth_login_success',
+    | 'oauth_login_success'
+    | 'totp_challenge'
+    | 'totp_enabled'
+    | 'totp_disabled',
   opts: { subjectId?: string | null; status?: number; detail?: Record<string, unknown> } = {}
 ): void {
   audit({

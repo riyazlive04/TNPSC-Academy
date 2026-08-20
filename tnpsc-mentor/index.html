@@ -239,10 +239,25 @@
     <!-- Google Fonts: Plus Jakarta Sans + Anek Tamil (display), Inter + Noto Sans Tamil (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-blocking font load: fetch as a low-priority preload, then swap it
+         in as the stylesheet once it arrives instead of blocking first paint. -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Anek+Tamil:wght@500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Anek+Tamil:wght@500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Anek+Tamil:wght@500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <!-- The <noscript> tracking fallbacks have been REMOVED. They cannot be

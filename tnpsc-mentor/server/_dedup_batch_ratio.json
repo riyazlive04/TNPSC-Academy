@@ -1,0 +1,294 @@
+[
+  {
+    "group_nums": "125,3,5",
+    "classification": "true_duplicate",
+    "notes": "Both rows: car covers 125 km on 5 kg LP Gas, asks distance on 3 kg. Rate = 125/5 = 25 km/kg; 25*3 = 75 km. Row 02746f1f option A=75km (correct, matches). Row 7926444a option C=75km (correct, matches). No conflict — both point to the mathematically correct value, just different option ordering/labels. Kept 7926444a (n_seen=2+n_ans=1=3 history) over 02746f1f (n_seen=1+n_ans=0=1 history).",
+    "keep_id": "7926444a-d706-4bea-880a-d5d385469192",
+    "rewrites": [
+      {
+        "id": "02746f1f-03cb-42f8-bae2-e69a33affa0e",
+        "question_text": "A motorbike covers 180 km using 4 litres of petrol. What distance will it cover with 6 litres of petrol?",
+        "question_text_ta": "ஒரு மோட்டார் பைக் 4 லிட்டர் பெட்ரோலில் 180 கி.மீ தூரம் செல்கிறது. அதே அளவில் 6 லிட்டர் பெட்ரோலில் எவ்வளவு தூரம் செல்லும்?",
+        "option_a": "270 km",
+        "option_b": "216 km",
+        "option_c": "300 km",
+        "option_d": "240 km",
+        "correct_answer": "A",
+        "explanation": "Given:\nDistance covered \\( = 180 \\) km using \\( 4 \\) litres of petrol\nWorking:\nFormula: \\( \\text{distance per litre} = \\dfrac{\\text{total distance}}{\\text{litres used}} \\)\nDistance per litre \\( = \\dfrac{180}{4} = 45 \\) km\nDistance for 6 litres \\( = 45 \\times 6 = 270 \\) km\nAsked:\nDistance covered with 6 litres of petrol\n\\( = 270 \\) km\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n4 லிட்டர் பெட்ரோலில் கடக்கும் தூரம் \\( = 180 \\) கி.மீ\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஒரு லிட்டருக்கான தூரம்} = \\dfrac{\\text{மொத்த தூரம்}}{\\text{பயன்படுத்திய லிட்டர்}} \\)\nஒரு லிட்டருக்கான தூரம் \\( = \\dfrac{180}{4} = 45 \\) கி.மீ\n6 லிட்டருக்கான தூரம் \\( = 45 \\times 6 = 270 \\) கி.மீ\nகேட்டது:\n6 லிட்டர் பெட்ரோலில் கடக்கும் தூரம்\n\\( = 270 \\) கி.மீ\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "6,738,9",
+    "classification": "true_duplicate",
+    "notes": "Both rows: postman sorts 738 letters in 6 hours, asks for 9 hours. Rate = 738/6 = 123/hr; 123*9 = 1107. Row 03bcd86d option A=1107 (correct). Row e06fdcc8 option C=1107 (correct). No conflict. Kept 03bcd86d (n_seen=2+n_ans=2=4 history) over e06fdcc8 (n_seen=2+n_ans=0=2 history).",
+    "keep_id": "03bcd86d-fe92-4ae9-a2ce-ca9721001a21",
+    "rewrites": [
+      {
+        "id": "e06fdcc8-b1f6-4ecc-b67e-38368562da64",
+        "question_text": "A weaver can weave 512 metres of cloth in 8 hours. How many metres can she weave in 5 hours at the same speed?",
+        "question_text_ta": "ஒரு நெசவாளர் 8 மணி நேரத்தில் 512 மீட்டர் துணி நெய்கிறார். அதே வேகத்தில் 5 மணி நேரத்தில் எத்தனை மீட்டர் நெய்வார்?",
+        "option_a": "320 metres",
+        "option_b": "288 metres",
+        "option_c": "360 metres",
+        "option_d": "300 metres",
+        "correct_answer": "A",
+        "explanation": "Given:\nCloth woven \\( = 512 \\) metres in \\( 8 \\) hours\nWorking:\nFormula: \\( \\text{rate per hour} = \\dfrac{\\text{total metres}}{\\text{hours}} \\)\nRate per hour \\( = \\dfrac{512}{8} = 64 \\) metres/hour\nMetres woven in 5 hours \\( = 64 \\times 5 = 320 \\) metres\nAsked:\nMetres woven in 5 hours\n\\( = 320 \\) metres\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n8 மணி நேரத்தில் நெய்யப்பட்ட துணி \\( = 512 \\) மீட்டர்\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஒரு மணி நேரத்திற்கான வீதம்} = \\dfrac{\\text{மொத்த மீட்டர்}}{\\text{மணி நேரம்}} \\)\nஒரு மணி நேரத்திற்கான வீதம் \\( = \\dfrac{512}{8} = 64 \\) மீட்டர்/மணி\n5 மணி நேரத்தில் நெய்யும் துணி \\( = 64 \\times 5 = 320 \\) மீட்டர்\nகேட்டது:\n5 மணி நேரத்தில் நெய்யும் துணி\n\\( = 320 \\) மீட்டர்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "30,6,8",
+    "classification": "true_duplicate",
+    "notes": "Both rows: pole height 8m, shadow 6m; another pole shadow 30m, find its height. height/shadow constant: 8/6*30 = 40. Row 0e87ec6b option B=40 (correct). Row 9edc5e09 option B=40 (correct, same letter here). No conflict. Kept 0e87ec6b (n_seen=5+n_ans=3=8 history) over 9edc5e09 (n_seen=2+n_ans=0=2 history).",
+    "keep_id": "0e87ec6b-c118-46da-938f-d281aa892d7d",
+    "rewrites": [
+      {
+        "id": "9edc5e09-71dd-4763-98f0-656c58b1e27a",
+        "question_text": "A flagpole of height 7 m casts a shadow of 4 m. At the same time, a nearby building casts a shadow of 20 m. Find the height of the building.",
+        "question_text_ta": "7 மீ உயரமுள்ள ஒரு கொடிக்கம்பம் 4 மீ நிழலை உருவாக்குகிறது. அதே நேரத்தில், அருகிலுள்ள ஒரு கட்டிடம் 20 மீ நிழலை உருவாக்குகிறது. அந்தக் கட்டிடத்தின் உயரத்தைக் காண்க.",
+        "option_a": "35 m",
+        "option_b": "28 m",
+        "option_c": "32 m",
+        "option_d": "40 m",
+        "correct_answer": "A",
+        "explanation": "Given:\nHeight of flagpole \\( = 7 \\) m, its shadow \\( = 4 \\) m\nShadow of building (at the same time) \\( = 20 \\) m\nWorking:\nHeight and shadow are in direct proportion (same time, same sun angle).\nFormula: \\( \\dfrac{\\text{height}}{\\text{shadow}} = \\text{constant} \\)\n\\( \\dfrac{7}{4} = \\dfrac{\\text{height of building}}{20} \\)\nHeight of building \\( = \\dfrac{7}{4} \\times 20 = 35 \\) m\nAsked:\nHeight of the building\n\\( = 35 \\) m\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nகொடிக்கம்பத்தின் உயரம் \\( = 7 \\) மீ, அதன் நிழல் \\( = 4 \\) மீ\nஅதே நேரத்தில் கட்டிடத்தின் நிழல் \\( = 20 \\) மீ\nசெயல்முறை:\nஉயரமும் நிழலும் நேர் விகிதசமத்தில் உள்ளன (ஒரே நேரம், ஒரே சூரிய கோணம்).\nசூத்திரம்: \\( \\dfrac{\\text{உயரம்}}{\\text{நிழல்}} = \\text{மாறிலி} \\)\n\\( \\dfrac{7}{4} = \\dfrac{\\text{கட்டிடத்தின் உயரம்}}{20} \\)\nகட்டிடத்தின் உயரம் \\( = \\dfrac{7}{4} \\times 20 = 35 \\) மீ\nகேட்டது:\nகட்டிடத்தின் உயரம்\n\\( = 35 \\) மீ\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "11,54,77,9",
+    "classification": "true_duplicate",
+    "notes": "Both rows: Karmegam 54 runs/9 overs, Asif 77 runs/11 overs, whose run rate is better. Karmegam=54/9=6, Asif=77/11=7, so Asif is better (7 vs 6). Row 1f0eb8f3 option B='Asif's run rate is better (7 vs 6)' (correct). Row 8e294124 option C='Asif, run rate 7' (correct). No conflict. Kept 8e294124 (n_seen=1+n_ans=0=1 history) over 1f0eb8f3 (n_seen=0+n_ans=0=0 history).",
+    "keep_id": "8e294124-99dc-4a30-9310-c6742e4c6ed3",
+    "rewrites": [
+      {
+        "id": "1f0eb8f3-9c79-44a1-b98c-48252d6a2b58",
+        "question_text": "Meena scored 45 runs in 9 overs and Ravi scored 72 runs in 12 overs. Whose run rate is better? (run rate = ratio of runs to overs)",
+        "question_text_ta": "மீனா 9 ஓவர்களில் 45 ரன்களும், ரவி 12 ஓவர்களில் 72 ரன்களும் எடுத்தனர். யாருடைய ரன் விகிதம் (ரன் விகிதம் = ரன்கள் : ஓவர்கள் என்ற விகிதம்) சிறந்தது?",
+        "option_a": "Ravi's run rate is better (6 vs 5)",
+        "option_b": "Meena's run rate is better (5 vs 6)",
+        "option_c": "Both have equal run rate",
+        "option_d": "Ravi's run rate is better (9 vs 12)",
+        "correct_answer": "A",
+        "explanation": "Given:\nMeena: \\( 45 \\) runs in \\( 9 \\) overs\nRavi: \\( 72 \\) runs in \\( 12 \\) overs\nWorking:\nFormula: \\( \\text{run rate} = \\dfrac{\\text{runs}}{\\text{overs}} \\)\nMeena's run rate \\( = \\dfrac{45}{9} = 5 \\)\nRavi's run rate \\( = \\dfrac{72}{12} = 6 \\)\nSince \\( 6 > 5 \\), Ravi's run rate is better.\nAsked:\nWhose run rate is better\n\\( = \\) Ravi (6 vs 5)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nமீனா: 9 ஓவர்களில் 45 ரன்கள்\nரவி: 12 ஓவர்களில் 72 ரன்கள்\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ரன் விகிதம்} = \\dfrac{\\text{ரன்கள்}}{\\text{ஓவர்கள்}} \\)\nமீனாவின் ரன் விகிதம் \\( = \\dfrac{45}{9} = 5 \\)\nரவியின் ரன் விகிதம் \\( = \\dfrac{72}{12} = 6 \\)\n\\( 6 > 5 \\) என்பதால், ரவியின் ரன் விகிதம் சிறந்தது.\nகேட்டது:\nயாருடைய ரன் விகிதம் சிறந்தது\n\\( = \\) ரவி (6 vs 5)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1,13,200,260",
+    "classification": "true_duplicate",
+    "notes": "Both rows: box cost ₹200, could buy 13 boxes; price rises to ₹260, how many boxes now. Total money = 200*13 = 2600; 2600/260 = 10. Row 25c0181f option B=10 (correct). Row 855329ec option D=10 (correct). No conflict. Kept 25c0181f (n_seen=1+n_ans=1=2 history) over 855329ec (n_seen=1+n_ans=0=1 history).",
+    "keep_id": "25c0181f-544a-4da5-b109-797a0f3f9f0a",
+    "rewrites": [
+      {
+        "id": "855329ec-d318-4971-b125-f7e061fd62b3",
+        "question_text": "Cost of 1 kg of rice is ₹40. Priya had money to buy 15 kg. If the price per kg increases to ₹50, how many kg can she buy with the same amount?",
+        "question_text_ta": "1 கிலோ அரிசியின் விலை ₹40. பிரியாவிடம் 15 கிலோ வாங்குவதற்கான பணம் இருந்தது. ஒரு கிலோவின் விலை ₹50 ஆக அதிகரித்தால், அதே பணத்தில் அவர் எத்தனை கிலோ வாங்க முடியும்?",
+        "option_a": "12 kg",
+        "option_b": "15 kg",
+        "option_c": "10 kg",
+        "option_d": "18 kg",
+        "correct_answer": "A",
+        "explanation": "Given:\nCost per kg of rice \\( = \\) ₹40; money enough to buy \\( = 15 \\) kg\nNew price per kg \\( = \\) ₹50\nWorking:\nFormula: \\( \\text{total money} = \\text{price} \\times \\text{quantity} \\)\nTotal money \\( = 40 \\times 15 = 600 \\) (₹600)\nQuantity at new price \\( = \\dfrac{600}{50} = 12 \\) kg\nAsked:\nQuantity she can buy at the new price\n\\( = 12 \\) kg\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஒரு கிலோ அரிசியின் விலை \\( = \\) ₹40; வாங்கக்கூடிய அளவு \\( = 15 \\) கிலோ\nபுதிய விலை (ஒரு கிலோ) \\( = \\) ₹50\nசெயல்முறை:\nசூத்திரம்: \\( \\text{மொத்தப் பணம்} = \\text{விலை} \\times \\text{அளவு} \\)\nமொத்தப் பணம் \\( = 40 \\times 15 = 600 \\) (₹600)\nபுதிய விலையில் வாங்கக்கூடிய அளவு \\( = \\dfrac{600}{50} = 12 \\) கிலோ\nகேட்டது:\nபுதிய விலையில் வாங்கக்கூடிய அளவு\n\\( = 12 \\) கிலோ\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "2,20,8",
+    "classification": "true_duplicate",
+    "notes": "Both rows: person reads 20 pages in 2 hours, asks pages in 8 hours. Rate=20/2=10/hr; 10*8=80. Row 306d5bfa option B=80 (correct). Row d48959cc option D=80 (correct). No conflict. History tied at 0 for both (n_book/n_seen/n_ans all 0). Tie-broken using created_at: 306d5bfa is from the earlier GOV batch (2026-06-21, external_id GOV-ratio_proportion-03) vs d48959cc from the later SMGOV batch (2026-06-22, external_id SMGOV-ratio_and_proportion-5); kept the earlier/primary row 306d5bfa (also already carries a template-correct explanation matching this bank's established Ratio-and-Proportion style, confirmed by direct DB check).",
+    "keep_id": "306d5bfa-f4f8-4590-a918-29043d4ee3fb",
+    "rewrites": [
+      {
+        "id": "d48959cc-149e-422d-9424-ef5a4044a11f",
+        "question_text": "A typist types 45 pages in 3 hours. How many pages will she type in 7 hours at the same speed?",
+        "question_text_ta": "ஒரு தட்டச்சர் 3 மணி நேரத்தில் 45 பக்கங்களை தட்டச்சு செய்கிறார். அதே வேகத்தில் 7 மணி நேரத்தில் எத்தனை பக்கங்களை தட்டச்சு செய்வார்?",
+        "option_a": "105 pages",
+        "option_b": "90 pages",
+        "option_c": "120 pages",
+        "option_d": "135 pages",
+        "correct_answer": "A",
+        "explanation": "Given:\nPages typed \\( = 45 \\) in \\( 3 \\) hours\nTime available \\( = 7 \\) hours\nWorking:\nPages and time are in direct proportion.\nIn 1 hour, pages \\( = \\dfrac{45}{3} = 15 \\)\nIn 7 hours, pages \\( = 15 \\times 7 = 105 \\)\nAsked:\nPages typed in 7 hours\n\\( = 105 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n3 மணி நேரத்தில் தட்டச்சு செய்த பக்கங்கள் \\( = 45 \\)\nகிடைக்கும் நேரம் \\( = 7 \\) மணி நேரம்\nசெயல்முறை:\nபக்கங்களும் நேரமும் நேர் விகிதசமத்தில் உள்ளன.\n1 மணி நேரத்தில் பக்கங்கள் \\( = \\dfrac{45}{3} = 15 \\)\n7 மணி நேரத்தில் பக்கங்கள் \\( = 15 \\times 7 = 105 \\)\nகேட்டது:\n7 மணி நேரத்தில் தட்டச்சு செய்யும் பக்கங்கள்\n\\( = 105 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1400,2,280",
+    "classification": "true_duplicate",
+    "notes": "Both rows: aircraft carries 280 people in 2 trips, asks trips for 1400 people. Rate=280/2=140/trip; 1400/140=10. Row 42990339 option C=10 (correct). Row 6828c09f option C=10 (correct, same letter). No conflict. Kept 6828c09f (n_seen=4+n_ans=3=7 history) over 42990339 (n_seen=0+n_ans=0=0 history).",
+    "keep_id": "6828c09f-900f-4ad3-8bf1-7ceebcaf5211",
+    "rewrites": [
+      {
+        "id": "42990339-4aed-4ad6-a0f0-32ff78afaccb",
+        "question_text": "A ferry can carry 360 passengers in 3 trips. How many trips will it take to carry 1800 passengers?",
+        "question_text_ta": "ஒரு படகு 3 சுற்றுகளில் 360 பயணிகளை ஏற்றிச் செல்ல முடியும். 1800 பயணிகளை ஏற்றிச் செல்ல எத்தனை சுற்றுகள் தேவை?",
+        "option_a": "15 trips",
+        "option_b": "12 trips",
+        "option_c": "18 trips",
+        "option_d": "10 trips",
+        "correct_answer": "A",
+        "explanation": "Given:\nPassengers carried \\( = 360 \\) in \\( 3 \\) trips\nTotal passengers to carry \\( = 1800 \\)\nWorking:\nFormula: \\( \\text{passengers per trip} = \\dfrac{\\text{passengers}}{\\text{trips}} \\)\nPassengers per trip \\( = \\dfrac{360}{3} = 120 \\)\nTrips needed \\( = \\dfrac{1800}{120} = 15 \\)\nAsked:\nTrips needed to carry 1800 passengers\n\\( = 15 \\) trips\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n3 சுற்றுகளில் ஏற்றிச் சென்ற பயணிகள் \\( = 360 \\)\nமொத்தமாக ஏற்றிச் செல்ல வேண்டிய பயணிகள் \\( = 1800 \\)\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஒரு சுற்றிற்கான பயணிகள்} = \\dfrac{\\text{பயணிகள்}}{\\text{சுற்றுகள்}} \\)\nஒரு சுற்றிற்கான பயணிகள் \\( = \\dfrac{360}{3} = 120 \\)\nதேவையான சுற்றுகள் \\( = \\dfrac{1800}{120} = 15 \\)\nகேட்டது:\n1800 பயணிகளை ஏற்ற தேவையான சுற்றுகள்\n\\( = 15 \\) சுற்றுகள்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "105,1863,2415",
+    "classification": "true_duplicate",
+    "notes": "Both rows: 105 notebooks cost ₹2415, asks how many for ₹1863. Cost/notebook=2415/105=23; 1863/23=81. Row 63eca02c option B=81 (correct). Row e36c2d42 option C=81 (correct). No conflict. History tied at 0 for both. Tie-broken using created_at: e36c2d42 is from the earlier GOV batch (2026-06-21, external_id GOV-ratio_proportion-15) vs 63eca02c from the later SMGOV batch (2026-06-22, external_id SMGOV-ratio_and_proportion-34); kept the earlier/primary row e36c2d42.",
+    "keep_id": "e36c2d42-47da-4f9e-9952-d79c83652632",
+    "rewrites": [
+      {
+        "id": "63eca02c-e86f-464f-837f-de6aa408f09f",
+        "question_text": "The cost of 72 pens is ₹936. How many pens can be bought for ₹702?",
+        "question_text_ta": "72 பேனாக்களின் விலை ₹936. ₹702-க்கு எத்தனை பேனாக்கள் வாங்க முடியும்?",
+        "option_a": "54 pens",
+        "option_b": "48 pens",
+        "option_c": "60 pens",
+        "option_d": "56 pens",
+        "correct_answer": "A",
+        "explanation": "Given:\nCost of \\( 72 \\) pens \\( = \\) ₹936\nAmount available \\( = \\) ₹702\nWorking:\nFormula: \\( \\text{cost of 1 pen} = \\dfrac{\\text{total cost}}{\\text{number of pens}} \\)\nCost of 1 pen \\( = \\dfrac{936}{72} = 13 \\) (₹13)\nNumber of pens for ₹702 \\( = \\dfrac{702}{13} = 54 \\)\nAsked:\nNumber of pens that can be bought for ₹702\n\\( = 54 \\) pens\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n72 பேனாக்களின் விலை \\( = \\) ₹936\nகையில் உள்ள தொகை \\( = \\) ₹702\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஒரு பேனாவின் விலை} = \\dfrac{\\text{மொத்த விலை}}{\\text{பேனாக்களின் எண்ணிக்கை}} \\)\nஒரு பேனாவின் விலை \\( = \\dfrac{936}{72} = 13 \\) (₹13)\n₹702-க்கு வாங்கக்கூடிய பேனாக்கள் \\( = \\dfrac{702}{13} = 54 \\)\nகேட்டது:\n₹702-க்கு வாங்கக்கூடிய பேனாக்களின் எண்ணிக்கை\n\\( = 54 \\) பேனாக்கள்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "10,14,21",
+    "classification": "true_duplicate",
+    "notes": "Both rows: 10 farmers plough field in 21 days; find days reduced with 14 farmers. Work=10*21=210 farmer-days; days for 14 farmers=210/14=15; reduction=21-15=6. Row 6cbce4f6 option B=6 (correct). Row 87086085 option C=6 (correct). No conflict. Kept 87086085 (n_seen=1+n_ans=0=1 history) over 6cbce4f6 (n_seen=0+n_ans=0=0 history).",
+    "keep_id": "87086085-06ad-4038-90a5-0f2754c684be",
+    "rewrites": [
+      {
+        "id": "6cbce4f6-8456-4758-89f5-e33e6c008d8d",
+        "question_text": "8 painters can paint a building in 27 days. By how many days is the time reduced if 12 painters work on it?",
+        "question_text_ta": "8 ஓவியர்களால் ஒரு கட்டிடத்தை 27 நாட்களில் வர்ணம் தீட்ட முடியும். அதே கட்டிடத்தில் 12 ஓவியர்கள் பணியாற்றினால், நாட்களின் எண்ணிக்கை எத்தனை நாட்கள் குறையும்?",
+        "option_a": "9 days",
+        "option_b": "18 days",
+        "option_c": "15 days",
+        "option_d": "6 days",
+        "correct_answer": "A",
+        "explanation": "Given:\n8 painters complete the work in \\( 27 \\) days\nNumber of painters increased to \\( 12 \\)\nWorking:\nFormula: \\( \\text{painters} \\times \\text{days} = \\text{constant work} \\)\nTotal work \\( = 8 \\times 27 = 216 \\) painter-days\nDays for 12 painters \\( = \\dfrac{216}{12} = 18 \\)\nDays reduced \\( = 27 - 18 = 9 \\)\nAsked:\nNumber of days the time is reduced by\n\\( = 9 \\) days\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n8 ஓவியர்கள் வேலையை \\( 27 \\) நாட்களில் முடிக்கின்றனர்\nஓவியர்களின் எண்ணிக்கை \\( 12 \\) ஆக அதிகரிக்கிறது\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஓவியர்கள்} \\times \\text{நாட்கள்} = \\text{மாறாத வேலை} \\)\nமொத்த வேலை \\( = 8 \\times 27 = 216 \\) ஓவியர்-நாட்கள்\n12 ஓவியர்களுக்கான நாட்கள் \\( = \\dfrac{216}{12} = 18 \\)\nகுறையும் நாட்கள் \\( = 27 - 18 = 9 \\)\nகேட்டது:\nகுறையும் நாட்களின் எண்ணிக்கை\n\\( = 9 \\) நாட்கள்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "25,5,7",
+    "classification": "true_duplicate",
+    "notes": "Both rows: 7:5 is in proportion to x:25, find x. Cross-multiply: 7*25=5x -> x=175/5=35. Row 73f5cd34 option C=35 (correct). Row bd63d225 option A=35 (correct). No conflict. History tied at 0 for both. Tie-broken using created_at: bd63d225 is from the earlier GOV batch (2026-06-21, external_id GOV-ratio_proportion-08) vs 73f5cd34 from the later SMGOV batch (2026-06-22, external_id SMGOV-ratio_and_proportion-11); kept the earlier/primary row bd63d225.",
+    "keep_id": "bd63d225-ea4a-4c7f-9d2c-58bedb6ec008",
+    "rewrites": [
+      {
+        "id": "73f5cd34-6ca5-4cd9-9406-a2151ab6d0e4",
+        "question_text": "If 9 : 4 is in proportion to y : 36, then find the value of y.",
+        "question_text_ta": "9 : 4 என்பது y : 36 உடன் விகிதசமத்தில் இருந்தால், y-யின் மதிப்பைக் காண்க.",
+        "option_a": "y = 81",
+        "option_b": "y = 16",
+        "option_c": "y = 144",
+        "option_d": "y = 36",
+        "correct_answer": "A",
+        "explanation": "Given:\nProportion: \\( 9 : 4 = y : 36 \\)\nWorking:\nFormula: in a proportion \\( a:b = c:d \\), \\( a \\times d = b \\times c \\)\n\\( 9 \\times 36 = 4 \\times y \\)\n\\( 324 = 4y \\)\n\\( y = \\dfrac{324}{4} = 81 \\)\nAsked:\nValue of \\( y \\)\n\\( = 81 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nவிகிதசமம்: \\( 9 : 4 = y : 36 \\)\nசெயல்முறை:\nசூத்திரம்: \\( a:b = c:d \\) விகிதசமத்தில், \\( a \\times d = b \\times c \\)\n\\( 9 \\times 36 = 4 \\times y \\)\n\\( 324 = 4y \\)\n\\( y = \\dfrac{324}{4} = 81 \\)\nகேட்டது:\n\\( y \\)-யின் மதிப்பு\n\\( = 81 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "2,20,3,30",
+    "classification": "true_duplicate",
+    "notes": "Both rows: check whether 3:2 and 30:20 are in proportion. Cross multiply: 3*20=60, 2*30=60, equal -> YES in proportion. Row 872f0450 option D='Yes, 3:2::30:20 are in proportion' (correct). Row a0e30394 option A='in proportion because 3x20=2x30=60' (correct). No conflict. Kept a0e30394 (n_seen=2+n_ans=1=3 history) over 872f0450 (n_seen=2+n_ans=0=2 history).",
+    "keep_id": "a0e30394-c50c-4fce-9872-b551bb4a5fe3",
+    "rewrites": [
+      {
+        "id": "872f0450-da86-4275-8e2b-0db42a9955b2",
+        "question_text": "Check whether 5 : 8 and 15 : 26 are in proportion.",
+        "question_text_ta": "5 : 8 மற்றும் 15 : 26 விகிதசமத்தில் உள்ளதா எனச் சரிபார்க்கவும்.",
+        "option_a": "No, they are not in proportion (5 x 26 is not equal to 8 x 15)",
+        "option_b": "Yes, 5:8::15:26 are in proportion",
+        "option_c": "Cannot be determined",
+        "option_d": "Yes, but only as 8:5::26:15",
+        "correct_answer": "A",
+        "explanation": "Given:\nRatios \\( 5:8 \\) and \\( 15:26 \\)\nWorking:\nFormula: \\( a:b \\) and \\( c:d \\) are in proportion if \\( a \\times d = b \\times c \\)\n\\( 5 \\times 26 = 130 \\)\n\\( 8 \\times 15 = 120 \\)\nSince \\( 130 \\neq 120 \\), the ratios are not in proportion.\nAsked:\nWhether \\( 5:8 \\) and \\( 15:26 \\) are in proportion\n\\( = \\) No\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nவிகிதங்கள் \\( 5:8 \\) மற்றும் \\( 15:26 \\)\nசெயல்முறை:\nசூத்திரம்: \\( a:b \\) மற்றும் \\( c:d \\) விகிதசமத்தில் இருக்க வேண்டுமெனில் \\( a \\times d = b \\times c \\)\n\\( 5 \\times 26 = 130 \\)\n\\( 8 \\times 15 = 120 \\)\n\\( 130 \\neq 120 \\) என்பதால், இவை விகிதசமத்தில் இல்லை.\nகேட்டது:\n\\( 5:8 \\) மற்றும் \\( 15:26 \\) விகிதசமத்தில் உள்ளதா\n\\( = \\) இல்லை\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "10,11,84",
+    "classification": "true_duplicate",
+    "notes": "All 3 rows: correct answers ratio 10:11 (Karmegam/Kaarmugilan/Karthi vs Kavitha), total 84 points, asks Kavitha's score. 10x+11x=84 -> x=4; Kavitha(11 part)=44. Row c4507582 option B=44 (correct). Row c7eda477 option D=44 (correct). Row cb21a02b option A=44 (correct). All three agree on the same correct value with no conflict; row 3's name 'karthi' (lowercase) vs the other two rows' 'Kaarmugilan' is treated as the same duplicated scenario since numbers, ratio, and total are identical. Kept c7eda477 (n_seen=3+n_ans=1=4 history), the highest of the three (c4507582=2, cb21a02b=3).",
+    "keep_id": "c7eda477-df49-40df-9927-57500f1858e0",
+    "rewrites": [
+      {
+        "id": "c4507582-7170-4e83-8cf6-76ee49a1b3ba",
+        "question_text": "The number of matches won by Team A and Team B in a season are in the ratio 5 : 7. If together they won 60 matches, how many did Team B win?",
+        "question_text_ta": "ஒரு பருவத்தில் அணி A மற்றும் அணி B வென்ற போட்டிகளின் எண்ணிக்கை 5 : 7 என்ற விகிதத்தில் உள்ளது. அவர்கள் மொத்தம் 60 போட்டிகள் வென்றிருந்தால், அணி B எத்தனை போட்டிகள் வென்றது?",
+        "option_a": "35 matches",
+        "option_b": "25 matches",
+        "option_c": "30 matches",
+        "option_d": "40 matches",
+        "correct_answer": "A",
+        "explanation": "Given:\nRatio of matches won by Team A and Team B \\( = 5 : 7 \\)\nTotal matches won \\( = 60 \\)\nWorking:\nFormula: part in ratio \\( a : b \\) \\( = \\dfrac{b}{a + b} \\times \\text{Total} \\)\nLet matches \\( = 5x \\) and \\( 7x \\)\n\\( 5x + 7x = 60 \\)\n\\( 12x = 60 \\)\n\\( x = \\dfrac{60}{12} = 5 \\)\nTeam B \\( = 7x = 7 \\times 5 = 35 \\)\nAsked:\nMatches won by Team B\n\\( = 35 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅணி A மற்றும் அணி B வென்ற போட்டிகளின் விகிதம் \\( = 5 : 7 \\)\nமொத்தம் வென்ற போட்டிகள் \\( = 60 \\)\nசெயல்முறை:\nசூத்திரம்: \\( a : b \\) விகிதத்தில் ஒரு பங்கு \\( = \\dfrac{b}{a + b} \\times \\text{Total} \\)\nபோட்டிகள் \\( = 5x \\) மற்றும் \\( 7x \\) எனக் கொள்க\n\\( 5x + 7x = 60 \\)\n\\( 12x = 60 \\)\n\\( x = \\dfrac{60}{12} = 5 \\)\nஅணி B \\( = 7x = 7 \\times 5 = 35 \\)\nகேட்டது:\nஅணி B வென்ற போட்டிகள்\n\\( = 35 \\)\nவிடை (A)"
+      },
+      {
+        "id": "cb21a02b-2dc4-4350-9a8d-9c403950e306",
+        "question_text": "The marks scored by Arun and Bala in a test are in the ratio 8 : 9. If their total marks is 102, how many marks did Bala score?",
+        "question_text_ta": "ஒரு தேர்வில் அருண் மற்றும் பாலா பெற்ற மதிப்பெண்கள் 8 : 9 என்ற விகிதத்தில் உள்ளன. அவர்களின் மொத்த மதிப்பெண் 102 எனில், பாலா எத்தனை மதிப்பெண் பெற்றார்?",
+        "option_a": "54 marks",
+        "option_b": "48 marks",
+        "option_c": "51 marks",
+        "option_d": "57 marks",
+        "correct_answer": "A",
+        "explanation": "Given:\nRatio of marks scored by Arun and Bala \\( = 8 : 9 \\)\nTotal marks \\( = 102 \\)\nWorking:\nFormula: part in ratio \\( a : b \\) \\( = \\dfrac{b}{a + b} \\times \\text{Total} \\)\nLet marks \\( = 8x \\) and \\( 9x \\)\n\\( 8x + 9x = 102 \\)\n\\( 17x = 102 \\)\n\\( x = \\dfrac{102}{17} = 6 \\)\nBala \\( = 9x = 9 \\times 6 = 54 \\)\nAsked:\nMarks scored by Bala\n\\( = 54 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅருண் மற்றும் பாலா பெற்ற மதிப்பெண்களின் விகிதம் \\( = 8 : 9 \\)\nமொத்த மதிப்பெண் \\( = 102 \\)\nசெயல்முறை:\nசூத்திரம்: \\( a : b \\) விகிதத்தில் ஒரு பங்கு \\( = \\dfrac{b}{a + b} \\times \\text{Total} \\)\nமதிப்பெண்கள் \\( = 8x \\) மற்றும் \\( 9x \\) எனக் கொள்க\n\\( 8x + 9x = 102 \\)\n\\( 17x = 102 \\)\n\\( x = \\dfrac{102}{17} = 6 \\)\nபாலா \\( = 9x = 9 \\times 6 = 54 \\)\nகேட்டது:\nபாலா பெற்ற மதிப்பெண்கள்\n\\( = 54 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "18,24,6",
+    "classification": "true_duplicate",
+    "notes": "Both rows: 6 children share 24 pencils equally, asks pencils needed for 18 children. Pencils/child=24/6=4; 4*18=72. Row c7937410 option D=72 (correct). Row d14796a5 option B=72 (correct). No conflict. Kept c7937410 (n_seen=1+n_ans=0=1 history) over d14796a5 (n_seen=0+n_ans=0=0 history).",
+    "keep_id": "c7937410-b314-4212-bb00-94660485b246",
+    "rewrites": [
+      {
+        "id": "d14796a5-3eaa-4441-90c1-4bfd6b09a14f",
+        "question_text": "If 5 workers are paid ₹1500 equally, how much would 8 workers be paid at the same rate per worker?",
+        "question_text_ta": "5 தொழிலாளர்களுக்கு சமமாக ₹1500 கொடுக்கப்பட்டால், அதே தனிநபர் விகிதத்தில் 8 தொழிலாளர்களுக்கு எவ்வளவு கொடுக்க வேண்டும்?",
+        "option_a": "₹2400",
+        "option_b": "₹1800",
+        "option_c": "₹2100",
+        "option_d": "₹2700",
+        "correct_answer": "A",
+        "explanation": "Given:\nAmount paid to \\( 5 \\) workers (equally) \\( = \\) ₹1500\nWorking:\nFormula: \\( \\text{pay per worker} = \\dfrac{\\text{total amount}}{\\text{number of workers}} \\)\nPay per worker \\( = \\dfrac{1500}{5} = 300 \\) (₹300)\nAmount for 8 workers \\( = 300 \\times 8 = 2400 \\) (₹2400)\nAsked:\nAmount to be paid to 8 workers\n\\( = \\) ₹2400\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n5 தொழிலாளர்களுக்குச் சமமாகக் கொடுக்கப்பட்ட தொகை \\( = \\) ₹1500\nசெயல்முறை:\nசூத்திரம்: \\( \\text{ஒரு தொழிலாளிக்கான ஊதியம்} = \\dfrac{\\text{மொத்தத் தொகை}}{\\text{தொழிலாளர்களின் எண்ணிக்கை}} \\)\nஒரு தொழிலாளிக்கான ஊதியம் \\( = \\dfrac{1500}{5} = 300 \\) (₹300)\n8 தொழிலாளர்களுக்கான தொகை \\( = 300 \\times 8 = 2400 \\) (₹2400)\nகேட்டது:\n8 தொழிலாளர்களுக்குக் கொடுக்க வேண்டிய தொகை\n\\( = \\) ₹2400\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "11,14,14,17,17,20,20",
+    "classification": "true_duplicate",
+    "notes": "Row 51377b8f: '11 14 14 17 17 20 20 __ __' (forward). Pattern: a leading single term (11) followed by pairs increasing by 3 each step (14,14 / 17,17 / 20,20); next pair = 23,23. Option A=23,23 (verified correct). Row faf7e782: '20 20 17 17 14 14 11 ?' is the EXACT reverse of row 51377b8f's 7 given terms (same 7 numbers, same multiset, order flipped) with the lone '11' now at the end instead of the start. By the same pair-pattern read in the descending direction, the next pair beyond the boundary singleton is 8,8 (11-3=8). Option A='8 8' (verified correct: this is the mirror-symmetric continuation of the identical sequence, not a numeric conflict — both rows are independently correct for their own stated direction). Classified as true duplicate: identical 7-number set, identical underlying pattern, only the reading direction differs — the second row is trivially answerable by anyone who solved the first. Kept 51377b8f (n_seen=4+n_ans=1=5 history) over faf7e782 (n_seen=0+n_ans=0=0 history).",
+    "keep_id": "51377b8f-2348-479e-bf9c-d21d1a330b9a",
+    "rewrites": [
+      {
+        "id": "faf7e782-a508-4167-8c64-880b3058aa96",
+        "question_text": "50 45 45 40 40 35 35 __ __",
+        "question_text_ta": "50 45 45 40 40 35 35 __ __",
+        "option_a": "30 30",
+        "option_b": "25 25",
+        "option_c": "30 25",
+        "option_d": "32 32",
+        "correct_answer": "A",
+        "explanation": "Given:\nSeries: \\( 50,\\ 45,\\ 45,\\ 40,\\ 40,\\ 35,\\ 35,\\ ?,\\ ? \\)\nWorking:\nFormula: a leading single term, followed by pairs decreasing by \\( 5 \\) each step\n\\( 50 \\) (single) \\( \\to 45,45 \\) (pair, \\( 50-5 \\)) \\( \\to 40,40 \\) (pair, \\( 45-5 \\)) \\( \\to 35,35 \\) (pair, \\( 40-5 \\))\nNext pair \\( = 35 - 5 = 30 \\), repeated twice \\( \\to 30,\\ 30 \\)\nAsked:\nNext two terms \\( = ?,\\ ? \\)\n\\( = 30,\\ 30 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nதொடர்: \\( 50,\\ 45,\\ 45,\\ 40,\\ 40,\\ 35,\\ 35,\\ ?,\\ ? \\)\nசெயல்முறை:\nசூத்திரம்: முதலில் ஒரு தனி எண், அதைத் தொடர்ந்து ஒவ்வொரு முறையும் \\( 5 \\) வீதம் குறையும் இரட்டை எண் ஜோடிகள்\n\\( 50 \\) (தனி) \\( \\to 45,45 \\) (ஜோடி, \\( 50-5 \\)) \\( \\to 40,40 \\) (ஜோடி, \\( 45-5 \\)) \\( \\to 35,35 \\) (ஜோடி, \\( 40-5 \\))\nஅடுத்த ஜோடி \\( = 35 - 5 = 30 \\), இரு முறை \\( \\to 30,\\ 30 \\)\nகேட்டது:\nஅடுத்த இரு எண்கள் \\( = ?,\\ ? \\)\n\\( = 30,\\ 30 \\)\nவிடை (A)"
+      }
+    ]
+  }
+]

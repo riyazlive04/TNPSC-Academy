@@ -12,6 +12,11 @@ export const CREDIT_PER_QUESTION = 1
  * signup (day one is the 50 signup credits only; profiles are born with
  * last_daily_grant = creation day, so the same-day grant no-ops). */
 export const DAILY_CREDIT_GRANT = 10
+/** Boosted daily grant for an active ₹399 Group 1 Mock Test Pack owner (see
+ * bundleAccess().mockPack), in place of DAILY_CREDIT_GRANT — same use-it-or-
+ * lose-it rule (grant_daily_credit expires the unused remainder at the next
+ * IST day boundary), just a bigger number while the plan is active. */
+export const DAILY_CREDIT_GRANT_BOOSTED = 50
 /** A free user may take at most this many mock exams total, ever. */
 export const FREE_MOCK_LIMIT = 1
 /** One-time credits awarded when the user's FIRST completed test is graded. */
@@ -77,9 +82,14 @@ export async function chargeTestStart(
   return { error: 'insufficient_credits', balance, cost }
 }
 
-/** Grant the daily login bonus (once per IST day). Returns { granted, balance }. */
-export async function grantDaily(db: SupabaseClient): Promise<{ granted: boolean; balance: number }> {
-  const { data, error } = await db.rpc('grant_daily_credit', { p_amount: DAILY_CREDIT_GRANT })
+/** Grant the daily login bonus (once per IST day). Returns { granted, balance }.
+ *  `amount` defaults to the standard grant; callers pass DAILY_CREDIT_GRANT_BOOSTED
+ *  for an active Mock Pack owner (see routes/credits.ts). */
+export async function grantDaily(
+  db: SupabaseClient,
+  amount: number = DAILY_CREDIT_GRANT
+): Promise<{ granted: boolean; balance: number }> {
+  const { data, error } = await db.rpc('grant_daily_credit', { p_amount: amount })
   if (error) throw error
   const r = (data ?? {}) as { granted?: boolean; balance?: number }
   return { granted: !!r.granted, balance: Number(r.balance ?? 0) }

@@ -16,14 +16,14 @@ export default function SectionHeader({
 }) {
   return (
     <div className={`flex items-baseline justify-between gap-3 ${className}`}>
-      <h2 className="tamil font-display text-[15px] font-semibold tracking-tight text-ink">
+      <h2 className="tamil font-display text-base font-semibold tracking-tight text-ink">
         {title}
       </h2>
       {action && (
         <button
           type="button"
           onClick={action.onClick}
-          className="tamil focus-ring rounded-md font-body text-[13px] font-medium text-accent transition-opacity hover:opacity-80"
+          className="tamil focus-ring rounded-md font-body text-sm font-medium text-accent transition-opacity hover:opacity-80"
         >
           {action.label}
         </button>

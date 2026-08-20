@@ -43,10 +43,10 @@ export default function MarathonFreeAlert({
           </p>
 
           <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="rounded-full bg-mintsoft px-3 py-1 font-heading text-[11px] font-bold uppercase text-mint">
+            <span className="rounded-full bg-mintsoft px-3 py-1 font-heading text-2xs font-bold uppercase text-mint">
               {t('marathonFreeBadge')}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-tint px-3 py-1 font-heading text-[11px] font-semibold text-ink2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-tint px-3 py-1 font-heading text-2xs font-semibold text-ink2">
               <CalendarDays size={12} /> 100 Q · 90 min
             </span>
           </div>

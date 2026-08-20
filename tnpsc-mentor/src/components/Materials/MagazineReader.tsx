@@ -189,7 +189,7 @@ export default function MagazineReader({
                 key={value}
                 onClick={() => setReadLang(value)}
                 aria-pressed={readLang === value}
-                className={`tamil press rounded-full border px-3 py-1 font-heading text-[11px] font-semibold transition ${
+                className={`tamil press rounded-full border px-3 py-1 font-heading text-2xs font-semibold transition ${
                   readLang === value
                     ? 'border-brand bg-brand text-white'
                     : 'border-line bg-card text-ink2 hover:border-brand-ring hover:text-ink'

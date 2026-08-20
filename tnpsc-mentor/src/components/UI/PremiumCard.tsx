@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck, Download } from 'lucide-react'
+import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck, Download, Rocket } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useVettriEnabled } from '../../hooks/useVettriEnabled'
+import { useRankBoosterEnabled } from '../../hooks/useRankBoosterEnabled'
 import { startPurchase, couponMode, PURCHASE_ERR_KEY } from '../../lib/purchase'
 import { useStorePrice } from '../../hooks/useStorePrice'
 import { toast } from '../../store/toastStore'
@@ -12,25 +13,27 @@ import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
+import { hapticSuccess } from '../../lib/haptics'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
 import VettriSuggestModal from './VettriSuggestModal'
 import StoreCodeRow from './StoreCodeRow'
 
 // ─── Premium plan pricing ───────────────────────────────────────────────────
-// Single source of truth for the 3-month plan. `PRICE_PAISE` is what the order is
+// Single source of truth for the 6-month plan. `PRICE_PAISE` is what the order is
 // created for (₹1 = 100 paise); the MRP is shown struck-through. When the
 // monetisation model firms up, derive these from a server-side plan instead.
 export const PREMIUM_MRP_RUPEES = 1699
 export const PREMIUM_PRICE_RUPEES = 1699
 export const PREMIUM_PRICE_PAISE = PREMIUM_PRICE_RUPEES * 100
 const SAVINGS = PREMIUM_MRP_RUPEES - PREMIUM_PRICE_RUPEES
-// Value framing shown under the price ("≈ ₹566 / month" for the 3-month plan).
-const PER_MONTH_RUPEES = Math.round(PREMIUM_PRICE_RUPEES / 3)
 
 // Test Marathon (premiumPerk5) leads: Premium includes the whole Vettri Nichayam
 // series, which is the headline reason to pick Premium over the cheaper bundle.
+// premiumPerk7 (Rank Booster) rides right after it — Premium includes that
+// standalone plan too, at no extra cost.
 const PERK_KEYS = [
   'premiumPerk5',
+  'premiumPerk7',
   'premiumPerk1',
   'premiumPerk2',
   'premiumPerk3',
@@ -54,7 +57,7 @@ function rupees(paise: number): string {
 }
 
 /**
- * Premium upsell card. Shows the struck MRP and the flat 3-month price, lets a
+ * Premium upsell card. Shows the struck MRP and the flat 6-month price, lets a
  * customer apply a promoter coupon (validated server-side), and runs the Razorpay
  * checkout (tagged `plan: premium_annual` so the ledger records *what* was bought
  * - the final price is always recomputed on the server from the coupon).
@@ -86,6 +89,7 @@ export default function PremiumCard({
   const [suggestOpen, setSuggestOpen] = useState(false)
   const [suggestSeen, setSuggestSeen] = useState(false)
   const vettriOn = useVettriEnabled()
+  const rankBoosterOn = useRankBoosterEnabled()
   const hasVettri = useEntitlementsStore((s) => s.vettri)
   const entitlementsLoaded = useEntitlementsStore((s) => s.loaded)
   const { premium, loaded, refresh, markPremium } = usePremiumStore()
@@ -156,17 +160,18 @@ export default function PremiumCard({
     setConfirmOpen(false)
     setPaying(true)
     // Meta: buyer confirmed the recap and checkout is opening (high-intent lead).
-    trackCheckoutConfirmed({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 3 months' })
+    trackCheckoutConfirmed({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 6 months' })
     try {
       const result = await startPurchase({
         plan: 'premium_annual',
         amount: PREMIUM_PRICE_PAISE,
         profile,
-        description: 'TNPSC Mentors Premium - 3 months',
+        description: 'TNPSC Mentors Premium - 6 months',
         couponCode: applied?.code,
         userId: user?.id ?? null,
       })
       if (result.status === 'paid') {
+        hapticSuccess()
         // Optimistically flip every entitlement surface, then reconcile with the
         // server (expiry, exact balance) so nothing stays locked until a reload.
         markPremium()
@@ -217,7 +222,7 @@ export default function PremiumCard({
       return
     }
     // Meta: buyer initiated checkout (opened the Vettri suggest / recap popup).
-    trackInitiateCheckout({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 3 months' })
+    trackInitiateCheckout({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 6 months' })
     if (vettriOn && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
     else setConfirmOpen(true)
   }
@@ -236,16 +241,43 @@ export default function PremiumCard({
           onClick={dismiss}
           aria-label={t('dismiss')}
           title={t('dismiss')}
-          className="absolute right-2.5 top-2.5 z-10 grid h-7 w-7 place-items-center rounded-full text-ink2/60 transition hover:bg-tint hover:text-ink focus-ring active:scale-90"
+          className="absolute right-1 top-1 z-10 grid h-11 w-11 place-items-center rounded-full text-ink2/60 transition hover:bg-tint hover:text-ink focus-ring active:scale-90"
         >
           <X size={16} />
         </button>
       )}
 
+      {/* Group II/ IIA- Rank Booster header - mirrors VettriCard's Test Marathon
+          strip: Premium is a superset, so buyers should see the standalone
+          ₹399 plan is included at no extra cost. Hidden while the superadmin
+          has the Rank Booster feature switched off. */}
+      {rankBoosterOn && (
+        <div className="relative -ml-7 -mr-6 -mt-6 mb-5 bg-mint py-4 pl-7 pr-6 text-white">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                <Rocket size={20} />
+              </span>
+              <div className="min-w-0">
+                <h3 className="tamil font-display text-base font-bold tracking-tight">
+                  {t('rankBoosterBannerTitle')}
+                </h3>
+                <p className="tamil mt-0.5 font-body text-xs text-white/85">
+                  {t('rankBoosterBannerSub')}
+                </p>
+              </div>
+            </div>
+            <span className="tamil flex-shrink-0 rounded-pill bg-white/15 px-3 py-1 font-heading text-2xs font-semibold">
+              {t('rankBoosterIncluded')}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-mintsoft px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-mint">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-mintsoft px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
             <Crown size={13} /> {t('premiumBadge')}
           </span>
           <h2 className="mt-3 font-display text-xl font-bold tracking-tight text-ink">
@@ -285,7 +317,7 @@ export default function PremiumCard({
 
           {/* Bonus benefits - a distinct extras block under the core perks. */}
           <div className="mt-4 rounded-field border border-mint/25 bg-mintsoft/60 p-3">
-            <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-mint">
+            <p className="tamil flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
               <Gift size={13} /> {t('premiumBonusTitle')}
             </p>
             <ul className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2">
@@ -316,18 +348,14 @@ export default function PremiumCard({
               {!isFree && <span className="font-body text-sm text-ink2">{t('premiumPerYear')}</span>}
             </div>
             {applied ? (
-              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-white">
                 {`${t('premiumYouSave')} ₹${rupees(PREMIUM_PRICE_PAISE - finalPaise)}`}
               </span>
             ) : SAVINGS > 0 ? (
-              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+              <span className="tamil mt-2 inline-flex items-center rounded-full bg-mint px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-white">
                 {`${t('premiumFlatSave')} ₹${SAVINGS}`}
               </span>
-            ) : (
-              <p className="tamil mt-1 font-body text-xs text-ink2">
-                ≈ ₹{PER_MONTH_RUPEES} {t('premiumPerMonth')}
-              </p>
-            )}
+            ) : null}
           </div>
 
           <div className="my-3.5 border-t border-dashed border-line" />
@@ -380,7 +408,7 @@ export default function PremiumCard({
                 </button>
               </div>
               {couponError && (
-                <span className="font-body text-xs text-coral">{couponError}</span>
+                <span className="font-body text-xs text-error">{couponError}</span>
               )}
             </div>
           )}
@@ -401,7 +429,7 @@ export default function PremiumCard({
 
           {/* Trust microcopy - Razorpay order checkout is one-time, not a
               subscription, so "no auto-renewal" is accurate. */}
-          <p className="tamil mt-2.5 flex items-center justify-center gap-1 text-center font-body text-[11px] text-ink2">
+          <p className="tamil mt-2.5 flex items-center justify-center gap-1 text-center font-body text-2xs text-ink2">
             <ShieldCheck size={12} className="flex-shrink-0 text-mint" />
             {t('premiumSecureNote')}
           </p>

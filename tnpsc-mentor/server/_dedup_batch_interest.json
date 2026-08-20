@@ -1,0 +1,334 @@
+[
+  {
+    "group_nums": "2,640,774.40",
+    "classification": "true_duplicate",
+    "notes": "All 3 rows are the same problem: P=640, A=774.40, n=2 years, CI compounded annually. Independently verified: A/P = 774.40/640 = 1.21 = 1.1^2, so r = 10%. Row 1 (008ce1f6) correct=C=10%; Row 2 (8a58e5fc) correct=C=10%; Row 3 (f6c19766) correct=D=10%. All three point to the same correct VALUE (10%) despite different option orderings/distractor sets — no conflict. n_seen+n_ans: row1=1, row2=1, row3=0 (tie between row1/row2); kept row1 (008ce1f6) arbitrarily since tied, rewrote the other two into different P/A/rate CI problems.",
+    "keep_id": "008ce1f6-a7b9-4f48-be07-8ed5dde9097f",
+    "rewrites": [
+      {
+        "id": "8a58e5fc-d08a-4b17-b361-3d27b28ab9a7",
+        "question_text": "At what rate percent per annum will Rs. 8,000 amount to Rs. 8,820 in 2 years, when interest is compounded annually?",
+        "question_text_ta": "வட்டி ஆண்டுதோறும் கூட்டப்படும்போது, ஆண்டுக்கு எத்தனை சதவீத விகிதத்தில் Rs. 8,000 ஆனது 2 ஆண்டுகளில் Rs. 8,820 ஆக மாறும்?",
+        "option_a": "5%",
+        "option_b": "10%",
+        "option_c": "8%",
+        "option_d": "4%",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 8000 \\)\n\\( A = 8820 \\)\n\\( n = 2 \\) years\nWorking:\nFormula: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\)\n\\( \\dfrac{8820}{8000} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( 1.1025 = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\left(\\dfrac{21}{20}\\right)^{2} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\dfrac{21}{20} = 1 + \\dfrac{r}{100} \\)\n\\( \\dfrac{r}{100} = \\dfrac{1}{20} \\)\n\\( r = 5 \\)\nAsked:\nRate percent\n\\(= 5\\%\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = 8000 \\)\n\\( A = 8820 \\)\n\\( n = 2 \\) ஆண்டுகள்\nசெயல்முறை:\nசூத்திரம்: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\)\n\\( \\dfrac{8820}{8000} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( 1.1025 = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\left(\\dfrac{21}{20}\\right)^{2} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\dfrac{21}{20} = 1 + \\dfrac{r}{100} \\)\n\\( \\dfrac{r}{100} = \\dfrac{1}{20} \\)\n\\( r = 5 \\)\nகேட்டது:\nவட்டி விகிதம்\n\\(= 5\\%\\)\nவிடை (A)"
+      },
+      {
+        "id": "f6c19766-ba77-45d2-b355-1d33965733f6",
+        "question_text": "At what rate percent compound interest per annum will Rs. 2,000 amount to Rs. 2,880 in 2 years, compounded annually?",
+        "question_text_ta": "ஆண்டுதோறும் கூட்டப்படும் எத்தனை சதவீத கூட்டு வட்டி வீதத்தில் Rs. 2,000 ஆனது 2 ஆண்டுகளில் Rs. 2,880 ஆக மொத்தத் தொகை ஆகும்?",
+        "option_a": "20%",
+        "option_b": "40%",
+        "option_c": "10%",
+        "option_d": "15%",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 2000 \\), \\( A = 2880 \\), \\( n = 2 \\)\nFormula: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\)\nWorking:\n\\( \\dfrac{2880}{2000} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( 1.44 = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\dfrac{6}{5} = 1 + \\dfrac{r}{100} \\)\n\\( \\dfrac{r}{100} = \\dfrac{1}{5} \\)\n\\( r = 20 \\)\nAsked:\nRate of compound interest\n\\(= 20\\%\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = 2000 \\), \\( A = 2880 \\), \\( n = 2 \\)\nசூத்திரம்: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\)\nசெயல்முறை:\n\\( \\dfrac{2880}{2000} = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( 1.44 = \\left(1 + \\dfrac{r}{100}\\right)^{2} \\)\n\\( \\dfrac{6}{5} = 1 + \\dfrac{r}{100} \\)\n\\( \\dfrac{r}{100} = \\dfrac{1}{5} \\)\n\\( r = 20 \\)\nகேட்டது:\nகூட்டு வட்டி வீதம்\n\\(= 20\\%\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1,3,5,500,6,750",
+    "classification": "true_duplicate",
+    "notes": "Both rows: sum amounts to Rs.6,500 in 3 years and Rs.5,750 in 1.5 years at SI. Independently verified: interest for 1.5yr = 6500-5750=750; interest/yr=500; interest for 3yr=1500; P=6500-1500=5000; r=1500*100/(5000*3)=10%. Row1 (00b1a9ce) correct=C=\"P=5000,Rate=10%\" matches. Row2 (ecb40e6d) correct=B=\"Rs.5,000\" matches (asks principal only, same computation). No conflict — same underlying scenario/numbers, row1 just additionally asks for rate. n_seen+n_ans: row1=0, row2=6. Kept row2 (ecb40e6d), rewrote row1 into a different two-amounts problem.",
+    "keep_id": "ecb40e6d-7317-41b8-8ba1-44a1053fc243",
+    "rewrites": [
+      {
+        "id": "00b1a9ce-82e1-413f-8281-078245c371d9",
+        "question_text": "A certain sum of money amounts to Rs. 5,280 in 4 years and Rs. 4,640 in 2 years respectively at simple interest. Find the principal and rate percent.",
+        "question_text_ta": "ஒரு குறிப்பிட்ட தொகை தனிவட்டியில் 4 ஆண்டுகளில் Rs. 5,280 ஆகவும், 2 ஆண்டுகளில் Rs. 4,640 ஆகவும் மாறுகிறது. அசல் மற்றும் வட்டி விகிதத்தைக் கண்டறியவும்.",
+        "option_a": "Principal = Rs. 4,000, Rate = 8%",
+        "option_b": "Principal = Rs. 4,640, Rate = 8%",
+        "option_c": "Principal = Rs. 4,000, Rate = 4%",
+        "option_d": "Principal = Rs. 4,500, Rate = 8%",
+        "correct_answer": "A",
+        "explanation": "Given:\nAmount in 4 years \\(= \\text{Rs.}\\,5280\\)\nAmount in 2 years \\(= \\text{Rs.}\\,4640\\)\nWorking:\nFormula: \\(A = P + SI\\), \\(\\quad r = \\dfrac{SI \\times 100}{P \\times n}\\)\nInterest for \\((4-2)=2\\) years \\(= 5280 - 4640 = 640\\)\nInterest for 1 year \\(= 640 \\div 2 = 320\\)\nInterest for 4 years \\(= 320 \\times 4 = 1280\\)\nPrincipal \\(P = 5280 - 1280 = 4000\\)\n\\(r = \\dfrac{1280 \\times 100}{4000 \\times 4} = \\dfrac{128000}{16000} = 8\\%\\)\nAsked:\nPrincipal and rate percent\nPrincipal \\(= \\text{Rs.}\\,4000\\), Rate \\(= 8\\%\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n4 ஆண்டுகளில் தொகை \\(= \\text{Rs.}\\,5280\\)\n2 ஆண்டுகளில் தொகை \\(= \\text{Rs.}\\,4640\\)\nசெயல்முறை:\nசூத்திரம்: \\(A = P + SI\\), \\(\\quad r = \\dfrac{SI \\times 100}{P \\times n}\\)\n\\((4-2)=2\\) ஆண்டுகளுக்கான வட்டி \\(= 5280 - 4640 = 640\\)\n1 ஆண்டிற்கான வட்டி \\(= 640 \\div 2 = 320\\)\n4 ஆண்டுகளுக்கான வட்டி \\(= 320 \\times 4 = 1280\\)\nஅசல் \\(P = 5280 - 1280 = 4000\\)\n\\(r = \\dfrac{1280 \\times 100}{4000 \\times 4} = \\dfrac{128000}{16000} = 8\\%\\)\nகேட்டது:\nஅசல் மற்றும் வட்டி விகிதம்\nஅசல் \\(= \\text{Rs.}\\,4000\\), விகிதம் \\(= 8\\%\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "10",
+    "classification": "true_duplicate",
+    "notes": "Both rows: sum doubles in 10 years at SI, find rate. Independently verified: SI=A-P=P (since A=2P); r=SI*100/(P*n)=100/10=10%. Row1 (1141ccc1) correct=C=10% matches. Row2 (bae1ad8a) correct=D=10% matches. Same value, no conflict. n_seen+n_ans: row1=8, row2=2. Kept row1, rewrote row2 with a different doubling period (20 years => 5%).",
+    "keep_id": "1141ccc1-0d9d-4ce4-9651-bfb9b55d1d4b",
+    "rewrites": [
+      {
+        "id": "bae1ad8a-2d43-4190-8a4d-6446fb2afbfc",
+        "question_text": "A sum of money doubles itself in 20 years at simple interest. Find the rate of interest.",
+        "question_text_ta": "ஒரு தொகை தனிவட்டியில் 20 ஆண்டுகளில் இரண்டு மடங்காகிறது. வட்டி வீதத்தைக் காண்க.",
+        "option_a": "5%",
+        "option_b": "20%",
+        "option_c": "10%",
+        "option_d": "4%",
+        "correct_answer": "A",
+        "explanation": "Given:\nPrincipal \\(= P\\), Amount \\(= 2P\\), \\(n = 20\\) years\nIf the sum doubles, \\(SI = A - P = 2P - P = P\\).\nWorking:\nFormula: \\(r = \\dfrac{SI \\times 100}{P \\times n}\\)\n\\(SI = 2P - P = P\\)\n\\(r = \\dfrac{P \\times 100}{P \\times 20} = \\dfrac{100}{20} = 5\\)\nAsked:\nRate of interest\n\\(= 5\\%\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\(= P\\), மொத்தத் தொகை \\(= 2P\\), \\(n = 20\\) ஆண்டுகள்\nதொகை இரண்டு மடங்கானால், தனிவட்டி \\(= A - P = 2P - P = P\\).\nசெயல்முறை:\nசூத்திரம்: \\(r = \\dfrac{SI \\times 100}{P \\times n}\\)\nதனிவட்டி \\(= 2P - P = P\\)\n\\(r = \\dfrac{P \\times 100}{P \\times 20} = \\dfrac{100}{20} = 5\\)\nகேட்டது:\nவட்டி வீதம்\n\\(= 5\\%\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "12",
+    "classification": "true_duplicate",
+    "notes": "Both rows: sum doubles at 12.5% p.a. SI, find number of years. Independently verified: SI=P; n=SI*100/(P*r)=100/12.5=8. Row1 (180b8f55) correct=B=8 years matches. Row2 (9cf35351) correct=A=8 years matches. Same value, no conflict. n_seen+n_ans: row1=7, row2=1. Kept row1, rewrote row2 with a different rate (20% => 5 years).",
+    "keep_id": "180b8f55-4243-40ad-8dc2-1b87fd04ef4d",
+    "rewrites": [
+      {
+        "id": "9cf35351-561a-4c1f-a086-35972256bdef",
+        "question_text": "A sum of money doubles itself at 20% per annum simple interest over a certain period. Find the number of years.",
+        "question_text_ta": "ஒரு தொகை ஆண்டுக்கு 20% தனிவட்டி வீதத்தில் குறிப்பிட்ட காலத்தில் இரண்டு மடங்காகிறது. ஆண்டுகளின் எண்ணிக்கையைக் காண்க.",
+        "option_a": "5 years",
+        "option_b": "20 years",
+        "option_c": "10 years",
+        "option_d": "4 years",
+        "correct_answer": "A",
+        "explanation": "Given:\nLet principal \\(= P\\), Amount \\(= 2P\\)\nRate \\(r = 20\\%\\)\nIf the sum doubles, \\(SI = A - P = 2P - P = P\\).\nWorking:\nFormula: \\(n = \\dfrac{SI \\times 100}{P \\times r}\\)\n\\(SI = 2P - P = P\\)\n\\(n = \\dfrac{P \\times 100}{P \\times 20} = \\dfrac{100}{20} = 5\\)\nAsked:\nNumber of years\n\\(= 5\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\(= P\\), மொத்தத் தொகை \\(= 2P\\)\nவட்டி வீதம் \\(r = 20\\%\\)\nதொகை இரண்டு மடங்கானால், \\(SI = A - P = 2P - P = P\\).\nசெயல்முறை:\nசூத்திரம்: \\(n = \\dfrac{SI \\times 100}{P \\times r}\\)\n\\(SI = 2P - P = P\\)\n\\(n = \\dfrac{P \\times 100}{P \\times 20} = \\dfrac{100}{20} = 5\\)\nகேட்டது:\nஆண்டுகளின் எண்ணிக்கை\n\\(= 5\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1,2,4,632",
+    "classification": "true_duplicate",
+    "notes": "Both rows: CI=Rs.1,632, n=2 years, r=4% p.a., find principal. Independently verified: CI = P[(1+r/100)^2 - 1] = P*51/625; P=1632*625/51=20000. Row1 (28a45787) correct=A=Rs.20,000 matches. Row2 (f2f4f322) correct=B=Rs.20,000 matches. Same value, no conflict. n_seen+n_ans: row1=0, row2=3. Kept row2, rewrote row1 with different CI/rate (CI=Rs.820, r=5%, n=2 => P=8000).",
+    "keep_id": "f2f4f322-0d6d-4a8b-aa50-f01bec298f38",
+    "rewrites": [
+      {
+        "id": "28a45787-3f20-4039-9201-4bd84b82cf49",
+        "question_text": "Find the principal that will yield a compound interest of Rs. 820 in 2 years at 5% per annum.",
+        "question_text_ta": "ஆண்டுக்கு 5% வட்டி வீதத்தில் 2 ஆண்டுகளில் Rs. 820 கூட்டு வட்டியைத் தரும் அசலைக் காண்க.",
+        "option_a": "Rs. 8,000",
+        "option_b": "Rs. 8,200",
+        "option_c": "Rs. 10,000",
+        "option_d": "Rs. 6,400",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( CI = 820 \\)\n\\( r = 5\\% \\)\n\\( n = 2 \\)\nWorking:\nFormula: \\( CI = P\\left[\\left(1 + \\dfrac{r}{100}\\right)^{n} - 1\\right] \\)\n\\( 820 = P\\left[\\left(1 + \\dfrac{5}{100}\\right)^{2} - 1\\right] \\)\n\\( 820 = P\\left[\\left(\\dfrac{21}{20}\\right)^{2} - 1\\right] = P\\left[\\dfrac{441}{400} - 1\\right] \\)\n\\( 820 = P \\times \\dfrac{41}{400} \\)\n\\( P = 820 \\times \\dfrac{400}{41} = 8000 \\)\nAsked:\nPrincipal\n\\(= \\text{Rs.}\\,8000\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( CI = 820 \\)\n\\( r = 5\\% \\)\n\\( n = 2 \\)\nசெயல்முறை:\nசூத்திரம்: \\( CI = P\\left[\\left(1 + \\dfrac{r}{100}\\right)^{n} - 1\\right] \\)\n\\( 820 = P\\left[\\left(1 + \\dfrac{5}{100}\\right)^{2} - 1\\right] \\)\n\\( 820 = P\\left[\\left(\\dfrac{21}{20}\\right)^{2} - 1\\right] = P\\left[\\dfrac{441}{400} - 1\\right] \\)\n\\( 820 = P \\times \\dfrac{41}{400} \\)\n\\( P = 820 \\times \\dfrac{400}{41} = 8000 \\)\nகேட்டது:\nஅசல்\n\\(= \\text{Rs.}\\,8000\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,15,3,3,8",
+    "classification": "true_duplicate",
+    "notes": "Both rows: Ramlal deposits Rs.8,000 for 3 years at 15% p.a. CI, find CI. Independently verified: A=8000*(1.15)^3=8000*1.520875=12167; CI=4167. Row1 (33fde78c) correct=C=Rs.4,167 matches. Row2 (5a2160cf) correct=A=Rs.4,167 matches. Same value, no conflict. n_seen+n_ans: row1=6, row2=2. Kept row1, rewrote row2 into a different depositor/amount/rate (Rs.10,000 at 10% for 3 years => CI=3,310).",
+    "keep_id": "33fde78c-9c93-405b-b010-7029a6c8bda8",
+    "rewrites": [
+      {
+        "id": "5a2160cf-680b-4cc5-bded-87f6af924167",
+        "question_text": "Kannan deposited Rs. 10,000 with a bank for 3 years at an interest of 10% per annum compounded annually. What is the compound interest he gets after 3 years?",
+        "question_text_ta": "கண்ணன் Rs. 10,000 ஐ ஆண்டுக்கு 10% வட்டியில் ஆண்டுதோறும் கூட்டப்படும் முறையில் 3 ஆண்டுகளுக்கு ஒரு வங்கியில் வைப்பு செய்தார். 3 ஆண்டுகளுக்குப் பிறகு அவர் பெறும் கூட்டு வட்டி என்ன?",
+        "option_a": "Rs. 3,310",
+        "option_b": "Rs. 3,000",
+        "option_c": "Rs. 13,310",
+        "option_d": "Rs. 3,100",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 10000 \\), \\( r = 10\\% \\), \\( n = 3 \\)\nFormula: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\quad;\\quad CI = A - P \\)\nWorking:\n\\( A = 10000 \\times \\left(1 + \\dfrac{10}{100}\\right)^{3} = 10000 \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} = 13310 \\)\n\\( CI = 13310 - 10000 = 3310 \\)\nAsked:\nCompound interest\n\\(= \\text{Rs.}\\,3310\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = 10000 \\), \\( r = 10\\% \\), \\( n = 3 \\)\nசூத்திரம்: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n} \\quad;\\quad CI = A - P \\)\nசெயல்முறை:\n\\( A = 10000 \\times \\left(1 + \\dfrac{10}{100}\\right)^{3} = 10000 \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} = 13310 \\)\n\\( CI = 13310 - 10000 = 3310 \\)\nகேட்டது:\nகூட்டு வட்டி\n\\(= \\text{Rs.}\\,3310\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,1,3,7",
+    "classification": "true_duplicate",
+    "notes": "Both rows: Kamal invests Rs.3,000 for 1 year at 7% SI. Independently verified: SI=3000*1*7/100=210, Amount=3210. Row1 (4116ca36) correct=A=Rs.210 matches. Row2 (edb04414) correct=A=\"SI=Rs.210,Amount=Rs.3,210\" matches. Same value, no conflict. n_seen+n_ans: both 0 (tie). Kept row1 arbitrarily, rewrote row2 with a different investor/amount/rate/time (Selvi, Rs.4,500, 8%, 2 years).",
+    "keep_id": "4116ca36-284e-4c0a-852d-3efdef8ea5c4",
+    "rewrites": [
+      {
+        "id": "edb04414-1ab4-4444-87c8-8b3cdb860cba",
+        "question_text": "Selvi invested Rs. 4,500 for 2 years at 8% per annum. Find the simple interest and amount received by her at the end of two years.",
+        "question_text_ta": "செல்வி ஆண்டுக்கு 8% என்ற வட்டி விகிதத்தில் 2 ஆண்டுகளுக்கு Rs. 4,500 முதலீடு செய்தார். இரண்டு ஆண்டுகளின் இறுதியில் அவருக்குக் கிடைக்கும் தனிவட்டி மற்றும் தொகையைக் கண்டறியவும்.",
+        "option_a": "SI = Rs. 720, Amount = Rs. 5,220",
+        "option_b": "SI = Rs. 720, Amount = Rs. 3,780",
+        "option_c": "SI = Rs. 360, Amount = Rs. 4,860",
+        "option_d": "SI = Rs. 7,200, Amount = Rs. 11,700",
+        "correct_answer": "A",
+        "explanation": "Given:\nPrincipal \\(P = \\text{Rs.}\\,4500\\)\nTime \\(n = 2\\) years; rate \\(r = 8\\%\\)\nFormula: \\(SI = \\dfrac{P \\times n \\times r}{100}\\), \\(A = P + SI\\)\nWorking:\n\\(SI = \\dfrac{4500 \\times 2 \\times 8}{100} = \\dfrac{72000}{100} = \\text{Rs.}\\,720\\)\n\\(A = 4500 + 720 = \\text{Rs.}\\,5220\\)\nAsked:\nSimple interest \\(= \\text{Rs.}\\,720\\), Amount \\(= \\text{Rs.}\\,5220\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\(P = \\text{Rs.}\\,4500\\)\nகாலம் \\(n = 2\\) ஆண்டுகள்; விகிதம் \\(r = 8\\%\\)\nசூத்திரம்: \\(SI = \\dfrac{P \\times n \\times r}{100}\\), \\(A = P + SI\\)\nசெயல்முறை:\n\\(SI = \\dfrac{4500 \\times 2 \\times 8}{100} = \\dfrac{72000}{100} = \\text{Rs.}\\,720\\)\n\\(A = 4500 + 720 = \\text{Rs.}\\,5220\\)\nகேட்டது:\nதனிவட்டி \\(= \\text{Rs.}\\,720\\), மொத்தத் தொகை \\(= \\text{Rs.}\\,5220\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "3,372,6,6",
+    "classification": "true_duplicate",
+    "notes": "Both rows: sum amounts to Rs.6,372 in 3 years at 6% p.a. SI, find principal. Independently verified: A=P(1+nr/100); 6372=P*118/100=P*59/50; P=6372*50/59=5400. Row1 (54f35142) correct=A=Rs.5,400 matches. Row2 (96bb0e35) correct=A=Rs.5,400 matches. Same value, no conflict. n_seen+n_ans: both 0 (tie). Kept row1 arbitrarily, rewrote row2 with different amount/rate/time (A=Rs.6,600, r=8%, n=4 => P=5000).",
+    "keep_id": "54f35142-9e4e-438e-840e-ea06c22135d5",
+    "rewrites": [
+      {
+        "id": "96bb0e35-a8ee-4c93-a76f-9829776567ce",
+        "question_text": "A certain sum of money amounts to Rs. 6,600 in 4 years at 8% per annum simple interest. Find the principal.",
+        "question_text_ta": "ஆண்டுக்கு 8% தனிவட்டி வீதத்தில் ஒரு தொகை 4 ஆண்டுகளில் Rs. 6,600 ஆக மொத்தத் தொகை ஆகிறது. அசலைக் காண்க.",
+        "option_a": "Rs. 5,000",
+        "option_b": "Rs. 6,600",
+        "option_c": "Rs. 5,500",
+        "option_d": "Rs. 4,800",
+        "correct_answer": "A",
+        "explanation": "Given:\nAmount \\(A = 6600\\)\nRate \\(r = 8\\%\\)\nTime \\(n = 4\\) years\nFormula: \\(A = P\\left(1 + \\dfrac{nr}{100}\\right)\\)\nWorking:\n\\(6600 = P\\left(1 + \\dfrac{4 \\times 8}{100}\\right)\\)\n\\(6600 = P\\left(1 + \\dfrac{32}{100}\\right) = P\\left(\\dfrac{132}{100}\\right) = P\\left(\\dfrac{33}{25}\\right)\\)\n\\(P = 6600 \\times \\dfrac{25}{33} = 5000\\)\nAsked:\nPrincipal\n\\(= \\text{Rs.}\\,5000\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nமொத்தத் தொகை \\(A = 6600\\)\nவட்டி வீதம் \\(r = 8\\%\\)\nகாலம் \\(n = 4\\) ஆண்டுகள்\nசூத்திரம்: \\(A = P\\left(1 + \\dfrac{nr}{100}\\right)\\)\nசெயல்முறை:\n\\(6600 = P\\left(1 + \\dfrac{4 \\times 8}{100}\\right)\\)\n\\(6600 = P\\left(1 + \\dfrac{32}{100}\\right) = P\\left(\\dfrac{132}{100}\\right) = P\\left(\\dfrac{33}{25}\\right)\\)\n\\(P = 6600 \\times \\dfrac{25}{33} = 5000\\)\nகேட்டது:\nஅசல்\n\\(= \\text{Rs.}\\,5000\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "080,16,2,3",
+    "classification": "true_duplicate",
+    "notes": "Both rows: principal that earns Rs.2,080 SI in 3.25 years at 16%. Independently verified: P=SI*100/(n*r)=2080*100/((13/4)*16)=208000/52=4000. Row1 (57bd6bbf) correct=A=Rs.4,000 matches. Row2 (d39ad183) correct=B=Rs.4,000 matches. Same value, no conflict. n_seen+n_ans: row1=2, row2=1. Kept row1, rewrote row2 with different SI/time/rate (SI=Rs.2,592, n=4.5yr, r=12% => P=4800).",
+    "keep_id": "57bd6bbf-d6f0-416a-ba7e-98d8a7da237a",
+    "rewrites": [
+      {
+        "id": "d39ad183-2826-49e3-a4b9-a6467657e3c8",
+        "question_text": "Find the principal that earns Rs. 2,592 as simple interest in 4½ years at 12% per annum.",
+        "question_text_ta": "ஆண்டுக்கு 12% வட்டி வீதத்தில் 4½ ஆண்டுகளில் Rs. 2,592 தனிவட்டியாக ஈட்டும் அசலைக் காண்க.",
+        "option_a": "Rs. 4,800",
+        "option_b": "Rs. 5,600",
+        "option_c": "Rs. 3,800",
+        "option_d": "Rs. 2,592",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( SI = 2592 \\)\n\\( r = 12\\% \\)\n\\( n = 4\\dfrac{1}{2} = \\dfrac{9}{2} \\) years\nWorking:\nFormula: \\( P = \\dfrac{SI \\times 100}{n \\times r} \\)\n\\( P = \\dfrac{2592 \\times 100}{\\dfrac{9}{2} \\times 12} \\)\n\\( P = \\dfrac{259200}{54} = 4800 \\)\nAsked:\nPrincipal\n\\(= \\text{Rs.}\\,4800\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nதனிவட்டி \\( = 2592 \\)\nவட்டி வீதம் \\( = 12\\% \\)\nகாலம் \\( = 4\\dfrac{1}{2} = \\dfrac{9}{2} \\) ஆண்டுகள்\nசெயல்முறை:\nசூத்திரம்: அசல் \\( = \\dfrac{SI \\times 100}{n \\times r} \\)\n\\( P = \\dfrac{2592 \\times 100}{\\dfrac{9}{2} \\times 12} \\)\n\\( P = \\dfrac{259200}{54} = 4800 \\)\nகேட்டது:\nஅசல்\n\\(= \\text{Rs.}\\,4800\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "13,146,2,500",
+    "classification": "true_duplicate",
+    "notes": "Both rows: amount when Rs.2,500 invested for 146 days at 13%. Independently verified: n=146/365=2/5 yr; SI=2500*(2/5)*13/100=130; A=2630. Row1 (5916afc7) correct=B=Rs.2,630 matches. Row2 (90ca673f) correct=D=Rs.2,630 matches. Same value, no conflict. n_seen+n_ans: row1=0, row2=2. Kept row2, rewrote row1 with a different principal/days/rate (Rs.4,500, 73 days, 10% => A=4590).",
+    "keep_id": "90ca673f-cbb0-467d-94f1-f84c29e918e0",
+    "rewrites": [
+      {
+        "id": "5916afc7-fb22-4699-8ecd-7bda6c784af3",
+        "question_text": "Find the amount when Rs. 4,500 is invested for 73 days at 10% per annum.",
+        "question_text_ta": "Rs. 4,500 ஐ ஆண்டுக்கு 10% வட்டி வீதத்தில் 73 நாட்களுக்கு முதலீடு செய்தால் கிடைக்கும் மொத்தத் தொகையைக் காண்க.",
+        "option_a": "Rs. 4,590",
+        "option_b": "Rs. 4,500",
+        "option_c": "Rs. 90",
+        "option_d": "Rs. 4,950",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 4500 \\)\n\\( r = 10\\% \\)\n\\( n = 73 \\) days \\( = \\dfrac{73}{365} = \\dfrac{1}{5} \\) year\nWorking:\nFormula: \\( SI = \\dfrac{P \\times n \\times r}{100} \\); \\( A = P + SI \\)\n\\( SI = \\dfrac{4500 \\times \\dfrac{1}{5} \\times 10}{100} \\)\n\\( = \\dfrac{4500 \\times 10}{5 \\times 100} \\)\n\\( = 90 \\)\n\\( A = 4500 + 90 = 4590 \\)\nAsked:\nAmount\n\\(= \\text{Rs.}\\,4590\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\( P = 4500 \\)\nவட்டி வீதம் \\( r = 10\\% \\)\nகாலம் \\( n = 73 \\) நாட்கள் \\( = \\dfrac{73}{365} = \\dfrac{1}{5} \\) ஆண்டு\nசெயல்முறை:\nசூத்திரம்: \\( SI = \\dfrac{P \\times n \\times r}{100} \\); மொத்தம் \\( = P + SI \\)\n\\( SI = \\dfrac{4500 \\times \\dfrac{1}{5} \\times 10}{100} \\)\n\\( = \\dfrac{4500 \\times 10}{5 \\times 100} \\)\n\\( = 90 \\)\n\\( A = 4500 + 90 = 4590 \\)\nகேட்டது:\nமொத்தத் தொகை\n\\(= \\text{Rs.}\\,4590\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,1,3,5",
+    "classification": "true_duplicate",
+    "notes": "Both rows: amount and CI on P=1000, r=5%, n=3 years. Independently verified: A=1000*1.05^3=1157.63; CI=157.63. Row1 (5e4f609e) correct=D=\"Amount=Rs.1,157.63,CI=Rs.157.63\" matches. Row2 (efa52a3f) correct=C=Rs.157.63 matches. Same value, no conflict. n_seen+n_ans: row1=0, row2=2. Kept row2, rewrote row1 with different P/r/n (P=2000,r=10%,n=2 => A=2420,CI=420).",
+    "keep_id": "efa52a3f-4435-41f0-a1e9-040367df1818",
+    "rewrites": [
+      {
+        "id": "5e4f609e-ebba-4aef-9271-1ea03c83613a",
+        "question_text": "Find the amount and compound interest on P = Rs. 2,000 at r = 10% for n = 2 years.",
+        "question_text_ta": "P = Rs. 2,000, r = 10%, n = 2 ஆண்டுகள் என்ற அளவில் மொத்தத் தொகை மற்றும் கூட்டு வட்டியைக் காண்க.",
+        "option_a": "Amount = Rs. 2,420, CI = Rs. 420",
+        "option_b": "Amount = Rs. 2,400, CI = Rs. 400",
+        "option_c": "Amount = Rs. 2,420, CI = Rs. 2,420",
+        "option_d": "Amount = Rs. 2,200, CI = Rs. 200",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\(P = 2000\\)\n\\(r = 10\\%\\)\n\\(n = 2\\) years\nWorking:\nFormula: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n},\\quad CI = A - P \\)\n\\( A = 2000 \\times \\left(1 + \\dfrac{10}{100}\\right)^{2} \\)\n\\( A = 2000 \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} \\)\n\\( A = \\text{Rs.}\\,2420 \\)\n\\( CI = A - P = 2420 - 2000 \\)\n\\( CI = \\text{Rs.}\\,420 \\)\nAsked:\nAmount and compound interest\nAmount \\(= \\text{Rs.}\\,2420\\), CI \\(= \\text{Rs.}\\,420\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\(P = 2000\\) ரூ.\n\\(r = 10\\%\\)\n\\(n = 2\\) ஆண்டுகள்\nசெயல்முறை:\nசூத்திரம்: \\( A = P\\left(1 + \\dfrac{r}{100}\\right)^{n},\\quad CI = A - P \\)\n\\( A = 2000 \\times \\left(1 + \\dfrac{10}{100}\\right)^{2} \\)\n\\( A = 2000 \\times \\dfrac{11}{10} \\times \\dfrac{11}{10} \\)\nமொத்தத் தொகை \\( A = 2420 \\) ரூ.\n\\( CI = A - P = 2420 - 2000 \\)\nகூட்டு வட்டி \\( CI = 420 \\) ரூ.\nகேட்டது:\nமொத்தத் தொகை மற்றும் கூட்டு வட்டி\nமொத்தத் தொகை \\(= 2420\\) ரூ., கூட்டு வட்டி \\(= 420\\) ரூ.\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "10,2,250",
+    "classification": "true_duplicate",
+    "notes": "Both rows: principal that earns Rs.250 SI in 2.5 years at 10%. Independently verified: P=SI*100/(n*r)=250*100/(2.5*10)=1000. Row1 (63f01f8f) correct=D=Rs.1,000 matches. Row2 (fda1c441) correct=A=Rs.1,000 matches. Same value, no conflict. n_seen+n_ans: row1=2, row2=1. Kept row1, rewrote row2 with different SI/time/rate (SI=Rs.360, n=3yr, r=6% => P=2000).",
+    "keep_id": "63f01f8f-b4f4-4e86-b974-77ff7e6bbeb6",
+    "rewrites": [
+      {
+        "id": "fda1c441-d411-4589-96cb-20738bfa1e31",
+        "question_text": "Find the principal that earns Rs. 360 as simple interest in 3 years at 6% per annum.",
+        "question_text_ta": "ஆண்டுக்கு 6% வட்டி வீதத்தில் 3 ஆண்டுகளில் Rs. 360 தனிவட்டியாக ஈட்டும் அசலைக் காண்க.",
+        "option_a": "Rs. 2,000",
+        "option_b": "Rs. 1,800",
+        "option_c": "Rs. 1,200",
+        "option_d": "Rs. 6,000",
+        "correct_answer": "A",
+        "explanation": "Given:\nSI \\(= \\text{Rs.}\\,360\\)\n\\(r = 6\\%\\)\n\\(n = 3\\) years\nFormula: \\(P = \\dfrac{SI \\times 100}{n \\times r}\\)\nWorking:\n\\(P = \\dfrac{360 \\times 100}{3 \\times 6}\\)\n\\(= \\dfrac{36000}{18}\\)\n\\(= 2000\\)\nAsked: Principal\n\\(= \\text{Rs.}\\,2000\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nதனிவட்டி \\(= \\text{Rs.}\\,360\\)\n\\(r = 6\\%\\)\nஆண்டுகள் \\(n = 3\\)\nசூத்திரம்: \\(P = \\dfrac{SI \\times 100}{n \\times r}\\)\nசெயல்முறை:\n\\(P = \\dfrac{360 \\times 100}{3 \\times 6}\\)\n\\(= \\dfrac{36000}{18}\\)\n\\(= 2000\\)\nகேட்டது: அசல்\n\\(= \\text{Rs.}\\,2000\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "15,3,3,600,9",
+    "classification": "true_duplicate",
+    "notes": "Both rows: SI on Rs.3,600 at 15% for 3 years 9 months. Independently verified: n=15/4 yr; SI=3600*(15/4)*15/100=2025; A=5625. Row1 (6438d122) correct=C=Rs.2,025 matches. Row2 (fc384858) correct=C=\"SI=Rs.2,025,Amount=Rs.5,625\" matches. Same value, no conflict. n_seen+n_ans: row1=8, row2=3. Kept row1, rewrote row2 with different P/r/time (Rs.4,800, 12%, 2yr6mo => SI=1440, A=6240).",
+    "keep_id": "6438d122-24af-4396-ab48-6632e254627d",
+    "rewrites": [
+      {
+        "id": "fc384858-2c60-4a91-bc55-ffa9d975b919",
+        "question_text": "Find SI and amount on Rs. 4,800 at 12% p.a. for 2 years and 6 months.",
+        "question_text_ta": "Rs. 4,800 க்கு ஆண்டுக்கு 12% என்ற விகிதத்தில் 2 ஆண்டுகள் 6 மாதங்களுக்கான தனிவட்டி மற்றும் மொத்தத் தொகையைக் காண்க.",
+        "option_a": "SI = Rs. 1,440, Amount = Rs. 6,240",
+        "option_b": "SI = Rs. 1,440, Amount = Rs. 3,360",
+        "option_c": "SI = Rs. 720, Amount = Rs. 5,520",
+        "option_d": "SI = Rs. 14,400, Amount = Rs. 19,200",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = \\text{Rs.}\\,4800 \\); \\( r = 12\\% \\)\n\\( n = 2 \\) years 6 months \\( = 2\\dfrac{6}{12} = \\dfrac{5}{2} \\) years\nFormula: \\( SI = \\dfrac{P \\times n \\times r}{100} \\), \\( A = P + SI \\)\nWorking:\n\\( SI = \\dfrac{4800 \\times \\frac{5}{2} \\times 12}{100} = \\dfrac{4800 \\times 5 \\times 12}{2 \\times 100} \\)\n\\( SI = \\dfrac{288000}{200} = \\text{Rs.}\\,1440 \\)\n\\( A = P + SI = 4800 + 1440 = \\text{Rs.}\\,6240 \\)\nAsked: simple interest and amount\n\\( SI = \\text{Rs.}\\,1440 \\), \\( A = \\text{Rs.}\\,6240 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = \\text{Rs.}\\,4800 \\); \\( r = 12\\% \\)\n\\( n = 2 \\) ஆண்டுகள் 6 மாதங்கள் \\( = 2\\dfrac{6}{12} = \\dfrac{5}{2} \\) ஆண்டுகள்\nசூத்திரம்: \\( SI = \\dfrac{P \\times n \\times r}{100} \\), \\( A = P + SI \\)\nசெயல்முறை:\n\\( SI = \\dfrac{4800 \\times \\frac{5}{2} \\times 12}{100} = \\dfrac{4800 \\times 5 \\times 12}{2 \\times 100} \\)\n\\( SI = \\dfrac{288000}{200} = \\text{Rs.}\\,1440 \\)\n\\( A = P + SI = 4800 + 1440 = \\text{Rs.}\\,6240 \\)\nகேட்டது: தனிவட்டி மற்றும் மொத்தத் தொகை\n\\( SI = \\text{Rs.}\\,1440 \\), \\( A = \\text{Rs.}\\,6240 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,5,5,8,800",
+    "classification": "true_duplicate",
+    "notes": "Both rows: years for Rs.5,000 to amount to Rs.5,800 at 8% SI. Independently verified: SI=800; n=800*100/(5000*8)=2. Row1 (817d3366) correct=B=2 years matches. Row2 (db5af4dd) correct=C=2 years matches. Same value, no conflict. n_seen+n_ans: row1=1, row2=3. Kept row2, rewrote row1 with different P/A/rate (P=6000,A=7800,r=10% => n=3 years).",
+    "keep_id": "db5af4dd-8af3-4aca-b928-d4701bfce45c",
+    "rewrites": [
+      {
+        "id": "817d3366-1451-4c7f-8efe-67dbf7d00249",
+        "question_text": "In how many years will a sum of Rs. 6,000 amount to Rs. 7,800 at the rate of 10% per annum simple interest?",
+        "question_text_ta": "ஆண்டுக்கு 10% தனிவட்டி வீதத்தில் Rs. 6,000 எத்தனை ஆண்டுகளில் Rs. 7,800 ஆக மொத்தத் தொகை ஆகும்?",
+        "option_a": "3 years",
+        "option_b": "2 years",
+        "option_c": "4 years",
+        "option_d": "2.5 years",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 6000,\\quad A = 7800,\\quad r = 10\\% \\)\nFormula: \\( \\text{S.I} = A - P, \\quad n = \\dfrac{\\text{S.I} \\times 100}{P \\times r} \\)\nWorking:\n\\( \\text{S.I} = 7800 - 6000 = 1800 \\)\n\\( n = \\dfrac{1800 \\times 100}{6000 \\times 10} = \\dfrac{180000}{60000} = 3 \\)\nAsked:\nNumber of years\n\\(= 3\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = 6000,\\quad A = 7800,\\quad r = 10\\% \\)\nசூத்திரம்: \\( \\text{S.I} = A - P, \\quad n = \\dfrac{\\text{S.I} \\times 100}{P \\times r} \\)\nசெயல்முறை:\n\\( \\text{S.I} = 7800 - 6000 = 1800 \\)\n\\( n = \\dfrac{1800 \\times 100}{6000 \\times 10} = \\dfrac{180000}{60000} = 3 \\)\nகேட்டது:\nஆண்டுகளின் எண்ணிக்கை\n\\(= 3\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,10,5,5",
+    "classification": "true_duplicate",
+    "notes": "Both rows: SI/amount on Rs.5,000 at 10% for 5 years. Independently verified: SI=5000*5*10/100=2500; A=7500. Row1 (a505a2c8) correct=A=\"SI=Rs.2,500,Amount=Rs.7,500\" matches. Row2 (bc998e93) correct=D=Rs.2,500 matches. Same value, no conflict. n_seen+n_ans: row1=3, row2=4. Kept row2, rewrote row1 with different P/r/time (Rs.7,000, 6%, 4 years => SI=1680, A=8680).",
+    "keep_id": "bc998e93-cfca-418b-a1be-88bdefe17987",
+    "rewrites": [
+      {
+        "id": "a505a2c8-b521-4438-b729-ed953a622bfe",
+        "question_text": "Find SI and amount on Rs. 7,000 at 6% per annum for 4 years.",
+        "question_text_ta": "Rs. 7,000 க்கு ஆண்டுக்கு 6% என்ற விகிதத்தில் 4 ஆண்டுகளுக்கான தனிவட்டி மற்றும் மொத்தத் தொகையைக் காண்க.",
+        "option_a": "SI = Rs. 1,680, Amount = Rs. 8,680",
+        "option_b": "SI = Rs. 1,680, Amount = Rs. 1,680",
+        "option_c": "SI = Rs. 420, Amount = Rs. 7,420",
+        "option_d": "SI = Rs. 16,800, Amount = Rs. 23,800",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P = 7000 \\), \\( r = 6\\% \\), \\( n = 4 \\) years\nFormula: \\( SI = \\dfrac{P \\times n \\times r}{100} \\)\nWorking:\n\\( SI = \\dfrac{7000 \\times 4 \\times 6}{100} \\)\n\\( = \\dfrac{168000}{100} = 1680 \\)\n\\( A = 7000 + 1680 = 8680 \\)\nAsked:\nSimple interest and amount\n\\(= \\text{Rs.}\\,1680, \\text{Rs.}\\,8680\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P = 7000 \\), \\( r = 6\\% \\), \\( n = 4 \\) ஆண்டுகள்\nசூத்திரம்: \\( SI = \\dfrac{P \\times n \\times r}{100} \\)\nசெயல்முறை:\n\\( SI = \\dfrac{7000 \\times 4 \\times 6}{100} \\)\n\\( = \\dfrac{168000}{100} = 1680 \\)\n\\( A = 7000 + 1680 = 8680 \\)\nகேட்டது:\nதனிவட்டி மற்றும் மொத்தத் தொகை\n\\(= \\text{Rs.}\\,1680, \\text{Rs.}\\,8680\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "000,10,2,8",
+    "classification": "true_duplicate",
+    "notes": "Both rows: difference between SI and CI on Rs.8,000 at 10% for 2 years. Independently verified: diff=P*(r/100)^2=8000*0.01=80. Row1 (aa759f1b) correct=A=Rs.80 matches. Row2 (c897cc41) correct=A=Rs.80 matches. Same value, no conflict. n_seen+n_ans: both 1 (tie). Kept row1 arbitrarily, rewrote row2 with a different principal/rate (Rs.10,000, 5%, 2yr => diff=25).",
+    "keep_id": "aa759f1b-bf3d-42ee-8df3-512371819aa7",
+    "rewrites": [
+      {
+        "id": "c897cc41-fe2d-4e21-a3dc-e65d0e5a1043",
+        "question_text": "Find the difference between SI and CI for a sum of Rs. 10,000 at 5% per annum in 2 years.",
+        "question_text_ta": "Rs. 10,000 என்ற தொகைக்கு ஆண்டுக்கு 5% என்ற விகிதத்தில் 2 ஆண்டுகளில் தனிவட்டி மற்றும் கூட்டு வட்டிக்கு இடையேயான வேறுபாட்டைக் காண்க.",
+        "option_a": "Rs. 25",
+        "option_b": "Rs. 50",
+        "option_c": "Rs. 500",
+        "option_d": "Rs. 2.50",
+        "correct_answer": "A",
+        "explanation": "Given:\nPrincipal \\( P = \\text{Rs.}\\, 10{,}000 \\)\nRate \\( r = 5\\% \\)\nTime \\( n = 2 \\) years\nWorking:\nFormula: Difference (2 years) \\( = P \\times \\left( \\dfrac{r}{100} \\right)^{2} \\)\nDifference \\( = 10000 \\times \\left( \\dfrac{5}{100} \\right)^{2} = 10000 \\times \\dfrac{1}{20} \\times \\dfrac{1}{20} = \\dfrac{10000}{400} = 25 \\)\nAsked:\nDifference between SI and CI\n\\(= \\text{Rs.}\\,25\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஅசல் \\( P = \\text{Rs.}\\, 10{,}000 \\)\nவட்டி விகிதம் \\( r = 5\\% \\)\nகாலம் \\( n = 2 \\) ஆண்டுகள்\nசெயல்முறை:\nசூத்திரம்: வேறுபாடு (2 ஆண்டுகள்) \\( = P \\times \\left( \\dfrac{r}{100} \\right)^{2} \\)\nவேறுபாடு \\( = 10000 \\times \\left( \\dfrac{5}{100} \\right)^{2} = 10000 \\times \\dfrac{1}{20} \\times \\dfrac{1}{20} = \\dfrac{10000}{400} = 25 \\)\nகேட்டது:\nதனிவட்டி மற்றும் கூட்டு வட்டி இடையேயான வேறுபாடு\n\\(= \\text{Rs.}\\,25\\)\nவிடை (A)"
+      }
+    ]
+  }
+]

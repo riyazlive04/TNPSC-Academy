@@ -191,7 +191,7 @@ export default function PyqAptitudePage() {
             <ArrowLeft size={16} /> {t('back')}
           </button>
         )}
-        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{heading}</h2>
+        <h2 className="font-display text-2xl font-bold tracking-tight text-ink">{heading}</h2>
       </div>
 
       {counts === null ? (

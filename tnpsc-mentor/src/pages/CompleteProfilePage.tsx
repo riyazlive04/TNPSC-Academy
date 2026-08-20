@@ -1,11 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Info, Send } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore, selectProfileNeedsOnboarding } from '../store/authStore'
 import { useOnboardingStore } from '../store/onboardingStore'
-import { api, ApiError, isSignupWaOtpConfigured, isTelegramVerifyConfigured } from '../lib/api'
-import { postAuthDestination } from '../lib/authRouting'
+import { api, ApiError } from '../lib/api'
+import { useAuthConfigStore } from '../store/authConfigStore'
+import { postAuthDestination, postAuthState } from '../lib/authRouting'
 import AuthShell from '../components/Auth/AuthShell'
 import TelegramHelpModal from '../components/Auth/TelegramHelpModal'
 import Spinner from '../components/UI/Spinner'
@@ -47,11 +48,24 @@ const RESEND_COOLDOWN_S = 45
  */
 export default function CompleteProfilePage() {
   const navigate = useNavigate()
-  const { profile, sendSignupOtp, verifySignupOtp, startTelegramVerify, checkTelegramVerify } =
-    useAuth()
+  const location = useLocation()
+  // Deep link the user was bounced from before Google onboarding intervened
+  // (e.g. /rank-booster) — see postAuthState() in lib/authRouting.ts, which is
+  // what puts this here in the first place.
+  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
+  const {
+    profile,
+    sendSignupOtp,
+    verifySignupOtp,
+    startTelegramVerify,
+    checkTelegramVerify,
+    signOut,
+  } = useAuth()
   const fetchProfile = useAuthStore((s) => s.fetchProfile)
   const needsOnboarding = useAuthStore(selectProfileNeedsOnboarding)
   const { t } = useT()
+  const isSignupWaOtpConfigured = useAuthConfigStore((s) => s.whatsappOtp)
+  const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
 
   const [phone, setPhone] = useState(profile?.phone ?? '')
   const [gender, setGender] = useState(profile?.gender ?? '')
@@ -105,7 +119,7 @@ export default function CompleteProfilePage() {
       await fetchProfile()
       // New Google account just finished profile setup - arm the first-run tour.
       useOnboardingStore.getState().arm()
-      navigate(postAuthDestination(), { replace: true })
+      navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
     } catch (e) {
       setStep('form')
       if (e instanceof ApiError && e.message === 'phone_already_registered') {
@@ -278,7 +292,17 @@ export default function CompleteProfilePage() {
 
   // Already complete (direct navigation / refresh after finishing) → move on.
   if (!needsOnboarding) {
-    return <Navigate to={postAuthDestination()} replace />
+    return <Navigate to={postAuthDestination(fromPath)} state={postAuthState(fromPath)} replace />
+  }
+
+  // This screen only ever appears already signed in (Google supplied name +
+  // email; only phone is missing) — but there was previously no way off it if
+  // that was the wrong Google account. Signing out here just clears the
+  // session; ProtectedRoute then sends the now-anonymous user to /login same
+  // as everywhere else.
+  const handleSwitchAccount = async () => {
+    await signOut()
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -287,7 +311,19 @@ export default function CompleteProfilePage() {
         <h2 className="mb-1 text-center font-heading text-xl font-semibold tracking-tight text-ink">
           {t('completeProfileTitle')}
         </h2>
-        <p className="mb-6 text-center font-body text-sm text-ink2">{t('completeProfileSub')}</p>
+        <p className="mb-4 text-center font-body text-sm text-ink2">{t('completeProfileSub')}</p>
+        {profile?.email && (
+          <p className="mb-6 text-center font-body text-xs text-ink2">
+            {profile.email} ·{' '}
+            <button
+              type="button"
+              onClick={handleSwitchAccount}
+              className="focus-ring rounded font-heading font-semibold text-accent underline-offset-2 hover:underline"
+            >
+              {t('signOut')}
+            </button>
+          </p>
+        )}
 
         {step === 'otp' ? (
           /* WhatsApp phone verification — the code was sent to the number's

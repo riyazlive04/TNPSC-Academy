@@ -221,6 +221,14 @@ export function trackViewResult(params: {
  * that tag). `transactionId` lets GA4 de-duplicate purchases; `value` is in
  * rupees (not paise). We null out `ecommerce` first so values can't bleed in
  * from a previous event.
+ *
+ * Also fires Meta's CompleteRegistration on the verified payment itself — this
+ * is the single choke point every web payment flow (Premium, Vettri, Rank
+ * Booster, ...) resolves through in razorpay.ts, so it's guaranteed to reflect
+ * an actual successful payment rather than checkout intent. This is on top of,
+ * not instead of, the pre-payment CompleteRegistration in
+ * trackCheckoutConfirmed() below — a real purchase now fires it twice
+ * (confirm + success), by deliberate choice.
  */
 export function trackPurchase(params: {
   transactionId: string
@@ -252,6 +260,13 @@ export function trackPurchase(params: {
     currency,
     content_name: itemName,
   })
+  // Meta CompleteRegistration, fired again here on the verified payment itself
+  // (see doc comment above) so it reliably reflects a successful payment.
+  metaTrack('CompleteRegistration', {
+    value: params.value,
+    currency,
+    content_name: itemName,
+  })
 }
 
 /**
@@ -277,10 +292,11 @@ export function trackInitiateCheckout(params: {
  * Buyer confirmed the recap popup and the Razorpay sheet is opening. Fires Meta's
  * CompleteRegistration as a high-intent lead signal for the payment funnel.
  * Meta-only, no GA4 push.
- * NOTE: this is a deliberate SECOND use of CompleteRegistration — trackSignUp()
- * also fires it at account creation, so this Meta standard event now counts both
- * new signups and buyers proceeding to pay. Segment in Ads Manager if you need
- * them apart (e.g. by the presence of `value`).
+ * NOTE: this is a deliberate reuse of CompleteRegistration — trackSignUp() fires
+ * it at account creation, and trackPurchase() fires it again on the verified
+ * payment itself, so this Meta standard event now counts new signups, buyers
+ * proceeding to pay, and successful payments. Segment in Ads Manager if you need
+ * them apart (e.g. by the presence of `value`, or a custom param).
  */
 export function trackCheckoutConfirmed(params: {
   value: number

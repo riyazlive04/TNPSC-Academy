@@ -6,6 +6,8 @@ import { listSessions, revokeSessionById } from '../sessions.js'
 import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
 import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
 import { notifyUser } from '../notify.js'
+import { KNOWN_PLANS } from '../pricing.js'
+import { TEST_SERIES_CONFIG, resolveSeries } from '../lib/testSeriesCatalog.js'
 
 const router = Router()
 
@@ -119,6 +121,23 @@ router.post(
   })
 )
 
+// ─── POST /api/superadmin/users/revoke-rank-booster ──────────────────────────
+// Withdraw a user's Group II/IIA Rank Booster plan. Premium/Vettri untouched.
+router.post(
+  '/users/revoke-rank-booster',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId } = req.body ?? {}
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' })
+    }
+    const { data, error } = await req.db!.rpc('superadmin_revoke_rank_booster', {
+      p_user: userId,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ revoked: Number(data ?? 0) })
+  })
+)
+
 // ─── POST /api/superadmin/users/grant-plan ───────────────────────────────────
 // Comp a plan: inserts a ₹0 'paid' ledger row (same shape as a 100%-off coupon
 // order), so the normal computed entitlement grants access for the plan's own
@@ -131,7 +150,7 @@ router.post(
       return res.status(400).json({ error: 'userId and plan are required' })
     }
     // Allow-list before the RPC (which validates again) for a clear message.
-    if (!['premium_annual', 'vettri_nichayam', 'vettri_month'].includes(plan)) {
+    if (!KNOWN_PLANS.has(plan)) {
       return res.status(400).json({ error: `Invalid plan: ${plan}` })
     }
     const { error } = await req.db!.rpc('superadmin_grant_plan', {
@@ -416,24 +435,30 @@ router.post(
   })
 )
 
-// ─── GET /api/superadmin/test-series ─────────────────────────────────────────
-// All tests (incl. disabled), each with the count of questions actually loaded
-// for its test_set, so the console can warn if a set is empty/short.
+// ─── GET /api/superadmin/test-series ──────────────────────────────────────────
+// All tests for ONE series (incl. disabled), each with the count of questions
+// actually loaded for its test_set, so the console can warn if a set is
+// empty/short. `series` defaults to the original Group 1 Marathon.
 router.get(
   '/test-series',
   asyncH(async (req: AuthedRequest, res) => {
+    const series = resolveSeries(req.query.series)
+    if (!series) return res.status(400).json({ error: 'unknown series' })
+    const config = TEST_SERIES_CONFIG[series]
+
     const { data: tests, error } = await req.db!
       .from('test_series')
       .select(
-        'id, test_set, title, title_ta, unit_label, subjects_label, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order'
+        'id, test_set, title, title_ta, unit_label, subjects_label, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
       )
+      .eq('series', series)
       .order('sort_order')
     if (error) return sendDbError(res, error)
 
     const { data: rows, error: cErr } = await req.db!
       .from('questions')
       .select('test_set')
-      .eq('category', 'testseries')
+      .eq('category', config.category)
     if (cErr) return sendDbError(res, cErr)
     const loaded: Record<number, number> = {}
     for (const r of (rows ?? []) as { test_set: number }[]) {
@@ -451,10 +476,12 @@ router.get(
 // ─── POST /api/superadmin/test-series/:id ────────────────────────────────────
 // Patch a test's gating/schedule via the is_admin()-gated RPC. Only the fields
 // present in the body are changed (the RPC treats null as "leave unchanged").
+// `id` is globally unique across every series, so no `series` param is needed
+// to disambiguate which row to patch.
 router.post(
   '/test-series/:id',
   asyncH(async (req: AuthedRequest, res) => {
-    const { enabled, open_override, scheduled_date, duration_seconds, negative_mark, title } =
+    const { enabled, open_override, scheduled_date, duration_seconds, negative_mark, title, tier } =
       req.body ?? {}
     if (
       open_override != null &&
@@ -464,6 +491,9 @@ router.post(
     ) {
       return res.status(400).json({ error: `Invalid open_override: ${open_override}` })
     }
+    if (tier != null && tier !== 'free' && tier !== 'paid') {
+      return res.status(400).json({ error: `Invalid tier: ${tier}` })
+    }
     const { data, error } = await req.db!.rpc('admin_set_test_series', {
       p_id: req.params.id,
       p_enabled: typeof enabled === 'boolean' ? enabled : null,
@@ -472,6 +502,7 @@ router.post(
       p_duration_seconds: duration_seconds == null ? null : Math.trunc(Number(duration_seconds)),
       p_negative_mark: negative_mark == null ? null : Number(negative_mark),
       p_title: title ?? null,
+      p_tier: tier ?? null,
     })
     if (error) return sendDbError(res, error)
     res.json({ test: data })

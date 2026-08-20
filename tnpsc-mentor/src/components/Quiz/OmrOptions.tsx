@@ -60,7 +60,7 @@ export default function OmrOptions({
             </span>
             <span
               className={[
-                'tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm leading-relaxed sm:text-[15px]',
+                'tamil min-w-0 flex-1 whitespace-pre-line break-words text-sm leading-relaxed sm:text-base',
                 on ? 'font-medium text-brand' : 'text-navytext',
               ].join(' ')}
             >

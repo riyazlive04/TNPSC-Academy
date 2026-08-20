@@ -13,9 +13,9 @@ import { api } from '../../lib/api'
 import { prefetchRoute } from '../../lib/routePrefetch'
 import { useT } from '../../lib/i18n'
 import { getTestsCompleted, TESTS_BEFORE_FEEDBACK } from '../../lib/testProgress'
+import { hapticSelect } from '../../lib/haptics'
 import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
-import MessagesIcon from './MessagesIcon'
 import BackToTopButton from './BackToTopButton'
 import AlertPopup from './AlertPopup'
 
@@ -43,15 +43,28 @@ function withinFeedbackWindow(key: string | null): boolean {
 }
 
 // Learner navigation - the personal study tabs (spaced revision, progress
-// insights, profile) shown to regular users. The same list drives both the
-// desktop top nav and the mobile bottom bar; each entry is gated by its feature
-// flag below, so the bar only grows when a feature is turned on.
+// insights, profile) shown to regular users. Desktop has room for the full
+// set; each entry is gated by its feature flag below, so the bar only grows
+// when a feature is turned on.
 const LEARNER_NAV = [
   { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
   { to: '/vettri', icon: Trophy, key: 'vettriNav' as const, short: 'vettriNav' as const },
   { to: '/test-series', icon: CalendarDays, key: 'testSeries' as const, short: 'testSeries' as const },
   { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/materials', icon: Library, key: 'materials' as const, short: 'materials' as const },
+  { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
+  { to: '/profile', icon: User, key: 'profile' as const, short: 'profile' as const },
+]
+
+// Mobile bottom bar - a fixed 5 slots (iOS HIG / Material 3 both treat 3-5 as
+// the reliable range before recall and tap accuracy drop). Vettri and
+// Materials aren't tab-worthy on a phone: Vettri already has its own row on
+// the Home practice list (TestArenaPage) plus a Profile entry, and Materials
+// moves to Profile - neither disappears, they just aren't a permanent slot.
+const MOBILE_LEARNER_NAV = [
+  { to: '/test-arena', icon: Home, key: 'home' as const, short: 'home' as const },
+  { to: '/test-series', icon: CalendarDays, key: 'testSeries' as const, short: 'testSeries' as const },
+  { to: '/revision', icon: RefreshCw, key: 'revision' as const, short: 'revision' as const },
   { to: '/insights', icon: BarChart3, key: 'insights' as const, short: 'navInsights' as const },
   { to: '/profile', icon: User, key: 'profile' as const, short: 'profile' as const },
 ]
@@ -117,7 +130,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const hasMaterials = useHasMaterials()
   const testSeriesOn = useTestSeriesEnabled()
   const vettriOn = useVettriEnabled()
-  // Same nav for desktop top bar + mobile bottom bar; gated per feature flag.
+  // Desktop top nav - full set, gated per feature flag.
   const nav = isAdmin
     ? ADMIN_NAV
     : LEARNER_NAV.filter(
@@ -126,6 +139,10 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
           (item.to !== '/test-series' || testSeriesOn) &&
           (item.to !== '/vettri' || vettriOn)
       )
+  // Mobile bottom bar - the fixed 5-slot set (see MOBILE_LEARNER_NAV above).
+  const mobileNav = isAdmin
+    ? ADMIN_NAV
+    : MOBILE_LEARNER_NAV.filter((item) => item.to !== '/test-series' || testSeriesOn)
 
   // Badge: number of open student question-reports awaiting triage (admins only).
   const [openReports, setOpenReports] = useState(0)
@@ -220,7 +237,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                     <Icon size={17} />
                     <span className="tamil">{t(key)}</span>
                     {to === '/admin/reports' && openReports > 0 && (
-                      <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-[11px] font-bold text-white">
+                      <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white">
                         {openReports}
                       </span>
                     )}
@@ -248,7 +265,11 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
               {user && <CreditPill />}
-              {user && !isAdmin && <MessagesIcon />}
+              {/* The standalone Messages icon is hidden from the dashboard -
+                  a new mentor message now surfaces only via the bell
+                  (notifyUser deep-links target_user_id notifications to
+                  /messages already, in server/src/routes/superadmin.ts), so
+                  tapping that notification is the one way in. */}
               {user && <NotificationBell />}
               {/* Preview toggle (real admins only) - switch between the admin and
                   the student experience. Visible in both modes so it's reversible. */}
@@ -333,12 +354,15 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
             className="mx-auto flex max-w-md items-stretch justify-between gap-0.5 px-2 py-1.5"
             style={{ paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom))' }}
           >
-            {nav.map(({ to, icon: Icon, short }) => {
+            {mobileNav.map(({ to, icon: Icon, short }) => {
               const active = isActive(to)
               return (
                 <button
                   key={to}
-                  onClick={() => navigate(to)}
+                  onClick={() => {
+                    if (!active) hapticSelect()
+                    navigate(to)
+                  }}
                   {...warm(to)}
                   aria-label={t(short)}
                   aria-current={active}
@@ -354,14 +378,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   >
                     <Icon size={19} />
                     {to === '/admin/reports' && openReports > 0 && (
-                      <span className="absolute -right-1 -top-1 grid h-4 min-w-[1rem] place-items-center rounded-full bg-coral px-0.5 font-heading text-[10px] font-bold text-white">
+                      <span className="absolute -right-1 -top-1 grid h-4 min-w-[1rem] place-items-center rounded-full bg-coral px-0.5 font-heading text-2xs font-bold text-white">
                         {openReports}
                       </span>
                     )}
                   </span>
                   <span
                     className={[
-                      'tamil w-full truncate text-center text-[10px] font-heading font-medium leading-none transition-colors',
+                      'tamil w-full truncate text-center text-2xs font-heading font-medium leading-none transition-colors',
                       active ? 'text-brand-dark' : 'text-ink2',
                     ].join(' ')}
                   >

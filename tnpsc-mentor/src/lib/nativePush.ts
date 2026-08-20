@@ -47,10 +47,11 @@ let listenersBound = false
 /**
  * Ask for notification permission and register for a device token.
  *
- * Deliberately NOT called on boot. Apple treats an unprompted permission dialog
- * on first launch as a poor experience, and Play's UX guidance says the same, so
- * this runs from an explicit user action (the Profile toggle / the dashboard
- * nudge) once the user knows what they're agreeing to.
+ * Callable both ways: the Profile toggle calls this directly for an explicit
+ * ask, and <PushPrimer> calls it when its "Enable notifications" button is
+ * tapped. Either way it's a no-op dialog-wise once the OS has already
+ * recorded an answer — checkPermissions() below only escalates to
+ * requestPermissions() while status is still 'prompt'.
  */
 export async function enableNativePush(): Promise<NativePushResult> {
   if (!nativePushConfigured()) return 'unsupported'
@@ -145,5 +146,31 @@ export async function refreshNativePushToken(): Promise<void> {
     await PushNotifications.register()
   } catch {
     /* ignore */
+  }
+}
+
+const PRIMER_SHOWN_KEY = 'tnpsc:native-push-primer-shown'
+
+/**
+ * Whether the in-app priming card (PushPrimer) has already been shown on this
+ * device — checked before the card renders so it only ever appears once,
+ * regardless of whether the learner tapped Enable or Not now. Android/iOS
+ * both permanently remember the OS dialog's answer (granted OR denied) after
+ * the first system prompt anyway, so re-showing the primer after a decision
+ * has no system dialog left to lead into.
+ */
+export function pushPrimerShown(): boolean {
+  try {
+    return localStorage.getItem(PRIMER_SHOWN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function markPushPrimerShown(): void {
+  try {
+    localStorage.setItem(PRIMER_SHOWN_KEY, '1')
+  } catch {
+    /* best-effort */
   }
 }

@@ -1,0 +1,2160 @@
+[
+ {
+  "sig": "added|amendment|constitution|constitutional|duties|fundamental",
+  "rows": [
+   {
+    "id": "bebc3ff5-1c38-426c-9267-26220463a41a",
+    "question_text": "The Fundamental Duties were added to the Indian Constitution by which Constitutional Amendment Act?",
+    "option_a": "42nd Amendment Act, 1976",
+    "option_b": "44th Amendment Act, 1978",
+    "option_c": "52nd Amendment Act, 1985",
+    "option_d": "86th Amendment Act, 2002"
+   },
+   {
+    "id": "931c86ea-ed70-4d66-a784-15c5896beb99",
+    "question_text": "Which Constitutional Amendment Act added Fundamental Duties in the Constitution of India?",
+    "option_a": "42nd Amendment Act",
+    "option_b": "44th Amendment Act",
+    "option_c": "47th Amendment Act",
+    "option_d": "49th Amendment Act"
+   }
+  ]
+ },
+ {
+  "sig": "appointed|attorney|general|minister|parliament|president",
+  "rows": [
+   {
+    "id": "7e01e2c3-4276-42bd-831f-5a1bc29fb248",
+    "question_text": "The Attorney General of India is appointed by the",
+    "option_a": "President of India",
+    "option_b": "Prime Minister of India",
+    "option_c": "Chief Justice of India",
+    "option_d": "Parliament of India"
+   },
+   {
+    "id": "2d59a99a-09fe-47b8-ae29-29a6f4f5d214",
+    "question_text": "The Attorney-General of India is appointed by whom?",
+    "option_a": "The Chief Justice of India",
+    "option_b": "The President of India",
+    "option_c": "The Prime Minister of India",
+    "option_d": "The Parliament of India"
+   }
+  ]
+ },
+ {
+  "sig": "association|chandrashekhar|hindustan|initiative|reorganised|republican",
+  "rows": [
+   {
+    "id": "ff6b8fe3-973a-478d-8582-63b26955e181",
+    "question_text": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 as the Hindustan Socialist Republican Association (HSRA) mainly at the initiative of",
+    "option_a": "Chandrashekhar Azad and Bhagat Singh",
+    "option_b": "Khudiram Bose and Prafulla Chaki",
+    "option_c": "Rash Behari Bose and Sachindra Nath Sanyal",
+    "option_d": "Madan Lal Dhingra and V.D. Savarkar"
+   },
+   {
+    "id": "28876889-3551-499f-a02c-69404a7ef508",
+    "question_text": "The Hindustan Republican Association (HRA), founded in 1924, was reorganised in 1928 as the Hindustan Socialist Republican Association (HSRA), placing greater emphasis on socialism, mainly at the initiative of",
+    "option_a": "Khudiram Bose and Prafulla Chaki",
+    "option_b": "Chandrashekhar Azad and Bhagat Singh",
+    "option_c": "Rash Behari Bose and Sachindra Nath Sanyal",
+    "option_d": "Madan Lal Dhingra and V.D. Savarkar"
+   }
+  ]
+ },
+ {
+  "sig": "different|homonyms|homophones|repetition|similar|spelling",
+  "rows": [
+   {
+    "id": "6f61501a-a0bc-4fb4-8d6e-7bf13cc3132f",
+    "question_text": "_______ are the words with similar sound and different spelling and meaning.",
+    "option_a": "Repetition",
+    "option_b": "Homophones",
+    "option_c": "Homonyms",
+    "option_d": "An anagram"
+   },
+   {
+    "id": "ec5970b9-0f32-4f42-9d6a-2e44d4925396",
+    "question_text": "_____ are the words with similar sound and spelling but different meaning.",
+    "option_a": "Repetition",
+    "option_b": "Homophones",
+    "option_c": "Homonyms",
+    "option_d": "An anagram"
+   }
+  ]
+ },
+ {
+  "sig": "atmospheric|increasing|stratosphere|temperature|thermosphere|troposphere",
+  "rows": [
+   {
+    "id": "db7409fc-fbbb-4a8c-9dfb-0d9830f75ccd",
+    "question_text": "The lowest layer of the atmospheric, in which the temperature decreases with increasing altitude is called",
+    "option_a": "Mesosphere",
+    "option_b": "Stratosphere",
+    "option_c": "Troposphere",
+    "option_d": "Thermosphere"
+   },
+   {
+    "id": "902e3220-6960-41d8-9e2a-a653da8dec20",
+    "question_text": "Choose the correct answer:\nThe Atmospheric layer where the decrease of temperature with increasing elevation at a Normal \nlapse rate.",
+    "option_a": "Troposphere",
+    "option_b": "Stratosphere",
+    "option_c": "Thermosphere",
+    "option_d": "Exosphere"
+   }
+  ]
+ },
+ {
+  "sig": "agricultural|assertion|disguised|explanation|generally|unemployment",
+  "rows": [
+   {
+    "id": "9471e9fd-c7a7-470f-81b1-de220433a1fb",
+    "question_text": "Consider the following statements: Assertion(A): Disguised unemployment is generally observed in Indian Agricultural sector Reason(R): More and more people in rural areas are being literates Of these statements",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are true but (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   },
+   {
+    "id": "0eb240e7-efbc-4f4e-aac1-9d29c5f15c7c",
+    "question_text": "Consider the following statements:\nAssertion(A): Disguised unemployment is generally found in Indian Agricultural sector\nReason(R): More and more people in rural areas are becoming literate\nNow select your answer according to the coding scheme given below",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are correct but (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   }
+  ]
+ },
+ {
+  "sig": "attended|conference|conferences|consider|gandhi|second",
+  "rows": [
+   {
+    "id": "fb8d803e-8d42-496a-bc4b-ec2739617990",
+    "question_text": "Consider the following statements:\n M.K.Gandhi attended\n I. the First Round Table Conference only\n II. the Second Round Table Conference only\n III. the First and Second Round Table Conferences\n IV. all the three Round Table Conferences\n Of these,",
+    "option_a": "I alone is correct",
+    "option_b": "II alone is correct",
+    "option_c": "III alone is correct",
+    "option_d": "IV alone is correct"
+   },
+   {
+    "id": "77206e82-80a2-417b-9d37-c39e5a62dc7a",
+    "question_text": "Consider the following statements:\n M.K. Gandhi attended\n 1. The First Round Table Conference only\n 2. The Second Round Table Conference only\n 3. The First and Second Round Table Conferences\n 4. All the three Round Table Conferences\n Of these",
+    "option_a": "1 alone is correct",
+    "option_b": "2 alone is correct",
+    "option_c": "3 alone is correct",
+    "option_d": "4 alone is correct"
+   }
+  ]
+ },
+ {
+  "sig": "fundamental|information|legal|neither|right",
+  "rows": [
+   {
+    "id": "8aa2c409-d768-4fac-b593-c4b5f6d31261",
+    "question_text": "Right to Information Act, is a",
+    "option_a": "Fundamental Right",
+    "option_b": "Legal Right",
+    "option_c": "Neither Fundamental nor Legal Right",
+    "option_d": "Both Fundamental as well as Legal Right"
+   },
+   {
+    "id": "28ad3e10-4adf-4b6b-9c8d-e8b5bffb9879",
+    "question_text": "Right to Information in India is a",
+    "option_a": "Fundamental Right",
+    "option_b": "Legal Right",
+    "option_c": "Both Fundamental and Legal Right",
+    "option_d": "Neither Fundamental nor Legal Right"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|grounds|impeached|incapacity|misbehaviour|violation",
+  "rows": [
+   {
+    "id": "2fafc1e8-204d-44f0-8b2c-62b7e1def791",
+    "question_text": "On which of the following grounds can a Judge of the Supreme Court be impeached?\nI. Violation of the Constitution.\nII. Proved misbehaviour.\nIII. Incapacity to act as a judge.\nSelect the correct answer using the codes given below",
+    "option_a": "Only I",
+    "option_b": "Only II",
+    "option_c": "I, II and III",
+    "option_d": "II and III"
+   },
+   {
+    "id": "4ba519f4-dc7e-434f-8ca5-dcb6267d2a12",
+    "question_text": "On which of the following grounds can a judge of the High Court be impeached? \nI. Violation of the Constitution\nII. Proved misbehaviour\nIII. Incapacity to act as a judge\nSelect the correct answer using the codes given below.",
+    "option_a": "Only I",
+    "option_b": "Only II",
+    "option_c": "II and III",
+    "option_d": "All of these"
+   }
+  ]
+ },
+ {
+  "sig": "electron|energy|ground|hydrogen|state",
+  "rows": [
+   {
+    "id": "a2ff7b7c-5d91-4cec-a1b4-4c21211a3d7a",
+    "question_text": "The ground state energy of the electron in the hydrogen atom is 13.6 eV. The energy of the state n = 2 is",
+    "option_a": "13.6 eV",
+    "option_b": "6.8 eV",
+    "option_c": "4.5 eV",
+    "option_d": "3.4 eV"
+   },
+   {
+    "id": "87d5fe93-ddbd-4c93-8a7e-ec1fb8488e01",
+    "question_text": "The ground state energy of the electron in the Hydrogen atom is",
+    "option_a": "-13.6 eV",
+    "option_b": "-3.41 eV",
+    "option_c": "+13.6 eV",
+    "option_d": "-10.5 eV"
+   }
+  ]
+ },
+ {
+  "sig": "autumn|mentioned|season|seasons|spring|summer",
+  "rows": [
+   {
+    "id": "c4b7de51-385d-4906-be78-ddd29f869e13",
+    "question_text": "Name the season mentioned in the poem, \"Indian Seasons\"",
+    "option_a": "summer",
+    "option_b": "rainy",
+    "option_c": "spring and autumn",
+    "option_d": "all the above"
+   },
+   {
+    "id": "c31747fe-0ba6-47c4-8612-b137e5239e52",
+    "question_text": "Find the order of season mentioned in  the poem \"Indian Seasons\"",
+    "option_a": "summer,rainy,spring,autumn",
+    "option_b": "Summer,spring,autumn,winter",
+    "option_c": "rainy,summer,spring,winter",
+    "option_d": "summer,rainy,autumn,spring"
+   }
+  ]
+ },
+ {
+  "sig": "argument|behaviour|conflict|meaning|prepare|unsporting",
+  "rows": [
+   {
+    "id": "7c4da96e-2100-4081-993f-a8222f7090b3",
+    "question_text": "Find the meaning of the given idiom Below the belt",
+    "option_a": "unfair or unsporting behaviour",
+    "option_b": "prepare for a conflict",
+    "option_c": "on your side in an argument or dispute",
+    "option_d": "to give up"
+   },
+   {
+    "id": "3d7b4c3e-eb7b-47cf-8c12-88e1cefd4279",
+    "question_text": "Find the meaning of the given idiom Throw in the towel",
+    "option_a": "unfair or unsporting behaviour",
+    "option_b": "prepare for a conflict",
+    "option_c": "on your side in an argument or dispute",
+    "option_d": "to give up"
+   }
+  ]
+ },
+ {
+  "sig": "first|fourth|global|production|second|third",
+  "rows": [
+   {
+    "id": "d942cb7f-8521-44f5-b0a0-d57e1ace15be",
+    "question_text": "What is India's global rank in fish production?",
+    "option_a": "First",
+    "option_b": "Second",
+    "option_c": "Third",
+    "option_d": "Fourth"
+   },
+   {
+    "id": "f69ccf16-7d37-462a-8d05-669208663856",
+    "question_text": "What is India's rank in the global production of milk in 2010-2011?",
+    "option_a": "First",
+    "option_b": "Second",
+    "option_c": "Third",
+    "option_d": "Fourth"
+   }
+  ]
+ },
+ {
+  "sig": "contractionary|describes|expansionary|inflationary|maintains|monetary",
+  "rows": [
+   {
+    "id": "2eeb2148-7adb-430c-8b9c-ab0e358cdccd",
+    "question_text": "What term describes a monetary policy that maintains short-term interest rates higher than usual?",
+    "option_a": "Expansionary policy",
+    "option_b": "Contractionary policy",
+    "option_c": "Neutral policy",
+    "option_d": "Inflationary policy"
+   },
+   {
+    "id": "4a3d7a24-7eb5-4edf-ae03-594924673460",
+    "question_text": "What term describes a monetary policy that maintains short-term interest rates lower than usual?",
+    "option_a": "Expansionary policy",
+    "option_b": "Contractionary policy",
+    "option_c": "Neutral policy",
+    "option_d": "Inflationary policy"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|mention|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "5d44d818-7c44-4c6c-ae76-d328ff5062c4",
+    "question_text": "Be a bush, if you can't be a tree'\nMention the figure of speech of the above line",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Alliteration",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "88d40e62-65c7-4db8-b1e2-967f606bf46f",
+    "question_text": "\"Shows only my teeth like a snake's bare fangs!\" Mention the figure of speech in the above sentence",
+    "option_a": "Metaphor",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "abandoning|difficult|difficulty|rescuing|situation|something",
+  "rows": [
+   {
+    "id": "d896df88-b228-4cb1-8c74-32fe821a76e4",
+    "question_text": "alarm bells ringing Find the meaning of the given idiom",
+    "option_a": "abandoning one who is in difficulty",
+    "option_b": "in serious difficulty",
+    "option_c": "sign of something going wrong",
+    "option_d": "help at the last moment rescuing one from a difficult situation"
+   },
+   {
+    "id": "f1c8d9e6-960c-4f2f-86f3-ffa41d14f384",
+    "question_text": "back to the wall Find the meaning of the given idiom",
+    "option_a": "abandoning one who is in difficulty",
+    "option_b": "in serious difficulty",
+    "option_c": "sign of something going wrong",
+    "option_d": "help at the last moment rescuing one from a difficult situation"
+   }
+  ]
+ },
+ {
+  "sig": "holiday|matching|matilda|necklace|reflowering|rowther",
+  "rows": [
+   {
+    "id": "05a86dc6-352b-4c49-bee2-83dae7aac52b",
+    "question_text": "Match the following\n\nList I:\nA) Noodle vendor\nB) Rowther\nC) Matilda\nD) Phatik\n\nList II:\n1) The necklace\n2) The Refuge\n3) Reflowering\n4) Holiday\n\nSelect the correct matching code:",
+    "option_a": "A-4, B-3, C-2, D-1",
+    "option_b": "A-3, B-1, C-2, D-4",
+    "option_c": "A-2, B-1, C-3, D-4",
+    "option_d": "A-2, B-3, C-1, D-4"
+   },
+   {
+    "id": "ea360aa5-3ad3-4da8-812d-08e660476d9b",
+    "question_text": "Match the following\n\nList I:\nA) Makhan lal\nB) Matilda\nC) Rowther\nD) Vera\n\nList II:\n1) The open window\n2) Reflowering\n3) Holiday\n4) The Necklace\n\nSelect the correct matching code:",
+    "option_a": "A-2, B-4, C-1, D-3",
+    "option_b": "A-1, B-4, C-2, D-3",
+    "option_c": "A-1, B-3, C-2, D-4",
+    "option_d": "A-3, B-4, C-2, D-1"
+   }
+  ]
+ },
+ {
+  "sig": "about|enemy|friend|mother|wrath",
+  "rows": [
+   {
+    "id": "97c1f383-2c79-4917-a75c-12031b0e5179",
+    "question_text": "I told my wrath, my wrath did end To whom the poet told about his wrath",
+    "option_a": "To his mother",
+    "option_b": "To his enemy",
+    "option_c": "To his friend",
+    "option_d": "To God"
+   },
+   {
+    "id": "634208ae-77d5-4fd0-8a6d-385396773e47",
+    "question_text": "I told it not, my wrath did grow He didn't told about his wrath",
+    "option_a": "To his mother",
+    "option_b": "To his enemy",
+    "option_c": "To his friend",
+    "option_d": "To God"
+   }
+  ]
+ },
+ {
+  "sig": "heavens|lifetime|rampaging|spectacle|stopping|through",
+  "rows": [
+   {
+    "id": "90d66117-3676-4f1b-9b1a-fb77ce6ba8b9",
+    "question_text": "\"Rampaging through the heavens Never stopping day or night, A spectacle of a lifetime A comet in full flight\" Pick the rhyming words in the above stanza",
+    "option_a": "Night-flight",
+    "option_b": "Heaven-night",
+    "option_c": "Lifetime-night",
+    "option_d": "Full flight"
+   },
+   {
+    "id": "fee18a43-fb33-4dc5-b5f4-55c5f55e501c",
+    "question_text": "\"Rampaging through the heavens Never stopping day or night, A spectacle of a lifetime A comet in full flight\" Write the rhyme scheme of the above stanza",
+    "option_a": "aabb",
+    "option_b": "abcb",
+    "option_c": "abab",
+    "option_d": "abcd"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|metaphor|personification|simile|speech",
+  "rows": [
+   {
+    "id": "617706c6-4fef-4d01-8339-e93bbddabe65",
+    "question_text": "\"Witty and you're wise\" Find the figure of speech.",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Metaphor",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "4b881baf-830e-46f4-99dc-21989c5deaed",
+    "question_text": "\"but mine are dull as lead\". Find the figure of speech",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Simile",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "e9997ecc-3735-4ade-8e88-38f520a92c73",
+    "question_text": "What figure of speech is used in\n'And all I ask is a tall ship and a star to steer her by':",
+    "option_a": "Metaphor",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "bc937260-4c6c-48f7-9501-f58659dcddfc",
+    "question_text": "What figure of speech is in 'The voice of the wind is the voice of our fate'?",
+    "option_a": "Simile",
+    "option_b": "Personification",
+    "option_c": "Metaphor",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "comrade|fireside|friends|mother|relatives",
+  "rows": [
+   {
+    "id": "a17c5a36-1e34-46f5-8bfc-abe24ce4fc69",
+    "question_text": "\"Come you back unto the fireside and be comrade with your kin\" What do you mean by kin?",
+    "option_a": "Relatives",
+    "option_b": "Love ones",
+    "option_c": "Friends",
+    "option_d": "Mother"
+   },
+   {
+    "id": "f0d5a40b-8af7-4b98-9f94-e92a848ac75e",
+    "question_text": "\"Come you back unto the fireside and be comrade with your kin\" What do you mean by Comrade?",
+    "option_a": "Relatives",
+    "option_b": "Love ones",
+    "option_c": "Friends",
+    "option_d": "Mother"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|identify|metaphor|speech",
+  "rows": [
+   {
+    "id": "2e6e0393-2c02-4de0-9cbe-7a95a4d84ccc",
+    "question_text": "Identify the figure of speech in the line 'Broad, and deep, and still as Time':",
+    "option_a": "Metaphor",
+    "option_b": "Alliteration",
+    "option_c": "Simile",
+    "option_d": "Hyperbole"
+   },
+   {
+    "id": "c3522e1c-6e03-495d-b142-b5db91c3391a",
+    "question_text": "If he hasn’t it now, he will have it not\nIdentify the Figure of Speech?",
+    "option_a": "Hyperbole",
+    "option_b": "Alliteration",
+    "option_c": "Simile",
+    "option_d": "Metaphor"
+   }
+  ]
+ },
+ {
+  "sig": "headlong|mention|rhyming|rounded|sounded|voyage",
+  "rows": [
+   {
+    "id": "ffe4152d-88e9-4619-9e5f-97998a8eeda1",
+    "question_text": "River! river! headlong river!\nDown you dash into the sea;\nSea, that line hath never sounded,\nSea, that voyage hath never rounded,\nMention the Rhyming Words given in the above phrase",
+    "option_a": "Sounded-Rounded",
+    "option_b": "River-Sea",
+    "option_c": "Hath-Headlong",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "7e6bc5c1-599e-4a96-a1a3-24e50e5d37e4",
+    "question_text": "River! river! headlong river!\nDown you dash into the sea;\nSea, that line hath never sounded,\nSea, that voyage hath never rounded,\nMention the Rhyming scheme given in the above phrase",
+    "option_a": "ABCD",
+    "option_b": "ABCC",
+    "option_c": "AABB",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "272195b6-d470-4ab9-b22d-96cf328d986e",
+    "question_text": "What figure of speech is used in\n'When the night had veiled the pole'?",
+    "option_a": "Hyperbole",
+    "option_b": "Alliteration",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "cbcd2b54-b8bb-4da7-9bd9-d75621566c9a",
+    "question_text": "What figure of speech is used in 'Let your limbs sway'?",
+    "option_a": "Hyperbole",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Alliteration"
+   },
+   {
+    "id": "a31e5195-40bd-4cf1-9359-405ff7d07db3",
+    "question_text": "Which figure of speech is used in 'growl at the rain and growl at the sun'?",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Hyperbole",
+    "option_d": "Alliteration"
+   }
+  ]
+ },
+ {
+  "sig": "figure|hyperbole|metaphor|personification|simile|speech",
+  "rows": [
+   {
+    "id": "7ae967d5-387a-4ed6-9cfd-0d19bf5e7e33",
+    "question_text": "What figure of speech is used in the line\n'It isn’t a thing that a man can call'?",
+    "option_a": "Hyperbole",
+    "option_b": "Personification",
+    "option_c": "Simile",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "60fe8c23-d883-41a3-95ca-9ceeb67fb6e2",
+    "question_text": "What figure of speech is used in\n'It’s part of a man when his skies are blue'?",
+    "option_a": "Simile",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Hyperbole"
+   },
+   {
+    "id": "75186038-991b-49d7-b22b-6efdf81b9b4c",
+    "question_text": "Which figure of speech is used in\n'It isn’t a thing that can come and go'?",
+    "option_a": "Simile",
+    "option_b": "Hyperbole",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "762aa5ff-6c4a-4aec-816f-39b14b277696",
+    "question_text": "'Or you’ll never win the game;'\nFind the Figure of Speech from the above line",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Metaphor",
+    "option_d": "Personification"
+   },
+   {
+    "id": "fffecc5e-229f-40b3-8781-6d8b6a83ff2a",
+    "question_text": "What figure of speech is used in 'With a tail that’s miles long'?",
+    "option_a": "Simile",
+    "option_b": "Metaphor",
+    "option_c": "Hyperbole",
+    "option_d": "Personification"
+   },
+   {
+    "id": "a0cd0634-0320-46a9-a505-537aa1c82a00",
+    "question_text": "What figure of speech is used in 'you never shut your eye'?",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   }
+  ]
+ },
+ {
+  "sig": "creature|flickered|rhyming|slipping|something|working",
+  "rows": [
+   {
+    "id": "8e605982-42f9-4a5a-a035-f8f68b3da491",
+    "question_text": "it isn’t a creature of flickered hope\nOr the final tug at a slipping rope;\nBut it’s something deep in the soul of man\nThat is working always to serve some plan.\nFind the rhyming scheme of the above stanza",
+    "option_a": "AABB",
+    "option_b": "ABCD",
+    "option_c": "ABAB",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "aa56b65a-c2a3-466d-adbc-e44f3cbe356a",
+    "question_text": "it isn’t a creature of flickered hope\nOr the final tug at a slipping rope;\nBut it’s something deep in the soul of man\nThat is working always to serve some plan.\nFind the rhyming word of the above stanza",
+    "option_a": "hope - rope",
+    "option_b": "man - plan",
+    "option_c": "Both 1) & 2)",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "alliteration|figure|identify|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "ae12d6b4-cfce-40fb-820f-05a1c587436b",
+    "question_text": "Identify the figure of speech in the line:\n'The woods are lovely, dark and deep.'",
+    "option_a": "Metaphor",
+    "option_b": "Personification",
+    "option_c": "Alliteration",
+    "option_d": "Simile"
+   },
+   {
+    "id": "3d2314e8-acff-4cbd-92a3-a684abd8b555",
+    "question_text": "'Is to set your mind and set your will'\nIdentify the Figure of speech",
+    "option_a": "Alliteration",
+    "option_b": "Metaphor",
+    "option_c": "Simile",
+    "option_d": "Personification"
+   }
+  ]
+ },
+ {
+  "sig": "figure|hyperbole|identify|metaphor|personification|speech",
+  "rows": [
+   {
+    "id": "9e006b6b-e98d-4cbf-ace0-8e9dd2f344c3",
+    "question_text": "Identify the figure of speech in the line:\n'My little horse must think it queer.'",
+    "option_a": "Hyperbole",
+    "option_b": "Simile",
+    "option_c": "Personification",
+    "option_d": "Metaphor"
+   },
+   {
+    "id": "79e45c6d-a054-4a43-89be-19ca0771a58e",
+    "question_text": "Identify the figure of speech in the line:\n'To watch his woods fill up with snow.'",
+    "option_a": "Metaphor",
+    "option_b": "Hyperbole",
+    "option_c": "Personification",
+    "option_d": "Simile"
+   },
+   {
+    "id": "9be0aa24-f6d1-4ee2-bb50-7ebee5d2956d",
+    "question_text": "'Doesn’t tell the man you are;'\nIdentify the Figure of speech",
+    "option_a": "Irony",
+    "option_b": "Metaphor",
+    "option_c": "Personification",
+    "option_d": "Hyperbole"
+   }
+  ]
+ },
+ {
+  "sig": "coimbatore|district|sankarankoil|situated|tirunelveli|tiruppur",
+  "rows": [
+   {
+    "id": "30df33a4-61d9-4e5a-a0d8-268035f19487",
+    "question_text": "Where is Perur situated?",
+    "option_a": "Coimbatore District",
+    "option_b": "Tirunelveli District",
+    "option_c": "Tiruppur District",
+    "option_d": "Sankarankoil Taluk"
+   },
+   {
+    "id": "b67be025-249e-48a4-845b-83038f5d22fd",
+    "question_text": "Where is Mangudi situated?",
+    "option_a": "Tirunelveli District",
+    "option_b": "Coimbatore District",
+    "option_c": "Sankarankoil Taluk",
+    "option_d": "Tiruppur District"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|lakshmipathi|legislative|presidency|sambamurti|shivashanmugan",
+  "rows": [
+   {
+    "id": "fd7685c2-8332-4072-ade4-5912c6f6e863",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 1937 to 1942?",
+    "option_a": "Bulusu Sambamurti",
+    "option_b": "Rukmini Lakshmipathi",
+    "option_c": "J. Shivashanmugan",
+    "option_d": "Ammanna Raja"
+   },
+   {
+    "id": "ccfd39e4-bd00-4aa3-932b-977703ac12c9",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 1946 to 1952?",
+    "option_a": "Bulusu Sambamurti",
+    "option_b": "Rukmini Lakshmipathi",
+    "option_c": "J. Shivashanmugan",
+    "option_d": "Ammanna Raja"
+   }
+  ]
+ },
+ {
+  "sig": "agananuru|kurinji|landscapes|marudham|numbers|represented",
+  "rows": [
+   {
+    "id": "0c11f4da-c523-4402-88a2-f1a04e533b71",
+    "question_text": "Which thinai (landscapes) is represented by songs with odd numbers in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   },
+   {
+    "id": "d2c349bb-6de4-4a55-8a5b-104d5d3a1838",
+    "question_text": "Which thinai (landscapes) is represented by songs with numbers 4, 14, ... in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   },
+   {
+    "id": "f1d6190e-d123-4f60-89ea-c9024702c98a",
+    "question_text": "Which thinai (landscapes) is represented by songs with numbers 2, 8, ... in Agananuru?",
+    "option_a": "Palai Thinai",
+    "option_b": "Mullai Thinai",
+    "option_c": "Kurinji Thinai",
+    "option_d": "Marudham Thinai"
+   }
+  ]
+ },
+ {
+  "sig": "arisilkizhar|associated|kabilar|kakkaipadiniyar|pathitruppathu|perunkundrurkizhar",
+  "rows": [
+   {
+    "id": "c215101d-e5ce-486c-bee2-df41f6c4170f",
+    "question_text": "Who is the poet associated with the 7th Ten in Pathitruppathu?",
+    "option_a": "Kabilar",
+    "option_b": "Arisilkizhar",
+    "option_c": "Perunkundrurkizhar",
+    "option_d": "Kakkaipadiniyar"
+   },
+   {
+    "id": "37008758-9349-43d1-98c7-f16954872aab",
+    "question_text": "Who is the poet associated with the 9th Ten in Pathitruppathu?",
+    "option_a": "Kabilar",
+    "option_b": "Arisilkizhar",
+    "option_c": "Perunkundrurkizhar",
+    "option_d": "Kakkaipadiniyar"
+   }
+  ]
+ },
+ {
+  "sig": "academy|assembly|collection|denotes|history|scholarly",
+  "rows": [
+   {
+    "id": "1740c722-5fa0-4523-81a6-7f3e0b8d9eb1",
+    "question_text": "The word \"Sangam\" in the early history of Tamil Nadu denotes",
+    "option_a": "Academy of learned man",
+    "option_b": "Assembly of poets",
+    "option_c": "Collection of scholarly works",
+    "option_d": "Scholarly debates"
+   },
+   {
+    "id": "4e16ae37-69a7-4d17-bef9-fea71a55723c",
+    "question_text": "The word 'Sangam' in the early History of South India denotes",
+    "option_a": "Academy of learned men",
+    "option_b": "Assembly of workers",
+    "option_c": "Collection of scholarly works",
+    "option_d": "Scholarly debates"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|concessions|explanation|immediate|proposals|resolution",
+  "rows": [
+   {
+    "id": "b03a18da-3d59-4a6f-b978-33e00a295380",
+    "question_text": "Consider the following:\n Assertion(A): In August 1942 the Indian National Congress adopted the Quit India Resolution.\n Reason (R): The Cripps Mission proposals held promises for the future with no immediate concessions.\n Now select your answer according to the coding schedule given below:",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are true and (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   },
+   {
+    "id": "817f070b-d2fd-4041-a2c3-00876d7923dd",
+    "question_text": "Consider the following statements\n Assertion(A): In August 1942, the Indian National Congress passed the Quit India Resolution.\n Reason(R): The Cripps mission proposals held promises for the future with no immediate concessions.\n Now select your answer according to the coding scheme given below",
+    "option_a": "Both A and R are true, and R is the correct explanation of A",
+    "option_b": "Both A and R are true, and R is not the correct explanation of A",
+    "option_c": "A is true, but R is false",
+    "option_d": "A is false, but R is true"
+   }
+  ]
+ },
+ {
+  "sig": "bannerman|expedition|kattabomman|panchalamkuruchi|sivasubramania|wellesley",
+  "rows": [
+   {
+    "id": "ed33aba2-030e-4e55-808a-8e78f2d4dd4a",
+    "question_text": "Who issued orders for the expedition to Panchalamkuruchi?",
+    "option_a": "Kattabomman",
+    "option_b": "Lord Wellesley",
+    "option_c": "Major Bannerman",
+    "option_d": "Sivasubramania Pillai"
+   },
+   {
+    "id": "836be03f-7973-4044-9720-612e24e9c3f5",
+    "question_text": "Who assumed command of the expedition to Panchalamkuruchi?",
+    "option_a": "Kattabomman",
+    "option_b": "Lord Wellesley",
+    "option_c": "Major Bannerman",
+    "option_d": "Sivasubramania Pillai"
+   }
+  ]
+ },
+ {
+  "sig": "bhishnuram|governor|january|jayachamaraja|maharaja|presidency",
+  "rows": [
+   {
+    "id": "a3e5d7e8-51ab-4e55-b92f-d9a8c35c5eb9",
+    "question_text": "Who served as the Governor of Madras Presidency from 24 January 1958 to 4 May 1964?",
+    "option_a": "Bhishnuram Medhi",
+    "option_b": "Maharaja Sir Jayachamaraja Wodeyar Bahadur",
+    "option_c": "P. Chandra Reddy",
+    "option_d": "Sardar Ujjal Singh"
+   },
+   {
+    "id": "0d8d7a94-9826-4fc8-bce5-a1e466ee8d6b",
+    "question_text": "Who served as the Governor of Madras Presidency from 28 June 1966 to 14 January 1969?",
+    "option_a": "Bhishnuram Medhi",
+    "option_b": "Maharaja Sir Jayachamaraja Wodeyar Bahadur",
+    "option_c": "P. Chandra Reddy",
+    "option_d": "Sardar Ujjal Singh"
+   }
+  ]
+ },
+ {
+  "sig": "aiadmk|founded|party|political|puducherry",
+  "rows": [
+   {
+    "id": "88bd76cd-6641-41c6-99e7-61add67263fc",
+    "question_text": "Which political party was founded in 1949 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   },
+   {
+    "id": "a61264fc-50da-4b23-bc86-25d06a585a09",
+    "question_text": "Which political party was founded in 1972 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   },
+   {
+    "id": "4c510d88-2e13-44cd-a30b-8f31f89743a0",
+    "question_text": "Which political party was founded in 1989 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   }
+  ]
+ },
+ {
+  "sig": "alexander|archibald|davidson|february|governor|macartney",
+  "rows": [
+   {
+    "id": "db5bab0c-7d9d-4695-929e-4c141da9c147",
+    "question_text": "Who served as the Governor from 12 February 1785 to 14 June 1785?",
+    "option_a": "George MaCartney",
+    "option_b": "Alexander Davidson",
+    "option_c": "Sir Archibald Campbell",
+    "option_d": "John Holland"
+   },
+   {
+    "id": "f86bf31d-e9ba-40ea-a471-0b417a81faca",
+    "question_text": "Who served as the Governor from 6 April 1786 to 7 February 1789?",
+    "option_a": "George MaCartney",
+    "option_b": "Alexander Davidson",
+    "option_c": "Sir Archibald Campbell",
+    "option_d": "John Holland"
+   }
+  ]
+ },
+ {
+  "sig": "anaparambil|bhavsinhji|kumarasinhji|lieutenant|presidency|september",
+  "rows": [
+   {
+    "id": "5938b1f7-623b-4ce9-863f-41d6008e3f7d",
+    "question_text": "Who served as the Governor of Madras Presidency from 6 May 1946 to 7 September 1948?",
+    "option_a": "Lieutenant-General Sir Archibald Edward Nye",
+    "option_b": "Maharaja Sir Krishna Kumarasinhji Bhavsinhji",
+    "option_c": "Sri Prakasa",
+    "option_d": "A.J. John, Anaparambil"
+   },
+   {
+    "id": "bb53ef1c-baa4-43f6-9406-0de606d04f2c",
+    "question_text": "Who served as the Governor of Madras Presidency from 7 September 1948 to 12 March 1952?",
+    "option_a": "Lieutenant-General Sir Archibald Edward Nye",
+    "option_b": "Maharaja Sir Krishna Kumarasinhji Bhavsinhji",
+    "option_c": "Sri Prakasa",
+    "option_d": "A.J. John, Anaparambil"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|chellapandian|legislative|presidency|shanmugam|speaker",
+  "rows": [
+   {
+    "id": "d117e54f-4468-483f-a0ad-be96882590ad",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 31 March 1962 to 14 March 1967?",
+    "option_a": "J. Shiva Shanmugam Pillai",
+    "option_b": "N. Gopala Menon",
+    "option_c": "U. Krishna Rao",
+    "option_d": "S. Chellapandian"
+   },
+   {
+    "id": "a810919b-3eff-47be-b652-715aad487dc9",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 6 May 1952 to 16 August 1955?",
+    "option_a": "J. Shiva shanmugam Pillai",
+    "option_b": "N. Gopala Menon",
+    "option_c": "U. Krishna Rao",
+    "option_d": "S. Chellapandian"
+   }
+  ]
+ },
+ {
+  "sig": "bombay|calcutta|courts|established|madras",
+  "rows": [
+   {
+    "id": "948ef058-4598-4c25-b7be-f2a5eed8d89e",
+    "question_text": "When were High Courts established in Bombay, Madras and Calcutta?",
+    "option_a": "1881",
+    "option_b": "1871",
+    "option_c": "1851",
+    "option_d": "1861"
+   },
+   {
+    "id": "e598344d-f1f8-40f2-a98f-0d1f3da7716e",
+    "question_text": "By which of the following Acts were the High courts of Bombay, Madras and Calcutta established?",
+    "option_a": "India High Courts Act, 1911",
+    "option_b": "India High Courts Act, 1865",
+    "option_c": "India High Courts Act, 1861",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "number|primary|secondary|transformer|turns",
+  "rows": [
+   {
+    "id": "53f61f33-0cc2-410a-99de-979ff650c68e",
+    "question_text": "In a step-up transformer, the number of turns",
+    "option_a": "In the primary is more than in the secondary",
+    "option_b": "In the secondary is more than in the primary",
+    "option_c": "Is same both in the primary and the secondary",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "da9a9d2a-1a7a-4319-9093-e499fd96eb63",
+    "question_text": "In a step-down transformer",
+    "option_a": "Number of turns in primary is more than that in the secondary",
+    "option_b": "Number of turns in primary is less than that in the secondary",
+    "option_c": "Number of turns in primary & secondary are the same",
+    "option_d": "None of these"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|democratic|preamble|republic|socialist|sovereign",
+  "rows": [
+   {
+    "id": "b87003bd-8ce6-445b-8b59-05bf0322b757",
+    "question_text": "Which of the following statement is correct?                                                                                                                                                                                                                                                                                                                                                                                                                                The Preamble of the Indian constitution reads as follows: India is a,\nI. Sovereign, Socialist, Secular, Democratic, Republic\nII. Socialist, Sovereign, Democratic, Secular, Republic.\nIII. Sovereign, Secular, Socialist, Democratic, Republic\nIV. Republic, Sovereign, Socialist, Secular, Democratic",
+    "option_a": "I",
+    "option_b": "II",
+    "option_c": "III",
+    "option_d": "IV"
+   },
+   {
+    "id": "4d4adc0f-f9bc-4d66-867f-5a0007223c91",
+    "question_text": "The Preamble of the Indian Constitution starts with the phrase:",
+    "option_a": "\"We, the People of India...\"",
+    "option_b": "\"In the name of God...\"",
+    "option_c": "\"India, a Sovereign Socialist Secular Democratic Republic...\"",
+    "option_d": "\"To secure to all its citizens...\""
+   }
+  ]
+ },
+ {
+  "sig": "assembly|congress|federal|legislature|parliament|supreme",
+  "rows": [
+   {
+    "id": "373f9806-322d-4019-ad78-b2f8bc296a45",
+    "question_text": "What is the name of the legislature of India?",
+    "option_a": "Congress",
+    "option_b": "Parliament",
+    "option_c": "Supreme Soviet",
+    "option_d": "Federal Assembly"
+   },
+   {
+    "id": "727d238b-b3c9-4c61-ad56-2807a82ce892",
+    "question_text": "What is the name of the legislature of Russia?",
+    "option_a": "Supreme Soviet",
+    "option_b": "Congress",
+    "option_c": "Parliament",
+    "option_d": "Federal Assembly"
+   }
+  ]
+ },
+ {
+  "sig": "இடங்களில்|எத்தனை|எழுத்து|ஒலிக்கும்|தனித்து|மாத்திரை",
+  "rows": [
+   {
+    "id": "2745874f-695b-4c10-b1eb-b65298cf3119",
+    "question_text": "ஔகார எழுத்து, தனித்து வரும் இடங்களில் எத்தனை மாத்திரை அளவில் ஒலிக்கும்",
+    "option_a": "2",
+    "option_b": "1 1/2",
+    "option_c": "1",
+    "option_d": "1/2"
+   },
+   {
+    "id": "55d26adc-e703-4625-b097-fec3e29f03ef",
+    "question_text": "ஐ, கை, பை என ஐகார எழுத்து, தனித்து வரும் இடங்களில் எத்தனை மாத்திரை அளவில் ஒலிக்கும்?",
+    "option_a": "2",
+    "option_b": "1 1/2",
+    "option_c": "1",
+    "option_d": "1/2"
+   }
+  ]
+ },
+ {
+  "sig": "இல்லார்|காட்டிச்|கொடையைக்|சொல்லின்|நெஞ்சில்|ழைப்பைக்",
+  "rows": [
+   {
+    "id": "81593071-869f-4e05-bb06-9e739394faf7",
+    "question_text": "நெஞ்சில் ஈரம் இல்லார் நாண \nநீளு ழைப்பைக் கொடையைக் காட்டிச் - இதில் ஈரம் என்ற சொல்லின் பொருள்?",
+    "option_a": "தண்ணீர்",
+    "option_b": "ஆறு",
+    "option_c": "இரக்கம்",
+    "option_d": "அன்பு"
+   },
+   {
+    "id": "4f450d04-50a0-44fb-b2a1-a2c603f86326",
+    "question_text": "நெஞ்சில் ஈரம் இல்லார் நாண \nநீளு ழைப்பைக் கொடையைக் காட்டிச் - இதில் நாணம் என்ற சொல்லின் பொருள்?",
+    "option_a": "பயம்",
+    "option_b": "வெட்கம்",
+    "option_c": "துன்பம்",
+    "option_d": "நாணயம்"
+   }
+  ]
+ },
+ {
+  "sig": "எனப்படுவது|கூறியது|செறாஅமை|சொல்நோன்றல்|தன்கிளை|பேதையார்",
+  "rows": [
+   {
+    "id": "3275330f-cf52-4196-8adc-274e0b6142c5",
+    "question_text": "செறிவு எனப்படுவது _________?",
+    "option_a": "தன்கிளை செறாஅமை",
+    "option_b": "பேதையார் சொல்நோன்றல்",
+    "option_c": "கூறியது மறாஅமை",
+    "option_d": "மறை பிறர் அறியாமை"
+   },
+   {
+    "id": "77b72444-326d-4b84-883e-539e15783f25",
+    "question_text": "நிறை எனப்படுவது _________?",
+    "option_a": "தன்கிளை செறாஅமை",
+    "option_b": "பேதையார் சொல்நோன்றல்",
+    "option_c": "கூறியது மறாஅமை",
+    "option_d": "மறை பிறர் அறியாமை"
+   }
+  ]
+ },
+ {
+  "sig": "இவ்வரியில்|உருகெழும்|குறிப்பிடப்படும்|சொல்லின்|பெடையோடு|பெருக்கம்",
+  "rows": [
+   {
+    "id": "0dda9580-70b1-4839-8906-bcde6b0a6267",
+    "question_text": "_________ போரின்\nஉருகெழும் ஓதை வெரீஇப் பெடையோடு _________ இவ்வரியில் குறிப்பிடப்படும் ஓதை என்ற சொல்லின் பொருள்?",
+    "option_a": "நீர் பெருக்கம்",
+    "option_b": "அஞ்சி",
+    "option_c": "ஓசை",
+    "option_d": "வருவாய்"
+   },
+   {
+    "id": "f2940379-eb1b-4570-b9b8-d4641ef4f9cc",
+    "question_text": "_________ போரின் \nஉருகெழும் ஓதை வெரீஇப் பெடையோடு _________ இவ்வரியில் குறிப்பிடப்படும் வெரீஇப் என்ற சொல்லின் பொருள்?",
+    "option_a": "நீர் பெருக்கம்",
+    "option_b": "அஞ்சி",
+    "option_c": "ஓசை",
+    "option_d": "வருவாய்"
+   }
+  ]
+ },
+ {
+  "sig": "ஆராய்ந்து|இடம்பெற்றுள்ள|இவ்வரியில்|குணங்கள்எல்லாம்|கொடுக்கும்|மறவிஒர்ப்பு",
+  "rows": [
+   {
+    "id": "3a6c820a-1311-4edf-83c8-d657d9254059",
+    "question_text": "மறவிஒர்ப்பு இன்னபிற \nமன்னும் உயிர்க் குணங்கள்எல்லாம் - இவ்வரியில் இடம்பெற்றுள்ள மன்னும் என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கொடுக்கும்",
+    "option_b": "ஆராய்ந்து தெளிதல்",
+    "option_c": "விருப்பம்",
+    "option_d": "நிலைபெற்ற"
+   },
+   {
+    "id": "6a0ecfa3-6d20-4a27-8f16-71a61222c347",
+    "question_text": "மறவிஒர்ப்பு இன்னபிற \nமன்னும் உயிர்க் குணங்கள்எல்லாம் - இவ்வரியில் இடம்பெற்றுள்ள ஓர்ப்பு என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கொடுக்கும்",
+    "option_b": "ஆராய்ந்து தெளிதல்",
+    "option_c": "விருப்பம்",
+    "option_d": "நிலைபெற்ற"
+   }
+  ]
+ },
+ {
+  "sig": "அழைக்கப்படுகிறது|எவ்வாறு|கன்னடம்|தமிழ்ச்|முறையே|மொழிகளில்",
+  "rows": [
+   {
+    "id": "5fd9ad9a-3b7c-44c1-994c-f3b3e87c1f1b",
+    "question_text": "ஒன்று' என்ற தமிழ்ச் சொல் கன்னடம், துளு ஆகிய மொழிகளில் முறையே எவ்வாறு அழைக்கப்படுகிறது",
+    "option_a": "ஒகடி, ஒந்து",
+    "option_b": "ஒந்து, ஒகடி",
+    "option_c": "ஒந்து, ஒஞ்சி",
+    "option_d": "ஒஞ்சி, ஒந்து"
+   },
+   {
+    "id": "2235b75d-9e0e-481d-b3c7-9545a30446ea",
+    "question_text": "நூறு' என்ற தமிழ்ச் சொல் கன்னடம், துளு ஆகிய மொழிகளில் முறையே எவ்வாறு அழைக்கப்படுகிறது",
+    "option_a": "நூறு, நூரு",
+    "option_b": "நூரு, நூறு",
+    "option_c": "நூறு, நூது",
+    "option_d": "நூரு, நூது"
+   }
+  ]
+ },
+ {
+  "sig": "கருத்துகளை|கீழ்க்கணக்கு|சிறுபஞ்ச|திரிகடுகம்|நூல்களுள்|பாடலிலும்",
+  "rows": [
+   {
+    "id": "9824f774-33d5-4748-8f0c-5847c7f30e6c",
+    "question_text": "பதினெண் கீழ்க்கணக்கு நூல்களுள் ஒவ்வொரு பாடலிலும் ஆறு கருத்துகளை கூறும் நூல் எது?",
+    "option_a": "திரிகடுகம்",
+    "option_b": "ஏலாதி",
+    "option_c": "சிறுபஞ்ச மூலம்",
+    "option_d": "நன்னூல்"
+   },
+   {
+    "id": "38b174e0-2994-4b6f-9db8-288cc67204f6",
+    "question_text": "பதினெண் கீழ்க்கணக்கு நூல்களுள் ஒவ்வொரு பாடலிலும் மூன்று கருத்துகளை கூறும் நூல் எது?",
+    "option_a": "திரிகடுகம்",
+    "option_b": "ஏலாதி",
+    "option_c": "சிறுபஞ்ச மூலம்",
+    "option_d": "நன்னூல்"
+   }
+  ]
+ },
+ {
+  "sig": "குறிப்புத்|பெயரெச்சம்|வினைத்தொகை|வினைமுற்று|வினையெச்சம்|வியங்கோள்",
+  "rows": [
+   {
+    "id": "8b8156d4-c2d1-4c14-9f9e-ae2d6469af0f",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - இறைஞ்சி",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   },
+   {
+    "id": "6abf55fc-ef2b-4269-826c-e6264d80d201",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - விளைக",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   },
+   {
+    "id": "85a17559-8083-49e8-8a84-413994c48c90",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - தேர்ந்த",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   }
+  ]
+ },
+ {
+  "sig": "அடுக்குத்|இரட்டைக்கிளவி|இலக்கணக்|உம்மைத்தொகை|எண்ணும்மை|குறிப்புத்",
+  "rows": [
+   {
+    "id": "b9135e30-fabe-46bc-8d7b-f6264e3a7e2b",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - பாண்டம் பாண்டமாக",
+    "option_a": "எண்ணும்மை",
+    "option_b": "உம்மைத்தொகை",
+    "option_c": "இரட்டைக்கிளவி",
+    "option_d": "அடுக்குத் தொடர்"
+   },
+   {
+    "id": "d70faa47-1138-4dfe-9593-7b201bb7fb25",
+    "question_text": "இலக்கணக் குறிப்புத் தருக -வாயிலும் சன்னலும்",
+    "option_a": "எண்ணும்மை",
+    "option_b": "உம்மைத்தொகை",
+    "option_c": "இரட்டைக்கிளவி",
+    "option_d": "அடுக்குத் தொடர்"
+   }
+  ]
+ },
+ {
+  "sig": "இயற்சீர்|நிரையொன்றாசிரியத்தளை|நேரொன்றாசிரியத்தளை|வருவது|வெண்சீர்|வெண்டளை",
+  "rows": [
+   {
+    "id": "5f592f44-72a5-4754-b37c-7d5958672ee2",
+    "question_text": "மா முன் நேர்' வருவது ____ தளை.",
+    "option_a": "நேரொன்றாசிரியத்தளை",
+    "option_b": "நிரையொன்றாசிரியத்தளை",
+    "option_c": "வெண்சீர் வெண்டளை",
+    "option_d": "இயற்சீர் வெண்டளை"
+   },
+   {
+    "id": "3ead62fa-c86e-476e-8734-728a135355d4",
+    "question_text": "விள முன் நிரை' வருவது ____ தளை.",
+    "option_a": "நேரொன்றாசிரியத்தளை",
+    "option_b": "நிரையொன்றாசிரியத்தளை",
+    "option_c": "வெண்சீர் வெண்டளை",
+    "option_d": "இயற்சீர் வெண்டளை"
+   },
+   {
+    "id": "0f0f430a-9066-4149-8f14-57841c0c3e6f",
+    "question_text": "காய் முன் நேர்' வருவது ____ தளை",
+    "option_a": "நேரொன்றாசிரியத்தளை",
+    "option_b": "நிரையொன்றாசிரியத்தளை",
+    "option_c": "வெண்சீர் வெண்டளை",
+    "option_d": "இயற்சீர் வெண்டளை"
+   }
+  ]
+ },
+ {
+  "sig": "அடிப்பகுதியைக்|கீழ்க்கண்ட|குறிக்கும்|சொற்களில்|தாவரத்தின்|மூங்கிலின்",
+  "rows": [
+   {
+    "id": "617ec1a1-1cfd-442b-b17c-c6e9017a1878",
+    "question_text": "கீழ்க்கண்ட தாவரத்தின் அடிப்பகுதியைக் குறிக்கும் சொற்களில் எது தவறானது?",
+    "option_a": "தாள் - நெல், கேழ்வரகு",
+    "option_b": "தண்டு - கீரை, வாழை",
+    "option_c": "கோல் - நெட்டி, மிளகாய்ச் செடி",
+    "option_d": "தூறு - மூங்கிலின் அடி"
+   },
+   {
+    "id": "4b538546-1ebc-4821-ab91-269a5638e7a9",
+    "question_text": "கீழ்க்கண்ட தாவரத்தின் அடிப்பகுதியைக் குறிக்கும் சொற்களில் எது தவறானது?\n1. தட்டு அல்லது தட்டை - கம்பு, சோளம்\n2. கழி -மூங்கிலின் அடி\n3. கழை - கரும்பின் அடி\n4. அடி-புளி, வேம்பு",
+    "option_a": "1, 3",
+    "option_b": "1, 4",
+    "option_c": "2, 3",
+    "option_d": "2, 4"
+   }
+  ]
+ },
+ {
+  "sig": "இலக்கணக்குறிப்பு|உரிச்சொல்தொடர்|பண்புத்தொகை|மூன்றாம்|வினைத்தொகை|வேற்றுமைத்தொகை",
+  "rows": [
+   {
+    "id": "0cfae9c6-20e9-4c1f-8f41-df569ccd525a",
+    "question_text": "இலக்கணக்குறிப்பு தருக - தடக்கை",
+    "option_a": "உரிச்சொல்தொடர்",
+    "option_b": "மூன்றாம் வேற்றுமைத்தொகை",
+    "option_c": "வினைத்தொகை",
+    "option_d": "பண்புத்தொகை"
+   },
+   {
+    "id": "4b3004c4-8c01-40ff-9cec-82ee89735f2b",
+    "question_text": "இலக்கணக்குறிப்பு தருக - மூதூர்",
+    "option_a": "உரிச்சொல்தொடர்",
+    "option_b": "மூன்றாம் வேற்றுமைத்தொகை",
+    "option_c": "வினைத்தொகை",
+    "option_d": "பண்புத்தொகை"
+   }
+  ]
+ },
+ {
+  "sig": "அடுக்குத்தொடர்|இலக்கணக்குறிப்பு|எதிர்மறைப்|பண்புத்தொகை|பெயரெச்சம்|வினைத்தொகை",
+  "rows": [
+   {
+    "id": "672375f2-70f4-4525-88b9-bc9aad480022",
+    "question_text": "ஊழ் ஊழ் -இலக்கணக்குறிப்பு தருக?",
+    "option_a": "அடுக்குத்தொடர்",
+    "option_b": "வினைத்தொகை",
+    "option_c": "பண்புத்தொகை",
+    "option_d": "ஈறுகெட்ட எதிர்மறைப் பெயரெச்சம்"
+   },
+   {
+    "id": "db982428-9c99-4136-b043-f429c12315bd",
+    "question_text": "வளர்வானம் - இலக்கணக்குறிப்பு தருக?",
+    "option_a": "அடுக்குத்தொடர்",
+    "option_b": "வினைத்தொகை",
+    "option_c": "பண்புத்தொகை",
+    "option_d": "ஈறுகெட்ட எதிர்மறைப் பெயரெச்சம்"
+   },
+   {
+    "id": "6bb656bb-628e-48f4-bf04-fde6fd36cd0c",
+    "question_text": "செந்தீ -இலக்கணக்குறிப்பு தருக?",
+    "option_a": "அடுக்குத்தொடர்",
+    "option_b": "வினைத்தொகை",
+    "option_c": "பண்புத்தொகை",
+    "option_d": "ஈறுகெட்ட எதிர்மறைப் பெயரெச்சம்"
+   },
+   {
+    "id": "28d7c5b7-40c5-49f6-a81e-e6df74bac95b",
+    "question_text": "வாரா (ஒன்றன்) - இலக்கணக்குறிப்பு தருக?",
+    "option_a": "அடுக்குத்தொடர்",
+    "option_b": "வினைத்தொகை",
+    "option_c": "பண்புத்தொகை",
+    "option_d": "ஈறுகெட்ட எதிர்மறைப் பெயரெச்சம்"
+   }
+  ]
+ },
+ {
+  "sig": "அறிவினா|இரண்டுமே|சரியான|பற்றிய|மட்டும்|வகைப்படும்",
+  "rows": [
+   {
+    "id": "dfc8b7fd-918f-4bfd-b26b-3d89e88f1da7",
+    "question_text": "வினா பற்றிய சரியான கூற்று எது?\nI. வினா எட்டு வகைப்படும்.\nII. அறிவினா, தெரி வினா, அறியா வினா, ஐயவினா, கொளல் வினா, கொடை வினா, ஏவல் வினா, சுட்டு வினா என்று வினா எட்டு வகைப்படும்.",
+    "option_a": "I மட்டும் சரி",
+    "option_b": "II மட்டும் சரி",
+    "option_c": "I, II இரண்டுமே சரி",
+    "option_d": "I, II இரண்டுமே தவறு"
+   },
+   {
+    "id": "efc1b1ae-9679-4d32-aed1-4b49ed40cc9e",
+    "question_text": "வினா பற்றிய சரியான கூற்று எது?\nI. வினா ஆறு வகைப்படும்.\nII. அறிவினா, அறியா வினா, ஐயவினா, கொளல் வினா, கொடை வினா, ஏவல் வினா என்று வினா எட்டு வகைப்படும்.",
+    "option_a": "I மட்டும் சரி",
+    "option_b": "II மட்டும் சரி",
+    "option_c": "I, II இரண்டுமே சரி",
+    "option_d": "I, II இரண்டுமே தவறு"
+   }
+  ]
+ },
+ {
+  "sig": "குளிர்காலம்|சிறுபொழுது|திணைக்குரிய|பெரும்பொழுது|பெரும்பொழுதுகள்|முன்பனிக்காலம்",
+  "rows": [
+   {
+    "id": "fdedb1aa-eea7-47ec-9287-c0fcf9f7363e",
+    "question_text": "குறிஞ்சி திணைக்குரிய பெரும்பொழுது மற்றும் சிறுபொழுது யாது?",
+    "option_a": "குளிர்காலம், முன்பனிக்காலம், யாமம்",
+    "option_b": "கார்காலம், மாலை",
+    "option_c": "ஆறு பெரும்பொழுதுகள், வைகறை",
+    "option_d": "ஆறு பெரும்பொழுதுகள், எற்பாடு"
+   },
+   {
+    "id": "fc1ec3bb-bad1-4769-919b-d46247c26e7b",
+    "question_text": "முல்லை திணைக்குரிய பெரும்பொழுது மற்றும் சிறுபொழுது யாது?",
+    "option_a": "குளிர்காலம், முன்பனிக்காலம், யாமம்",
+    "option_b": "கார்காலம், மாலை",
+    "option_c": "ஆறு பெரும்பொழுதுகள், வைகறை",
+    "option_d": "ஆறு பெரும்பொழுதுகள், எற்பாடு"
+   },
+   {
+    "id": "96d56d85-74ad-42cf-b34b-94ac36cb0f18",
+    "question_text": "மருதம் திணைக்குரிய பெரும்பொழுது மற்றும் சிறுபொழுது யாது?",
+    "option_a": "குளிர்காலம், முன்பனிக்காலம், யாமம்",
+    "option_b": "கார்காலம், மாலை",
+    "option_c": "ஆறு பெரும்பொழுதுகள், வைகறை",
+    "option_d": "ஆறு பெரும்பொழுதுகள், எற்பாடு"
+   },
+   {
+    "id": "0080272e-c01f-4555-81d9-610878e9496c",
+    "question_text": "நெய்தல் திணைக்குரிய பெரும்பொழுது மற்றும் சிறுபொழுது யாது?",
+    "option_a": "குளிர்காலம், முன்பனிக்காலம், யாமம்",
+    "option_b": "கார்காலம், மாலை",
+    "option_c": "ஆறு பெரும்பொழுதுகள், வைகறை",
+    "option_d": "ஆறு பெரும்பொழுதுகள், எற்பாடு"
+   }
+  ]
+ },
+ {
+  "sig": "matching|கருப்பொருள்|குறிஞ்சி|சரியாகப்|தொடர்பானவற்றை|பொருத்துக",
+  "rows": [
+   {
+    "id": "34d41fdc-987a-4d30-96c0-467e001a037e",
+    "question_text": "கருப்பொருள் (மரம்), திணை தொடர்பானவற்றை சரியாகப் பொருத்துக.\n\nList I:\nA) குறிஞ்சி\nB) முல்லை\nC) மருதம்\nD) நெய்தல்\n\nList II:\n1) கொன்றை, காயா\n2) காஞ்சி, மருதம்\n3) புன்னை, ஞாழல்\n4) அகில், வேங்கை\n\nSelect the correct matching code:",
+    "option_a": "A-2, B-3, C-1, D-4",
+    "option_b": "A-4, B-1, C-2, D-3",
+    "option_c": "A-2, B-4, C-3, D-1",
+    "option_d": "A-3, B-2, C-4, D-1"
+   },
+   {
+    "id": "be462f2b-df16-46ed-9d52-22044c4da8e5",
+    "question_text": "கருப்பொருள் (யாழ்), திணை தொடர்பானவற்றை சரியாகப் பொருத்துக.\n\nList I:\nA) குறிஞ்சி\nB) முல்லை\nC) மருதம்\nD) நெய்தல்\n\nList II:\n1) குறிஞ்சி யாழ்\n2) விளரி யாழ்\n3) முல்லை யாழ்\n4) மருத யாழ்\n\nSelect the correct matching code:",
+    "option_a": "A-3, B-2, C-1, D-4",
+    "option_b": "A-2, B-3, C-1, D-4",
+    "option_c": "A-1, B-3, C-4, D-2",
+    "option_d": "A-4, B-3, C-1, D-2"
+   }
+  ]
+ },
+ {
+  "sig": "matching|ஆசிரியப்பா|கீழ்க்கண்டவற்றுள்|சரியாகப்|பொருந்தியது|வஞ்சிப்பா",
+  "rows": [
+   {
+    "id": "d3130f31-be9f-4694-867c-d4b0f05b909f",
+    "question_text": "கீழ்க்கண்டவற்றுள் சரியாகப் பொருந்தியது எது?\n\nList I:\nA) வெண்பா\nB) ஆசிரியப்பா\nC) கலிப்பா\nD) வஞ்சிப்பா\n\nList II:\n1) ஐந்து வகை\n2) இரண்டு வகை\n3) நான்கு வகை\n4) நான்கு வகை\n\nSelect the correct matching code:",
+    "option_a": "A-3, B-4, C-2, D-1",
+    "option_b": "A-2, B-4, C-3, D-1",
+    "option_c": "A-4, B-3, C-2, D-1",
+    "option_d": "A-1, B-4, C-3, D-2"
+   },
+   {
+    "id": "11502e0a-396e-4d12-a553-a853a557b5ff",
+    "question_text": "கீழ்க்கண்டவற்றுள் சரியாகப் பொருந்தியது எது?D) 1-2. 1-4. III-1. IV-3\n\nList I:\nA) வெண்பா\nB) ஆசிரியப்பா\nC) கலிப்பா\nD) வஞ்சிப்பா\n\nList II:\n1) துள்ளல் ஓசை\n2) செப்பல் ஓசை\n3) தூங்கல் ஓசை\n4) அகவல் ஓசை\n\nSelect the correct matching code:",
+    "option_a": "A-2, B-1, C-3, D-4",
+    "option_b": "A-2, B-4, C-1, D-3",
+    "option_c": "A-1, B-2, C-4, D-3",
+    "option_d": "A-3, B-1, C-4, D-2"
+   }
+  ]
+ },
+ {
+  "sig": "கொடுக்கப்பட்டுள்ளது|சரியாகப்|தேர்ந்தெடு|புளிமாங்காய்|பொருந்தியவற்றைத்|வாய்ப்பாடு",
+  "rows": [
+   {
+    "id": "d794b043-1174-4af7-9fea-007016395f63",
+    "question_text": "சீர் கொடுக்கப்பட்டுள்ளது. அசை மற்றும் வாய்ப்பாடு முறையே சரியாகப் பொருந்தியவற்றைத் தேர்ந்தெடு.\n\nList I:\nA) சீர் (உல/கத்/தோ)\nB) சீர் (டொட்/ட)\nC) சீர் (வொழு/கல்)\nD) சீர் (பல/கற்/றும்)\n\nList II:\n1) அசை (நிரை நேர் நேர்). வாய்ப்பாடு (புளிமாங்காய்)\n2) அசை (நிரை நேர் நேர்). வாய்ப்பாடு (புளிமாங்காய்)\n3) அசை (நிரை நேர்). வாய்ப்பாடு (புளிமா)\n4) அசை (நேர் நேர்). வாய்ப்பாடு (தேமா)\n\nSelect the correct matching code:",
+    "option_a": "A-2, B-3, C-4, D-1",
+    "option_b": "A-1, B-4, C-3, D-2",
+    "option_c": "A-3, B-1, C-2, D-4",
+    "option_d": "A-4, B-2, C-1, D-3"
+   },
+   {
+    "id": "cab16bea-1a09-4bb3-8368-f5f14ff81129",
+    "question_text": "சீர் கொடுக்கப்பட்டுள்ளது. அசை மற்றும் வாய்ப்பாடு முறையே சரியாகப் பொருந்தியவற்றைத் தேர்ந்தெடு.\n\nList I:\nA) சீர் (உல/கத்/தோ)\nB) சீர் (கல்/லார்)\nC) சீர் (அறி/விலா)\nD) சீர் (தார்)\n\nList II:\n1) அசை (நேர்). வாய்ப்பாடு (நாள்)\n2) அசை (நேர் நேர்). வாய்ப்பாடு (தேமா)\n3) அசை (நிரை நேர் நேர்). வாய்ப்பாடு (புளிமாங்காய்)\n4) அசை (நிரை நிரை). வாய்ப்பாடு (கருவிளம்)\n\nSelect the correct matching code:",
+    "option_a": "A-1, B-4, C-3, D-2",
+    "option_b": "A-1, B-3, C-2, D-4",
+    "option_c": "A-1, B-2, C-3, D-4",
+    "option_d": "A-3, B-1, C-2, D-4"
+   }
+  ]
+ },
+ {
+  "sig": "உறுப்பிலக்கண|எதுவுமில்லை|ஒன்றன்பால்|சொற்களில்|விகுதியான|வெளிப்படுத்தும்",
+  "rows": [
+   {
+    "id": "89e628c8-fe1f-4926-a1d5-2b20abba4b6b",
+    "question_text": "பகுபத உறுப்பிலக்கண விகுதியான \"ஆன்\" என்பது சொற்களில் எவற்றை வெளிப்படுத்தும்",
+    "option_a": "உயர்திணை ஆண்பால், ஒருமை, படர்க்கை இடம்",
+    "option_b": "உயர்திணை பெண்பால், ஒருமை, படர்க்கை இடம்",
+    "option_c": "அஃறிணை ஒன்றன்பால், படர்க்கை இடம்",
+    "option_d": "மேற்கண்ட எதுவுமில்லை"
+   },
+   {
+    "id": "4da4ad13-206f-4f69-981e-0b96e3d101dd",
+    "question_text": "பகுபத உறுப்பிலக்கண விகுதியான \"ஆள்\" என்பது சொற்களில் எவற்றை வெளிப்படுத்தும்",
+    "option_a": "உயர்திணை ஆண்பால், ஒருமை, படர்க்கை இடம்",
+    "option_b": "உயர்திணை பெண்பால், ஒருமை, படர்க்கை இடம்",
+    "option_c": "அஃறிணை ஒன்றன்பால், படர்க்கை இடம்",
+    "option_d": "மேற்கண்ட எதுவுமில்லை"
+   },
+   {
+    "id": "f1478f64-8512-4f12-b79f-84d241aeda4e",
+    "question_text": "பகுபத உறுப்பிலக்கண விகுதியான \"து\" என்பது சொற்களில் எவற்றை வெளிப்படுத்தும்",
+    "option_a": "உயர்திணை ஆண்பால், ஒருமை படர்க்கை இடம்",
+    "option_b": "உயர்திணை பெண்பால், ஒருமை, படர்க்கை இடம்",
+    "option_c": "அஃறிணை ஒன்றன்பால், படர்க்கை இடம்",
+    "option_d": "மேற்கண்ட எதுவுமில்லை"
+   }
+  ]
+ },
+ {
+  "sig": "இராஜாவின்|இளையராஜாவின்|கீழ்க்கண்டவற்றுள்|தொகுப்புகள்|மூகாம்பிகை|வெளியிட்ட",
+  "rows": [
+   {
+    "id": "96e5fb04-37a8-4966-83a7-a571b9c0dab9",
+    "question_text": "கீழ்க்கண்டவற்றுள் இளையராஜா வெளியிட்ட தமிழ் இசைத் தொகுப்புகள் எவை?\n1. இராஜாவின் ரமணமாலை\n2. இளையராஜாவின் கீதாஞ்சலி\n3. மூகாம்பிகை",
+    "option_a": "1, 2, 3",
+    "option_b": "1, 2",
+    "option_c": "1, 3",
+    "option_d": "2, 3"
+   },
+   {
+    "id": "8b3f0394-0e5e-4adc-89f3-c88592e11329",
+    "question_text": "கீழ்க்கண்டவற்றுள் இளையராஜா வெளியிட்ட கன்னட இசைத் தொகுப்புகள் எவை?\n1. இராஜாவின் ரமணமாலை\n2. இளையராஜாவின் கீதாஞ்சலி\n3. மூகாம்பிகை",
+    "option_a": "2, 3",
+    "option_b": "3 மட்டும்",
+    "option_c": "1 மட்டும்",
+    "option_d": "2 மட்டும்"
+   }
+  ]
+ },
+ {
+  "sig": "உரிச்சொல்|குறிப்புத்|பண்புத்தொகைகள்|வினைத்தொகைகள்|வினைமுற்றுகள்|வியங்கோள்",
+  "rows": [
+   {
+    "id": "c9ec630b-c225-4033-a7a4-77e039d215b7",
+    "question_text": "இலக்கணக் குறிப்புத் தருக.\nதடந்தேர், மாமதலை",
+    "option_a": "வினைத்தொகைகள்",
+    "option_b": "பண்புத்தொகைகள்",
+    "option_c": "உரிச்சொல் தொடர்கள்",
+    "option_d": "வியங்கோள் வினைமுற்றுகள்"
+   },
+   {
+    "id": "625e1501-3994-49b4-a336-e74ab5fb23de",
+    "question_text": "இலக்கணக் குறிப்புத் தருக.\nநவில்க, உதவுக, கொள்க, தருக, சொல்லுக",
+    "option_a": "வினைத்தொகைகள்",
+    "option_b": "பண்புத்தொகைகள்",
+    "option_c": "உரிச்சொல் தொடர்கள்",
+    "option_d": "வியங்கோள் வினைமுற்றுகள்"
+   }
+  ]
+ },
+ {
+  "sig": "அமைச்சகம்|அவர்களுக்கு|தொலைக்காட்சி|பல்கலைக்கழகம்|வழங்கியது|வெளியுறவுத்துறை",
+  "rows": [
+   {
+    "id": "73bb31fc-7cdd-425b-95c8-9e9c3d81a39a",
+    "question_text": "நர்த்தகி நடராஜ் அவர்களுக்கு 'சிறந்த கலைஞர்' விருதை யார் வழங்கியது?",
+    "option_a": "இந்திய வெளியுறவுத்துறை அமைச்சகம்",
+    "option_b": "பெரியார் பல்கலைக்கழகம்",
+    "option_c": "இந்திய அரசுத் தொலைக்காட்சி",
+    "option_d": "தமிழக அரசு"
+   },
+   {
+    "id": "9a82dba0-5896-4ef2-80cd-e0a0f6415540",
+    "question_text": "நர்த்தகி நடராஜ் அவர்களுக்கு ஏ கிரேடு விருதை யார் வழங்கியது?",
+    "option_a": "இந்திய வெளியுறவுத்துறை அமைச்சகம்",
+    "option_b": "பெரியார் பல்கலைக்கழகம்",
+    "option_c": "இந்திய அரசுத் தொலைக்காட்சி",
+    "option_d": "தமிழக அரசு"
+   }
+  ]
+ },
+ {
+  "sig": "அவர்களுக்கு|எவ்விருது|கலைமாமணி|கவுரவித்தது|நர்த்தகி|நாட்டியாஞ்சலி",
+  "rows": [
+   {
+    "id": "02b88bd3-546b-4c87-8055-98e627336007",
+    "question_text": "நர்த்தகி நடராஜ் அவர்களுக்கு தமிழக அரசு எவ்விருது வழங்கி கவுரவித்தது?",
+    "option_a": "நாட்டியாஞ்சலி விருது",
+    "option_b": "கலைமாமணி விருது",
+    "option_c": "சிறந்த கலைஞர் விருது",
+    "option_d": "சங்கீத நாடக அகாதெமி விருது"
+   },
+   {
+    "id": "93a16439-681e-45f0-86cd-f16520976e0a",
+    "question_text": "நர்த்தகி நடராஜ் அவர்களுக்கு இந்திய அரசு எவ்விருது வழங்கி கவுரவித்தது?",
+    "option_a": "நாட்டியாஞ்சலி விருது",
+    "option_b": "கலைமாமணி விருது",
+    "option_c": "சிறந்த கலைஞர் விருது",
+    "option_d": "சங்கீத நாடக அகாதெமி விருது"
+   }
+  ]
+ },
+ {
+  "sig": "அவர்கள்|கதிரைவேல்|தணிகாசலம்|திருவாரூரார்|பயின்றார்|விருத்தாசலனார்",
+  "rows": [
+   {
+    "id": "ab7eafcf-fa2b-4e02-b3e3-44d7ca76e7c8",
+    "question_text": "திரு.வி.க அவர்கள் யாரிடம் தமிழ் பயின்றார்?",
+    "option_a": "விருத்தாசலனார்",
+    "option_b": "நா.கதிரைவேல்",
+    "option_c": "மயிலை தணிகாசலம்",
+    "option_d": "திருவாரூரார்"
+   },
+   {
+    "id": "9276288b-6303-4e68-a931-fca87b5e9bb1",
+    "question_text": "திரு. வி.க அவர்கள் யாரிடம் சைவ நூல்களை பயின்றார்?",
+    "option_a": "விருத்தாசலனார்",
+    "option_b": "நா.கதிரைவேல்",
+    "option_c": "மயிலை தணிகாசலம்",
+    "option_d": "திருவாரூரார்"
+   }
+  ]
+ },
+ {
+  "sig": "கிருஷ்ணாபுரம்|கீழ்க்காணும்|திண்ணைப்பள்ளிக்கூடம்|திருநெல்வேலி|பள்ளிக்கூடத்தில்|பள்ளிக்கூடம்",
+  "rows": [
+   {
+    "id": "6a82f625-3541-432a-a7fe-bea5f9317642",
+    "question_text": "பின்னத்தூர் நாராயணசாமி கீழ்க்காணும் எந்த திண்ணைப் பள்ளிக்கூடத்தில் படித்தார்?",
+    "option_a": "திருநெல்வேலி தெற்குத் தெரு கணபதியார் திண்ணைப் பள்ளிக்கூடம்",
+    "option_b": "மௌனகுருவிடம்",
+    "option_c": "கிருஷ்ணாபுரம் முத்துராம பாரதி திண்ணைப்பள்ளிக்கூடம்",
+    "option_d": "எட்டயபுரம் திண்ணைப் பள்ளிக்கூடம்"
+   },
+   {
+    "id": "09416e7b-696f-4a71-bee8-0029998a9c7f",
+    "question_text": "பாரதியின் நண்பர் நாவலர் சோமசுந்தர பாரதியார் கீழ்க்காணும் எந்த திண்ணைப் பள்ளிக்கூடத்தில் படித்தார்?",
+    "option_a": "திருநெல்வேலி தெற்குத் தெரு கணபதியார் திண்ணைப் பள்ளிக்கூடம்",
+    "option_b": "மௌனகுருவிடம்",
+    "option_c": "கிருஷ்ணாபுரம் முத்துராம பாரதி திண்ணைப்பள்ளிக்கூடம்",
+    "option_d": "எட்டயபுரம் திண்ணைப் பள்ளிக்கூடம்"
+   },
+   {
+    "id": "02de99fe-1fb0-4ef9-9671-afe0f86ff8ee",
+    "question_text": "வ.சுப.மாணிக்கம் கீழ்க்காணும் எந்த திண்ணைப் பள்ளிக்கூடத்தில் படித்தார்?",
+    "option_a": "திருநெல்வேலி தெற்குத் தெரு கணபதியார் திண்ணைப் பள்ளிக்கூடம்",
+    "option_b": "மகிபாலன் பட்டி நடேசனார் திண்ணைப் பள்ளிக்கூடம்",
+    "option_c": "கிருஷ்ணாபுரம் முத்துராம பாரதி திண்ணைப்பள்ளிக்கூடம்",
+    "option_d": "எட்டயபுரம் திண்ணைப் பள்ளிக்கூடம்"
+   }
+  ]
+ },
+ {
+  "sig": "எட்டுத்தொகை|குறுந்தொகை|நூல்களில்|பதிற்றுப்பத்து|பரிபாடல்|புறநானூறு",
+  "rows": [
+   {
+    "id": "17833c71-586e-408f-9afd-0aeb9e0699ef",
+    "question_text": "எட்டுத்தொகை நூல்களில் புறம் பற்றிய பேசாத நூல் எது?",
+    "option_a": "பதிற்றுப்பத்து",
+    "option_b": "புறநானூறு",
+    "option_c": "பரிபாடல்",
+    "option_d": "குறுந்தொகை"
+   },
+   {
+    "id": "94d540a5-4d5b-49a4-afdd-5ebdea9efe6b",
+    "question_text": "எட்டுத்தொகை நூல்களில் அகமும் புறமும் பேசும் நூல் எது?",
+    "option_a": "பதிற்றுப்பத்து",
+    "option_b": "புறநானூறு",
+    "option_c": "பரிபாடல்",
+    "option_d": "குறுந்தொகை"
+   }
+  ]
+ },
+ {
+  "sig": "குறிஞ்சிப்பாட்டு|கூத்தாராற்றுப்படை|சிறுபாணாற்றுப்படை|திருமுருகாற்றுப்படை|பெரும்பாணாற்றுப்படை|பொருநராற்றுப்படை",
+  "rows": [
+   {
+    "id": "f7be2fc0-8a07-45a1-8278-7b2a5d3bdad7",
+    "question_text": "கூற்றுகளை ஆராய்க\n1. அகம்: குறிஞ்சிப்பாட்டு, முல்லைப்பாட்டு, நெடுநல்வாடை, பட்டினப்பாலை\n2. புறம்: மதுரைக்காஞ்சி, திருமுருகாற்றுப்படை, பொருநராற்றுப்படை, பெரும்பாணாற்றுப்படை, சிறுபாணாற்றுப்படை, கூத்தாராற்றுப்படை",
+    "option_a": "1 மட்டும் சரி",
+    "option_b": "2 மட்டும் சரி",
+    "option_c": "இரண்டும் சரி",
+    "option_d": "இரண்டும் தவறு"
+   },
+   {
+    "id": "3261c20f-211f-4f2b-b365-df0c0e44b89b",
+    "question_text": "கூற்றுகளை ஆராய்க.\n1. அகம் - நற்றிணை, குறுந்தொகை, ஐங்குறுநூறு, அகநானூறு, கலித்தொகை\n2. புறம் - பதிற்றுப்பத்து, புறநானூறு\n3. அகம்: குறிஞ்சிப்பாட்டு, முல்லைப்பாட்டு, நெடுநல்வாடை, பட்டினப்பாலை\n4. அகமும் புறமும் - பரிபாடல்\n5. புறம்: மதுரைக்காஞ்சி, திருமுருகாற்றுப்படை, பொருநராற்றுப்படை, பெரும்பாணாற்றுப்படை, சிறுபாணாற்றுப்படை, கூத்தாராற்றுப்படை",
+    "option_a": "1, 2 சரி",
+    "option_b": "4, 5 சரி",
+    "option_c": "1, 3, 4 சரி",
+    "option_d": "அனைத்தும் சரி"
+   }
+  ]
+ },
+ {
+  "sig": "அழைக்கப்படுகிறது|எவ்வாறு|சகோடயாழ்|செங்கோட்டியாழ்|நரம்புகளைக்|பேரியாழ்",
+  "rows": [
+   {
+    "id": "1d996812-592e-4e2b-babe-f10a2c056ca7",
+    "question_text": "21 நரம்புகளைக் கொண்ட யாழ் எவ்வாறு அழைக்கப்படுகிறது?",
+    "option_a": "பேரியாழ்",
+    "option_b": "மகரயாழ்",
+    "option_c": "சகோடயாழ்",
+    "option_d": "செங்கோட்டியாழ்"
+   },
+   {
+    "id": "393e580e-d1b7-41e9-9ec0-883cadcb8bb4",
+    "question_text": "17 நரம்புகளைக் கொண்ட யாழ் எவ்வாறு அழைக்கப்படுகிறது?",
+    "option_a": "பேரியாழ்",
+    "option_b": "மகரயாழ்",
+    "option_c": "சகோடயாழ்",
+    "option_d": "செங்கோட்டியாழ்"
+   },
+   {
+    "id": "e55e282c-9e9a-4c81-ac07-9794d8164421",
+    "question_text": "7 நரம்புகளைக் கொண்ட யாழ் எவ்வாறு அழைக்கப்படுகிறது?",
+    "option_a": "பேரியாழ்",
+    "option_b": "மகரயாழ்",
+    "option_c": "சகோடயாழ்",
+    "option_d": "செங்கோட்டியாழ்"
+   },
+   {
+    "id": "0f2ee634-e854-4f0e-80bc-caf88dd1e0e2",
+    "question_text": "16 நரம்புகளைக் கொண்ட யாழ் எவ்வாறு அழைக்கப்படுகிறது?",
+    "option_a": "பேரியாழ்",
+    "option_b": "மகரயாழ்",
+    "option_c": "சகோடயாழ்",
+    "option_d": "செங்கோட்டியாழ்"
+   }
+  ]
+ },
+ {
+  "sig": "குறிப்பிடப்படுவதன்|குறிப்பிடுகிறது|சிரிப்பு|தொல்காப்பியம்|மகிழ்ச்சி|மெய்ப்பாடு",
+  "rows": [
+   {
+    "id": "abb5042d-af77-47fd-94b5-5c9122fca09b",
+    "question_text": "மெய்ப்பாடு 8 என தொல்காப்பியம் குறிப்பிடுகிறது. இதில் நகை என்று குறிப்பிடப்படுவதன் பொருள் என்ன?",
+    "option_a": "மகிழ்ச்சி",
+    "option_b": "வியப்பு",
+    "option_c": "பெருமை",
+    "option_d": "சிரிப்பு"
+   },
+   {
+    "id": "415c1ea5-c04b-4f6f-9f02-8935d679d084",
+    "question_text": "மெய்ப்பாடு 8 என தொல்காப்பியம் குறிப்பிடுகிறது. இதில் உவகை என்று குறிப்பிடப்படுவதன் பொருள் என்ன?",
+    "option_a": "மகிழ்ச்சி",
+    "option_b": "வியப்பு",
+    "option_c": "பெருமை",
+    "option_d": "சிரிப்பு"
+   },
+   {
+    "id": "6124b511-d103-44f1-885a-a5004f21ce00",
+    "question_text": "மெய்ப்பாடு 8 என தொல்காப்பியம் குறிப்பிடுகிறது. இதில் மருட்கை என்று குறிப்பிடப்படுவதன் பொருள் என்ன?",
+    "option_a": "மகிழ்ச்சி",
+    "option_b": "வியப்பு",
+    "option_c": "பெருமை",
+    "option_d": "சிரிப்பு"
+   }
+  ]
+ },
+ {
+  "sig": "ஆகுமென்றால்|ஆதிரைப்பருக்கை|எழுதப்பட்டுள்ள|கவிதையில்|குறியீடாகிறது|தலைப்பில்",
+  "rows": [
+   {
+    "id": "ca3e40e6-934f-4c74-bb3e-3332329d002c",
+    "question_text": "‘திட்டம்’ என்னும் தலைப்பில் ‘வரங்கள் சாபங்கள் ஆகுமென்றால் இங்கே தவங்கள் எதற்காக?’ என்று எழுதப்பட்டுள்ள கவிதையில் ‘வரம் எதற்குக் குறியீடாகிறது?",
+    "option_a": "அமுதசுரபி",
+    "option_b": "ஆதிரைப்பருக்கை",
+    "option_c": "திட்டம்",
+    "option_d": "பயனற்ற விளைவு"
+   },
+   {
+    "id": "d1f6337d-45b5-4b61-928b-8a60272303e3",
+    "question_text": "‘திட்டம்’ என்னும் தலைப்பில் ‘வரங்கள் சாபங்கள் ஆகுமென்றால் இங்கே தவங்கள் எதற்காக?’ என்று எழுதப்பட்டுள்ள கவிதையில் ‘சாபம் எதற்குக் குறியீடாகிறது?",
+    "option_a": "அமுதசுரபி",
+    "option_b": "ஆதிரைப்பருக்கை",
+    "option_c": "திட்டம்",
+    "option_d": "பயனற்ற விளைவு"
+   }
+  ]
+ },
+ {
+  "sig": "acrocentric|centromere|chromosomes|metacentric|submetacentric|telocentric",
+  "rows": [
+   {
+    "id": "f27db3c6-37f9-4974-9efa-3ffb1acd83d5",
+    "question_text": "What type of chromosomes have the centromere located on the proximal end and are rod- shaped?",
+    "option_a": "Telocentric",
+    "option_b": "Acrocentric",
+    "option_c": "Submetacentric",
+    "option_d": "Metacentric"
+   },
+   {
+    "id": "9b791c07-f776-422e-8b97-bf5b227cbfaa",
+    "question_text": "What type of chromosomes have the centromere located near the centre, forming two unequal arms, and are J-shaped or L-shaped?",
+    "option_a": "Telocentric",
+    "option_b": "Acrocentric",
+    "option_c": "Submetacentric",
+    "option_d": "Metacentric"
+   }
+  ]
+ },
+ {
+  "sig": "chromosome|configuration|heterogametic|homogametic|individuals|monogametic",
+  "rows": [
+   {
+    "id": "391a01c9-3719-4a74-8904-7c58490f2aef",
+    "question_text": "What term is used to describe individuals with the chromosome configuration 22+XX?",
+    "option_a": "Homogametic",
+    "option_b": "Heterogametic",
+    "option_c": "Monogametic",
+    "option_d": "Digametic"
+   },
+   {
+    "id": "c166b9e9-fe29-4624-8f99-e5f4e6933270",
+    "question_text": "What term is used to describe individuals with the chromosome configuration 22 + XY?",
+    "option_a": "Homogametic",
+    "option_b": "Heterogametic",
+    "option_c": "Monogametic",
+    "option_d": "Digametic"
+   }
+  ]
+ },
+ {
+  "sig": "bearing|female|fertilized|happens|individual|produced",
+  "rows": [
+   {
+    "id": "729fa6f8-56a9-42e8-b578-6014249f1864",
+    "question_text": "What happens if the egg is fertilized by a Y-bearing sperm?",
+    "option_a": "An XX individual (female) is produced",
+    "option_b": "An XY individual (male) is produced",
+    "option_c": "An XYY individual (male) is produced",
+    "option_d": "An XXY individual (female) is produced"
+   },
+   {
+    "id": "dbc8a6d6-bc6e-4a86-af23-1e9fd3b292ea",
+    "question_text": "What happens if the egg is fertilized by an X-bearing sperm?",
+    "option_a": "An XX individual (female) is produced",
+    "option_b": "An XY individual (male) is produced",
+    "option_c": "An XYY individual (male) is produced",
+    "option_d": "An XXY individual (female) is produced"
+   }
+  ]
+ },
+ {
+  "sig": "chromosome|configuration|fertilization|results|sperm",
+  "rows": [
+   {
+    "id": "e49fdf7a-7ca1-4269-b8d0-ba276bdeb50b",
+    "question_text": "What chromosome configuration results from the fertilization of an egg (22 + X) with a sperm (22 + X)?",
+    "option_a": "44+XY",
+    "option_b": "44 + XX",
+    "option_c": "44 + YY",
+    "option_d": "44+XZ"
+   },
+   {
+    "id": "588f049b-8589-4c42-b958-6ad118e1aeaa",
+    "question_text": "What chromosome configuration results from the fertilization of an egg (22 + X) with a sperm (22+Y)?",
+    "option_a": "44+XY",
+    "option_b": "44 + XX",
+    "option_c": "44 + YY",
+    "option_d": "44+XZ"
+   }
+  ]
+ },
+ {
+  "sig": "chromosome|chromosomes|containing|contribute|fertilizing|formation",
+  "rows": [
+   {
+    "id": "ba195d86-aebf-4771-a10c-3d400d37e3e1",
+    "question_text": "How do the chromosomes contribute to the formation of a female child?",
+    "option_a": "By fertilizing with an X-bearing sperm",
+    "option_b": "By fertilizing with a Y-bearing sperm",
+    "option_c": "By containing two X chromosomes",
+    "option_d": "By containing an XY chromosome pair"
+   },
+   {
+    "id": "2e559b6b-2864-4007-943d-d960c943e1c9",
+    "question_text": "How do the chromosomes contribute to the formation of a male child?",
+    "option_a": "By fertilizing with an X-bearing sperm",
+    "option_b": "By fertilizing with a Y-bearing sperm",
+    "option_c": "By containing two X chromosomes",
+    "option_d": "By containing an XY chromosome pair"
+   }
+  ]
+ },
+ {
+  "sig": "division|function|nutrients|production|synthesis|vacuoles",
+  "rows": [
+   {
+    "id": "af78c880-675e-4af9-9a5d-012a01b2130a",
+    "question_text": "What is the function of vacuoles in plant cells?",
+    "option_a": "Energy production",
+    "option_b": "Storage of water and nutrients",
+    "option_c": "Protein synthesis",
+    "option_d": "Cell division"
+   },
+   {
+    "id": "01e3fa18-c5d1-48e9-8cd8-77b07ccc9227",
+    "question_text": "What is the function of vacuoles in animal cells?",
+    "option_a": "Storage of water and nutrients",
+    "option_b": "Energy production",
+    "option_c": "Protein synthesis",
+    "option_d": "Cell division"
+   }
+  ]
+ },
+ {
+  "sig": "animals|consumers|primary|quaternary|secondary|tertiary",
+  "rows": [
+   {
+    "id": "dd85c80b-caef-4b77-b7ee-5cbb2d28fd55",
+    "question_text": "What are animals that eat secondary consumers mostly known as?",
+    "option_a": "Primary consumers",
+    "option_b": "Secondary consumers",
+    "option_c": "Tertiary consumers",
+    "option_d": "Quaternary consumers"
+   },
+   {
+    "id": "b650475a-364d-4cd8-8371-2aadf78b6237",
+    "question_text": "What are animals that eat plants called?",
+    "option_a": "Primary consumers",
+    "option_b": "Secondary consumers",
+    "option_c": "Tertiary consumers",
+    "option_d": "Quaternary consumers"
+   },
+   {
+    "id": "fd378ff5-e350-41d8-987d-56da39ac0ff7",
+    "question_text": "What are animals that eat primary consumers called?",
+    "option_a": "Primary consumers",
+    "option_b": "Secondary consumers",
+    "option_c": "Tertiary consumers",
+    "option_d": "Quaternary consumers"
+   }
+  ]
+ },
+ {
+  "sig": "affecting|organisms|patterns|reproduce|sunlight|temperature",
+  "rows": [
+   {
+    "id": "1b16364f-7c89-41a0-a5c6-655d9c824435",
+    "question_text": "What are biotic factors?",
+    "option_a": "Non-living factors like temperature and sunlight",
+    "option_b": "Living factors like plants and animals",
+    "option_c": "Factors affecting the ability of organisms to survive and reproduce",
+    "option_d": "Factors affecting weather patterns"
+   },
+   {
+    "id": "7d64c1f9-312a-4ce4-8986-8cb8431f0c4e",
+    "question_text": "What are abiotic factors?",
+    "option_a": "Living factors like plants and animals",
+    "option_b": "Non-living factors like temperature and sunlight",
+    "option_c": "Factors affecting the ability of organisms to survive and reproduce",
+    "option_d": "Factors affecting weather patterns"
+   }
+  ]
+ },
+ {
+  "sig": "agricultural|biodegradable|constituents|recycling|treatment|wastewater",
+  "rows": [
+   {
+    "id": "1d4c9117-289e-4417-a37f-1177fa82c40a",
+    "question_text": "What is the purpose of primary treatment in wastewater recycling?",
+    "option_a": "To remove inorganic constituents",
+    "option_b": "To remove biodegradable dissolved organic matter",
+    "option_c": "To settle heavy solids and remove floating materials",
+    "option_d": "To discharge treated water waste for agricultural purposes"
+   },
+   {
+    "id": "9289aa32-95cb-4beb-9dc1-99439c0ea76e",
+    "question_text": "What is the purpose of tertiary treatment in wastewater recycling?",
+    "option_a": "To settle heavy solids and remove floating materials",
+    "option_b": "To remove biodegradable dissolved organic matter",
+    "option_c": "To remove inorganic constituents",
+    "option_d": "To discharge treated water waste for agricultural purposes"
+   }
+  ]
+ },
+ {
+  "sig": "biosphere|located|meghalaya|pradesh|reserve|territory",
+  "rows": [
+   {
+    "id": "c93cb795-16d3-4211-a83a-d2e0cf4ec43b",
+    "question_text": "Which state or union territory is Nanda Devi Biosphere Reserve located in?",
+    "option_a": "Uttar Pradesh",
+    "option_b": "Meghalaya",
+    "option_c": "Assam",
+    "option_d": "West Bengal"
+   },
+   {
+    "id": "f012e07a-c68c-4d0f-9ed6-b9ca2afc0f40",
+    "question_text": "Which state or union territory is Nokrek Biosphere Reserve located in?",
+    "option_a": "Uttar Pradesh",
+    "option_b": "Meghalaya",
+    "option_c": "Assam",
+    "option_d": "West Bengal"
+   },
+   {
+    "id": "543bb7c5-8104-49ad-9cfa-b4f39520a574",
+    "question_text": "Which state or union territory is Manas Biosphere Reserve located in?",
+    "option_a": "Uttar Pradesh",
+    "option_b": "Meghalaya",
+    "option_c": "Assam",
+    "option_d": "West Bengal"
+   }
+  ]
+ },
+ {
+  "sig": "coimbatore|district|national|nilgiris|ramanathpuram|tuticorin",
+  "rows": [
+   {
+    "id": "9a3fdae2-8507-4a23-88da-83001a277a2d",
+    "question_text": "Which district(s) is Gulf of Mannar Marine National Park located in?",
+    "option_a": "Chennai",
+    "option_b": "Ramanathpuram and Tuticorin",
+    "option_c": "Coimbatore",
+    "option_d": "Nilgiris"
+   },
+   {
+    "id": "fc568fe8-aa29-4b62-b2cb-8dbafbf754d7",
+    "question_text": "Which district(s) is Guindy National Park located in?",
+    "option_a": "Chennai",
+    "option_b": "Ramanathpuram and Tuticorin",
+    "option_c": "Coimbatore",
+    "option_d": "Nilgiris"
+   }
+  ]
+ },
+ {
+  "sig": "index|level|pollution|quality|unhealthy",
+  "rows": [
+   {
+    "id": "6977cccf-ffb2-451b-962e-2677945d723a",
+    "question_text": "What is the Air Quality Index (AQI) level for 'Unhealthy' air pollution?",
+    "option_a": "0-50",
+    "option_b": "51-100",
+    "option_c": "101-150",
+    "option_d": "151-200"
+   },
+   {
+    "id": "973d685e-a7ff-4cdc-918f-0111cef0a406",
+    "question_text": "What is the Air Quality Index (AQI) level for 'Very Unhealthy' air pollution?",
+    "option_a": "101-150",
+    "option_b": "151-200",
+    "option_c": "201-300",
+    "option_d": "301+"
+   }
+  ]
+ },
+ {
+  "sig": "diversity|ecosystems|occurring|particular|species|variety",
+  "rows": [
+   {
+    "id": "dc74d636-d395-444a-ad4f-9426ae069c21",
+    "question_text": "What is flora?",
+    "option_a": "Plant life occurring in a particular area",
+    "option_b": "Animal life occurring in a particular area",
+    "option_c": "The variety of species in a particular area",
+    "option_d": "The diversity of ecosystems in a particular area"
+   },
+   {
+    "id": "2fd772b1-1b53-425f-a7e7-8de8ea739996",
+    "question_text": "What is fauna?",
+    "option_a": "Plant life occurring in a particular area",
+    "option_b": "Animal life occurring in a particular area",
+    "option_c": "The variety of species in a particular area",
+    "option_d": "The diversity of ecosystems in a particular area"
+   }
+  ]
+ },
+ {
+  "sig": "அன்னவன்|அமலனும்|இராமன்|இலக்குவன்|குறிப்பிடப்படுபவர்|நேர்வான்",
+  "rows": [
+   {
+    "id": "5aae5ebb-5dae-44dc-8af4-1a0e7e34b5a8",
+    "question_text": "அன்னவன் உரை கேளா\nஅமலனும் உரை நேர்வான் - இதில் அன்னவன் என்று குறிப்பிடப்படுபவர் யார்?",
+    "option_a": "பரதன்",
+    "option_b": "குகன்",
+    "option_c": "இராமன்",
+    "option_d": "இலக்குவன்"
+   },
+   {
+    "id": "2311d691-ec1d-4afe-a11f-5b80b986ac4e",
+    "question_text": "அன்னவன் உரை கேளா\nஅமலனும் உரை நேர்வான் - இதில் அமலன் என்று குறிப்பிடப்படுபவர் யார்?",
+    "option_a": "பரதன்",
+    "option_b": "குகன்",
+    "option_c": "இராமன்",
+    "option_d": "இலக்குவன்"
+   }
+  ]
+ },
+ {
+  "sig": "அல்இடத்துக்|சினம்காப்பான்|செல்இடத்துக்|நிகரானவரிடத்தில்|மெலியவரிடத்தில்|வலியவரிடத்தில்",
+  "rows": [
+   {
+    "id": "db8c26f2-8c01-4b6e-aec3-2d458bebd9e0",
+    "question_text": "செல்இடத்துக் காப்பான் சினம்காப்பான் அல்இடத்துக்\nகாக்கின்என் காவாக்கால் என்? - என்ற குறட்பாவில் அல்இடத்து என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "மெலியவரிடத்தில்",
+    "option_b": "வலியவரிடத்தில்",
+    "option_c": "தனக்கு நிகரானவரிடத்தில்",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   },
+   {
+    "id": "b63b701f-1986-4672-a82e-8aade82833b9",
+    "question_text": "செல்இடத்துக் காப்பான் சினம்காப்பான் அல்இடத்துக்\nகாக்கின்என் காவாக்கால் என்? - என்ற குறட்பாவில் செல்இடத்து என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "மெலியவரிடத்தில்",
+    "option_b": "வலியவரிடத்தில்",
+    "option_c": "தனக்கு நிகரானவரிடத்தில்",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   }
+  ]
+ },
+ {
+  "sig": "எதுவுமில்லை|எதைக்குறிக்கிறது|சொல்லுக்குறுதி|நானாநாற்பது|நான்மணிக்கடிகை|பல்லுக்குறுதி",
+  "rows": [
+   {
+    "id": "ba196187-c755-4829-be8c-3bea0e91034c",
+    "question_text": "ஆலும் வேலும் பல்லுக்குறுதி\nநாலும் இரண்டும் சொல்லுக்குறுதி - இதில் நால் என்பது எதைக்குறிக்கிறது?",
+    "option_a": "நான்மணிக்கடிகை",
+    "option_b": "நானாநாற்பது",
+    "option_c": "நாலடியார்",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   },
+   {
+    "id": "c92062d9-4bda-4209-87ef-50c830ee337c",
+    "question_text": "ஆலும் வேலும் பல்லுக்குறுதி\nநாலும் இரண்டும் சொல்லுக்குறுதி - இதில் இரண்டு என்பது எதைக்குறிக்கிறது?",
+    "option_a": "நான்மணிக்கடிகை",
+    "option_b": "நானாநாற்பது",
+    "option_c": "நாலடியார்",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   }
+  ]
+ },
+ {
+  "sig": "அமாவாசை|ஒத்தார்|சந்திரன்|சூரியன்|சொல்லின்|வரிகளில்",
+  "rows": [
+   {
+    "id": "3358ae03-4260-4723-b0d9-750f379baf8b",
+    "question_text": "உவா உற வந்து கூடும்\nஉடுபதி, இரவி ஒத்தார் - என்ற வரிகளில் உடுபதி என்ற சொல்லின் பொருள்?",
+    "option_a": "சந்திரன்",
+    "option_b": "சூரியன்",
+    "option_c": "அமாவாசை",
+    "option_d": "பௌர்ணமி"
+   },
+   {
+    "id": "093c088b-c0d3-46de-ae73-7ff5fc70433e",
+    "question_text": "உவா உற வந்து கூடும்\nஉடுபதி, இரவி ஒத்தார் - என்ற வரிகளில் இரவி என்ற சொல்லின் பொருள்?",
+    "option_a": "சந்திரன்",
+    "option_b": "சூரியன்",
+    "option_c": "அமாவாசை",
+    "option_d": "பௌர்ணமி"
+   }
+  ]
+ },
+ {
+  "sig": "இலக்கணக்|எதுவுமில்லை|குறிப்பு|செய்யுளிசை|சொல்லின்|மேற்காணும்",
+  "rows": [
+   {
+    "id": "48c275f1-7c22-4b1e-b9e1-6208eff6c5b5",
+    "question_text": "வெரீஇய - என்ற சொல்லின் இலக்கணக் குறிப்பு என்ன?",
+    "option_a": "சொல்லிசை அளபெடை",
+    "option_b": "செய்யுளிசை அளபெடை",
+    "option_c": "இன்னிசை அளபெடை",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   },
+   {
+    "id": "11f42c3e-1f30-4d6a-9b46-32cca9d05364",
+    "question_text": "உழாஅது - என்ற சொல்லின் இலக்கணக் குறிப்பு என்ன?",
+    "option_a": "சொல்லிசை அளபெடை",
+    "option_b": "செய்யுளிசை அளபெடை",
+    "option_c": "இன்னிசை அளபெடை",
+    "option_d": "மேற்காணும் எதுவுமில்லை"
+   }
+  ]
+ },
+ {
+  "sig": "குறட்பாவில்|சொல்லின்|தீயினத்தின்|துணையில்லை|நல்லினத்தின்|படுப்பதூஉம்",
+  "rows": [
+   {
+    "id": "4ee90b97-8f3f-47c9-b56f-4961ca3cdc7d",
+    "question_text": "நல்லினத்தின் ஊங்கும் துணையில்லை தீயினத்தின்\nஅல்லல் படுப்பதூஉம் இல் - என்ற குறட்பாவில் ஊங்கும் என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "பகை",
+    "option_b": "துணை",
+    "option_c": "நட்பு",
+    "option_d": "ஊக்கம்"
+   },
+   {
+    "id": "65dc889a-7ac0-42a4-a5c0-bafe6901f767",
+    "question_text": "நல்லினத்தின் ஊங்கும் துணையில்லை தீயினத்தின்\nஅல்லல் படுப்பதூஉம் இல் - என்ற குறட்பாவில் அல்லல் என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "பகை",
+    "option_b": "துணை",
+    "option_c": "துன்பம்",
+    "option_d": "ஊக்கம்"
+   }
+  ]
+ },
+ {
+  "sig": "உததியை|ஒடுக்க|ஒண்ணுமோ|கூவலுக்கு|சொல்லின்|வரியில்",
+  "rows": [
+   {
+    "id": "802b9a22-549e-4860-a992-90388baf1737",
+    "question_text": "ஒண்ணுமோ வறுங் கூவலுக்கு உததியை ஒடுக்க - என்ற வரியில் உததி என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கிணறு",
+    "option_b": "கடல்",
+    "option_c": "ஆறு",
+    "option_d": "ஏரி"
+   },
+   {
+    "id": "98ce75f9-4d2f-492d-b24c-516412fa0c89",
+    "question_text": "ஒண்ணுமோ வறுங் கூவலுக்கு உததியை ஒடுக்க - என்ற வரியில் கூவல் என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கிணறு",
+    "option_b": "கடல்",
+    "option_c": "ஆறு",
+    "option_d": "ஏரி"
+   }
+  ]
+ }
+]

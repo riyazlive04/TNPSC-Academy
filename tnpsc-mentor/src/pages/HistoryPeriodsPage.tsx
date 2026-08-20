@@ -60,10 +60,10 @@ export default function HistoryPeriodsPage() {
   return (
     <PickerPage badge={t('historyPeriodBadge')} backTo="/test-arena/pyq/group1">
       <div className="mb-5">
-        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-ink">
           {t('historyPickPeriod')}
         </h2>
-        <p className="tamil mt-1 font-body text-[15px] text-muted">{t('historyPickPeriodSub')}</p>
+        <p className="tamil mt-1 font-body text-base text-muted">{t('historyPickPeriodSub')}</p>
       </div>
 
       {counts === null ? (

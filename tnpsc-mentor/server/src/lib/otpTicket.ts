@@ -65,3 +65,36 @@ export function verifyPhoneVerifyTicket(ticket: string): string | null {
   if (!exp || exp < Date.now()) return null
   return phone
 }
+
+// ─── TOTP step-up ticket ──────────────────────────────────────────────────────
+// A third claim on the same mechanism: "this user's password/Google check just
+// succeeded — a TOTP step-up is the only thing standing between them and a
+// session." Issued by /login and /google when the authenticating account is
+// admin/superadmin with totp_enabled, redeemed by /totp/step-up. 5-minute TTL:
+// enough to open an authenticator app, short enough that a leaked ticket goes
+// stale fast. The `tu` prefix (and 4th dot-part) keeps it from ever being
+// replayed as either ticket kind above.
+
+const TOTP_TTL_MS = 5 * 60 * 1000
+
+/** Issue a ticket binding a userId who has cleared password/Google but still
+ * owes a TOTP code, for the next 5 minutes. */
+export function issueTotpStepUpTicket(userId: string): string {
+  const exp = Date.now() + TOTP_TTL_MS
+  const payload = `tu.${userId}.${exp}`
+  return `${payload}.${sign(payload)}`
+}
+
+/** Return the userId iff the ticket is well-formed, unexpired and untampered. */
+export function verifyTotpStepUpTicket(ticket: string): string | null {
+  const parts = String(ticket ?? '').split('.')
+  if (parts.length !== 4 || parts[0] !== 'tu') return null
+  const [, userId, expStr, sig] = parts
+  const expected = sign(`tu.${userId}.${expStr}`)
+  const a = Buffer.from(sig)
+  const b = Buffer.from(expected)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null
+  const exp = Number(expStr)
+  if (!exp || exp < Date.now()) return null
+  return userId
+}

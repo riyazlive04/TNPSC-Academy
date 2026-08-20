@@ -1,0 +1,50 @@
+[
+  {
+    "id": "d2b09852-8f0c-4d33-8cd2-e4ca3863957a",
+    "topic": "Perimeter, Circumference & Diameter",
+    "issue_types": ["B"],
+    "current_correct_answer": "D",
+    "current_question_summary": "Rectangular field: length exceeds breadth by 9 m, perimeter = 154 m. Asked: find the BREADTH. Options: A) 34 m, B) 36 m, C) 40 m, D) 43 m.",
+    "your_independent_calculation": "l = b + 9. 2(l+b) = 154 => l+b = 77. Substitute: (b+9)+b = 77 => 2b = 68 => b = 34 m (and l = 43 m). The breadth asked for is 34 m, which is option A.",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Change the stored correct_answer field from 'D' to 'A'. (The stored explanation text itself already computes b = 34 m and literally concludes '→ Option (A)' — the explanation and the correct_answer column simply disagree; D = 43 m is the LENGTH, not the breadth that was asked for.)",
+    "confidence": "high",
+    "notes": "Clear-cut database inconsistency: the explanation's own final line says 'Option (A)' but the correct_answer field stores 'D'. Math independently re-verified: b=34, l=43."
+  },
+  {
+    "id": "9e3a7a10-7ad8-4c6a-aa28-6246bd83747d",
+    "topic": "3D - Volume & Surface Area",
+    "issue_types": ["D"],
+    "current_correct_answer": "D",
+    "current_question_summary": "Conical heap of paddy, diameter 4.2 m, height 2.8 m (both in METRES). Find the area of canvas needed to cover it. Options given as A) 25.31 cm², B) 18.11 cm², C) 20 cm², D) 23.1 cm².",
+    "your_independent_calculation": "r = 2.1 m, h = 2.8 m. l = sqrt(2.1^2+2.8^2) = sqrt(4.41+7.84) = sqrt(12.25) = 3.5 m. CSA = (22/7)*2.1*3.5 = 23.1 m². The numeric value 23.1 (option D) is correct and is the right choice, but the unit displayed on ALL FOUR options is 'cm²' even though every dimension in the question is given in metres and the explanation itself computes and states the answer in m². This is a unit-labeling error across the option set, not just the marked option.",
+    "recommended_correct_answer": "D",
+    "recommended_fix": "Change option unit labels from cm² to m²: A) 25.31 m² (approx.)  B) 18.11 m² (approx.)  C) 20 m² (approx.)  D) 23.1 m²",
+    "confidence": "high",
+    "notes": "Letter D remains the correct choice (value 23.1 is right), so no student-facing scoring impact, but the printed unit on every option contradicts the question's stated units (m) and the explanation's own working (which correctly uses m²). Should be corrected for consistency/credibility."
+  },
+  {
+    "id": "9cdcfc42-f6b8-48cb-aed2-c40ee787e607",
+    "topic": "3D - Volume & Surface Area",
+    "issue_types": ["A", "C", "E"],
+    "current_correct_answer": "C",
+    "current_question_summary": "Two right circular cones of the same height; radii ratio 1:3; height of each cone = 3 times the radius of the smaller cone. Find the ratio of their curved surface areas. Options: A) 9:5, B) 1:3, C) 5:9, D) 1:9. Marked correct: C (5:9).",
+    "your_independent_calculation": "Let r1=x (smaller), r2=3x, and shared height h=3x (per the problem statement). l1=sqrt(r1^2+h^2)=sqrt(x^2+9x^2)=sqrt(10)x. l2=sqrt(r2^2+h^2)=sqrt(9x^2+9x^2)=sqrt(18)x=3sqrt(2)x. CSA1=pi*r1*l1=sqrt(10)*pi*x^2. CSA2=pi*r2*l2=pi*3x*3sqrt(2)x=9sqrt(2)*pi*x^2. Ratio CSA1:CSA2 = sqrt(10):(9sqrt(2)) = sqrt(5):9 (numerically ~2.236:9, i.e. ~0.2485). Verified numerically in Python: 0.24845... which exactly equals sqrt(5)/9, NOT 5/9 (=0.5556). The stored explanation itself derives '= sqrt(10)/(9sqrt(2)) = sqrt(5)/9' correctly, then makes an invalid leap claiming this '...simplifies to 5:9' — sqrt(5) is not equal to 5, so this final step is a mathematical error. None of the four given options (9:5, 1:3, 5:9, 1:9) equals the true irrational ratio sqrt(5):9.",
+    "recommended_correct_answer": null,
+    "recommended_fix": "This question needs to be reworked, not just re-keyed — no existing option is mathematically correct for the CSA ratio as posed. Two possible remedies: (1) If the intent was 'ratio of curved surface areas', replace the options with one that includes sqrt(5):9 (irrational ratios are unusual for this MCQ format, so the question premise likely needs to change), or (2) the question may originally have intended to ask for the ratio of VOLUMES under the same given data, which comes out to a clean 1:9 (V1=(1/3)*pi*x^2*3x=pi*x^3; V2=(1/3)*pi*9x^2*3x=9*pi*x^3; ratio 1:9) — this exactly matches option D and is a much more plausible original-textbook answer. Recommend an author review to determine which was intended, then fix either the wording ('curved surface area' -> 'volume', keeping D as correct) or replace the options entirely.",
+    "confidence": "medium",
+    "notes": "High confidence that the currently marked answer (C, 5:9) is wrong and that the explanation contains a clear invalid-simplification error (sqrt(5)/9 asserted to equal 5/9). Medium confidence on the specific recommended fix, since it requires guessing the original question's intent (CSA vs volume) to restore a clean answer."
+  },
+  {
+    "id": "7ae32d51-08a9-41a8-914f-ac182a0f5cfd",
+    "topic": "3D - Volume & Surface Area",
+    "issue_types": ["F"],
+    "current_correct_answer": "C",
+    "current_question_summary": "English: 'Two cubes each of volume 64 cm3 are joined to form a cuboid. Find T.S.A of the resulting solid.' Correct answer C (160 cm²), which is mathematically correct for volume=64 (side 4 cm, cuboid 8x4x4, TSA=160).",
+    "your_independent_calculation": "English math confirmed correct: side = cube_root(64) = 4 cm; cuboid 8x4x4 cm; TSA = 2(32+16+32) = 160 cm² = option C. However, question_text_ta reads 'கன அளவு 63cm3 கொண்ட இரு கன சதுரங்களை...' i.e. states the cube volume as 63 cm³, not 64 cm³. This is a straight mistranslation/typo — 63 is not a perfect cube, so a Tamil-reading student working the problem as literally stated (63 cm³) cannot reach any of the given options cleanly, while explanation_ta correctly uses 64 throughout its own working (a further internal inconsistency between question_text_ta and explanation_ta).",
+    "recommended_correct_answer": "C",
+    "recommended_fix": "In question_text_ta, change 'கன அளவு 63cm3' to 'கன அளவு 64cm3' so it matches the English question_text and explanation_ta (both of which correctly use 64).",
+    "confidence": "high",
+    "notes": "English side and the correct_answer(C)/explanation are all fine; only the Tamil question_text has the wrong number (63 vs 64). Confirmed by direct inspection of question_text_ta and cross-check against explanation_ta, which itself uses 64 cm³ in its working."
+  }
+]

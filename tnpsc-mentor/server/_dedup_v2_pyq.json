@@ -1,0 +1,23 @@
+[
+ {
+  "sig": "akila|examination|marks|maximum|score|scored",
+  "rows": [
+   {
+    "id": "f548288f-b95e-4e83-89d7-a7215222c021",
+    "question_text": "Akila scored 80% of marks in an examination. If her score was 576 marks. Find the maximum marks of the examination.",
+    "option_a": "640",
+    "option_b": "680",
+    "option_c": "720",
+    "option_d": "700"
+   },
+   {
+    "id": "06477636-0d70-4211-9580-304670807023",
+    "question_text": "Akila scored 80% of marks in an examination. If her score was 576 marks then find the maximum marks of the examination",
+    "option_a": "720",
+    "option_b": "620",
+    "option_c": "820",
+    "option_d": "710"
+   }
+  ]
+ }
+]

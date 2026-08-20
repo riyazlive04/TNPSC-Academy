@@ -33,6 +33,25 @@ export default function NotificationBell() {
     startNotificationPolling()
   }, [])
 
+  // Jiggle the bell when unread genuinely INCREASES (a fresh notification
+  // landed via the poll) — not on first load, where existing unread just
+  // establishes the baseline, and not when it drops (mark-all-read).
+  const [jiggle, setJiggle] = useState(false)
+  const prevUnreadRef = useRef<number | null>(null)
+  useEffect(() => {
+    if (prevUnreadRef.current === null) {
+      prevUnreadRef.current = unread
+      return
+    }
+    if (unread > prevUnreadRef.current) {
+      setJiggle(true)
+      const id = window.setTimeout(() => setJiggle(false), 700)
+      prevUnreadRef.current = unread
+      return () => window.clearTimeout(id)
+    }
+    prevUnreadRef.current = unread
+  }, [unread])
+
   // Open → refresh, then mark everything read so the badge clears.
   useEffect(() => {
     if (!open) return
@@ -72,11 +91,15 @@ export default function NotificationBell() {
         }
         className="relative grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90"
       >
-        {unread > 0 ? <BellRing size={18} /> : <Bell size={18} />}
+        {unread > 0 ? (
+          <BellRing size={18} className={jiggle ? 'origin-top animate-ring' : ''} />
+        ) : (
+          <Bell size={18} />
+        )}
         {unread > 0 && (
           <span
             aria-hidden="true"
-            className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-[10px] font-bold text-white"
+            className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white"
           >
             {unread > 9 ? '9+' : unread}
           </span>
@@ -90,7 +113,7 @@ export default function NotificationBell() {
             {loading && <Loader2 size={14} className="animate-spin text-ink2" />}
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto" aria-live="polite">
             {loading && items.length === 0 ? (
               // Never flash "no notifications" at someone whose feed is still
               // loading - hold the row shape until the answer is real.
@@ -115,6 +138,7 @@ export default function NotificationBell() {
                       n.read ? '' : 'bg-brand-soft/30'
                     }`}
                   >
+                    {!n.read && <span className="sr-only">{t('unread')}. </span>}
                     <span
                       className={`mt-0.5 grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg ${
                         n.kind === 'system' ? 'bg-goldsoft text-gold' : 'bg-brand-soft text-brand'
@@ -127,7 +151,9 @@ export default function NotificationBell() {
                         <span className="tamil truncate font-heading text-sm font-semibold text-ink">
                           {title}
                         </span>
-                        {!n.read && <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-coral" />}
+                        {!n.read && (
+                          <span aria-hidden="true" className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-coral" />
+                        )}
                       </span>
                       <span className="tamil mt-0.5 block whitespace-pre-line font-body text-xs text-ink2">
                         {body}
@@ -137,7 +163,7 @@ export default function NotificationBell() {
                           {secondaryTa}
                         </span>
                       )}
-                      <span className="mt-1 block font-body text-[10px] uppercase tracking-wide text-ink2/70">
+                      <span className="mt-1 block font-body text-2xs uppercase tracking-wide text-ink2/70">
                         {ago(n.created_at)}
                       </span>
                     </span>

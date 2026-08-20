@@ -1,0 +1,334 @@
+[
+ {
+  "category": "subject",
+  "sig": "development|employment|integrated|national|programme|training",
+  "classification": "false_positive",
+  "notes": "Row 8ce6d14e tests the LAUNCH YEARS of IRDP/TRYSEM/NREP/JRY. Row b3f2c852 tests the ACRONYM EXPANSIONS of NREP/IRDP/TRYSEM/SFDA. Same broad topic (rural-development programmes) but genuinely different facts being examined (years vs. full-forms), and SFDA appears only in the second row. Not redundant — no action taken.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "abandoning|difficulty|eleventh|meaning|rescuing|something",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the identical 4 idioms with identical 4 meanings (Alarm bells ringing=warning sign, Leave in the lurch=abandon, Back to the wall=serious difficulty, Eleventh-hour help=last-moment rescue) — only the List I/List II ordering and option lettering differ. Kept 4225f6aa-74ce-4025-bead-4c3eb209811c (external_id sub-english-match-0021; tied on history with the other row at 0/0/0, kept as the lower/earlier external_id). Rewrote 7faf09df-2640-4eeb-8419-9070abb2697b into a genuinely different idiom-matching question (Bite the bullet / Break the ice / Burn the midnight oil / Once in a blue moon), same subject=English, topic=Grammar and Comprehension. Idiom meanings verified against standard English usage.",
+  "keep_id": "4225f6aa-74ce-4025-bead-4c3eb209811c",
+  "rewrites": [
+   {
+    "id": "7faf09df-2640-4eeb-8419-9070abb2697b",
+    "question_text": "Match each idiom in List I with its meaning in List II and choose the correct code:\nList I\n(a) Bite the bullet\n(b) Break the ice\n(c) Burn the midnight oil\n(d) Once in a blue moon\nList II\n1. To initiate conversation and ease tension in a social setting\n2. To work or study late into the night\n3. To endure a difficult situation with courage\n4. Something that happens very rarely",
+    "question_text_ta": "பட்டியல் I-இல் உள்ள ஒவ்வொரு மரபுத்தொடரையும் பட்டியல் II-இல் உள்ள அதன் பொருளுடன் பொருத்தி சரியான குறியீட்டைத் தேர்ந்தெடுக்கவும்:\nபட்டியல் I\n(a) Bite the bullet\n(b) Break the ice\n(c) Burn the midnight oil\n(d) Once in a blue moon\nபட்டியல் II\n1. சமூக சூழலில் உரையாடலைத் தொடங்கி பதற்றத்தைக் குறைத்தல்\n2. இரவு நேரம் வரை வேலை செய்தல்/படித்தல்\n3. கடினமான சூழலைத் தைரியத்துடன் தாங்கிக்கொள்ளுதல்\n4. மிகவும் அரிதாக நிகழும் ஒன்று",
+    "option_a": "(a)-3, (b)-1, (c)-2, (d)-4",
+    "option_b": "(a)-2, (b)-1, (c)-3, (d)-4",
+    "option_c": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d": "(a)-1, (b)-3, (c)-2, (d)-4",
+    "option_a_ta": "(a)-3, (b)-1, (c)-2, (d)-4",
+    "option_b_ta": "(a)-2, (b)-1, (c)-3, (d)-4",
+    "option_c_ta": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d_ta": "(a)-1, (b)-3, (c)-2, (d)-4",
+    "correct_answer": "A",
+    "explanation": "'Bite the bullet' means to face a painful or difficult situation with courage (a-3); 'break the ice' means to initiate conversation and ease tension in a social setting (b-1); 'burn the midnight oil' means to work or study late into the night (c-2); 'once in a blue moon' means something that happens very rarely (d-4). Hence (a)-3, (b)-1, (c)-2, (d)-4.",
+    "explanation_ta": "'Bite the bullet' என்பது கடினமான சூழலைத் தைரியத்துடன் எதிர்கொள்வதைக் குறிக்கும் (a-3); 'break the ice' என்பது சமூக சூழலில் உரையாடலைத் தொடங்கிப் பதற்றத்தைக் குறைப்பதைக் குறிக்கும் (b-1); 'burn the midnight oil' என்பது இரவு நேரம் வரை வேலை செய்வதை/படிப்பதைக் குறிக்கும் (c-2); 'once in a blue moon' என்பது மிக அரிதாக நிகழும் ஒன்றைக் குறிக்கும் (d-4). எனவே (a)-3, (b)-1, (c)-2, (d)-4."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "agriculture|composite|correlation|percentage|population|variable",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the same correlation facts for the HRD composite index (income measures positively correlated, share of population in agriculture negatively correlated); row c6613a50's 2-item list is essentially a subset of row fa3a6ff2's 3-item list. NOTE: both rows already have active=false in the DB, so neither is currently served to students — low urgency, but fixed for correctness in case they are ever reactivated. Kept fa3a6ff2 (broader 3-variable version, external_id ...-0064). Rewrote c6613a50 into a genuinely different, verified fact about the Human Development Index's three dimensions (health/education/standard-of-living), same subject=Tamil Nadu Administration, topic=Human Development Indicators.",
+  "keep_id": "fa3a6ff2-2790-48b7-9f4c-908fa1c59028",
+  "rewrites": [
+   {
+    "id": "c6613a50-ca40-4525-93fd-c9cf27f238b8",
+    "question_text": "Match List I (Component of the Human Development Index) with List II (Dimension it represents) and select the correct code:\nList I\n(a) Life expectancy at birth\n(b) Mean years of schooling\n(c) GNI per capita (PPP US$)\nList II\n1. Health\n2. Education\n3. Standard of living",
+    "question_text_ta": "பட்டியல் I (மனித வள மேம்பாட்டுக் குறியீட்டின் கூறு) உடன் பட்டியல் II (அது குறிக்கும் பரிமாணம்) பொருத்தி சரியான குறியீட்டைத் தேர்ந்தெடுக்கவும்:\nபட்டியல் I\n(a) பிறக்கும்போது எதிர்பார்க்கப்படும் ஆயுட்காலம்\n(b) சராசரி பள்ளிப்படிப்பு ஆண்டுகள்\n(c) தலா GNI (PPP அமெரிக்க டாலர்)\nபட்டியல் II\n1. சுகாதாரம்\n2. கல்வி\n3. வாழ்க்கைத் தரம்",
+    "option_a": "(a)-1, (b)-2, (c)-3",
+    "option_b": "(a)-2, (b)-1, (c)-3",
+    "option_c": "(a)-1, (b)-3, (c)-2",
+    "option_d": "(a)-3, (b)-2, (c)-1",
+    "option_a_ta": "(a)-1, (b)-2, (c)-3",
+    "option_b_ta": "(a)-2, (b)-1, (c)-3",
+    "option_c_ta": "(a)-1, (b)-3, (c)-2",
+    "option_d_ta": "(a)-3, (b)-2, (c)-1",
+    "correct_answer": "A",
+    "explanation": "The Human Development Index (HDI) is built from three dimensions: a long and healthy life, measured by life expectancy at birth (a-1); knowledge, measured by mean years of schooling (b-2); and a decent standard of living, measured by GNI per capita in PPP terms (c-3). Hence (a)-1, (b)-2, (c)-3.",
+    "explanation_ta": "மனித வள மேம்பாட்டுக் குறியீடு (HDI) மூன்று பரிமாணங்களைக் கொண்டது: நீண்ட, ஆரோக்கியமான வாழ்க்கை - பிறக்கும்போது எதிர்பார்க்கப்படும் ஆயுட்காலத்தால் அளக்கப்படுகிறது (a-1); அறிவு - சராசரி பள்ளிப்படிப்பு ஆண்டுகளால் அளக்கப்படுகிறது (b-2); தகுந்த வாழ்க்கைத் தரம் - PPP அடிப்படையிலான தலா GNI-யால் அளக்கப்படுகிறது (c-3). எனவே (a)-1, (b)-2, (c)-3."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "agricultural|commission|establishment|industrial|introduction|population",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the exact same 4 facts (Planning Commission 1950, New Industrial Policy 1991, National Population Policy Feb 2000, New Agricultural Policy Jul 2000) — only list order/option lettering differ. Kept 8e9c966f (n_seen=1,n_ans=1, more history than the other row's 0/0/1). Rewrote 1ab14916 into a different, verified set of planning-body facts (NITI Aayog, First Five-Year Plan, National Development Council, National Income Committee), same subject=Economy, topic=Planning Commission and Niti Ayog.",
+  "keep_id": "8e9c966f-080d-4320-bac1-ab06bc485696",
+  "rewrites": [
+   {
+    "id": "1ab14916-f215-42d1-ac97-2a4cc26d6120",
+    "question_text": "Match List I (Body) with List II (Year of establishment) and select the correct code:\nList I\n(a) NITI Aayog\n(b) First Five-Year Plan\n(c) National Development Council\n(d) National Income Committee\nList II\n1. 1949\n2. 1951\n3. 1952\n4. 2015",
+    "question_text_ta": "பட்டியல் I (அமைப்பு) -ஐ பட்டியல் II (நிறுவப்பட்ட ஆண்டு) உடன் பொருத்தி சரியான குறியீட்டைத் தேர்வு செய்க:\nபட்டியல் I\n(a) நிதி ஆயோக்\n(b) முதல் ஐந்தாண்டு திட்டம்\n(c) தேசிய வளர்ச்சி கவுன்சில்\n(d) தேசிய வருமான குழு\nபட்டியல் II\n1. 1949\n2. 1951\n3. 1952\n4. 2015",
+    "option_a": "(a)-4, (b)-2, (c)-3, (d)-1",
+    "option_b": "(a)-2, (b)-4, (c)-3, (d)-1",
+    "option_c": "(a)-4, (b)-2, (c)-1, (d)-3",
+    "option_d": "(a)-3, (b)-2, (c)-4, (d)-1",
+    "option_a_ta": "(a)-4, (b)-2, (c)-3, (d)-1",
+    "option_b_ta": "(a)-2, (b)-4, (c)-3, (d)-1",
+    "option_c_ta": "(a)-4, (b)-2, (c)-1, (d)-3",
+    "option_d_ta": "(a)-3, (b)-2, (c)-4, (d)-1",
+    "correct_answer": "A",
+    "explanation": "NITI Aayog was established on 1 January 2015, replacing the Planning Commission (a-4). The First Five-Year Plan was launched in 1951 (b-2). The National Development Council was set up in 1952 to strengthen and mobilise the resources needed for the Five-Year Plans (c-3). The National Income Committee, chaired by P.C. Mahalanobis, was constituted in 1949 to estimate India's national income (d-1). Hence (a)-4, (b)-2, (c)-3, (d)-1.",
+    "explanation_ta": "திட்டக் கமிஷனுக்குப் பதிலாக நிதி ஆயோக் 1 ஜனவரி 2015-இல் நிறுவப்பட்டது (a-4). முதல் ஐந்தாண்டு திட்டம் 1951-இல் தொடங்கப்பட்டது (b-2). ஐந்தாண்டு திட்டங்களுக்குத் தேவையான வளங்களைத் திரட்ட தேசிய வளர்ச்சி கவுன்சில் 1952-இல் அமைக்கப்பட்டது (c-3). இந்தியாவின் தேசிய வருமானத்தை மதிப்பிட பி.சி. மகாலனோபிஸ் தலைமையில் தேசிய வருமான குழு 1949-இல் அமைக்கப்பட்டது (d-1). எனவே (a)-4, (b)-2, (c)-3, (d)-1."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "arrange|descending|maharashtra|population|populous|pradesh",
+  "classification": "false_positive",
+  "notes": "Different specific state lists (row 74591d9d ranks UP/West-Bengal/MP/Maharashtra; row 7f17693e ranks Bihar/Maharashtra/MP/UP) — only 3 of 4 items overlap and the two lists test different specific rankings, so this is not a redundant duplicate. No rewrite made. SEPARATE ISSUE FOUND (unrelated to duplication, flagging for a follow-up fix outside this dedup pass): row 7f17693e-197c-4605-a67e-60aeb97953eb has an incorrect answer key. Its correct_answer is set to 'A' = '(4),(1),(2),(3)' = Uttar Pradesh, Bihar, Maharashtra, Madhya Pradesh — but by the 2011 Census, Maharashtra (~112.4M) has a larger population than Bihar (~104.1M), so the correct descending order is Uttar Pradesh, Maharashtra, Bihar, Madhya Pradesh, i.e. option B = '(4),(2),(1),(3)'. Row 74591d9d's own answer (option D, UP>Maharashtra>West Bengal>MP) is independently verified correct against 2011 Census figures.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "beriberi|blindness|deficiency|disease|rickets|vitamin",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the identical vitamin-deficiency-disease pairings (Beriberi=B1, Scurvy=C, Rickets=D, Night blindness=A), just with List I/List II swapped in direction. Kept 2ac5d25e (n_seen=1,n_ans=2, more history than the other row's 0/1). Rewrote 8a3e6156 into a different, verified fact set — the chemical names of the same 4 vitamins — same subject=Biology, topic=Nutrition.",
+  "keep_id": "2ac5d25e-1493-4432-a009-f27a4b32db5a",
+  "rewrites": [
+   {
+    "id": "8a3e6156-37eb-4a80-8393-e0e5706a2d67",
+    "question_text": "Match List I (Vitamin) with List II (Chemical name) and select the correct answer using the codes given below:\nList I\n(a) Vitamin A\n(b) Vitamin B1\n(c) Vitamin C\n(d) Vitamin D\nList II\n(1) Ascorbic acid\n(2) Calciferol\n(3) Retinol\n(4) Thiamine",
+    "question_text_ta": "பட்டியல் I (வைட்டமின்) உடன் பட்டியல் II (வேதியியல் பெயர்) பொருத்தி, கீழே உள்ள குறியீடுகளைப் பயன்படுத்தி சரியான விடையைத் தேர்ந்தெடுக்கவும்:\nபட்டியல் I\n(a) வைட்டமின் A\n(b) வைட்டமின் B1\n(c) வைட்டமின் C\n(d) வைட்டமின் D\nபட்டியல் II\n(1) அஸ்கார்பிக் அமிலம்\n(2) கால்சிஃபெரால்\n(3) ரெட்டினால்\n(4) தையமின்",
+    "option_a": "(a)-3, (b)-4, (c)-1, (d)-2",
+    "option_b": "(a)-4, (b)-3, (c)-1, (d)-2",
+    "option_c": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d": "(a)-1, (b)-4, (c)-3, (d)-2",
+    "option_a_ta": "(a)-3, (b)-4, (c)-1, (d)-2",
+    "option_b_ta": "(a)-4, (b)-3, (c)-1, (d)-2",
+    "option_c_ta": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d_ta": "(a)-1, (b)-4, (c)-3, (d)-2",
+    "correct_answer": "A",
+    "explanation": "Vitamin A's chemical name is Retinol (a-3); Vitamin B1's chemical name is Thiamine (b-4); Vitamin C's chemical name is Ascorbic acid (c-1); Vitamin D's chemical name is Calciferol (d-2). Hence (a)-3, (b)-4, (c)-1, (d)-2.",
+    "explanation_ta": "வைட்டமின் A-வின் வேதியியல் பெயர் ரெட்டினால் (a-3); வைட்டமின் B1-இன் வேதியியல் பெயர் தையமின் (b-4); வைட்டமின் C-இன் வேதியியல் பெயர் அஸ்கார்பிக் அமிலம் (c-1); வைட்டமின் D-இன் வேதியியல் பெயர் கால்சிஃபெரால் (d-2). எனவே (a)-3, (b)-4, (c)-1, (d)-2."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "constitution|fundamental|government|parliamentary|principles|provisions",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the identical 4 constitution-features-borrowed-from-source-country facts (DPSP=Ireland, Fundamental Rights=USA, Parliamentary system=Britain, Emergency provisions=Germany/Weimar). Tied on history (0/0/0 each); kept 72afdaf7 (cleaner single-country List II labels). Rewrote c60c9c40 into a genuinely different, verified fact set — the subject matter of specific DPSP articles (39, 44, 45, 48) — which also better matches that row's own topic label 'Directive Principles of State Policy'.",
+  "keep_id": "72afdaf7-7a09-45ca-b211-968667648cd4",
+  "rewrites": [
+   {
+    "id": "c60c9c40-5a92-47c4-838f-475b126a22ae",
+    "question_text": "Match List I (Directive Principle - Article of the Indian Constitution) with List II (Subject matter) and select the correct answer using the codes given below:\nList I\n(a) Article 39\n(b) Article 44\n(c) Article 45\n(d) Article 48\nList II\n1. Uniform Civil Code for citizens\n2. Organisation of agriculture and animal husbandry\n3. Equal pay for equal work\n4. Early childhood care and education",
+    "question_text_ta": "பட்டியல் I (உரிமைத் தலைப்பு - இந்திய அரசியலமைப்புச் சட்டப் பிரிவு) உடன் பட்டியல் II (பொருள்) பொருத்தி, கீழே உள்ள குறியீடுகளைப் பயன்படுத்தி சரியான விடையைத் தேர்ந்தெடுக்கவும்:\nபட்டியல் I\n(a) பிரிவு 39\n(b) பிரிவு 44\n(c) பிரிவு 45\n(d) பிரிவு 48\nபட்டியல் II\n1. குடிமக்களுக்கான ஒரே சீரான சிவில் சட்டம்\n2. வேளாண்மை மற்றும் கால்நடை வளர்ப்பை ஒழுங்கமைத்தல்\n3. சம வேலைக்கு சம ஊதியம்\n4. ஆரம்பக் குழந்தைப் பராமரிப்பும் கல்வியும்",
+    "option_a": "(a)-3, (b)-1, (c)-4, (d)-2",
+    "option_b": "(a)-1, (b)-3, (c)-4, (d)-2",
+    "option_c": "(a)-3, (b)-1, (c)-2, (d)-4",
+    "option_d": "(a)-4, (b)-1, (c)-3, (d)-2",
+    "option_a_ta": "(a)-3, (b)-1, (c)-4, (d)-2",
+    "option_b_ta": "(a)-1, (b)-3, (c)-4, (d)-2",
+    "option_c_ta": "(a)-3, (b)-1, (c)-2, (d)-4",
+    "option_d_ta": "(a)-4, (b)-1, (c)-3, (d)-2",
+    "correct_answer": "A",
+    "explanation": "Article 39 directs the State to secure, among other things, equal pay for equal work for both men and women (a-3). Article 44 directs the State to endeavour to secure a Uniform Civil Code for citizens throughout India (b-1). Article 45 (as substituted by the 86th Amendment, 2002) directs the State to provide early childhood care and education for children below six years (c-4). Article 48 directs the State to organise agriculture and animal husbandry on modern and scientific lines (d-2). Hence (a)-3, (b)-1, (c)-4, (d)-2.",
+    "explanation_ta": "ஆண், பெண் இருபாலருக்கும் சம வேலைக்குச் சம ஊதியத்தை உறுதி செய்யுமாறு பிரிவு 39 அரசை வழிநடத்துகிறது (a-3). இந்தியா முழுவதும் குடிமக்களுக்கு ஒரே சீரான சிவில் சட்டத்தை ஏற்படுத்த முயற்சிக்குமாறு பிரிவு 44 அரசுக்கு வழிகாட்டுகிறது (b-1). ஆறு வயதிற்குட்பட்ட குழந்தைகளுக்கு ஆரம்பக் குழந்தைப் பராமரிப்பும் கல்வியும் வழங்குமாறு பிரிவு 45 (86-வது திருத்தம், 2002-இன் பின்) அரசை வழிநடத்துகிறது (c-4). நவீன, விஞ்ஞான அடிப்படையில் வேளாண்மையையும் கால்நடை வளர்ப்பையும் ஒழுங்கமைக்குமாறு பிரிவு 48 அரசுக்கு வழிகாட்டுகிறது (d-2). எனவே (a)-3, (b)-1, (c)-4, (d)-2."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "committee|committees|disinvestment|industrial|rajamannar|rangarajan",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the identical committee-to-subject mapping (Dutt=Industrial licensing, Wanchoo=Direct taxes, Rajamannar=Centre-State relations, Rangarajan=Disinvestment) — verified correct, just with List II item numbers reshuffled. Kept 9a2d1ce2 (n_seen=1, more history than the other row's 0/0/0). Rewrote fc9dc0e2 into a different, verified set of economic-reform committees (Narasimham/Chelliah/Malhotra/Abid Hussain), same subject=Economy, topic=Economic Reforms.",
+  "keep_id": "9a2d1ce2-4aa4-4fbb-8726-637844e4b481",
+  "rewrites": [
+   {
+    "id": "fc9dc0e2-e85f-4b4c-b416-3229ea289375",
+    "question_text": "Match the committees in List I with the reform area they examined in List II.\n\nList I\n(A) Narasimham Committee\n(B) Chelliah Committee\n(C) Malhotra Committee\n(D) Abid Hussain Committee\n\nList II\n(1) Insurance sector reforms\n(2) Small-scale industries\n(3) Banking sector reforms\n(4) Tax reforms",
+    "question_text_ta": "பட்டியல் I-இல் உள்ள குழுக்களை, அவை ஆய்வு செய்த சீர்திருத்தத் துறையுடன் பட்டியல் II-இல் பொருத்துக.\n\nபட்டியல் I\n(A) நரசிம்மம் குழு\n(B) செல்லையா குழு\n(C) மல்ஹோத்ரா குழு\n(D) அபித் ஹுசைன் குழு\n\nபட்டியல் II\n(1) காப்பீட்டுத் துறை சீர்திருத்தங்கள்\n(2) சிறு அளவிலான தொழில்கள்\n(3) வங்கித் துறை சீர்திருத்தங்கள்\n(4) வரிச் சீர்திருத்தங்கள்",
+    "option_a": "A-3, B-4, C-1, D-2",
+    "option_b": "A-4, B-3, C-1, D-2",
+    "option_c": "A-3, B-4, C-2, D-1",
+    "option_d": "A-1, B-4, C-3, D-2",
+    "option_a_ta": "A-3, B-4, C-1, D-2",
+    "option_b_ta": "A-4, B-3, C-1, D-2",
+    "option_c_ta": "A-3, B-4, C-2, D-1",
+    "option_d_ta": "A-1, B-4, C-3, D-2",
+    "correct_answer": "A",
+    "explanation": "The Narasimham Committee (1991 and 1998) recommended reforms to India's banking sector (A-3). The Chelliah Committee (1991) recommended reforms to the direct and indirect tax system (B-4). The Malhotra Committee (1994) recommended opening up and reforming the insurance sector, leading to the creation of IRDA (C-1). The Abid Hussain Committee (1997) examined the development and promotion of small-scale industries (D-2). Hence A-3, B-4, C-1, D-2.",
+    "explanation_ta": "நரசிம்மம் குழு (1991, 1998) இந்தியாவின் வங்கித் துறைக்கான சீர்திருத்தங்களைப் பரிந்துரைத்தது (A-3). செல்லையா குழு (1991) நேரடி, மறைமுக வரி முறைக்கான சீர்திருத்தங்களைப் பரிந்துரைத்தது (B-4). மல்ஹோத்ரா குழு (1994) காப்பீட்டுத் துறையைத் திறந்து சீர்திருத்தப் பரிந்துரைத்தது; இதன் விளைவாக IRDA உருவானது (C-1). அபித் ஹுசைன் குழு (1997) சிறு அளவிலான தொழில்களின் வளர்ச்சி மற்றும் மேம்பாட்டை ஆய்வு செய்தது (D-2). எனவே A-3, B-4, C-1, D-2."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "assertion|collectively|confidence|explanation|legislative|responsible",
+  "classification": "true_duplicate",
+  "notes": "Both rows assert the same core constitutional fact — collective responsibility of the State Council of Ministers to the State Legislative Assembly — via near-identical Assertion/Reason framing, with the same 4 standard AR answer options and both keyed to option A. Kept 63eb252f (n_seen=3,n_ans=1, far more history than the other row's 0/0/0). Rewrote 8f6ec8e2 into a different, verified State Executive fact (Governor's power to appoint the Chief Minister under Article 164(1)), same subject=Polity, topic=State Executive.",
+  "keep_id": "63eb252f-8905-4703-bde1-839064a1192d",
+  "rewrites": [
+   {
+    "id": "8f6ec8e2-bcbb-4734-9bd1-3548be867dce",
+    "question_text": "Assertion [A]: In a State, the Chief Minister is appointed by the Governor.\nReason [R]: Under Article 164(1), the Governor appoints as Chief Minister the leader of the party or coalition that commands a majority in the State Legislative Assembly.\nSelect the correct answer using the codes given below:",
+    "question_text_ta": "கூற்று [A]: ஒரு மாநிலத்தில் முதலமைச்சர் ஆளுநரால் நியமிக்கப்படுகிறார்.\nகாரணம் [R]: பிரிவு 164(1)-இன் கீழ், மாநில சட்டமன்றத்தில் பெரும்பான்மையைப் பெற்றுள்ள கட்சியின் அல்லது கூட்டணியின் தலைவரையே ஆளுநர் முதலமைச்சராக நியமிக்கிறார்.\nகீழே கொடுக்கப்பட்டுள்ள குறியீடுகளைப் பயன்படுத்தி சரியான விடையைத் தேர்ந்தெடுக்கவும்:",
+    "option_a": "Both [A] and [R] are true, and [R] is the correct explanation of [A]",
+    "option_b": "Both [A] and [R] are true, but [R] is not the correct explanation of [A]",
+    "option_c": "[A] is true but [R] is false",
+    "option_d": "[A] is false but [R] is true",
+    "option_a_ta": "[A] மற்றும் [R] இரண்டும் சரி, மேலும் [R], [A]-க்கான சரியான விளக்கமாகும்",
+    "option_b_ta": "[A] மற்றும் [R] இரண்டும் சரி, ஆனால் [R], [A]-க்கான சரியான விளக்கம் அல்ல",
+    "option_c_ta": "[A] சரி, ஆனால் [R] தவறு",
+    "option_d_ta": "[A] தவறு, ஆனால் [R] சரி",
+    "correct_answer": "A",
+    "explanation": "Article 164(1) of the Constitution provides that the Chief Minister of a State shall be appointed by the Governor. By convention, the Governor appoints as Chief Minister the leader of the party or coalition commanding a majority in the State Legislative Assembly. Both statements are true, and R correctly explains the constitutional basis and process behind A.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 164(1)-இன் படி மாநில முதலமைச்சர் ஆளுநரால் நியமிக்கப்படுகிறார். மரபுப்படி, மாநில சட்டமன்றத்தில் பெரும்பான்மையைப் பெற்றுள்ள கட்சியின் அல்லது கூட்டணியின் தலைவரையே ஆளுநர் முதலமைச்சராக நியமிக்கிறார். இரு கூற்றுகளும் சரி, மேலும் [R], [A]-வின் அரசியலமைப்பு அடிப்படையையும் செயல்முறையையும் சரியாக விளக்குகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "celebrated|festival|இராஜஸ்தான்|உத்தராயன்|தமிழ்நாடு|மகரசங்கராந்தி",
+  "classification": "true_duplicate",
+  "notes": "Both rows test the identical 4 harvest-festival-to-state mappings (Makara Sankranti=Andhra/Karnataka, Lohri=Punjab, Uttarayan=Gujarat/Rajasthan, Pongal=Tamil Nadu), just with list order/lettering reshuffled. Kept a35fb89d (n_seen=5,n_ans=4, much more history than the other row's 0/0). Rewrote b533d698 into a genuinely different, verified set of festival-state facts (Bihu=Assam, Onam=Kerala, Garba=Gujarat, Durga Puja=West Bengal), same subject=Tamil, topic=06th-Std. Matched the bilingual convention observed on real rows in this group: the 'English' field embeds Tamil proper nouns with (a)(b)(c)(d)/Latin instructions, while question_text_ta is a fully Tamil version using (அ)(ஆ)(இ)(ஈ) markers.",
+  "keep_id": "a35fb89d-fd50-4187-aa59-bc90cf5a31dd",
+  "rewrites": [
+   {
+    "id": "b533d698-550f-4395-8c05-6d14405771a9",
+    "question_text": "Match each festival name in List I with the state where it is celebrated in List II:\nList I\n(a) பிஹு\n(b) ஓணம்\n(c) கர்பா\n(d) துர்கா பூஜை\nList II\n1. கேரளா\n2. மேற்கு வங்காளம்\n3. குஜராத்\n4. அசாம்",
+    "question_text_ta": "பட்டியல் I-ல் உள்ள ஒவ்வொரு திருவிழாவையும் பட்டியல் II-ல் அது கொண்டாடப்படும் மாநிலத்துடன் பொருத்துக:\nபட்டியல் I\n(அ) பிஹு\n(ஆ) ஓணம்\n(இ) கர்பா\n(ஈ) துர்கா பூஜை\nபட்டியல் II\n1. கேரளா\n2. மேற்கு வங்காளம்\n3. குஜராத்\n4. அசாம்",
+    "option_a": "(a)-4, (b)-1, (c)-3, (d)-2",
+    "option_b": "(a)-1, (b)-4, (c)-3, (d)-2",
+    "option_c": "(a)-4, (b)-1, (c)-2, (d)-3",
+    "option_d": "(a)-3, (b)-1, (c)-4, (d)-2",
+    "option_a_ta": "(அ)-4, (ஆ)-1, (இ)-3, (ஈ)-2",
+    "option_b_ta": "(அ)-1, (ஆ)-4, (இ)-3, (ஈ)-2",
+    "option_c_ta": "(அ)-4, (ஆ)-1, (இ)-2, (ஈ)-3",
+    "option_d_ta": "(அ)-3, (ஆ)-1, (இ)-4, (ஈ)-2",
+    "correct_answer": "A",
+    "explanation": "Bihu is the major harvest/New Year festival of Assam; Onam is Kerala's principal harvest festival; Garba is danced during Navratri in Gujarat; Durga Puja is West Bengal's largest festival. Hence (a)-4, (b)-1, (c)-3, (d)-2.",
+    "explanation_ta": "பிஹு அசாமின் முதன்மை அறுவடை/புத்தாண்டுத் திருவிழா; ஓணம் கேரளாவின் முக்கிய அறுவடைத் திருவிழா; கர்பா குஜராத்தில் நவராத்திரியின்போது ஆடப்படும் நடனம்; துர்கா பூஜை மேற்கு வங்காளத்தின் மிகப்பெரிய திருவிழா. எனவே (அ)-4, (ஆ)-1, (இ)-3, (ஈ)-2."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "subject",
+  "sig": "articulation|consonant|அண்ணத்தின்|இருபக்கங்கள்|நடுப்பகுதியைத்|மேல்நோக்கி",
+  "classification": "true_duplicate",
+  "notes": "3 of the 4 consonants overlap between the two rows (ள், ழ், ண்) and, critically, each shared consonant's articulation description is worded identically in both rows — only ல் (row ac81fdc4) vs. ர் (row 0fa3163d) differs. This is highly specialised Tamil phonetics (எழுத்ததிகாரம்) content; given the risk of an inaccurate technical articulation claim, chose a safer, universally-verified Tamil-grammar fact for the rewrite instead of inventing a new phonetic description. Kept 0fa3163d (n_seen=3,n_ans=3, more history than the other row's 2/1). Rewrote ac81fdc4 into a different, 100%-verified Tamil letter-count fact (12 உயிர் + 18 மெய் + 216 உயிர்மெய் + 1 ஆய்தம் = 247), same subject=Tamil, topic=06th-Std.",
+  "keep_id": "0fa3163d-64d8-48cc-91b4-0d956d7c9ea7",
+  "rewrites": [
+   {
+    "id": "ac81fdc4-a4eb-4eae-b9c3-767d68ee5553",
+    "question_text": "Match List I (Category of Tamil letters) with List II (Number of letters) and select the correct code:\nList I\n(a) உயிர் எழுத்துகள்\n(b) மெய் எழுத்துகள்\n(c) உயிர்மெய் எழுத்துகள்\n(d) ஆய்த எழுத்து\nList II\n1. 18\n2. 216\n3. 12\n4. 1",
+    "question_text_ta": "பட்டியல் I (தமிழ் எழுத்துகளின் வகை) உடன் பட்டியல் II (எழுத்துகளின் எண்ணிக்கை) பொருத்தி சரியான குறியீட்டைத் தேர்ந்தெடுக்கவும்:\nபட்டியல் I\n(அ) உயிர் எழுத்துகள்\n(ஆ) மெய் எழுத்துகள்\n(இ) உயிர்மெய் எழுத்துகள்\n(ஈ) ஆய்த எழுத்து\nபட்டியல் II\n1. 18\n2. 216\n3. 12\n4. 1",
+    "option_a": "(a)-3, (b)-1, (c)-2, (d)-4",
+    "option_b": "(a)-1, (b)-3, (c)-2, (d)-4",
+    "option_c": "(a)-3, (b)-1, (c)-4, (d)-2",
+    "option_d": "(a)-2, (b)-1, (c)-3, (d)-4",
+    "option_a_ta": "(அ)-3, (ஆ)-1, (இ)-2, (ஈ)-4",
+    "option_b_ta": "(அ)-1, (ஆ)-3, (இ)-2, (ஈ)-4",
+    "option_c_ta": "(அ)-3, (ஆ)-1, (இ)-4, (ஈ)-2",
+    "option_d_ta": "(அ)-2, (ஆ)-1, (இ)-3, (ஈ)-4",
+    "correct_answer": "A",
+    "explanation": "Tamil has 247 letters in total: 12 உயிர் எழுத்துகள் (vowels), 18 மெய் எழுத்துகள் (consonants), 216 உயிர்மெய் எழுத்துகள் (vowel-consonant compounds, 12x18), and 1 ஆய்த எழுத்து (aytham). Hence (a)-3, (b)-1, (c)-2, (d)-4.",
+    "explanation_ta": "தமிழில் மொத்தம் 247 எழுத்துகள் உள்ளன: 12 உயிர் எழுத்துகள், 18 மெய் எழுத்துகள், 216 உயிர்மெய் எழுத்துகள் (12x18), மற்றும் 1 ஆய்த எழுத்து. எனவே (அ)-3, (ஆ)-1, (இ)-2, (ஈ)-4."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq",
+  "sig": "akila|examination|marks|maximum|score|scored",
+  "classification": "true_duplicate",
+  "notes": "Both rows have identical wording (same fictional name 'Akila', same numbers 80%/576) and both agree the correct maximum marks is 720 — no answer-key conflict. Both rows have external_id=null and expl_status='generated' (unlike the rest of the pyq/pyq2/pyq4 banks, which carry a traceable external_id per real exam paper), strongly indicating this is an auto-generated template duplicate rather than a genuine question asked in both the 2022 and 2025 Group 1 papers. Kept f548288f-b95e-4e83-89d7-a7215222c021 (year 2022). Rewrote 06477636-0d70-4211-9580-304670807023 (year 2025) into a different, computed-and-verified percentage word problem, same group_type=Group1, subject=Aptitude, topic=Percentage.",
+  "keep_id": "f548288f-b95e-4e83-89d7-a7215222c021",
+  "rewrites": [
+   {
+    "id": "06477636-0d70-4211-9580-304670807023",
+    "question_text": "Vishnu scored 65% of the maximum marks in an examination and obtained 390 marks. Find the maximum marks of the examination.",
+    "question_text_ta": "விஷ்ணு ஒரு தேர்வில் அதிகபட்ச மதிப்பெண்களில் 65% பெற்று 390 மதிப்பெண்கள் பெற்றார். அந்தத் தேர்வின் அதிகபட்ச மதிப்பெண்களைக் காண்க.",
+    "option_a": "580",
+    "option_b": "600",
+    "option_c": "620",
+    "option_d": "640",
+    "option_a_ta": "580",
+    "option_b_ta": "600",
+    "option_c_ta": "620",
+    "option_d_ta": "640",
+    "correct_answer": "B",
+    "explanation": "Maximum marks = (score x 100) / percentage = (390 x 100) / 65 = 39000 / 65 = 600. -> Option (B)",
+    "explanation_ta": "அதிகபட்ச மதிப்பெண் = (மதிப்பெண் x 100) / சதவீதம் = (390 x 100) / 65 = 39000 / 65 = 600. -> விடை (B)"
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq2",
+  "sig": "இரண்டைப்|ஒன்றுடன்|தொகுப்பிலிருந்து|பட்டியல்|பட்டியல்களுக்குக்|விடையினைத்",
+  "classification": "false_positive",
+  "notes": "The fuzzy signature matched purely on the generic Tamil 'match the following' instruction phrase, not on content. The 3 rows test 3 completely unrelated facts: a2d9b704 (year 2016) matches lines of a Tamil verse about penmai/womanhood's roles; 4b65f855 (year 2016) matches the vocabulary words கனகம்/மேழி/கலிங்கம்/ஆழி to their meanings; ebe7e303 (year 2015) matches a different vocabulary set சரதம்/சூளிகை/மகோததி/அவனி to their meanings. No overlap in tested facts between any pair. No action taken.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq2",
+  "sig": "அம்பேத்கர்|இலக்கணம்|உண்டாக்குவது|கமில்சுவலபில்|கூறியவர்|விருப்பத்தை",
+  "classification": "conflict",
+  "notes": "Same underlying quotation/scenario (praise that repeated engagement with Tamil grammar creates a growing desire to study it further), asked almost identically in 2 different years, but the two rows' generated explanations attribute the quote to two DIFFERENT people. Per instructions, not resolving or guessing — flagging for the team to verify against the actual 2017 and 2018 TNPSC question papers/official answer keys before any edit.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": "Row 60aaae09-b144-42a8-93df-a7ca691c70a7 (year 2017, external_id pyq2-ta-2017-TLANGHIST-46): question wording 'தமிழ் இலக்கணம் படிக்க படிக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்' (the more one STUDIES Tamil grammar...), correct_answer=B='கெல்லட்' (Kellett), and its explanation attributes the remark to the English scholar Kellett. Row a89b865a-ad92-4e35-9d36-d4c6d3f424fd (year 2018, external_id pyq2-ta-2018-TLANGHIST-46): near-identical wording 'தமிழ் இலக்கணம் பகுக்க பகுக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்' (the more one ANALYSES Tamil grammar...), also correct_answer=B, but its option B text is 'கேல்வெட்' and its explanation attributes the remark to Robert Caldwell (கால்டுவெல்) — a different historical figure entirely. Both rows have expl_status='generated' (AI-authored explanations), so neither explanation should be trusted as the verified source of truth; the underlying option-B name/correct-answer-letter pairing needs to be checked against the actual scanned 2017 and 2018 TNPSC Tamil papers before deciding whether these are two genuinely distinct historical questions (different years, different attributed scholars) or one row has a corrupted/hallucinated attribution."
+ },
+ {
+  "category": "pyq2",
+  "sig": "amount|amounts|increased|interest|simple|years",
+  "classification": "false_positive",
+  "notes": "Same simple-interest arithmetic (Rs.800 -> Rs.920 in 3 years, rate +3% -> Rs.992) and both rows agree on the correct numeric answer (992) — no conflict. However year (2013 vs 2016) and external_id genuinely differ, and short templated aptitude word-problems of this kind (round numbers, standard SI setup) are commonly recycled verbatim across different TNPSC exam years/papers. Per the instruction to check year/external_id before assuming an import error, treating this as a plausible legitimate historical repeat rather than a bank duplicate. No rewrite made to avoid altering genuine historical exam content without stronger evidence of a data error.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq2",
+  "sig": "amount|annum|compound|interest|years",
+  "classification": "false_positive",
+  "notes": "Different questions: 7540bc6f asks to find the TIME (years) given principal/amount/rate (1600 -> 1852.20 at 5%, answer 3 years); 44a30bc5 asks to find the RATE given principal/amount/time (640 -> 774.40 in 2 years, answer 10%). Different numbers, different unknowns solved for — only share generic compound-interest vocabulary. No action taken.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq4",
+  "sig": "authority|commission|conducts|election|elections|observers",
+  "classification": "false_positive",
+  "notes": "Same fact (State Election Commission conducts local body elections under Articles 243K/243ZA) and both rows agree on the correct answer — no conflict. Year (2011 vs 2014) and external_id genuinely differ. 'Which authority conducts local body elections' is a well-known recurring static-GK civics question in TNPSC objective papers across many years/groups, so this reads as a plausible legitimate historical repeat rather than a bank-loading duplicate. No rewrite made.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "pyq4",
+  "sig": "அகவற்பாக்களால்|ஐங்குறுநூறு|குறுந்தொகை|சிற்றெல்லையும்|பேரெல்லையும்|மூன்றடிச்",
+  "classification": "false_positive",
+  "notes": "Question wording is character-for-character identical in both rows ('மூன்றடிச் சிற்றெல்லையும் ஆறடிப் பேரெல்லையும் கொண்ட அகவற்பாக்களால் ஆன நூல் எது?'), and both agree on the correct answer (ஐங்குறுநூறு) — no conflict. Year (2019 vs 2022) and external_id genuinely differ. This is a well-established, distinctively-phrased 'static fact' about Sangam-literature classification (line-count ranges of the எட்டுத்தொகை texts) that is commonly reused verbatim across different TNPSC Group 4 exam years, so treating this as a plausible legitimate historical repeat rather than a data error. No rewrite made.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ }
+]

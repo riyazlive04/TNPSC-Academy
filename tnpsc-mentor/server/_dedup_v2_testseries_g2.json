@@ -1,0 +1,131 @@
+[
+ {
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "rows": [
+   {
+    "id": "37878554-8d3f-48b5-81a1-6a08366befbe",
+    "question_text": "Find the compound interest on Rs. 12,000 for 2 years at 10% per annum, compounded annually.",
+    "option_a": "Rs. 1,200",
+    "option_b": "Rs. 2,520",
+    "option_c": "Rs. 2,400",
+    "option_d": "Rs. 14,520"
+   },
+   {
+    "id": "27946226-b276-4490-acdd-ebf7c6ef6aba",
+    "question_text": "Find the compound interest on Rs. 6,000 for 2 years at 20% per annum, compounded annually.",
+    "option_a": "Rs. 1,200",
+    "option_b": "Rs. 2,400",
+    "option_c": "Rs. 2,640",
+    "option_d": "Rs. 8,640"
+   },
+   {
+    "id": "316f6656-58e5-479e-b89c-74aaed16afe0",
+    "question_text": "Find the compound interest on Rs. 20,000 for 3 years at 5% per annum, compounded annually.",
+    "option_a": "Rs. 3,000",
+    "option_b": "Rs. 2,050",
+    "option_c": "Rs. 23,152.50",
+    "option_d": "Rs. 3,152.50"
+   },
+   {
+    "id": "7c38ef7f-2698-4244-9c04-06601b64ce20",
+    "question_text": "Find the compound interest on Rs. 10,000 for 2 years at 10% per annum, compounded annually.",
+    "option_a": "Rs. 2,100",
+    "option_b": "Rs. 2,000",
+    "option_c": "Rs. 2,200",
+    "option_d": "Rs. 2,500"
+   },
+   {
+    "id": "192aef13-ccf7-4015-994e-c4dc9fbdc591",
+    "question_text": "Find the compound interest on Rs. 8,000 for 2 years at 5% per annum, compounded annually.",
+    "option_a": "Rs. 820",
+    "option_b": "Rs. 800",
+    "option_c": "Rs. 840",
+    "option_d": "Rs. 900"
+   }
+  ]
+ },
+ {
+  "sig": "annually|between|compound|compounded|difference|interest",
+  "rows": [
+   {
+    "id": "44de4098-0e6d-48bc-a205-4ef6af04cea6",
+    "question_text": "Find the difference between the compound interest and simple interest on Rs. 10,000 for 3 years at 10% per annum, compounded annually.",
+    "option_a": "Rs. 310",
+    "option_b": "Rs. 100",
+    "option_c": "Rs. 3,000",
+    "option_d": "Rs. 3,310"
+   },
+   {
+    "id": "6205fb7b-cffb-45c7-ae99-6a87cc25e4b5",
+    "question_text": "Find the difference between the compound interest and simple interest on Rs. 25,000 for 2 years at 8% per annum, compounded annually.",
+    "option_a": "Rs. 80",
+    "option_b": "Rs. 160",
+    "option_c": "Rs. 4,000",
+    "option_d": "Rs. 4,160"
+   }
+  ]
+ },
+ {
+  "sig": "annum|compound|compounded|interest|months|quarterly",
+  "rows": [
+   {
+    "id": "36c35291-d7d5-4f09-9895-1e7948881364",
+    "question_text": "Find the compound interest on Rs. 40,000 for 9 months at 20% per annum, compounded quarterly.",
+    "option_a": "Rs. 4,100",
+    "option_b": "Rs. 5,860",
+    "option_c": "Rs. 6,305",
+    "option_d": "Rs. 6,000"
+   },
+   {
+    "id": "5ee85c1c-22b6-4d8a-9a7d-e2bea8561797",
+    "question_text": "Find the compound interest on Rs. 10,000 for 6 months at 8% per annum, compounded quarterly.",
+    "option_a": "Rs. 404",
+    "option_b": "Rs. 400",
+    "option_c": "Rs. 392",
+    "option_d": "Rs. 800"
+   }
+  ]
+ },
+ {
+  "sig": "between|compound|difference|interest|simple|years",
+  "rows": [
+   {
+    "id": "ad60c315-02d6-49ef-a048-bf894415a485",
+    "question_text": "The difference between compound interest and simple interest on a sum for 2 years at 6% per annum is Rs. 180. Find the sum.",
+    "option_a": "Rs. 16,340",
+    "option_b": "Rs. 3,000",
+    "option_c": "Rs. 30,000",
+    "option_d": "Rs. 50,000"
+   },
+   {
+    "id": "ec7ab32e-a65f-4c9b-9ea7-5bb9ecb5bf4c",
+    "question_text": "The difference between compound interest and simple interest on a sum for 3 years at 5% per annum is Rs. 183. Find the sum.",
+    "option_a": "Rs. 73,200",
+    "option_b": "Rs. 24,400",
+    "option_c": "Rs. 24,000",
+    "option_d": "Rs. 18,300"
+   }
+  ]
+ },
+ {
+  "sig": "faces|number|numbered|opposite|position|positions",
+  "rows": [
+   {
+    "id": "088159c1-33e6-478a-9227-9af5562ceddc",
+    "question_text": "Two positions of the same dice (with faces numbered 1 to 6) are shown below:\nPosition 1: 1 is on top, 2 is in front, 3 is on the right side.\nPosition 2: 1 is on top, 4 is in front, 5 is on the right side.\nWhich number is on the face opposite to 1?",
+    "option_a": "2",
+    "option_b": "3",
+    "option_c": "6",
+    "option_d": "4"
+   },
+   {
+    "id": "2a78d7e6-0298-4ea4-875f-6adc3aef0000",
+    "question_text": "Three positions of the same dice (with faces numbered 1 to 6) are shown below:\nPosition 1: 2 is on top, 3 is in front, 4 is on the right.\nPosition 2: 2 is on top, 5 is in front, 6 is on the right.\nPosition 3: 2 is on top, 6 is in front, 3 is on the right.\nWhich number lies opposite to the number 2?",
+    "option_a": "6",
+    "option_b": "5",
+    "option_c": "3",
+    "option_d": "1"
+   }
+  ]
+ }
+]

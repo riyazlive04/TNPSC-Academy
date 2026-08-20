@@ -10,7 +10,9 @@ router.get(
   '/ids',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { data, error } = await req.db!.from('bookmarks').select('question_id')
+    // Defensive cap — a normal account has a handful to a few hundred bookmarks,
+    // never unbounded.
+    const { data, error } = await req.db!.from('bookmarks').select('question_id').limit(500)
     if (error) return sendDbError(res, error)
     res.json({ ids: (data ?? []).map((r: { question_id: string }) => r.question_id) })
   })

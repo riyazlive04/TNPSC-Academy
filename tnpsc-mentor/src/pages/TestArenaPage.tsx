@@ -1,4 +1,4 @@
-import { cloneElement, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { motion, useReducedMotion } from 'motion/react'
 import {
@@ -6,17 +6,16 @@ import {
   Newspaper,
   Calculator,
   ShieldCheck,
-  RefreshCw,
   Flame,
   ChevronRight,
   Layers,
   Activity,
-  BarChart3,
   ScrollText,
   CalendarDays,
-  Trophy,
   Sparkles,
-  ListChecks,
+  RefreshCw,
+  BarChart3,
+  Trophy,
 } from 'lucide-react'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
@@ -30,10 +29,13 @@ import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
 import CaMagazineCarousel from '../components/Home/CaMagazineCarousel'
 import DailyCaSheet from '../components/Home/DailyCaSheet'
+import CurrentAffairsHubSheet from '../components/Home/CurrentAffairsHubSheet'
 import { List, ListRow } from '../components/UI/ListRow'
+import { CardGrid, GridCard } from '../components/UI/CardRow'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
+import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import { starterTestConfig } from '../lib/starterTest'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -49,7 +51,7 @@ import PushNudge from '../components/PushNudge'
 import RewardOverlay from '../components/RewardOverlay'
 import { toast } from '../store/toastStore'
 import { tapScaleSubtle } from '../lib/motion'
-import { iconUrl } from '../lib/subjectIcons'
+import { api } from '../lib/api'
 import type { GroupType } from '../types'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -58,21 +60,21 @@ interface ArenaCard {
   titleKey: StringKey
   subtitle: string
   icon: React.ReactNode
-  /** PNG illustration (public/subject-icons) shown in place of the Lucide glyph. */
-  iconSrc?: string
   tint: Tint
 }
 
-// Each category carries a tint for its in-row IconTile (design-system.md §1) -
-// a small tinted square, never a large category card. The first entry (Mock) is
-// promoted to the single gradient hero; the rest render as a hairline list.
+// Each category carries a tint for its IconTile (design-system.md §1). The
+// first entry (Mock) is promoted to the single gradient hero; the rest render
+// as cards. Every row uses the same icon idiom - a white Lucide glyph on a
+// gradient tile - rather than mixing in the commissioned PNG illustrations
+// used elsewhere (subject/topic pickers): on a dense set of small tiles the
+// two styles read as two different apps stitched together.
 const CARDS: ArenaCard[] = [
   {
     to: '/mock',
     titleKey: 'mockTests',
     subtitle: 'Group exam · subject · timed',
     icon: <ShieldCheck size={20} />,
-    iconSrc: iconUrl('mock-test'),
     tint: 'coral',
   },
   {
@@ -80,7 +82,6 @@ const CARDS: ArenaCard[] = [
     titleKey: 'subjectPracticeTitle',
     subtitle: 'Subject · topic · question type',
     icon: <Layers size={19} />,
-    iconSrc: iconUrl('general-studies'),
     tint: 'violet',
   },
   {
@@ -88,7 +89,6 @@ const CARDS: ArenaCard[] = [
     titleKey: 'pyqTitle',
     subtitle: 'Group 1 · Group 2 / 2A · Group 4',
     icon: <BookOpen size={19} />,
-    iconSrc: iconUrl('pyq-group-1'),
     tint: 'blue',
   },
   {
@@ -96,7 +96,6 @@ const CARDS: ArenaCard[] = [
     titleKey: 'currentAffairsTitle',
     subtitle: 'Month & topic wise',
     icon: <Newspaper size={19} />,
-    iconSrc: iconUrl('current-affairs-hub'),
     tint: 'green',
   },
   {
@@ -104,7 +103,6 @@ const CARDS: ArenaCard[] = [
     titleKey: 'aptitudeTitle',
     subtitle: 'Numerics · Reasoning',
     icon: <Calculator size={19} />,
-    iconSrc: iconUrl('aptitude'),
     tint: 'coral',
   },
 ]
@@ -113,23 +111,18 @@ const CARDS: ArenaCard[] = [
 // categories - the Mock Test entry (a student exam mode, not a bank) is excluded.
 const BANK_CARDS = CARDS.filter((c) => c.to.startsWith('/test-arena'))
 
-// Gradient stops per tint for the dashboard category cards. Each pairs two real
-// theme colours (br direction) so the icon tile reads as a designed, dimensional
-// chip rather than a flat pastel square. White glyph sits on top.
-const GRADIENTS: Record<Tint, string> = {
-  violet: 'from-brand to-brand-deep',
-  coral: 'from-accentwarm to-coral',
-  blue: 'from-sky to-brand',
-  green: 'from-mint to-sky',
+// Live bank sizes, fetched once for the dashboard's practice cards (§ below).
+// Keyed by the same ArenaCard.to so a card can look its own count up directly.
+const COUNT_KEY: Record<string, 'subject' | 'pyq' | 'aptitude'> = {
+  '/test-arena/subjects': 'subject',
+  '/test-arena/pyq': 'pyq',
+  '/test-arena/aptitude': 'aptitude',
 }
 
-// Soft pastel tile behind a PNG illustration (the artwork carries its own colour,
-// so it sits on a light tint rather than the brand gradient used for glyphs).
-const SOFT_TINT: Record<Tint, string> = {
-  violet: 'bg-tint-violet',
-  coral: 'bg-tint-coral',
-  blue: 'bg-tint-blue',
-  green: 'bg-tint-green',
+/** Prefixes a live "N questions · " count onto a card's structural subtitle
+ *  once it has loaded; falls back to the bare structural copy until then. */
+function withCount(n: number | undefined, suffix: string, questionsWord: string): string {
+  return n != null ? `${n} ${questionsWord} · ${suffix}` : suffix
 }
 
 export default function TestArenaPage() {
@@ -137,6 +130,7 @@ export default function TestArenaPage() {
   const startTest = useStartTest()
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const testSeriesOn = useTestSeriesEnabled()
+  const rankBoosterOn = useRankBoosterEnabled()
   const vettriOn = useVettriEnabled()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
@@ -145,6 +139,10 @@ export default function TestArenaPage() {
   const [dailyKural, setDailyKural] = useState<Kural | null>(null)
   // The Daily CA card opens its day picker as a popup rather than a screen.
   const [dailyCaOpen, setDailyCaOpen] = useState(false)
+  // The consolidated Current Affairs card opens a picker over its three entry
+  // points (Daily CA Test, month/topic practice, CA Questions) instead of each
+  // getting its own dashboard card.
+  const [caHubOpen, setCaHubOpen] = useState(false)
 
   // First-run sequence - shown ONLY to a freshly created account (signup arms
   // both flags; existing users never had them, admins skip the aspirant layer).
@@ -203,6 +201,41 @@ export default function TestArenaPage() {
       cancelled = true
     }
   }, [user, isAdmin, profile?.daily_goal, profile?.exam_date, t])
+
+  // Live bank sizes for the practice cards' subtitles (§ CARDS/withCount) -
+  // purely decorative enrichment, so a failure here just leaves the structural
+  // subtitles in place rather than surfacing an error.
+  const [counts, setCounts] = useState<{ subject?: number; pyq?: number; aptitude?: number; current_affairs?: number }>(
+    {}
+  )
+  useEffect(() => {
+    if (isAdmin) return
+    let cancelled = false
+    // allSettled, not all: one slow/failed category shouldn't blank out the
+    // other five cards' counts too.
+    Promise.allSettled([
+      api.countQuestions({ category: 'subject' }),
+      api.countQuestions({ category: 'pyq' }),
+      api.countQuestions({ category: 'pyq2' }),
+      api.countQuestions({ category: 'pyq4' }),
+      api.countQuestions({ category: 'aptitude' }),
+      api.countQuestions({ category: 'current_affairs' }),
+    ]).then((results) => {
+      if (cancelled) return
+      const [subject, pyq, pyq2, pyq4, aptitude, current_affairs] = results.map((r) =>
+        r.status === 'fulfilled' ? r.value : undefined
+      )
+      setCounts({
+        subject,
+        pyq: pyq != null || pyq2 != null || pyq4 != null ? (pyq ?? 0) + (pyq2 ?? 0) + (pyq4 ?? 0) : undefined,
+        aptitude,
+        current_affairs,
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [isAdmin])
 
   const firstName = profile?.full_name?.split(' ')[0]
   const lvl = levelInfo(
@@ -294,15 +327,15 @@ export default function TestArenaPage() {
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
         {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
         <header className="px-1">
-          <p className="tamil font-body text-[13px] text-muted">{t(greetingKey())}</p>
+          <p className="tamil font-body text-sm text-muted">{t(greetingKey())}</p>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="font-display text-[28px] font-bold leading-tight tracking-tight text-ink">
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink">
               {firstName || 'Aspirant'}
             </h1>
             {showStreak && (
-              <span className="inline-flex items-center gap-1 font-display text-[15px] font-semibold text-accent">
+              <span className="inline-flex items-center gap-1 font-display text-base font-semibold text-accent">
                 <Flame size={15} /> {habit!.currentStreak}
-                <span className="tamil font-body text-[13px] font-normal text-muted">
+                <span className="tamil font-body text-sm font-normal text-muted">
                   {t('dayStreak')}
                 </span>
               </span>
@@ -318,7 +351,7 @@ export default function TestArenaPage() {
               onClick={() => setThirukuralOpen(true)}
               className="focus-ring group mt-4 block w-full rounded-card border border-line bg-tint-violet/40 p-4 text-left transition-colors hover:bg-tint-violet/60"
             >
-              <span className="flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+              <span className="flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
                 <ScrollText size={13} />
                 <span className="tamil">{t('kuralOfTheDay')}</span>
                 <ChevronRight
@@ -336,12 +369,12 @@ export default function TestArenaPage() {
                 max={17}
               />
               {lang === 'ta' ? (
-                <p className="mt-1 font-body text-[12px] italic leading-relaxed text-muted sm:text-[13px]">
+                <p className="mt-1 font-body text-xs italic leading-relaxed text-muted sm:text-sm">
                   {dailyKural.transliteration}
                 </p>
               ) : (
                 // English meaning as a two-line couplet, mirroring the Tamil.
-                <p className="mt-1.5 font-body text-[12px] not-italic leading-relaxed text-muted sm:text-[13px]">
+                <p className="mt-1.5 font-body text-xs not-italic leading-relaxed text-muted sm:text-sm">
                   {splitCoupletEn(dailyKural.translation_en).map((line, i) => (
                     <span key={i} className="block">
                       {line}
@@ -365,7 +398,7 @@ export default function TestArenaPage() {
             exactly one obvious next action: the Starter Challenge. */}
         {showFirstTestHero && (
           <section className="rounded-card border border-primary/30 bg-tint-violet/50 p-5">
-            <span className="inline-flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+            <span className="inline-flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
               <Sparkles size={13} />
               <span className="tamil">{t('firstTestBadge')}</span>
             </span>
@@ -381,6 +414,12 @@ export default function TestArenaPage() {
           </section>
         )}
 
+        {/* Test Marathon + Rank Booster discovery banners removed from the
+            dashboard - they were competing with the main Hero/practice list for
+            attention right up front. Both products stay discoverable via the
+            Vettri Nichayam / Test Marathon cards in the Practice list below,
+            plus the plans nudge on the Profile page. */}
+
         {/* One-time web-push opt-in nudge (browsers only — the Android WebView
             has no Push API so it never renders there). Held back while the
             first-run sequence (starter-test prompt / guided tour) is active. */}
@@ -391,7 +430,6 @@ export default function TestArenaPage() {
         <div data-tour="mock">
           <Hero
             icon={featured.icon}
-            iconSrc={featured.iconSrc}
             title={t(featured.titleKey)}
             subtitle={featured.subtitle}
             cta={t('start')}
@@ -399,121 +437,123 @@ export default function TestArenaPage() {
           />
         </div>
 
-        {/* Practice - a two-column grid of tactile category cards. */}
-        <section className="space-y-3" data-tour="practice">
+        {/* Practice - a two-column grid of icon-top cards (GridCard), matching
+            the app's original card language rather than a wide-row "tile".
+            Every card uses the same white-glyph-on-gradient IconTile - one icon
+            idiom instead of mixing in the PNG illustrations used on the
+            subject/topic pickers. */}
+        <section className="space-y-2" data-tour="practice">
           <SectionHeader title={t('practice')} className="px-1" />
-          <div className="grid grid-cols-2 gap-3">
-            {/* Daily CA test - leads the grid: it's the one card that changes
-                every morning, and it pairs with the magazine strip above. Opens
-                its day picker as a popup instead of routing away. */}
-            {/* Deliberately a glyph chip, not a PNG: the CA hub and CA Questions
-                cards both carry the newspaper artwork, and a third would be
-                indistinguishable at a glance. */}
-            <CategoryCard
-              onClick={() => setDailyCaOpen(true)}
-              icon={<ListChecks />}
+          <CardGrid>
+            {/* Current Affairs - leads the section: it's the one card that
+                changes every morning, and it pairs with the magazine strip
+                above. This single card replaces what used to be three separate
+                cards (Daily CA Test / Current Affairs / CA Questions) - the
+                picker sheet keeps all three actions, just no longer competing
+                for a slot each on the dashboard. */}
+            <GridCard
+              onClick={() => setCaHubOpen(true)}
+              style={{ '--i': 0 } as React.CSSProperties}
+              icon={<Newspaper size={20} />}
               tint="green"
-              gradient={GRADIENTS.green}
-              title={t('caDailyTitle')}
-              subtitle={t('caDailyCardSub')}
-              index={0}
+              title={t('currentAffairsTitle')}
+              subtitle={t('currentAffairsHubSub')}
             />
-            {/* Vettri Nichayam bundle - gold to signal the flagship paid product. */}
+            {/* Vettri Nichayam bundle. */}
             {vettriOn && (
-              <CategoryCard
+              <GridCard
                 onClick={() => navigate('/vettri')}
-                icon={<Trophy />}
-                iconSrc={iconUrl('vettri')}
+                style={{ '--i': 1 } as React.CSSProperties}
+                icon={<Trophy size={20} />}
                 tint="coral"
-                gradient="from-gold to-accentwarm"
                 title={t('vettriTitle')}
                 subtitle={t('vettriArenaSub')}
-                index={1}
               />
             )}
-            {/* Test Marathon - only once the superadmin has enabled it. */}
-            {testSeriesOn && (
-              <CategoryCard
+            {/* Test Marathon - the scheduled test-series hub (Vettri Nichayam +
+                Rank Booster tabs inside). Shows once EITHER product is
+                enabled, so the card is never a dead end. */}
+            {(testSeriesOn || rankBoosterOn) && (
+              <GridCard
                 onClick={() => navigate('/test-series')}
-                icon={<CalendarDays />}
-                gradient={GRADIENTS.coral}
+                style={{ '--i': 2 } as React.CSSProperties}
+                icon={<CalendarDays size={20} />}
+                tint="coral"
                 title={t('testSeriesTitle')}
                 subtitle={t('testSeriesArenaSub')}
-                index={2}
               />
             )}
-            {restCards.map((card, i) => (
-              <CategoryCard
-                key={card.to}
-                onClick={() => navigate(card.to)}
-                icon={card.icon}
-                iconSrc={card.iconSrc}
-                tint={card.tint}
-                gradient={GRADIENTS[card.tint]}
-                title={t(card.titleKey)}
-                subtitle={card.subtitle}
-                index={i + 3}
-              />
-            ))}
-            {/* CA Questions - superadmin-published daily/monthly sets, each a
-                one-tap PDF download with answers + explanations. */}
-            <CategoryCard
-              onClick={() => navigate('/test-arena/ca-questions')}
-              icon={<ListChecks />}
-              iconSrc={iconUrl('ca-questions')}
-              tint="blue"
-              gradient={GRADIENTS.blue}
-              title={t('caQuestionsTitle')}
-              subtitle={t('caQuestionsArenaSub')}
-              index={restCards.length + 3}
-            />
+            {restCards
+              .filter((card) => card.to !== '/test-arena/current-affairs')
+              .map((card, i) => (
+                <GridCard
+                  key={card.to}
+                  onClick={() => navigate(card.to)}
+                  style={{ '--i': i + 3 } as React.CSSProperties}
+                  icon={card.icon}
+                  tint={card.tint}
+                  title={t(card.titleKey)}
+                  subtitle={withCount(counts[COUNT_KEY[card.to]], card.subtitle, t('questionsCount'))}
+                  badge={
+                    card.to === '/test-arena/subjects' && stats ? (
+                      <span className="rounded-full bg-tint-violet px-2 py-0.5 font-heading text-2xs font-bold tabular-nums text-primary">
+                        {stats.subjects}/{stats.totalSubjects}
+                      </span>
+                    ) : undefined
+                  }
+                />
+              ))}
             {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
-            <CategoryCard
+            <GridCard
               onClick={() => navigate('/test-arena/thirukural')}
-              icon={<ScrollText />}
-              iconSrc={iconUrl('thirukkural')}
+              style={{ '--i': restCards.length + 2 } as React.CSSProperties}
+              icon={<ScrollText size={20} />}
               tint="green"
-              gradient={GRADIENTS.green}
               title={t('tkQuizTitle')}
               subtitle={t('tkQuizSub')}
-              index={restCards.length + 4}
             />
-          </div>
+          </CardGrid>
         </section>
 
         {/* Payment banner - deliberately NOT permanent. It appears only when the
             credit balance actually blocks practice: a quiet strip while running
             low, the full Vettri + Premium cards once the balance hits zero.
-            Plans stay discoverable meanwhile via the Vettri tile above and the
+            Plans stay discoverable meanwhile via the Vettri card above and the
             Profile screen. */}
         <CreditWall />
 
         {/* Keep going - study-loop quick links, matching the practice cards. */}
-        <section className="space-y-3" data-tour="progress">
+        <section className="space-y-2" data-tour="progress">
           <SectionHeader title={t('keepGoingShort')} className="px-1" />
-          <div className="grid grid-cols-2 gap-3">
-            <CategoryCard
+          <CardGrid>
+            <GridCard
               onClick={() => navigate('/revision')}
-              icon={<RefreshCw />}
-              iconSrc={iconUrl('revision')}
+              icon={<RefreshCw size={20} />}
               tint="violet"
-              gradient={GRADIENTS.violet}
               title={t('revision')}
             />
-            <CategoryCard
+            <GridCard
               onClick={() => navigate('/insights')}
-              icon={<BarChart3 />}
-              iconSrc={iconUrl('insights')}
+              style={{ '--i': 1 } as React.CSSProperties}
+              icon={<BarChart3 size={20} />}
               tint="blue"
-              gradient={GRADIENTS.blue}
               title={t('insights')}
             />
-          </div>
+          </CardGrid>
         </section>
       </div>
 
       {/* The Daily CA day picker - today's paper + every earlier published day. */}
       <DailyCaSheet open={dailyCaOpen} onClose={() => setDailyCaOpen(false)} />
+
+      {/* The consolidated Current Affairs picker - Daily CA Test / month & topic
+          practice / CA Questions, opened from the single dashboard card above. */}
+      <CurrentAffairsHubSheet
+        open={caHubOpen}
+        onClose={() => setCaHubOpen(false)}
+        onOpenDaily={() => setDailyCaOpen(true)}
+        topicPracticeCount={counts.current_affairs}
+      />
 
       <ThirukuralModal
         open={thirukuralOpen}
@@ -571,79 +611,17 @@ export default function TestArenaPage() {
   )
 }
 
-/** A dashboard category as a clean, compact card: a gradient icon chip, title +
- * optional (clamped) subtitle. Presses via motion; lifts subtly on hover. */
-function CategoryCard({
-  onClick,
-  icon,
-  iconSrc,
-  tint = 'violet',
-  gradient,
-  title,
-  subtitle,
-  index = 0,
-}: {
-  onClick: () => void
-  icon: React.ReactNode
-  /** PNG illustration; when set it replaces the Lucide glyph + gradient chip. */
-  iconSrc?: string
-  tint?: Tint
-  /** Tailwind gradient stops, e.g. 'from-brand to-brand-deep'. */
-  gradient: string
-  title: string
-  subtitle?: string
-  index?: number
-}) {
-  const glyph = icon as ReactElement<{ size?: number }>
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      style={{ '--i': index } as React.CSSProperties}
-      className="stagger-item group focus-ring flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-transform duration-200 hover:-translate-y-0.5"
-      {...tapScaleSubtle}
-    >
-      {iconSrc ? (
-        <span
-          className={`grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-xl p-1 ${SOFT_TINT[tint]}`}
-        >
-          <img src={iconSrc} alt="" className="h-full w-full object-contain" loading="lazy" />
-        </span>
-      ) : (
-        <span
-          className={`grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-sm`}
-        >
-          {cloneElement(glyph, { size: 20 })}
-        </span>
-      )}
-      <span className="min-w-0">
-        <span className="tamil block font-heading text-sm font-semibold leading-tight text-ink">
-          {title}
-        </span>
-        {subtitle && (
-          <span className="tamil mt-0.5 line-clamp-2 block font-body text-[11.5px] leading-snug text-muted">
-            {subtitle}
-          </span>
-        )}
-      </span>
-    </motion.button>
-  )
-}
-
 /** The single gradient hero - the only elevated/shadowed element on a screen
  * (design-system.md elevation budget). Full-bleed brand gradient, dotted
  * overlay, white "Start" pill. Tactile press via motion. */
 function Hero({
   icon,
-  iconSrc,
   title,
   subtitle,
   cta,
   onClick,
 }: {
   icon: React.ReactNode
-  /** PNG illustration; sits on a solid white tile so it reads on the gradient. */
-  iconSrc?: string
   title: string
   subtitle: string
   cta: string
@@ -660,15 +638,9 @@ function Hero({
         className="pointer-events-none absolute inset-0 bg-hero-grid opacity-60"
         style={{ backgroundSize: '18px 18px' }}
       />
-      {iconSrc ? (
-        <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center overflow-hidden rounded-tile bg-white/90 p-1 ring-1 ring-white/30">
-          <img src={iconSrc} alt="" className="h-full w-full object-contain" />
-        </span>
-      ) : (
-        <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
-          {icon}
-        </span>
-      )}
+      <span className="relative grid h-12 w-12 flex-shrink-0 place-items-center rounded-tile bg-white/15 text-white ring-1 ring-white/20">
+        {icon}
+      </span>
       <span className="relative min-w-0 flex-1">
         <span className="tamil block font-display text-lg font-semibold tracking-tight text-white">
           {title}
@@ -713,13 +685,13 @@ function AdminDashboard({
       <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
         {/* Admin greeting - bare, role-aware, no gamification, no gradient panel. */}
         <header className="px-1">
-          <span className="inline-flex items-center gap-1.5 font-display text-[13px] font-bold uppercase tracking-wide text-accent">
+          <span className="inline-flex items-center gap-1.5 font-display text-sm font-bold uppercase tracking-wide text-accent">
             <ShieldCheck size={14} /> {isSuperAdmin ? t('superadmin') : t('admin')}
           </span>
-          <h1 className="mt-1.5 font-display text-[28px] font-bold leading-tight tracking-tight text-ink">
+          <h1 className="mt-1.5 font-display text-3xl font-bold leading-tight tracking-tight text-ink">
             {name || (isSuperAdmin ? 'Super Admin' : 'Admin')}
           </h1>
-          <p className="mt-1 font-body text-[15px] text-muted">{t('adminHomeSub')}</p>
+          <p className="mt-1 font-body text-base text-muted">{t('adminHomeSub')}</p>
         </header>
 
         {/* Superadmin-only: the platform console is the primary action → hero. */}
@@ -736,7 +708,7 @@ function AdminDashboard({
         {/* Question bank management - a list, not a card grid. */}
         <section className="space-y-2">
           <SectionHeader title={t('manageBank')} className="px-1" />
-          <p className="px-1 font-body text-[13px] text-muted">{t('pickCategoryAdmin')}</p>
+          <p className="px-1 font-body text-sm text-muted">{t('pickCategoryAdmin')}</p>
           <List>
             {BANK_CARDS.map((card, i) => (
               <ListRow

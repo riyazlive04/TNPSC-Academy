@@ -29,7 +29,7 @@ export default function MessagesIcon() {
       {unread > 0 && (
         <span
           aria-hidden="true"
-          className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-[10px] font-bold text-white"
+          className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white"
         >
           {unread > 9 ? '9+' : unread}
         </span>

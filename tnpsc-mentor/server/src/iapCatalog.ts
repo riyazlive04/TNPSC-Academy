@@ -18,7 +18,7 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
   {
     plan: 'premium_annual',
     productId: 'com.tnpscmentor.app.premium90',
-    label: 'TNPSC Mentors Premium - 3 months',
+    label: 'TNPSC Mentors Premium - 6 months',
   },
   {
     plan: 'vettri_nichayam',
@@ -29,6 +29,16 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
     plan: 'vettri_month',
     productId: 'com.tnpscmentor.app.vettri30',
     label: 'Vettri Nichayam - 1 month',
+  },
+  {
+    plan: 'rank_booster_g2',
+    productId: 'com.tnpscmentor.app.rankbooster90',
+    label: 'Group II/ IIA- Rank Booster - 90 days',
+  },
+  {
+    plan: 'group1_mock_pack',
+    productId: 'com.tnpscmentor.app.mockpack80',
+    label: 'Group 1 Mock Test Pack - 80 days',
   },
 ] as const
 

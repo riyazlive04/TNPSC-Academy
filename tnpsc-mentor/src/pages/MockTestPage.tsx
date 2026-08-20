@@ -91,10 +91,10 @@ export default function MockTestPage() {
         </button>
 
         <header className="mb-6 mt-4">
-          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+          <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
             {t('mockTests')}
           </h1>
-          <p className="tamil mt-1 font-body text-[15px] text-muted">{t('fullLength')}</p>
+          <p className="tamil mt-1 font-body text-base text-muted">{t('fullLength')}</p>
         </header>
 
         {/* Tab switch - segmented control (only when more than one section shows) */}
@@ -382,7 +382,7 @@ function SubjectExamTab() {
                 onChange={(e) => setMinutes(Number(e.target.value))}
                 className="h-2 w-full cursor-pointer accent-brand"
               />
-              <div className="mt-1 flex justify-between font-body text-[10px] text-ink2">
+              <div className="mt-1 flex justify-between font-body text-2xs text-ink2">
                 <span>
                   {T_MIN} {t('minutesUnit')}
                 </span>
@@ -480,7 +480,7 @@ function FullMockExamTab() {
                         {title}
                       </h3>
                       {e.locked && (
-                        <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-[11px] font-semibold text-accentwarm">
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-2xs font-semibold text-accentwarm">
                           <Lock size={11} /> {t('premiumOnly')}
                         </span>
                       )}
@@ -492,7 +492,7 @@ function FullMockExamTab() {
                       <Tag>
                         <Clock size={12} /> {minutes} {t('minutesUnit')}
                       </Tag>
-                      <span className="inline-flex items-center gap-1 font-body text-[11px] text-ink2">
+                      <span className="inline-flex items-center gap-1 font-body text-2xs text-ink2">
                         {exhausted ? (
                           <>
                             <CheckCircle2 size={12} className="text-correct" /> {t('examCompleted')}
@@ -541,7 +541,7 @@ function cap(s: string): string {
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-[11px] font-medium uppercase tracking-wide text-ink2">
+    <span className="inline-flex items-center gap-1 rounded-md bg-tint px-2.5 py-1 font-heading text-2xs font-medium uppercase tracking-wide text-ink2">
       {children}
     </span>
   )

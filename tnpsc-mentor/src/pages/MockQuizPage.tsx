@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Flag, Grid3x3, GripVertical, Loader2, Maximize2, X } from 'lucide-react'
 import QuestionStem from '../components/Quiz/QuestionStem'
@@ -19,7 +19,7 @@ import { useMockQuizStore } from '../store/mockQuizStore'
 import { useCreditsStore } from '../store/creditsStore'
 import { upsell } from '../store/upsellStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
-import { useT } from '../lib/i18n'
+import { useT, translate } from '../lib/i18n'
 import { hapticSelect } from '../lib/haptics'
 import { optionLetters, displayOption } from '../types'
 import type { AnswerLetter, DisplayLang, Question, QuizConfig, TestAnswer } from '../types'
@@ -158,7 +158,7 @@ export default function MockQuizPage() {
       try {
         const qs =
           config.mockKind === 'series'
-            ? await api.testSeriesQuestions(config.seriesTestId as string)
+            ? await api.testSeriesQuestions(config.seriesTestId as string, config.seriesKey)
             : config.mockKind === 'vettri'
             ? await api.vettriExamQuestions(config.vettriExamId as string)
             : config.mockKind === 'exam'
@@ -401,35 +401,52 @@ export default function MockQuizPage() {
       document.getElementById(`omr-q-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     )
   }
-  const setAnswer = (q: Question, letter: AnswerLetter) => {
+  // Stable across the once-a-second countdown re-render (both timers below tick
+  // via setState on this page) — these are passed down into the memoised
+  // OmrQuestionRow, where a fresh closure every render would defeat the memo.
+  // All use the functional-updater form so no state needs to be a dependency.
+  const setAnswer = useCallback((q: Question, letter: AnswerLetter) => {
     hapticSelect()
     setAnswers((a) => ({ ...a, [q.id]: letter }))
-  }
-  const clearAnswer = (q: Question) =>
-    setAnswers((a) => {
-      const next = { ...a }
-      delete next[q.id]
-      return next
-    })
-  const toggleFlag = (q: Question) => setMarked((m) => ({ ...m, [q.id]: !m[q.id] }))
+  }, [])
+  const clearAnswer = useCallback(
+    (q: Question) =>
+      setAnswers((a) => {
+        const next = { ...a }
+        delete next[q.id]
+        return next
+      }),
+    []
+  )
+  const toggleFlag = useCallback(
+    (q: Question) => setMarked((m) => ({ ...m, [q.id]: !m[q.id] })),
+    []
+  )
 
-  const reportToastFor = (msg: string) => {
+  const reportToastFor = useCallback((msg: string) => {
     setReportToast(msg)
     reportTimers.current.push(window.setTimeout(() => setReportToast(''), 3500))
-  }
+  }, [])
 
   // Tapping the report icon: an already-reported question is un-reported in
   // place; otherwise the feedback box opens (which pauses the countdown).
-  const onReportClick = (q: Question, i: number) => {
-    if (reported[q.id]) {
-      setReported((r) => ({ ...r, [q.id]: false }))
-      void api.feedback.reportQuestion(q.id, false).catch(() => {})
-      reportToastFor(t('reportQuestionUndone'))
-      return
-    }
-    pauseStartRef.current = Date.now()
-    setReportIdx(i)
-  }
+  // Memoised (like the handlers above) since this is also passed down into the
+  // memoised OmrQuestionRow — `translate(key, lang)` is used instead of `t(...)`
+  // so the dependency is the (rarely-changing) `lang` primitive rather than the
+  // `t` closure, which `useT()` recreates every render.
+  const onReportClick = useCallback(
+    (q: Question, i: number) => {
+      if (reported[q.id]) {
+        setReported((r) => ({ ...r, [q.id]: false }))
+        void api.feedback.reportQuestion(q.id, false).catch(() => {})
+        reportToastFor(translate('reportQuestionUndone', lang))
+        return
+      }
+      pauseStartRef.current = Date.now()
+      setReportIdx(i)
+    },
+    [reported, lang, reportToastFor]
+  )
 
   // Closing the box (submit or cancel) resumes the clock; the paused span is
   // credited back to startedAt so the recorded time-taken stays honest.
@@ -546,7 +563,7 @@ export default function MockQuizPage() {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-canvas select-none">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-line bg-card px-3 py-2.5 sm:px-4 sm:py-3">
+      <header className="pt-safe sticky top-0 z-20 flex items-center justify-between gap-2 border-b border-line bg-card px-3 py-2.5 sm:px-4 sm:py-3">
         <span className="min-w-0 flex-1 truncate font-heading text-sm font-semibold text-ink">
           {describeConfig(config, lang)}
         </span>
@@ -616,75 +633,20 @@ export default function MockQuizPage() {
           <div className="space-y-3">
             {visibleIndices.map((i) => {
               const q = questions[i]
-              const sel = answers[q.id] ?? null
-              const flagged = Boolean(marked[q.id])
               return (
-                <div
+                <OmrQuestionRow
                   key={q.id}
-                  id={`omr-q-${i}`}
-                  className="scroll-mt-20 rounded-card border border-line bg-card p-4 sm:p-5"
-                >
-                  {/* Top: question number + flag / clear */}
-                  <div className="flex items-center gap-3 border-b border-line pb-3">
-                    <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft font-heading text-sm font-bold text-brand">
-                      {i + 1}
-                    </span>
-                    <div className="ml-auto flex items-center gap-1">
-                      <button
-                        onClick={() => onReportClick(q, i)}
-                        aria-label={t('reportQuestionAria')}
-                        aria-pressed={Boolean(reported[q.id])}
-                        title={reported[q.id] ? t('reportedLabel') : t('reportError')}
-                        className={[
-                          'icon-btn h-9 w-9 flex-shrink-0',
-                          reported[q.id] ? 'text-coral' : 'text-ink2/45',
-                        ].join(' ')}
-                      >
-                        <AlertCircle size={16} />
-                      </button>
-                      <button
-                        onClick={() => toggleFlag(q)}
-                        aria-label={t('markedReview')}
-                        aria-pressed={flagged}
-                        className={[
-                          'icon-btn h-9 w-9 flex-shrink-0',
-                          flagged ? 'text-primary' : 'text-ink2/45',
-                        ].join(' ')}
-                      >
-                        <Flag size={16} className={flagged ? 'fill-current' : ''} />
-                      </button>
-                      <button
-                        onClick={() => clearAnswer(q)}
-                        disabled={!sel}
-                        aria-label={t('clearResponse')}
-                        className="icon-btn h-9 w-9 flex-shrink-0 disabled:opacity-40"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Question text */}
-                  <div className="mt-3">
-                    <QuestionStem
-                      question={q}
-                      lang={lang}
-                      textClassName="text-[15px] font-semibold leading-relaxed text-navytext sm:text-base"
-                    />
-                    <QuestionFigures images={q.images} className="mt-3" />
-                  </div>
-
-                  {/* Answer choices - full option text + OMR-style bubble. Falls
-                      back to a bare A-D bubble row only if the question has no
-                      option text stored. */}
-                  {hasOptions(q, lang) ? (
-                    <OmrOptions question={q} lang={lang} selected={sel} onSelect={(l) => setAnswer(q, l)} />
-                  ) : (
-                    <div className="mt-4">
-                      <OmrBubbles selected={sel} onSelect={(l) => setAnswer(q, l)} letters={optionLetters(q)} />
-                    </div>
-                  )}
-                </div>
+                  question={q}
+                  index={i}
+                  lang={lang}
+                  selected={answers[q.id] ?? null}
+                  flagged={Boolean(marked[q.id])}
+                  reported={Boolean(reported[q.id])}
+                  onSelect={setAnswer}
+                  onClear={clearAnswer}
+                  onToggleFlag={toggleFlag}
+                  onReport={onReportClick}
+                />
               )
             })}
           </div>
@@ -819,6 +781,118 @@ export default function MockQuizPage() {
     </div>
   )
 }
+
+/** One OMR answer-sheet row (question stem + choices). Extracted out of the
+ * `visibleIndices.map()` above and wrapped in `React.memo` so the proctored
+ * countdown timer - which re-renders MockQuizPage every second for up to 180
+ * minutes - doesn't force all 50 KaTeX-heavy rows on the page to re-render with
+ * it. Every prop here is either primitive/stable data (question, index, lang,
+ * selected, flagged, reported) or a `useCallback`-memoised handler from the
+ * parent, so this only re-renders when something about THIS row actually
+ * changes. Translation is looked up via `useT()` internally (matching
+ * QuestionCard's pattern) rather than taking `t` as a prop, since `useT()`
+ * hands back a fresh closure every render and would defeat the memo otherwise. */
+const OmrQuestionRow = memo(function OmrQuestionRow({
+  question,
+  index,
+  lang,
+  selected,
+  flagged,
+  reported,
+  onSelect,
+  onClear,
+  onToggleFlag,
+  onReport,
+}: {
+  question: Question
+  index: number
+  lang: DisplayLang
+  selected: AnswerLetter | null
+  flagged: boolean
+  reported: boolean
+  onSelect: (q: Question, letter: AnswerLetter) => void
+  onClear: (q: Question) => void
+  onToggleFlag: (q: Question) => void
+  onReport: (q: Question, index: number) => void
+}) {
+  const { t } = useT()
+  return (
+    <div
+      id={`omr-q-${index}`}
+      className="scroll-mt-20 rounded-card border border-line bg-card p-4 sm:p-5"
+    >
+      {/* Top: question number + flag / clear */}
+      <div className="flex items-center gap-3 border-b border-line pb-3">
+        <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-brand-soft font-heading text-sm font-bold text-brand">
+          {index + 1}
+        </span>
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            onClick={() => onReport(question, index)}
+            aria-label={t('reportQuestionAria')}
+            aria-pressed={reported}
+            title={reported ? t('reportedLabel') : t('reportError')}
+            className={[
+              'icon-btn h-11 w-11 flex-shrink-0',
+              reported ? 'text-coral' : 'text-ink2/45',
+            ].join(' ')}
+          >
+            <AlertCircle size={16} />
+          </button>
+          <button
+            onClick={() => onToggleFlag(question)}
+            aria-label={t('markedReview')}
+            aria-pressed={flagged}
+            className={[
+              'icon-btn h-11 w-11 flex-shrink-0',
+              flagged ? 'text-primary' : 'text-ink2/45',
+            ].join(' ')}
+          >
+            <Flag size={16} className={flagged ? 'fill-current' : ''} />
+          </button>
+          <button
+            onClick={() => onClear(question)}
+            disabled={!selected}
+            aria-label={t('clearResponse')}
+            className="icon-btn h-11 w-11 flex-shrink-0 disabled:opacity-40"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Question text */}
+      <div className="mt-3">
+        <QuestionStem
+          question={question}
+          lang={lang}
+          textClassName="text-base font-semibold leading-relaxed text-navytext sm:text-base"
+        />
+        <QuestionFigures images={question.images} className="mt-3" />
+      </div>
+
+      {/* Answer choices - full option text + OMR-style bubble. Falls
+          back to a bare A-D bubble row only if the question has no
+          option text stored. */}
+      {hasOptions(question, lang) ? (
+        <OmrOptions
+          question={question}
+          lang={lang}
+          selected={selected}
+          onSelect={(l) => onSelect(question, l)}
+        />
+      ) : (
+        <div className="mt-4">
+          <OmrBubbles
+            selected={selected}
+            onSelect={(l) => onSelect(question, l)}
+            letters={optionLetters(question)}
+          />
+        </div>
+      )}
+    </div>
+  )
+})
 
 /** Shared palette body - rendered in the desktop sidebar and the mobile drawer.
  * The number grid is SCOPED to the current page: page 1 shows pills 1-50, page 2
@@ -1028,7 +1102,7 @@ function SummaryStat({ value, label, cls }: { value: number; label: string; cls:
   return (
     <div className="rounded-xl bg-tint px-2 py-2">
       <div className={['font-heading text-lg font-bold leading-none', cls].join(' ')}>{value}</div>
-      <div className="tamil mt-1 truncate font-body text-[10px] uppercase tracking-wide text-ink2">{label}</div>
+      <div className="tamil mt-1 truncate font-body text-2xs uppercase tracking-wide text-ink2">{label}</div>
     </div>
   )
 }
@@ -1047,7 +1121,7 @@ function Toast({ tone, children }: { tone: 'warn' | 'error' | 'info'; children: 
   return (
     <div
       className={[
-        'fixed left-1/2 top-16 z-50 w-[min(92vw,28rem)] -translate-x-1/2 rounded-xl px-4 py-2.5 text-center font-heading text-sm font-semibold shadow-card',
+        'fixed left-1/2 top-[calc(4rem+env(safe-area-inset-top))] z-50 w-[min(92vw,28rem)] -translate-x-1/2 rounded-xl px-4 py-2.5 text-center font-heading text-sm font-semibold shadow-card',
         toneCls,
       ].join(' ')}
     >

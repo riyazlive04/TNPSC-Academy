@@ -1,0 +1,294 @@
+[
+  {
+    "group_nums": "3",
+    "topic": "Probability",
+    "classification": "false_positive",
+    "notes": "Row 0ce82f7a asks P(exactly one or two heads in 3 tosses of a coin) = 6/8 = 3/4 (verified: S has 8 outcomes, B={HHT,HTH,HTT,THH,THT,TTH} has 6, correctly keyed to option C). Row df292c79 asks a completely different thing: the SIZE of the sample space for tossing 3 coins, i.e. n(S)=2^3=8 (correctly keyed to option C=8). These are different questions testing different skills (computing a specific event probability vs. counting the sample space) that only coincidentally share the number 3 (three tosses) and the number 8 (numerator/denominator of one vs. the count in the other). Not a duplicate — both rows are already independently correct and should be left untouched.",
+    "keep_id": null,
+    "rewrites": []
+  },
+  {
+    "group_nums": "5,6,7,8",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "Same bag (5 red, 6 white, 7 green, 8 black = 26 total) in both rows. Row 12790c95 asks only P(not white) = 1 - 6/26 = 1 - 3/13 = 10/13, correctly keyed to option B. Row 227525ee is the full 4-part version (i white, ii black-or-red, iii not white, iv neither white nor black); I verified all four: i) 6/26=3/13, ii) (8+5)/26=13/26=1/2, iii) 10/13 (matches row 12790c95 exactly), iv) (7+5)/26=12/26=6/13 — all match option C exactly. No conflict; part iii of the multi-part row is a verbatim restatement of the single-part row. Row 12790c95 has more history (n_seen+n_ans=5) vs row 227525ee (=2), so keep 12790c95 and rewrite 227525ee.",
+    "keep_id": "12790c95-8c3b-421a-b860-2531315376e7",
+    "rewrites": [
+      {
+        "id": "227525ee-2213-41ad-8511-64f1fc2d018b",
+        "question_text": "A bag contains 4 red, 5 blue, 9 green and 2 yellow balls. One ball is drawn at random. Find the probability that the ball drawn is not green.",
+        "question_text_ta": "ஒரு பையில் 4 சிவப்பு, 5 நீலம், 9 பச்சை மற்றும் 2 மஞ்சள் பந்துகள் உள்ளன. ஒரு பந்து சமவாய்ப்பு முறையில் எடுக்கப்படுகிறது. எடுக்கப்பட்ட பந்து பச்சை நிறமாக இல்லாததற்கான நிகழ்தகவைக் காண்க.",
+        "option_a": "$\\dfrac{11}{20}$",
+        "option_b": "$\\dfrac{9}{20}$",
+        "option_c": "$\\dfrac{1}{4}$",
+        "option_d": "$\\dfrac{1}{2}$",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( n(S) = 4 + 5 + 9 + 2 = 20 \\)\n\\( P(\\text{green}) = \\dfrac{9}{20} \\)\nFormula: \\( P(E) + P(\\bar{E}) = 1 \\)\nWorking:\n\\( P(\\text{not green}) = 1 - P(\\text{green}) \\)\n\\( = 1 - \\dfrac{9}{20} \\)\n\\( = \\dfrac{11}{20} \\)\nAsked:\n\\( P(\\text{not green}) = \\dfrac{11}{20} \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( n(S) = 4 + 5 + 9 + 2 = 20 \\)\nபச்சை நிகழ்தகவு \\( = \\dfrac{9}{20} \\)\nசூத்திரம்: \\( P(E) + P(\\bar{E}) = 1 \\)\nசெயல்முறை:\nபச்சை அல்லாத நிகழ்தகவு \\( = 1 - \\dfrac{9}{20} \\)\n\\( = \\dfrac{11}{20} \\)\nகேட்டது:\nபச்சை அல்லாத நிகழ்தகவு \\( = \\dfrac{11}{20} \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "12,8",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "Identical problem worded two ways: bag has 12 blue balls and x red balls; add 8 more red balls; new P(red) is twice the old P(red); find x. Solving: (x+8)/(20+x) = 2x/(12+x) → x²+20x-96=0 → (x-4)(x+24)=0 → x=4 (x=-24 rejected as a count can't be negative). Row 1383477e option C='4' (labeled x=4) is correct; row 3f2ecc31 option C='4' is also correct. No conflict — both already point to the same correct value. Row 3f2ecc31 has more history (n_seen+n_ans=3) vs row 1383477e (=2), so keep 3f2ecc31 and rewrite 1383477e.",
+    "keep_id": "3f2ecc31-35cd-4403-a7c7-d46837b4130a",
+    "rewrites": [
+      {
+        "id": "1383477e-3b62-463c-b73d-3f8d60ad0b60",
+        "question_text": "A bag contains 10 blue balls and x red balls. If a ball is drawn at random, the probability that it is red is found. If 15 more red balls are put into the bag and the new probability of drawing a red ball is twice the earlier probability, find x.",
+        "question_text_ta": "ஒரு பையில் 10 நீல பந்துகளும் x சிவப்பு பந்துகளும் உள்ளன. சமவாய்ப்பு முறையில் ஒரு பந்து எடுக்கப்படும்போது அது சிவப்பாக இருப்பதற்கான நிகழ்தகவு கணக்கிடப்படுகிறது. பையில் மேலும் 15 சிவப்பு பந்துகள் சேர்க்கப்பட்டால், சிவப்பு பந்து எடுக்கும் புதிய நிகழ்தகவு முந்தைய நிகழ்தகவைப் போல இரு மடங்கு எனில், x-ஐக் கண்டறிக.",
+        "option_a": "x=5",
+        "option_b": "x=-30",
+        "option_c": "x=10",
+        "option_d": "x=15",
+        "correct_answer": "A",
+        "explanation": "Given:\nInitially \\( n(S) = 10 + x \\), red \\( = x \\)\nAfter adding 15 red: \\( n(S) = 25 + x \\), red \\( = x + 15 \\)\nFormula: \\( P(\\text{new}) = 2 \\times P(\\text{old}) \\)\nWorking:\n\\( \\dfrac{x + 15}{25 + x} = 2 \\times \\dfrac{x}{10 + x} \\)\n\\( (x + 15)(10 + x) = 2x(25 + x) \\)\n\\( x^{2} + 25x + 150 = 2x^{2} + 50x \\)\n\\( x^{2} + 25x - 150 = 0 \\)\n\\( (x - 5)(x + 30) = 0 \\)\n\\( x = 5 \\) or \\( x = -30 \\)\nSince a count cannot be negative, \\( x = 5 \\)\nAsked: \\( x = 5 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஆரம்பத்தில் \\( n(S) = 10 + x \\), சிவப்பு \\( = x \\)\n15 சிவப்பு சேர்த்த பின்: \\( n(S) = 25 + x \\), சிவப்பு \\( = x + 15 \\)\nசூத்திரம்: புதிய நிகழ்தகவு \\( = 2 \\times \\) பழைய நிகழ்தகவு\nசெயல்முறை:\n\\( \\dfrac{x + 15}{25 + x} = 2 \\times \\dfrac{x}{10 + x} \\)\n\\( (x + 15)(10 + x) = 2x(25 + x) \\)\n\\( x^{2} + 25x + 150 = 2x^{2} + 50x \\)\n\\( x^{2} + 25x - 150 = 0 \\)\n\\( (x - 5)(x + 30) = 0 \\)\n\\( x = 5 \\) அல்லது \\( x = -30 \\)\nஎண்ணிக்கை எதிர்மறையாக இருக்க முடியாது எனவே \\( x = 5 \\)\nகேட்டது: \\( x = 5 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1,1000,500",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "Same setup: cards 1-1000, no replacement, winning card = perfect square > 500. Perfect squares from 501-1000: 23²..31² = 9 values. Row 1daf2b59 (two-part) i) P(first wins)=9/1000, ii) P(second wins | first won)=8/999 (one winning card removed after first win: n(S)=999, winners=8) — matches option B exactly. Row 731779c7 (single-part) asks only P(first wins)=9/1000 — matches option D exactly. No conflict; row 731779c7's answer is identical to part i) of row 1daf2b59. Row 731779c7 has more history (n_seen+n_ans=2) vs row 1daf2b59 (=0), so keep 731779c7 and rewrite 1daf2b59.",
+    "keep_id": "731779c7-3a17-4031-b5d6-49aba1eaa62c",
+    "rewrites": [
+      {
+        "id": "1daf2b59-7c78-4332-afe0-6110740e637c",
+        "question_text": "Cards numbered 1 to 500 (one number per card) are put in a box. Each player selects one card at random and that card is not replaced. A player wins a prize if the selected card shows a perfect cube number less than 400. Find i) the probability that the first player wins the prize, ii) the probability that the second player wins a prize, given that the first has won.",
+        "question_text_ta": "ஒரு பெட்டியில் 1 முதல் 500 வரை எண்கள் (ஒரு சீட்டில் ஒரு எண்) எழுதப்பட்ட சீட்டுகள் இடப்படுகின்றன. ஒவ்வொரு வீரரும் சமவாய்ப்பு முறையில் ஒரு சீட்டை எடுக்கிறார், அந்த சீட்டு திரும்ப வைக்கப்படுவதில்லை. தேர்ந்தெடுக்கப்பட்ட சீட்டில் 400-ஐ விட குறைவான முழு கன (cube) எண் இருந்தால் வீரர் பரிசு பெறுவார். i) முதல் வீரர் பரிசு பெறுவதற்கான நிகழ்தகவு, ii) முதல் வீரர் வென்ற நிலையில் இரண்டாம் வீரர் பரிசு பெறுவதற்கான நிகழ்தகவைக் கண்டறிக.",
+        "option_a": "$\\dfrac{7}{500}$, $\\dfrac{6}{499}$",
+        "option_b": "$\\dfrac{7}{500}$, $\\dfrac{7}{499}$",
+        "option_c": "$\\dfrac{6}{500}$, $\\dfrac{5}{499}$",
+        "option_d": "$\\dfrac{7}{499}$, $\\dfrac{6}{500}$",
+        "correct_answer": "A",
+        "explanation": "Given:\nCards numbered 1 to 500, drawn without replacement\nWinning card: a perfect cube less than 400\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nWorking:\nPerfect cubes less than 400: \\( 1^{3}=1,\\ 2^{3}=8,\\ 3^{3}=27,\\ 4^{3}=64,\\ 5^{3}=125,\\ 6^{3}=216,\\ 7^{3}=343 \\)\ni) \\( n(S)=500,\\ n(A)=7 \\)\n\\( P(A)=\\dfrac{7}{500} \\)\nii) First player has won, so one winning card is gone: \\( n(S)=499,\\ n(B)=7-1=6 \\)\n\\( P(B)=\\dfrac{6}{499} \\)\nAsked:\nP(first wins) and P(second wins | first won)\n\\( \\dfrac{7}{500} \\) and \\( \\dfrac{6}{499} \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n1 முதல் 500 வரை எண்ணிடப்பட்ட சீட்டுகள், திரும்ப வைக்காமல் எடுக்கப்படுகின்றன\nவெற்றிச் சீட்டு: 400-ஐ விட குறைவான முழு கன எண்\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nசெயல்முறை:\n400-ஐ விட குறைவான முழு கன எண்கள்: \\( 1^{3}=1,\\ 2^{3}=8,\\ 3^{3}=27,\\ 4^{3}=64,\\ 5^{3}=125,\\ 6^{3}=216,\\ 7^{3}=343 \\)\ni) \\( n(S)=500,\\ n(A)=7 \\)\n\\( P(A)=\\dfrac{7}{500} \\)\nii) முதல் வீரர் வென்றதால், ஒரு வெற்றிச் சீட்டு நீக்கப்பட்டது: \\( n(S)=499,\\ n(B)=7-1=6 \\)\n\\( P(B)=\\dfrac{6}{499} \\)\nகேட்டது:\nமுதல் வீரர் வெல்வதற்கான நிகழ்தகவும், முதல் வீரர் வென்ற நிலையில் இரண்டாம் வீரர் வெல்வதற்கான நிகழ்தகவும்\n\\( \\dfrac{7}{500} \\) மற்றும் \\( \\dfrac{6}{499} \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "15,17,640",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "Same setup: P(A):P(Ā)=17:15 so P(A)=17/32, n(S)=640, so n(A)=17/32×640=340. Row 1fe40f76 (single-part) asks only n(A)=340 — matches option D. Row 4446851a (two-part) asks i) P(Ā)=15/32, ii) n(A)=340 — matches option A. No conflict; n(A)=340 agrees exactly in both. Row 4446851a has more history (n_seen+n_ans=7) vs row 1fe40f76 (=3), so keep 4446851a and rewrite 1fe40f76.",
+    "keep_id": "4446851a-f2e9-4de5-bb00-d57e7578c806",
+    "rewrites": [
+      {
+        "id": "1fe40f76-2999-4f5f-a620-c4e97f7d845c",
+        "question_text": "B is an event of a random experiment such that P(B) : P(B̄) = 9 : 11 and n(S) = 500. Find n(B).",
+        "question_text_ta": "ஒரு சமவாய்ப்புச் சோதனையின் நிகழ்வு B ஆனது P(B) : P(B̄) = 9 : 11 மற்றும் n(S) = 500 என்றவாறு உள்ளது. n(B)-ஐக் காண்க.",
+        "option_a": "225",
+        "option_b": "275",
+        "option_c": "200",
+        "option_d": "250",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( P(B) : P(\\bar{B}) = 9 : 11 \\), so \\( P(B) = \\dfrac{9}{20} \\)\n\\( n(S) = 500 \\)\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nWorking:\n\\( P(B) = \\dfrac{n(B)}{n(S)} = \\dfrac{9}{20} \\)\n\\( n(B) = \\dfrac{9}{20} \\times 500 = 225 \\)\nAsked:\n\\( n(B) \\)\n225\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( P(B) : P(\\bar{B}) = 9 : 11 \\), எனவே \\( P(B) = \\dfrac{9}{20} \\)\n\\( n(S) = 500 \\)\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nசெயல்முறை:\n\\( P(B) = \\dfrac{n(B)}{n(S)} = \\dfrac{9}{20} \\)\n\\( n(B) = \\dfrac{9}{20} \\times 500 = 225 \\)\nகேட்டது:\n\\( n(B) \\)\n225\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "52",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "This group has 5 rows; 4 of them form one duplicate cluster and the 5th is an unrelated false positive that happens to also involve a 52-card deck. Cluster (same standard 52-card deck, no cards removed): row 361260b4 is the 5-part parent question (i red=26/52=1/2, ii heart=13/52=1/4, iii red king=2/52=1/26, iv face card=12/52=3/13, v number card 2-10=36/52=9/13 — all verified, matches option B exactly). Row 8153e5a3 asks only 'heart card' = 1/4, matches part ii verbatim (option D). Row 92226d1b asks only 'face card (J,Q,K)' = 3/13, matches part iv verbatim (option A). Row a1d2984d asks only 'red king' = 1/26, matches part iii verbatim (option C). No conflicts anywhere in the cluster. History (n_seen+n_ans): 361260b4=0, 8153e5a3=4, 92226d1b=2, a1d2984d=0 — 8153e5a3 has the most, so keep it and rewrite the other three. IMPORTANT: row c2bb2242 is NOT part of this duplicate cluster — it is a genuinely different problem (deck with 6 specific cards physically removed before drawing, then find P(clubs), P(red queen), P(black king)). I independently verified it: 46 cards remain; clubs=13/46 unaffected; both red queens (♦Q,♥Q) were removed so P(red queen)=0/46=0; of the two black kings only ♣K remains (♠K removed) so P(black king)=1/46. Its correct_answer A='13/46, 0, 1/46' is already mathematically correct. It only shares the incidental number '52' (the size of the deck before removal) with the other four — leave c2bb2242 completely untouched, no DB change needed for it.",
+    "keep_id": "8153e5a3-bf10-4705-a8ae-abd23f3fce6c",
+    "rewrites": [
+      {
+        "id": "361260b4-b5c9-4aaf-8a8d-06339dabc984",
+        "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. Find the probability of getting i) a black card, ii) a spade card, iii) a black queen, iv) a picture card (King, Queen or Jack), v) a card numbered from 2 to 9.",
+        "question_text_ta": "நன்கு கலைக்கப்பட்ட 52 சீட்டுகள் கொண்ட கட்டிலிருந்து ஒரு சீட்டு சமவாய்ப்பு முறையில் எடுக்கப்படுகிறது. i) கருப்புச் சீட்டு, ii) ஸ்பேட் சீட்டு, iii) கருப்பு ராணி, iv) படச் சீட்டு (King, Queen அல்லது Jack), v) 2 முதல் 9 வரையிலான எண் சீட்டு கிடைப்பதற்கான நிகழ்தகவைக் கண்டறிக.",
+        "option_a": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{26}$, $\\dfrac{3}{13}$, $\\dfrac{8}{13}$",
+        "option_b": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{26}$, $\\dfrac{3}{13}$, $\\dfrac{9}{13}$",
+        "option_c": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{13}$, $\\dfrac{3}{13}$, $\\dfrac{8}{13}$",
+        "option_d": "$\\dfrac{1}{4}$, $\\dfrac{1}{2}$, $\\dfrac{1}{26}$, $\\dfrac{3}{13}$, $\\dfrac{8}{13}$",
+        "correct_answer": "A",
+        "explanation": "Given:\nStandard pack \\( n(S) = 52 \\)\n26 black, 13 spades, 2 black queens, 12 picture cards, 32 cards numbered 2 to 9.\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nWorking:\ni) black card: \\( P = \\dfrac{26}{52} = \\dfrac{1}{2} \\)\nii) spade card: \\( P = \\dfrac{13}{52} = \\dfrac{1}{4} \\)\niii) black queen: \\( P = \\dfrac{2}{52} = \\dfrac{1}{26} \\)\niv) picture card \\( (4 \\times 3 = 12) \\): \\( P = \\dfrac{12}{52} = \\dfrac{3}{13} \\)\nv) card numbered 2 to 9 \\( (4 \\times 8 = 32) \\): \\( P = \\dfrac{32}{52} = \\dfrac{8}{13} \\)\nAsked:\n\\( \\dfrac{1}{2},\\ \\dfrac{1}{4},\\ \\dfrac{1}{26},\\ \\dfrac{3}{13},\\ \\dfrac{8}{13} \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nநிலையான கட்டு \\( n(S) = 52 \\)\n26 கருப்பு, 13 ஸ்பேட், 2 கருப்பு ராணி, 12 படச் சீட்டு, 32 எண் சீட்டு (2 முதல் 9 வரை).\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nசெயல்முறை:\ni) கருப்புச் சீட்டு: \\( P = \\dfrac{26}{52} = \\dfrac{1}{2} \\)\nii) ஸ்பேட் சீட்டு: \\( P = \\dfrac{13}{52} = \\dfrac{1}{4} \\)\niii) கருப்பு ராணி: \\( P = \\dfrac{2}{52} = \\dfrac{1}{26} \\)\niv) படச் சீட்டு \\( (4 \\times 3 = 12) \\): \\( P = \\dfrac{12}{52} = \\dfrac{3}{13} \\)\nv) எண் சீட்டு \\( (4 \\times 8 = 32) \\): \\( P = \\dfrac{32}{52} = \\dfrac{8}{13} \\)\nகேட்டது:\n\\( \\dfrac{1}{2},\\ \\dfrac{1}{4},\\ \\dfrac{1}{26},\\ \\dfrac{3}{13},\\ \\dfrac{8}{13} \\)\nவிடை (A)"
+      },
+      {
+        "id": "92226d1b-e1c8-4c74-b6a6-852498efae7d",
+        "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. What is the probability of getting an ace?",
+        "question_text_ta": "நன்கு கலைக்கப்பட்ட 52 சீட்டுகள் கொண்ட கட்டிலிருந்து ஒரு சீட்டு சமவாய்ப்பு முறையில் எடுக்கப்படுகிறது. ஏஸ் சீட்டு கிடைப்பதற்கான நிகழ்தகவு என்ன?",
+        "option_a": "$\\dfrac{1}{13}$",
+        "option_b": "$\\dfrac{1}{52}$",
+        "option_c": "$\\dfrac{1}{4}$",
+        "option_d": "$\\dfrac{4}{13}$",
+        "correct_answer": "A",
+        "explanation": "Given:\nStandard pack \\( n(S) = 52 \\); number of aces \\( = 4 \\) (one in each suit)\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nWorking:\n\\( P(\\text{ace}) = \\dfrac{4}{52} = \\dfrac{1}{13} \\)\nAsked:\nP(ace) \\( = \\dfrac{1}{13} \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nநிலையான கட்டு \\( n(S) = 52 \\); ஏஸ் சீட்டுகளின் எண்ணிக்கை \\( = 4 \\) (ஒவ்வொரு வகையிலும் ஒன்று)\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\)\nசெயல்முறை:\nஏஸ் நிகழ்தகவு \\( = \\dfrac{4}{52} = \\dfrac{1}{13} \\)\nகேட்டது:\nஏஸ் கிடைப்பதற்கான நிகழ்தகவு \\( = \\dfrac{1}{13} \\)\nவிடை (A)"
+      },
+      {
+        "id": "a1d2984d-85f0-4dd1-8382-1efab5c0b0f1",
+        "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. What is the probability that it is not a face card?",
+        "question_text_ta": "நன்கு கலைக்கப்பட்ட 52 சீட்டுகள் கொண்ட கட்டிலிருந்து ஒரு சீட்டு சமவாய்ப்பு முறையில் எடுக்கப்படுகிறது. அது முக சீட்டு (face card) இல்லாததற்கான நிகழ்தகவு என்ன?",
+        "option_a": "$\\dfrac{10}{13}$",
+        "option_b": "$\\dfrac{3}{13}$",
+        "option_c": "$\\dfrac{1}{2}$",
+        "option_d": "$\\dfrac{9}{13}$",
+        "correct_answer": "A",
+        "explanation": "Given:\nStandard pack \\( n(S) = 52 \\); face cards (King, Queen, Jack) \\( = 12 \\)\n\\( P(\\text{face card}) = \\dfrac{12}{52} = \\dfrac{3}{13} \\)\nFormula: \\( P(E) + P(\\bar{E}) = 1 \\)\nWorking:\n\\( P(\\text{not face card}) = 1 - \\dfrac{3}{13} \\)\n\\( = \\dfrac{10}{13} \\)\nAsked:\nP(not a face card) \\( = \\dfrac{10}{13} \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nநிலையான கட்டு \\( n(S) = 52 \\); முக சீட்டுகள் (King, Queen, Jack) \\( = 12 \\)\nமுக சீட்டு நிகழ்தகவு \\( = \\dfrac{12}{52} = \\dfrac{3}{13} \\)\nசூத்திரம்: \\( P(E) + P(\\bar{E}) = 1 \\)\nசெயல்முறை:\nமுக சீட்டு அல்லாத நிகழ்தகவு \\( = 1 - \\dfrac{3}{13} \\)\n\\( = \\dfrac{10}{13} \\)\nகேட்டது:\nமுக சீட்டு இல்லாததற்கான நிகழ்தகவு \\( = \\dfrac{10}{13} \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "6",
+    "topic": "Probability",
+    "classification": "true_duplicate",
+    "notes": "Same bag: 6 green balls, black = 2×red, P(green)=3×P(red). Solving: let red=r, black=2r, total=6+3r. 6/(6+3r)=3×r/(6+3r) → 6=3r → r=2, black=4, total=12. Row 5fda17a8 (two-part) asks i) black balls=4, ii) total=12 — matches option D='4 black balls, 12 balls' exactly. Row af27a0f3 (single-part) asks only total=12 — matches option B=12, which agrees exactly with part ii of the other row. No conflict. Row 5fda17a8 has more history (n_seen+n_ans=3) vs af27a0f3 (=0), so keep 5fda17a8 and rewrite af27a0f3.",
+    "keep_id": "5fda17a8-19aa-413f-bb01-510eab2ba7a4",
+    "rewrites": [
+      {
+        "id": "af27a0f3-c3c8-419c-846b-7645877d3bba",
+        "question_text": "A bag contains 8 yellow balls, some pink balls and some blue balls. The number of pink balls is three times the number of blue balls, and the probability of getting a yellow ball is four times the probability of getting a blue ball. Find the total number of balls.",
+        "question_text_ta": "ஒரு பையில் 8 மஞ்சள் பந்துகளும், சில இளஞ்சிவப்பு பந்துகளும் சில நீல பந்துகளும் உள்ளன. இளஞ்சிவப்பு பந்துகளின் எண்ணிக்கை நீல பந்துகளின் எண்ணிக்கையைப் போல மூன்று மடங்கு, மேலும் மஞ்சள் பந்து கிடைப்பதற்கான நிகழ்தகவு நீல பந்து கிடைப்பதற்கான நிகழ்தகவைப் போல நான்கு மடங்கு. மொத்த பந்துகளின் எண்ணிக்கையைக் கண்டறிக.",
+        "option_a": "16",
+        "option_b": "12",
+        "option_c": "20",
+        "option_d": "14",
+        "correct_answer": "A",
+        "explanation": "Given:\nYellow balls \\( = 8 \\), blue balls \\( = b \\), pink balls \\( = 3b \\)\nTotal balls \\( = 8 + b + 3b = 8 + 4b \\)\n\\( P(Y) = 4 \\times P(Bl) \\); both probabilities share the same denominator \\( (8 + 4b) \\)\nWorking:\nFormula: \\( P(E) = \\dfrac{n(E)}{n(S)} \\), condition \\( P(Y) = 4 \\times P(Bl) \\)\n\\( P(Y) = \\dfrac{8}{8 + 4b},\\quad P(Bl) = \\dfrac{b}{8 + 4b} \\)\n\\( \\dfrac{8}{8 + 4b} = 4 \\times \\dfrac{b}{8 + 4b} \\)\nCancel the common denominator: \\( 8 = 4b \\)\n\\( b = 2 \\) (blue balls)\nPink balls \\( = 3b = 3 \\times 2 = 6 \\)\nTotal \\( = 8 + 4b = 8 + 4 \\times 2 = 16 \\)\nAsked:\nTotal number of balls \\( = 16 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nமஞ்சள் பந்துகள் \\( = 8 \\), நீல பந்துகள் \\( = b \\), இளஞ்சிவப்பு பந்துகள் \\( = 3b \\)\nமொத்த பந்துகள் \\( = 8 + b + 3b = 8 + 4b \\)\n\\( P(Y) = 4 \\times P(Bl) \\); இரு நிகழ்தகவுகளுக்கும் ஒரே பகுதி \\( (8 + 4b) \\)\nசெயல்முறை:\nசூத்திரம்: \\( P(E) = \\dfrac{n(E)}{n(S)} \\), நிபந்தனை \\( P(Y) = 4 \\times P(Bl) \\)\n\\( P(Y) = \\dfrac{8}{8 + 4b},\\quad P(Bl) = \\dfrac{b}{8 + 4b} \\)\n\\( \\dfrac{8}{8 + 4b} = 4 \\times \\dfrac{b}{8 + 4b} \\)\nபொது பகுதியை நீக்க: \\( 8 = 4b \\)\n\\( b = 2 \\) (நீல பந்துகள்)\nஇளஞ்சிவப்பு பந்துகள் \\( = 3b = 3 \\times 2 = 6 \\)\nமொத்தம் \\( = 8 + 4b = 8 + 4 \\times 2 = 16 \\)\nகேட்டது:\nமொத்த பந்துகளின் எண்ணிக்கை \\( = 16 \\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "1,12,2,3",
+    "topic": "Probability",
+    "classification": "false_positive",
+    "notes": "Same spinner setup (numbers 1 to 12) in both rows, but they ask for genuinely different facts. Row 63d416ee asks P(prime number): primes in 1-12 are {2,3,5,7,11} = 5 values, P=5/12, correctly keyed to option B. Row f8da5a70 asks P(composite number): composites in 1-12 are {4,6,8,9,10,12} = 6 values (1 is neither prime nor composite, so 12-5-1=6), P=6/12=1/2, correctly keyed to option C. These are different sub-questions (identifying primes vs. composites) requiring different classification work, not a restatement of the same computation — analogous to the \"different work problems sharing 10 days\" false-positive pattern called out in the task brief. Both rows are already independently correct and should be left untouched.",
+    "keep_id": null,
+    "rewrites": []
+  },
+  {
+    "group_nums": "18,8,96",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 96 sq.m whitewashed in 8 days -> rate 12 sq.m/day -> 18 days gives 12×18=216 sq.m. Row 2718dfd4 option B='216 sq.m.' correct; row 6eb0f2e0 option D='216 sq.m' correct. No conflict — both agree on 216. History is an exact tie (n_seen+n_ans=2 for both rows). Kept 2718dfd4 (its explanation already matches this bank's exact template, confirmed by direct DB lookup), rewrote 6eb0f2e0.",
+    "keep_id": "2718dfd4-964e-47d3-957e-280bc8684c40",
+    "rewrites": [
+      {
+        "id": "6eb0f2e0-79ca-41f7-96bf-57eae5231d81",
+        "question_text": "A painter paints 150 sq.m. of a fence in 10 days. How many sq.m. will be painted in 25 days at the same rate?",
+        "question_text_ta": "ஒரு ஓவியர் ஒரு வேலியின் 150 ச.மீ. பகுதியை 10 நாட்களில் வர்ணம் பூசுகிறார். அதே வீதத்தில் 25 நாட்களில் எத்தனை ச.மீ. வர்ணம் பூசப்படும்?",
+        "option_a": "375 sq.m.",
+        "option_b": "60 sq.m.",
+        "option_c": "425 sq.m.",
+        "option_d": "350 sq.m.",
+        "correct_answer": "A",
+        "explanation": "Given:\n\\( 150 \\) sq.m. is painted in \\( 10 \\) days\nTime available now \\( = 25 \\) days at the same rate\nWorking:\nWork done is directly proportional to time.\nFormula: \\( \\text{Work} = \\text{rate} \\times \\text{time} \\)\n\\( 150 : 10 :: x : 25 \\)\n\\( 10x = 150 \\times 25 \\)\n\\( x = \\dfrac{150 \\times 25}{10} = 375 \\)\nAsked:\nArea painted in 25 days \\( = 375 \\) sq.m.\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n\\( 150 \\) ச.மீ. \\( 10 \\) நாட்களில் வர்ணம் பூசப்படுகிறது\nஇப்போது அதே வீதத்தில் \\( 25 \\) நாட்கள் கிடைக்கின்றன\nசெயல்முறை:\nசெய்யப்படும் வேலை நேரத்திற்கு நேர் விகிதத்தில் உள்ளது.\nசூத்திரம்: வேலை = வீதம் × நேரம்\n\\( 150 : 10 :: x : 25 \\)\n\\( 10x = 150 \\times 25 \\)\n\\( x = \\dfrac{150 \\times 25}{10} = 375 \\)\nகேட்டது:\n25 நாட்களில் வர்ணம் பூசப்படும் பரப்பு \\( = 375 \\) ச.மீ.\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "20,30,70",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 70 pages × 30 lines = 2100 total lines; at 20 lines/page -> 2100/20=105 pages. Row 4e726af4 option B='105 pages' correct; row 9904978d option B='105 pages' correct. No conflict. History: row 4e726af4 n_seen+n_ans=3 vs row 9904978d=1, so keep 4e726af4 and rewrite 9904978d.",
+    "keep_id": "4e726af4-0fe5-4dd9-aa55-5a0dd20000c9",
+    "rewrites": [
+      {
+        "id": "9904978d-4ad9-428a-9688-e68980d6dc32",
+        "question_text": "A notebook has 90 pages with 24 lines of ruled matter on each page. If each page is to have only 18 lines, how many pages will the notebook have?",
+        "question_text_ta": "ஒரு நோட்டுப் புத்தகத்தில் ஒவ்வொரு பக்கத்திலும் 24 வரிகள் கோடிடப்பட்ட 90 பக்கங்கள் உள்ளன. ஒவ்வொரு பக்கத்திலும் 18 வரிகள் மட்டுமே இருந்தால், நோட்டுப் புத்தகத்தில் எத்தனை பக்கங்கள் இருக்கும்?",
+        "option_a": "120 pages",
+        "option_b": "67.5 pages",
+        "option_c": "108 pages",
+        "option_d": "135 pages",
+        "correct_answer": "A",
+        "explanation": "Given:\n90 pages with 24 lines each, so total lines \\(= 90 \\times 24\\)\nLines per page reduced to 18\nTotal ruled matter is constant; pages and lines-per-page are inversely proportional\nWorking:\nFormula: \\(M_1 \\times D_1 = M_2 \\times D_2\\)\n\\(90 \\times 24 = 18 \\times x\\)\n\\(18x = 2160\\)\n\\(x = \\dfrac{90 \\times 24}{18} = 120\\)\nAsked:\nNumber of pages with 18 lines each \\(= 120\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஒவ்வொரு பக்கத்திலும் 24 வரிகள் கொண்ட 90 பக்கங்கள், எனவே மொத்த வரிகள் \\(= 90 \\times 24\\)\nஒரு பக்கத்திற்கு வரிகள் 18 ஆகக் குறைக்கப்படுகிறது\nமொத்த கோடுகள் மாறிலி; பக்கங்களும் பக்கத்திற்கான வரிகளும் எதிர் விகிதத்தில் உள்ளன\nசெயல்முறை:\nசூத்திரம்: \\(M_1 \\times D_1 = M_2 \\times D_2\\)\n\\(90 \\times 24 = 18 \\times x\\)\n\\(18x = 2160\\)\n\\(x = \\dfrac{90 \\times 24}{18} = 120\\)\nகேட்டது:\nஒவ்வொரு பக்கத்திலும் 18 வரிகள் கொண்ட பக்கங்களின் எண்ணிக்கை \\(= 120\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "120,24,35",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 120 pages × 35 lines = 4200 total lines; at 24 lines/page -> 4200/24=175 pages. Row 81a544f0 option D='175 pages' correct; row c9c5e38b option A='175 pages' correct. No conflict. History: row 81a544f0 n_seen+n_ans=4 vs row c9c5e38b=2, so keep 81a544f0 and rewrite c9c5e38b.",
+    "keep_id": "81a544f0-2e29-4672-b3b2-2be3d22ca4aa",
+    "rewrites": [
+      {
+        "id": "c9c5e38b-9057-4384-a3a9-425f04401d19",
+        "question_text": "A diary contains 96 pages with 28 lines on each page. How many pages will the diary contain if every page has 21 lines per page?",
+        "question_text_ta": "ஒரு நாட்குறிப்பு புத்தகத்தில் ஒவ்வொரு பக்கத்திலும் 28 வரிகள் கொண்ட 96 பக்கங்கள் உள்ளன. ஒவ்வொரு பக்கத்திலும் 21 வரிகள் இருந்தால், நாட்குறிப்பு புத்தகத்தில் எத்தனை பக்கங்கள் இருக்கும்?",
+        "option_a": "128 pages",
+        "option_b": "72 pages",
+        "option_c": "112 pages",
+        "option_d": "144 pages",
+        "correct_answer": "A",
+        "explanation": "Given:\n96 pages with 28 lines each, so total lines \\(= 96 \\times 28 = 2688\\)\nLines per page reduced to 21\nWorking:\nFormula: \\(M_1 \\times D_1 = M_2 \\times D_2\\)\n\\(96 \\times 28 = 21 \\times x\\)\n\\(21x = 2688\\)\n\\(x = \\dfrac{2688}{21} = 128\\)\nAsked:\nNumber of pages with 21 lines each \\(= 128\\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\nஒவ்வொரு பக்கத்திலும் 28 வரிகள் கொண்ட 96 பக்கங்கள், எனவே மொத்த வரிகள் \\(= 96 \\times 28 = 2688\\)\nஒரு பக்கத்திற்கு வரிகள் 21 ஆகக் குறைக்கப்படுகிறது\nசெயல்முறை:\nசூத்திரம்: \\(M_1 \\times D_1 = M_2 \\times D_2\\)\n\\(96 \\times 28 = 21 \\times x\\)\n\\(21x = 2688\\)\n\\(x = \\dfrac{2688}{21} = 128\\)\nகேட்டது:\n21 வரிகள் கொண்ட பக்கங்களின் எண்ணிக்கை \\(= 128\\)\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "400,60,800",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 800 soldiers, 60-day provisions = 48000 soldier-days; +400 soldiers -> 1200 soldiers; 48000/1200=40 days. Row 8c07798e option C='40 days' correct; row 8d906932 option C='40 days' correct. No conflict. History: row 8c07798e n_seen+n_ans=3 vs row 8d906932=0, so keep 8c07798e and rewrite 8d906932.",
+    "keep_id": "8c07798e-6c9d-468a-9454-f7bedcbb2743",
+    "rewrites": [
+      {
+        "id": "8d906932-478e-4386-b01a-f8be246c0a25",
+        "question_text": "A hostel has provisions for 300 students for 40 days. If 100 more students join the hostel, for how many days will the provisions last?",
+        "question_text_ta": "ஒரு விடுதியில் 300 மாணவர்களுக்கு 40 நாட்களுக்கு போதுமான உணவுப் பொருட்கள் உள்ளன. விடுதியில் மேலும் 100 மாணவர்கள் சேர்ந்தால், உணவுப் பொருட்கள் எத்தனை நாட்களுக்கு போதுமானதாக இருக்கும்?",
+        "option_a": "30 days",
+        "option_b": "53.3 days",
+        "option_c": "25 days",
+        "option_d": "35 days",
+        "correct_answer": "A",
+        "explanation": "Given:\n300 students have provisions enough for 40 days\nAfter 100 more join, total students \\(= 300 + 100 = 400\\)\nWorking:\nMore students means fewer days — inverse proportion\nFormula: students\\(_1 \\times\\) days\\(_1 =\\) students\\(_2 \\times\\) days\\(_2\\)\n\\(300 \\times 40 = 400 \\times x\\)\n\\(400x = 12000\\)\n\\(x = \\dfrac{300 \\times 40}{400} = \\dfrac{12000}{400} = 30\\) days\nAsked:\nDays the provisions last for 400 students \\(= 30\\) days\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n300 மாணவர்களுக்கு 40 நாட்களுக்கு உணவுப் பொருட்கள் போதுமானவை\nமேலும் 100 பேர் சேர்ந்த பிறகு, மொத்த மாணவர்கள் \\(= 300 + 100 = 400\\)\nசெயல்முறை:\nஅதிக மாணவர்கள் என்றால் குறைவான நாட்கள் — எதிர் விகிதம்\nசூத்திரம்: மாணவர்கள் \\(_1 \\times\\) நாட்கள் \\(_1 =\\) மாணவர்கள் \\(_2 \\times\\) நாட்கள் \\(_2\\)\n\\(300 \\times 40 = 400 \\times x\\)\n\\(400x = 12000\\)\n\\(x = \\dfrac{300 \\times 40}{400} = \\dfrac{12000}{400} = 30\\) நாட்கள்\nகேட்டது:\n400 மாணவர்களுக்கு உணவுப் பொருட்கள் போதுமான நாட்கள் \\(= 30\\) நாட்கள்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "18,20,24",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 18 men × 20 days = 360 man-days; at 24 men -> 360/24=15 days. Row bc064a56 option C='15 days' correct; row c81d1548 option D='15 days' correct. No conflict. History: row c81d1548 n_seen+n_ans=2 vs row bc064a56=0, so keep c81d1548 and rewrite bc064a56.",
+    "keep_id": "c81d1548-18fa-40e8-8c52-f82aaf5d0a71",
+    "rewrites": [
+      {
+        "id": "bc064a56-ce0b-42e5-881a-fbbf6fa37deb",
+        "question_text": "If 15 men can do a work in 24 days, then in how many days will 20 men complete the same work?",
+        "question_text_ta": "15 ஆட்கள் ஒரு வேலையை 24 நாட்களில் செய்ய முடிந்தால், அதே வேலையை 20 ஆட்கள் எத்தனை நாட்களில் முடிப்பார்கள்?",
+        "option_a": "18 days",
+        "option_b": "32 days",
+        "option_c": "20 days",
+        "option_d": "12 days",
+        "correct_answer": "A",
+        "explanation": "Given:\n15 men do the work in 24 days\nNumber of men increased to 20\nMen and days are inversely proportional.\nFormula: \\( M_{1} \\times D_{1} = M_{2} \\times D_{2} \\)\nWorking:\n\\( 15 \\times 24 = 20 \\times x \\)\n\\( 20x = 360 \\)\n\\( x = \\dfrac{15 \\times 24}{20} = 18 \\) days\nAsked:\nDays for 20 men \\( = 18 \\) days\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n15 ஆட்கள் வேலையை 24 நாட்களில் செய்கின்றனர்\nஆட்களின் எண்ணிக்கை 20 ஆக அதிகரித்தது\nஆட்களும் நாட்களும் எதிர் விகிதத்தில் உள்ளன.\nசூத்திரம்: \\( M_{1} \\times D_{1} = M_{2} \\times D_{2} \\)\nசெயல்முறை:\n\\( 15 \\times 24 = 20 \\times x \\)\n\\( 20x = 360 \\)\n\\( x = \\dfrac{15 \\times 24}{20} = 18 \\) நாட்கள்\nகேட்டது:\n20 ஆட்களுக்கான நாட்கள் \\( = 18 \\) நாட்கள்\nவிடை (A)"
+      }
+    ]
+  },
+  {
+    "group_nums": "20,276,46",
+    "topic": "Time and Work",
+    "classification": "true_duplicate",
+    "notes": "Identical problem: 276 soldiers × 20 days = 5520 soldier-days; for 46 days -> 5520/46=120 can stay; leaving=276-120=156. Row bd3a3c69 option D='156 soldiers' correct; row db9fd1f4 option D='156 soldiers' correct. No conflict. History: row bd3a3c69 n_seen+n_ans=4 vs row db9fd1f4=2, so keep bd3a3c69 and rewrite db9fd1f4.",
+    "keep_id": "bd3a3c69-d969-4740-9556-07e78db6e03f",
+    "rewrites": [
+      {
+        "id": "db9fd1f4-b405-4dbd-826d-805e53144321",
+        "question_text": "A camp has provisions for 350 people for 24 days. How many people should leave the camp so that the provisions may last for 42 days?",
+        "question_text_ta": "ஒரு முகாமில் 350 பேருக்கு 24 நாட்களுக்கான உணவுப் பொருட்கள் உள்ளன. உணவுப் பொருட்கள் 42 நாட்களுக்கு போதுமானதாக இருக்க எத்தனை பேர் முகாமை விட்டு வெளியேற வேண்டும்?",
+        "option_a": "150 people",
+        "option_b": "200 people",
+        "option_c": "175 people",
+        "option_d": "125 people",
+        "correct_answer": "A",
+        "explanation": "Given:\n350 people have provisions enough for 24 days.\nProvisions must now last for 42 days for the remaining \\( x \\) people.\nTotal provisions (people \\( \\times \\) days) stays constant; more days means fewer people (inverse proportion).\nFormula: \\( \\text{people}_{1} \\times \\text{days}_{1} = \\text{people}_{2} \\times \\text{days}_{2} \\)\nWorking:\n\\( 350 \\times 24 = 42 \\times x \\)\n\\( 8400 = 42x \\)\n\\( x = \\dfrac{8400}{42} = 200 \\) people (who can stay)\nPeople who leave \\( = 350 - 200 = 150 \\)\nAsked:\nNumber of people who should leave \\( = 150 \\)\n→ Option (A)",
+        "explanation_ta": "தரவுகள்:\n350 பேருக்கு 24 நாட்களுக்கு உணவுப் பொருட்கள் போதுமானவை.\nஇப்போது உணவுப் பொருட்கள் \\( x \\) பேருக்கு 42 நாட்களுக்கு போதுமானதாக இருக்க வேண்டும்.\nமொத்த உணவுப் பொருட்கள் (பேர் \\( \\times \\) நாட்கள்) மாறாது; அதிக நாட்கள் என்றால் குறைவான பேர் (எதிர் விகிதம்).\nசூத்திரம்: \\( \\text{people}_{1} \\times \\text{days}_{1} = \\text{people}_{2} \\times \\text{days}_{2} \\)\nசெயல்முறை:\n\\( 350 \\times 24 = 42 \\times x \\)\n\\( 8400 = 42x \\)\n\\( x = \\dfrac{8400}{42} = 200 \\) பேர் (தங்கக்கூடியவர்கள்)\nவெளியேறும் பேர் \\( = 350 - 200 = 150 \\)\nகேட்டது:\nவெளியேற வேண்டிய பேரின் எண்ணிக்கை \\( = 150 \\)\nவிடை (A)"
+      }
+    ]
+  }
+]

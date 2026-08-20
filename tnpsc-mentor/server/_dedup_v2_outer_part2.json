@@ -1,0 +1,1110 @@
+[
+ {
+  "sig": "arisilkizhar|associated|kabilar|kakkaipadiniyar|pathitruppathu|perunkundrurkizhar",
+  "rows": [
+   {
+    "id": "c215101d-e5ce-486c-bee2-df41f6c4170f",
+    "question_text": "Who is the poet associated with the 7th Ten in Pathitruppathu?",
+    "option_a": "Kabilar",
+    "option_b": "Arisilkizhar",
+    "option_c": "Perunkundrurkizhar",
+    "option_d": "Kakkaipadiniyar"
+   },
+   {
+    "id": "37008758-9349-43d1-98c7-f16954872aab",
+    "question_text": "Who is the poet associated with the 9th Ten in Pathitruppathu?",
+    "option_a": "Kabilar",
+    "option_b": "Arisilkizhar",
+    "option_c": "Perunkundrurkizhar",
+    "option_d": "Kakkaipadiniyar"
+   }
+  ]
+ },
+ {
+  "sig": "buddha|lumbini|preached|sanchi|saranath|sermon",
+  "rows": [
+   {
+    "id": "6578d5d9-e523-47fd-8f41-e7536d3606bc",
+    "question_text": "Buddha preached his first Sermon at",
+    "option_a": "Gaya",
+    "option_b": "Lumbini",
+    "option_c": "Sanchi",
+    "option_d": "Saranath"
+   },
+   {
+    "id": "e46d7b8e-71ab-439f-8e18-c46a3c12b8e7",
+    "question_text": "Buddha preached the first sermon at",
+    "option_a": "Lumbini",
+    "option_b": "Saranath",
+    "option_c": "Sanchi",
+    "option_d": "Gaya"
+   }
+  ]
+ },
+ {
+  "sig": "dharmakirti|dingnaga|exponent|mahayanism|nagarjuna|vasubandhu",
+  "rows": [
+   {
+    "id": "c0e0956b-2314-4cde-9df2-10e6bb4c7738",
+    "question_text": "The great exponent of Mahayanism was",
+    "option_a": "Dingnaga",
+    "option_b": "Dharmakirti",
+    "option_c": "Nagarjuna",
+    "option_d": "Vasubandhu Asanga"
+   },
+   {
+    "id": "96f9a0da-5e23-4797-829f-e4815d5ef13b",
+    "question_text": "A great exponent of Mahayanism was __________",
+    "option_a": "Dharmakirti",
+    "option_b": "Dingnaga",
+    "option_c": "Vasubandhu Asanga",
+    "option_d": "Nagarjuna"
+   }
+  ]
+ },
+ {
+  "sig": "against|consider|revival|ritualism|system|worship",
+  "rows": [
+   {
+    "id": "1059d54d-e535-4d8d-83ab-53232b899d76",
+    "question_text": "Consider the statements:\n Arya samaj\n 1. was against idol worship 2.was against caste system\n 3. was against ritualism 4. was for revival of the Vedas\n Of the statements:",
+    "option_a": "1 and 2 are correct",
+    "option_b": "1,2 and 3 are correct",
+    "option_c": "1,2,3 and 4 are correct",
+    "option_d": "4 alone is correct"
+   },
+   {
+    "id": "60e3d305-e648-49fe-aba6-a09839581c00",
+    "question_text": "Consider the following statements:\n 1. Arya samaj was against idol worship\n 2. Arya samaj was against caste system\n 3. Arya samaj was against ritualism\n 4. Arya samaj was for revival of the Vedas\n Of the statements:",
+    "option_a": "1 and 2 are alone",
+    "option_b": "1, 2 and 3 are correct",
+    "option_c": "all are correct",
+    "option_d": "4 alone is correct"
+   }
+  ]
+ },
+ {
+  "sig": "conference|front|national|party|regional",
+  "rows": [
+   {
+    "id": "d1b03f23-abe1-4c15-9247-82da07625a29",
+    "question_text": "Which one of the following is regional party?",
+    "option_a": "C.P.I.",
+    "option_b": "B.J.P",
+    "option_c": "National Conference",
+    "option_d": "National front"
+   },
+   {
+    "id": "c0149204-7396-40c0-80b6-7b926639680f",
+    "question_text": "Which one of the following is a regional party?",
+    "option_a": "C.P.I",
+    "option_b": "BJP",
+    "option_c": "National Conference",
+    "option_d": "National front"
+   }
+  ]
+ },
+ {
+  "sig": "celebrated|congress|freedom|january|national|struggle",
+  "rows": [
+   {
+    "id": "a3a6378e-1766-4540-9403-2fd00cfc1232",
+    "question_text": "During the freedom struggle on which day the Indian National Congress celebrated the Poorna Swaraj.",
+    "option_a": "January 26th, 1930",
+    "option_b": "January 29th, 1929",
+    "option_c": "August 16th, 1930",
+    "option_d": "August 18th, 1930"
+   },
+   {
+    "id": "2716cfaf-3966-487b-9a54-2eb758e8a885",
+    "question_text": "During the freedom struggle on which day the Indian National Congress celebrated the Poorna Swaraj?",
+    "option_a": "26 January 1930",
+    "option_b": "26 January 1929",
+    "option_c": "15 August 1930",
+    "option_d": "15 August 1929"
+   }
+  ]
+ },
+ {
+  "sig": "commission|economic|educational|established|judicial|reforms",
+  "rows": [
+   {
+    "id": "ca981762-9681-459f-84af-2f95a4c32802",
+    "question_text": "Hunter commission 1882 was established for",
+    "option_a": "social reforms",
+    "option_b": "economic reforms",
+    "option_c": "educational reforms",
+    "option_d": "judicial reforms"
+   },
+   {
+    "id": "5d99fbc5-f5f9-499a-bd68-41ba7e7ea93e",
+    "question_text": "Hunter commission 1882 was established for________ reforms.",
+    "option_a": "social",
+    "option_b": "economic",
+    "option_c": "Educational",
+    "option_d": "judicial"
+   }
+  ]
+ },
+ {
+  "sig": "academy|assembly|collection|denotes|history|scholarly",
+  "rows": [
+   {
+    "id": "1740c722-5fa0-4523-81a6-7f3e0b8d9eb1",
+    "question_text": "The word \"Sangam\" in the early history of Tamil Nadu denotes",
+    "option_a": "Academy of learned man",
+    "option_b": "Assembly of poets",
+    "option_c": "Collection of scholarly works",
+    "option_d": "Scholarly debates"
+   },
+   {
+    "id": "4e16ae37-69a7-4d17-bef9-fea71a55723c",
+    "question_text": "The word 'Sangam' in the early History of South India denotes",
+    "option_a": "Academy of learned men",
+    "option_b": "Assembly of workers",
+    "option_c": "Collection of scholarly works",
+    "option_d": "Scholarly debates"
+   }
+  ]
+ },
+ {
+  "sig": "august|movement|october|september|started",
+  "rows": [
+   {
+    "id": "6dd2eea8-7527-4f1c-baed-9e41152d59c9",
+    "question_text": "The Quit India Movement started in",
+    "option_a": "June, 1942",
+    "option_b": "August, 1942",
+    "option_c": "September, 1942",
+    "option_d": "October, 1942"
+   },
+   {
+    "id": "934a9141-edd8-4fca-b155-e0cbe59ee419",
+    "question_text": "The Quit India Movement started in________.",
+    "option_a": "October, 1942",
+    "option_b": "September, 1942",
+    "option_c": "August, 1942",
+    "option_d": "July, 1942"
+   }
+  ]
+ },
+ {
+  "sig": "attended|conference|conferences|consider|gandhi|second",
+  "rows": [
+   {
+    "id": "fb8d803e-8d42-496a-bc4b-ec2739617990",
+    "question_text": "Consider the following statements:\n M.K.Gandhi attended\n I. the First Round Table Conference only\n II. the Second Round Table Conference only\n III. the First and Second Round Table Conferences\n IV. all the three Round Table Conferences\n Of these,",
+    "option_a": "I alone is correct",
+    "option_b": "II alone is correct",
+    "option_c": "III alone is correct",
+    "option_d": "IV alone is correct"
+   },
+   {
+    "id": "77206e82-80a2-417b-9d37-c39e5a62dc7a",
+    "question_text": "Consider the following statements:\n M.K. Gandhi attended\n 1. The First Round Table Conference only\n 2. The Second Round Table Conference only\n 3. The First and Second Round Table Conferences\n 4. All the three Round Table Conferences\n Of these",
+    "option_a": "1 alone is correct",
+    "option_b": "2 alone is correct",
+    "option_c": "3 alone is correct",
+    "option_d": "4 alone is correct"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|concessions|explanation|immediate|proposals|resolution",
+  "rows": [
+   {
+    "id": "b03a18da-3d59-4a6f-b978-33e00a295380",
+    "question_text": "Consider the following:\n Assertion(A): In August 1942 the Indian National Congress adopted the Quit India Resolution.\n Reason (R): The Cripps Mission proposals held promises for the future with no immediate concessions.\n Now select your answer according to the coding schedule given below:",
+    "option_a": "Both (A) and (R) are true and (R) is the correct explanation of (A)",
+    "option_b": "Both (A) and (R) are true and (R) is not the correct explanation of (A)",
+    "option_c": "(A) is true but (R) is false",
+    "option_d": "(A) is false but (R) is true"
+   },
+   {
+    "id": "817f070b-d2fd-4041-a2c3-00876d7923dd",
+    "question_text": "Consider the following statements\n Assertion(A): In August 1942, the Indian National Congress passed the Quit India Resolution.\n Reason(R): The Cripps mission proposals held promises for the future with no immediate concessions.\n Now select your answer according to the coding scheme given below",
+    "option_a": "Both A and R are true, and R is the correct explanation of A",
+    "option_b": "Both A and R are true, and R is not the correct explanation of A",
+    "option_c": "A is true, but R is false",
+    "option_d": "A is false, but R is true"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|constituent|december|january|meeting|november",
+  "rows": [
+   {
+    "id": "855fc452-edf8-4d4c-90fc-87fd6e0493a9",
+    "question_text": "The first meeting of the constituent Assembly of India held on",
+    "option_a": "26 January, 1948",
+    "option_b": "16 August, 1947",
+    "option_c": "9 December, 1946",
+    "option_d": "26 November, 1947"
+   },
+   {
+    "id": "fd150698-e7da-4d91-9ad3-7163049b6969",
+    "question_text": "The first meeting of the constituent assembly of India held on",
+    "option_a": "26th January 1948",
+    "option_b": "16th August 1947",
+    "option_c": "9th December 1946",
+    "option_d": "26th November 1947"
+   }
+  ]
+ },
+ {
+  "sig": "bannerman|expedition|kattabomman|panchalamkuruchi|sivasubramania|wellesley",
+  "rows": [
+   {
+    "id": "ed33aba2-030e-4e55-808a-8e78f2d4dd4a",
+    "question_text": "Who issued orders for the expedition to Panchalamkuruchi?",
+    "option_a": "Kattabomman",
+    "option_b": "Lord Wellesley",
+    "option_c": "Major Bannerman",
+    "option_d": "Sivasubramania Pillai"
+   },
+   {
+    "id": "836be03f-7973-4044-9720-612e24e9c3f5",
+    "question_text": "Who assumed command of the expedition to Panchalamkuruchi?",
+    "option_a": "Kattabomman",
+    "option_b": "Lord Wellesley",
+    "option_c": "Major Bannerman",
+    "option_d": "Sivasubramania Pillai"
+   }
+  ]
+ },
+ {
+  "sig": "bhishnuram|governor|january|jayachamaraja|maharaja|presidency",
+  "rows": [
+   {
+    "id": "a3e5d7e8-51ab-4e55-b92f-d9a8c35c5eb9",
+    "question_text": "Who served as the Governor of Madras Presidency from 24 January 1958 to 4 May 1964?",
+    "option_a": "Bhishnuram Medhi",
+    "option_b": "Maharaja Sir Jayachamaraja Wodeyar Bahadur",
+    "option_c": "P. Chandra Reddy",
+    "option_d": "Sardar Ujjal Singh"
+   },
+   {
+    "id": "0d8d7a94-9826-4fc8-bce5-a1e466ee8d6b",
+    "question_text": "Who served as the Governor of Madras Presidency from 28 June 1966 to 14 January 1969?",
+    "option_a": "Bhishnuram Medhi",
+    "option_b": "Maharaja Sir Jayachamaraja Wodeyar Bahadur",
+    "option_c": "P. Chandra Reddy",
+    "option_d": "Sardar Ujjal Singh"
+   }
+  ]
+ },
+ {
+  "sig": "aiadmk|founded|party|political|puducherry",
+  "rows": [
+   {
+    "id": "88bd76cd-6641-41c6-99e7-61add67263fc",
+    "question_text": "Which political party was founded in 1949 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   },
+   {
+    "id": "a61264fc-50da-4b23-bc86-25d06a585a09",
+    "question_text": "Which political party was founded in 1972 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   },
+   {
+    "id": "4c510d88-2e13-44cd-a30b-8f31f89743a0",
+    "question_text": "Which political party was founded in 1989 in Puducherry and Tamil Nadu?",
+    "option_a": "AIADMK",
+    "option_b": "DMDK",
+    "option_c": "DMK",
+    "option_d": "PMK"
+   }
+  ]
+ },
+ {
+  "sig": "alexander|archibald|davidson|february|governor|macartney",
+  "rows": [
+   {
+    "id": "db5bab0c-7d9d-4695-929e-4c141da9c147",
+    "question_text": "Who served as the Governor from 12 February 1785 to 14 June 1785?",
+    "option_a": "George MaCartney",
+    "option_b": "Alexander Davidson",
+    "option_c": "Sir Archibald Campbell",
+    "option_d": "John Holland"
+   },
+   {
+    "id": "f86bf31d-e9ba-40ea-a471-0b417a81faca",
+    "question_text": "Who served as the Governor from 6 April 1786 to 7 February 1789?",
+    "option_a": "George MaCartney",
+    "option_b": "Alexander Davidson",
+    "option_c": "Sir Archibald Campbell",
+    "option_d": "John Holland"
+   }
+  ]
+ },
+ {
+  "sig": "anaparambil|bhavsinhji|kumarasinhji|lieutenant|presidency|september",
+  "rows": [
+   {
+    "id": "5938b1f7-623b-4ce9-863f-41d6008e3f7d",
+    "question_text": "Who served as the Governor of Madras Presidency from 6 May 1946 to 7 September 1948?",
+    "option_a": "Lieutenant-General Sir Archibald Edward Nye",
+    "option_b": "Maharaja Sir Krishna Kumarasinhji Bhavsinhji",
+    "option_c": "Sri Prakasa",
+    "option_d": "A.J. John, Anaparambil"
+   },
+   {
+    "id": "bb53ef1c-baa4-43f6-9406-0de606d04f2c",
+    "question_text": "Who served as the Governor of Madras Presidency from 7 September 1948 to 12 March 1952?",
+    "option_a": "Lieutenant-General Sir Archibald Edward Nye",
+    "option_b": "Maharaja Sir Krishna Kumarasinhji Bhavsinhji",
+    "option_c": "Sri Prakasa",
+    "option_d": "A.J. John, Anaparambil"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|chellapandian|legislative|presidency|shanmugam|speaker",
+  "rows": [
+   {
+    "id": "d117e54f-4468-483f-a0ad-be96882590ad",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 31 March 1962 to 14 March 1967?",
+    "option_a": "J. Shiva Shanmugam Pillai",
+    "option_b": "N. Gopala Menon",
+    "option_c": "U. Krishna Rao",
+    "option_d": "S. Chellapandian"
+   },
+   {
+    "id": "a810919b-3eff-47be-b652-715aad487dc9",
+    "question_text": "Who served as the Speaker of the Legislative Assembly of Madras Presidency from 6 May 1952 to 16 August 1955?",
+    "option_a": "J. Shiva shanmugam Pillai",
+    "option_b": "N. Gopala Menon",
+    "option_c": "U. Krishna Rao",
+    "option_d": "S. Chellapandian"
+   }
+  ]
+ },
+ {
+  "sig": "bombay|calcutta|courts|established|madras",
+  "rows": [
+   {
+    "id": "948ef058-4598-4c25-b7be-f2a5eed8d89e",
+    "question_text": "When were High Courts established in Bombay, Madras and Calcutta?",
+    "option_a": "1881",
+    "option_b": "1871",
+    "option_c": "1851",
+    "option_d": "1861"
+   },
+   {
+    "id": "e598344d-f1f8-40f2-a98f-0d1f3da7716e",
+    "question_text": "By which of the following Acts were the High courts of Bombay, Madras and Calcutta established?",
+    "option_a": "India High Courts Act, 1911",
+    "option_b": "India High Courts Act, 1865",
+    "option_c": "India High Courts Act, 1861",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "association|consider|founders|hindustan|republican|socialist",
+  "rows": [
+   {
+    "id": "1cae8284-13c2-4981-a4a3-5cbd265a2c23",
+    "question_text": "Consider the following statements and select the correct answer from  the code given below.\n\n1.\tSubhash Chandra Bose formed the Forward Block.\n2.\tBhagat Singh was one of the founders of Hindustan Republican Socialist Association.",
+    "option_a": "Only 1 is correct",
+    "option_b": "Both 1 and 2 are correct",
+    "option_c": "Only 2 is correct",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "6769288f-3fcc-4002-8482-6d077a882eab",
+    "question_text": "Consider the following statements and select the correct answer from  the code given below.\n\n1.\tSubhash Chandra Bose formed the Forward Bloc.\n2.\tBhagat Singh was one of the founders of Hindustan Republican Socialist Association.",
+    "option_a": "Only 1 is correct",
+    "option_b": "Both 1 and 2 are correct",
+    "option_c": "Only 2 is correct",
+    "option_d": "None of the above"
+   }
+  ]
+ },
+ {
+  "sig": "conspiracy|hanging|lahore|rajguru|resulted|sukhdev",
+  "rows": [
+   {
+    "id": "ff6b8fe3-973a-478d-8582-63b26955e181",
+    "question_text": "Lahore conspiracy case resulted in the hanging of\n\n1.\tRam Prasad Bismil\n2.\tRoshan Singh\n3.\tBhagat Singh\n4.\tSukhdev\n5.\tRajguru",
+    "option_a": "3, 4 and 5",
+    "option_b": "2, 3 and 4",
+    "option_c": "1, 2 and 4",
+    "option_d": "1 and 2"
+   },
+   {
+    "id": "0de67835-5ae9-4564-a512-8d7f95d8167d",
+    "question_text": "Lahore conspiracy case resulted in the hanging of \n\n1.\tRam Prasad Bismil\n2.\tRoshan Singh\n3.\tBhagat Singh\n4.\tSukhdev\n5.\tRajguru\n\nSelect the correct answer from the code given below.",
+    "option_a": "3, 4 and 5",
+    "option_b": "2, 3 and 4",
+    "option_c": "1, 2 and 4",
+    "option_d": "1 and 2"
+   }
+  ]
+ },
+ {
+  "sig": "assembly|batukeshwar|british|central|government|legislative",
+  "rows": [
+   {
+    "id": "6c438693-4051-44b8-8400-e55f5b4c0577",
+    "question_text": "Who among the following threw a bomb in the Central Legislative Assembly on April 8, 1929 to make the deaf British Government hear?\n\n1.\tBhagat Singh\n2.\tSukhdev\n3.\tRajguru\n4.\tBatukeshwar Dutt",
+    "option_a": "1 and 4",
+    "option_b": "1 and 3",
+    "option_c": "2 and 3",
+    "option_d": "1 and 2"
+   },
+   {
+    "id": "28876889-3551-499f-a02c-69404a7ef508",
+    "question_text": "Who among the following threw a bomb in the Central Legislative Assembly on April 8, 1929 to make the deaf British Government hear?\n\n1.\tBhagat Singh\n2.\tSukhdev\n3.\tRajguru\n4.\tBatukeshwar Dutt\n\nSelect the answer from the code given below.",
+    "option_a": "1 and 4",
+    "option_b": "1 and 3",
+    "option_c": "2 and 3",
+    "option_d": "1 and 2"
+   }
+  ]
+ },
+ {
+  "sig": "between|comes|earth|eclipse|occurs|solar",
+  "rows": [
+   {
+    "id": "b9f51116-c6b0-4631-925c-4c08263b4851",
+    "question_text": "A solar eclipse occurs when",
+    "option_a": "The sun, the moon and the earth are not in the same line",
+    "option_b": "The moon comes between the sun and the earth",
+    "option_c": "The earth comes between the sun and the moon",
+    "option_d": "The sun comes between the earth and the moon"
+   },
+   {
+    "id": "2ba760f3-9c6c-49ff-a0a2-55e37aac2233",
+    "question_text": "A solar eclipse occurs when the",
+    "option_a": "Earth comes between the sun and the moon",
+    "option_b": "Moon is at right angle to earth",
+    "option_c": "Moon comes between the sun and the earth",
+    "option_d": "None of these"
+   }
+  ]
+ },
+ {
+  "sig": "number|primary|secondary|transformer|turns",
+  "rows": [
+   {
+    "id": "53f61f33-0cc2-410a-99de-979ff650c68e",
+    "question_text": "In a step-up transformer, the number of turns",
+    "option_a": "In the primary is more than in the secondary",
+    "option_b": "In the secondary is more than in the primary",
+    "option_c": "Is same both in the primary and the secondary",
+    "option_d": "None of the above"
+   },
+   {
+    "id": "da9a9d2a-1a7a-4319-9093-e499fd96eb63",
+    "question_text": "In a step-down transformer",
+    "option_a": "Number of turns in primary is more than that in the secondary",
+    "option_b": "Number of turns in primary is less than that in the secondary",
+    "option_c": "Number of turns in primary & secondary are the same",
+    "option_d": "None of these"
+   }
+  ]
+ },
+ {
+  "sig": "ammeter|connecting|converted|galvanometer|parallel|resistance",
+  "rows": [
+   {
+    "id": "674ccbb0-9582-46f2-826e-9d830d08cef2",
+    "question_text": "A galvanometer can be converted into ammeter by connecting",
+    "option_a": "Low resistance in parallel",
+    "option_b": "Low resistance in series",
+    "option_c": "High resistance in parallel",
+    "option_d": "High resistance in series"
+   },
+   {
+    "id": "6590a0ff-b3ee-48a9-946b-ec1d20743928",
+    "question_text": "A moving coil galvanometer can be converted into an ammeter by connecting",
+    "option_a": "A low resistance in parallel with a galvanometer",
+    "option_b": "A high resistance in parallel with a galvanometer",
+    "option_c": "A high resistance in series with a galvanometer",
+    "option_d": "A low resistance in series with a galvanometer"
+   }
+  ]
+ },
+ {
+  "sig": "human|kelvin|normal|scale|temperature",
+  "rows": [
+   {
+    "id": "2a3af3c0-fe9f-4509-bd25-d115dbc564d5",
+    "question_text": "The normal temperature of human body on the Kelvin scale is",
+    "option_a": "280",
+    "option_b": "290",
+    "option_c": "310",
+    "option_d": "340"
+   },
+   {
+    "id": "8c17b271-9da9-4b1e-bfb9-87e7f1677fec",
+    "question_text": "The normal temperature of human body on the Kelvin scale is,",
+    "option_a": "280",
+    "option_b": "290",
+    "option_c": "300",
+    "option_d": "310"
+   }
+  ]
+ },
+ {
+  "sig": "executive|fundamental|guardian|judiciary|legislature|political",
+  "rows": [
+   {
+    "id": "eea9e4ae-36e9-4485-90dc-cb3329c15045",
+    "question_text": "Which one of the following is the guardian of fundamental rights?",
+    "option_a": "Legislature",
+    "option_b": "Executive",
+    "option_c": "Political parties",
+    "option_d": "Judiciary"
+   },
+   {
+    "id": "eb49d543-96f3-44e5-87bc-6f4f0b296526",
+    "question_text": "Which one of the following is the guardian of Fundamental Right?",
+    "option_a": "Legislature",
+    "option_b": "Executive",
+    "option_c": "Political parties",
+    "option_d": "Judiciary"
+   }
+  ]
+ },
+ {
+  "sig": "advocate|appointed|commission|general|governor|minister",
+  "rows": [
+   {
+    "id": "e19a29b8-25d7-4ec1-976f-52d0fd25fa6b",
+    "question_text": "Which one of the following is NOT appointed by Governor?",
+    "option_a": "The Chief Minister",
+    "option_b": "Advocate General",
+    "option_c": "Member of the State Public Service Commission",
+    "option_d": "Judges of the High Court"
+   },
+   {
+    "id": "7d6cc7c8-d3fc-473b-9463-7663d7d2e06c",
+    "question_text": "Which of the following is not appointed by the Governor?",
+    "option_a": "Chief Minister",
+    "option_b": "Advocate General",
+    "option_c": "Member of State Public Service Commission",
+    "option_d": "Judges of the High Court"
+   }
+  ]
+ },
+ {
+  "sig": "consists|constitution|directive|policy|principles|state",
+  "rows": [
+   {
+    "id": "d5a7e0e3-212d-4c6b-8201-bbe9c1b2d25f",
+    "question_text": "Which part of the Indian Constitution the Directive Principles of State policy consists?",
+    "option_a": "Part IV",
+    "option_b": "Part III",
+    "option_c": "Part IV-A",
+    "option_d": "Part V"
+   },
+   {
+    "id": "7c84fee9-26c6-4d07-b22b-d069648cadca",
+    "question_text": "Among the following statements which is correct?\nI. Part IV of the Indian Constitution consists of Directive principles of state policy.\nII. Part V of the Indian Constitution consists of Directive principles of state policy.\nIII. Part III of the Indian Constitution consists of Directive principles of state policy.\nIV. Part IV-A of the Indian Constitution consists of Directive principles of state policy.",
+    "option_a": "I",
+    "option_b": "II",
+    "option_c": "III",
+    "option_d": "IV"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|executive|judicial|legislature|restricted|transferable",
+  "rows": [
+   {
+    "id": "597532af-7ab2-494d-bedd-73b01cdf3e28",
+    "question_text": "In India, the power of judicial review is restricted because",
+    "option_a": "the executive is supreme",
+    "option_b": "the legislature is supreme",
+    "option_c": "the constitution is supreme",
+    "option_d": "the judges are transferable"
+   },
+   {
+    "id": "12048510-9a63-4703-bf79-59dfeab852b0",
+    "question_text": "In India, power of Judicial Review is restricted because the",
+    "option_a": "Executive is supreme",
+    "option_b": "Legislature is supreme",
+    "option_c": "Constitution is supreme",
+    "option_d": "Judges are transferable"
+   }
+  ]
+ },
+ {
+  "sig": "commission|disputes|election|parliament|president|regarding",
+  "rows": [
+   {
+    "id": "3fb71a8f-c4dd-46ae-9627-4028fef11ac3",
+    "question_text": "Who has the power to settle disputes regarding the election of the President?",
+    "option_a": "The Parliament",
+    "option_b": "The Election Commission",
+    "option_c": "The Supreme Court",
+    "option_d": "The Attorney General"
+   },
+   {
+    "id": "bb3cd0d7-7d7d-4376-a821-4fee117ad5af",
+    "question_text": "Who decides the disputes regarding the election of the President?",
+    "option_a": "The Speaker",
+    "option_b": "The Supreme Court",
+    "option_c": "The Election Commission",
+    "option_d": "The Parliament"
+   }
+  ]
+ },
+ {
+  "sig": "courts|enjoyed|judicial|power|review|supreme",
+  "rows": [
+   {
+    "id": "9cad1bf6-53eb-443a-98f9-9bb6413f5773",
+    "question_text": "In India the power of judicial review is enjoyed by",
+    "option_a": "High courts only",
+    "option_b": "Lower courts",
+    "option_c": "Supreme court and High courts",
+    "option_d": "Supreme court only"
+   },
+   {
+    "id": "5f723988-4a88-4f24-8e1d-d7b7f74eef66",
+    "question_text": "In India, the power of Judicial review is enjoyed by",
+    "option_a": "the Supreme Court",
+    "option_b": "the SC as well as HCs",
+    "option_c": "All the courts",
+    "option_d": "None of these"
+   }
+  ]
+ },
+ {
+  "sig": "conduct|constitution|governor|minister|president|responsible",
+  "rows": [
+   {
+    "id": "3e1b8072-4a81-4389-888d-7c61af2652f2",
+    "question_text": "The Governor of the state is responsible for his conduct under the constitution to the",
+    "option_a": "Prime Minister",
+    "option_b": "President",
+    "option_c": "Chief Minister",
+    "option_d": "Vice-President"
+   },
+   {
+    "id": "ed7a2da1-5d69-4f58-802a-6fe2bd80237d",
+    "question_text": "The Governor of a state is responsible for his conduct under the constitution to",
+    "option_a": "The Prime Minister",
+    "option_b": "The President",
+    "option_c": "The Chief Minister",
+    "option_d": "The Vice-President"
+   }
+  ]
+ },
+ {
+  "sig": "council|minister|ministers|parliament|president|responsible",
+  "rows": [
+   {
+    "id": "5325bb45-b340-43bd-8daf-b90eaf8b6034",
+    "question_text": "The council of Ministers is responsible to",
+    "option_a": "The Prime Minister",
+    "option_b": "The President",
+    "option_c": "The people",
+    "option_d": "The Parliament"
+   },
+   {
+    "id": "933de71b-fbc0-4c27-8d78-b27a8740f958",
+    "question_text": "The council of Ministers of the union of India is responsible to the",
+    "option_a": "Parliament",
+    "option_b": "Prime Minister",
+    "option_c": "Lok sabha",
+    "option_d": "President"
+   }
+  ]
+ },
+ {
+  "sig": "adopted|constitution|december|january|november|preamble",
+  "rows": [
+   {
+    "id": "aa136e75-f0ae-4216-a286-d2fe1e6e99b5",
+    "question_text": "When was the Preamble of Indian Constitution adopted?",
+    "option_a": "13, December 1946",
+    "option_b": "22, January 1947",
+    "option_c": "26, November 1949",
+    "option_d": "30, January 1950"
+   },
+   {
+    "id": "7496ffea-a9a9-4d68-a17a-34bb7143125e",
+    "question_text": "The Preamble of the Indian Constitution was adopted on:",
+    "option_a": "26th January 1950",
+    "option_b": "26th November 1949",
+    "option_c": "15th August 1947",
+    "option_d": "9th December 1946"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|democratic|preamble|republic|socialist|sovereign",
+  "rows": [
+   {
+    "id": "b87003bd-8ce6-445b-8b59-05bf0322b757",
+    "question_text": "Which of the following statement is correct?                                                                                                                                                                                                                                                                                                                                                                                                                                The Preamble of the Indian constitution reads as follows: India is a,\nI. Sovereign, Socialist, Secular, Democratic, Republic\nII. Socialist, Sovereign, Democratic, Secular, Republic.\nIII. Sovereign, Secular, Socialist, Democratic, Republic\nIV. Republic, Sovereign, Socialist, Secular, Democratic",
+    "option_a": "I",
+    "option_b": "II",
+    "option_c": "III",
+    "option_d": "IV"
+   },
+   {
+    "id": "4d4adc0f-f9bc-4d66-867f-5a0007223c91",
+    "question_text": "The Preamble of the Indian Constitution starts with the phrase:",
+    "option_a": "\"We, the People of India...\"",
+    "option_b": "\"In the name of God...\"",
+    "option_c": "\"India, a Sovereign Socialist Secular Democratic Republic...\"",
+    "option_d": "\"To secure to all its citizens...\""
+   }
+  ]
+ },
+ {
+  "sig": "assembly|congress|federal|legislature|parliament|supreme",
+  "rows": [
+   {
+    "id": "373f9806-322d-4019-ad78-b2f8bc296a45",
+    "question_text": "What is the name of the legislature of India?",
+    "option_a": "Congress",
+    "option_b": "Parliament",
+    "option_c": "Supreme Soviet",
+    "option_d": "Federal Assembly"
+   },
+   {
+    "id": "727d238b-b3c9-4c61-ad56-2807a82ce892",
+    "question_text": "What is the name of the legislature of Russia?",
+    "option_a": "Supreme Soviet",
+    "option_b": "Congress",
+    "option_c": "Parliament",
+    "option_d": "Federal Assembly"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|government|independence|judiciary|parliamentary|presidential",
+  "rows": [
+   {
+    "id": "3b1696c5-82d8-470c-9c02-cc82832f2e65",
+    "question_text": "Which of the following is not a feature of the Indian constitution?",
+    "option_a": "Federal Government",
+    "option_b": "Parliamentary Government",
+    "option_c": "Presidential Government",
+    "option_d": "Independence of judiciary"
+   },
+   {
+    "id": "584d123c-8fbd-4d66-afec-88f089617e0d",
+    "question_text": "Which of the following is not a basic feature of the Indian Constitution?",
+    "option_a": "Presidential Government",
+    "option_b": "Parliamentary Government",
+    "option_c": "Federal Government",
+    "option_d": "Independence of Judiciary"
+   }
+  ]
+ },
+ {
+  "sig": "appointed|auditor|comptroller|general|minister|president",
+  "rows": [
+   {
+    "id": "37a978bc-fd3d-4b10-9eaf-22527898e828",
+    "question_text": "The Comptroller and Auditor General of India is appointed by the",
+    "option_a": "Vice-President",
+    "option_b": "President",
+    "option_c": "Prime Minister",
+    "option_d": "Chief Justice of Supreme Court"
+   },
+   {
+    "id": "a747e604-24a7-44f8-a598-1638785aa75b",
+    "question_text": "The comptroller and Auditor General of India is appointed by the",
+    "option_a": "Prime Minister",
+    "option_b": "Finance Minister of India",
+    "option_c": "Lok Sabha",
+    "option_d": "President of India"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|directive|fundamental|independent|judiciary|principles",
+  "rows": [
+   {
+    "id": "3ec6c241-1698-4e27-a7bc-71c850c78cbf",
+    "question_text": "Which feature of the Indian Constitution is referred to as \"Magna Carta\" of the Indian people?",
+    "option_a": "Directive principles of state policy",
+    "option_b": "Fundamental duties",
+    "option_c": "Fundamental rights",
+    "option_d": "Independent judiciary"
+   },
+   {
+    "id": "a75a2bcb-0b3e-45a1-9e70-13d1124d41c6",
+    "question_text": "Which feature of the Indian Constitution is referred as Magna Carta of the Indian People?",
+    "option_a": "Directive principles of State Policy",
+    "option_b": "Fundamental duties",
+    "option_c": "Independent Judiciary",
+    "option_d": "Fundamental rights"
+   }
+  ]
+ },
+ {
+  "sig": "fundamental|information|legal|neither|right",
+  "rows": [
+   {
+    "id": "8aa2c409-d768-4fac-b593-c4b5f6d31261",
+    "question_text": "Right to Information Act, is a",
+    "option_a": "Fundamental Right",
+    "option_b": "Legal Right",
+    "option_c": "Neither Fundamental nor Legal Right",
+    "option_d": "Both Fundamental as well as Legal Right"
+   },
+   {
+    "id": "28ad3e10-4adf-4b6b-9c8d-e8b5bffb9879",
+    "question_text": "Right to Information in India is a",
+    "option_a": "Fundamental Right",
+    "option_b": "Legal Right",
+    "option_c": "Both Fundamental and Legal Right",
+    "option_d": "Neither Fundamental nor Legal Right"
+   }
+  ]
+ },
+ {
+  "sig": "amendment|constitutional|creation|majority|ratification|requires",
+  "rows": [
+   {
+    "id": "6371c1f4-5beb-4271-9f39-3c9253fc56e6",
+    "question_text": "Creation of a new state requires a majority for Constitutional Amendment",
+    "option_a": "simple",
+    "option_b": "two-third",
+    "option_c": "three-fourth",
+    "option_d": "two-third plus ratification by half of all states"
+   },
+   {
+    "id": "74a50571-1398-4485-a4ac-e0932d1716b6",
+    "question_text": "Creation of a new state requires a ________ majority for Constitutional Amendment.",
+    "option_a": "Simple",
+    "option_b": "Two-third",
+    "option_c": "Three-fourth",
+    "option_d": "Two-third plus ratification by half of all states"
+   }
+  ]
+ },
+ {
+  "sig": "ascending|chronological|created|formation|meghalaya|nagaland",
+  "rows": [
+   {
+    "id": "de5b5387-8dee-4ece-ba1c-907a3a73e336",
+    "question_text": "The following states were created after 1960. Arrange them in ascending chronological order of their formation and choose your answer form the given codes\nI. Haryana\nII. Sikkim\nIII. Nagaland\nIV.Meghalaya\nCodes",
+    "option_a": "I, II, III, IV",
+    "option_b": "II, III, IV, I",
+    "option_c": "III, I, IV, II",
+    "option_d": "II, IV, I, III"
+   },
+   {
+    "id": "75c5ef2e-f42b-4a99-9f4a-206f321ff687",
+    "question_text": "The following States were created after 1960. Arrange them in ascending chronological order of their formation.\n1. Haryana\n2. Sikkim\n3. Nagaland\n4. Meghalaya\nChoose your answer from the given code. \nCode",
+    "option_a": "1, 2, 3, 4",
+    "option_b": "2, 3, 4, 1",
+    "option_c": "3, 1, 4, 2",
+    "option_d": "2, 4, 1, 3"
+   }
+  ]
+ },
+ {
+  "sig": "appropriate|between|changed|liberty|reflects|relationship",
+  "rows": [
+   {
+    "id": "251023fe-815d-4088-ab64-9318214af884",
+    "question_text": "Which of the following reflects the most appropriate relationship between law and liberty?",
+    "option_a": "If there are more laws, there is less liberty.",
+    "option_b": "If there are no laws, there is no liberty.",
+    "option_c": "If there is liberty, laws have to be made by people.",
+    "option_d": "If laws are changed too often liberty is in danger."
+   },
+   {
+    "id": "68688f3d-498b-42af-9bc9-4f8fc98663a7",
+    "question_text": "Which one of the following reflects the most appropriate relationship between Law and Liberty?",
+    "option_a": "If there are more law, there is loss liberty.",
+    "option_b": "If there are no laws, there is no liberty",
+    "option_c": "If there is liberty, laws have to be made by the people.",
+    "option_d": "If law are changed too often, liberty is in danger."
+   }
+  ]
+ },
+ {
+  "sig": "இடங்களில்|எத்தனை|எழுத்து|ஒலிக்கும்|தனித்து|மாத்திரை",
+  "rows": [
+   {
+    "id": "2745874f-695b-4c10-b1eb-b65298cf3119",
+    "question_text": "ஔகார எழுத்து, தனித்து வரும் இடங்களில் எத்தனை மாத்திரை அளவில் ஒலிக்கும்",
+    "option_a": "2",
+    "option_b": "1 1/2",
+    "option_c": "1",
+    "option_d": "1/2"
+   },
+   {
+    "id": "55d26adc-e703-4625-b097-fec3e29f03ef",
+    "question_text": "ஐ, கை, பை என ஐகார எழுத்து, தனித்து வரும் இடங்களில் எத்தனை மாத்திரை அளவில் ஒலிக்கும்?",
+    "option_a": "2",
+    "option_b": "1 1/2",
+    "option_c": "1",
+    "option_d": "1/2"
+   }
+  ]
+ },
+ {
+  "sig": "இல்லார்|காட்டிச்|கொடையைக்|சொல்லின்|நெஞ்சில்|ழைப்பைக்",
+  "rows": [
+   {
+    "id": "81593071-869f-4e05-bb06-9e739394faf7",
+    "question_text": "நெஞ்சில் ஈரம் இல்லார் நாண \nநீளு ழைப்பைக் கொடையைக் காட்டிச் - இதில் ஈரம் என்ற சொல்லின் பொருள்?",
+    "option_a": "தண்ணீர்",
+    "option_b": "ஆறு",
+    "option_c": "இரக்கம்",
+    "option_d": "அன்பு"
+   },
+   {
+    "id": "4f450d04-50a0-44fb-b2a1-a2c603f86326",
+    "question_text": "நெஞ்சில் ஈரம் இல்லார் நாண \nநீளு ழைப்பைக் கொடையைக் காட்டிச் - இதில் நாணம் என்ற சொல்லின் பொருள்?",
+    "option_a": "பயம்",
+    "option_b": "வெட்கம்",
+    "option_c": "துன்பம்",
+    "option_d": "நாணயம்"
+   }
+  ]
+ },
+ {
+  "sig": "எனப்படுவது|கூறியது|செறாஅமை|சொல்நோன்றல்|தன்கிளை|பேதையார்",
+  "rows": [
+   {
+    "id": "3275330f-cf52-4196-8adc-274e0b6142c5",
+    "question_text": "செறிவு எனப்படுவது _________?",
+    "option_a": "தன்கிளை செறாஅமை",
+    "option_b": "பேதையார் சொல்நோன்றல்",
+    "option_c": "கூறியது மறாஅமை",
+    "option_d": "மறை பிறர் அறியாமை"
+   },
+   {
+    "id": "77b72444-326d-4b84-883e-539e15783f25",
+    "question_text": "நிறை எனப்படுவது _________?",
+    "option_a": "தன்கிளை செறாஅமை",
+    "option_b": "பேதையார் சொல்நோன்றல்",
+    "option_c": "கூறியது மறாஅமை",
+    "option_d": "மறை பிறர் அறியாமை"
+   }
+  ]
+ },
+ {
+  "sig": "இவ்வரியில்|உருகெழும்|குறிப்பிடப்படும்|சொல்லின்|பெடையோடு|பெருக்கம்",
+  "rows": [
+   {
+    "id": "0dda9580-70b1-4839-8906-bcde6b0a6267",
+    "question_text": "_________ போரின்\nஉருகெழும் ஓதை வெரீஇப் பெடையோடு _________ இவ்வரியில் குறிப்பிடப்படும் ஓதை என்ற சொல்லின் பொருள்?",
+    "option_a": "நீர் பெருக்கம்",
+    "option_b": "அஞ்சி",
+    "option_c": "ஓசை",
+    "option_d": "வருவாய்"
+   },
+   {
+    "id": "f2940379-eb1b-4570-b9b8-d4641ef4f9cc",
+    "question_text": "_________ போரின் \nஉருகெழும் ஓதை வெரீஇப் பெடையோடு _________ இவ்வரியில் குறிப்பிடப்படும் வெரீஇப் என்ற சொல்லின் பொருள்?",
+    "option_a": "நீர் பெருக்கம்",
+    "option_b": "அஞ்சி",
+    "option_c": "ஓசை",
+    "option_d": "வருவாய்"
+   }
+  ]
+ },
+ {
+  "sig": "ஆராய்ந்து|இடம்பெற்றுள்ள|இவ்வரியில்|குணங்கள்எல்லாம்|கொடுக்கும்|மறவிஒர்ப்பு",
+  "rows": [
+   {
+    "id": "3a6c820a-1311-4edf-83c8-d657d9254059",
+    "question_text": "மறவிஒர்ப்பு இன்னபிற \nமன்னும் உயிர்க் குணங்கள்எல்லாம் - இவ்வரியில் இடம்பெற்றுள்ள மன்னும் என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கொடுக்கும்",
+    "option_b": "ஆராய்ந்து தெளிதல்",
+    "option_c": "விருப்பம்",
+    "option_d": "நிலைபெற்ற"
+   },
+   {
+    "id": "6a0ecfa3-6d20-4a27-8f16-71a61222c347",
+    "question_text": "மறவிஒர்ப்பு இன்னபிற \nமன்னும் உயிர்க் குணங்கள்எல்லாம் - இவ்வரியில் இடம்பெற்றுள்ள ஓர்ப்பு என்ற சொல்லின் பொருள் என்ன?",
+    "option_a": "கொடுக்கும்",
+    "option_b": "ஆராய்ந்து தெளிதல்",
+    "option_c": "விருப்பம்",
+    "option_d": "நிலைபெற்ற"
+   }
+  ]
+ },
+ {
+  "sig": "அழைக்கப்படுகிறது|எவ்வாறு|கன்னடம்|தமிழ்ச்|முறையே|மொழிகளில்",
+  "rows": [
+   {
+    "id": "5fd9ad9a-3b7c-44c1-994c-f3b3e87c1f1b",
+    "question_text": "ஒன்று' என்ற தமிழ்ச் சொல் கன்னடம், துளு ஆகிய மொழிகளில் முறையே எவ்வாறு அழைக்கப்படுகிறது",
+    "option_a": "ஒகடி, ஒந்து",
+    "option_b": "ஒந்து, ஒகடி",
+    "option_c": "ஒந்து, ஒஞ்சி",
+    "option_d": "ஒஞ்சி, ஒந்து"
+   },
+   {
+    "id": "2235b75d-9e0e-481d-b3c7-9545a30446ea",
+    "question_text": "நூறு' என்ற தமிழ்ச் சொல் கன்னடம், துளு ஆகிய மொழிகளில் முறையே எவ்வாறு அழைக்கப்படுகிறது",
+    "option_a": "நூறு, நூரு",
+    "option_b": "நூரு, நூறு",
+    "option_c": "நூறு, நூது",
+    "option_d": "நூரு, நூது"
+   }
+  ]
+ },
+ {
+  "sig": "கருத்துகளை|கீழ்க்கணக்கு|சிறுபஞ்ச|திரிகடுகம்|நூல்களுள்|பாடலிலும்",
+  "rows": [
+   {
+    "id": "9824f774-33d5-4748-8f0c-5847c7f30e6c",
+    "question_text": "பதினெண் கீழ்க்கணக்கு நூல்களுள் ஒவ்வொரு பாடலிலும் ஆறு கருத்துகளை கூறும் நூல் எது?",
+    "option_a": "திரிகடுகம்",
+    "option_b": "ஏலாதி",
+    "option_c": "சிறுபஞ்ச மூலம்",
+    "option_d": "நன்னூல்"
+   },
+   {
+    "id": "38b174e0-2994-4b6f-9db8-288cc67204f6",
+    "question_text": "பதினெண் கீழ்க்கணக்கு நூல்களுள் ஒவ்வொரு பாடலிலும் மூன்று கருத்துகளை கூறும் நூல் எது?",
+    "option_a": "திரிகடுகம்",
+    "option_b": "ஏலாதி",
+    "option_c": "சிறுபஞ்ச மூலம்",
+    "option_d": "நன்னூல்"
+   }
+  ]
+ },
+ {
+  "sig": "குறிப்புத்|பெயரெச்சம்|வினைத்தொகை|வினைமுற்று|வினையெச்சம்|வியங்கோள்",
+  "rows": [
+   {
+    "id": "8b8156d4-c2d1-4c14-9f9e-ae2d6469af0f",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - இறைஞ்சி",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   },
+   {
+    "id": "6abf55fc-ef2b-4269-826c-e6264d80d201",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - விளைக",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   },
+   {
+    "id": "85a17559-8083-49e8-8a84-413994c48c90",
+    "question_text": "இலக்கணக் குறிப்புத் தருக - தேர்ந்த",
+    "option_a": "பெயரெச்சம்",
+    "option_b": "வியங்கோள் வினைமுற்று",
+    "option_c": "வினையெச்சம்",
+    "option_d": "வினைத்தொகை"
+   }
+  ]
+ }
+]

@@ -100,10 +100,10 @@ export default function PyqGroupPage() {
   return (
     <PickerPage badge={t(group.i18n.badge)} backTo="/test-arena/pyq">
       <div className="mb-5">
-        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-ink">
           {t('pyqPickSection')}
         </h2>
-        <p className="tamil mt-1 font-body text-[15px] text-muted">{t(group.i18n.hint)}</p>
+        <p className="tamil mt-1 font-body text-base text-muted">{t(group.i18n.hint)}</p>
       </div>
 
       {/* Exam-year filter. Scopes the section counts below and is carried into

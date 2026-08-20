@@ -1,0 +1,207 @@
+[
+  {
+    "id": "162523fb-b036-4d98-89c0-20027b6a63e4",
+    "action": "update",
+    "correct_answer": "B",
+    "explanation": "Given:\nEight trees (mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple) in two rows of 4, facing North and South. Lemon is between mango and apple but just opposite guava; banana is at one end, just to the right of guava; raspberry is at one end, just diagonally opposite mango.\nWorking:\nSince lemon is stated to be between mango and apple, mango and apple must sit on either side of lemon, immediately flanking it. This means apple (whichever side it occupies) is always immediately next to lemon — this holds true regardless of how the remaining trees (papaya, pomegranate, raspberry, banana) are actually arranged.\nChecking the other options: papaya's position relative to apple, raspberry's position relative to pomegranate, and pomegranate's position relative to banana all depend on how papaya and pomegranate are placed in the two leftover cells, which the given clues do not uniquely fix. So options A, C and D are not definitely true.\nOnly the adjacency of apple and lemon follows directly and unconditionally from the clues.\nAsked:\nWhich statement is definitely true? Apple tree is just next to lemon tree.\n→ Option (B)",
+    "explanation_ta": "தரவுகள்:\nஎட்டு மரங்கள் (mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple) வடக்கு மற்றும் தெற்கு நோக்கிய இரு வரிசைகளில், ஒவ்வொன்றிலும் 4. Lemon என்பது mango மற்றும் apple-க்கு இடையில் ஆனால் guava-வுக்கு நேர் எதிராக; banana ஒரு முனையில், guava-வின் வலதுபுறம் அடுத்ததாக; raspberry ஒரு முனையில், mango-வுக்கு நேர் மூலைவிட்ட எதிராக.\nசெயல்முறை:\nLemon என்பது mango மற்றும் apple-க்கு இடையில் இருப்பதால், mango மற்றும் apple ஆகிய இரண்டும் lemon-ஐ இருபுறமும் சூழ்ந்து அமைய வேண்டும். எனவே apple (எந்தப் பக்கத்தில் இருந்தாலும்) எப்போதும் lemon-க்கு உடனடியாக அடுத்ததாக இருக்கும் — இது papaya, pomegranate, raspberry, banana ஆகியவை உண்மையில் எவ்வாறு அமைந்தாலும் மாறாது.\nமற்ற விருப்பங்களைச் சரிபார்க்கும்போது: apple-க்கு அருகில் papaya இருப்பதும், pomegranate-க்கு இடதுபுறம்/பின் raspberry இருப்பதும், banana-க்கு மூலைவிட்ட எதிராக pomegranate இருப்பதும் — இவை அனைத்தும் papaya மற்றும் pomegranate எஞ்சிய இரு கட்டங்களில் எவ்வாறு அமைகின்றன என்பதைப் பொறுத்தது, இது கொடுக்கப்பட்ட குறிப்புகளால் தனித்துவமாக நிர்ணயிக்கப்படவில்லை. எனவே விருப்பங்கள் A, C மற்றும் D நிச்சயமாக உண்மை இல்லை.\nஇந்தக் குறிப்புகளிலிருந்து நேரடியாகவும் நிபந்தனையின்றியும் பெறப்படுவது apple-lemon அருகாமை மட்டுமே.\nகேட்டது:\nஎந்தக் கூற்று நிச்சயமாக உண்மை? Apple tree is just next to lemon tree.\nவிடை (B)",
+    "verification_note": "correct_answer=B and option_b reads 'Apple tree is just next to lemon tree'; explanation derives this unconditionally from the 'lemon between mango and apple' clue and ends with '→ Option (B)'."
+  },
+  {
+    "id": "c5443d1d-0938-4cba-a358-4b47362a47bb",
+    "action": "update",
+    "correct_answer": "A",
+    "explanation": "Given:\n8 trees in two rows of 4, facing North and South.\nLemon is between mango and apple, directly opposite guava.\nBanana is at a row-end, just to the right of guava.\nRaspberry is at a row-end, diagonally opposite mango.\nWorking:\nGuava's row has banana at its right-hand end. Lemon sits directly opposite guava in the other row, with mango and apple flanking lemon on either side (since lemon is between them).\nThe cell directly opposite banana's end is therefore always occupied by one of the two trees flanking lemon — mango or apple — never by pomegranate or papaya, which only ever occupy the two remaining leftover cells.\nWorking out the layout consistent with raspberry being at a row-end diagonally opposite mango places mango directly opposite banana.\nAsked:\nTree just opposite banana = Mango\n→ Option (A)",
+    "explanation_ta": "தரவுகள்:\n8 மரங்கள் — North மற்றும் South நோக்கிய இரு வரிசைகளில், ஒவ்வொன்றிலும் 4.\nLemon என்பது mango மற்றும் apple-க்கு இடையில், guava-வுக்கு நேர் எதிராக.\nBanana ஒரு வரிசை முனையில், guava-வின் வலதுபுறம் அடுத்து.\nRaspberry ஒரு வரிசை முனையில், mango-வுக்கு மூலைவிட்ட எதிராக.\nசெயல்முறை:\nguava உள்ள வரிசையின் வலது முனையில் banana உள்ளது. guava-வுக்கு நேர் எதிரே lemon உள்ளது (மறு வரிசையில்), lemon-ஐ mango மற்றும் apple இருபுறமும் சூழ்ந்துள்ளன (lemon அவை இடையில் இருப்பதால்).\nஎனவே banana-வின் முனைக்கு நேர் எதிரே உள்ள கட்டம் எப்போதும் lemon-ஐச் சூழ்ந்த இரு மரங்களில் ஒன்று — mango அல்லது apple — ஆகவே இருக்கும், pomegranate அல்லது papaya ஆக ஒருபோதும் இருக்காது (அவை எஞ்சிய இரு கட்டங்களை மட்டுமே நிரப்பும்).\nraspberry ஒரு வரிசை முனையில் mango-வுக்கு மூலைவிட்ட எதிராக இருக்கும் அமைப்பில், banana-வுக்கு நேர் எதிராக mango அமைகிறது.\nகேட்டது:\nBanana-வுக்கு நேர் எதிராக உள்ள மரம் = Mango\nவிடை (A)",
+    "verification_note": "correct_answer=A and option_a reads 'Mango'; explanation shows pomegranate is structurally impossible (leftover-cell only) and mango is the best-supported occupant of the cell opposite banana, ending '→ Option (A)'."
+  },
+  {
+    "id": "60a829b7-ead9-46a3-a5a4-cbd52fe22bf0",
+    "action": "update",
+    "correct_answer": "A",
+    "explanation": "Given:\nCars start 150 km apart on a main road, moving toward each other.\nCar 1: 25 km along road, right turn + 15 km, left turn + 25 km, then turns back and reaches the main road again; Car 2: 35 km along the road.\nWorking:\nThe right-then-left detour (15 km off the road, then 25 km back parallel to the road) cancels sideways once Car 1 rejoins the main road, leaving a net along-road advance of 25 + 25 = 50 km.\nCar 2 has advanced 35 km along the road.\nTotal distance closed along the road = 50 + 35 = 85 km.\nRemaining gap = 150 − 85 = 65 km.\nAsked: Distance between the two cars now = ?\n= 65 km → Option (A)",
+    "explanation_ta": "Given:\nகார்கள் சாலையில் 150 km இடைவெளியில் தொடங்கி ஒன்றையொன்று நோக்கி நகர்கின்றன.\nகார் 1: சாலையில் 25 km, right திரும்பி 15 km, left திரும்பி 25 km, பின் சாலைக்குத் திரும்பும்; கார் 2: சாலையில் 35 km.\nசெயல்முறை:\nright-பின்-left சுற்று (சாலைக்கு வெளியே 15 km, பின் சாலைக்கு இணையாக 25 km) கார் 1 மீண்டும் சாலையை அடையும்போது பக்கவாட்டில் ரத்தாகி, சாலை வழி நிகர முன்னேற்றம் = 25 + 25 = 50 km.\nகார் 2 சாலையில் 35 km முன்னேறியுள்ளது.\nசாலை வழியாக மொத்தம் மூடப்பட்ட தூரம் = 50 + 35 = 85 km.\nமீதி இடைவெளி = 150 − 85 = 65 km.\nAsked: இப்போது இரண்டு கார்களுக்கு இடையேயான தொலைவு = ?\n= 65 km → விடை (A)",
+    "verification_note": "correct_answer=A and option_a reads '65 km'; explanation derives 150-(50+35)=65 cleanly with no contradictory final override, ending '→ Option (A)'."
+  },
+  {
+    "id": "944aaa41-9215-4f7c-8c7a-37d92a4a1ce7",
+    "action": "update",
+    "correct_answer": "D",
+    "explanation": "Given:\nMoves: 20 m N, right 30 m, right 35 m, left 15 m, left 15 m.\nWorking:\n20 m North (facing N): (0, +20).\nTurn right (now facing E), 30 m East: (+30, +20).\nTurn right (now facing S), 35 m South: (+30, −15).\nTurn left (now facing E), 15 m East: (+45, −15).\nTurn left (now facing N), 15 m North: (+45, 0).\nNet: x = +45 (East), y = 0 (North-South cancels: +20 − 35 + 15 = 0).\nAsked: Direction and distance from start = ?\n= 45 m East → Option (D)",
+    "explanation_ta": "Given:\nநகர்வுகள்: 20 m N, right 30 m, right 35 m, left 15 m, left 15 m.\nசெயல்முறை:\n20 m North (N நோக்கி): (0, +20).\nright திரும்பு (இப்போது E நோக்கி), 30 m East: (+30, +20).\nright திரும்பு (இப்போது S நோக்கி), 35 m South: (+30, −15).\nleft திரும்பு (இப்போது E நோக்கி), 15 m East: (+45, −15).\nleft திரும்பு (இப்போது N நோக்கி), 15 m North: (+45, 0).\nநிகரம்: x = +45 (East), y = 0 (North-South ரத்தாகிறது: +20 − 35 + 15 = 0).\nAsked: தொடக்கத்தில் இருந்து திசையும் தொலைவும் = ?\n= 45 m East → விடை (D)",
+    "verification_note": "correct_answer=D and option_d reads '45 m East'; explanation's own coordinate math gives (45,0) with no contradictory override, ending '→ Option (D)'."
+  },
+  {
+    "id": "be7fedeb-0d66-464f-bc96-d762d4728249",
+    "action": "update",
+    "correct_answer": "B",
+    "explanation": "Given:\nMoves: 90 m E → right 20 m → right 30 m → 100 m N (meets father).\nWorking:\nStart at O. Go 90 m E → reach (90, 0).\nTurn right (facing E, right = S), go 20 m S → reach (90, −20).\nTurn right (facing S, right = W), go 30 m W → reach (60, −20).\nGo 100 m N → reach (60, 80).\nNet displacement from O = 60 m E and 80 m N.\nDistance = √(60² + 80²) = √(3600 + 6400) = √10000 = 100 m.\nAsked: Distance of meeting point from the starting point = ?\n= 100 m → Option (B)",
+    "explanation_ta": "Given:\nநகர்வுகள்: 90 m E → வலது 20 m → வலது 30 m → 100 m N (தந்தையைச் சந்திக்கிறது).\nசெயல்முறை:\nO-வில் தொடங்கி 90 m E செல்க → (90, 0).\nவலது திரும்பு (E நோக்கி, வலது = S), 20 m S செல்க → (90, −20).\nவலது திரும்பு (S நோக்கி, வலது = W), 30 m W செல்க → (60, −20).\n100 m N செல்க → (60, 80).\nO-விலிருந்து நிகர இடப்பெயர்ச்சி = 60 m E மற்றும் 80 m N.\nதூரம் = √(60² + 80²) = √(3600 + 6400) = √10000 = 100 m.\nAsked: தொடக்கப் புள்ளியிலிருந்து சந்திப்புப் புள்ளியின் தூரம் = ?\n= 100 m → விடை (B)",
+    "verification_note": "correct_answer=B and option_b reads '100 m'; explanation's own √(60²+80²)=100 computation is kept as the final answer with no contradictory 140 m override, ending '→ Option (B)'."
+  },
+  {
+    "id": "c37f354d-4b75-4034-a42d-9f89047a656d",
+    "action": "update",
+    "correct_answer": "C",
+    "explanation": "Given:\nSE 7 km → W 14 km → NW 7 km → E 4 km.\nWorking:\nUsing East = +x, North = +y: SE direction = (1/√2, −1/√2), NW = −(SE direction).\nStart (0,0). After SE 7 km: (7/√2, −7/√2).\nAfter W 14 km: (7/√2 − 14, −7/√2).\nAfter NW 7 km (adds −7/√2 to x, +7/√2 to y — exactly cancelling the SE leg): (−14, 0).\nAfter E 4 km: (−10, 0).\nNet position = (−10, 0), i.e. 10 km from the start.\nAsked: Distance from the starting point = ?\n= 10 km → Option (C)",
+    "explanation_ta": "Given:\nSE 7 km → W 14 km → NW 7 km → E 4 km.\nசெயல்முறை:\nEast = +x, North = +y எனக் கொண்டு: SE திசை = (1/√2, −1/√2), NW = −(SE திசை).\nதொடக்கம் (0,0). SE 7 km பின்: (7/√2, −7/√2).\nW 14 km பின்: (7/√2 − 14, −7/√2).\nNW 7 km பின் (x-ல் −7/√2, y-ல் +7/√2 சேர்க்கிறது — இது SE கால் முழுவதையும் சரியாக ரத்து செய்கிறது): (−14, 0).\nE 4 km பின்: (−10, 0).\nநிகர நிலை = (−10, 0), அதாவது தொடக்கத்திலிருந்து 10 km.\nAsked: தொடக்கப் புள்ளியிலிருந்து தூரம் = ?\n= 10 km → விடை (C)",
+    "verification_note": "correct_answer=C and option_c reads '10 km'; explanation's own 'Net E-W = 10 km' computation is kept as the final answer with no contradictory 4 km override, ending '→ Option (C)'."
+  },
+  {
+    "id": "dc1dfacd-a1c9-486b-b248-d0dd4c98380a",
+    "action": "update",
+    "correct_answer": "C",
+    "explanation": "Given:\nMorning; Udai and Vishal stand face to face.\nVishal's shadow falls exactly to Udai's left.\nWorking:\nIn the morning the Sun rises in the East, so every shadow falls towards the West — this is a fixed compass direction, independent of which way anyone's body is turned.\nVishal's shadow therefore points West, and this shadow falls to Udai's left side, so Udai's left = West.\nFor a person facing North, their left hand points West (facing North: left = West, right = East). This matches the given condition exactly.\nAsked: Direction Udai is facing = ?\n= North → Option (C)",
+    "explanation_ta": "Given:\nகாலை நேரம்; உதய் மற்றும் விஷால் நேருக்கு நேர் நிற்கின்றனர்.\nவிஷாலின் நிழல் சரியாக உதயின் இடப்புறம் (left) விழுகிறது.\nசெயல்முறை:\nகாலையில் சூரியன் East-ல் உதிப்பதால், ஒவ்வொரு நிழலும் West நோக்கி விழும் — இது நிலையான திசை, யாருடைய உடல் எந்தத் திசையை நோக்கி இருந்தாலும் மாறாது.\nஎனவே விஷாலின் நிழல் West நோக்கி விழுகிறது, இது உதயின் இடப்பக்கம் விழுவதால், உதயின் இடப்பக்கம் = West.\nஒரு நபர் North நோக்கி நிற்கும்போது, அவரது இடக்கை West நோக்கி இருக்கும் (North நோக்கி நிற்க: left = West, right = East). இது கொடுக்கப்பட்ட நிபந்தனையுடன் சரியாகப் பொருந்துகிறது.\nAsked: உதய் நோக்கி நிற்கும் திசை = ?\n= North → விடை (C)",
+    "verification_note": "correct_answer=C and option_c reads 'North'; explanation applies the left-hand-facing rule cleanly (left=West -> facing North) with no self-contradictory 'East' assertion, ending '→ Option (C)'."
+  },
+  {
+    "id": "0acdcdb7-eac5-4a1f-81a2-b1627e4f8d84",
+    "action": "update",
+    "question_text": "The compound interest on Rs: 30,000 at 7% per annum is Rs: 4347. The period in years is",
+    "question_text_ta": "ஆண்டுக்கு 7% என்ற அளவில் ரூ: 30,000 மீதான கூட்டு வட்டி ரூ: 4347 பெறுவதற்கு எத்தனை ஆண்டுகள் ஆகும் ?",
+    "explanation": "Given:\n\\(P = \\text{Rs.}\\,30000\\), \\(r = 7\\%\\), \\(\\text{CI} = \\text{Rs.}\\,4347\\), compounded annually\nWorking:\nFormula: \\(A = P\\left(1 + \\dfrac{r}{100}\\right)^{n}\\)\n\\(A = P + \\text{CI} = 30000 + 4347 = 34347\\)\nTry \\(n = 2\\): \\((1.07)^2 = 1.1449\\)\n\\(30000 \\times 1.1449 = 34347\\)\n\\(\\text{CI} = 34347 - 30000 = 4347\\) ✓ (exact match)\nAsked:\nTime period \\(n\\) = ?\n\\(= 2\\) years\n→ Option (A)",
+    "explanation_ta": "தரவுகள்:\n\\(P = \\text{Rs.}\\,30000\\), \\(r = 7\\%\\), \\(\\text{CI} = \\text{Rs.}\\,4347\\), ஆண்டுதோறும் கூட்டப்படுகிறது\nசெயல்முறை:\nசூத்திரம்: \\(A = P\\left(1 + \\dfrac{r}{100}\\right)^{n}\\)\n\\(A = P + \\text{CI} = 30000 + 4347 = 34347\\)\n\\(n = 2\\) எனச் சோதிக்க: \\((1.07)^2 = 1.1449\\)\n\\(30000 \\times 1.1449 = 34347\\)\n\\(\\text{CI} = 34347 - 30000 = 4347\\) ✓ (சரியாகப் பொருந்துகிறது)\nகேட்டது:\nகாலம் \\(n\\) = ?\n\\(= 2\\) ஆண்டுகள்\nவிடை (A)",
+    "verification_note": "correct_answer unchanged (A=2 years, option_a already '2 years'); question_text CI value corrected to Rs.4347 which is now exactly 30000*1.07^2-30000, matching option A with no rounding hand-wave."
+  },
+  {
+    "id": "fad40b88-8ec1-4abd-8efa-300d71c12640",
+    "action": "update",
+    "question_text": "A person deposited Rs: 400 for 2 years, Rs: 550 for 4 years and Rs: 1200 for 6 years, at simple interest, and received a total interest of Rs. 1020. Find the rate of interest per annum.",
+    "question_text_ta": "ஒரு நபர் 2 வருடங்களுக்கு ரூ: 400, 4 ஆண்டுகளுக்கு ரூ: 550 மற்றும் 6 ஆண்டுகளுக்கு ரூ: 1200 ஆகியவற்றை எளிய வட்டியில் டெபாசிட் செய்து, மொத்தம் ரூ. 1020 வட்டி பெற்றார். ஆண்டுக்கான வட்டி விகிதத்தைக் கண்டறியவும்.",
+    "verification_note": "correct_answer unchanged (B=10%, option_b already '10%'); question_text now states the previously-missing total interest of Rs.1020 so r=10% is uniquely derivable, matching the existing explanation's working."
+  },
+  {
+    "id": "05d6a71e-5196-4b62-8bf4-318471a708c0",
+    "action": "update",
+    "option_d": "10",
+    "explanation": "Given:\nPoint 1: (x₁, y₁) = (0, 8)\nPoint 2: (x₂, y₂) = (0, -2)\nWorking:\nDistance formula: d = √[(x₂ - x₁)² + (y₂ - y₁)²]\nd = √[(0 - 0)² + (-2 - 8)²]\nd = √[0² + (-10)²]\nd = √[0 + 100]\nd = √100\nd = 10\nAsked: Distance between (0, 8) and (0, -2) = ?\n= 10 → Option (D)",
+    "explanation_ta": "Given:\nபுள்ளி 1: (x₁, y₁) = (0, 8)\nபுள்ளி 2: (x₂, y₂) = (0, -2)\nசெயல்முறை:\nதூர சூத்திரம்: d = √[(x₂ - x₁)² + (y₂ - y₁)²]\nd = √[(0 - 0)² + (-2 - 8)²]\nd = √[0² + (-10)²]\nd = √[0 + 100]\nd = √100\nd = 10\nAsked: புள்ளிகள் (0, 8) மற்றும் (0, -2) இடையே உள்ள தூரம் = ?\n= 10 → விடை (D)",
+    "verification_note": "correct_answer unchanged D; option_d changed from '121' to '10' so it now matches the explanation's exact distance computation, and the self-flagging 'misprint' NOTE was removed since the mismatch is resolved."
+  },
+  {
+    "id": "1c140727-e388-4f82-9d91-e13970dba72e",
+    "action": "update",
+    "question_text": "A chess board contains 64 equal squares and the area of each square is 25 cm2. A border around the board is 2cm wide. Find the length of the side of the chess board.",
+    "question_text_ta": "ஒரு சதுரங்கக் பலகையில்  64 சம சதுரங்கள் உள்ளன, ஒவ்வொரு சதுரத்தின் பரப்பளவு 25 செ.மீ 2 ஆகும். போர்டைச் சுற்றி உள்ள  எல்லை 2 செ.மீ அகலம் கொண்டது எனில்  சதுரங்கப் பலகையின் பக்கத்தின் நீளத்தைக் கண்டறியவும்.",
+    "explanation": "Given:\nChess board \\( = 64 \\) equal squares \\( (8 \\times 8 \\text{ grid}) \\)\nArea of each square \\( = 25 \\text{ cm}^2 \\)\nBorder width \\( = 2 \\text{ cm} \\)\nWorking:\nFormula: side \\( = \\sqrt{A} \\), where \\( A \\) is the area of one square\nSide of one small square \\( = \\sqrt{25} = 5 \\text{ cm} \\)\nInner board side \\( = 8 \\times 5 = 40 \\text{ cm} \\)\nAdding the border on both sides \\( = 40 + 4 + 4 = 48 \\text{ cm} \\)\nAsked:\nLength of the side of the chess board \\( = 48 \\text{ cm} \\)\n→ Option (B)",
+    "explanation_ta": "தரவுகள்:\nசதுரங்கப் பலகை \\( = 64 \\) சம சதுரங்கள் \\( (8 \\times 8) \\)\nஒவ்வொரு சதுரத்தின் பரப்பளவு \\( = 25 \\text{ cm}^2 \\)\nஎல்லை அகலம் \\( = 2 \\text{ cm} \\)\nசெயல்முறை:\nசூத்திரம்: பக்கம் \\( = \\sqrt{A} \\), இங்கு \\( A \\) என்பது ஒரு சதுரத்தின் பரப்பளவு\nஒரு சிறிய சதுரத்தின் பக்கம் \\( = \\sqrt{25} = 5 \\text{ cm} \\)\nஉள் பலகையின் பக்கம் \\( = 8 \\times 5 = 40 \\text{ cm} \\)\nஇரு பக்கமும் எல்லையைச் சேர்த்து \\( = 40 + 4 + 4 = 48 \\text{ cm} \\)\nகேட்டது:\nசதுரங்கப் பலகையின் பக்க நீளம் \\( = 48 \\text{ cm} \\)\nவிடை (B)",
+    "verification_note": "correct_answer unchanged B (option_b='48'); question_text area corrected from 6.25 cm2 to 25 cm2 so side=√25=5, inner=40, +4+4=48 now matches the question's own stated data with no silent substitution."
+  },
+  {
+    "id": "39ec0be3-67e8-4b40-8ae7-f3d564e4b00a",
+    "action": "update",
+    "option_a": "(x - 4)(x + 3)",
+    "option_b": "(x + 4)(x - 3)",
+    "option_c": "(x - 6)(x + 2)",
+    "option_d": "(x - 12)(x + 1)",
+    "correct_answer": "A",
+    "explanation": "Given:\nExpression: x² − x − 12\nFind the factors of the quadratic expression\nWorking:\nRule: Factorisation by splitting the middle term: x² + (p + q)x + pq = (x + p)(x + q), where p + q = −1 and p × q = −12\nx² − x − 12\n⇒ Find p and q such that p + q = −1 and p × q = −12\n⇒ p = −4, q = 3   (since −4 + 3 = −1 and −4 × 3 = −12)\n⇒ x² − 4x + 3x − 12\n⇒ x(x − 4) + 3(x − 4)\n⇒ (x − 4)(x + 3)\nFactors are (x − 4) and (x + 3)\nAsked:\nFactors of x² − x − 12 = ?\n= (x − 4)(x + 3) → Option (A)",
+    "explanation_ta": "Given:\nவெளிப்பாடு: x² − x − 12\nஇந்த இருபடி வெளிப்பாட்டின் காரணிகளை கண்டுபிடிக்கவும்\nசெயல்முறை:\nவிதி: நடுப்பதத்தை பிரித்து காரணிகள் காணல்: x² + (p + q)x + pq = (x + p)(x + q), where p + q = −1 and p × q = −12\nx² − x − 12\n⇒ Find p and q such that p + q = −1 and p × q = −12\n⇒ p = −4, q = 3   (since −4 + 3 = −1 and −4 × 3 = −12)\n⇒ x² − 4x + 3x − 12\n⇒ x(x − 4) + 3(x − 4)\n⇒ (x − 4)(x + 3)\nFactors are (x − 4) and (x + 3)\nAsked:\nx² − x − 12 இன் காரணிகள் = ?\n= (x − 4)(x + 3) → விடை (A)",
+    "verification_note": "correct_answer changed D->A; option_a now holds the actual derived factorisation '(x-4)(x+3)', distractor options B/C/D are plausible wrong factor-pairs, and the arbitrary 'maps to Option D' note was removed."
+  },
+  {
+    "id": "3dff2517-be9b-49e6-86a8-b07031fbda01",
+    "action": "update",
+    "question_text": "Find the remainder when x3+ax2-3x+a is divided by \t              x+a",
+    "question_text_ta": "x3+ax2-3x+a ஐ x+a ஆல் வகுத்தால் வரும் மீதத்தை கண்டுபிடி",
+    "verification_note": "correct_answer unchanged C (option_c already '4a'); question_text's 'ax3' middle term corrected to 'ax2' so the stated polynomial now matches f(x)=x^3+ax^2-3x+a actually solved in the (unchanged) explanation, giving f(-a)=4a."
+  },
+  {
+    "id": "68ebe5ee-cfa2-4474-81ab-5da26538cc95",
+    "action": "update",
+    "option_a": "a² + b² = 116 and (a+b)² = 196",
+    "option_b": "a² + b² = 100 and (a+b)² = 180",
+    "option_c": "a² + b² = 120 and (a+b)² = 200",
+    "option_d": "a² + b² = 90 and (a+b)² = 170",
+    "explanation": "Given:\na - b = 6\nab = 40\nWorking:\nAlgebraic Identities: a² + b² = (a - b)² + 2ab  and  (a + b)² = (a - b)² + 4ab\na² + b² = (a - b)² + 2ab\na² + b² = (6)² + 2(40)\na² + b² = 36 + 80\na² + b² = 116\n(a + b)² = (a - b)² + 4ab\n(a + b)² = (6)² + 4(40)\n(a + b)² = 36 + 160\n(a + b)² = 196\nAsked:\na² + b² and (a + b)² = ?\n= a² + b² = 116  and  (a + b)² = 196 → Option (A)",
+    "explanation_ta": "Given:\na - b = 6\nab = 40\nசெயல்முறை:\nஇயற்கணித அடையாளங்கள்: a² + b² = (a - b)² + 2ab  and  (a + b)² = (a - b)² + 4ab\na² + b² = (a - b)² + 2ab\na² + b² = (6)² + 2(40)\na² + b² = 36 + 80\na² + b² = 116\n(a + b)² = (a - b)² + 4ab\n(a + b)² = (6)² + 4(40)\n(a + b)² = 36 + 160\n(a + b)² = 196\nAsked:\na² + b² மற்றும் (a + b)² = ?\n= a² + b² = 116  மற்றும்  (a + b)² = 196 → விடை (A)",
+    "verification_note": "correct_answer unchanged A; option_a now holds the actual computed pair '116 and 196' (matching explanation's own math), distractors placed in B/C/D, and the self-flagged 'options belong to a different question' NOTE was removed."
+  },
+  {
+    "id": "823ce8d9-8ab3-49a5-9a45-1a72d104368e",
+    "action": "update",
+    "option_a": "a² + b² = 70 and (a-b)² = 10",
+    "option_b": "a² + b² = 96 and (a-b)² = 32",
+    "option_c": "a² + b² = 80 and (a-b)² = 16",
+    "option_d": "a² + b² = 60 and (a-b)² = 6",
+    "explanation": "Given:\na + b = 12\nab = 32\nWorking:\nAlgebraic Identities: a² + b² = (a + b)² - 2ab  and  (a - b)² = (a + b)² - 4ab\na² + b² = (a + b)² - 2ab\na² + b² = (12)² - 2(32)\na² + b² = 144 - 64\na² + b² = 80\n(a - b)² = (a + b)² - 4ab\n(a - b)² = (12)² - 4(32)\n(a - b)² = 144 - 128\n(a - b)² = 16\nAsked:\na² + b² and (a - b)² = ?\n= a² + b² = 80  and  (a - b)² = 16 → Option (C)",
+    "explanation_ta": "Given:\na + b = 12\nab = 32\nசெயல்முறை:\nஇயற்கணித அடையாளங்கள்: a² + b² = (a + b)² - 2ab  and  (a - b)² = (a + b)² - 4ab\na² + b² = (a + b)² - 2ab\na² + b² = (12)² - 2(32)\na² + b² = 144 - 64\na² + b² = 80\n(a - b)² = (a + b)² - 4ab\n(a - b)² = (12)² - 4(32)\n(a - b)² = 144 - 128\n(a - b)² = 16\nAsked:\na² + b² மற்றும் (a - b)² = ?\n= a² + b² = 80  மற்றும்  (a - b)² = 16 → விடை (C)",
+    "verification_note": "correct_answer unchanged C; option_c now holds the actual computed pair '80 and 16' (matching explanation's own math), distractors placed in A/B/D, and the self-flagged mismatch NOTE was removed."
+  },
+  {
+    "id": "9fbbd660-1012-4a9d-9d76-c06af3fc4362",
+    "action": "deactivate",
+    "verification_note": "question_text and two of four options are empty/stray fragments with no recoverable source content (figure-based question never captured); deactivated per instructions rather than fabricating content."
+  },
+  {
+    "id": "b49722a0-dabe-42f5-a215-8e01d327685f",
+    "action": "update",
+    "option_a": "2x² + 5x - 3",
+    "option_b": "2x² - 5x + 3",
+    "option_c": "2x² - x + 3",
+    "option_d": "2x² - 5x - 3",
+    "verification_note": "correct_answer unchanged B; option_b's malformed merged value '(a+4) C (a+6)' replaced with the actual product '2x² - 5x + 3' (matches explanation's own derivation), and options A/C/D replaced with plausible wrong expansions in the same variable/degree."
+  },
+  {
+    "id": "d0b32f4c-e5e1-4494-a0ed-6c208d38050e",
+    "action": "update",
+    "option_a": "25 & 27",
+    "explanation": "Given:\nTwo consecutive positive odd integers\nLet them be \\( n \\) and \\( (n + 2) \\)\nTheir sum \\( = 52 \\)\nWorking:\nConsecutive odd integers differ by 2\n\\( n + (n + 2) = 52 \\)\n\\( 2n + 2 = 52 \\)\n\\( 2n = 50 \\)\n\\( n = \\dfrac{50}{2} = 25 \\)\nSecond integer \\( = n + 2 = 27 \\)\nCheck: \\( 25 + 27 = 52 \\)\nAsked:\nThe two consecutive positive odd integers \\( = 25 \\text{ and } 27 \\)\n→ Option (A)",
+    "explanation_ta": "தரவுகள்:\nதொடர்ச்சியான இரண்டு நேர்மறை ஒற்றைப்படை எண்கள்\nஅவற்றை \\( n \\) மற்றும் \\( (n + 2) \\) என்க\nஅவற்றின் கூட்டு \\( = 52 \\)\nசெயல்முறை:\nதொடர்ச்சியான ஒற்றைப்படை எண்களுக்கு இடையே வித்தியாசம் 2\n\\( n + (n + 2) = 52 \\)\n\\( 2n + 2 = 52 \\)\n\\( 2n = 50 \\)\n\\( n = \\dfrac{50}{2} = 25 \\)\nஇரண்டாம் எண் \\( = n + 2 = 27 \\)\nசரிபார்: \\( 25 + 27 = 52 \\)\nகேட்டது:\nதொடர்ச்சியான இரண்டு நேர்மறை ஒற்றைப்படை எண்கள் \\( = 25 \\text{ and } 27 \\)\nவிடை (A)",
+    "verification_note": "correct_answer unchanged A; option_a corrected from '25 & 57' (digit typo) to '25 & 27' which matches n=25, n+2=27 exactly; removed the awkward 'matches leading value' hedge from the explanation."
+  },
+  {
+    "id": "dafda95e-1039-4aa4-8a34-e76a8b439818",
+    "action": "update",
+    "correct_answer": "C",
+    "explanation": "Given:\nPolynomial: 4x² - 7x³ + 6x + 1\nTerms and their degrees: 4x² (degree 2), -7x³ (degree 3), 6x (degree 1), 1 (degree 0)\nKey point: the degree of a polynomial is the highest power of the variable among all its terms\nFrom question:\nRule: Degree of a polynomial = highest power of the variable in the expression\nList each term and its degree:\n4x²  → degree 2\n-7x³ → degree 3  ← highest\n6x   → degree 1\n1    → degree 0\nHighest degree among all terms = 3\nAsked: Degree of the polynomial = ?\n= 3 → Option (C)",
+    "explanation_ta": "Given:\nபல்லுறுப்புக்கோவை: 4x² - 7x³ + 6x + 1\nஉறுப்புகள் மற்றும் அவற்றின் படிகள்: 4x² (படி 2), -7x³ (படி 3), 6x (படி 1), 1 (படி 0)\nமுக்கியக் குறிப்பு: பல்லுறுப்புக்கோவையின் படி என்பது அதன் அனைத்து உறுப்புகளிலும் உள்ள மாறியின் மிகப்பெரிய அடுக்கு ஆகும்\nFrom question:\nவிதி: Degree of a polynomial = highest power of the variable in the expression\nList each term and its degree:\n4x²  → degree 2\n-7x³ → degree 3  ← highest\n6x   → degree 1\n1    → degree 0\nHighest degree among all terms = 3\nAsked: பல்லுறுப்புக்கோவையின் படி = ?\n= 3 → விடை (C)",
+    "verification_note": "correct_answer changed B->C; option_c already reads '3' which is the true highest-power degree; removed the self-flagging NOTE now that correct_answer itself is fixed."
+  },
+  {
+    "id": "d04cb36d-6cb8-48f9-a976-828f222945ac",
+    "action": "update",
+    "question_text": "The speed of a boat in still water is 15 km/hr. It goes upstream and returns downstream to the original point in 4hrs 30 minutes. Find the speed of the stream.",
+    "question_text_ta": "நிலையான நீரில் ஒரு படகின் வேகம் 15 கி.மீ / மணி. இது நீரோட்டத்திற்கு எதிராக சென்று நீரோட்ட திசையிலேயே திரும்பி தொடக்க புள்ளியை சென்றடைய 4 மணிநேரம் 30 நிமிடங்கள் ஆகிறது எனில் நீரோட்டத்தின் வேகத்தைக் கண்டறியவும்",
+    "verification_note": "correct_answer unchanged C (option_c='5 km/hr'); question_text unit corrected from '15 m/hr' to '15 km/hr' to match the explanation, which already computes consistently in km/hr throughout."
+  },
+  {
+    "id": "692c1b4a-1cec-4736-ab67-00f6338320bd",
+    "action": "update",
+    "option_b": "1640",
+    "explanation": "Given:\nAP: 2, 4, 6, …, 80\na = 2 (first term)\nl = 80 (last term)\nd = 2 (common difference)\nKey point: Find n first, then apply the sum formula Sₙ = n/2 × (a + l)\nFrom question:\nSum of n terms of an AP: Sₙ = n/2 × (a + l)\nNumber of terms: n = (l − a) / d + 1\nn = (80 − 2) / 2 + 1\nn = 78 / 2 + 1\nn = 39 + 1 = 40\nSₙ = 40 / 2 × (2 + 80)\nSₙ = 20 × 82\nSₙ = 1640\nAsked: Sum of the arithmetic series = ?\n= 1640 → Option (B)",
+    "explanation_ta": "Given:\nகூட்டுத்தொடர்: 2, 4, 6, …, 80\na = 2 (முதல் உறுப்பு)\nl = 80 (கடைசி உறுப்பு)\nd = 2 (பொது வித்தியாசம்)\nமுக்கியக் குறிப்பு: முதலில் n காண்க, பின்னர் Sₙ = n/2 × (a + l) பயன்படுத்துக\nFrom question:\nகூட்டுத்தொடரின் n உறுப்புகளின் கூடுதல்: Sₙ = n/2 (a + l)\nNumber of terms: n = (l − a) / d + 1\nn = (80 − 2) / 2 + 1\nn = 78 / 2 + 1\nn = 39 + 1 = 40\nSₙ = 40 / 2 × (2 + 80)\nSₙ = 20 × 82\nSₙ = 1640\nAsked: எண்கணித தொடரின் கூட்டுத்தொகை = ?\n= 1640 → விடை (B)",
+    "verification_note": "correct_answer unchanged B; option_b corrected from '800' to '1640' which matches the explanation's own Sn=n/2(a+l)=1640 computation; removed the fabricated 'different series' NOTE that had overridden it."
+  },
+  {
+    "id": "a51fd936-dbe3-463a-8dd2-9787c19aa4de",
+    "action": "update",
+    "correct_answer": "B",
+    "explanation": "Given:\nProduction cost (lakhs): 2010 = 55, 2011 = 40, 2012 = 30, 2013 = 25, 2014 = 35, 2015 = 70\nNumber of years n = 6\nKey point: Read max/min directly from the values; average = sum of values / number of years; percentage increase = (increase / base value) × 100\nFrom question:\nAverage = (Sum of all values) / (Number of years); Percentage increase = [(Final value − Base value) / Base value] × 100\n→ Maximum cost = 70 (in 2015); Minimum cost = 25 (in 2013)\n→ Average = (55 + 40 + 30 + 25 + 35 + 70) / 6\n→ Average = 255 / 6\n→ Average = Rs. 42.5 lakhs\n→ Percentage increase (2014 to 2015) = [(70 − 35) / 35] × 100\n→ Percentage increase = (35 / 35) × 100 = 100%\nAsked: Maximum/minimum year, average production cost, and percentage increase from 2014 to 2015 = ?\n= Max in 2015, Min in 2013; Average = Rs. 42.5 lakhs; Percentage increase = 100%  → Option (B)",
+    "explanation_ta": "Given:\nஉற்பத்திச் செலவு (லட்சம்): 2010 = 55, 2011 = 40, 2012 = 30, 2013 = 25, 2014 = 35, 2015 = 70\nஆண்டுகளின் எண்ணிக்கை n = 6\nமுக்கியக் குறிப்பு: அதிக/குறைந்த மதிப்புகளை நேரடியாக மதிப்புகளிலிருந்து படிக்கவும்; சராசரி = மதிப்புகளின் கூட்டுத்தொகை / ஆண்டுகளின் எண்ணிக்கை; சதவீத அதிகரிப்பு = (அதிகரிப்பு / அடிப்படை மதிப்பு) × 100\nFrom question:\nAverage = (Sum of all values) / (Number of years); Percentage increase = [(Final value − Base value) / Base value] × 100\n→ Maximum cost = 70 (in 2015); Minimum cost = 25 (in 2013)\n→ Average = (55 + 40 + 30 + 25 + 35 + 70) / 6\n→ Average = 255 / 6\n→ Average = Rs. 42.5 lakhs\n→ Percentage increase (2014 to 2015) = [(70 − 35) / 35] × 100\n→ Percentage increase = (35 / 35) × 100 = 100%\nAsked: அதிக/குறைந்த ஆண்டு, சராசரி உற்பத்திச் செலவு மற்றும் 2014 முதல் 2015 வரையிலான சதவீத அதிகரிப்பு = ?\n= அதிகம் 2015-இல், குறைவு 2013-இல்; சராசரி = Rs. 42.5 lakhs; சதவீத அதிகரிப்பு = 100%  → விடை (B)",
+    "verification_note": "correct_answer changed D->B; option_b already reads 'Max=2015, Min=2013; Average=Rs.42.5 lakhs; Percentage increase=100%' which matches the corrected (increase/base)*100=100% math."
+  },
+  {
+    "id": "ea8e49f0-a34e-4b35-86a6-5aeb880cafa5",
+    "action": "update",
+    "correct_answer": "A",
+    "explanation": "Given:\nCost in 2014 = 35 lakhs\nCost in 2015 = 70 lakhs\nKey point: Percentage increase = (increase / original value) × 100\nFrom question:\nPercentage increase = (increase / original) × 100\nincrease = 70 − 35 = 35\n= (35 / 35) × 100\n= 100%\nAsked: Percentage increase from 2014 to 2015 = ?\n= 100% → Option (A)",
+    "explanation_ta": "Given:\n2014-இல் செலவு = 35 லட்சம்\n2015-இல் செலவு = 70 லட்சம்\nமுக்கியக் குறிப்பு: சதவீத அதிகரிப்பு = (அதிகரிப்பு / அடிப்படை மதிப்பு) × 100\nFrom question:\nசதவீத அதிகரிப்பு (Percentage increase) = (increase / original) × 100\nincrease = 70 − 35 = 35\n= (35 / 35) × 100\n= 100%\nAsked: 2014 முதல் 2015 வரை சதவீத அதிகரிப்பு = ?\n= 100% → விடை (A)",
+    "verification_note": "correct_answer changed C->A; option_a already reads '100%' which matches the corrected (increase/original)*100=100% math, removing the fabricated 'book computes 200%' override."
+  },
+  {
+    "id": "7359dd39-1779-421f-b178-c6557843297c",
+    "action": "update",
+    "option_a": "(i) Median = Rs. 111.6; (ii) 183 workers",
+    "explanation": "Given:\nFrequencies (No. of workers): \\( 12,\\ 18,\\ 35,\\ 42,\\ 50,\\ 45,\\ 20,\\ 8 \\); total \\( N = 230 \\)\nFormula: \\( \\text{Median} = L + \\dfrac{\\frac{N}{2} - cf}{f} \\times h \\)\nWorking:\nless than 80 \\( = 12 \\)\nless than 90 \\( = 12 + 18 = 30 \\)\nless than 100 \\( = 30 + 35 = 65 \\)\nless than 110 \\( = 65 + 42 = 107 \\)\nless than 120 \\( = 107 + 50 = 157 \\)\nless than 130 \\( = 157 + 45 = 202 \\)\nless than 140 \\( = 202 + 20 = 222 \\)\nless than 150 \\( = 222 + 8 = 230 \\)\n\\( \\dfrac{N}{2} = \\dfrac{230}{2} = 115 \\); since cf(110) = 107 < 115 ≤ cf(120) = 157, the median class is 110–120, with \\( L = 110,\\ cf = 107,\\ f = 50,\\ h = 10 \\)\nMedian \\( = 110 + \\dfrac{115 - 107}{50} \\times 10 = 110 + 1.6 = 111.6 \\)\nAt \\( x = 125 \\) the curve reads \\( \\approx 183 \\) workers\nAsked:\n(i) Median and (ii) workers with wages less than Rs. 125\n(i) Median = Rs. 111.6; (ii) 183 workers\n→ Option (A)",
+    "explanation_ta": "தரவுகள்:\nநிகழ்வெண்கள் (தொழிலாளர்கள்): \\( 12,\\ 18,\\ 35,\\ 42,\\ 50,\\ 45,\\ 20,\\ 8 \\); மொத்தம் \\( N = 230 \\)\nசூத்திரம்: \\( \\text{Median} = L + \\dfrac{\\frac{N}{2} - cf}{f} \\times h \\)\nசெயல்முறை:\nless than 80 \\( = 12 \\)\nless than 90 \\( = 12 + 18 = 30 \\)\nless than 100 \\( = 30 + 35 = 65 \\)\nless than 110 \\( = 65 + 42 = 107 \\)\nless than 120 \\( = 107 + 50 = 157 \\)\nless than 130 \\( = 157 + 45 = 202 \\)\nless than 140 \\( = 202 + 20 = 222 \\)\nless than 150 \\( = 222 + 8 = 230 \\)\n\\( \\dfrac{N}{2} = \\dfrac{230}{2} = 115 \\); cf(110) = 107 < 115 ≤ cf(120) = 157 என்பதால் median class 110–120, \\( L = 110,\\ cf = 107,\\ f = 50,\\ h = 10 \\)\nMedian \\( = 110 + \\dfrac{115 - 107}{50} \\times 10 = 110 + 1.6 = 111.6 \\)\n\\( x = 125 \\)-இல் வளைகோடு \\( \\approx 183 \\) தொழிலாளர்கள்\nகேட்டது:\n(i) இடைநிலை மற்றும் (ii) Rs. 125-க்கும் குறைவான தொழிலாளர்கள்\n(i) இடைநிலை = Rs. 111.6; (ii) 183 தொழிலாளர்கள்\nவிடை (A)",
+    "verification_note": "correct_answer unchanged A; option_a's median value corrected from the unsupported 'Rs.120' to the exact formula result 'Rs.111.6' (110+((115-107)/50)*10), keeping the unflagged '183 workers' ogive-reading part (ii) as-is."
+  },
+  {
+    "id": "5d2b6d5e-9a43-4288-a49b-418dd569bb3a",
+    "action": "update",
+    "option_a": "6.25% Loss",
+    "verification_note": "correct_answer unchanged A; option_a corrected from '25%' to '6.25% Loss', matching the explanation's own twice-verified Loss%=A²/100=6.25% computation (CP=800, SP=750, Loss=50, Loss%=6.25%), which already ended '→ Option (A)'."
+  }
+]

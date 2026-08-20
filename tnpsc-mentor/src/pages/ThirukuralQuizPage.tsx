@@ -118,13 +118,13 @@ export default function ThirukuralQuizPage() {
 
         {/* Title block */}
         <div className="mb-5">
-          <span className="tamil font-display text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+          <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
             {t('thirukuralBadge')}
           </span>
-          <h1 className="tamil mt-1.5 font-display text-[22px] font-bold tracking-tight text-ink lg:text-[26px]">
+          <h1 className="tamil mt-1.5 font-display text-2xl font-bold tracking-tight text-ink lg:text-2xl">
             {heading}
           </h1>
-          <p className="tamil mt-1 font-body text-[15px] text-muted">{hint}</p>
+          <p className="tamil mt-1 font-body text-base text-muted">{hint}</p>
         </div>
 
         {/* Animated step body */}
@@ -171,7 +171,7 @@ export default function ThirukuralQuizPage() {
                       style={{ '--i': i } as React.CSSProperties}
                       leading={
                         <IconTile tint="violet">
-                          <span className="font-heading text-[13px] font-bold">{a.no}</span>
+                          <span className="font-heading text-sm font-bold">{a.no}</span>
                         </IconTile>
                       }
                       title={lang === 'ta' ? a.ta : a.en}

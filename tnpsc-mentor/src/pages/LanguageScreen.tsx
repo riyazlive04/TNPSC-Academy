@@ -76,7 +76,7 @@ export default function LanguageScreen() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="tamil font-display text-base font-bold text-ink">{t(o.titleKey)}</div>
-                  <div className="tamil font-body text-[13px] text-muted">{t(o.descKey)}</div>
+                  <div className="tamil font-body text-sm text-muted">{t(o.descKey)}</div>
                 </div>
                 <span
                   className={[

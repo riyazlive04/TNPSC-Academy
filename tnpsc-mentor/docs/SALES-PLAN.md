@@ -12,7 +12,7 @@ one (`src/components/UI/CreditWall.tsx`).
 | --- | --- | --- | --- |
 | **Vettri Nichayam — full** | ₹899 | 2 months | 13-paper Test Marathon + unlimited PYQ + unlimited Current Affairs |
 | **Vettri Nichayam — monthly** | ₹499 | 1 month (pay again for month 2) | Same, half the commitment |
-| **Premium** | ₹1,699 | 3 months (90 days) | Everything: unlimited tests everywhere, all mock exams, the Marathon, PDFs, insights |
+| **Premium** | ₹1,699 | 6 months (180 days) | Everything: unlimited tests everywhere, all mock exams, the Marathon, PDFs, insights |
 
 Free tier is a **credit meter**, not a feature lock:
 

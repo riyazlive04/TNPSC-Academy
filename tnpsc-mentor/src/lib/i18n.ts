@@ -137,6 +137,16 @@ const STRINGS = {
     ta: 'தொடக்க சவால்: எல்லா வகைகளும் கலந்த 18 கடின கேள்விகள் - கூற்றுகள், பொருத்துக, உறுதி-காரணம், காலவரிசை, நேரடி மற்றும் திறனாய்வு. முடித்தால் +25 போனஸ் கிரெடிட்கள். நீங்கள் எந்த நிலையில் இருக்கிறீர்கள் என்று அறிய இதுவே சிறந்த வழி!',
   },
   onbFirstTestCta: { en: 'Experience the free test now!', ta: 'இப்போதே இலவசத் தேர்வை அனுபவியுங்கள்!' },
+
+  // ─── Push notification primer (native app, shown once before the OS asks) ──
+  pushPrimerTitle: { en: "Don't miss your streak", ta: 'உங்கள் தொடர்ச்சியை தவறவிடாதீர்கள்' },
+  pushPrimerBody: {
+    en: 'Turn on notifications for daily current-affairs digests, streak reminders and exam updates. You can change this anytime in Profile.',
+    ta: 'தினசரி நடப்பு நிகழ்வுத் தொகுப்பு, தொடர்ச்சி நினைவூட்டல்கள் மற்றும் தேர்வு புதுப்பிப்புகளுக்கு அறிவிப்புகளை இயக்குங்கள். இதை எப்போது வேண்டுமானாலும் சுயவிவரத்தில் மாற்றலாம்.',
+  },
+  pushPrimerEnable: { en: 'Enable notifications', ta: 'அறிவிப்புகளை இயக்கு' },
+  pushPrimerDismiss: { en: 'Not now', ta: 'இப்போது வேண்டாம்' },
+
   // First-login prompt (StarterTestPrompt): the test leads, the tour follows.
   startPromptSkip: {
     en: 'Not now - show me around first',
@@ -212,6 +222,14 @@ const STRINGS = {
     en: 'This section opens with any paid plan - Vettri Nichayam or Premium. Pick the one that fits you below.',
     ta: 'இந்தப் பிரிவு எந்தக் கட்டணத் திட்டத்திலும் திறக்கும் - வெற்றி நிச்சயம் அல்லது பிரீமியம். உங்களுக்கு ஏற்றதைக் கீழே தேர்ந்தெடுங்கள்.',
   },
+  upsellRankBoosterTitle: {
+    en: 'Unlock Group II/ IIA- Rank Booster',
+    ta: 'குரூப் II/ IIA - Rank Booster-ஐத் திறக்கவும்',
+  },
+  upsellRankBoosterBody: {
+    en: 'The Group II/ IIA- Rank Booster series opens with its own plan, or with Premium. Vettri Nichayam does not include it.',
+    ta: 'குரூப் II/ IIA - Rank Booster தொடர் அதன் சொந்தத் திட்டத்துடன் அல்லது பிரீமியத்துடன் திறக்கும். வெற்றி நிச்சயம் இதைச் சேர்க்காது.',
+  },
   upsellLater: { en: 'Maybe later', ta: 'பிறகு பார்க்கலாம்' },
   howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
   howItWorksSub: { en: 'Replay the app tour', ta: 'செயலி சுற்றுப்பயணத்தை மீண்டும் பார்க்க' },
@@ -241,11 +259,18 @@ const STRINGS = {
   browseEditBank: { en: 'Browse & edit · answers shown', ta: 'பார்க்க & திருத்த · விடைகளுடன்' },
   outerQuestionsSub: { en: 'Subject-wise bank · view & download PDF', ta: 'பாட வாரியான தொகுப்பு · PDF பதிவிறக்கம்' },
 
-  // Category titles
-  pyqTitle: { en: 'PREVIOUS YEAR QUESTION PAPERS', ta: 'முந்தைய ஆண்டு வினாத்தாள்கள்' },
+  // Category titles - Title Case throughout, matching every other dashboard row
+  // (Daily CA Test, CA Questions, Thirukkural Quiz…) rather than shouting caps.
+  pyqTitle: { en: 'Previous Year Question Papers', ta: 'முந்தைய ஆண்டு வினாத்தாள்கள்' },
   samacheerTitle: { en: 'SAMACHEER BASED', ta: 'சமச்சீர் அடிப்படையில்' },
-  currentAffairsTitle: { en: 'CURRENT AFFAIRS', ta: 'நடப்பு நிகழ்வுகள்' },
-  aptitudeTitle: { en: 'APTITUDE TOPIC WISE', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு' },
+  currentAffairsTitle: { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்' },
+  aptitudeTitle: { en: 'Aptitude Topic Wise', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு' },
+  // The consolidated Current Affairs dashboard card - opens a picker over the
+  // three CA entry points that used to be separate rows (Daily CA Test,
+  // month/topic practice, CA Questions PDFs).
+  currentAffairsHubSub: { en: 'Daily test · monthly practice · PDFs', ta: 'தினசரி தேர்வு · மாதாந்திர பயிற்சி · PDF' },
+  caTopicPracticeTitle: { en: 'Month & Topic Practice', ta: 'மாதம் & தலைப்பு வாரியான பயிற்சி' },
+  caTopicPracticeSub: { en: 'Browse by month or topic', ta: 'மாதம் அல்லது தலைப்பு வாரியாகப் பார்வையிடவும்' },
 
   // Section badges
   pyqBadge: { en: 'Previous Year Question Paper', ta: 'முந்தைய ஆண்டு வினாத்தாள்' },
@@ -294,7 +319,7 @@ const STRINGS = {
   questionBank: { en: 'Question Bank', ta: 'வினாத் தொகுப்பு' },
 
   // Subject Practice (rewritten bank: subject -> topic -> question type)
-  subjectPracticeTitle: { en: 'SUBJECT PRACTICE', ta: 'பாடப் பயிற்சி' },
+  subjectPracticeTitle: { en: 'Subject Practice', ta: 'பாடப் பயிற்சி' },
   subjectPracticeBadge: { en: 'Subject Practice', ta: 'பாடப் பயிற்சி' },
   step3Type: { en: 'Step 3 - Select Question Type', ta: 'படி 3 - வினா வகையைத் தேர்ந்தெடுக்கவும்' },
   typeMixed: { en: 'Mixed (All Types)', ta: 'கலப்பு (அனைத்து வகைகள்)' },
@@ -718,14 +743,21 @@ const STRINGS = {
   },
   mockExamsEmpty: { en: 'No mock exams are available yet.', ta: 'இன்னும் மாதிரித் தேர்வுகள் எதுவும் இல்லை.' },
 
-  // Test Marathon - scheduled Group 1 "Test Marathon 2026" papers
+  // Test Marathon - the scheduled-series hub. Tile + page title stay "Test
+  // Marathon"; it now fans out into per-product tabs (Vettri Nichayam / Rank
+  // Booster / Overall) via TestSeriesPage's HubTab switcher.
   testSeries: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
   testSeriesTitle: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
-  testSeriesArenaSub: { en: 'Scheduled Group 1 marathon', ta: 'திட்டமிடப்பட்ட குரூப் 1 மாரத்தான்' },
+  testSeriesArenaSub: { en: 'Scheduled test series', ta: 'திட்டமிடப்பட்ட தேர்வுத் தொடர்கள்' },
   testSeriesSub: {
     en: 'A scheduled marathon of full-length papers. Each unlocks on its date and can be attempted twice.',
     ta: 'திட்டமிடப்பட்ட முழு நீளத் தேர்வு மாரத்தான். ஒவ்வொன்றும் அதன் தேதியில் திறக்கும்; இருமுறை எழுதலாம்.',
   },
+  testSeriesHubSub: {
+    en: 'Pick a series below — each unlocks on its own schedule and can be attempted twice.',
+    ta: 'கீழே ஒரு தொடரைத் தேர்ந்தெடுக்கவும் — ஒவ்வொன்றும் அதன் சொந்த அட்டவணையில் திறக்கும்; இருமுறை எழுதலாம்.',
+  },
+  tsOverallTab: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
   testSeriesEmpty: {
     en: 'No tests have been scheduled yet.',
     ta: 'இன்னும் எந்தத் தேர்வும் திட்டமிடப்படவில்லை.',
@@ -745,6 +777,101 @@ const STRINGS = {
     ta: 'திட்டமிட்ட அட்டவணையில் 13 குரூப் 1 தேர்வுத் தாள்கள்: 10 பிரிவு வாரியான + 3 முழு மாதிரி',
   },
   marathonIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
+
+  // Group II/ IIA- Rank Booster — a second, independent scheduled test series.
+  // Every surface (including the hub tab pill) spells out the full name,
+  // matching how VettriCard/PremiumCard always spell out "Vettri Nichayam" in
+  // full — the tab bar wraps a two-line label rather than truncate it.
+  rankBoosterPageTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterPageSub: {
+    en: 'Group II/IIA prelims practice: 23 full-length papers, each unlocking on its date. Attempt each up to twice.',
+    ta: 'குரூப் II/IIA முதல்நிலைத் தேர்வுப் பயிற்சி: 23 முழு நீளத் தேர்வுத் தாள்கள், ஒவ்வொன்றும் அதன் தேதியில் திறக்கும். ஒவ்வொன்றையும் இருமுறை வரை எழுதலாம்.',
+  },
+  rankBoosterArenaTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterArenaSub: { en: 'Group II/IIA scheduled series', ta: 'குரூப் II/IIA திட்டமிட்ட தொடர்' },
+  /** Superadmin series switcher only — the hub tab pill now uses the full name. */
+  rankBoosterTab: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterBadge: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterValidity: { en: '90-day access', ta: '90 நாள் அணுகல்' },
+  // Independence Day Month Offer — orange badge, matches the marketing flyer.
+  rankBoosterOfferBadge: {
+    en: 'Independence Day Offer',
+    ta: 'சுதந்திர தின சலுகை',
+  },
+  rankBoosterOfferNote: {
+    en: 'Independence Day Month Offer price of ₹1,249 (MRP ₹1,800) is valid till 31 August 2026 only.',
+    ta: 'சுதந்திர தின மாத சலுகை விலை ₹1,249 (MRP ₹1,800) 31 ஆகஸ்ட் 2026 வரை மட்டுமே செல்லுபடியாகும்.',
+  },
+  rankBoosterPerk1: {
+    en: '23 full-length Group II/IIA prelims papers, each attempted up to twice',
+    ta: '23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள், ஒவ்வொன்றும் இருமுறை வரை',
+  },
+  // Same bonus mechanism as VettriCard's vettriBonus1-3 (the credit gate's
+  // creditsUnlimited flag covers Rank Booster too) — reworded to this plan's
+  // own 90-day window instead of Vettri's 2-month one.
+  rankBoosterBonus1: {
+    en: 'Unlimited PYQ tests (Premium feature · 90-day access)',
+    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள் (பிரீமியம் அம்சம் · 90 நாள் அணுகல்)',
+  },
+  rankBoosterBonus2: {
+    en: 'Unlimited Current Affairs tests (Premium feature · 90-day access)',
+    ta: 'வரம்பற்ற நடப்பு நிகழ்வுத் தேர்வுகள் (பிரீமியம் அம்சம் · 90 நாள் அணுகல்)',
+  },
+  rankBoosterBonus3: {
+    en: 'Subject-wise test questions (3000+), unlimited · 90-day access and much more',
+    ta: 'பாட வாரியான தேர்வு வினாக்கள் (3000+), வரம்பற்றது · 90 நாள் அணுகல் மற்றும் இன்னும் பல',
+  },
+  rankBoosterBonus4: {
+    en: 'Bilingual questions with full explanations',
+    ta: 'இருமொழி வினாக்கள் முழு விளக்கங்களுடன்',
+  },
+  rankBoosterBonus5: {
+    en: 'Test 1 is free for everyone — try before you enroll',
+    ta: 'தேர்வு 1 அனைவருக்கும் இலவசம் — சேருமுன் முயற்சிக்கவும்',
+  },
+  rankBoosterGet: {
+    en: 'Get Group II/ IIA- Rank Booster',
+    ta: 'குரூப் II/ IIA - Rank Booster பெறுங்கள்',
+  },
+  // Promo strip — mirrors marathonBannerTitle/Sub/Included (VettriCard's Test
+  // Marathon header) — used inside PremiumCard and the Test Marathon hub page.
+  rankBoosterBannerTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterBannerSub: {
+    en: '23 full-length Group II/IIA prelims papers on a fixed schedule',
+    ta: 'திட்டமிட்ட அட்டவணையில் 23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள்',
+  },
+  // Group 1 Mock Test Pack banner (Test Marathon hub) - mirrors PricingCards'
+  // Landing-page copy for the same pack (mockTitle/MOCK_ITEMS[0]).
+  mockPackBannerTitle: { en: 'Group 1 Mock Test Pack', ta: 'குரூப் 1 மாதிரித் தேர்வு தொகுப்பு' },
+  mockPackBannerSub: {
+    en: '6 full-length Group 1 mock tests, server-graded',
+    ta: '6 முழு நீள குரூப் 1 மாதிரித் தேர்வுகள் (Server-graded)',
+  },
+  mockPackValidity: { en: '80-day access', ta: '80 நாள் அணுகல்' },
+  mockPackPerk2: {
+    en: 'Explanation PDF to download for the 6 mock tests',
+    ta: '6 மாதிரித் தேர்வுகளுக்கான விளக்கங்கள் PDF ஆக பதிவிறக்கம்',
+  },
+  // The differentiator this plan actually grants server-side (see
+  // DAILY_CREDIT_GRANT_BOOSTED in server/src/lib/credits.ts) - same
+  // use-it-or-lose-it daily rule as the free tier's 10, just a bigger number
+  // while this plan is active.
+  mockPackPerk3: {
+    en: '50 credits every day (instead of the usual 10) while this plan is active',
+    ta: 'இந்த திட்டம் செயலில் இருக்கும் வரை தினமும் 50 கிரெடிட்கள் (வழக்கமான 10 க்கு பதிலாக)',
+  },
+  mockPackGet: { en: 'Get Mock Tests', ta: 'மாதிரி தேர்வுகள் பெறு' },
+  rankBoosterIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
+  // Dashboard discovery banner (Test Arena).
+  rankBoosterDashBadge: { en: 'New', ta: 'புதியது' },
+  rankBoosterDashTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterDashSub: {
+    en: '23 full-length Group II/IIA prelims papers — Test 1 free',
+    ta: '23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள் — தேர்வு 1 இலவசம்',
+  },
+  rankBoosterDashCta: { en: 'Explore', ta: 'பார்க்க' },
+
   // Test Marathon — Analytics tab
   tsTabPapers: { en: 'Papers', ta: 'தேர்வுகள்' },
   tsTabAnalytics: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
@@ -814,12 +941,16 @@ const STRINGS = {
   qtypeAptitude: { en: 'Aptitude & Reasoning', ta: 'திறனறிவு & பகுத்தறிவு' },
   qtypeFactual: { en: 'Direct / Factual', ta: 'நேரடி / உண்மை' },
   // Superadmin
-  testSeriesTab: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
-  testSeriesShowTitle: { en: 'Test Marathon visibility', ta: 'தேர்வு மாரத்தான் காட்சி' },
+  testSeriesTab: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  // Shared by both scheduled test-series tabs (Test Marathon / Rank Booster) —
+  // the specific series name shows separately right below in the toggle row.
+  testSeriesShowTitle: { en: 'Series visibility', ta: 'தொடர் காட்சி' },
   testSeriesShowSub: {
-    en: 'Show or hide the Test Marathon tab and Test Arena tile for all students.',
-    ta: 'அனைத்து மாணவர்களுக்கும் தேர்வு மாரத்தான் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
+    en: 'Show or hide this series’ tab and Test Arena tile for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் இந்தத் தொடரின் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
   },
+  testSeriesTierFree: { en: 'Free trial', ta: 'இலவச முயற்சி' },
+  testSeriesTierPaid: { en: 'Paid (bundle)', ta: 'கட்டணம் (திட்டம்)' },
   availabilityAuto: { en: 'Auto (by date)', ta: 'தானியங்கி (தேதிப்படி)' },
   availabilityOpen: { en: 'Force open', ta: 'கட்டாயம் திற' },
   availabilityClosed: { en: 'Force closed', ta: 'கட்டாயம் மூடு' },
@@ -882,7 +1013,7 @@ const STRINGS = {
     ta: 'வெற்றி நிச்சயத்தில் 13 மாதிரித் தேர்வுகளுடன் வரம்பற்ற PYQ, நடப்பு நிகழ்வுகள் & பாடத் தேர்வுகளும் கிடைக்கும் - பணத்திற்கு மிகச் சிறந்த மதிப்பு.',
   },
   vettriSuggestMonths: { en: '2 months', ta: '2 மாதங்கள்' },
-  vettriSuggestPremiumMonths: { en: '3 months', ta: '3 மாதங்கள்' },
+  vettriSuggestPremiumMonths: { en: '6 months', ta: '6 மாதங்கள்' },
   vettriSuggestGo: { en: 'View Vettri Nichayam', ta: 'வெற்றி நிச்சயம் பார்க்க' },
   vettriSuggestStay: { en: 'Continue with Premium', ta: 'பிரீமியத்துடன் தொடர' },
   vettriThanks: {
@@ -1153,7 +1284,7 @@ const STRINGS = {
     en: 'Go Premium - prepare faster',
     ta: 'பிரீமியம் பெறுங்கள் - வேகமாக தயாராகுங்கள்',
   },
-  premiumValidity: { en: '3-month plan', ta: '3-மாத திட்டம்' },
+  premiumValidity: { en: '6-month plan', ta: '6-மாத திட்டம்' },
   premiumPerk1: { en: 'Unlimited practice tests', ta: 'வரம்பற்ற பயிற்சித் தேர்வுகள்' },
   premiumPerk2: {
     en: '6 mock exams',
@@ -1177,6 +1308,11 @@ const STRINGS = {
     en: 'All future updates included for your plan duration',
     ta: 'உங்கள் திட்டக் காலம் வரை அனைத்து எதிர்கால புதுப்பிப்புகளும் அடங்கும்',
   },
+  // Rank Booster is a standalone ₹1,249/90-day plan; Premium includes it free.
+  premiumPerk7: {
+    en: 'Group II/ IIA- Rank Booster series - all 23 papers',
+    ta: 'குரூப் II/ IIA - Rank Booster தொடர் - அனைத்து 23 தாள்களும்',
+  },
   // Bonus benefits, shown as a separate "extras" block on the premium banner.
   premiumBonusTitle: { en: 'Bonus with Premium', ta: 'பிரீமியத்துடன் போனஸ்' },
   premiumBonus1: {
@@ -1189,8 +1325,7 @@ const STRINGS = {
     en: 'Face the exam with confidence',
     ta: 'தேர்வை நம்பிக்கையுடன் எதிர்கொள்ளுங்கள்',
   },
-  premiumPerYear: { en: 'for 3 months', ta: '3 மாதங்களுக்கு' },
-  premiumPerMonth: { en: 'per month', ta: 'மாதத்திற்கு' },
+  premiumPerYear: { en: 'for 6 months', ta: '6 மாதங்களுக்கு' },
   premiumSecureNote: {
     en: 'Secure payment via Razorpay · one-time, no auto-renewal',
     ta: 'Razorpay மூலம் பாதுகாப்பான கட்டணம் · ஒருமுறை மட்டும், தானாக புதுப்பிக்காது',
@@ -1351,6 +1486,10 @@ const STRINGS = {
     en: 'Your plan is active and everything is unlocked. Happy learning!',
     ta: 'உங்கள் திட்டம் செயலில் உள்ளது, அனைத்தும் திறக்கப்பட்டுவிட்டன. மகிழ்ச்சியான கற்றல்!',
   },
+  paySuccessConfirming: {
+    en: 'Confirming your payment...',
+    ta: 'உங்கள் கட்டணம் உறுதிப்படுத்தப்படுகிறது...',
+  },
   paySuccessPlanLabel: { en: 'Your plan', ta: 'உங்கள் திட்டம்' },
   paySuccessUnlocked: { en: "What's unlocked", ta: 'திறக்கப்பட்டவை' },
   paySuccessStart: { en: 'Start practising', ta: 'பயிற்சியைத் தொடங்குங்கள்' },
@@ -1375,8 +1514,14 @@ const STRINGS = {
   locked: { en: 'Locked', ta: 'பூட்டப்பட்டது' },
   keepGoing: { en: 'Keep going - you’re doing great!', ta: 'தொடருங்கள் - அருமை!' },
 
+  // Profile page - section tabs (Profile & Gamification / Security)
+  securityTab: { en: 'Security', ta: 'பாதுகாப்பு' },
+  moreStats: { en: 'More Stats', ta: 'மேலும் புள்ளிவிவரங்கள்' },
+  quickLinks: { en: 'Quick Links', ta: 'விரைவு இணைப்புகள்' },
+
   // Percentile + syllabus
   yourRank: { en: 'Your Standing', ta: 'உங்கள் நிலை' },
+  stateLevelAnalytics: { en: 'State Level Analytics', ta: 'மாநில அளவு பகுப்பாய்வு' },
   aheadOf: { en: 'ahead of', ta: 'முந்தியுள்ளீர்கள்' },
   ofAspirants: { en: 'of aspirants', ta: 'விண்ணப்பதாரர்களில்' },
   syllabusCoverage: { en: 'Syllabus Coverage', ta: 'பாடத்திட்ட பரப்பளவு' },
@@ -1476,6 +1621,8 @@ const STRINGS = {
   creatingAccount: { en: 'Creating account…', ta: 'கணக்கை உருவாக்குகிறது…' },
   alreadyRegistered: { en: 'Already registered?', ta: 'ஏற்கனவே பதிவு செய்துள்ளீர்களா?' },
   orDivider: { en: 'or', ta: 'அல்லது' },
+  fastestWayToEnroll: { en: 'Fastest way to enroll', ta: 'Enroll ஆக வேகமான வழி' },
+  orSignUpWithEmail: { en: 'or sign up with email', ta: 'அல்லது மின்னஞ்சல் மூலம் பதிவு செய்யவும்' },
   // Phone-OTP login (alternate sign-in)
   tabPassword: { en: 'Password', ta: 'கடவுச்சொல்' },
   tabPhone: { en: 'Phone OTP', ta: 'தொலைபேசி OTP' },
@@ -1583,6 +1730,64 @@ const STRINGS = {
     en: "Couldn't sign in with Google. Please try again.",
     ta: 'Google மூலம் உள்நுழைய முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
   },
+
+  // ─── Two-factor authentication (TOTP, admin/superadmin) ────────────────────
+  totpChallengeTitle: { en: 'Two-step verification', ta: 'இரு-கட்ட சரிபார்ப்பு' },
+  totpChallengeHint: {
+    en: 'Enter the 6-digit code from your authenticator app.',
+    ta: 'உங்கள் authenticator ஆப்பில் உள்ள 6-இலக்க குறியீட்டை உள்ளிடவும்.',
+  },
+  totpUseBackupCode: { en: 'Use a backup code instead', ta: 'மாற்றாக backup குறியீட்டைப் பயன்படுத்தவும்' },
+  totpUseAppCodeInstead: { en: 'Use your app code instead', ta: 'மாற்றாக ஆப் குறியீட்டைப் பயன்படுத்தவும்' },
+  totpBackupCodeLabel: { en: 'Backup code', ta: 'Backup குறியீடு' },
+  totpBackToSignIn: { en: 'Back to sign in', ta: 'உள்நுழைவுக்குத் திரும்பு' },
+
+  securityTitle: { en: 'Security', ta: 'பாதுகாப்பு' },
+  totpSectionTitle: { en: 'Two-factor authentication', ta: 'இரு-கட்ட அங்கீகாரம்' },
+  totpSectionDesc: {
+    en: 'Adds an extra step at sign-in using an authenticator app, on top of your password.',
+    ta: 'கடவுச்சொல்லுடன், authenticator ஆப் மூலம் ஒரு கூடுதல் பாதுகாப்பு படி சேர்க்கிறது.',
+  },
+  totpStatusOn: { en: 'On', ta: 'இயக்கத்தில்' },
+  totpStatusOff: { en: 'Off', ta: 'அணைக்கப்பட்டது' },
+  totpTurnOn: { en: 'Turn on', ta: 'இயக்கு' },
+  totpTurnOff: { en: 'Turn off', ta: 'அணை' },
+  totpEnrollIntro: {
+    en: 'Scan this QR code with an authenticator app (Google Authenticator, Authy, etc.), then enter the 6-digit code it shows.',
+    ta: 'ஒரு authenticator ஆப்பில் (Google Authenticator, Authy போன்றவை) இந்த QR குறியீட்டை ஸ்கேன் செய்து, அது காட்டும் 6-இலக்க குறியீட்டை உள்ளிடவும்.',
+  },
+  totpManualKeyLabel: {
+    en: "Can't scan? Enter this key manually:",
+    ta: 'ஸ்கேன் செய்ய முடியவில்லையா? இந்த key-ஐ கைமுறையாக உள்ளிடவும்:',
+  },
+  totpActivate: { en: 'Activate', ta: 'செயல்படுத்து' },
+  totpBackupCodesTitle: { en: 'Save your backup codes', ta: 'உங்கள் backup குறியீடுகளைச் சேமிக்கவும்' },
+  totpBackupCodesIntro: {
+    en: "If you lose access to your authenticator app, use one of these to sign in. Each works once — store them somewhere safe.",
+    ta: 'உங்கள் authenticator ஆப்பை அணுக முடியாவிட்டால், இவற்றில் ஒன்றைப் பயன்படுத்தி உள்நுழையலாம். ஒவ்வொன்றும் ஒருமுறை மட்டுமே செயல்படும் — பாதுகாப்பாகச் சேமிக்கவும்.',
+  },
+  totpBackupCodesDone: { en: "I've saved these codes", ta: 'இந்தக் குறியீடுகளைச் சேமித்துவிட்டேன்' },
+  totpDisableConfirmTitle: {
+    en: 'Turn off two-factor authentication?',
+    ta: 'இரு-கட்ட அங்கீகாரத்தை அணைக்கவா?',
+  },
+  totpDisablePasswordLabel: {
+    en: 'Enter your password to confirm',
+    ta: 'உறுதிப்படுத்த உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
+  },
+  totpAlreadyEnabled: {
+    en: 'Two-factor authentication is already enabled.',
+    ta: 'இரு-கட்ட அங்கீகாரம் ஏற்கனவே இயக்கத்தில் உள்ளது.',
+  },
+  totpEnabledToast: {
+    en: 'Two-factor authentication is now on.',
+    ta: 'இரு-கட்ட அங்கீகாரம் இப்போது இயக்கத்தில் உள்ளது.',
+  },
+  totpDisabledToast: {
+    en: 'Two-factor authentication is now off.',
+    ta: 'இரு-கட்ட அங்கீகாரம் அணைக்கப்பட்டது.',
+  },
+
   // Complete-profile onboarding (Google signups land here to add the details
   // Google doesn't provide - phone + target group).
   completeProfileTitle: { en: 'Almost there', ta: 'கிட்டத்தட்ட முடிந்தது' },
@@ -1612,7 +1817,7 @@ const STRINGS = {
   errEmailRequired: { en: 'Please enter your email.', ta: 'உங்கள் மின்னஞ்சலை உள்ளிடவும்.' },
   errEmailInvalid: { en: 'Please enter a valid email address.', ta: 'சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்.' },
   errPasswordRequired: { en: 'Please enter your password.', ta: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்.' },
-  errPasswordShort: { en: 'Password must be at least 6 characters.', ta: 'கடவுச்சொல் குறைந்தது 6 எழுத்துகள் இருக்க வேண்டும்.' },
+  errPasswordShort: { en: 'Password must be at least 8 characters.', ta: 'கடவுச்சொல் குறைந்தது 8 எழுத்துகள் இருக்க வேண்டும்.' },
   errPasswordMismatch: { en: 'Passwords do not match.', ta: 'கடவுச்சொற்கள் பொருந்தவில்லை.' },
   errNameRequired: { en: 'Please enter your full name.', ta: 'உங்கள் முழுப் பெயரை உள்ளிடவும்.' },
   errPhoneRequired: { en: 'Please enter your phone number.', ta: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்.' },

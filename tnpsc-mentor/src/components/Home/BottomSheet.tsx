@@ -59,7 +59,7 @@ export default function BottomSheet({
         {/* Sticky header so the close control is always reachable, however far
             the list of options is scrolled. */}
         <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-canvas/95 px-5 py-4 backdrop-blur">
-          <h2 className="tamil font-display text-[17px] font-bold tracking-tight text-ink">
+          <h2 className="tamil font-display text-lg font-bold tracking-tight text-ink">
             {title}
           </h2>
           <button

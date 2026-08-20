@@ -78,7 +78,7 @@ function SolutionPane({
   return (
     <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">
       {label && (
-        <p className="mb-2 font-heading text-[11px] font-bold uppercase tracking-wider text-secondary/70">
+        <p className="mb-2 font-heading text-2xs font-bold uppercase tracking-wider text-secondary/70">
           {label}
         </p>
       )}
@@ -99,7 +99,7 @@ function SolutionPane({
               line.kind === 'formula' ? (
                 <div
                   key={i}
-                  className="tamil rounded-lg border border-secondary/30 bg-tint px-3 py-2 text-[13px] font-semibold leading-loose text-ink"
+                  className="tamil rounded-lg border border-secondary/30 bg-tint px-3 py-2 text-sm font-semibold leading-loose text-ink"
                 >
                   {line.label && (
                     <span className="mr-1 font-heading text-secondary">{line.label}:</span>
@@ -109,7 +109,7 @@ function SolutionPane({
               ) : (
                 <p
                   key={i}
-                  className="tamil whitespace-pre-line pl-1 text-[13px] leading-loose text-navytext/80"
+                  className="tamil whitespace-pre-line pl-1 text-sm leading-loose text-navytext/80"
                 >
                   <MathText text={line.text} />
                 </p>

@@ -33,7 +33,7 @@ export default function StarterTestPrompt({
           <Sparkles size={26} />
         </span>
 
-        <p className="tamil mt-4 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+        <p className="tamil mt-4 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
           {t('firstTestBadge')}
         </p>
         <h2 className="tamil mt-1.5 font-display text-xl font-bold leading-tight tracking-tight text-ink">
@@ -45,10 +45,10 @@ export default function StarterTestPrompt({
 
         {/* Quick facts strip - size + bonus, mirroring the dashboard hero. */}
         <div className="mt-4 flex items-center justify-center gap-2">
-          <span className="rounded-full bg-tint px-3 py-1 font-heading text-[11px] font-semibold text-ink2">
+          <span className="rounded-full bg-tint px-3 py-1 font-heading text-2xs font-semibold text-ink2">
             {STARTER_TEST_QUESTIONS} {t('questionsCount')}
           </span>
-          <span className="rounded-full bg-goldsoft px-3 py-1 font-heading text-[11px] font-semibold text-gold">
+          <span className="rounded-full bg-goldsoft px-3 py-1 font-heading text-2xs font-semibold text-gold">
             +{FIRST_TEST_BONUS} {t('creditsWord')}
           </span>
         </div>

@@ -75,7 +75,7 @@ export default function MessagesPage() {
       </button>
 
       <header className="mb-3 flex-shrink-0">
-        <h1 className="font-display text-[20px] font-bold tracking-tight text-ink">
+        <h1 className="font-display text-xl font-bold tracking-tight text-ink">
           {t('messagesTitle')}
         </h1>
         <p className="mt-1 font-body text-sm text-muted">{t('messagesSubtitle')}</p>
@@ -108,7 +108,7 @@ export default function MessagesPage() {
                     <p className="tamil mt-1 whitespace-pre-line opacity-80">{secondaryTa}</p>
                   )}
                   <p
-                    className={`mt-1 text-[10px] ${m.sender === 'admin' ? 'text-ink2' : 'text-white/70'}`}
+                    className={`mt-1 text-2xs ${m.sender === 'admin' ? 'text-ink2' : 'text-white/70'}`}
                   >
                     {ago(m.created_at)}
                   </p>

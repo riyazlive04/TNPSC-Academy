@@ -142,7 +142,7 @@ export default function TestSeriesAnalyticsView({ analytics }: { analytics: Test
                 <Lightbulb size={16} className="text-primary" />
                 <h2 className="tamil font-heading text-sm font-bold text-ink">{t('tsAdviceTitle')}</h2>
               </div>
-              <p className="tamil mb-3 font-body text-[12px] text-muted">{t('tsAdviceSub')}</p>
+              <p className="tamil mb-3 font-body text-xs text-muted">{t('tsAdviceSub')}</p>
               <div className="space-y-2.5">
                 {plan.map((item, i) => (
                   <AdviceRow
@@ -169,7 +169,7 @@ export default function TestSeriesAnalyticsView({ analytics }: { analytics: Test
           {subjectRows.length > 0 && (
             <section>
               <SectionHead icon={<BarChart2 size={15} />} title={t('tsSubjectPerf')} />
-              {weakSubjects.length > 0 && <p className="tamil mb-2.5 font-body text-[13px] text-muted">{t('tsFocusHint')}</p>}
+              {weakSubjects.length > 0 && <p className="tamil mb-2.5 font-body text-sm text-muted">{t('tsFocusHint')}</p>}
               <div className="rounded-card border border-line bg-card p-4">
                 <SubjectBarChart
                   rows={subjectRows}
@@ -198,7 +198,7 @@ export default function TestSeriesAnalyticsView({ analytics }: { analytics: Test
           {weakType && (
             <section className="flex items-start gap-2.5 rounded-card border border-accentwarm/30 bg-accentwarmsoft p-4">
               <Layers size={16} className="mt-0.5 shrink-0 text-accentwarm" />
-              <p className="tamil min-w-0 flex-1 font-body text-[13px] leading-snug text-ink">
+              <p className="tamil min-w-0 flex-1 font-body text-sm leading-snug text-ink">
                 {t('tsAdviceType')
                   .replace('{type}', t(qtypeLabelKey(weakType.key)))
                   .replace('{acc}', String(weakType.accuracy))}
@@ -255,7 +255,7 @@ function SegTabs({
           onClick={() => onChange(key)}
           aria-pressed={value === key}
           className={[
-            'flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 font-heading text-[13px] font-semibold transition-colors',
+            'flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2 font-heading text-sm font-semibold transition-colors',
             value === key ? 'bg-brand-gradient text-white' : 'text-ink2 hover:text-ink',
           ].join(' ')}
         >
@@ -308,12 +308,12 @@ function AdviceRow({
   return (
     <div className="flex items-start gap-2.5">
       <Icon size={16} className={`mt-0.5 shrink-0 ${meta.color}`} />
-      <p className="tamil min-w-0 flex-1 font-body text-[13px] leading-snug text-ink">
+      <p className="tamil min-w-0 flex-1 font-body text-sm leading-snug text-ink">
         {text}
         {item.kind === 'focus' && (
           <button
             onClick={() => onPractice(item.route)}
-            className="ml-1.5 whitespace-nowrap font-heading text-[12px] font-bold text-primary transition-opacity hover:opacity-80"
+            className="ml-1.5 whitespace-nowrap font-heading text-xs font-bold text-primary transition-opacity hover:opacity-80"
           >
             {practiceLabel} →
           </button>
@@ -327,7 +327,7 @@ function Stat({ label, value, tint }: { label: string; value: string; tint?: str
   return (
     <div className="rounded-card border border-line bg-card px-2 py-3 text-center">
       <div className={`font-display text-xl font-bold leading-none ${tint ?? 'text-ink'}`}>{value}</div>
-      <div className="tamil mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">{label}</div>
+      <div className="tamil mt-1.5 font-body text-2xs uppercase tracking-wide text-ink2">{label}</div>
     </div>
   )
 }
@@ -352,9 +352,9 @@ function AttemptRow({ a, ta }: { a: TestSeriesAttempt; ta: boolean }) {
       <div className="min-w-0">
         <p className="tamil truncate font-heading text-sm font-semibold text-ink">
           {title}
-          {unit && <span className="ml-1.5 font-body text-[11px] font-normal text-muted">{unit}</span>}
+          {unit && <span className="ml-1.5 font-body text-2xs font-normal text-muted">{unit}</span>}
         </p>
-        {sub && <p className="font-body text-[11px] text-ink2">{sub}</p>}
+        {sub && <p className="font-body text-2xs text-ink2">{sub}</p>}
       </div>
       <span className={`shrink-0 font-display text-lg font-bold ${scoreText(a.score)}`}>{a.score}%</span>
     </div>

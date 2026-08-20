@@ -340,8 +340,13 @@ export interface QuizConfig {
   mockGroup?: GroupType
   /** A fixed full mock exam id ('exam1'..'exam6') when mockKind === 'exam'. */
   mockExamId?: string
-  /** A scheduled test-series id ('test1'..'test13') when mockKind === 'series'. */
+  /** A scheduled test-series id ('test1'..'test13', or 'g2rb1'..'g2rb10' for
+   *  Rank Booster) when mockKind === 'series'. */
   seriesTestId?: string
+  /** Which test-series product `seriesTestId` belongs to. Defaults server-side
+   *  to 'g1_marathon' when omitted, so this can stay unset for the original
+   *  Test Marathon flow. */
+  seriesKey?: 'g1_marathon' | 'g2a_rankbooster'
   /** A Vettri Nichayam exam id ('vettri1'..'vettri13') when mockKind === 'vettri'. */
   vettriExamId?: string
   /** Set when this quiz is a revision re-test (gates similar-question fetch). */
@@ -519,6 +524,7 @@ export interface TestSeriesAdmin {
   enabled: boolean
   open_override: 'auto' | 'open' | 'closed'
   sort_order: number
+  tier: 'free' | 'paid'
   /** Questions actually loaded for this set (should be total_questions). */
   loaded_questions: number
 }
@@ -538,6 +544,9 @@ export interface Profile {
   language?: DisplayLang | null
   /** Profile picture URL - set from Google on Google sign-in; null otherwise. */
   avatar_url?: string | null
+  /** Whether TOTP two-factor auth is active (admin/superadmin only). The
+   * secret and backup codes themselves never leave the server. */
+  totp_enabled?: boolean
 }
 
 // ─── Result payload passed via router state to /result ──────────────────────

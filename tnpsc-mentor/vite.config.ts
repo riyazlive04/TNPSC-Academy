@@ -30,6 +30,12 @@ export default defineConfig({
           // split them out of the main bundle.
           pdf: ['jspdf', 'html2canvas'],
           vendor: ['react', 'react-dom', 'react-router-dom', 'zustand'],
+          // Shared across many lazy route chunks (quiz/mock/result/admin
+          // pages, page-transition engine) — isolate so they get their own
+          // long-lived cache entry instead of being duplicated/re-bundled
+          // into whichever chunk happens to import them first.
+          motion: ['motion'],
+          katex: ['katex'],
         },
       },
     },

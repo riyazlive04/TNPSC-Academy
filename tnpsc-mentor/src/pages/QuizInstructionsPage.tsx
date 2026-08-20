@@ -187,7 +187,7 @@ export default function QuizInstructionsPage() {
                 aria-label={t('numQuestions')}
                 className="w-full accent-brand disabled:opacity-50"
               />
-              <div className="mt-1 flex justify-between font-body text-[11px] text-ink2">
+              <div className="mt-1 flex justify-between font-body text-2xs text-ink2">
                 <span>{minCount}</span>
                 <span>{maxCount}</span>
               </div>
@@ -244,7 +244,7 @@ export default function QuizInstructionsPage() {
             aria-label={t('timeLimitMin')}
             className="w-full accent-brand"
           />
-          <div className="mt-1 flex justify-between font-body text-[11px] text-ink2">
+          <div className="mt-1 flex justify-between font-body text-2xs text-ink2">
             <span>
               {MIN_MINUTES} {t('minutesShort')}
             </span>

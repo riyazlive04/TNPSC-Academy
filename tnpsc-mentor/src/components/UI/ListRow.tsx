@@ -51,11 +51,11 @@ export function ListRow({
     >
       {leading}
       <span className="min-w-0 flex-1">
-        <span className="tamil block truncate font-display text-[15px] font-semibold leading-snug text-ink">
+        <span className="tamil block truncate font-display text-base font-semibold leading-snug text-ink">
           {title}
         </span>
         {subtitle && (
-          <span className="tamil mt-0.5 block truncate font-body text-[13px] text-muted">
+          <span className="tamil mt-0.5 block truncate font-body text-sm text-muted">
             {subtitle}
           </span>
         )}

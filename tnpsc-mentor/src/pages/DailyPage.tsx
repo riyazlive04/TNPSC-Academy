@@ -80,7 +80,7 @@ export default function DailyPage() {
                 <div className="font-heading text-xl font-semibold leading-none text-ink">
                   {habit?.currentStreak ?? 0}
                 </div>
-                <div className="tamil mt-1 truncate font-body text-[11px] uppercase tracking-wide text-ink2">
+                <div className="tamil mt-1 truncate font-body text-2xs uppercase tracking-wide text-ink2">
                   {t('dayStreak')}
                 </div>
               </div>
@@ -94,7 +94,7 @@ export default function DailyPage() {
               <div className="font-heading text-xl font-semibold leading-none text-ink">
                 {dailyRewardPoints}
               </div>
-              <div className="tamil mt-1 truncate font-body text-[11px] uppercase tracking-wide text-ink2">
+              <div className="tamil mt-1 truncate font-body text-2xs uppercase tracking-wide text-ink2">
                 {t('totalRewards')}
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function DailyPage() {
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="tamil truncate font-body text-[11px] uppercase tracking-wide text-ink2">
+                <span className="tamil truncate font-body text-2xs uppercase tracking-wide text-ink2">
                   {habit.goalMetToday ? t('goalDone') : t('dailyGoal')}
                 </span>
                 <span className="font-heading text-sm font-semibold text-ink">

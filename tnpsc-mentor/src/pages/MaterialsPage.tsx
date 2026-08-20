@@ -75,10 +75,10 @@ export default function MaterialsPage() {
             <Library size={22} />
           </span>
           <div>
-            <h1 className="font-display text-[22px] font-bold tracking-tight text-ink">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
               {t('materialsTitle')}
             </h1>
-            <p className="tamil font-body text-[14px] text-muted">{t('materialsSubtitle')}</p>
+            <p className="tamil font-body text-sm text-muted">{t('materialsSubtitle')}</p>
           </div>
         </div>
 
@@ -232,7 +232,7 @@ function MaterialCard({
       </div>
       {/* Meta */}
       <div className="flex flex-1 flex-col gap-1 p-3">
-        <span className="font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+        <span className="font-heading text-2xs font-bold uppercase tracking-wide text-primary">
           {kindLabel(m.kind)}
           {m.file_size ? ` · ${formatFileSize(m.file_size)}` : ''}
         </span>

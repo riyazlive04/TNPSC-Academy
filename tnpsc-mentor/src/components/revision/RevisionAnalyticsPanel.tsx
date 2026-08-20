@@ -109,7 +109,7 @@ function Stat({
     <div className="rounded-xl border border-line bg-tint px-3 py-2.5">
       <span className={`flex items-center gap-1.5 ${TONES[tone] ?? 'text-ink2'}`}>{icon}</span>
       <p className="mt-1 font-heading text-lg font-bold leading-none text-ink tabular-nums">{value}</p>
-      <p className="tamil mt-0.5 font-body text-[11px] text-muted">{label}</p>
+      <p className="tamil mt-0.5 font-body text-2xs text-muted">{label}</p>
     </div>
   )
 }

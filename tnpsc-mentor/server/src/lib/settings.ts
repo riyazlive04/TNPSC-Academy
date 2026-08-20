@@ -12,10 +12,12 @@ export interface PublicSettings {
   mock_group_enabled: boolean
   /** Show the Subject / Topic mock tab. */
   mock_subject_enabled: boolean
-  /** Show the scheduled Test Series nav tab + Test Arena tile. */
+  /** Show the scheduled Test Series (Group 1 Marathon) nav tab + Test Arena tile. */
   test_series_enabled: boolean
   /** Show the Vettri Nichayam nav tab + Test Arena tile. */
   vettri_enabled: boolean
+  /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
+  rank_booster_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
@@ -23,6 +25,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   mock_subject_enabled: false,
   test_series_enabled: false,
   vettri_enabled: false,
+  rank_booster_enabled: false,
 }
 
 // ─── Admin-only settings ─────────────────────────────────────────────────────
@@ -88,6 +91,9 @@ export async function readPublicSettings(): Promise<PublicSettings> {
       raw.test_series_enabled ?? PUBLIC_SETTING_DEFAULTS.test_series_enabled
     ),
     vettri_enabled: Boolean(raw.vettri_enabled ?? PUBLIC_SETTING_DEFAULTS.vettri_enabled),
+    rank_booster_enabled: Boolean(
+      raw.rank_booster_enabled ?? PUBLIC_SETTING_DEFAULTS.rank_booster_enabled
+    ),
   }
 }
 

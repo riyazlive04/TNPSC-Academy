@@ -14,13 +14,24 @@ interface EntitlementsState {
   unlimited: boolean
   premiumUntil: string | null
   vettriUntil: string | null
+  rankBooster: boolean
+  rankBoosterUntil: string | null
+  /** premium || rankBooster — unlocks the Group II/IIA Rank Booster series. */
+  rankBoosterUnlocked: boolean
+  /** The standalone ₹399/80-day Group 1 Mock Test Pack. */
+  mockPack: boolean
+  mockPackUntil: string | null
   loaded: boolean // true once we've checked at least once
   refresh: () => Promise<void>
   /** Optimistically mark vettri (called right after a verified Vettri payment). */
   markVettri: () => void
   /** Optimistically mark premium (called right after a verified Premium payment).
-   *  Premium is a superset, so this also flips `unlimited`. */
+   *  Premium is a superset, so this also flips `unlimited` and `rankBoosterUnlocked`. */
   markPremium: () => void
+  /** Optimistically mark Rank Booster (called right after a verified payment). */
+  markRankBooster: () => void
+  /** Optimistically mark the Mock Pack (called right after a verified payment). */
+  markMockPack: () => void
 }
 
 export const useEntitlementsStore = create<EntitlementsState>((set) => ({
@@ -29,6 +40,11 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
   unlimited: false,
   premiumUntil: null,
   vettriUntil: null,
+  rankBooster: false,
+  rankBoosterUntil: null,
+  rankBoosterUnlocked: false,
+  mockPack: false,
+  mockPackUntil: null,
   loaded: false,
   refresh: async () => {
     if (!isApiConfigured) {
@@ -43,6 +59,11 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
         unlimited: e.unlimited,
         premiumUntil: e.premiumUntil,
         vettriUntil: e.vettriUntil,
+        rankBooster: e.rankBooster,
+        rankBoosterUntil: e.rankBoosterUntil,
+        rankBoosterUnlocked: e.rankBoosterUnlocked,
+        mockPack: e.mockPack,
+        mockPackUntil: e.mockPackUntil,
         loaded: true,
       })
     } catch {
@@ -51,5 +72,7 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
     }
   },
   markVettri: () => set({ vettri: true, unlimited: true }),
-  markPremium: () => set({ premium: true, unlimited: true }),
+  markPremium: () => set({ premium: true, unlimited: true, rankBoosterUnlocked: true }),
+  markRankBooster: () => set({ rankBooster: true, rankBoosterUnlocked: true }),
+  markMockPack: () => set({ mockPack: true }),
 }))

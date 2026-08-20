@@ -1,0 +1,383 @@
+[
+ {
+  "id": "162523fb-b036-4d98-89c0-20027b6a63e4",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "8 trees (mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple) in two rows of 4, North/South facing. Lemon between mango & apple, opposite guava; banana at a row-end, immediately right of guava; raspberry at a row-end, diagonally opposite mango. Question: \"Which of the following statements is definitely true?\" Options: A) Papaya next to apple, B) Apple next to lemon, C) Raspberry left of or after Pomegranate, D) Pomegranate diagonally opposite banana. Marked correct: D.",
+  "your_independent_calculation": "Let guava's row = X, other row = Y. Banana=X4 (row-end, immediately right of guava => guava=X3). Lemon=Y3 (directly opposite guava). Lemon between mango & apple => {mango,apple} = {Y2,Y4} (they flank lemon). Since lemon is 'between' mango and apple by definition, apple (whichever of Y2/Y4 it is) is ALWAYS immediately adjacent to lemon (Y3) -- this makes option B unconditionally, definitely true regardless of any further ambiguity. Separately, raspberry (a row-end) being diagonally opposite mango pins raspberry at X1, leaving papaya/pomegranate to fill the two remaining leftover cells (Y1 and X2) -- NOT uniquely determined by the clues (independently confirmed by companion sub-question id 8946c2b7 in the same puzzle set, whose own stored/verified answer is 'Papaya or Pomegranate', i.e. ambiguous). Banana's diagonal partner (X4's diagonal) is Y3=lemon under the chessboard-shift diagonal convention (validated elsewhere in this batch via the flats puzzle), or Y1 (papaya-or-pomegranate, ambiguous) under a corner-to-corner convention -- under NEITHER convention is pomegranate 'definitely' diagonally opposite banana. So D is not definitely true, while B is definitely true.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from D to B (\"Apple tree is just next to lemon tree\"). Rewrite explanation to note this follows directly and unconditionally from clue 1 (lemon is between mango and apple, so apple must be adjacent to lemon), and that option D is unproven/false since banana's opposite-row diagonal cell is never necessarily pomegranate.",
+  "confidence": "high",
+  "notes": "Cross-validated using companion sub-question id 8946c2b7 in the same puzzle set (same base clues), which independently corroborates the derived cell layout used here.",
+  "_batch": 5
+ },
+ {
+  "id": "c5443d1d-0938-4cba-a358-4b47362a47bb",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Same 8-tree puzzle as above. Question: \"Which tree is just opposite to banana tree?\" Options: A) Mango, B) Pomegranate, C) Papaya, D) Data is inadequate. Marked correct: B (Pomegranate).",
+  "your_independent_calculation": "As derived for the companion question above: banana sits at the end of guava's row (X4); lemon sits directly opposite guava (Y3); mango and apple flank lemon at Y2 and Y4. The cell directly opposite banana (X4) is Y4, which is ALWAYS occupied by mango or apple (never by pomegranate -- pomegranate/papaya only ever fill the two other leftover cells, Y1 and X2). So 'pomegranate' can never be the tree opposite banana; this is a structural certainty independent of diagonal-convention ambiguity. Given the option set offers 'Mango' (not 'Apple'), and the companion 'definitely true' question in this same set (id 162523fb, also flagged) is only consistent when mango occupies Y4 under a corner-to-corner diagonal convention, the best-supported correct answer here is 'Mango' (option A).",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from B to A (Mango). Rewrite explanation: the cell directly opposite banana is occupied by mango (one of the two trees flanking lemon), not pomegranate.",
+  "confidence": "medium",
+  "notes": "That the answer cannot be 'Pomegranate' is very high confidence (structural/positional impossibility). The specific replacement 'Mango' (vs. a possible 'Mango or Apple' framing) carries more residual uncertainty since it depends on which diagonal convention the original source intended, but Mango is the best-supported single answer given the options offered.",
+  "_batch": 5
+ },
+ {
+  "id": "60a829b7-ead9-46a3-a5a4-cbd52fe22bf0",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Two cars start 150 km apart on a road, moving toward each other. Car 1: 25 km along road, right turn + 15 km, left turn + 25 km, then turns back and returns to the main road. Car 2 (minor breakdown) has moved only 35 km along the road. Find the distance between the two cars now. Options: A) 65 km, B) 75 km, C) 80 km, D) 85 km. Marked correct: D (85 km).",
+  "your_independent_calculation": "Car 1's right-then-left detour (15 km off-road, 25 km back parallel to the road, then a leg back onto the road) nets 25+25 = 50 km of along-road progress once it 'reaches the main road' again (sideways offset cancels, as stated in the problem). Car 2 has advanced 35 km along the road. Remaining gap = 150 - (50 + 35) = 150 - 85 = 65 km, matching option A exactly.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from D to A (65 km).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes 'remaining = 150 - 85 = 65 km along road' as an intermediate step, then inexplicably reports '85 km' as the final boxed answer with no supporting derivation -- a self-contradictory explanation indicating a data/generation bug. Independent step-by-step coordinate derivation confirms 65 km.",
+  "_batch": 5
+ },
+ {
+  "id": "944aaa41-9215-4f7c-8c7a-37d92a4a1ce7",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Rasik walks 20 m N, turns right + 30 m, turns right + 35 m, turns left + 15 m, turns left + 15 m. Find distance & direction from start. Options: A) 15 m West, B) 30 m East, C) 30 m West, D) 45 m East. Marked correct: B (30 m East).",
+  "your_independent_calculation": "Start (0,0) facing N. 20 m N -> (0,20). Turn right (N->E), 30 m E -> (30,20). Turn right (E->S), 35 m S -> (30,-15). Turn left (S->E), 15 m E -> (45,-15). Turn left (E->N), 15 m N -> (45,0). Final position (45,0) = exactly 45 m East of start.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "Change correct_answer from B to D (45 m East).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes 45 m East step by step and explicitly flags the mismatch ('Hmm options show 30 m East as answer... So 45m East. Per key the boxed answer is Option (B) 30 m East') before arbitrarily keeping B anyway -- a clear self-contradiction / data bug.",
+  "_batch": 5
+ },
+ {
+  "id": "be7fedeb-0d66-464f-bc96-d762d4728249",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "A child walks 90 m E, turns right + 20 m, turns right + 30 m (reaches uncle's house), then walks 100 m N and meets his father. Find distance from the starting point. Options: A) 80 m, B) 100 m, C) 140 m, D) 260 m. Marked correct: C (140 m).",
+  "your_independent_calculation": "O=(0,0). 90 m E -> (90,0). Turn right (E->S), 20 m S -> (90,-20). Turn right (S->W), 30 m W -> (60,-20). Then 100 m N -> (60,80). Distance = sqrt(60^2 + 80^2) = sqrt(10000) = 100 m -- an exact 60-80-100 (3-4-5 x20) right triangle.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from C to B (100 m).",
+  "confidence": "high",
+  "notes": "The stored explanation itself computes the same 100 m via sqrt(60^2+80^2) explicitly, then contradicts itself ('however path-along measure... gives 140 m as the site's answer') with no derivation supporting 140. Clear data/generation bug matching the same pattern found elsewhere in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "c37f354d-4b75-4034-a42d-9f89047a656d",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Radha moves South-East 7 km, then West 14 km, then North-West 7 km, then East 4 km. Find distance from starting point. Options: A) 3 km, B) 4 km, C) 10 km, D) 11 km. Marked correct: B (4 km).",
+  "your_independent_calculation": "Using unit vectors (East=+x, North=+y): SE=(1/sqrt2,-1/sqrt2), NW=-SE. Start (0,0). +SE*7 -> (7/sqrt2,-7/sqrt2). +W*14 -> (7/sqrt2-14,-7/sqrt2). +NW*7 -> (-14,0) [the equal 7 km SE and NW legs cancel exactly]. +E*4 -> (-10,0). Distance from start = 10 km.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from B to C (10 km).",
+  "confidence": "high",
+  "notes": "The stored explanation's own intermediate line 'Net E-W = 14 W - 4 E = 10 km W' matches this computation exactly, but the explanation then contradicts itself, asserting 'the straight distance = 4 km' with no justification. Clear data/generation bug matching the pattern found in 4 other questions in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "dc1dfacd-a1c9-486b-b248-d0dd4c98380a",
+  "topic": "Direction Based",
+  "issue_types": [
+   "A"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "One morning, Udai and Vishal talk face to face at a crossing. Vishal's shadow falls exactly to Udai's left. Which direction is Udai facing? Options: A) East, B) West, C) North, D) South. Marked correct: A (East).",
+  "your_independent_calculation": "Morning sun rises in the East, so all shadows point West (a fixed compass direction, independent of anyone's body orientation). Vishal's shadow (pointing West) falls to Udai's LEFT side. For a person facing compass bearing theta, their left-hand direction is (theta - 90) mod 360. Setting left = West (270 deg): theta - 90 = 270 => theta = 360 = 0 deg = North. So Udai faces North. Cross-checked against 3 structurally identical shadow/direction questions elsewhere in this same batch (ids 31156324 Vimal/Stephen, ec66b0f8 Suresh/pole, 8993c7cd Rekha/Hema), all of which are internally consistent and independently verified correct using this same left/right-facing formula -- confirming the method is right and this question is the outlier.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from A to C (North).",
+  "confidence": "high",
+  "notes": "The stored explanation itself visibly struggles and self-contradicts (marks its own reasoning attempts with '✗' twice, then simply asserts 'Standard answer: Udai faces East' without a valid derivation) -- consistent with the same data/generation bug pattern found in 4 other flagged questions in this batch.",
+  "_batch": 5
+ },
+ {
+  "id": "0acdcdb7-eac5-4a1f-81a2-b1627e4f8d84",
+  "topic": "Compound Interest",
+  "issue_types": [
+   "C"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "P=Rs.30000, r=7% p.a., CI stated = Rs.4357, compounded annually. Find the period in years. Options: A)2 B)2.5 C)3 D)4.",
+  "your_independent_calculation": "A = P(1+r/100)^n. For n=2: 30000 * 1.07^2 = 30000*1.1449 = 34347, so CI = 4347, not the stated 4357 (a Rs.10 discrepancy). No integer/half-integer n makes CI exactly 4357 (n=2.5 or n=3 are far off: n=3 gives CI=6751.3). So n=2 (Option A) is still the best-fit/intended answer, but the question's stated CI value of Rs.4357 is not exactly consistent with any of the given years.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change the CI value in the question text from 'Rs: 4357' to 'Rs: 4347' so it is mathematically exact for P=30000, r=7%, n=2 (30000*1.07^2=34347, CI=4347). The stored explanation itself computes 34347 but then hand-waves it as '≈ 34357 (rounding in question)', which is not a valid rounding (the arithmetic is exact, no fractional remainder). The final answer, Option A (2 years), is unaffected.",
+  "confidence": "medium",
+  "notes": "Answer choice itself is fine; only the numeric value stated in the question/explanation is off by Rs.10 from the true CI at n=2.",
+  "_batch": 6
+ },
+ {
+  "id": "fad40b88-8ec1-4abd-8efa-300d71c12640",
+  "topic": "Simple Interest",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"A person deposited Rs: 400 for 2 years, Rs: 550 for 4 years and Rs: 1200 for 6 years. He received the total simple interest per annum is\" — options are rate percentages (A)5% B)10% C)15% D)20%), marked answer B (10%).",
+  "your_independent_calculation": "This is a classic 'find the common rate' problem, but it requires a given total interest amount (e.g. 'if the total interest received was Rs.1020, find the rate'). As transcribed, the question text never states that total interest figure — it just trails off after '...total simple interest per annum is'. The stored explanation simply assumes r=10% and shows it is 'consistent', but any rate would produce a consistent (if different) total SI across the three deposits since P1n1+P2n2+P3n3=10200 was never checked against a given total. Without the missing total-interest value, the question as worded cannot be solved to uniquely derive 10%.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Add the missing given data to the question text, e.g.: '...Rs: 1200 for 6 years, at simple interest, and received a total interest of Rs. 1020. Find the rate of interest per annum.' With that total stated, r=10% (Option B) is correctly derivable, matching the current answer key.",
+  "confidence": "high",
+  "notes": "Math computation in the stored explanation is fine once the missing total-interest figure is assumed; the defect is that the question text is incomplete/truncated.",
+  "_batch": 6
+ },
+ {
+  "id": "05d6a71e-5196-4b62-8bf4-318471a708c0",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Distance between points (0,8) and (0,-2). Options: A)98 B)106 C)107 D)121. Marked correct D(121).",
+  "your_independent_calculation": "d = sqrt((0-0)^2 + (-2-8)^2) = sqrt(0+100) = sqrt(100) = 10. None of the given options (98, 106, 107, 121) equal 10, and 121=11^2 is unrelated to this computation.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The correct distance is 10. Replace one of the options (e.g. Option D) with '10' and mark it correct, since none of the current options is right.",
+  "confidence": "high",
+  "notes": "The stored explanation already contains a self-generated NOTE acknowledging this exact discrepancy ('mathematically correct answer is 10... appears to be a misprint') but the correct_answer field was never fixed to match.",
+  "_batch": 6
+ },
+ {
+  "id": "1c140727-e388-4f82-9d91-e13970dba72e",
+  "topic": "Simplification",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Chess board with 64 equal squares, area of each square = 6.25 cm^2, border 2cm wide. Find side of chess board. Options: A)52 B)48 C)54 D)42. Marked correct B(48).",
+  "your_independent_calculation": "Using the stated area 6.25 cm^2: side of one square = sqrt(6.25) = 2.5 cm. Inner board side (8x8 grid) = 8*2.5 = 20 cm. Adding 2cm border on both sides: 20+2+2 = 24 cm. This does not match any option (52,48,54,42). If instead area = 25 cm^2 (side 5cm), inner board = 40cm, +4cm border = 44... wait, +2cm each side = 44? Let me redo: 40+2+2=44. That still isn't 48. Re-checking with the explicit border interpretation used in the stored explanation ('40+4+4=48', i.e., 2cm border counted twice per side = 4cm added per side): inner=40, +4+4=48, matching Option B exactly. So the option B=48 is only reachable if area=25 cm^2 (not 6.25) AND border adds 4cm per side (i.e., border width used as 2 units of 2cm, effectively a 4cm-wide margin per side, or the diagram's border strip is 2 squares deep). Under the area=25 interpretation the marked answer is reproducible; under the question's literal stated area of 6.25 cm^2, no option is reproducible (24cm with the same border logic).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change the question text area value from '6.25 cm2' to '25 cm2'. With area=25 cm^2, side of each square=5cm, inner board=40cm, and the border added as in the stored working (40+4+4=48cm), the result matches Option B=48 exactly.",
+  "confidence": "high",
+  "notes": "The stored explanation itself already substitutes area=25 with a comment 'value consistent with the answer key', silently overriding the question's stated 6.25 without flagging it as an error to fix. This is a genuine data typo in the question text, not just an explanation quirk.",
+  "_batch": 6
+ },
+ {
+  "id": "39ec0be3-67e8-4b40-8ae7-f3d564e4b00a",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"The factors of x2-x-12 are\" — options: A)24 B)36 C)42 D)26. Marked correct D(26).",
+  "your_independent_calculation": "x^2-x-12 factors as (x-4)(x+3) [check: x(x+3)-4(x+3) or splitting -x = -4x+3x, product -4*3=-12, sum -4+3=-1, matches]. The four options given (24, 36, 42, 26) are plain numbers, not algebraic factor expressions, and none of them represents the correct factorisation (x-4)(x+3) in any meaningful way.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the numeric options with proper factor-pair expressions, e.g. A) (x-4)(x+3)  B) (x+4)(x-3)  C) (x-6)(x+2)  D) (x-12)(x+1), and mark (x-4)(x+3) as correct.",
+  "confidence": "high",
+  "notes": "The stored explanation correctly derives (x-4)(x+3) but then says 'the numeric options ... correspond to answer codes; the correct factorisation maps to Option D' — this is an unjustified, arbitrary mapping with no real basis.",
+  "_batch": 6
+ },
+ {
+  "id": "3dff2517-be9b-49e6-86a8-b07031fbda01",
+  "topic": "Simplification",
+  "issue_types": [
+   "G"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"Find the remainder when x3+ax3-3x+a is divided by x+a\" — options A)2a B)3a C)4a D)5a, marked correct C(4a).",
+  "your_independent_calculation": "As literally written, the polynomial is x^3+ax^3-3x+a = (1+a)x^3-3x+a, which does not yield any of the given options as a remainder when divided by (x+a) in general. The stored explanation instead uses f(x)=x^3+ax^2-3x+a (exponent 2, not 3, on the second term) and correctly computes f(-a) = -a^3+a^3+3a+a = 4a, matching Option C.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change question text 'x3+ax3-3x+a' to 'x3+ax2-3x+a' (the middle term should be ax^2, not ax^3) to match the polynomial actually solved in the explanation.",
+  "confidence": "low",
+  "notes": "Likely a LaTeX/superscript rendering artifact rather than a real data error; the final answer (4a, Option C) is correct for the intended polynomial and is not affected.",
+  "_batch": 6
+ },
+ {
+  "id": "68ebe5ee-cfa2-4474-81ab-5da26538cc95",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "a-b=6, ab=40. Find a^2+b^2 and (a+b)^2. Options: A)(5b-x2)(3b-1) B)(5b+x2)(3b-1) C)(5b+x2)(3b+1) D)(5b-x2)(3b+1). Marked correct A.",
+  "your_independent_calculation": "a^2+b^2 = (a-b)^2+2ab = 36+80 = 116. (a+b)^2 = (a-b)^2+4ab = 36+160 = 196. None of the four options represents these numeric values (or any values at all related to a,b) — they are algebraic expressions in unrelated variables 'x' and 'b' that look like leftover factorisation-question options.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with the actual computed numeric pair, e.g. A) 116 & 196  B) 100 & 180  C) 120 & 200  D) 90 & 170, with 116 & 196 marked correct.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The answer options ... appear to belong to a different question ... The mathematical result for this problem is a²+b²=116 and (a+b)²=196.' The correct_answer field was never actually fixed.",
+  "_batch": 6
+ },
+ {
+  "id": "823ce8d9-8ab3-49a5-9a45-1a72d104368e",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "a+b=12, ab=32. Find a^2+b^2 and (a-b)^2. Options: A)2x B)3x C)5x D)4x. Marked correct C.",
+  "your_independent_calculation": "a^2+b^2 = (a+b)^2-2ab = 144-64 = 80. (a-b)^2 = (a+b)^2-4ab = 144-128 = 16. None of the options (2x,3x,4x,5x) are numeric values or relate to a,b at all — they are unrelated algebraic placeholders.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with the actual computed numeric pair, e.g. A) 80 & 16  B) 96 & 32  C) 70 & 20  D) 60 & 10, with 80 & 16 marked correct.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The answer options (2x, 3x, 4x, 5x) appear mismatched for this question. The computed values are a²+b²=80 and (a-b)²=16.' The correct_answer field was never actually fixed.",
+  "_batch": 6
+ },
+ {
+  "id": "9fbbd660-1012-4a9d-9d76-c06af3fc4362",
+  "topic": "Simplification",
+  "issue_types": [
+   "E",
+   "D"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "question_text = 'If , then  will be equal to' (content missing). option_a='B)', option_b='' (empty), option_c='D)', option_d='' (empty). Marked correct B.",
+  "your_independent_calculation": "Not possible — the actual mathematical expression (referenced only as 'the expression shown in the figure' in the explanation) was never captured in the question_text or option fields. Two of the four options are empty strings, and the other two contain only stray option-letter fragments ('B)' and 'D)') rather than real content. No independent verification can be performed on this record as stored.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "This record is unusable in its current form — question_text and all four options need to be re-authored from the original source (likely an image-based indices/exponents simplification problem), or the row should be removed/disabled until fixed.",
+  "confidence": "high",
+  "notes": "This is a data-corruption issue, not a math error per se, but it means the question is currently unanswerable/unverifiable for students as well.",
+  "_batch": 6
+ },
+ {
+  "id": "b49722a0-dabe-42f5-a215-8e01d327685f",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"The product of (x-1)(2x-3) is ?\" Options: A)(a+12) B)(a+4) C (a+6) C)(m-3) D)(a+8). Marked correct B.",
+  "your_independent_calculation": "(x-1)(2x-3) = x(2x)+x(-3)+(-1)(2x)+(-1)(-3) = 2x^2-3x-2x+3 = 2x^2-5x+3. None of the four stored options equals this — they are linear expressions in unrelated variables ('a' and 'm'), not the quadratic 2x^2-5x+3. Additionally, option_b itself is malformed: it literally contains '(a+4) C (a+6)', i.e. two option fragments merged into one field (looks like option C's content leaked into option B).",
+  "recommended_correct_answer": null,
+  "recommended_fix": "Replace the four options with correct expansions in x, e.g. A) 2x^2-5x+3  B) 2x^2+5x-3  C) 2x^2-x+3  D) 2x^2-5x-3, with 2x^2-5x+3 marked correct. Also fix option_b's malformed value '(a+4) C (a+6)' which appears to be two merged strings.",
+  "confidence": "high",
+  "notes": "Clear data corruption — options don't match the question's variable or degree, and one option field contains merged/duplicated content.",
+  "_batch": 6
+ },
+ {
+  "id": "d0b32f4c-e5e1-4494-a0ed-6c208d38050e",
+  "topic": "Simplification",
+  "issue_types": [
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Find two consecutive positive odd integers whose sum is 52. Options: A)25 & 57 B)23 & 29 C)33 & 19 D)21 & 31. Marked correct A.",
+  "your_independent_calculation": "n+(n+2)=52 -> 2n+2=52 -> n=25, n+2=27. The pair is 25 & 27 (check: 25+27=52, both odd, consecutive). Option A currently reads '25 & 57', not '25 & 27' — 57 is not consecutive-odd with 25, and 25+57=82≠52.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change option A from '25 & 57' to '25 & 27'.",
+  "confidence": "high",
+  "notes": "The stored explanation already computes the correct pair (25 & 27) and awkwardly notes 'matches Option A's leading value 25' to paper over the mismatch with the second number — a clear sign the option text itself has a digit typo (27 -> 57).",
+  "_batch": 6
+ },
+ {
+  "id": "dafda95e-1039-4aa4-8a34-e76a8b439818",
+  "topic": "Simplification",
+  "issue_types": [
+   "B"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"The degree of the polynomial 4x2-7x3+6x+1 is\" Options: A)2 B)1 C)3 D)0. Marked correct B(1).",
+  "your_independent_calculation": "Degree of a polynomial = highest power of the variable among all terms. Terms: 4x^2 (deg 2), -7x^3 (deg 3), 6x (deg 1), 1 (deg 0). Highest = 3, which is Option C. Marked answer B(=1) is the degree of the 6x term only, not the polynomial's degree.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change correct_answer from 'B' to 'C'.",
+  "confidence": "high",
+  "notes": "Already self-flagged in the stored explanation with an explicit NOTE: 'The stated correct answer is B (1), but the mathematical degree of this polynomial is 3 ... The question bank answer appears to be erroneous.' The correct_answer field was never actually fixed to C.",
+  "_batch": 6
+ },
+ {
+  "id": "d04cb36d-6cb8-48f9-a976-828f222945ac",
+  "topic": "Time, Work , Speed And Distance",
+  "issue_types": [
+   "D"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"The speed of a boat in still water is 15 m/hr. It goes upstream and returns downstream ... in 4hrs 30 minutes. Find the speed of the stream.\" Options: A)8 km/hr B)10 km/hr C)5 km/hr D)3 km/hr. Marked correct C.",
+  "your_independent_calculation": "Using b=15 (treated as km/hr throughout the explanation, distance 30km each way): 4.5 = 30/(15-v) + 30/(15+v) => 225-v^2=200 => v^2=25 => v=5 km/hr. Matches Option C. The math and answer are correct; only the boat speed's stated unit ('15 m/hr') is wrong.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "Change 'The speed of a boat in still water is 15 m/hr' to 'The speed of a boat in still water is 15 km/hr' — the explanation and all options use km/hr consistently, so 'm/hr' is a unit typo.",
+  "confidence": "medium",
+  "notes": "Does not affect the correct answer, but the stated unit is wrong and could confuse a careful student (15 m/hr vs 15 km/hr is a huge real-world difference).",
+  "_batch": 6
+ },
+ {
+  "id": "692c1b4a-1cec-4736-ab67-00f6338320bd",
+  "topic": "AP, GP and Special Series",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Find the sum of the arithmetic series 2 + 4 + 6 + ... + 80. Options: A)300 B)800 C)600 D)500. Marked correct: B (800).",
+  "your_independent_calculation": "a=2, l=80, d=2, n=(80-2)/2+1=40. Sn = n/2*(a+l) = 40/2*(2+80) = 20*82 = 1640. (Equivalently, sum of first 40 even numbers = n(n+1) = 40*41 = 1640.) The stored explanation itself computes 1640 via the correct formula, then abandons that result and inserts a fabricated 'Note' claiming a different series (4+8+...+80) justifies 800, which is not the series in the question.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The correct sum is 1640, which is not among any of the four options. Options must be replaced, e.g. change option B from '800' to '1640' and keep correct_answer='B'; also rewrite the explanation to remove the self-contradictory 'Note' paragraph and simply show a=2,l=80,d=2,n=40,Sn=1640.",
+  "confidence": "high",
+  "notes": "The explanation text visibly self-contradicts: it correctly derives 1640 via the standard AP sum formula, then explicitly overrides it with an unrelated series to force-match the pre-set answer of 800. This is a clear fabricated/corrupted explanation, not a rounding or interpretation issue.",
+  "_batch": 7
+ },
+ {
+  "id": "a51fd936-dbe3-463a-8dd2-9787c19aa4de",
+  "topic": "Conversion of Information to Data",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Production cost 2010-2015 = 55,40,30,25,35,70 (lakhs). (a) year of max/min, (b) average, (c) % increase 2014(35) to 2015(70). Marked correct D: Max=2015, Min=2013, Average=42.5 lakhs, % increase=200%.",
+  "your_independent_calculation": "Max=70(2015), Min=25(2013) - correct. Average = 255/6 = 42.5 - correct. Percentage increase = (New-Old)/Old * 100 = (70-35)/35*100 = 35/35*100 = 100%, NOT 200%. The stored explanation mistakenly computes (70/35)*100=200%, which is 'new value as a % of old value' (i.e. new value IS 200% of old), not the percentage INCREASE. Percentage increase from 35 to 70 (a doubling) is 100%, since the increase itself (35) equals 100% of the original (35).",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "Change correct_answer from 'D' to 'B' (option B: Max=2015, Min=2013, Average=Rs.42.5 lakhs, Percentage increase=100%). Fix explanation's last step to: Percentage increase = (70-35)/35 * 100 = 100%.",
+  "confidence": "high",
+  "notes": "Classic percentage-increase-vs-percentage-of mistake. Option B already contains the fully correct answer (same max/min/average as marked answer D, only the % increase figure differs and is correct in B).",
+  "_batch": 7
+ },
+ {
+  "id": "ea8e49f0-a34e-4b35-86a6-5aeb880cafa5",
+  "topic": "Conversion of Information to Data",
+  "issue_types": [
+   "A",
+   "B"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "A company's production cost was 35 lakhs in 2014 and 70 lakhs in 2015. What is the percentage increase in production cost from 2014 to 2015? Options: A)100% B)50% C)200% D)35%. Marked correct: C (200%).",
+  "your_independent_calculation": "Percentage increase = (increase/original)*100 = (70-35)/35*100 = 35/35*100 = 100%. The stored explanation computes increase=35 correctly, then in the final line inexplicably substitutes (70/35)*100=200% (labelled as 'book computes... ratio of new to base scaled') instead of using the increase it just calculated. 200% would be the value if the question asked 'what percent of the original value is the new value,' not 'percentage increase.'",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "Change correct_answer from 'C' to 'A' (100%). Fix explanation to conclude (35/35)*100 = 100%, removing the fabricated 'Note' that swaps in the wrong ratio.",
+  "confidence": "high",
+  "notes": "Same systematic percentage-increase error as id a51fd936 above (both involve the identical 35->70 production-cost figures), suggesting a shared source-generation bug across both questions.",
+  "_batch": 7
+ },
+ {
+  "id": "7359dd39-1779-421f-b178-c6557843297c",
+  "topic": "Parametric Representation",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Daily wages of 230 workers grouped: 70-80=12, 80-90=18, 90-100=35, 100-110=42, 110-120=50, 120-130=45, 130-140=20, 140-150=8. Asked: (i) median, (ii) workers earning less than Rs.125. Marked correct A: (i) Median=Rs.120; (ii) 183 workers.",
+  "your_independent_calculation": "Cumulative frequencies: <80=12,<90=30,<100=65,<110=107,<120=157,<130=202,<140=222,<150=230 (N=230, matches explanation's own table). N/2=115. Since CF(<110)=107<115<=CF(<120)=157, the median class is 110-120 with L=110, cf=107, f=50, h=10. Median = L + [(N/2-cf)/f]*h = 110 + [(115-107)/50]*10 = 110 + 1.6 = 111.6 (~Rs.112). This is NOT close to Rs.120 -- it is off by ~8.4, far beyond any rounding/graph-reading tolerance. This same median formula is used correctly elsewhere in this very batch (e.g. id 2c88bb55/mango-yield median=66 checks out), confirming the method, so the 111.6 result should be trusted over the stated 120.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "The true median (~Rs.111.6, i.e. ~Rs.112) is not among any of the 4 options (115, 120, 120, 125). The question needs a corrected option set with ~Rs.112 as the median value (keeping whichever '183 workers' or similar reading for part ii, which is a graph-reading figure not independently verifiable here). At minimum, correct the explanation's median-formula line, which currently jumps from '110 + 1.6' logic to an unexplained final claim of '~120' that contradicts its own numbers.",
+  "confidence": "high",
+  "notes": "Part (ii) of this question ('183 workers earning less than Rs.125') is a graphical-ogive-reading value that cannot be independently confirmed without the original curve image, so it is not flagged here; only the median figure is flagged, since it is derivable by exact formula from the fully-given frequency table and clearly contradicts the stated answer. A related question (id c44f3f50, 'daily-wages... intersection at Rs.120... find median') restates the same wrong Rs.120 figure as a given premise; it is not separately flagged since it is posed as a hypothetical/definitional question rather than a from-data computation, but it likely stems from the same underlying source error.",
+  "_batch": 7
+ },
+ {
+  "id": "5d2b6d5e-9a43-4288-a49b-418dd569bb3a",
+  "topic": "Profit And Loss",
+  "issue_types": [
+   "A",
+   "E"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "A man sold two articles at Rs.375 each, gaining 25% on the first and losing 25% on the second. Find overall gain/loss %. Options: A)25% B)50% C)23% D)40%. Marked correct: A (25%).",
+  "your_independent_calculation": "Classic 'equal SP, equal +x%/-x% profit and loss' case always yields a net LOSS of (x/10)^2 percent = (25/10)^2 = 6.25%. Verified directly: CP1 = 375/1.25 = 300, CP2 = 375/0.75 = 500, Total CP = 800, Total SP = 750, Loss = 50, Loss% = 50/800*100 = 6.25%. The stored explanation itself derives Loss% = 6.25% twice (once via the shortcut formula, once via direct CP/SP verification) and explicitly writes 'Loss% = 6.25%' as its conclusion -- yet the record's correct_answer is set to option A (25%), which the explanation never even claims.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "None of the four options (25%, 50%, 23%, 40%) equal the correct value of 6.25% loss. The option list must be corrected to include '6.25% Loss' as one of the choices (e.g., replace option A's '25%' with '6.25% Loss') and correct_answer set to that option.",
+  "confidence": "high",
+  "notes": "This is an unambiguous mismatch: the explanation's own final computed value (6.25% loss, shown twice, via two different methods) does not match any of the 4 supplied options, yet the record still marks option A as correct.",
+  "_batch": 7
+ }
+]

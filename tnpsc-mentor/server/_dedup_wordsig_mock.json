@@ -1,0 +1,430 @@
+[
+ {
+  "sig": "administrator|belonged|mangammal|remembered",
+  "rows": [
+   {
+    "id": "d823b356-f5e2-420c-a33b-8194923df00d",
+    "question_text": "Rani Mangammal, remembered as an able administrator who ruled as regent, belonged to the"
+   },
+   {
+    "id": "81fceecd-6a58-4e5a-8776-f5d7d18338be",
+    "question_text": "Rani Mangammal, remembered as an able administrator who ruled as regent in the late 17th century, belonged to which kingdom?"
+   }
+  ]
+ },
+ {
+  "sig": "annum|interest|simple|years",
+  "rows": [
+   {
+    "id": "33872b7c-ae67-4de1-9e88-c11d2ff56a77",
+    "question_text": "What is the simple interest on ₹5,000 at 8% per annum for 3 years?"
+   },
+   {
+    "id": "0b715afe-6388-438d-bd1d-4b2ca413a7ef",
+    "question_text": "Find the simple interest on ₹5,000 at the rate of 8% per annum for 3 years."
+   }
+  ]
+ },
+ {
+  "sig": "annually|compound|compounded|interest",
+  "rows": [
+   {
+    "id": "a6cc1e6d-1e17-4309-a7e8-514b10554666",
+    "question_text": "Find the compound interest on ₹4,000 at 5% per annum for 2 years, compounded annually."
+   },
+   {
+    "id": "b4b4dc53-2448-4241-86a2-ed93402fc38b",
+    "question_text": "Find the compound interest on ₹10,000 at 10% per annum for 2 years, compounded annually."
+   },
+   {
+    "id": "b54df41b-76bf-43dc-924c-2173260f9b03",
+    "question_text": "Find the compound interest on ₹8,000 at 15% per annum for 2 years, compounded annually."
+   },
+   {
+    "id": "e2ac4122-c5af-44b8-ab15-3938645392dc",
+    "question_text": "A sum of money becomes 1.21 times itself in 2 years under compound interest, compounded annually. What is the rate of interest per annum?"
+   }
+  ]
+ },
+ {
+  "sig": "ambedkar|article|constitution|described",
+  "rows": [
+   {
+    "id": "cebb89f5-feb4-4599-85a2-c754be0ae1f3",
+    "question_text": "Dr. B.R. Ambedkar described which Article of the Constitution as 'the heart and soul of the Constitution'?"
+   },
+   {
+    "id": "3bee8175-cbff-4006-b111-5260d3505463",
+    "question_text": "Dr. B.R. Ambedkar described which Article as the 'heart and soul' of the Constitution?"
+   }
+  ]
+ },
+ {
+  "sig": "consisting|elected|electoral|president",
+  "rows": [
+   {
+    "id": "747d83f8-a9f9-44d6-aadd-5f93b3b239d1",
+    "question_text": "The President of India is elected by an electoral college consisting of"
+   },
+   {
+    "id": "0cb24494-b8d9-4976-8f20-09012395fb00",
+    "question_text": "The Vice-President of India is elected by an electoral college consisting of"
+   }
+  ]
+ },
+ {
+  "sig": "authorities|citizens|empowers|information",
+  "rows": [
+   {
+    "id": "790201b9-9235-4390-b2e2-a4527a72fd67",
+    "question_text": "The Right to Information (RTI) Act, which empowers citizens to seek information from public authorities, came into force in the year"
+   },
+   {
+    "id": "cc13be68-55f3-484c-87f1-fccfd33c3b19",
+    "question_text": "The Right to Information (RTI) Act, which empowers citizens to seek information from public authorities, was enacted in"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|established|expression|procedure",
+  "rows": [
+   {
+    "id": "465941f2-4b3a-4138-9e47-a77439d8fbb6",
+    "question_text": "The expression 'procedure established by law' used in Article 21 of the Constitution was borrowed from the Constitution of"
+   },
+   {
+    "id": "1c004ae8-78a2-497a-8cf0-bbe2a1973b9a",
+    "question_text": "The expression 'procedure established by law' used in Article 21 of the Indian Constitution was borrowed from the constitution of"
+   }
+  ]
+ },
+ {
+  "sig": "announced|refers|reserve",
+  "rows": [
+   {
+    "id": "863b4903-6f68-43ed-bf7c-e654382eb7cd",
+    "question_text": "The 'repo rate' announced by the Reserve Bank of India refers to the rate at which"
+   },
+   {
+    "id": "d52b98e2-3b34-4eca-8130-5a7deee7e3e7",
+    "question_text": "The 'Bank Rate' announced by the Reserve Bank of India refers to"
+   }
+  ]
+ },
+ {
+  "sig": "deficit|defined|fiscal|government",
+  "rows": [
+   {
+    "id": "f23fc9f4-77c4-4864-bfd7-76720999bee0",
+    "question_text": "The fiscal deficit of the government is best defined as the excess of"
+   },
+   {
+    "id": "2ba8a1d7-53f1-41b3-a564-a2288c7cafc5",
+    "question_text": "The 'fiscal deficit' of the government is best defined as"
+   }
+  ]
+ },
+ {
+  "sig": "assassination|remembered|revolutionary|vanchinathan",
+  "rows": [
+   {
+    "id": "7d4dbcff-25e8-4953-9ba1-3a3d22f32d4d",
+    "question_text": "Vanchinathan, a Tamil revolutionary, is remembered for the assassination in 1911 of the British official"
+   },
+   {
+    "id": "08071f14-7684-4840-98b9-eda3f7f95ab5",
+    "question_text": "Vanchinathan, a young revolutionary from Tamil Nadu, is remembered for the assassination in 1911 of the British official"
+   }
+  ]
+ },
+ {
+  "sig": "kattabomman|palayakkarar|resisted|veerapandiya",
+  "rows": [
+   {
+    "id": "8ad93933-3b36-4f5b-83d2-1b1629f866e8",
+    "question_text": "Veerapandiya Kattabomman, who resisted the British in the late 18th century, was the Polygar (Palayakkarar) of"
+   },
+   {
+    "id": "284c4d0d-3b28-4b9e-b5a6-2c579b44c7f7",
+    "question_text": "Veerapandiya Kattabomman, who resisted the British, was the Polygar (Palayakkarar) of"
+   }
+  ]
+ },
+ {
+  "sig": "dravida|founded|kazhagam|munnetra",
+  "rows": [
+   {
+    "id": "4aaf7b09-6e0f-450d-b993-cd62af145ef1",
+    "question_text": "The Dravida Munnetra Kazhagam (DMK) was founded in 1949 by"
+   },
+   {
+    "id": "82ad642f-3e37-4a23-a6e2-2e7a2c4f86be",
+    "question_text": "The All India Anna Dravida Munnetra Kazhagam (AIADMK) was founded in 1972 by"
+   }
+  ]
+ },
+ {
+  "sig": "amount|divided|ratio|share",
+  "rows": [
+   {
+    "id": "e4f38fc7-350e-4481-a4f1-7938e0d843de",
+    "question_text": "An amount of ₹1,300 is divided among A, B and C in the ratio 2 : 3 : 5. What is C's share?"
+   },
+   {
+    "id": "12fef1f3-a4b2-4719-a221-f4a555451ea6",
+    "question_text": "An amount of ₹6,300 is divided among A, B and C in the ratio 2 : 3 : 4. What is C's share?"
+   }
+  ]
+ },
+ {
+  "sig": "between|compound|difference|interest",
+  "rows": [
+   {
+    "id": "0ae4d157-2308-4bef-b92a-bdc8ec4f6798",
+    "question_text": "The difference between the compound interest and the simple interest on a certain sum for 2 years at 10% per annum is ₹50. Find the sum."
+   },
+   {
+    "id": "ed9061c4-7ae3-494f-99b2-274742206105",
+    "question_text": "The difference between the compound interest and the simple interest on ₹4,000 for 2 years at 10% per annum is"
+   },
+   {
+    "id": "73df44e5-9c08-467a-a276-de478dece066",
+    "question_text": "The difference between the compound interest and the simple interest on a sum of ₹10,000 for 2 years at 10% per annum is"
+   }
+  ]
+ },
+ {
+  "sig": "entirely|highest|mountain|territory",
+  "rows": [
+   {
+    "id": "94798da4-87f3-4477-9afb-7b087af67bb0",
+    "question_text": "Which is the highest mountain peak located entirely within the territory of India?"
+   },
+   {
+    "id": "43bafbc1-358a-4823-b049-dda13e4050aa",
+    "question_text": "Which is the highest mountain peak lying entirely within the territory of India?"
+   }
+  ]
+ },
+ {
+  "sig": "constitutional|council|recommendations|services",
+  "rows": [
+   {
+    "id": "0422b8e3-395d-468f-b7af-1da5ec75679f",
+    "question_text": "The Goods and Services Tax (GST) Council, the constitutional body that makes recommendations on GST, was created under which Article?"
+   },
+   {
+    "id": "b4a91269-2041-4124-a235-42649ce5f3fa",
+    "question_text": "The GST Council, which makes recommendations on the Goods and Services Tax, is a constitutional body under"
+   }
+  ]
+ },
+ {
+  "sig": "context|disinvestment|economy|refers",
+  "rows": [
+   {
+    "id": "313ac76e-c21b-4e94-ada9-0c44c0000f66",
+    "question_text": "In the context of the Indian economy, 'disinvestment' refers to"
+   },
+   {
+    "id": "fcf4661d-72f4-4b9a-a158-9debe4c1990f",
+    "question_text": "'Disinvestment', in the context of the Indian economy, refers to"
+   }
+  ]
+ },
+ {
+  "sig": "double|interest|itself|simple",
+  "rows": [
+   {
+    "id": "4f775237-8292-4c7f-b883-e5c8ecd47a6f",
+    "question_text": "At what rate of simple interest per annum will a sum of money double itself in 12.5 years?"
+   },
+   {
+    "id": "e58f8437-54d2-4d3c-97ca-99f70d4c3baf",
+    "question_text": "At what rate of simple interest per annum will a sum of money double itself in 8 years?"
+   }
+  ]
+ },
+ {
+  "sig": "largest|producer|state",
+  "rows": [
+   {
+    "id": "84a19046-00b9-421a-b3cf-2ab1d290e2c8",
+    "question_text": "Which Indian state is the largest producer of tea?"
+   },
+   {
+    "id": "9f5c2884-a5fb-48aa-8a49-61b68dae1bdc",
+    "question_text": "Which state is the largest producer of tea in India?"
+   }
+  ]
+ },
+ {
+  "sig": "credited|government|received|revenues",
+  "rows": [
+   {
+    "id": "d330d78e-f1d1-43a2-b4a2-02331d0e8dd7",
+    "question_text": "All revenues received by the Government of India, and loans raised by it, are credited to the"
+   },
+   {
+    "id": "ebe34555-d4a5-4555-b4fd-2391240614a9",
+    "question_text": "All revenues received by the Government of India and all loans raised by it are credited to the"
+   }
+  ]
+ },
+ {
+  "sig": "advisory|article|importance|president",
+  "rows": [
+   {
+    "id": "a7245c38-a70a-410a-acd9-6d80acc9a243",
+    "question_text": "Under which Article can the President of India seek the advisory opinion of the Supreme Court on a question of law or fact of public importance?"
+   },
+   {
+    "id": "c6b7a7d2-646b-4413-b3eb-7c90b0450c1e",
+    "question_text": "Under which Article can the President seek the advisory opinion of the Supreme Court on a question of law or fact of public importance?"
+   }
+  ]
+ },
+ {
+  "sig": "amount|annually|annum|compounded",
+  "rows": [
+   {
+    "id": "096ff6e9-80ff-4e31-b0ae-078e7e8d51ed",
+    "question_text": "Find the amount on ₹6,250 at 4% per annum for 2 years, compounded annually."
+   },
+   {
+    "id": "ff4f0c14-e723-4e66-afb3-2ff0da95e131",
+    "question_text": "What will be the amount on ₹8,000 at 10% per annum compounded annually for 2 years?"
+   }
+  ]
+ },
+ {
+  "sig": "daughter|mother|pointing|related",
+  "rows": [
+   {
+    "id": "eec59aa3-0203-4865-af03-afb32b1db37d",
+    "question_text": "Pointing to a man, a woman said, \"His mother is the only daughter of my mother.\" How is the woman related to the man?"
+   },
+   {
+    "id": "603c54ef-6781-4f64-94d3-377aae5b095b",
+    "question_text": "Pointing to a man, a woman said, 'His mother is the only daughter of my mother.' How is the woman related to the man?"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|permissible|provided|strength",
+  "rows": [
+   {
+    "id": "1b02ee24-553a-45c1-bfa5-8edda0cebcb9",
+    "question_text": "The maximum permissible strength of the Lok Sabha, as provided in the Constitution, is"
+   },
+   {
+    "id": "5957e52a-2074-43e6-9ef0-c68af79cca2c",
+    "question_text": "The maximum permissible strength of the Rajya Sabha, as provided in the Constitution, is"
+   }
+  ]
+ },
+ {
+  "sig": "geographical|indication|madurai|received",
+  "rows": [
+   {
+    "id": "cbfb9b65-2bae-46eb-8956-a340224161d6",
+    "question_text": "The famous 'Madurai Malli', which has received a Geographical Indication (GI) tag, is a variety of"
+   },
+   {
+    "id": "9cf38d3d-639c-49bb-8563-c9ed8fe00650",
+    "question_text": "'Madurai Sungudi', which has received a Geographical Indication (GI) tag, is a type of"
+   }
+  ]
+ },
+ {
+  "sig": "become|member|minimum|person",
+  "rows": [
+   {
+    "id": "204f2194-2d1a-4293-a37c-a73813a8bb03",
+    "question_text": "The minimum age for a person to become a member of the Lok Sabha is"
+   },
+   {
+    "id": "6e95578f-1218-454c-9e27-5c2227bb5a69",
+    "question_text": "The minimum age for a person to become a member of the Rajya Sabha is"
+   }
+  ]
+ },
+ {
+  "sig": "foodgrains|national|population|subsidised",
+  "rows": [
+   {
+    "id": "432498bd-f3cc-4775-a00e-9c8f14203922",
+    "question_text": "The National Food Security Act, which provides subsidised foodgrains to a large section of the population as a legal right, was enacted in the year"
+   },
+   {
+    "id": "8aec566f-d44e-47a3-9631-c23afe547ace",
+    "question_text": "The National Food Security Act, which provides for subsidised foodgrains to a large section of the population, was enacted in"
+   }
+  ]
+ },
+ {
+  "sig": "amendment|constitution|fundamental|recommendation",
+  "rows": [
+   {
+    "id": "f4cfaf82-b9f3-422b-88df-2c10a3a0ae01",
+    "question_text": "Fundamental Duties were added to the Constitution by the 42nd Amendment on the recommendation of which committee?"
+   },
+   {
+    "id": "de8048c1-5564-44d5-8388-347808606851",
+    "question_text": "The Fundamental Duties were added to the Constitution by the 42nd Amendment on the recommendation of the"
+   }
+  ]
+ },
+ {
+  "sig": "abolition|creation|legislative|parishad",
+  "rows": [
+   {
+    "id": "ecad598d-f439-4b5a-81c8-59df01159396",
+    "question_text": "Under Article 169, the creation or abolition of a State Legislative Council (Vidhan Parishad) is finally done by"
+   },
+   {
+    "id": "3139b7e2-9958-42b6-b55d-cd3b9f7b6ebf",
+    "question_text": "The creation or abolition of a Legislative Council (Vidhan Parishad) in a state is done by"
+   }
+  ]
+ },
+ {
+  "sig": "distinction|prominent|rajagopalachari|rajaji",
+  "rows": [
+   {
+    "id": "81f6e098-0e55-4121-aa31-55232cf705e3",
+    "question_text": "C. Rajagopalachari (Rajaji), a prominent leader from Tamil Nadu, holds the distinction of being the"
+   },
+   {
+    "id": "9b9ca130-6c49-4fa8-b3d9-ab599cf19836",
+    "question_text": "C. Rajagopalachari (Rajaji), a prominent leader from Tamil Nadu, holds the distinction of being"
+   }
+  ]
+ },
+ {
+  "sig": "complete|piece|together|working",
+  "rows": [
+   {
+    "id": "0076141c-12e2-44bf-b42a-bdce4f13635f",
+    "question_text": "A can complete a piece of work in 12 days and B can complete the same work in 15 days. Working together, in how many days will they complete the work?"
+   },
+   {
+    "id": "02a06fbe-94ad-43b0-8697-4dd57b5553c3",
+    "question_text": "A can do a piece of work in 10 days and B can do the same work in 15 days. Working together, in how many days will they complete the work?"
+   }
+  ]
+ },
+ {
+  "sig": "between|candidates|election|secured",
+  "rows": [
+   {
+    "id": "accd6d66-03e1-4e5c-b642-94c76ffd16e3",
+    "question_text": "In an election between two candidates, the winner secured 60% of the valid votes and won by a margin of 9,000 votes. What was the total number of valid votes?"
+   },
+   {
+    "id": "edffac02-fa30-46f3-93d0-12deb005876b",
+    "question_text": "In an election between two candidates, the winner secured 56% of the valid votes and won by a margin of 4,800 votes. What was the total number of valid votes?"
+   }
+  ]
+ }
+]

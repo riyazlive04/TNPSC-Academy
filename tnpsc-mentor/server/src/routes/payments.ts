@@ -126,7 +126,11 @@ router.post(
             ? 'Vettri Nichayam (full)'
             : notes.plan === 'vettri_month'
               ? 'Vettri Nichayam (monthly)'
-              : 'a paid plan'
+              : notes.plan === 'rank_booster_g2'
+                ? 'Group II/ IIA- Rank Booster'
+                : notes.plan === 'group1_mock_pack'
+                  ? 'Group 1 Mock Test Pack'
+                  : 'a paid plan'
       const waived = `₹${Math.round(base / 100)}`
       await notifyAdmins(
         'Free unlock via coupon',
@@ -266,11 +270,11 @@ router.post(
 
 // ─── GET /api/payments/premium ───────────────────────────────────────────────
 // Derive the user's premium entitlement from the ledger: a paid `premium_annual`
-// payment within the plan window. Premium is a 3-MONTH plan, so the window is
-// 90 days — a payment older than that has lapsed. Entitlement is computed, never
+// payment within the plan window. Premium is a 6-MONTH plan, so the window is
+// 180 days — a payment older than that has lapsed. Entitlement is computed, never
 // stored as a flag, so it stays correct without a separate sync step. Returns
 // the expiry too. (The `premium_annual` plan id is retained for ledger continuity
-// even though the validity is now 3 months.) PREMIUM_VALIDITY_MS is shared from
+// even though the validity is now 6 months.) PREMIUM_VALIDITY_MS is shared from
 // pricing.ts so this window can never drift from the premium-audience logic.
 router.get(
   '/premium',
@@ -308,10 +312,13 @@ router.get(
   '/',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
+    // Defensive cap — the most recent 200 rows is already far more than any
+    // history view needs.
     const { data, error } = await req.db!
       .from('payments')
       .select('id, razorpay_order_id, razorpay_payment_id, amount, currency, status, created_at')
       .order('created_at', { ascending: false })
+      .limit(200)
     if (error) return sendDbError(res, error)
     res.json({ payments: data ?? [] })
   })

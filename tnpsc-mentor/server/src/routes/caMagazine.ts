@@ -94,6 +94,21 @@ async function signNewsImage(caType: string, date: string): Promise<string | nul
   return signObject(newsImagePath(date))
 }
 
+/** Batch-sign a path list in ONE Storage round trip; missing objects simply
+ * don't land in the map. Shared by /recent and /thumbnails so neither calls
+ * signObject/signNewsImage per-row (one Storage round trip per card). */
+async function signMany(paths: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>()
+  if (paths.length === 0) return out
+  const { data: signed } = await supabaseAdmin.storage
+    .from(CA_DELIVERABLES_BUCKET)
+    .createSignedUrls(paths, NEWS_IMAGE_TTL_SECONDS)
+  for (const s of signed ?? []) {
+    if (s.path && s.signedUrl) out.set(s.path, s.signedUrl)
+  }
+  return out
+}
+
 const admin = [requireAuth, requireSuperadmin] as const
 
 // ─── GET /api/ca-magazine/admin/issues ────────────────────────────────────────
@@ -402,14 +417,25 @@ router.get(
       .limit(limit)
     if (error) return sendDbError(res, error)
 
-    const issues = await Promise.all(
-      (data ?? []).map(async (r) => ({
-        id: r.id as string,
-        date: r.magazine_date as string,
-        downloadable: r.downloadable as boolean,
-        newsImage: await signNewsImage('day_wise', r.magazine_date as string),
-      }))
-    )
+    const rows = (data ?? []) as { id: string; downloadable: boolean; magazine_date: string }[]
+
+    // Batch-sign both candidate paths for every row in TWO Storage round trips
+    // total (not one signNewsImage call per row, up to ~28 for a 14-item list).
+    // Same custom → pipeline priority as signNewsImage.
+    const [customs, pipeline] = await Promise.all([
+      signMany(rows.map((r) => customThumbPath('day_wise', r.magazine_date))),
+      signMany(rows.map((r) => newsImagePath(r.magazine_date))),
+    ])
+
+    const issues = rows.map((r) => ({
+      id: r.id,
+      date: r.magazine_date,
+      downloadable: r.downloadable,
+      newsImage:
+        customs.get(customThumbPath('day_wise', r.magazine_date)) ??
+        pipeline.get(newsImagePath(r.magazine_date)) ??
+        null,
+    }))
     // Well inside the signed URLs' 1-hour lifetime, and short enough that a
     // replaced thumbnail shows up on the dashboard within minutes.
     res.set('Cache-Control', 'private, max-age=300')
@@ -440,19 +466,6 @@ router.get(
     const rows = (data ?? []).filter(
       (r) => CA_TYPES.has(String(r.magazine_ca_type)) && DATE_RE.test(String(r.magazine_date))
     ) as { id: string; magazine_ca_type: string; magazine_date: string }[]
-
-    /** Batch-sign a path list; missing objects simply don't land in the map. */
-    const signMany = async (paths: string[]): Promise<Map<string, string>> => {
-      const out = new Map<string, string>()
-      if (paths.length === 0) return out
-      const { data: signed } = await supabaseAdmin.storage
-        .from(CA_DELIVERABLES_BUCKET)
-        .createSignedUrls(paths, NEWS_IMAGE_TTL_SECONDS)
-      for (const s of signed ?? []) {
-        if (s.path && s.signedUrl) out.set(s.path, s.signedUrl)
-      }
-      return out
-    }
 
     const [customs, pipeline] = await Promise.all([
       signMany(rows.map((r) => customThumbPath(r.magazine_ca_type, r.magazine_date))),

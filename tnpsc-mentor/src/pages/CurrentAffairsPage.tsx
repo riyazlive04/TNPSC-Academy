@@ -247,7 +247,7 @@ export default function CurrentAffairsPage() {
     <PickerPage badge={t('currentAffairsBadge')}>
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
-          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <p className="tamil mb-3 font-body text-base text-muted">{t('topicFreeUsed')}</p>
           <VettriCard />
         </div>
       )}
@@ -361,7 +361,7 @@ export default function CurrentAffairsPage() {
           <RefreshCw size={20} />
         </span>
         <span className="relative min-w-0 flex-1">
-          <span className="tamil block font-heading text-[15px] font-semibold text-white">
+          <span className="tamil block font-heading text-base font-semibold text-white">
             {t('weeklyRevision')}
           </span>
           <span className="tamil block font-body text-sm text-white/70">{t('weeklyRevisionCta')}</span>
@@ -500,7 +500,7 @@ function TopicTile({ topic }: { topic: string }) {
 /** Small "locked" chip shown on a row whose one free test is spent. */
 function LockPill({ label }: { label: string }) {
   return (
-    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand-dark">
+    <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-brand-dark">
       <Lock size={11} /> {label}
     </span>
   )

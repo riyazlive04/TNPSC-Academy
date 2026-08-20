@@ -7,12 +7,12 @@ import { chargeTestStart } from '../lib/credits.js'
 
 const router = Router()
 
-/** premium OR vettri OR staff → unlimited (never spends credits). Fails closed. */
+/** premium OR vettri OR rankBooster OR staff → unlimited (never spends credits). Fails closed. */
 async function isUnlimited(req: AuthedRequest): Promise<boolean> {
   const role = await roleOf(req.userId!)
   if (role === 'admin' || role === 'superadmin') return true
   try {
-    return (await bundleAccess(req.db!)).unlimited
+    return (await bundleAccess(req.db!)).creditsUnlimited
   } catch {
     return false
   }

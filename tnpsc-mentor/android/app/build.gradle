@@ -18,8 +18,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         // Play rejects a versionCode it has already seen, even from a deleted
         // draft — always bump before re-uploading, never reuse.
-        versionCode 12
-        versionName "2.0.3"
+        versionCode 16
+        versionName "2.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     androidResources {
@@ -39,8 +39,23 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            // R8 only ever touches the native Java/Kotlin bridge layer — the app's
+            // actual UI is the WebView's bundled JS/HTML/CSS, which R8 never sees.
+            // Capacitor core and every plugin (incl. @capgo/capacitor-social-login)
+            // ship their own consumer ProGuard rules that keep annotated plugin
+            // classes, merged in automatically, so no hand-written keep rules are
+            // needed here. This also makes R8 emit mapping.txt, which AGP bundles
+            // into the AAB automatically — that's Play Console's "no deobfuscation
+            // file" warning, resolved by turning shrinking on rather than by
+            // uploading anything by hand.
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Bundles native debug symbols into the AAB (Play Console's "no debug
+            // symbols" warning) instead of a manual native-debug-symbols.zip upload
+            // per release.
+            ndk {
+                debugSymbolLevel 'FULL'
+            }
             // Sign with the release key when the credentials file is present.
             signingConfig keystorePropsFile.exists() ? signingConfigs.release : null
         }

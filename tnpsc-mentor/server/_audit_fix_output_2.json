@@ -1,0 +1,207 @@
+[
+ {
+  "id": "4d53418c-03f2-4b16-9db3-f0dcfb9ae35c",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 664, 332, 340, 170, ___, 89, ...\nKey point: alternating division and addition — first ÷2, then +8.\nFrom question:\nRule: divide by 2, then add 8, then divide by 2, then add 8, ...\n→ 664 ÷2 = 332\n→ 332 +8 = 340\n→ 340 ÷2 = 170\n→ 170 +8 = 178\n→ 178 ÷2 = 89 (matches the given next term, confirming the pattern)\nAsked: Missing term = ?\n= 178 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 664, 332, 340, 170, ___, 89, ...\nமுக்கியக் குறிப்பு: மாறி மாறி வகுத்தல் மற்றும் கூட்டல் — முதலில் ÷2, பின் +8.\nFrom question:\nவிதி: 2 ஆல் வகு, பின் 8 கூட்டு, பின் 2 ஆல் வகு, பின் 8 கூட்டு, ...\n→ 664 ÷2 = 332\n→ 332 +8 = 340\n→ 340 ÷2 = 170\n→ 170 +8 = 178\n→ 178 ÷2 = 89 (கொடுக்கப்பட்ட அடுத்த உறுப்புடன் பொருந்துகிறது, வடிவத்தை உறுதிப்படுத்துகிறது)\nAsked: விடுபட்ட உறுப்பு = ?\n= 178 → விடை (D)",
+  "verification_note": "correct_answer=D and option_d already stores 178; explanation now derives 178 cleanly and confirms it against the given trailing 89, ending with Option (D)."
+ },
+ {
+  "id": "5fba619f-2149-4052-9e5b-51bee8523c2d",
+  "action": "update",
+  "option_d": "35 10",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 2 44 4 41 6 38 8 ___ ___\nKey point: two alternating patterns — one increases by 2, the other decreases by 3.\nFrom question:\nRule: Odd positions (2, 4, 6, 8, ...) add 2; even positions (44, 41, 38, ...) subtract 3.\n→ Decreasing series (even positions): 44, 41, 38, ? → 38 −3 = 35 (this fills the first blank, position 8)\n→ Increasing series (odd positions): 2, 4, 6, 8, ? → 8 +2 = 10 (this fills the second blank, position 9)\nAsked: Next two terms = ?\n= 35, 10 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 2 44 4 41 6 38 8 ___ ___\nமுக்கியக் குறிப்பு: இரு மாறி மாறி வரும் வடிவங்கள் — ஒன்று 2 ஆல் கூடுகிறது, மற்றொன்று 3 ஆல் குறைகிறது.\nFrom question:\nவிதி: ஒற்றை இடங்கள் (2, 4, 6, 8, ...) 2 கூட்டுகின்றன; இரட்டை இடங்கள் (44, 41, 38, ...) 3 கழிக்கின்றன.\n→ குறையும் தொடர் (இரட்டை இடங்கள்): 44, 41, 38, ? → 38 −3 = 35 (முதல் காலியிடம், 8வது இடம்)\n→ கூடும் தொடர் (ஒற்றை இடங்கள்): 2, 4, 6, 8, ? → 8 +2 = 10 (இரண்டாம் காலியிடம், 9வது இடம்)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 35, 10 → விடை (D)",
+  "verification_note": "Option D rewritten to the true pair 35, 10 (position order: decreasing-series slot then increasing-series slot); correct_answer stays D and explanation now derives both values cleanly."
+ },
+ {
+  "id": "61af1feb-8ad8-4e2c-a760-a16c478fa65c",
+  "action": "deactivate",
+  "verification_note": "No self-consistent pattern reconstructs a defensible correct answer from the given series data (audit confidence medium, recommends re-authoring); deactivating rather than fabricating a rule."
+ },
+ {
+  "id": "692c47d8-3c79-4731-850d-aeed79782a53",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 6 20 8 14 10 8 12 ? ?\nKey point: Two alternating patterns — one adds 2 (6, 8, 10, 12, …) and the other subtracts 6 (20, 14, 8, …).\nFrom question:\nRule: pattern 1 = +2; pattern 2 (alternate term) = −6\n→ 6 (pattern 1)\n→ 20 (pattern 2)\n→ 6 + 2 = 8 (pattern 1)\n→ 20 − 6 = 14 (pattern 2)\n→ 8 + 2 = 10 (pattern 1)\n→ 14 − 6 = 8 (pattern 2)\n→ 10 + 2 = 12 (pattern 1)\n→ 8 − 6 = 2 (pattern 2, first missing term)\n→ 12 + 2 = 14 (pattern 1, second missing term)\nAsked: Next two terms = ?\n= 2 14 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 6 20 8 14 10 8 12 ? ?\nமுக்கியக் குறிப்பு: இரண்டு மாறி மாறி வரும் வடிவங்கள் — ஒன்று 2 கூட்டுகிறது (6, 8, 10, 12, …), மற்றொன்று 6 கழிக்கிறது (20, 14, 8, …).\nFrom question:\nவிதி: வடிவம் 1 = +2; வடிவம் 2 (மாற்று உறுப்பு) = −6\n→ 6 (வடிவம் 1)\n→ 20 (வடிவம் 2)\n→ 6 + 2 = 8 (வடிவம் 1)\n→ 20 − 6 = 14 (வடிவம் 2)\n→ 8 + 2 = 10 (வடிவம் 1)\n→ 14 − 6 = 8 (வடிவம் 2)\n→ 10 + 2 = 12 (வடிவம் 1)\n→ 8 − 6 = 2 (வடிவம் 2, முதல் விடுபட்ட உறுப்பு)\n→ 12 + 2 = 14 (வடிவம் 1, இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 2 14 → விடை (D)",
+  "verification_note": "correct_answer=D and option_d already stores '2 14'; explanation now derives 2 then 14 cleanly via the stated +2/-6 rule."
+ },
+ {
+  "id": "8225de03-17b6-4350-a0d1-63d451088a1f",
+  "action": "update",
+  "option_d": "10 8",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 36 31 29 24 22 17 15 ? ?\nKey point: An alternating subtraction series — subtract 5, then 2, then 5, then 2, and so on.\nFrom question:\nRule: −5, −2 alternately\n→ 36 − 5 = 31\n→ 31 − 2 = 29\n→ 29 − 5 = 24\n→ 24 − 2 = 22\n→ 22 − 5 = 17\n→ 17 − 2 = 15\n→ 15 − 5 = 10 (first missing term)\n→ 10 − 2 = 8 (second missing term)\nAsked: Next two terms = ?\n= 10 8 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 36 31 29 24 22 17 15 ? ?\nமுக்கியக் குறிப்பு: மாறி மாறி வரும் கழித்தல் தொடர் — 5 கழி, பிறகு 2, பிறகு 5, பிறகு 2, இவ்வாறே.\nFrom question:\nவிதி: −5, −2 மாறி மாறி\n→ 36 − 5 = 31\n→ 31 − 2 = 29\n→ 29 − 5 = 24\n→ 24 − 2 = 22\n→ 22 − 5 = 17\n→ 17 − 2 = 15\n→ 15 − 5 = 10 (முதல் விடுபட்ட உறுப்பு)\n→ 10 − 2 = 8 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 10 8 → விடை (D)",
+  "verification_note": "Option D rewritten to the true pair 10, 8 (continuing -5/-2 from 15); correct_answer stays D and explanation now derives both values cleanly."
+ },
+ {
+  "id": "87c0226a-ca8a-4409-b71a-b1ce45b4d4ac",
+  "action": "update",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 9 16 23 30 37 44 51 ___ ___\nKey point: This is a simple addition series — it begins with 9 and adds 7 each time.\nFrom question:\nRule: each term = previous + 7\n→ 9 + 7 = 16\n→ 44 + 7 = 51\n→ 51 + 7 = 58 (first missing term)\n→ 58 + 7 = 65 (second missing term)\nAsked: Next two terms = ?\n= 58 65 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 9 16 23 30 37 44 51 ___ ___\nமுக்கியக் குறிப்பு: இது எளிய கூட்டல் தொடர் — 9-இல் தொடங்கி ஒவ்வொரு முறையும் 7 கூட்டப்படுகிறது.\nFrom question:\nவிதி: ஒவ்வொரு உறுப்பு = முந்தையது + 7\n→ 9 + 7 = 16\n→ 44 + 7 = 51\n→ 51 + 7 = 58 (முதல் விடுபட்ட உறுப்பு)\n→ 58 + 7 = 65 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 58 65 → விடை (D)",
+  "verification_note": "correct_answer=D and option_d already stores '58 65'; explanation now derives 58 then 65 cleanly via the constant +7 rule."
+ },
+ {
+  "id": "8e3aadac-a3ac-4c7b-af11-476c76107227",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries: 21, 9, 21, 11, 21, 13, 21, ...\nKey point: The fixed number 21 is interpolated every other term; the hidden series 9, 11, 13, ... increases by 2.\nFrom question:\nRule: 21 repeats in alternate positions; the other terms follow +2 (9, 11, 13, ...)\n→ Hidden series: 9, 11, 13, ... (each +2)\n→ After the last 21 comes the next hidden term: 13 + 2 = 15\nAsked: Next term = ?\n= 15 → Option (B)",
+  "explanation_ta": "Given:\nதொடர்: 21, 9, 21, 11, 21, 13, 21, ...\nமுக்கியக் குறிப்பு: நிலையான எண் 21 மாற்று இடங்களில் இடைச்செருகப்படுகிறது; மறைந்த தொடர் 9, 11, 13, ... 2 வீதம் கூடுகிறது.\nFrom question:\nவிதி: 21 மாற்று இடங்களில் மீள்வரும்; மற்ற உறுப்புகள் +2 விதியைப் பின்பற்றும் (9, 11, 13, ...)\n→ மறைந்த தொடர்: 9, 11, 13, ... (ஒவ்வொன்றும் +2)\n→ கடைசி 21-க்குப் பின் அடுத்த மறைந்த உறுப்பு: 13 + 2 = 15\nAsked: அடுத்த உறுப்பு = ?\n= 15 → விடை (B)",
+  "verification_note": "correct_answer=B and option_b already stores 15; explanation now derives 15 cleanly via the stated +2 rule."
+ },
+ {
+  "id": "a0a618d5-e7a8-4b2d-9e52-1f557f7c55bb",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries: 14 14 26 26 38 38 50 ?\nKey point: A simple addition-with-repetition series — each number repeats, then increases by 12 to arrive at the next.\nFrom question:\nRule: repeat each number, then +12\n→ 14 repeats → 14\n→ 14 + 12 = 26 repeats → 26\n→ 26 + 12 = 38 repeats → 38\n→ 38 + 12 = 50\n→ 50 repeats → 50 (first missing term)\n→ 50 + 12 = 62 (second missing term)\nAsked: Next two terms = ?\n= 50 62 → Option (B)",
+  "explanation_ta": "Given:\nதொடர்: 14 14 26 26 38 38 50 ?\nமுக்கியக் குறிப்பு: எளிய கூட்டல்-உடன்-மறுபடியும் தொடர் — ஒவ்வொரு எண்ணும் மீண்டும் வந்து, பிறகு 12 கூடி அடுத்த எண்ணைப் பெறுகிறது.\nFrom question:\nவிதி: ஒவ்வொரு எண்ணையும் மீண்டும் வரச்செய்து, பிறகு +12\n→ 14 மீண்டும் வருகிறது → 14\n→ 14 + 12 = 26 மீண்டும் வருகிறது → 26\n→ 26 + 12 = 38 மீண்டும் வருகிறது → 38\n→ 38 + 12 = 50\n→ 50 மீண்டும் வருகிறது → 50 (முதல் விடுபட்ட உறுப்பு)\n→ 50 + 12 = 62 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 50 62 → விடை (B)",
+  "verification_note": "correct_answer=B and option_b already stores '50 62'; explanation now derives 50 then 62 cleanly via the repeat-then-+12 rule."
+ },
+ {
+  "id": "afb908d6-fb77-42b6-b1ae-2e8c54a34665",
+  "action": "update",
+  "option_d": "22 24",
+  "correct_answer": "D",
+  "explanation": "Given:\nSeries: 7 9 66 12 14 66 17 19 66 ___ ___\nKey point: 66 is interpolated as every third number; the rest follow +2, +3, +2, +3, ...\nFrom question:\nRule: Main series adds 2, then 3, then 2, then 3, ...; 66 appears as every third term.\n→ Drop the 66's: 7, 9, 12, 14, 17, 19, ?, ?\n→ 7 +2 = 9 ; 9 +3 = 12 ; 12 +2 = 14 ; 14 +3 = 17 ; 17 +2 = 19\n→ The next insert of 66 is not due until position 12, so the next two terms both continue the main series\n→ 19 +3 = 22 (first missing term)\n→ 22 +2 = 24 (second missing term)\nAsked: Next two terms = ?\n= 22 24 → Option (D)",
+  "explanation_ta": "Given:\nதொடர்: 7 9 66 12 14 66 17 19 66 ___ ___\nமுக்கியக் குறிப்பு: 66 மூன்றாவது எண்ணாக இடைச்செருகப்படுகிறது; மீதமுள்ளவை +2, +3, +2, +3, ... என வரும்.\nFrom question:\nவிதி: முதன்மைத் தொடர் 2, பின் 3, பின் 2, பின் 3, ... கூட்டுகிறது; 66 ஒவ்வொரு மூன்றாவது உறுப்பாக வருகிறது.\n→ 66 ஐ விலக்கினால்: 7, 9, 12, 14, 17, 19, ?, ?\n→ 7 +2 = 9 ; 9 +3 = 12 ; 12 +2 = 14 ; 14 +3 = 17 ; 17 +2 = 19\n→ அடுத்த 66 12வது இடத்தில் தான் வர வேண்டும், எனவே அடுத்த இரு உறுப்புகளும் முதன்மைத் தொடரையே தொடரும்\n→ 19 +3 = 22 (முதல் விடுபட்ட உறுப்பு)\n→ 22 +2 = 24 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 22 24 → விடை (D)",
+  "verification_note": "Option D rewritten to the true pair 22, 24 (main series continues past the given 19, since the next 66 insert is not due yet); correct_answer stays D."
+ },
+ {
+  "id": "b541e0e2-5fdc-4089-8221-460fb8e6dd91",
+  "action": "update",
+  "option_a": "29 22",
+  "correct_answer": "A",
+  "explanation": "Given:\nSeries: 61 57 50 61 43 36 61 ?\nKey point: An alternating-repetition series — the random number 61 is interpolated as every third number into an otherwise simple −7 subtraction series starting from 57.\nFrom question:\nRule: −7 subtraction series (from 57), with 61 inserted as every third term\n→ 61 (start / interpolated)\n→ 57 (subtraction series start)\n→ 57 − 7 = 50\n→ 61 inserted (every third position)\n→ 50 − 7 = 43\n→ 43 − 7 = 36\n→ 61 inserted (every third position)\n→ 36 − 7 = 29 (first missing term)\n→ 29 − 7 = 22 (second missing term)\nAsked: Next two terms = ?\n= 29 22 → Option (A)",
+  "explanation_ta": "Given:\nதொடர்: 61 57 50 61 43 36 61 ?\nமுக்கியக் குறிப்பு: மாறி மாறி-மறுபடியும் தொடர் — 57-இல் தொடங்கும் எளிய −7 கழித்தல் தொடரில், ஒவ்வொரு மூன்றாவது எண்ணாக சீரற்ற எண் 61 இடைச்செருகப்படுகிறது.\nFrom question:\nவிதி: −7 கழித்தல் தொடர் (57-இலிருந்து), ஒவ்வொரு மூன்றாவது உறுப்பாக 61 செருகப்படும்\n→ 61 (தொடக்கம் / செருகப்பட்டது)\n→ 57 (கழித்தல் தொடர் தொடக்கம்)\n→ 57 − 7 = 50\n→ 61 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 50 − 7 = 43\n→ 43 − 7 = 36\n→ 61 செருகப்படுகிறது (ஒவ்வொரு மூன்றாவது இடம்)\n→ 36 − 7 = 29 (முதல் விடுபட்ட உறுப்பு)\n→ 29 − 7 = 22 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 29 22 → விடை (A)",
+  "verification_note": "Option A's second value corrected from 61 to 22 (true pair is 29, 22); correct_answer changed from D to A to match; explanation and its own math (29 then 22) now agree with the boxed answer."
+ },
+ {
+  "id": "ba036f12-e077-48d2-80f4-ed988dbb47ce",
+  "action": "update",
+  "option_a": "210",
+  "explanation": "Given:\nSeries: 24, 60, 120, ?, 336\nKey point: Each term is a product of three consecutive integers - n × (n+1) × (n+2) - starting from n = 2\nFrom question:\nRule: nth term = n × (n + 1) × (n + 2), for n = 2, 3, 4, 5, 6\nn = 2: 2 × 3 × 4 = 24 ✓\nn = 3: 3 × 4 × 5 = 60 ✓\nn = 4: 4 × 5 × 6 = 120 ✓\nn = 5: 5 × 6 × 7 = 210\nn = 6: 6 × 7 × 8 = 336 ✓\nAsked:\nMissing term = ?\n= 210 → Option (A)",
+  "explanation_ta": "Given:\nதொடர்: 24, 60, 120, ?, 336\nமுக்கியக் குறிப்பு: ஒவ்வொரு உறுப்பும் மூன்று தொடர்ச்சியான முழு எண்களின் பெருக்கல் - n × (n+1) × (n+2) - n = 2 முதல் தொடங்கி\nFrom question:\nவிதி: n-வது உறுப்பு = n × (n + 1) × (n + 2), n = 2, 3, 4, 5, 6 க்கு\nn = 2: 2 × 3 × 4 = 24 ✓\nn = 3: 3 × 4 × 5 = 60 ✓\nn = 4: 4 × 5 × 6 = 120 ✓\nn = 5: 5 × 6 × 7 = 210\nn = 6: 6 × 7 × 8 = 336 ✓\nAsked:\nவிடுபட்ட உறுப்பு = ?\n= 210 → விடை (A)",
+  "verification_note": "INPUT ID CORRECTION: the input finding's id 'c01c3da2-7e4e-4402-a80b-d9eafda83b16' is stale/wrong in this DB — that id now belongs to an unrelated '9 11 33 13 15 33 17' row. The row actually matching the finding's description (series 24,60,120,?,336) was located by content search and has id 'ba036f12-e077-48d2-80f4-ed988dbb47ce', which is used here. Option A rewritten from the duplicate value 336 to the true missing 4th term 210; correct_answer stays A; explanation cleaned to derive 210 without contradiction."
+ },
+ {
+  "id": "c3736daf-9b8f-4e57-8856-5700d71b9b89",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries: 2 8 14 20 26 32 38 ___ ___\nKey point: This is a simple addition series — it begins with 2 and adds 6 each time.\nFrom question:\nRule: each term = previous + 6\n→ 2 + 6 = 8\n→ 32 + 6 = 38\n→ 38 + 6 = 44 (first missing term)\n→ 44 + 6 = 50 (second missing term)\nAsked: Next two terms = ?\n= 44 50 → Option (B)",
+  "explanation_ta": "Given:\nதொடர்: 2 8 14 20 26 32 38 ___ ___\nமுக்கியக் குறிப்பு: இது எளிய கூட்டல் தொடர் — 2-இல் தொடங்கி ஒவ்வொரு முறையும் 6 கூட்டப்படுகிறது.\nFrom question:\nவிதி: ஒவ்வொரு உறுப்பு = முந்தையது + 6\n→ 2 + 6 = 8\n→ 32 + 6 = 38\n→ 38 + 6 = 44 (முதல் விடுபட்ட உறுப்பு)\n→ 44 + 6 = 50 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 44 50 → விடை (B)",
+  "verification_note": "correct_answer=B and option_b already stores '44 50'; explanation now derives 44 then 50 cleanly via the constant +6 rule."
+ },
+ {
+  "id": "c553114c-7582-419d-b799-53376e47eda6",
+  "action": "update",
+  "option_c": "23 20",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 44 41 38 35 32 29 26 ?\nKey point: A simple subtraction series in which 3 is subtracted from each number to arrive at the next.\nFrom question:\nRule: −3 from each term\n→ 44 − 3 = 41\n→ 41 − 3 = 38\n→ 38 − 3 = 35\n→ 35 − 3 = 32\n→ 32 − 3 = 29\n→ 29 − 3 = 26\n→ 26 − 3 = 23 (first missing term)\n→ 23 − 3 = 20 (second missing term)\nAsked: Next two terms = ?\n= 23 20 → Option (C)",
+  "explanation_ta": "Given:\nதொடர்: 44 41 38 35 32 29 26 ?\nமுக்கியக் குறிப்பு: ஒவ்வொரு எண்ணிலிருந்தும் 3 கழித்து அடுத்த எண்ணைப் பெறும் எளிய கழித்தல் தொடர்.\nFrom question:\nவிதி: ஒவ்வொரு உறுப்பிலிருந்தும் −3\n→ 44 − 3 = 41\n→ 41 − 3 = 38\n→ 38 − 3 = 35\n→ 35 − 3 = 32\n→ 32 − 3 = 29\n→ 29 − 3 = 26\n→ 26 − 3 = 23 (முதல் விடுபட்ட உறுப்பு)\n→ 23 − 3 = 20 (இரண்டாம் விடுபட்ட உறுப்பு)\nAsked: அடுத்த இரு உறுப்புகள் = ?\n= 23 20 → விடை (C)",
+  "verification_note": "Option C's second value corrected from 19 to 20 (true pair is 23, 20); correct_answer changed from A to C; explanation's own math (23 then 20) now matches the boxed answer."
+ },
+ {
+  "id": "d23b3953-f701-44dd-b8d7-812fca1b014f",
+  "action": "update",
+  "correct_answer": "C",
+  "verification_note": "Explanation and Tamil explanation already correctly derive 162 and already end with 'Option (C)' / 'விடை (C)'; only the correct_answer DB field (previously D) was out of sync and is now corrected to C, matching option_c=162."
+ },
+ {
+  "id": "e86c98d9-221a-486a-8bc0-6ea1b968247a",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries \\( 75,\\ 65,\\ 85,\\ 55,\\ 45,\\ 85,\\ 35,\\ ?,\\ ? \\)\nWorking:\n\\( 85 \\) appears as every third term; the remaining terms form a \\( -10 \\) series.\nDrop the \\( 85 \\)'s: \\( 75,\\ 65,\\ 55,\\ 45,\\ 35,\\ ? \\)\n\\( 35 - 10 = 25 \\) (first missing term)\nThe next insert of 85 falls exactly at the position of the second missing term, so the second missing term is the interpolated \\( 85 \\).\nAsked:\nNext two terms \\( = 25,\\ 85 \\)\n→ Option (B)",
+  "explanation_ta": "தரவுகள்:\nதொடர் \\( 75,\\ 65,\\ 85,\\ 55,\\ 45,\\ 85,\\ 35,\\ ?,\\ ? \\)\nசெயல்முறை:\n\\( 85 \\) ஒவ்வொரு மூன்றாவது உறுப்பாக வருகிறது; மீதமுள்ளவை \\( -10 \\) தொடர்.\n\\( 85 \\) ஐ விலக்கினால்: \\( 75,\\ 65,\\ 55,\\ 45,\\ 35,\\ ? \\)\n\\( 35 - 10 = 25 \\) (முதல் விடுபட்ட உறுப்பு)\nஅடுத்த 85 இடைச்செருகல் இரண்டாம் விடுபட்ட உறுப்பின் இடத்தில் தான் வர வேண்டும், எனவே இரண்டாம் விடுபட்ட உறுப்பு இடைச்செருகப்பட்ட \\( 85 \\) ஆகும்.\nகேட்டது:\nஅடுத்த இரு உறுப்புகள் \\( = 25,\\ 85 \\)\nவிடை (B)",
+  "verification_note": "correct_answer=B and option_b already stores '25 85'; explanation now derives 25 then correctly places the recurring 85 insert at the second blank, ending Option (B)."
+ },
+ {
+  "id": "f1e73359-d76c-432f-bfd6-8326a8a8dce2",
+  "action": "update",
+  "correct_answer": "B",
+  "explanation": "Given:\nSeries \\( 13,\\ 29,\\ 15,\\ 26,\\ 17,\\ 23,\\ 19,\\ ?,\\ ? \\)\nWorking:\nTwo interwoven patterns — the main series (odd positions) adds \\( 2 \\): \\( 13, 15, 17, 19, \\ldots \\); the decoy series (even positions) subtracts \\( 3 \\): \\( 29, 26, 23, \\ldots \\)\nThe two blanks occupy the decoy-series slot then the main-series slot, in that order:\nDecoy series: \\( 23 - 3 = 20 \\) (first missing term)\nMain series: \\( 19 + 2 = 21 \\) (second missing term)\nAsked:\nNext two terms \\( = 20,\\ 21 \\)\n→ Option (B)",
+  "explanation_ta": "தரவுகள்:\nதொடர் \\( 13,\\ 29,\\ 15,\\ 26,\\ 17,\\ 23,\\ 19,\\ ?,\\ ? \\)\nசெயல்முறை:\nஇரு பின்னிப் பிணைந்த வடிவங்கள் — முதன்மைத் தொடர் (ஒற்றை இடங்கள்) \\( 2 \\) கூட்டுகிறது: \\( 13, 15, 17, 19, \\ldots \\); மாற்றுத் தொடர் (இரட்டை இடங்கள்) \\( 3 \\) கழிக்கிறது: \\( 29, 26, 23, \\ldots \\)\nஇரு காலியிடங்களும் முறையே மாற்றுத் தொடர் இடம், பின் முதன்மைத் தொடர் இடம் ஆகும்:\nமாற்றுத் தொடர்: \\( 23 - 3 = 20 \\) (முதல் விடுபட்ட உறுப்பு)\nமுதன்மைத் தொடர்: \\( 19 + 2 = 21 \\) (இரண்டாம் விடுபட்ட உறுப்பு)\nகேட்டது:\nஅடுத்த இரு உறுப்புகள் \\( = 20,\\ 21 \\)\nவிடை (B)",
+  "verification_note": "correct_answer=B and option_b already stores '20 21'; explanation now uses the decoy (-3) series that was previously dropped, deriving 20 then 21, ending Option (B)."
+ },
+ {
+  "id": "fffdee48-252c-4832-a6df-a8131ff2cf6f",
+  "action": "update",
+  "correct_answer": "C",
+  "explanation": "Given:\nSeries: 4, 8, 22, 12, 16, 22, 20, 24, ?\nWorking:\nRule: a \\(+4\\) addition series with the fixed number 22 inserted as every third term.\n\\(4 + 4 = 8\\)\n22 inserted\n\\(8 + 4 = 12\\)\n\\(12 + 4 = 16\\)\n22 inserted\n\\(16 + 4 = 20\\)\n\\(20 + 4 = 24\\)\nThe next insert of 22 is due immediately after 24 (position 9), before the next main term:\n22 inserted (first missing term)\n\\(24 + 4 = 28\\) (second missing term)\nAsked:\nNext two terms = ?\nNext two terms \\( = 22,\\ 28 \\)\n→ Option (C)",
+  "explanation_ta": "தரவுகள்:\nதொடர்: 4, 8, 22, 12, 16, 22, 20, 24, ?\nசெயல்முறை:\nவிதி: \\(+4\\) கூட்டல் தொடர், ஒவ்வொரு மூன்றாவது உறுப்பாக நிலையான எண் 22 செருகப்படுகிறது.\n\\(4 + 4 = 8\\)\n22 செருகப்படுகிறது\n\\(8 + 4 = 12\\)\n\\(12 + 4 = 16\\)\n22 செருகப்படுகிறது\n\\(16 + 4 = 20\\)\n\\(20 + 4 = 24\\)\nஅடுத்த 22 இடைச்செருகல் 24-க்குப் பின் (9வது இடத்தில்) உடனடியாக வர வேண்டும், அடுத்த முதன்மை உறுப்புக்கு முன்:\n22 செருகப்படுகிறது (முதல் விடுபட்ட உறுப்பு)\n\\(24 + 4 = 28\\) (இரண்டாம் விடுபட்ட உறுப்பு)\nகேட்டது:\nஅடுத்த இரு உறுப்புகள் = ?\nஅடுத்த இரு உறுப்புகள் \\( = 22,\\ 28 \\)\nவிடை (C)",
+  "verification_note": "correct_answer=C and option_c already stores '22 28'; explanation now places the recurring 22 insert at the correct position (first blank) before continuing the main series to 28, ending Option (C)."
+ },
+ {
+  "id": "503639e0-a419-4d9a-bc29-e9f775306d7b",
+  "action": "update",
+  "question_text": "If DEMOCRATIC is written as EDMORCATCI, how CONTINUOUS will be written in the same code?",
+  "question_text_ta": "DEMOCRATIC என்பது EDMORCATCI என எழுதப்பட்டால், அதே குறியீட்டில் CONTINUOUS எவ்வாறு எழுதப்படும்?",
+  "verification_note": "Fixed the impossible 11-letter code 'EDMORACATCI' in question_text/question_text_ta to the valid 10-letter 'EDMORCATCI', matching what the explanation already used; correct_answer C and option_c=OCNTNIUOSU are unaffected and remain correct."
+ },
+ {
+  "id": "4f0d4962-9f25-4c16-9d4b-53e42171863b",
+  "action": "update",
+  "question_text": "The least number of square tiles required to pave the ceiling of a room 15 m 17 cm long and 9 m 2 cm broad is",
+  "question_text_ta": "15 மீ 17 செ.மீ நீளமும் 9 மீ 2 செ.மீ அகலமும் கொண்ட ஒரு அறையின் உட்புற கூரையில் பதிப்பதற்கு குறைந்த பட்சமாக எத்தனை சதுர ஓடுகள் தேவைப்படும் ?",
+  "verification_note": "question_text/question_text_ta corrected from ambiguous '15.17 m / 9.2m' to the intended '15 m 17 cm / 9 m 2 cm' reading that the explanation (HCF=41cm, 814 tiles) already assumes; correct_answer C=814 unaffected."
+ },
+ {
+  "id": "a19133c5-2cd9-4581-981c-5f6020196468",
+  "action": "deactivate",
+  "verification_note": "Row depends on a missing figure; 2 of 4 options are empty strings and the other two are bare option-letter fragments with no recoverable values. Not repairable without fabricating content. Note: row was already active=false in the live DB at time of this fix, so this confirms/preserves that state."
+ },
+ {
+  "id": "4cd1aefd-e045-42a7-be50-c4ca5e19d9a4",
+  "action": "update",
+  "option_a": "Mathematics, by 20 percentage points (Maths 90%, English 70%)",
+  "explanation": "Given:\nEnglish = 35 out of 50\nMathematics = 27 out of 30\nFormula: \\(\\text{percentage} = \\dfrac{\\text{marks}}{\\text{total}} \\times 100\\)\nWorking:\nEnglish \\(= \\dfrac{35}{50} \\times 100 = 70\\%\\)\nMathematics \\(= \\dfrac{27}{30} \\times 100 = 90\\%\\)\nDifference \\(= 90 - 70 = 20\\)\nAsked:\nSubject with more marks and by how much = ?\nMathematics, by 20 percentage points\n→ Option (A)",
+  "explanation_ta": "தரவுகள்:\nஆங்கிலம் = 50-க்கு 35\nகணிதம் = 30-க்கு 27\nசூத்திரம்: சதவீதம் = (மதிப்பெண் ÷ மொத்தம்) × 100\nசெயல்முறை:\nஆங்கிலம் \\(= \\dfrac{35}{50} \\times 100 = 70\\%\\)\nகணிதம் \\(= \\dfrac{27}{30} \\times 100 = 90\\%\\)\nவேறுபாடு \\(= 90 - 70 = 20\\)\nகேட்டது:\nஅதிக மதிப்பெண் பெற்ற பாடம் மற்றும் எவ்வளவு அதிகம் = ?\nகணிதம், 20 சதவீத புள்ளிகள் அதிகம்\nவிடை (A)",
+  "verification_note": "Option A and the explanation's closing line changed from mislabeled '20 marks' to accurate '20 percentage points' (English and Maths have different totals, 50 vs 30, so raw marks aren't directly comparable); correct_answer A and the underlying 70%/90% arithmetic are unchanged and correct."
+ },
+ {
+  "id": "d2b09852-8f0c-4d33-8cd2-e4ca3863957a",
+  "action": "update",
+  "correct_answer": "A",
+  "verification_note": "Explanation and Tamil explanation already correctly derive b=34 m and already end with 'Option (A)' / 'விடை (A)'; only the correct_answer DB field (previously D, which is the length not the breadth asked for) was out of sync and is now corrected to A, matching option_a='34 m'."
+ },
+ {
+  "id": "9e3a7a10-7ad8-4c6a-aa28-6246bd83747d",
+  "action": "update",
+  "option_a": "25.31 m2",
+  "option_b": "18.11 m2",
+  "option_c": "20 m2",
+  "option_d": "23.1 m2",
+  "verification_note": "All four option unit labels corrected from cm2 to m2 to match the question's metre-based dimensions and the explanation's own m² working; correct_answer D and its value 23.1 are unchanged and correct."
+ },
+ {
+  "id": "9cdcfc42-f6b8-48cb-aed2-c40ee787e607",
+  "action": "deactivate",
+  "verification_note": "Verified the CSA ratio as posed is the irrational sqrt(5):9, which none of the four options equal; the stored explanation's own 'simplifies to 5:9' step is invalid (sqrt(5) != 5). Fixing this requires guessing whether the question intended CSA (needs new irrational-form options) or volume (clean 1:9, matching option D) — an authoring decision, not a mechanical correction — so deactivating rather than fabricating an answer."
+ },
+ {
+  "id": "7ae32d51-08a9-41a8-914f-ac182a0f5cfd",
+  "action": "update",
+  "question_text_ta": "கன அளவு 64cm3 கொண்ட இரு கன சதுரங்களை  இனைதத்து ஒரு கன சதுரம் உருவாக்க படுகிறது .புதிய கன சதுரத்தின் மொத்த மேற் பரப்பை கண்டுபிடி",
+  "verification_note": "question_text_ta corrected from mistranslated 63cm3 to 64cm3, matching question_text (English) and explanation_ta (both already use 64); correct_answer C=160 cm² and English question_text are unchanged and correct."
+ },
+ {
+  "id": "2db304d6-975d-44a4-8dd8-cc98d6c57511",
+  "action": "update",
+  "question_text": "How much does a watch gain per day, if its hands coincide every 64 minutes?",
+  "question_text_ta": "ஒரு கடிகாரத்தின் முட்கள் ஒவ்வொரு 64 நிமிடங்களுக்கும் ஒன்றுசேர்ந்தால், அது ஒரு நாளைக்கு எவ்வளவு ஆதாயம் அடைகிறது?",
+  "explanation": "Given:\nWatch hands coincide every 64 min.\nWorking:\nFormula: true coincidence interval \\( = \\dfrac{60 \\times 60}{55} = \\dfrac{720}{11} = 65\\dfrac{5}{11} \\) min\nGain in each interval: \\( 65\\dfrac{5}{11} - 64 = \\dfrac{16}{11} \\) min\nGain per day \\( = \\dfrac{16}{11} \\times \\dfrac{24 \\times 60}{64} = \\dfrac{16 \\times 1440}{11 \\times 64} = \\dfrac{23040}{704} = 32\\dfrac{8}{11} \\) min\nAsked:\nGain per day = ?\n→ Option (A)",
+  "explanation_ta": "தரவுகள்:\nகடிகார முட்கள் ஒவ்வொரு 64 நிமிடத்திற்கும் ஒன்றுசேர்கின்றன.\nசெயல்முறை:\nசூத்திரம்: உண்மையான ஒன்றுசேரும் இடைவெளி \\( = \\dfrac{60 \\times 60}{55} = \\dfrac{720}{11} = 65\\dfrac{5}{11} \\) நிமிடம்\nஒவ்வொரு இடைவெளியிலும் ஆதாயம்: \\( 65\\dfrac{5}{11} - 64 = \\dfrac{16}{11} \\) நிமிடம்\nஒரு நாளைக்கு ஆதாயம் \\( = \\dfrac{16}{11} \\times \\dfrac{24 \\times 60}{64} = \\dfrac{16 \\times 1440}{11 \\times 64} = \\dfrac{23040}{704} = 32\\dfrac{8}{11} \\) நிமிடம்\nகேட்டது:\nஒரு நாளைக்கு ஆதாயம் = ?\nவிடை (A)",
+  "verification_note": "Question wording (EN+TA) corrected from 'lose/falls behind' to 'gain' since a 64-min coincidence interval (< true 65 5/11 min) always means a fast/gaining clock; explanation's 'Loss'/'இழப்பு' wording also updated to 'Gain'/'ஆதாயம்' for consistency. Numeric answer 32 8/11 min (option A) is unchanged and correct."
+ },
+ {
+  "id": "0de8326a-1633-41b9-af98-2be2a26238c4",
+  "action": "update",
+  "explanation": "Given:\nSix flats in two rows facing North and South, allotted to P, Q, R, S, T and U.\nWorking:\nR is next to U and R is South-facing, so U is in the South row.\nS and U are diagonally opposite, so S is in the North row (the row opposite U's row).\nQ and T are North-facing (given), so the North row consists of S, T and Q.\nQ must not be next to S, so S and Q sit at the two ends of the North row with T in the middle: North row = S, T, Q.\nSouth row = P, R, U, with R adjacent to U.\nTherefore T's flat lies between Q's and S's.\nAsked:\nWhose flat is between Q and S?\n→ Option (A)",
+  "explanation_ta": "தரவுகள்:\nவடக்கு மற்றும் தெற்கு நோக்கிய இரு வரிசைகளில் ஆறு குடியிருப்புகள், P, Q, R, S, T மற்றும் U-க்கு ஒதுக்கப்பட்டுள்ளன.\nசெயல்முறை:\nR, U-க்கு அடுத்ததாக உள்ளது மற்றும் R தெற்கு நோக்கியது, எனவே U தெற்கு வரிசையில் உள்ளது.\nS மற்றும் U மூலைவிட்ட எதிரானவை, எனவே S வடக்கு வரிசையில் உள்ளது (U-வின் வரிசைக்கு எதிரான வரிசை).\nQ மற்றும் T வடக்கு நோக்கியவை (கொடுக்கப்பட்டது), எனவே வடக்கு வரிசை S, T, Q ஆகியவற்றைக் கொண்டது.\nQ, S-க்கு அடுத்ததாக இருக்கக்கூடாது, எனவே S மற்றும் Q வரிசையின் இரு முனைகளிலும், T நடுவிலும் அமர்கின்றனர்: வடக்கு வரிசை = S, T, Q.\nதெற்கு வரிசை = P, R, U, இதில் R, U-க்கு அடுத்ததாக உள்ளது.\nஎனவே T-யின் குடியிருப்பு Q மற்றும் S-க்கு இடையில் உள்ளது.\nகேட்டது:\nQ மற்றும் S-க்கு இடையில் இருப்பது யாருடைய குடியிருப்பு?\nவிடை (A)",
+  "verification_note": "Explanation rewritten so its own row layout (South row=U,R,P; North row=S,T,Q) is consistent with the 'S and U diagonally opposite' clue, instead of the old self-contradictory layout that placed S in the South row; final answer T (Option A) is unchanged and correct, matching the independently re-verified layout."
+ }
+]

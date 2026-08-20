@@ -278,7 +278,7 @@ export default function CaTelegramDialog({
 
             {/* Channel */}
             <label className="mt-4 block">
-              <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">
+              <span className="font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                 Channel
               </span>
               <input
@@ -288,14 +288,14 @@ export default function CaTelegramDialog({
                 placeholder="@tnpscmentors"
                 className="mt-1 w-full rounded-field border border-line bg-card px-3 py-2 font-body text-sm text-ink outline-none transition focus:border-brand-ring disabled:opacity-60"
               />
-              <span className="mt-1 block font-body text-[11px] text-ink2">
+              <span className="mt-1 block font-body text-2xs text-ink2">
                 The bot must be an administrator of this channel with "Post Messages".
               </span>
             </label>
 
             {/* Languages */}
             <div className="mt-4">
-              <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">
+              <span className="font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                 Send
               </span>
               <div className="mt-1.5 flex flex-wrap gap-2">
@@ -312,7 +312,7 @@ export default function CaTelegramDialog({
                     >
                       {on && <Check size={13} />} {LANG_NAME[lang]} PDF
                       {prev && (
-                        <span className={`font-body text-[10px] ${on ? 'text-white/80' : 'text-ink2'}`}>
+                        <span className={`font-body text-2xs ${on ? 'text-white/80' : 'text-ink2'}`}>
                           · sent {sentLabel(prev.sent_at)}
                         </span>
                       )}
@@ -321,7 +321,7 @@ export default function CaTelegramDialog({
                 })}
               </div>
               {langs.some((l) => lastSent(l)) && (
-                <p className="mt-1.5 font-body text-[11px] text-ink2">
+                <p className="mt-1.5 font-body text-2xs text-ink2">
                   A language marked "sent" will be posted again as a NEW message — Telegram does not
                   replace the old one.
                 </p>
@@ -332,19 +332,19 @@ export default function CaTelegramDialog({
             {langs.map((lang) => (
               <div key={lang} className="mt-4">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">
+                  <span className="font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                     {LANG_NAME[lang]} caption
                   </span>
                   <span className="flex items-center gap-2">
                     <button
                       onClick={() => resetCaption(lang)}
                       disabled={busy}
-                      className="font-heading text-[11px] font-semibold text-brand transition hover:underline disabled:opacity-50"
+                      className="font-heading text-2xs font-semibold text-brand transition hover:underline disabled:opacity-50"
                     >
                       Reset
                     </button>
                     <span
-                      className={`font-body text-[11px] ${
+                      className={`font-body text-2xs ${
                         captions[lang].length > captionMax ? 'text-coral' : 'text-ink2'
                       }`}
                     >
@@ -381,14 +381,14 @@ export default function CaTelegramDialog({
               </button>
               {showTemplates && (
                 <div className="border-t border-line px-3 py-3">
-                  <p className="font-body text-[11px] text-ink2">
+                  <p className="font-body text-2xs text-ink2">
                     Used to pre-fill every future send. Placeholders: {PLACEHOLDERS}. Basic Telegram HTML
                     (&lt;b&gt;bold&lt;/b&gt;) works; if the tags are malformed the caption is posted as
                     plain text instead.
                   </p>
                   {(['en', 'ta'] as Lang[]).map((lang) => (
                     <label key={lang} className="mt-2.5 block">
-                      <span className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">
+                      <span className="font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                         {LANG_NAME[lang]}
                       </span>
                       <textarea

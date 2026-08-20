@@ -115,7 +115,7 @@ export default function InsightsPage() {
         </button>
 
         <header className="mb-7 mt-4">
-          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+          <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
             {t('insightsTitle')}
           </h1>
         </header>
@@ -160,7 +160,7 @@ export default function InsightsPage() {
                 />
                 <HeroStat
                   icon={<Users size={16} />}
-                  label={t('yourRank')}
+                  label={t('stateLevelAnalytics')}
                   value={percentile != null ? `Top ${100 - percentile}%` : '-'}
                 />
               </div>
@@ -228,7 +228,7 @@ export default function InsightsPage() {
                       <span
                         key={s}
                         className={[
-                          'tamil inline-flex items-center gap-1 rounded-full px-3 py-1 font-heading text-[11px] font-semibold',
+                          'tamil inline-flex items-center gap-1 rounded-full px-3 py-1 font-heading text-2xs font-semibold',
                           done ? 'bg-mintsoft text-mint' : 'bg-tint text-ink2',
                         ].join(' ')}
                       >
@@ -295,7 +295,7 @@ export default function InsightsPage() {
                                 href={l.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="rounded-full bg-brand-soft px-3 py-1 font-heading text-[11px] font-semibold text-brand transition hover:bg-brand-ring/40"
+                                className="rounded-full bg-brand-soft px-3 py-1 font-heading text-2xs font-semibold text-brand transition hover:bg-brand-ring/40"
                               >
                                 {l.label} ↗
                               </a>
@@ -352,7 +352,7 @@ export default function InsightsPage() {
                         </span>
                       </div>
                       <ProgressBar percent={s.accuracy} color={accColor(s.accuracy)} height={6} />
-                      <div className="mt-2 font-body text-[11px] text-ink2">
+                      <div className="mt-2 font-body text-2xs text-ink2">
                         {s.attempted === 0 ? (
                           t('notAttemptedYet')
                         ) : (
@@ -409,7 +409,7 @@ function Ring({ percent, sublabel, size = 132, stroke = 11 }: { percent: number;
       </svg>
       <div className="absolute text-center">
         <div className="font-heading text-3xl font-bold leading-none text-white">{percent}%</div>
-        <div className="mt-1 max-w-[88px] font-body text-[10px] uppercase leading-tight tracking-wide text-white/60">
+        <div className="mt-1 max-w-[88px] font-body text-2xs uppercase leading-tight tracking-wide text-white/60">
           {sublabel}
         </div>
       </div>
@@ -463,7 +463,7 @@ function TrendChart({ points }: { points: { accuracy: number; label: string }[] 
 function HeroStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-xl bg-white/10 p-3 ring-1 ring-white/10">
-      <div className="flex items-center gap-1.5 font-body text-[11px] uppercase tracking-wide text-white/55">
+      <div className="flex items-center gap-1.5 font-body text-2xs uppercase tracking-wide text-white/55">
         <span className="text-white/70">{icon}</span>
         <span className="tamil truncate">{label}</span>
       </div>
@@ -541,7 +541,7 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
         {icon}
       </div>
       <div className="font-heading text-xl font-bold text-ink">{value}</div>
-      <div className="tamil font-body text-[11px] uppercase tracking-wide text-ink2">{label}</div>
+      <div className="tamil font-body text-2xs uppercase tracking-wide text-ink2">{label}</div>
     </div>
   )
 }

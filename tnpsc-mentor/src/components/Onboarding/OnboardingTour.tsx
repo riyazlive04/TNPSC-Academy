@@ -93,15 +93,28 @@ export default function OnboardingTour({
     return () => cancelAnimationFrame(id)
   }, [open, step, current.target, measure])
 
+  // Coalesce bursts of scroll/resize events (e.g. from scrollIntoView settling)
+  // into at most one measurement per animation frame, so a flurry of native
+  // scroll events doesn't force a layout read + re-render for each one.
+  const rafRef = useRef<number | null>(null)
+  const scheduleMeasure = useCallback(() => {
+    if (rafRef.current != null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      measure()
+    })
+  }, [measure])
+
   useEffect(() => {
     if (!open) return
-    window.addEventListener('resize', measure)
-    window.addEventListener('scroll', measure, true)
+    window.addEventListener('resize', scheduleMeasure, { passive: true })
+    window.addEventListener('scroll', scheduleMeasure, { capture: true, passive: true })
     return () => {
-      window.removeEventListener('resize', measure)
-      window.removeEventListener('scroll', measure, true)
+      window.removeEventListener('resize', scheduleMeasure)
+      window.removeEventListener('scroll', scheduleMeasure, true)
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
     }
-  }, [open, measure])
+  }, [open, scheduleMeasure])
 
   // Restart at the first step whenever the tour (re)opens.
   useEffect(() => {
@@ -137,9 +150,15 @@ export default function OnboardingTour({
           dims everything else, plus a brand ring. Centred steps (no rect) just
           dim the whole screen. pointer-events-none so it never traps clicks. */}
       {rect ? (
+        // key={step} remounts on each step so the spotlight snaps straight to
+        // its new position (no layout animation) and only crossfades in via
+        // fadeInFast — animating top/left/width/height on a 9999px box-shadow
+        // forces a near-fullscreen repaint on every frame, which is what made
+        // the tour feel sluggish. A single paint + cheap opacity fade instead.
         <div
+          key={step}
           aria-hidden
-          className="pointer-events-none absolute rounded-2xl ring-2 ring-white/90 transition-all duration-300"
+          className="pointer-events-none absolute rounded-2xl ring-2 ring-white/90 animate-fadeInFast"
           style={{
             top: rect.top - PAD,
             left: rect.left - PAD,
@@ -159,7 +178,7 @@ export default function OnboardingTour({
         total={STEPS.length}
         onDot={setStep}
         header={
-          <span className="font-heading text-[12px] font-bold uppercase tracking-[0.12em] text-muted">
+          <span className="font-heading text-xs font-bold uppercase tracking-[0.12em] text-muted">
             {step + 1} <span className="text-muted/60">{t('onbStepOf')}</span> {STEPS.length}
           </span>
         }
@@ -168,11 +187,11 @@ export default function OnboardingTour({
         <div className="mb-1 flex items-center gap-2">
           {isFirst && <Sparkles size={18} className="text-primary" />}
           {isLast && <Compass size={18} className="text-primary" />}
-          <h2 className="tamil font-display text-[18px] font-bold leading-tight tracking-tight text-ink">
+          <h2 className="tamil font-display text-lg font-bold leading-tight tracking-tight text-ink">
             {t(titleKey)}
           </h2>
         </div>
-        <p className="tamil font-body text-[14px] leading-relaxed text-muted">{t(bodyKey)}</p>
+        <p className="tamil font-body text-sm leading-relaxed text-muted">{t(bodyKey)}</p>
 
         {/* Footer nav. The last step ends in action: the primary button hands
             the new aspirant straight to the Starter Challenge; a quiet ghost
@@ -266,7 +285,7 @@ function TourCard({
         {header}
         <button
           onClick={onClose}
-          className="focus-ring -mr-1 inline-flex items-center gap-1 rounded-full px-2 py-1 font-heading text-[12px] font-semibold text-muted hover:bg-tint-coral hover:text-accent"
+          className="focus-ring -mr-1 inline-flex items-center gap-1 rounded-full px-2 py-1 font-heading text-xs font-semibold text-muted hover:bg-tint-coral hover:text-accent"
         >
           {skipLabel} <X size={14} />
         </button>

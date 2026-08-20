@@ -1,0 +1,65 @@
+[
+ {
+  "sig": "development|employment|integrated|national|programme|training",
+  "rows": [
+   {
+    "id": "8ce6d14e-7d51-4081-8af0-0fa3718df16f",
+    "question_text": "Match List I (Rural development programme) with List II (Year of launch) and select the correct answer using the codes below:\nList I\n(a) Integrated Rural Development Programme (IRDP)\n(b) Training Rural Youth for Self Employment (TRYSEM)\n(c) National Rural Employment Programme (NREP)\n(d) Jawahar Rozgar Yojana (JRY)\nList II\n1. 1978\n2. 1979\n3. 1980\n4. 1989",
+    "option_a": "(a)-1, (b)-2, (c)-3, (d)-4",
+    "option_b": "(a)-2, (b)-1, (c)-3, (d)-4",
+    "option_c": "(a)-1, (b)-2, (c)-4, (d)-3",
+    "option_d": "(a)-3, (b)-2, (c)-1, (d)-4"
+   },
+   {
+    "id": "b3f2c852-73e7-4081-800f-81b8d9537d98",
+    "question_text": "Match List I (Acronym) with List II (Full form) and select the correct answer using the codes given below:\nList I\n(a) NREP\n(b) IRDP\n(c) TRYSEM\n(d) SFDA\nList II\n1. Small Farmers Development Agency\n2. National Rural Employment Programme\n3. Training of Rural Youth for Self Employment\n4. Integrated Rural Development Programme",
+    "option_a": "(a)-2, (b)-4, (c)-3, (d)-1",
+    "option_b": "(a)-4, (b)-2, (c)-3, (d)-1",
+    "option_c": "(a)-2, (b)-4, (c)-1, (d)-3",
+    "option_d": "(a)-3, (b)-4, (c)-2, (d)-1"
+   }
+  ]
+ },
+ {
+  "sig": "ascorbic|calciferol|chemical|retinol|thiamine|vitamin",
+  "rows": [
+   {
+    "id": "8a3e6156-37eb-4a80-8393-e0e5706a2d67",
+    "question_text": "Match List I (Vitamin) with List II (Chemical name) and select the correct answer using the codes given below:\nList I\n(a) Vitamin A\n(b) Vitamin B1\n(c) Vitamin C\n(d) Vitamin D\nList II\n(1) Ascorbic acid\n(2) Calciferol\n(3) Retinol\n(4) Thiamine",
+    "option_a": "(a)-3, (b)-4, (c)-1, (d)-2",
+    "option_b": "(a)-4, (b)-3, (c)-1, (d)-2",
+    "option_c": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d": "(a)-1, (b)-4, (c)-3, (d)-2"
+   },
+   {
+    "id": "e7d6d817-96c5-4abf-a049-d915eb9a5554",
+    "question_text": "Match List I (Vitamin - chemical name) with List II (Common vitamin) and select the correct answer using the codes given below:\nList I (Chemical name)\n(a) Calciferol\n(b) Retinol\n(c) Ascorbic acid\n(d) Thiamine\nList II (Vitamin)\n1. Vitamin C\n2. Vitamin B₁\n3. Vitamin D\n4. Vitamin A",
+    "option_a": "(a)-3, (b)-4, (c)-1, (d)-2",
+    "option_b": "(a)-4, (b)-3, (c)-1, (d)-2",
+    "option_c": "(a)-3, (b)-4, (c)-2, (d)-1",
+    "option_d": "(a)-1, (b)-4, (c)-3, (d)-2"
+   }
+  ]
+ },
+ {
+  "sig": "arrange|descending|maharashtra|population|populous|pradesh",
+  "rows": [
+   {
+    "id": "74591d9d-6f9d-45b0-ac1d-2821150c29cb",
+    "question_text": "Arrange the following Indian states in descending order of their population (most populous first):\n(I) Uttar Pradesh\n(II) West Bengal\n(III) Madhya Pradesh\n(IV) Maharashtra",
+    "option_a": "I, II, III, IV",
+    "option_b": "I, III, IV, II",
+    "option_c": "I, II, IV, III",
+    "option_d": "I, IV, II, III"
+   },
+   {
+    "id": "7f17693e-197c-4605-a67e-60aeb97953eb",
+    "question_text": "Arrange the following Indian states in descending order of population (most populous first):\n(1) Bihar\n(2) Maharashtra\n(3) Madhya Pradesh\n(4) Uttar Pradesh\nSelect the correct order:",
+    "option_a": "(4), (1), (2), (3)",
+    "option_b": "(4), (2), (1), (3)",
+    "option_c": "(1), (4), (2), (3)",
+    "option_d": "(4), (1), (3), (2)"
+   }
+  ]
+ }
+]

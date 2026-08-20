@@ -8,8 +8,9 @@ import {
   googleEnabled,
   msg91Enabled,
   whatsappOtpEnabled,
+  telegramVerifyEnabled,
 } from '../config.js'
-import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, requireAdmin, type AuthedRequest } from '../middleware/auth.js'
 import {
   registerLoginSession,
   touchSession,
@@ -23,13 +24,23 @@ import {
 } from '../sessions.js'
 import { normalizeMobile, sendOtp, verifyOtp } from '../lib/msg91.js'
 import { phoneTakenByOther } from '../lib/phone.js'
+import { checkPassword } from '../lib/passwordPolicy.js'
 import {
   issueOtpTicket,
   verifyOtpTicket,
   issuePhoneVerifyTicket,
   verifyPhoneVerifyTicket,
+  issueTotpStepUpTicket,
+  verifyTotpStepUpTicket,
 } from '../lib/otpTicket.js'
 import { sendSignupOtp, verifySignupOtp } from '../lib/whatsappOtp.js'
+import {
+  generateSecret,
+  verifyToken as verifyTotpToken,
+  enrollmentQr,
+  generateBackupCodes,
+  consumeBackupCode,
+} from '../lib/totp.js'
 import { auditAuth, clientIp } from '../lib/audit.js'
 import { recordAuthFailure } from '../lib/securityAlerts.js'
 
@@ -181,6 +192,40 @@ function publicDevices(list: DeviceSession[]) {
   }))
 }
 
+/** Strip fields that must never reach the client — see admin_totp.sql. The
+ * secret and backup-code hashes are server-only; `totp_enabled` is just a
+ * status flag and is fine to keep. Applied everywhere a profile row (fetched
+ * with `select('*')`) is serialized into a response. */
+function stripTotpSecrets<T extends Record<string, unknown> | null>(profile: T): T {
+  if (!profile) return profile
+  const { totp_secret: _s, totp_backup_codes: _b, ...rest } = profile
+  return rest as T
+}
+
+/**
+ * If `userId` is admin/superadmin with totp_enabled, returns the body /login
+ * and /google should send instead of a session (a step-up ticket) — null
+ * means no TOTP gate applies and the caller should proceed to mint the
+ * session as normal. Never claims a device slot; that only happens once
+ * /totp/step-up succeeds.
+ */
+async function requireTotpStepUp(
+  req: Request,
+  userId: string
+): Promise<{ totpRequired: true; ticket: string } | null> {
+  const { data: prof } = await supabaseAdmin
+    .from('profiles')
+    .select('role, totp_enabled')
+    .eq('id', userId)
+    .single()
+  const role = prof?.role as string | undefined
+  if ((role === 'admin' || role === 'superadmin') && prof?.totp_enabled) {
+    auditAuth(req, 'totp_challenge', { subjectId: userId, status: 200 })
+    return { totpRequired: true, ticket: issueTotpStepUpTicket(userId) }
+  }
+  return null
+}
+
 /** Shape returned to the browser after a successful auth call. */
 async function sessionPayload(session: {
   access_token: string
@@ -196,9 +241,28 @@ async function sessionPayload(session: {
     access_token: session.access_token,
     refresh_token: session.refresh_token,
     user: { id: session.user.id },
-    profile: profile ?? null,
+    profile: stripTotpSecrets(profile) ?? null,
   }
 }
+
+// ─── GET /api/auth/config ─────────────────────────────────────────────────────
+// The single source of truth for which optional auth methods are live. Every
+// `*Enabled` constant here already gates its own routes (503 when unset); this
+// just exposes the same booleans so the client can show/hide UI for them
+// WITHOUT a separately hand-maintained set of VITE_* build flags that has to be
+// kept in sync by hand — that drift is exactly what let the WhatsApp-OTP UI lag
+// behind the server being armed for it in the past. Public, no auth required.
+router.get(
+  '/config',
+  asyncH(async (_req, res) => {
+    res.json({
+      google: googleEnabled,
+      whatsappOtp: whatsappOtpEnabled,
+      telegramVerify: telegramVerifyEnabled,
+      phoneOtp: msg91Enabled,
+    })
+  })
+)
 
 // ─── POST /api/auth/login ────────────────────────────────────────────────────
 router.post(
@@ -222,6 +286,11 @@ router.post(
       recordAuthFailure(clientIp(req), { route: 'login' })
       return res.status(401).json({ error: 'Invalid email or password' })
     }
+    // Privileged accounts with TOTP enrolled must clear a step-up challenge
+    // before a session — or a device slot — is ever granted. Checked BEFORE
+    // registerLoginSession so a pending step-up never consumes the cap.
+    const totpGate = await requireTotpStepUp(req, data.session.user.id)
+    if (totpGate) return res.json(totpGate)
     // Concurrent-device limit: block a new device once 2 others are active.
     const { blocked } = await registerLoginSession(
       data.session.user.id,
@@ -374,6 +443,12 @@ router.post(
     if (!email || !password || !fullName) {
       return res.status(400).json({ error: 'Name, email and password are required' })
     }
+    // Server-side floor — the client already enforces this, but that alone is
+    // trivially bypassed with curl. Checked before any DB round-trip below.
+    const pwCheck = await checkPassword(String(password))
+    if (!pwCheck.ok) {
+      return res.status(400).json({ error: `password_${pwCheck.code}` })
+    }
     // One mobile number = one account. Reject BEFORE creating the auth user so a
     // duplicate number never leaves an orphaned GoTrue user behind.
     const normalizedPhone = typeof phone === 'string' ? normalizeMobile(phone) : ''
@@ -477,6 +552,10 @@ router.post(
       return res.status(401).json({ error: 'Google sign-in failed' })
     }
 
+    // Same TOTP step-up gate as password login, checked before the device cap.
+    const totpGate = await requireTotpStepUp(req, data.session.user.id)
+    if (totpGate) return res.json(totpGate)
+
     // Concurrent-device limit (same rule as password login).
     const { blocked } = await registerLoginSession(
       data.session.user.id,
@@ -540,7 +619,7 @@ router.post(
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
         user: { id: data.user.id },
-        profile: { ...existing, ...patch },
+        profile: stripTotpSecrets({ ...existing, ...patch }),
       })
     } else {
       setRtCookie(res, data.session.refresh_token)
@@ -689,10 +768,16 @@ router.post(
     if (!password || typeof password !== 'string') {
       return res.status(400).json({ error: 'A new password is required.' })
     }
-    // Same floor the register form enforces, so a reset can't set a password
-    // that signing up would have rejected.
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters.' })
+    // Same floor /register enforces, so a reset can't set a password that
+    // signing up would have rejected.
+    const pwCheck = await checkPassword(password)
+    if (!pwCheck.ok) {
+      return res.status(400).json({
+        error:
+          pwCheck.code === 'too_short'
+            ? 'Password must be at least 8 characters.'
+            : 'This password has appeared in a known data breach. Please choose a different one.',
+      })
     }
     if (!accessTokenIn && !tokenHash) {
       return res.status(400).json({ error: 'This reset link is invalid or has expired.' })
@@ -750,7 +835,7 @@ router.get(
       .select('*')
       .eq('id', req.userId!)
       .single()
-    res.json({ user: { id: req.userId }, profile: profile ?? null })
+    res.json({ user: { id: req.userId }, profile: stripTotpSecrets(profile) ?? null })
   })
 )
 
@@ -1000,6 +1085,236 @@ router.post(
       return res
         .status(403)
         .json({ error: 'device_limit', devices, ticket: issueOtpTicket(session.user.id) })
+    }
+    setRtCookie(res, session.refresh_token)
+    res.json(await sessionPayload(session))
+  })
+)
+
+// ─── TOTP two-factor authentication (admin/superadmin) ───────────────────────
+// Enrollment is self-service from Profile → Security (requireAdmin: any admin
+// or superadmin may set it up for their OWN account only — req.userId is
+// always the acting user, there is no "set up 2FA for someone else" path).
+// The login-time challenge itself is issued by requireTotpStepUp() inside
+// /login and /google above; /totp/step-up below is where it's redeemed.
+
+router.post(
+  '/totp/enroll',
+  requireAuth,
+  requireAdmin,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data: prof } = await supabaseAdmin
+      .from('profiles')
+      .select('email, totp_enabled')
+      .eq('id', req.userId!)
+      .single()
+    if (prof?.totp_enabled) {
+      return res.status(409).json({ error: 'Two-factor authentication is already enabled.' })
+    }
+    const secret = generateSecret()
+    // Persisted immediately (but NOT yet active — totp_enabled stays false)
+    // so /totp/confirm can verify the first code without the secret ever
+    // needing to round-trip through the client in between.
+    await supabaseAdmin.from('profiles').update({ totp_secret: secret }).eq('id', req.userId!)
+    const qr = await enrollmentQr(prof?.email ?? req.userId!, secret)
+    res.json({ secret, qr })
+  })
+)
+
+router.post(
+  '/totp/confirm',
+  requireAuth,
+  requireAdmin,
+  asyncH(async (req: AuthedRequest, res) => {
+    const code = typeof req.body?.code === 'string' ? req.body.code.trim() : ''
+    if (!code) return res.status(400).json({ error: 'Enter the 6-digit code from your app.' })
+    const { data: prof } = await supabaseAdmin
+      .from('profiles')
+      .select('totp_secret')
+      .eq('id', req.userId!)
+      .single()
+    if (!prof?.totp_secret) {
+      return res.status(400).json({ error: 'Start enrollment first.' })
+    }
+    if (!(await verifyTotpToken(prof.totp_secret, code))) {
+      recordAuthFailure(clientIp(req), { route: 'totp/confirm' })
+      return res.status(401).json({ error: 'Invalid code. Please try again.' })
+    }
+    const { plain, hashed } = generateBackupCodes()
+    await supabaseAdmin
+      .from('profiles')
+      .update({ totp_enabled: true, totp_backup_codes: hashed })
+      .eq('id', req.userId!)
+    auditAuth(req, 'totp_enabled', { subjectId: req.userId!, status: 200 })
+    // Shown to the user exactly once — the server never displays these again.
+    res.json({ backupCodes: plain })
+  })
+)
+
+router.post(
+  '/totp/disable',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { password, backupCode } = req.body ?? {}
+    const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(req.userId!)
+    const email = userRes?.user?.email
+
+    let verified = false
+    if (typeof password === 'string' && password && email) {
+      const { data } = await supabaseAuthClient.auth.signInWithPassword({
+        email,
+        password: String(password),
+      })
+      verified = Boolean(data.session)
+    }
+    if (!verified && typeof backupCode === 'string' && backupCode) {
+      const { data: prof } = await supabaseAdmin
+        .from('profiles')
+        .select('totp_backup_codes')
+        .eq('id', req.userId!)
+        .single()
+      const stored = (prof?.totp_backup_codes as string[] | null) ?? []
+      verified = stored.length > 0 && consumeBackupCode(backupCode, stored) !== null
+    }
+    if (!verified) {
+      recordAuthFailure(clientIp(req), { route: 'totp/disable' })
+      return res
+        .status(401)
+        .json({ error: 'Re-enter your password or a backup code to turn this off.' })
+    }
+
+    await supabaseAdmin
+      .from('profiles')
+      .update({ totp_enabled: false, totp_secret: null, totp_backup_codes: null })
+      .eq('id', req.userId!)
+    auditAuth(req, 'totp_disabled', { subjectId: req.userId!, status: 200 })
+    res.json({ ok: true })
+  })
+)
+
+// POST /api/auth/totp/step-up — redeems a requireTotpStepUp() ticket + a
+// 6-digit code (or a backup code) into the real session, the same way
+// /otp/replace-device redeems a spent-OTP ticket: revoke nothing here (no
+// device was ever claimed for a step-up-pending login), just verify and mint.
+router.post(
+  '/totp/step-up',
+  tokenLimiter,
+  asyncH(async (req, res) => {
+    const ticket = typeof req.body?.ticket === 'string' ? req.body.ticket : ''
+    const code = typeof req.body?.code === 'string' ? req.body.code.trim() : ''
+    if (!ticket || !code) return res.status(400).json({ error: 'Missing ticket or code' })
+
+    const userId = verifyTotpStepUpTicket(ticket)
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ error: 'Your sign-in window expired. Please sign in again.' })
+    }
+
+    const { data: prof } = await supabaseAdmin
+      .from('profiles')
+      .select('totp_secret, totp_backup_codes')
+      .eq('id', userId)
+      .single()
+    if (!prof?.totp_secret) {
+      return res.status(404).json({ error: 'Two-factor authentication is not set up.' })
+    }
+
+    let usedBackup = false
+    let ok = await verifyTotpToken(prof.totp_secret, code)
+    if (!ok) {
+      const stored = (prof.totp_backup_codes as string[] | null) ?? []
+      const remaining = stored.length > 0 ? consumeBackupCode(code, stored) : null
+      if (remaining) {
+        ok = true
+        usedBackup = true
+        await supabaseAdmin
+          .from('profiles')
+          .update({ totp_backup_codes: remaining })
+          .eq('id', userId)
+      }
+    }
+    if (!ok) {
+      recordAuthFailure(clientIp(req), { route: 'totp/step-up' })
+      return res.status(401).json({ error: 'Invalid code. Please try again.' })
+    }
+
+    // The password/Google session from /login or /google was never returned to
+    // the client, and there's no clean way to hand THAT exact session across
+    // this second request — redeem a fresh one via the same admin-magiclink
+    // trick /otp/verify already uses.
+    const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const email = userRes?.user?.email
+    if (!email) return res.status(404).json({ error: 'Account not found' })
+    const session = await mintSessionForEmail(email)
+    if (!session) {
+      return res.status(500).json({ error: 'Could not complete sign in. Please try again.' })
+    }
+
+    const { blocked } = await registerLoginSession(
+      session.user.id,
+      deviceKey(session.access_token, req),
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = publicDevices(await listSessions(session.user.id))
+      // Fresh ticket so /totp/replace-device can finish without re-entering
+      // the (now-spent) code — same shape /otp/verify's block response takes.
+      return res
+        .status(403)
+        .json({ error: 'device_limit', devices, ticket: issueTotpStepUpTicket(session.user.id) })
+    }
+    auditAuth(req, 'login_success', {
+      subjectId: session.user.id,
+      status: 200,
+      detail: { method: usedBackup ? 'totp_backup' : 'totp', device: deviceLabel(req.headers['user-agent']) },
+    })
+    setRtCookie(res, session.refresh_token)
+    res.json(await sessionPayload(session))
+  })
+)
+
+// POST /api/auth/totp/replace-device — reached after a `device_limit` block on
+// /totp/step-up itself: the TOTP code already succeeded, so the fresh ticket
+// above stands in for it here, exactly as /otp/replace-device reuses a spent
+// OTP's ticket rather than asking for another code.
+router.post(
+  '/totp/replace-device',
+  tokenLimiter,
+  asyncH(async (req, res) => {
+    const ticket = typeof req.body?.ticket === 'string' ? req.body.ticket : ''
+    const sessionId = typeof req.body?.session_id === 'string' ? req.body.session_id : ''
+    if (!ticket || !sessionId) {
+      return res.status(400).json({ error: 'Missing ticket or session_id' })
+    }
+    const userId = verifyTotpStepUpTicket(ticket)
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ error: 'Your sign-in window expired. Please sign in again.' })
+    }
+    const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const email = userRes?.user?.email
+    if (!email) return res.status(404).json({ error: 'Account not found' })
+
+    // revokeSessionById is scoped to userId, so a forged session_id is a no-op.
+    await revokeSessionById(userId, sessionId)
+    const session = await mintSessionForEmail(email)
+    if (!session) {
+      return res.status(500).json({ error: 'Could not complete sign in. Please try again.' })
+    }
+    const { blocked } = await registerLoginSession(
+      session.user.id,
+      deviceKey(session.access_token, req),
+      deviceId(req),
+      deviceLabel(req.headers['user-agent'])
+    )
+    if (blocked) {
+      const devices = publicDevices(await listSessions(session.user.id))
+      return res
+        .status(403)
+        .json({ error: 'device_limit', devices, ticket: issueTotpStepUpTicket(session.user.id) })
     }
     setRtCookie(res, session.refresh_token)
     res.json(await sessionPayload(session))

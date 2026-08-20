@@ -183,7 +183,7 @@ function ReportCard({
           <Flag size={13} />
           {r.report_count} report{r.report_count === 1 ? '' : 's'}
         </span>
-        <span className="font-body text-[11px] text-ink2">Last flagged {when}</span>
+        <span className="font-body text-2xs text-ink2">Last flagged {when}</span>
       </div>
 
       {q ? (
@@ -229,7 +229,7 @@ function ReportCard({
               {[q.category, q.subject, q.topic].filter(Boolean).map((tag, k) => (
                 <span
                   key={k}
-                  className="rounded-full bg-tint px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2"
+                  className="rounded-full bg-tint px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2"
                 >
                   {tag}
                 </span>
@@ -248,7 +248,7 @@ function ReportCard({
           API returns null for plain admins, who get the anonymous view below). */}
       {r.reporters && r.reporters.length > 0 ? (
         <div className="mb-3 space-y-1.5">
-          <p className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+          <p className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
             Reported by
           </p>
           {r.reporters.map((rep) => (
@@ -263,7 +263,7 @@ function ReportCard({
                     <span className="font-normal text-ink2"> · {rep.email}</span>
                   )}
                 </span>
-                <span className="font-body text-[11px] text-ink2">
+                <span className="font-body text-2xs text-ink2">
                   {new Date(rep.reported_at).toLocaleDateString()}
                 </span>
               </div>
@@ -277,7 +277,7 @@ function ReportCard({
       ) : (
         r.reasons.length > 0 && (
           <div className="mb-3 space-y-1.5">
-            <p className="font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <p className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               Student notes
             </p>
             {r.reasons.map((reason, k) => (
@@ -294,7 +294,7 @@ function ReportCard({
 
       {/* Resolver attribution (resolved / dismissed views) */}
       {r.status !== 'open' && r.resolver_name && (
-        <p className="mb-3 font-body text-[11px] text-ink2">
+        <p className="mb-3 font-body text-2xs text-ink2">
           {r.status === 'resolved' ? 'Resolved' : 'Dismissed'} by {r.resolver_name}
           {r.resolved_at ? ` · ${new Date(r.resolved_at).toLocaleDateString()}` : ''}
         </p>

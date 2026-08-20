@@ -1,0 +1,735 @@
+[
+ {
+  "sig": "adopted|assembly|constituent|constitution|january|november",
+  "classification": "true_duplicate",
+  "notes": "Both ask when the Constitution was adopted by the Constituent Assembly; both correctly answer 26 November 1949. Keeping 81a78d84 (already the clean, previously-polished version). Rewriting 0bb51c93 into a different Polity/Constitution-of-India fact.",
+  "keep_id": "81a78d84-e231-4b6b-af43-b4f15f42779a",
+  "rewrites": [
+   {
+    "id": "0bb51c93-2799-42d6-9cef-71ee9a9d73ca",
+    "question_text": "Which Article of the Indian Constitution declares India to be a 'Union of States'?",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் எந்த பிரிவு, இந்தியாவை 'மாநிலங்களின் ஒன்றியம்' (Union of States) என்று அறிவிக்கிறது?",
+    "option_a": "Article 1", "option_b": "Article 3", "option_c": "Article 14", "option_d": "Article 21",
+    "option_a_ta": "பிரிவு 1", "option_b_ta": "பிரிவு 3", "option_c_ta": "பிரிவு 14", "option_d_ta": "பிரிவு 21",
+    "correct_answer": "A",
+    "explanation": "Article 1 of the Indian Constitution states, 'India, that is Bharat, shall be a Union of States.' This provision establishes India's federal structure while emphasizing that the states do not have the right to secede, unlike a true federation formed by agreement among independent units. Article 3 deals with the formation of new states and alteration of boundaries, not the basic declaration of statehood.",
+    "explanation_ta": "இந்திய அரசியலமைப்பின் பிரிவு 1, 'இந்தியா, அதாவது பாரதம், மாநிலங்களின் ஒன்றியமாக இருக்கும்' என்று கூறுகிறது. இந்த விதி இந்தியாவின் கூட்டாட்சி அமைப்பை நிறுவுகிறது; அதே சமயம், சுதந்திரமான அலகுகளின் ஒப்பந்தத்தால் உருவாகும் உண்மையான கூட்டாட்சியைப் போலல்லாமல், மாநிலங்களுக்குப் பிரிந்து செல்லும் உரிமை இல்லை என்பதையும் இது வலியுறுத்துகிறது. பிரிவு 3, புதிய மாநிலங்களை உருவாக்குதல் மற்றும் எல்லைகளை மாற்றுதல் தொடர்பானது; அடிப்படை மாநில அந்தஸ்து அறிவிப்புத் தொடர்பானது அல்ல."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "analogous|general|governor|kingdom|position|president",
+  "classification": "true_duplicate",
+  "notes": "Both ask what the President of India's position is analogous to; both correctly answer the Queen of the United Kingdom. Keeping 6633b4c9. Rewriting 75c5201d into a different Constitution-of-India fact.",
+  "keep_id": "6633b4c9-d1d5-4300-9bb8-b1ca7a406c7f",
+  "rewrites": [
+   {
+    "id": "75c5201d-3325-4525-8cbd-66c01ee52fb8",
+    "question_text": "The Drafting Committee of the Indian Constituent Assembly, which prepared the draft Constitution, was chaired by",
+    "question_text_ta": "இந்திய அரசியலமைப்பு வரைவை தயாரித்த வரைவுக் குழுவின் (Drafting Committee) தலைவராக இருந்தவர் யார்?",
+    "option_a": "Dr. B.R. Ambedkar", "option_b": "Jawaharlal Nehru", "option_c": "Dr. Rajendra Prasad", "option_d": "Sardar Vallabhbhai Patel",
+    "option_a_ta": "டாக்டர் பி.ஆர். அம்பேத்கர்", "option_b_ta": "ஜவஹர்லால் நேரு", "option_c_ta": "டாக்டர் ராஜேந்திர பிரசாத்", "option_d_ta": "சர்தார் வல்லபபாய் படேல்",
+    "correct_answer": "A",
+    "explanation": "Dr. B.R. Ambedkar was appointed Chairman of the Drafting Committee of the Constituent Assembly on 29 August 1947. The seven-member committee was responsible for preparing the actual draft text of the Indian Constitution based on the decisions of the Constituent Assembly. Dr. Rajendra Prasad was the President of the Constituent Assembly itself, a separate role.",
+    "explanation_ta": "1947 ஆகஸ்ட் 29 அன்று, அரசியலமைப்பு நிர்ணய சபையின் வரைவுக் குழுவின் தலைவராக டாக்டர் பி.ஆர். அம்பேத்கர் நியமிக்கப்பட்டார். இந்த ஏழு உறுப்பினர் கொண்ட குழு, அரசியலமைப்பு நிர்ணய சபையின் முடிவுகளின் அடிப்படையில் இந்திய அரசியலமைப்பின் உண்மையான வரைவு உரையைத் தயாரிக்கும் பொறுப்பைக் கொண்டிருந்தது. டாக்டர் ராஜேந்திர பிரசாத் அரசியலமைப்பு நிர்ணய சபையின் தலைவராக (President) இருந்தார்; இது தனி ஒரு பொறுப்பாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "accordance|applicable|constitution|fundamental|jurisdiction|recommendations",
+  "classification": "true_duplicate",
+  "notes": "Both present the same four statements (I-IV) about Fundamental Duties and both correctly answer 'III and IV'. Keeping 3305afe0 (cleaner text, no stray characters). Rewriting bebc3ff5 (has a stray 'V' typo in its stem) into a different Polity fact.",
+  "keep_id": "3305afe0-85ae-44ac-bd81-9cc9d7b1504a",
+  "rewrites": [
+   {
+    "id": "bebc3ff5-1c38-426c-9267-26220463a41a",
+    "question_text": "The Fundamental Duties were added to the Indian Constitution by which Constitutional Amendment Act?",
+    "question_text_ta": "இந்திய அரசியலமைப்பில் அடிப்படை கடமைகள் எந்த அரசியலமைப்புத் திருத்தச் சட்டத்தின் மூலம் சேர்க்கப்பட்டன?",
+    "option_a": "42nd Amendment Act, 1976", "option_b": "44th Amendment Act, 1978", "option_c": "52nd Amendment Act, 1985", "option_d": "86th Amendment Act, 2002",
+    "option_a_ta": "42வது திருத்தச் சட்டம், 1976", "option_b_ta": "44வது திருத்தச் சட்டம், 1978", "option_c_ta": "52வது திருத்தச் சட்டம், 1985", "option_d_ta": "86வது திருத்தச் சட்டம், 2002",
+    "correct_answer": "A",
+    "explanation": "The 42nd Constitutional Amendment Act, 1976, added Part IV-A (Article 51A) to the Constitution, laying down ten Fundamental Duties for citizens, based on the recommendations of the Swaran Singh Committee. An eleventh duty was later added by the 86th Amendment Act, 2002, requiring parents/guardians to provide education to children between 6 and 14 years.",
+    "explanation_ta": "1976ஆம் ஆண்டு 42வது அரசியலமைப்புத் திருத்தச் சட்டம், சுவரன் சிங் குழுவின் பரிந்துரைகளின் அடிப்படையில், அரசியலமைப்பில் IV-A பகுதியை (பிரிவு 51A) சேர்த்து, குடிமக்களுக்கான பத்து அடிப்படை கடமைகளை வகுத்தது. 2002ஆம் ஆண்டு 86வது திருத்தச் சட்டத்தின் மூலம், 6 முதல் 14 வயது வரையிலான குழந்தைகளுக்குக் கல்வி வழங்குமாறு பெற்றோர்/பாதுகாவலர்களைக் கோரும் பதினொன்றாவது கடமை பின்னர் சேர்க்கப்பட்டது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "aggrieved|applicable|fundamental|infringed|investigated|petitioner",
+  "classification": "true_duplicate",
+  "notes": "Identical options/answer about grounds for the Supreme Court to refuse relief; e5612e4b correctly cites Article 32, while accc86cd's stem cites 'Article 327' (a typo/error — Article 327 actually concerns Parliament's power over elections, unrelated to writ relief, and accc86cd's own explanation confusingly mixes both). Same fact and same correct answer (C), so treated as a true duplicate with a defective stem in the copy. Keeping e5612e4b (correct article number). Rewriting accc86cd into a different, correct judiciary fact.",
+  "keep_id": "e5612e4b-3385-4469-b98b-f3935bb19cbd",
+  "rewrites": [
+   {
+    "id": "accc86cd-03bb-46e2-9b55-dad87c68471b",
+    "question_text": "Which Article of the Indian Constitution empowers the High Courts to issue writs for the enforcement of Fundamental Rights and for any other purpose?",
+    "question_text_ta": "அடிப்படை உரிமைகளை அமல்படுத்துவதற்கும் பிற நோக்கங்களுக்காகவும் நீதிப் பேராணைகளை (writs) பிறப்பிக்க உயர்நீதிமன்றங்களுக்கு அதிகாரம் அளிக்கும் இந்திய அரசியலமைப்பின் பிரிவு எது?",
+    "option_a": "Article 32", "option_b": "Article 131", "option_c": "Article 226", "option_d": "Article 136",
+    "option_a_ta": "பிரிவு 32", "option_b_ta": "பிரிவு 131", "option_c_ta": "பிரிவு 226", "option_d_ta": "பிரிவு 136",
+    "correct_answer": "C",
+    "explanation": "Article 226 of the Constitution empowers every High Court to issue writs (such as habeas corpus, mandamus, prohibition, quo warranto, and certiorari) not only for the enforcement of Fundamental Rights but also for 'any other purpose,' making the High Courts' writ jurisdiction wider than that of the Supreme Court under Article 32, which is limited to Fundamental Rights.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 226, அடிப்படை உரிமைகளை அமல்படுத்துவதற்கு மட்டுமல்லாமல் 'பிற எந்த நோக்கத்திற்காகவும்' நீதிப் பேராணைகளை (ஹேபியஸ் கார்பஸ், மாண்டமஸ், தடையாணை, குவோ வாரண்டோ, சர்ஷியோரரி போன்றவை) பிறப்பிக்க ஒவ்வொரு உயர்நீதிமன்றத்திற்கும் அதிகாரம் அளிக்கிறது. இதனால், அடிப்படை உரிமைகளுக்கு மட்டுப்படுத்தப்பட்ட பிரிவு 32-இன் கீழ் உச்சநீதிமன்றத்தின் நீதிப் பேராணை அதிகார வரம்பை விட, உயர்நீதிமன்றங்களின் அதிகார வரம்பு பரந்ததாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "constitution|grounds|impeached|incapacity|misbehaviour|violation",
+  "classification": "false_positive",
+  "notes": "One row asks about impeachment grounds for a Supreme Court judge, the other for a High Court judge — different judicial bodies with different option sets/lettering (not merely reworded). Legitimate distinct questions, even though the underlying constitutional grounds are analogous. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "electrons|element|neutrons|number|protons|represents",
+  "classification": "true_duplicate",
+  "notes": "Both ask what the mass number of an element represents; both correctly answer protons+neutrons. Keeping 1cf1188f. Rewriting d1072cae into a different Chemistry fact.",
+  "keep_id": "1cf1188f-784c-4a34-8d76-b4e0fd2f6c0a",
+  "rewrites": [
+   {
+    "id": "d1072cae-651f-4500-b9dc-0680fbe16c3c",
+    "question_text": "The atomic number (Z) of an element is defined as the number of",
+    "question_text_ta": "ஒரு தனிமத்தின் அணு எண் (Atomic Number, Z) என்பது எதன் எண்ணிக்கையாக வரையறுக்கப்படுகிறது?",
+    "option_a": "Protons in the nucleus of an atom", "option_b": "Neutrons in the nucleus of an atom", "option_c": "Protons and neutrons in the nucleus", "option_d": "Electrons in the outermost shell",
+    "option_a_ta": "அணுவின் கருவில் உள்ள புரோட்டான்களின் எண்ணிக்கை", "option_b_ta": "அணுவின் கருவில் உள்ள நியூட்ரான்களின் எண்ணிக்கை", "option_c_ta": "கருவில் உள்ள புரோட்டான்கள் மற்றும் நியூட்ரான்களின் எண்ணிக்கை", "option_d_ta": "வெளிப்புற ஓட்டில் உள்ள எலக்ட்ரான்களின் எண்ணிக்கை",
+    "correct_answer": "A",
+    "explanation": "The atomic number (Z) of an element is defined as the number of protons present in the nucleus of an atom. It uniquely identifies each chemical element and determines its position in the periodic table. In a neutral atom, the number of electrons equals the number of protons, but the atomic number itself is defined strictly by the proton count, unlike the mass number, which is the sum of protons and neutrons.",
+    "explanation_ta": "ஒரு தனிமத்தின் அணு எண் (Z) என்பது, அந்த அணுவின் கருவில் உள்ள புரோட்டான்களின் எண்ணிக்கையாக வரையறுக்கப்படுகிறது. இது ஒவ்வொரு வேதியியல் தனிமத்தையும் தனித்துவமாக அடையாளம் காட்டி, தனிம வரிசை அட்டவணையில் அதன் இடத்தை நிர்ணயிக்கிறது. ஒரு நடுநிலை அணுவில், எலக்ட்ரான்களின் எண்ணிக்கை புரோட்டான்களின் எண்ணிக்கைக்குச் சமமாக இருக்கும்; ஆனால், புரோட்டான் மற்றும் நியூட்ரான்களின் கூட்டுத்தொகையான நிறை எண்ணிலிருந்து வேறுபட்டு, அணு எண் என்பது கண்டிப்பாக புரோட்டான் எண்ணிக்கையால் மட்டுமே வரையறுக்கப்படுகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "cathode|magnetron|microwaves|positive|production",
+  "classification": "true_duplicate",
+  "notes": "Both ask what magnetrons are used to produce; both correctly answer microwaves. Keeping 58db508c. Rewriting 76cc4127 into a different Physics/Light-Sound-Heat fact.",
+  "keep_id": "58db508c-dc0c-4d3e-9f33-9bdf90cdceb9",
+  "rewrites": [
+   {
+    "id": "76cc4127-a0cf-441b-8ee7-e4575bf2ea31",
+    "question_text": "The phenomenon in which light travelling through an optical fibre is confined within its core, enabling long-distance signal transmission, is called",
+    "question_text_ta": "ஒளியியல் இழையின் (optical fibre) வழியாகச் செல்லும் ஒளி, அதன் மையப் பகுதிக்குள் (core) அடைக்கப்பட்டு, நீண்ட தூர சமிக்ஞை பரிமாற்றத்தை சாத்தியமாக்கும் நிகழ்வு எவ்வாறு அழைக்கப்படுகிறது?",
+    "option_a": "Diffraction", "option_b": "Total Internal Reflection", "option_c": "Polarization", "option_d": "Simple Refraction",
+    "option_a_ta": "விளிம்பு விலகல் (Diffraction)", "option_b_ta": "முழு உள் அனிச்சை (Total Internal Reflection)", "option_c_ta": "முனைவாக்கம் (Polarization)", "option_d_ta": "எளிய ஒளிவிலகல்",
+    "correct_answer": "B",
+    "explanation": "Optical fibres work on the principle of Total Internal Reflection, where light travelling through the denser core of the fibre strikes the boundary with the less dense outer cladding at an angle greater than the critical angle, causing it to reflect entirely back into the core rather than escaping. This allows light signals to travel long distances through the fibre with minimal loss, forming the basis of modern fibre-optic communication.",
+    "explanation_ta": "ஒளியியல் இழைகள் முழு உள் அனிச்சை (Total Internal Reflection) தத்துவத்தின் அடிப்படையில் செயல்படுகின்றன. இழையின் அடர்த்தியான மையப் பகுதியின் (core) வழியாகச் செல்லும் ஒளி, குறைந்த அடர்த்தியுள்ள வெளிப்புற உறையுடன் (cladding) சந்திக்கும் எல்லையில், சாய்வான கோணம் சிக்கல் கோணத்தை (critical angle) விடப் பெரியதாக இருக்கும்போது, வெளியேறாமல் முழுவதுமாக மையப் பகுதிக்குள் பிரதிபலிக்கிறது. இதன் மூலம் ஒளிச் சமிக்ஞைகள் மிகக் குறைந்த இழப்புடன் இழையின் வழியாக நீண்ட தூரம் பயணிக்க முடிகிறது; இதுவே நவீன ஒளியியல்-இழை தகவல்தொடர்பின் அடிப்படையாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "chairman|commission|finance|minister|planning|president",
+  "classification": "true_duplicate",
+  "notes": "All four rows ask who chairs the (Indian) Planning Commission; all correctly answer Prime Minister. Keeping 82ef4c85. Rewriting the other three into different, distinct facts (two Economy/Planning-related, two Polity/Union-Executive-related, matching each row's own subject/topic).",
+  "keep_id": "82ef4c85-aa88-4313-945f-b12637f2d733",
+  "rewrites": [
+   {
+    "id": "d504ad56-bead-4758-84e1-1f087795675e",
+    "question_text": "The Planning Commission of India was replaced by NITI Aayog in which year?",
+    "question_text_ta": "இந்தியாவின் திட்ட ஆணையம் நிதி ஆயோக் (NITI Aayog) மூலம் எந்த ஆண்டு மாற்றப்பட்டது?",
+    "option_a": "2014", "option_b": "2015", "option_c": "2016", "option_d": "2017",
+    "option_a_ta": "2014", "option_b_ta": "2015", "option_c_ta": "2016", "option_d_ta": "2017",
+    "correct_answer": "B",
+    "explanation": "The Planning Commission, established in 1950, was replaced by NITI Aayog (National Institution for Transforming India) on 1 January 2015, through a resolution of the Union Cabinet. NITI Aayog functions as a policy think tank, promoting cooperative federalism through structured involvement of the states, unlike the more centralized, allocation-focused Planning Commission.",
+    "explanation_ta": "1950இல் நிறுவப்பட்ட திட்ட ஆணையம், 2015 ஜனவரி 1 அன்று மத்திய அமைச்சரவையின் தீர்மானத்தின் மூலம் நிதி ஆயோக் (National Institution for Transforming India) என்பதன் மூலம் மாற்றப்பட்டது. நிதி ஆயோக் ஒரு கொள்கை சிந்தனைக் குழுவாகச் செயல்பட்டு, மாநிலங்களின் கட்டமைக்கப்பட்ட ஈடுபாட்டின் மூலம் கூட்டுறவுக் கூட்டாட்சியை ஊக்குவிக்கிறது; இது, நிதி ஒதுக்கீட்டில் அதிக கவனம் செலுத்திய, மையப்படுத்தப்பட்ட திட்ட ஆணையத்திலிருந்து வேறுபட்டது."
+   },
+   {
+    "id": "7e01e2c3-4276-42bd-831f-5a1bc29fb248",
+    "question_text": "The Attorney General of India is appointed by the",
+    "question_text_ta": "இந்தியாவின் அட்டர்னி ஜெனரல் (Attorney General) யாரால் நியமிக்கப்படுகிறார்?",
+    "option_a": "President of India", "option_b": "Prime Minister of India", "option_c": "Chief Justice of India", "option_d": "Parliament of India",
+    "option_a_ta": "இந்தியக் குடியரசுத் தலைவர்", "option_b_ta": "இந்தியப் பிரதமர்", "option_c_ta": "இந்திய தலைமை நீதிபதி", "option_d_ta": "இந்திய பாராளுமன்றம்",
+    "correct_answer": "A",
+    "explanation": "The Attorney General of India, the highest law officer of the country, is appointed by the President of India under Article 76 of the Constitution. The Attorney General must be a person qualified to be appointed a Judge of the Supreme Court and holds office during the pleasure of the President, primarily advising the Government of India on legal matters.",
+    "explanation_ta": "நாட்டின் மிக உயர்ந்த சட்ட அதிகாரியான இந்தியாவின் அட்டர்னி ஜெனரல், அரசியலமைப்பின் பிரிவு 76-இன் கீழ் இந்தியக் குடியரசுத் தலைவரால் நியமிக்கப்படுகிறார். உச்சநீதிமன்ற நீதிபதியாக நியமிக்கப்படத் தகுதியுள்ள ஒருவரே அட்டர்னி ஜெனரலாக நியமிக்கப்பட முடியும்; இவர் குடியரசுத் தலைவரின் விருப்பம் நீடிக்கும் வரை பதவியில் இருப்பார், மேலும் முதன்மையாக இந்திய அரசுக்கு சட்ட விவகாரங்களில் ஆலோசனை வழங்குகிறார்."
+   },
+   {
+    "id": "7fe5a00b-4d17-4285-91a6-730123df0ac5",
+    "question_text": "The Union Council of Ministers is collectively responsible to the",
+    "question_text_ta": "ஒன்றிய அமைச்சரவை (Union Council of Ministers) கூட்டாகப் பொறுப்புடையது யாருக்கு?",
+    "option_a": "Rajya Sabha", "option_b": "Lok Sabha", "option_c": "President of India", "option_d": "Supreme Court of India",
+    "option_a_ta": "மாநிலங்களவை (Rajya Sabha)", "option_b_ta": "மக்களவை (Lok Sabha)", "option_c_ta": "இந்தியக் குடியரசுத் தலைவர்", "option_d_ta": "இந்திய உச்சநீதிமன்றம்",
+    "correct_answer": "B",
+    "explanation": "Under Article 75(3) of the Constitution, the Council of Ministers is collectively responsible to the Lok Sabha (the House of the People). This means the entire Council of Ministers must resign if it loses the confidence of, or is defeated on a no-confidence motion in, the Lok Sabha — the directly elected house of Parliament. Individual ministers are not answerable to the Rajya Sabha in this collective sense.",
+    "explanation_ta": "அரசியலமைப்பின் பிரிவு 75(3)-இன் படி, அமைச்சரவை மக்களவைக்கு (Lok Sabha) கூட்டாகப் பொறுப்புடையது. அதாவது, நேரடியாகத் தேர்ந்தெடுக்கப்பட்ட பாராளுமன்ற அவையான மக்களவையின் நம்பிக்கையை இழந்தால் அல்லது நம்பிக்கையில்லாத் தீர்மானத்தில் தோற்றால், முழு அமைச்சரவையும் ராஜினாமா செய்ய வேண்டும். இந்தக் கூட்டுப் பொறுப்பு அர்த்தத்தில் தனிப்பட்ட அமைச்சர்கள் மாநிலங்களவைக்குப் பதிலளிக்கக் கடமைப்பட்டவர்கள் அல்ல."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "because|polarity|spherical|surface|tension|viscosity",
+  "classification": "true_duplicate",
+  "notes": "Both ask why water drops are spherical; both correctly answer surface tension. Keeping 4a8213f6 (its Tamil translation for option B 'Viscosity' is correctly 'பிசுபிசுப்பு'; 4a46571e mistranslates option B's Tamil as 'அடர்த்தி', which actually means density — a translation defect). Rewriting 4a46571e into a different Physics fact.",
+  "keep_id": "4a8213f6-8b90-430a-8f5a-65ddbb61af58",
+  "rewrites": [
+   {
+    "id": "4a46571e-92ee-44f0-97e3-2396325fa76e",
+    "question_text": "The principle that a body immersed in a fluid experiences an upward buoyant force equal to the weight of the fluid it displaces is known as",
+    "question_text_ta": "ஒரு திரவத்தில் மூழ்கடிக்கப்பட்ட பொருள், அது இடம்பெயர்த்தும் திரவத்தின் எடைக்குச் சமமான மேல்நோக்கிய மிதப்பு விசையை (buoyant force) அனுபவிக்கும் என்ற தத்துவம் எவ்வாறு அறியப்படுகிறது?",
+    "option_a": "Pascal's Law", "option_b": "Archimedes' Principle", "option_c": "Bernoulli's Principle", "option_d": "Newton's Third Law of Motion",
+    "option_a_ta": "பாஸ்கல் விதி", "option_b_ta": "ஆர்க்கிமிடீஸ் தத்துவம்", "option_c_ta": "பெர்னோலி தத்துவம்", "option_d_ta": "நியூட்டனின் மூன்றாம் இயக்க விதி",
+    "correct_answer": "B",
+    "explanation": "Archimedes' Principle states that a body wholly or partially immersed in a fluid experiences an upward buoyant force equal to the weight of the fluid displaced by it. This principle explains why objects float or sink depending on their density relative to the fluid, and is the basis for the design of ships, submarines, and hydrometers.",
+    "explanation_ta": "ஆர்க்கிமிடீஸ் தத்துவத்தின்படி, ஒரு திரவத்தில் முழுமையாகவோ அல்லது ஓரளவோ மூழ்கடிக்கப்பட்ட பொருள், அது இடம்பெயர்த்தும் திரவத்தின் எடைக்குச் சமமான மேல்நோக்கிய மிதப்பு விசையை அனுபவிக்கும். திரவத்துடன் ஒப்பிடும்போது பொருளின் அடர்த்தியைப் பொறுத்து, பொருள்கள் ஏன் மிதக்கின்றன அல்லது மூழ்குகின்றன என்பதை இத்தத்துவம் விளக்குகிறது; இது கப்பல்கள், நீர்மூழ்கிக் கப்பல்கள், ஹைட்ரோமீட்டர்கள் ஆகியவற்றின் வடிவமைப்பிற்கு அடிப்படையாக அமைகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "agricultural|assertion|disguised|explanation|generally|unemployment",
+  "classification": "conflict",
+  "notes": "Same assertion (disguised unemployment is common in Indian agriculture — true) and same reason (rural literacy is rising — also a true, well-documented trend), but the two rows mark contradictory correct answers.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": "0eb240e7 marks correct_answer='B' (both A and R true, R not the correct explanation of A). 9471e9fd marks correct_answer='C' (A true, R false). Since rising rural literacy in India is a real, well-documented trend (R is factually true, just not causally explanatory of disguised unemployment), the logically and factually correct option is 'both true, R not the correct explanation' — i.e. 0eb240e7's answer (B) appears correct, and 9471e9fd's answer (C) appears to be an error (its own explanation text even argues R is 'not explanatory' but then incorrectly concludes R is 'false'). Recommend a human confirm and fix 9471e9fd's correct_answer to B (or otherwise resolve) rather than treating this as a simple duplicate — no change made here."
+ },
+ {
+  "sig": "electron|energy|ground|hydrogen|state",
+  "classification": "false_positive",
+  "notes": "a2ff7b7c asks for the energy at n=2 given the ground-state value (a computed follow-up fact, answer 3.4 eV), while 87d5fe93 asks for the ground-state energy value itself (-13.6 eV). Different specific facts, not contradictory. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "argentine|chief|limestone|mineral|silver",
+  "classification": "true_duplicate",
+  "notes": "Both ask what 'Argentine' (Argentite) is a chief ore of; both correctly answer silver. Keeping bde52cdc (Chemistry). Rewriting 64ee7e21 (Geography/Minerals) into a different ore/metal fact.",
+  "keep_id": "bde52cdc-51bc-4ab3-aa5e-3b2b97145187",
+  "rewrites": [
+   {
+    "id": "64ee7e21-6461-4ea2-87b3-96fdfbd60fc3",
+    "question_text": "Bauxite is the chief ore of which of the following metals?",
+    "question_text_ta": "பாக்சைட் (Bauxite) பின்வரும் எந்த உலோகத்தின் முதன்மையான தாதுவாகும்?",
+    "option_a": "Iron", "option_b": "Aluminium", "option_c": "Copper", "option_d": "Zinc",
+    "option_a_ta": "இரும்பு", "option_b_ta": "அலுமினியம்", "option_c_ta": "செம்பு", "option_d_ta": "துத்தநாகம்",
+    "correct_answer": "B",
+    "explanation": "Bauxite is the principal ore from which aluminium is extracted, primarily composed of aluminium oxide (hydrated) along with impurities such as iron oxide. It forms mainly through the weathering of aluminium-rich rocks in tropical and subtropical climates. India's major bauxite reserves are found in Odisha, which is the country's leading bauxite-producing state.",
+    "explanation_ta": "பாக்சைட், அலுமினியத்தைப் பிரித்தெடுக்கும் முதன்மையான தாது ஆகும்; இது முதன்மையாக நீரேற்றப்பட்ட அலுமினியம் ஆக்சைடையும், இரும்பு ஆக்சைடு போன்ற அசுத்தங்களையும் கொண்டுள்ளது. வெப்பமண்டல மற்றும் துணை வெப்பமண்டல காலநிலைகளில் அலுமினியம் நிறைந்த பாறைகள் தேய்மானமடைவதன் மூலம் இது முதன்மையாக உருவாகிறது. இந்தியாவின் முக்கிய பாக்சைட் இருப்புக்கள் ஒடிசாவில் காணப்படுகின்றன; அது நாட்டின் முன்னணி பாக்சைட் உற்பத்தி மாநிலமாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "autumn|mentioned|season|seasons|spring|summer",
+  "classification": "false_positive",
+  "notes": "c4b7de51 asks WHICH seasons are mentioned in the poem (answer: all of them), while c31747fe asks the ORDER of seasons. Different specific asks about the same poem, not a reworded duplicate. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "argument|behaviour|conflict|meaning|prepare|unsporting",
+  "classification": "false_positive",
+  "notes": "Two different idioms ('Below the belt' vs 'Throw in the towel') sharing the same four-option answer bank used across a set of idiom questions. Different questions, different correct answers, not conflicting. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "first|fourth|global|production|second|third",
+  "classification": "false_positive",
+  "notes": "One asks India's global rank in fish production (Second), the other in milk production for 2010-2011 (First). Different commodities, different facts. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "launched|mantri|mudra|pradhan|yojana",
+  "classification": "true_duplicate",
+  "notes": "Both ask when Pradhan Mantri MUDRA Yojana was launched; both correctly answer 2015. These are Current-Affairs rows tagged to different monthly magazines (APR-25/APR-26), likely because the scheme's anniversary recurred in the news, but the underlying question and answer are identical. Keeping 09205699. Rewriting 454c2837 into a different scheme-launch fact (also adding proper Tamil translation, since the source CA rows had none).",
+  "keep_id": "09205699-ea7e-4194-a9c7-34b6fc059b8f",
+  "rewrites": [
+   {
+    "id": "454c2837-971c-48a5-bf02-a569280e2a6b",
+    "question_text": "The 'Stand Up India' scheme, launched to promote entrepreneurship among women and Scheduled Caste/Scheduled Tribe borrowers by facilitating bank loans, was launched in which year?",
+    "question_text_ta": "பெண்கள் மற்றும் பட்டியல் சாதி/பட்டியல் பழங்குடியின கடன்பெறுநர்களிடையே தொழில் முனைவோர் மனப்பான்மையை வங்கிக் கடன்கள் மூலம் ஊக்குவிக்க தொடங்கப்பட்ட 'ஸ்டாண்ட் அப் இந்தியா' திட்டம் எந்த ஆண்டு தொடங்கப்பட்டது?",
+    "option_a": "2014", "option_b": "2015", "option_c": "2016", "option_d": "2018",
+    "option_a_ta": "2014", "option_b_ta": "2015", "option_c_ta": "2016", "option_d_ta": "2018",
+    "correct_answer": "C",
+    "explanation": "The Stand Up India scheme was launched by the Government of India on 5 April 2016. It facilitates bank loans between ₹10 lakh and ₹1 crore to at least one Scheduled Caste/Scheduled Tribe borrower and at least one woman borrower per bank branch, for setting up greenfield enterprises in manufacturing, services, or trading sectors.",
+    "explanation_ta": "ஸ்டாண்ட் அப் இந்தியா திட்டம் 2016 ஏப்ரல் 5 அன்று இந்திய அரசால் தொடங்கப்பட்டது. உற்பத்தி, சேவைகள் அல்லது வர்த்தகத் துறைகளில் புதிய நிறுவனங்களை (greenfield enterprises) தொடங்குவதற்கு, ஒவ்வொரு வங்கிக் கிளையிலும் குறைந்தது ஒரு பட்டியல் சாதி/பட்டியல் பழங்குடியின கடன்பெறுநருக்கும், குறைந்தது ஒரு பெண் கடன்பெறுநருக்கும் ₹10 லட்சம் முதல் ₹1 கோடி வரையிலான வங்கிக் கடன்களை இது வழங்குகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "corner|cornered|happen|means|round|waiting",
+  "classification": "true_duplicate",
+  "notes": "Near-identical wording of the same idiom question ('round the corner' meaning), same options, same answer (B). Keeping 83b76d4e. Rewriting cdaa7972 into a different idiom.",
+  "keep_id": "83b76d4e-6452-44e4-9e7d-8907e3837bd9",
+  "rewrites": [
+   {
+    "id": "cdaa7972-bb17-4730-b8ab-7a31871293ac",
+    "question_text": "In the sentence, \"He has a chip on his shoulder about his height\", the idiom \"chip on his shoulder\" means",
+    "question_text_ta": "\"He has a chip on his shoulder about his height\" என்ற வாக்கியத்தில், \"chip on his shoulder\" என்ற மரபுத்தொடர் எதைக் குறிக்கிறது?",
+    "option_a": "To hold a grudge or feel resentful about something", "option_b": "To carry a heavy physical burden", "option_c": "To be extremely cheerful and carefree", "option_d": "To be very careful and cautious",
+    "option_a_ta": "ஏதேனும் ஒன்றைப் பற்றி மனக்கசப்பு அல்லது வெறுப்பு கொண்டிருத்தல்", "option_b_ta": "கனமான பொருளை சுமந்து செல்லுதல்", "option_c_ta": "மிகவும் மகிழ்ச்சியாகவும் கவலையற்றும் இருத்தல்", "option_d_ta": "மிகவும் கவனமாகவும் எச்சரிக்கையாகவும் இருத்தல்",
+    "correct_answer": "A",
+    "explanation": "The idiom \"a chip on one's shoulder\" means to hold a grudge, feel resentful, or be easily offended about something, often due to a past slight or perceived unfair treatment. It originates from an old custom where a person would place a wood chip on their shoulder and dare others to knock it off as a challenge to a fight. Therefore, the correct meaning is option A.",
+    "explanation_ta": "\"a chip on one's shoulder\" என்ற மரபுத்தொடர், முன்பு நேர்ந்த ஒரு அவமதிப்பு அல்லது நியாயமற்ற நடத்தை எனக் கருதப்படுவதால் ஏதேனும் ஒன்றைப் பற்றி மனக்கசப்பு கொண்டிருத்தல் அல்லது எளிதில் புண்படுதலைக் குறிக்கிறது. ஒரு நபர் தனது தோளில் ஒரு மரத்துண்டை வைத்து, அதை யாராவது தட்டி வீழ்த்தினால் சண்டைக்கு அழைப்பு விடுப்பதாகக் கருதப்பட்ட ஒரு பழைய வழக்கத்திலிருந்து இது தோன்றியது. ஆகவே, சரியான பொருள் விருப்பம் A ஆகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "contractionary|describes|expansionary|inflationary|maintains|monetary",
+  "classification": "false_positive",
+  "notes": "One asks about a policy keeping rates HIGHER than usual (Contractionary), the other LOWER than usual (Expansionary). Complementary, non-conflicting, correctly-answered pair. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|mention|metaphor|personification|speech",
+  "classification": "false_positive",
+  "notes": "Two different quoted lines ('Be a bush...' vs 'Shows only my teeth like a snake's bare fangs') testing different figures of speech (Metaphor vs Simile). Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "anaphora|apostrophe|melancholy|metaphor|oxymoron|solitary",
+  "classification": "true_duplicate",
+  "notes": "Same quoted line ('And sings a melancholy strain' from The Solitary Reaper), same answer (Metaphor). Keeping b6af4fb4. Rewriting 8877882f into a different figure-of-speech line.",
+  "keep_id": "b6af4fb4-0631-475f-b3df-2f6431a3c5f4",
+  "rewrites": [
+   {
+    "id": "8877882f-abd7-4a00-aafa-309f68eabbd6",
+    "question_text": "\"I wandered lonely as a cloud\" — from William Wordsworth's poem 'Daffodils'. What is the figure of speech used here?",
+    "question_text_ta": "\"I wandered lonely as a cloud\" — வில்லியம் வேர்ட்ஸ்வொர்த் எழுதிய 'Daffodils' கவிதையிலிருந்து. இங்கு பயன்படுத்தப்பட்டுள்ள அணி (figure of speech) எது?",
+    "option_a": "Metaphor", "option_b": "Simile", "option_c": "Personification", "option_d": "Alliteration",
+    "option_a_ta": "உருவகம் (Metaphor)", "option_b_ta": "உவமை (Simile)", "option_c_ta": "உயிர்ப்பித்தல் (Personification)", "option_d_ta": "மோனை (Alliteration)",
+    "correct_answer": "B",
+    "explanation": "The figure of speech used in \"I wandered lonely as a cloud\" is a simile, as the poet directly compares himself to a cloud using the comparison word \"as.\" This comparison emphasizes the poet's sense of solitary, aimless drifting, much like a cloud floating alone in the sky. It is not a metaphor, since a metaphor would omit the word \"as\" and state the comparison directly.",
+    "explanation_ta": "\"I wandered lonely as a cloud\" என்ற வரியில் பயன்படுத்தப்பட்டுள்ள அணி உவமை (Simile) ஆகும்; ஏனெனில், கவிஞர் \"as\" என்ற ஒப்பீட்டுச் சொல்லைப் பயன்படுத்தி தன்னை ஒரு மேகத்துடன் நேரடியாக ஒப்பிடுகிறார். வானில் தனியாக மிதக்கும் மேகத்தைப் போலவே, கவிஞரின் தனிமையான, குறிக்கோளற்ற அலைச்சலை இந்த ஒப்பீடு வலியுறுத்துகிறது. இது உருவகம் (Metaphor) அல்ல, ஏனெனில் உருவகத்தில் \"as\" போன்ற சொல் இல்லாமல் ஒப்பீடு நேரடியாகக் கூறப்படும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "figure|flower|metaphor|oxymoron|personification|reddest",
+  "classification": "true_duplicate",
+  "notes": "Same line ('The reddest flower would/will look as pale as snow'), same answer (Simile). Keeping 3c53a3c1. Rewriting 01601e8e into a different figure-of-speech line.",
+  "keep_id": "3c53a3c1-fa0b-41bd-ae54-a3f03029f9b4",
+  "rewrites": [
+   {
+    "id": "01601e8e-796a-4ff9-b531-8f74e239f88b",
+    "question_text": "\"All the world's a stage, And all the men and women merely players\" — from Shakespeare's 'As You Like It'. Identify the figure of speech used.",
+    "question_text_ta": "\"All the world's a stage, And all the men and women merely players\" — ஷேக்ஸ்பியரின் 'As You Like It' நாடகத்திலிருந்து. இதில் பயன்படுத்தப்பட்டுள்ள அணியை (figure of speech) அடையாளம் காணவும்.",
+    "option_a": "Simile", "option_b": "Metaphor", "option_c": "Personification", "option_d": "Hyperbole",
+    "option_a_ta": "உவமை (Simile)", "option_b_ta": "உருவகம் (Metaphor)", "option_c_ta": "உயிர்ப்பித்தல் (Personification)", "option_d_ta": "மிகைபடுத்தல் (Hyperbole)",
+    "correct_answer": "B",
+    "explanation": "The line \"All the world's a stage\" is a classic example of a metaphor, as it directly equates the world to a stage without using \"like\" or \"as.\" This famous metaphor, spoken by the character Jaques, extends into comparing human life to a theatrical performance with different stages (infancy, childhood, and so on), symbolizing the roles people play throughout their lives.",
+    "explanation_ta": "\"All the world's a stage\" என்ற வரி உருவகத்தின் (Metaphor) ஒரு சிறந்த எடுத்துக்காட்டாகும்; ஏனெனில், \"like\" அல்லது \"as\" போன்ற சொற்களைப் பயன்படுத்தாமல் உலகத்தை நேரடியாக ஒரு அரங்கத்திற்கு (stage) சமப்படுத்துகிறது. ஜேக்குயெஸ் என்ற பாத்திரத்தால் பேசப்படும் இந்தப் புகழ்பெற்ற உருவகம், மனித வாழ்வை பல்வேறு கட்டங்களைக் (குழந்தைப் பருவம், பாலியம் என) கொண்ட ஒரு நாடக நிகழ்ச்சியுடன் ஒப்பிடுவதாக விரிவடைந்து, மனிதர்கள் தங்கள் வாழ்நாள் முழுவதும் ஏற்கும் பாத்திரங்களை அடையாளப்படுத்துகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "abandoning|difficult|difficulty|rescuing|situation|something",
+  "classification": "false_positive",
+  "notes": "Two different idioms ('alarm bells ringing' vs 'back to the wall') sharing the same four-option answer bank. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "holiday|matching|matilda|necklace|reflowering|rowther",
+  "classification": "false_positive",
+  "notes": "Both are 'Match the following' questions pairing story characters with story titles, but the actual list items differ (Noodle vendor & Phatik vs Makhan lal & Vera) even though Matilda/Rowther are common to both and consistently matched the same way in each (no contradiction). Per the guidance that differing list items make this a false positive even with identical instruction text, both rows test genuinely different pairings and are left unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "classrooms|developed|multimedia|resources|specifically|territory",
+  "classification": "true_duplicate",
+  "notes": "Same fill-in-the-blanks sentence about 'Business territory', same answer (B). Keeping e94e6a60 (slightly more polished with 'The Business territory...'). Rewriting ebdda093 into a different preposition-fill sentence.",
+  "keep_id": "e94e6a60-e9f2-41d5-8242-6acef32de25d",
+  "rewrites": [
+   {
+    "id": "ebdda093-1654-4045-b01f-2a0951d21102",
+    "question_text": "Choose the correct prepositions to fill in the blanks: \"She is good ______ mathematics but rather weak ______ science.\"",
+    "question_text_ta": "வெற்றிடங்களை நிரப்ப சரியான முன்னிடைச் சொற்களைத் (prepositions) தேர்ந்தெடுக்கவும்: \"She is good ______ mathematics but rather weak ______ science.\"",
+    "option_a": "at, in", "option_b": "in, at", "option_c": "on, with", "option_d": "for, at",
+    "option_a_ta": "at, in", "option_b_ta": "in, at", "option_c_ta": "on, with", "option_d_ta": "for, at",
+    "correct_answer": "A",
+    "explanation": "The correct prepositions are \"at\" and \"in\": \"She is good at mathematics but rather weak in science.\" The phrase \"good at\" is the standard collocation used to describe skill or proficiency in a subject or activity, while \"weak in\" is the standard collocation used to describe a lack of proficiency in a subject. These are fixed prepositional phrases commonly tested in English grammar.",
+    "explanation_ta": "சரியான முன்னிடைச் சொற்கள் \"at\" மற்றும் \"in\" ஆகும்: \"She is good at mathematics but rather weak in science.\" ஒரு பாடத்திலோ செயலிலோ திறமையைக் குறிக்க \"good at\" என்ற தொடர் பொதுவாகப் பயன்படுத்தப்படுகிறது; ஒரு பாடத்தில் திறமை குறைவைக் குறிக்க \"weak in\" என்ற தொடர் பொதுவாகப் பயன்படுத்தப்படுகிறது. இவை ஆங்கில இலக்கணத்தில் அடிக்கடி சோதிக்கப்படும் நிலையான முன்னிடைத் தொடர்கள் ஆகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "dictated|gathered|ordered|prayer|subjects|summoned",
+  "classification": "true_duplicate",
+  "notes": "Same sentence and vocabulary question about 'summoned', same answer (D). Keeping d7e4b6e5. Rewriting 815f3345 into a different vocabulary-in-context question.",
+  "keep_id": "d7e4b6e5-5706-4aff-97f4-4541877c91eb",
+  "rewrites": [
+   {
+    "id": "815f3345-c979-4a31-8f0d-d30200a9dc73",
+    "question_text": "The old man was known throughout the village for his benevolent nature. Here, \"benevolent\" means",
+    "question_text_ta": "\"The old man was known throughout the village for his benevolent nature.\" இந்த வாக்கியத்தில் \"benevolent\" என்ற சொல் எதைக் குறிக்கிறது?",
+    "option_a": "Kind and generous", "option_b": "Strict and harsh", "option_c": "Silent and reserved", "option_d": "Wealthy and proud",
+    "option_a_ta": "கருணையும் தாராள மனப்பான்மையும் கொண்ட", "option_b_ta": "கடுமையான மற்றும் கண்டிப்பான", "option_c_ta": "அமைதியான மற்றும் வெளிப்படுத்தாத", "option_d_ta": "செல்வந்தமான மற்றும் பெருமிதமிக்க",
+    "correct_answer": "A",
+    "explanation": "The word \"benevolent\" means kind, generous, and well-meaning towards others, particularly in showing goodwill or charity. In the sentence, describing the old man as benevolent suggests he was known for his kindness and generosity toward the villagers, not for being strict, silent, or wealthy, none of which relate to the meaning of \"benevolent.\"",
+    "explanation_ta": "\"benevolent\" என்ற சொல், குறிப்பாக நல்லெண்ணத்தையோ தொண்டு உணர்வையோ காட்டுவதன் மூலம், பிறரிடம் கருணையும் தாராள மனப்பான்மையும் நல்லெண்ணமும் கொண்டிருத்தலைக் குறிக்கிறது. இந்த வாக்கியத்தில், முதியவரை \"benevolent\" என விவரிப்பது, அவர் கிராமத்தினரிடம் கருணையாகவும் தாராளமாகவும் இருந்தார் என்பதைக் குறிக்கிறது; இது கடுமை, அமைதி, செல்வம் ஆகியவற்றுடன் தொடர்பில்லாதது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "attend|attended|class|special|students",
+  "classification": "true_duplicate",
+  "notes": "Same fill-in-the-blank sentence about students attending a special class, same answer (B). Keeping 303f407b (has terminal period, slightly more complete). Rewriting 0501f8b4 into a different tense-based fill-blank sentence.",
+  "keep_id": "303f407b-3e55-48cf-a040-84ffdc2053ba",
+  "rewrites": [
+   {
+    "id": "0501f8b4-fabb-41c7-9924-bc41bbe2b1fa",
+    "question_text": "She ____________ to Chennai next month to attend a conference.",
+    "question_text_ta": "மாநாட்டில் கலந்துகொள்ள அவள் அடுத்த மாதம் சென்னைக்கு ____________.",
+    "option_a": "Had travelled", "option_b": "Travelled", "option_c": "Will travel", "option_d": "Was travelling",
+    "option_a_ta": "Had travelled", "option_b_ta": "Travelled", "option_c_ta": "Will travel", "option_d_ta": "Was travelling",
+    "correct_answer": "C",
+    "explanation": "The correct answer is \"Will travel\" because the sentence refers to an action that is planned to happen in the future, indicated by the phrase \"next month.\" The simple future tense is used to describe actions that will occur at a specific time after the present moment. \"Had travelled\" (past perfect) and \"Travelled\" (simple past) refer to completed past actions, while \"Was travelling\" (past continuous) describes an ongoing past action — none of which fit a future time frame.",
+    "explanation_ta": "\"Will travel\" என்பதே சரியான விடையாகும்; ஏனெனில் \"next month\" என்ற தொடர், எதிர்காலத்தில் நிகழவிருக்கும் ஒரு திட்டமிடப்பட்ட செயலைக் குறிக்கிறது. நிகழ்காலத்திற்குப் பிறகு ஒரு குறிப்பிட்ட நேரத்தில் நிகழவிருக்கும் செயல்களை விவரிக்க எளிய எதிர்காலம் பயன்படுத்தப்படுகிறது. \"Had travelled\" (past perfect) மற்றும் \"Travelled\" (simple past) முடிந்துபோன கடந்தகால செயல்களைக் குறிக்கின்றன; \"Was travelling\" (past continuous) தொடர்ந்து நடந்த கடந்தகால செயலைக் குறிக்கிறது — இவை எதுவும் எதிர்கால நேரச் சூழலுக்குப் பொருந்தாது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "about|enemy|friend|mother|wrath",
+  "classification": "false_positive",
+  "notes": "Both quote William Blake's 'A Poison Tree', but 97c1f383 asks to whom the wrath WAS told (the friend, per the poem's first couplet) while 634208ae asks about the wrath that was NOT told (to the foe/enemy, per the second couplet). Complementary, non-conflicting facts from the same poem. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|metaphor|personification|speech|stopping",
+  "classification": "true_duplicate",
+  "notes": "Same line ('He will not see me stopping here'), same underlying correct answer (Alliteration), just with option lettering shuffled between the two rows. Keeping 64d3aaff. Rewriting e7184c97 into a different figure-of-speech line.",
+  "keep_id": "64d3aaff-178f-4042-9b95-8089d8d01104",
+  "rewrites": [
+   {
+    "id": "e7184c97-af90-481d-b9f3-940916d27525",
+    "question_text": "\"The sun smiled down warmly upon the fields\" — Identify the figure of speech used in this line.",
+    "question_text_ta": "\"The sun smiled down warmly upon the fields\" — இந்த வரியில் பயன்படுத்தப்பட்டுள்ள அணியை (figure of speech) அடையாளம் காணவும்.",
+    "option_a": "Alliteration", "option_b": "Metaphor", "option_c": "Personification", "option_d": "Simile",
+    "option_a_ta": "மோனை (Alliteration)", "option_b_ta": "உருவகம் (Metaphor)", "option_c_ta": "உயிர்ப்பித்தல் (Personification)", "option_d_ta": "உவமை (Simile)",
+    "correct_answer": "C",
+    "explanation": "The figure of speech used in \"The sun smiled down warmly upon the fields\" is personification, as the sun, a non-human object, is given the human quality of \"smiling.\" This attributes human emotion and action to nature, creating a warm, comforting image of sunlight for the reader. It is not alliteration (repeated consonant sounds), metaphor (a direct comparison equating two things), or simile (a comparison using \"like\" or \"as\").",
+    "explanation_ta": "\"The sun smiled down warmly upon the fields\" என்ற வரியில் பயன்படுத்தப்பட்டுள்ள அணி உயிர்ப்பித்தல் (Personification) ஆகும்; ஏனெனில் மனிதனல்லாத பொருளான சூரியனுக்கு \"சிரித்தல்\" (smiling) என்ற மனித குணம் கொடுக்கப்பட்டுள்ளது. இது இயற்கைக்கு மனித உணர்வையும் செயலையும் பொருத்தி, வாசகருக்கு சூரிய ஒளியின் அரவணைப்பான, சூடான உருவகத்தை உருவாக்குகிறது. இது மோனை (தொடர் மெய் ஒலிகள்), உருவகம் (இரண்டு பொருள்களை நேரடியாக சமப்படுத்தும் ஒப்பீடு), அல்லது உவமை (\"like\" அல்லது \"as\" பயன்படுத்தும் ஒப்பீடு) அல்ல."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "heavens|lifetime|rampaging|spectacle|stopping|through",
+  "classification": "true_duplicate",
+  "notes": "Of the 3 rows on the same 'Rampaging through the heavens...' stanza: fee18a43 and 2081fa43 both ask for the rhyme scheme and both correctly identify ABCB — a true duplicate pair. 90d66117 asks a genuinely different question (which words rhyme, not the scheme) and is NOT a duplicate — it is left untouched and is not included as keep or rewrite. Keeping fee18a43 (uses 'stanza', the more accurate literary term). Rewriting 2081fa43 into a different rhyme-scheme question.",
+  "keep_id": "fee18a43-fb33-4dc5-b5f4-55c5f55e501c",
+  "rewrites": [
+   {
+    "id": "2081fa43-25b1-4f6b-9a8d-691f4e855377",
+    "question_text": "\"Twinkle, twinkle, little star, How I wonder what you are! Up above the world so high, Like a diamond in the sky.\" What is the rhyme scheme of this stanza?",
+    "question_text_ta": "\"Twinkle, twinkle, little star, How I wonder what you are! Up above the world so high, Like a diamond in the sky.\" இந்தச் சரணத்தின் ஒலி இணை அமைப்பு (rhyme scheme) என்ன?",
+    "option_a": "AABB", "option_b": "ABAB", "option_c": "ABBA", "option_d": "ABCB",
+    "option_a_ta": "AABB", "option_b_ta": "ABAB", "option_c_ta": "ABBA", "option_d_ta": "ABCB",
+    "correct_answer": "A",
+    "explanation": "The rhyme scheme of this stanza is AABB. The first line ends with \"star\" and the second line ends with \"are,\" which rhyme (A, A). The third line ends with \"high\" and the fourth line ends with \"sky,\" which also rhyme with each other (B, B). This gives the pattern AABB, where consecutive pairs of lines rhyme.",
+    "explanation_ta": "இந்தச் சரணத்தின் ஒலி இணை அமைப்பு AABB ஆகும். முதல் வரி \"star\" என்றும், இரண்டாவது வரி \"are\" என்றும் முடிவடைகின்றன; இவை ஒலி இணையாக அமைகின்றன (A, A). மூன்றாவது வரி \"high\" என்றும், நான்காவது வரி \"sky\" என்றும் முடிவடைகின்றன; இவையும் ஒன்றுடன் ஒன்று ஒலி இணையாக அமைகின்றன (B, B). இதனால் தொடர்ச்சியான இரு வரிகள் ஒலி இணையாக அமையும் AABB என்ற அமைப்பு உருவாகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|metaphor|personification|simile|speech",
+  "classification": "false_positive",
+  "notes": "Four different quoted lines, each testing a different figure of speech (Alliteration, Simile, Personification, Metaphor). Classic shared-vocabulary false positive. Leaving all unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "comrade|fireside|friends|mother|relatives",
+  "classification": "false_positive",
+  "notes": "Same quoted line, but the two rows ask about the meaning of two different words in it ('kin' -> Relatives vs 'comrade' -> Friends). Both are correct, non-conflicting facts. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "dream|dreams|empty|extract|hopes|psalm",
+  "classification": "true_duplicate",
+  "notes": "Both ask which poem the 'Life is but an empty dream' line is from; both correctly answer 'A Psalm of Life'. Keeping e0b2de0e. Rewriting 9f4af850 into a different poem-attribution question.",
+  "keep_id": "e0b2de0e-3706-42f4-8f43-7bc1cecb6659",
+  "rewrites": [
+   {
+    "id": "9f4af850-901c-4893-982c-689151da5a8f",
+    "question_text": "\"The woods are lovely, dark and deep, But I have promises to keep\" is an extract from the poem ____________",
+    "question_text_ta": "\"The woods are lovely, dark and deep, But I have promises to keep\" என்பது எந்தக் கவிதையிலிருந்து எடுக்கப்பட்ட பகுதி?",
+    "option_a": "Stopping by Woods on a Snowy Evening", "option_b": "The Road Not Taken", "option_c": "A Psalm of Life", "option_d": "Daffodils",
+    "option_a_ta": "Stopping by Woods on a Snowy Evening", "option_b_ta": "The Road Not Taken", "option_c_ta": "A Psalm of Life", "option_d_ta": "Daffodils",
+    "correct_answer": "A",
+    "explanation": "The lines \"The woods are lovely, dark and deep, But I have promises to keep\" are from Robert Frost's poem \"Stopping by Woods on a Snowy Evening.\" The poem describes a traveller pausing to admire snow-filled woods before continuing his journey, reflecting themes of duty, rest, and the pull between beauty and responsibility. \"The Road Not Taken\" is a different, equally famous poem by the same poet.",
+    "explanation_ta": "\"The woods are lovely, dark and deep, But I have promises to keep\" என்ற வரிகள், ராபர்ட் ஃப்ராஸ்ட் எழுதிய \"Stopping by Woods on a Snowy Evening\" என்ற கவிதையிலிருந்து எடுக்கப்பட்டவை. பனி நிறைந்த காட்டைப் பாராட்டியபடி பயணத்தைத் தொடர முன் சிறிது நேரம் நிற்கும் ஒரு பயணியை இக்கவிதை விவரிக்கிறது; கடமை, ஓய்வு, அழகுக்கும் பொறுப்புக்கும் இடையிலான இழுப்பு ஆகிய கருப்பொருள்களை இது பிரதிபலிக்கிறது. \"The Road Not Taken\" என்பது அதே கவிஞரால் எழுதப்பட்ட, அதேபோல புகழ்பெற்ற வேறொரு கவிதையாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "brook|children|mentioned|search|still|stream",
+  "classification": "true_duplicate",
+  "notes": "Same underlying quote/fact (children searching for the brook/stream), same answer content despite different option lettering. Keeping adb2e133 ('seek' fits the grammar better than 'see'). Rewriting 5a8f0e1c into a different vocabulary-in-context question.",
+  "keep_id": "adb2e133-6776-4361-aeac-5bbab960b23a",
+  "rewrites": [
+   {
+    "id": "5a8f0e1c-06cd-4e6a-a53a-83a78e77de72",
+    "question_text": "In the sentence, \"The old sailor's face was weathered by years spent at sea\", the word \"weathered\" means",
+    "question_text_ta": "\"The old sailor's face was weathered by years spent at sea.\" இந்த வாக்கியத்தில் \"weathered\" என்ற சொல் எதைக் குறிக்கிறது?",
+    "option_a": "Worn or aged by exposure to weather", "option_b": "Freshly painted and smooth", "option_c": "Extremely young-looking", "option_d": "Newly built or constructed",
+    "option_a_ta": "வானிலைக்கு உட்பட்டு தேய்ந்து/வயதானது போல் தோன்றுதல்", "option_b_ta": "புதிதாக வர்ணம் பூசப்பட்டு மென்மையாக இருத்தல்", "option_c_ta": "மிகவும் இளமையாகத் தோன்றுதல்", "option_d_ta": "புதிதாக கட்டப்பட்ட",
+    "correct_answer": "A",
+    "explanation": "The word \"weathered\" means worn, aged, or altered in appearance due to long exposure to weather conditions such as sun, wind, and rain. In the sentence, describing the old sailor's face as weathered suggests that years of exposure to the sea and its elements have given his face a rough, aged appearance, not that it is young, freshly painted, or newly built.",
+    "explanation_ta": "\"weathered\" என்ற சொல், சூரிய ஒளி, காற்று, மழை போன்ற வானிலை நிலைமைகளுக்கு நீண்டகாலம் வெளிப்படுவதால் தேய்ந்து, வயதானது போல் தோற்றமளிப்பதைக் குறிக்கிறது. இந்த வாக்கியத்தில், முதிய மாலுமியின் முகத்தை \"weathered\" என விவரிப்பது, கடலிலும் அதன் இயற்கை நிலைமைகளிலும் ஆண்டுக்கணக்கில் வெளிப்பட்டதால் அவரது முகம் கரடுமுரடான, வயதான தோற்றம் பெற்றுள்ளது என்பதைக் குறிக்கிறது; இளமை, புதிய வர்ணம், புதிய கட்டுமானம் ஆகியவற்றுடன் இதற்குத் தொடர்பில்லை."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "desert|flying|killed|short|story|wonder",
+  "classification": "true_duplicate",
+  "notes": "Same options and same answer ('The tears of the desert' is the short story). Keeping 99e32278 (more natural phrasing). Rewriting 6aa56569 into a different, safely-verified author-attribution question.",
+  "keep_id": "99e32278-bfda-4517-9f01-368d5d809f6d",
+  "rewrites": [
+   {
+    "id": "6aa56569-0e70-4622-ab28-fe7f8ea4197c",
+    "question_text": "Who is the author of the famous short story 'The Gift of the Magi'?",
+    "question_text_ta": "'The Gift of the Magi' என்ற புகழ்பெற்ற சிறுகதையின் ஆசிரியர் யார்?",
+    "option_a": "O. Henry", "option_b": "Anton Chekhov", "option_c": "Guy de Maupassant", "option_d": "Edgar Allan Poe",
+    "option_a_ta": "ஓ. ஹென்றி", "option_b_ta": "அன்டன் செகாவ்", "option_c_ta": "கை டி மோப்பசான்", "option_d_ta": "எட்கர் ஆலன் போ",
+    "correct_answer": "A",
+    "explanation": "\"The Gift of the Magi\" is a famous short story written by American author O. Henry (William Sydney Porter), first published in 1905. It tells the story of a young couple who each sacrifice their most prized possession to buy a Christmas gift for the other, and is celebrated for its surprise, ironic ending — a hallmark of O. Henry's writing style.",
+    "explanation_ta": "\"The Gift of the Magi\" என்பது அமெரிக்க எழுத்தாளர் ஓ. ஹென்றி (வில்லியம் சிட்னி போர்ட்டர்) எழுதிய ஒரு புகழ்பெற்ற சிறுகதை; இது முதன்முதலில் 1905ஆம் ஆண்டு வெளியிடப்பட்டது. ஒரு இளம் தம்பதி ஒருவருக்கொருவர் கிறிஸ்துமஸ் பரிசு வாங்குவதற்காக தங்கள் மிக மதிப்புமிக்க பொருளைத் தியாகம் செய்யும் கதையை இது கூறுகிறது; எதிர்பாராத, முரண்நகைச் சுவையான முடிவிற்காக இது பாராட்டப்படுகிறது — இது ஓ. ஹென்றியின் எழுத்து பாணியின் சிறப்பம்சமாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "antonio|bassanio|christian|refers|shylock|thrice",
+  "classification": "true_duplicate",
+  "notes": "Same Merchant of Venice quote, same answer (Antonio). Keeping 1e2d9053. Rewriting ea405297 into a different Merchant of Venice comprehension question.",
+  "keep_id": "1e2d9053-c5a5-425a-a90f-680e86c6d4a1",
+  "rewrites": [
+   {
+    "id": "ea405297-58fd-49a5-915a-1d3138065f30",
+    "question_text": "In Shakespeare's play 'The Merchant of Venice', who disguises herself as a lawyer to defend Antonio in the court trial?",
+    "question_text_ta": "ஷேக்ஸ்பியரின் 'The Merchant of Venice' நாடகத்தில், நீதிமன்ற வழக்கில் அன்டோனியோவை வாதாட ஒரு வழக்கறிஞராக வேடமிட்டவர் யார்?",
+    "option_a": "Portia", "option_b": "Jessica", "option_c": "Nerissa", "option_d": "Lorenzo",
+    "option_a_ta": "போர்ஷியா", "option_b_ta": "ஜெசிகா", "option_c_ta": "நெரிசா", "option_d_ta": "லொரென்சோ",
+    "correct_answer": "A",
+    "explanation": "In 'The Merchant of Venice', Portia, disguised as a young male lawyer named Balthazar, defends Antonio in court against Shylock's claim to a pound of his flesh. Through her clever legal argument — that the bond permits flesh but not blood — she saves Antonio's life, making her disguise one of the most celebrated plot devices in the play.",
+    "explanation_ta": "'The Merchant of Venice' நாடகத்தில், போர்ஷியா, பால்தசார் என்ற இளம் ஆண் வழக்கறிஞராக வேடமிட்டு, அன்டோனியோவின் மாமிசத்தில் ஒரு பவுண்டு கோரும் ஷைலாக்கின் வழக்கிலிருந்து நீதிமன்றத்தில் அவரை காப்பாற்றுகிறார். பத்திரம் மாமிசத்தை மட்டுமே அனுமதிக்கிறது, இரத்தத்தை அல்ல என்ற அவரது புத்திசாலித்தனமான சட்ட வாதத்தின் மூலம் அவர் அன்டோனியோவின் உயிரைக் காப்பாற்றுகிறார்; இது நாடகத்தின் மிகவும் பாராட்டப்படும் கதைத் திருப்பங்களில் ஒன்றாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|identify|metaphor|speech",
+  "classification": "false_positive",
+  "notes": "Two different lines ('Broad, and deep, and still as Time' vs 'If he hasn't it now, he will have it not') testing different figures (Simile vs Alliteration). Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "headlong|mention|rhyming|rounded|sounded|voyage",
+  "classification": "false_positive",
+  "notes": "Same stanza but ffe4152d asks for the rhyming WORDS while 7e6bc5c1 asks for the rhyme SCHEME — different, complementary specific asks, not a reworded duplicate. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|hyperbole|metaphor|personification|speech",
+  "classification": "false_positive",
+  "notes": "Three different quoted lines, each testing a different figure of speech (two land on Personification for different lines, one on Alliteration) — different specific texts, not duplicated wording. Leaving all unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "figure|hyperbole|metaphor|personification|simile|speech",
+  "classification": "false_positive",
+  "notes": "Six different quoted lines (apparently from a poem-study set), each testing the figure of speech in a different specific line. Two lines happen to share 'Metaphor' as the answer and two share 'Hyperbole', but the quoted text differs in each case — not reworded duplicates. Leaving all six unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "creature|flickered|rhyming|slipping|something|working",
+  "classification": "false_positive",
+  "notes": "Same stanza, but one asks for the rhyme SCHEME (AABB) and the other for the rhyming WORDS (hope-rope, man-plan) — different, non-conflicting specific asks. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "alliteration|figure|identify|metaphor|personification|speech",
+  "classification": "false_positive",
+  "notes": "Two different lines ('The woods are lovely, dark and deep' vs 'Is to set your mind and set your will'), both happen to answer Alliteration but are different specific texts. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "figure|hyperbole|identify|metaphor|personification|speech",
+  "classification": "false_positive",
+  "notes": "Three different lines (two consecutive lines from Frost's 'Stopping by Woods on a Snowy Evening', plus a third unrelated line), each testing a different figure of speech. Leaving all unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "agarwal|childhood|malabar|mukuthan|neeraja|raghavan",
+  "classification": "true_duplicate",
+  "notes": "Both ask about the writer connected to a Malabar childhood/short story; both correctly answer Kamala Das. Keeping 58fa68de. Rewriting 79ad9b2b into a different, safely-verified author-attribution question.",
+  "keep_id": "58fa68de-6d39-4c59-9192-7067104cb260",
+  "rewrites": [
+   {
+    "id": "79ad9b2b-43aa-45e2-ad8e-c37d5cd38640",
+    "question_text": "Who is the author of the widely popular novel 'Malgudi Days'?",
+    "question_text_ta": "பரவலாக பிரபலமான 'Malgudi Days' நாவலின் ஆசிரியர் யார்?",
+    "option_a": "R.K. Narayan", "option_b": "Ruskin Bond", "option_c": "Vikram Seth", "option_d": "Arundhati Roy",
+    "option_a_ta": "ஆர்.கே. நாராயண்", "option_b_ta": "ரஸ்கின் பாண்ட்", "option_c_ta": "விக்ரம் சேத்", "option_d_ta": "அருந்ததி ராய்",
+    "correct_answer": "A",
+    "explanation": "'Malgudi Days' is a well-known collection of short stories by the celebrated Indian author R.K. Narayan, set in the fictional South Indian town of Malgudi. Narayan is regarded as one of the pioneers of Indian writing in English, and Malgudi Days was later adapted into a popular television series.",
+    "explanation_ta": "'Malgudi Days' என்பது புகழ்பெற்ற இந்திய எழுத்தாளர் ஆர்.கே. நாராயண் எழுதிய, தென்னிந்தியாவின் கற்பனையான மால்குடி நகரத்தில் நடக்கும் நிகழ்வுகளைக் கொண்ட ஒரு பிரபலமான சிறுகதைத் தொகுப்பு ஆகும். ஆங்கிலத்தில் இந்திய இலக்கியத்தின் முன்னோடிகளில் ஒருவராக நாராயண் கருதப்படுகிறார்; Malgudi Days பின்னர் ஒரு பிரபலமான தொலைக்காட்சி தொடராகவும் தழுவப்பட்டது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "different|homonyms|homophones|repetition|similar|spelling",
+  "classification": "conflict",
+  "notes": "Both rows define one of Homophones/Homonyms and ask which term fits, but on inspection BOTH rows' correct_answer fields are wrong relative to standard definitions, and each row's own explanation text argues for a DIFFERENT option than its stored correct_answer.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": "Standard definitions: Homophones = same/similar SOUND, DIFFERENT spelling, different meaning (e.g. flower/flour). Homonyms = SAME spelling AND same sound, different meaning (e.g. bat/bat). Row 6f61501a's stem ('similar sound and different spelling and meaning') describes Homophones, yet its stored correct_answer is 'C' = Homonyms — wrong; its own explanation text even argues for Homophones. Row ec5970b9's stem ('similar sound and spelling but different meaning') describes Homonyms, yet its stored correct_answer is 'B' = Homophones — also wrong. So both rows currently have an inverted/incorrect answer key. Recommend a human fix 6f61501a's correct_answer to 'B' (Homophones) and ec5970b9's correct_answer to 'C' (Homonyms) directly, rather than treating this as an ordinary duplicate rewrite — no change made here."
+ },
+ {
+  "sig": "andromeda|belongs|called|galaxy|magellanic|system",
+  "classification": "true_duplicate",
+  "notes": "Both ask which galaxy the solar system belongs to; both correctly answer the Milky Way. Keeping 84ef6c2d. Rewriting 396cb5f4 into a different astronomy fact.",
+  "keep_id": "84ef6c2d-9c67-44d1-a35f-67e7f12731b8",
+  "rewrites": [
+   {
+    "id": "396cb5f4-a758-4165-b49c-46c243d3b30e",
+    "question_text": "Which is the nearest star to the Sun (that is, the closest star to our solar system)?",
+    "question_text_ta": "சூரியனுக்கு அருகிலுள்ள மிக நெருங்கிய நட்சத்திரம் (அதாவது, நமது சூரிய குடும்பத்திற்கு மிக அருகிலுள்ள நட்சத்திரம்) எது?",
+    "option_a": "Alpha Centauri", "option_b": "Proxima Centauri", "option_c": "Sirius", "option_d": "Betelgeuse",
+    "option_a_ta": "ஆல்ஃபா செண்டாரி", "option_b_ta": "ப்ராக்சிமா செண்டாரி", "option_c_ta": "சிரியஸ்", "option_d_ta": "பீட்டில்ஜியூஸ்",
+    "correct_answer": "B",
+    "explanation": "Proxima Centauri is the nearest known star to our solar system, located about 4.24 light-years away. It is a small red dwarf star that is part of the Alpha Centauri triple star system, but Proxima Centauri itself, being slightly closer than its two brighter companions (Alpha Centauri A and B), holds the distinction of being the single closest star to the Sun.",
+    "explanation_ta": "ப்ராக்சிமா செண்டாரி நமது சூரிய குடும்பத்திற்கு மிக அருகிலுள்ள அறியப்பட்ட நட்சத்திரமாகும்; இது சுமார் 4.24 ஒளி ஆண்டுகள் தொலைவில் அமைந்துள்ளது. இது ஆல்ஃபா செண்டாரி மும்மை நட்சத்திர மண்டலத்தின் ஒரு பகுதியான ஒரு சிறிய சிவப்புக் குள்ள நட்சத்திரமாகும்; ஆனால் அதன் இரு பிரகாசமான துணை நட்சத்திரங்களை (ஆல்ஃபா செண்டாரி A மற்றும் B) விடச் சற்று அருகில் இருப்பதால், சூரியனுக்கு மிக அருகிலுள்ள ஒற்றை நட்சத்திரம் என்ற தனித்துவத்தை ப்ராக்சிமா செண்டாரி பெற்றுள்ளது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "coimbatore|district|sankarankoil|situated|tirunelveli|tiruppur",
+  "classification": "false_positive",
+  "notes": "Different places (Perur vs Mangudi) with different correct answers, both independently true (Perur is in Coimbatore District; Mangudi is in Sankarankoil Taluk, Tirunelveli District). Not conflicting. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "atmospheric|increasing|stratosphere|temperature|thermosphere|troposphere",
+  "classification": "conflict",
+  "notes": "Same underlying fact (the atmospheric layer where temperature decreases with increasing altitude is the Troposphere), but the two rows' stored correct_answer fields disagree, and one of them is internally self-contradictory.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": "db7409fc's options are Mesosphere/Stratosphere/Troposphere/Thermosphere with stored correct_answer='A' (Mesosphere) — but its own stored explanation text says 'The correct answer is C - Troposphere', directly contradicting the stored letter. 902e3220 (same fact, different option set: Troposphere/Stratosphere/Thermosphere/Exosphere) stores correct_answer='A' = Troposphere, which is correct and matches basic atmospheric science (the troposphere is the lowest layer, ~0-12km, where temperature decreases with altitude due to surface heating). Troposphere is the factually correct answer for both. Recommend a human fix db7409fc's correct_answer to 'C' (to match Troposphere in its own option ordering) rather than treating this as an ordinary duplicate rewrite — no change made here."
+ },
+ {
+  "sig": "karnataka|kerala|largest|natural|producer|rubber",
+  "classification": "true_duplicate",
+  "notes": "Both ask for India's largest natural rubber producer; both correctly answer Kerala. Keeping 569a656a. Rewriting 5c047958 into a different agricultural-production fact.",
+  "keep_id": "569a656a-bd07-4e9b-891a-e5f8f3403d48",
+  "rewrites": [
+   {
+    "id": "5c047958-2186-4579-8724-042460fec9cc",
+    "question_text": "Karnataka is the largest producer of which of the following agricultural commodities in India?",
+    "question_text_ta": "பின்வரும் எந்த வேளாண் பொருளின் இந்தியாவின் மிகப்பெரிய உற்பத்தியாளர் மாநிலமாக கர்நாடகா உள்ளது?",
+    "option_a": "Coffee", "option_b": "Tea", "option_c": "Natural Rubber", "option_d": "Cotton",
+    "option_a_ta": "காபி", "option_b_ta": "தேயிலை", "option_c_ta": "இயற்கை ரப்பர்", "option_d_ta": "பருத்தி",
+    "correct_answer": "A",
+    "explanation": "Karnataka is the largest producer of coffee in India, accounting for around 70% of the country's total coffee production, primarily grown in the hilly regions of Kodagu (Coorg), Chikmagalur, and Hassan districts. Tea is mainly produced in Assam and West Bengal, natural rubber chiefly in Kerala, and cotton chiefly in Gujarat and Maharashtra.",
+    "explanation_ta": "இந்தியாவின் காபி உற்பத்தியில் கர்நாடகா முதலிடத்தில் உள்ளது; நாட்டின் மொத்த காபி உற்பத்தியில் சுமார் 70% கர்நாடகாவிலிருந்தே வருகிறது, முதன்மையாக கொடகு (கூர்க்), சிக்மகளூர், ஹாசன் மாவட்டங்களின் மலைப் பகுதிகளில் இது பயிரிடப்படுகிறது. தேயிலை முதன்மையாக அசாம் மற்றும் மேற்கு வங்கத்திலும், இயற்கை ரப்பர் முதன்மையாக கேரளாவிலும், பருத்தி முதன்மையாக குஜராத் மற்றும் மகாராஷ்டிராவிலும் உற்பத்தி செய்யப்படுகின்றன."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "assembly|lakshmipathi|legislative|presidency|sambamurti|shivashanmugan",
+  "classification": "false_positive",
+  "notes": "Different time periods (1937-1942 vs 1946-1952) with different correct Speakers, both independently plausible historical facts, not contradictory. Leaving both unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "sig": "automobile|detroit|janeiro|nottingham|popularly|workshop",
+  "classification": "true_duplicate",
+  "notes": "Both ask which city is popularly called the automobile workshop of the world; both correctly answer Detroit. Keeping c5102ade. Rewriting a81ab6e0 into a different city-nickname geography question.",
+  "keep_id": "c5102ade-0674-431d-a6a3-39a2e5412dc7",
+  "rewrites": [
+   {
+    "id": "a81ab6e0-d40c-46df-881f-fdbaf2b4119f",
+    "question_text": "Which Indian city is popularly known as the 'Manchester of India' because of its historical importance in the cotton textile industry?",
+    "question_text_ta": "பருத்தி நூற்பாலைத் தொழிலில் அதன் வரலாற்று முக்கியத்துவம் காரணமாக 'இந்தியாவின் மான்செஸ்டர்' என்று பிரபலமாக அழைக்கப்படும் இந்திய நகரம் எது?",
+    "option_a": "Ahmedabad", "option_b": "Surat", "option_c": "Coimbatore", "option_d": "Mumbai",
+    "option_a_ta": "அகமதாபாத்", "option_b_ta": "சூரத்", "option_c_ta": "கோயம்புத்தூர்", "option_d_ta": "மும்பை",
+    "correct_answer": "A",
+    "explanation": "Ahmedabad, in Gujarat, is popularly known as the 'Manchester of India' due to its historical prominence as a major centre of the cotton textile industry, with numerous textile mills established there from the late 19th century onward, drawing comparison to Manchester, England, which was the hub of the global cotton textile industry during the Industrial Revolution. Coimbatore is separately known as the 'Manchester of South India' for its own textile industry.",
+    "explanation_ta": "குஜராத்தில் உள்ள அகமதாபாத், பருத்தி நூற்பாலைத் தொழிலின் முக்கிய மையமாக அதன் வரலாற்று முக்கியத்துவம் காரணமாக 'இந்தியாவின் மான்செஸ்டர்' என்று பிரபலமாக அழைக்கப்படுகிறது; 19ஆம் நூற்றாண்டின் பிற்பகுதியிலிருந்து அங்கு பல நூற்பாலைகள் நிறுவப்பட்டன, தொழில்துறை புரட்சியின்போது உலகளாவிய பருத்தி நூற்பாலைத் தொழிலின் மையமாக இருந்த இங்கிலாந்தின் மான்செஸ்டர் நகருடன் இது ஒப்பிடப்படுகிறது. கோயம்புத்தூர் அதன் சொந்த நூற்பாலைத் தொழிலுக்காக 'தென்னிந்தியாவின் மான்செஸ்டர்' என்று தனியாக அறியப்படுகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "located|manali|neyveli|petroleum|refinery|vellore",
+  "classification": "true_duplicate",
+  "notes": "Both ask where the Petroleum Refinery in Tamil Nadu is located; both correctly answer Manali. Keeping 53b184e5. Rewriting fe3050cd into a different TN-industry-location fact.",
+  "keep_id": "53b184e5-389d-4000-b8f2-d77b2fcb56dd",
+  "rewrites": [
+   {
+    "id": "fe3050cd-66a8-461c-801f-216bb5d40892",
+    "question_text": "The Integral Coach Factory (ICF), which manufactures railway passenger coaches, is located at",
+    "question_text_ta": "இரயில் பயணிகள் பெட்டிகளைத் தயாரிக்கும் ஒருங்கிணைந்த பெட்டித் தொழிற்சாலை (Integral Coach Factory, ICF) அமைந்துள்ள இடம் எது?",
+    "option_a": "Perambur, Chennai", "option_b": "Tiruchirappalli", "option_c": "Coimbatore", "option_d": "Salem",
+    "option_a_ta": "பெரம்பூர், சென்னை", "option_b_ta": "திருச்சிராப்பள்ளி", "option_c_ta": "கோயம்புத்தூர்", "option_d_ta": "சேலம்",
+    "correct_answer": "A",
+    "explanation": "The Integral Coach Factory (ICF), one of India's principal railway coach manufacturing units, is located at Perambur in Chennai, Tamil Nadu. Established in 1955, it produces a large share of the passenger coaches used by Indian Railways, including conventional coaches as well as modern coach designs such as LHB (Linke-Hofmann-Busch) coaches.",
+    "explanation_ta": "இந்தியாவின் முக்கிய இரயில் பெட்டி உற்பத்தி நிறுவனங்களில் ஒன்றான ஒருங்கிணைந்த பெட்டித் தொழிற்சாலை (ICF), தமிழ்நாட்டின் சென்னையில் உள்ள பெரம்பூரில் அமைந்துள்ளது. 1955ஆம் ஆண்டு நிறுவப்பட்ட இது, இந்திய ரயில்வேயில் பயன்படுத்தப்படும் பயணிகள் பெட்டிகளில் பெரும் பங்கை உற்பத்தி செய்கிறது; இதில் வழக்கமான பெட்டிகளுடன், LHB (Linke-Hofmann-Busch) பெட்டிகள் போன்ற நவீன வடிவமைப்புகளும் அடங்கும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "sig": "agananuru|kurinji|landscapes|marudham|numbers|represented",
+  "classification": "false_positive",
+  "notes": "Three rows, each about a different set of Agananuru poem-numbers mapping to a different thinai (odd numbers -> Palai; 4,14,... -> Mullai; 2,8,... -> Kurinji). These are complementary facts about the same classical numbering convention, not reworded duplicates of one another. Leaving all three unchanged.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ }
+]

@@ -1,8 +1,10 @@
+import { useEffect } from 'react'
 import { Check, Flame, Gift } from 'lucide-react'
 import { badgeIcon } from './badgeIcons'
 import type { Badge } from '../lib/achievements'
 import { SHOW_STREAK } from '../lib/features'
 import { useT } from '../lib/i18n'
+import { hapticSuccess } from '../lib/haptics'
 
 export interface DailyReward {
   /** Points awarded for today's daily-challenge completion. */
@@ -36,6 +38,11 @@ export default function RewardOverlay({
 }: RewardOverlayProps) {
   const { t } = useT()
   const hasProgress = leveledTo != null || newBadges.length > 0
+  // Fires once per mount - the caller only mounts this when there's actually
+  // something to celebrate, so this never fires on an empty reveal.
+  useEffect(() => {
+    hapticSuccess()
+  }, [])
   return (
     <div
       role="dialog"

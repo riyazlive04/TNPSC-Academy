@@ -1,0 +1,2504 @@
+{
+ "Ratio And Proportion": [
+  {
+   "nums": "125,3,5",
+   "rows": [
+    {
+     "id": "02746f1f-03cb-42f8-bae2-e69a33affa0e",
+     "question_text": "A car covers 125 km using 5 kg of LP Gas. What distance will it cover with 3 kg of LP Gas?",
+     "option_a": "75 km",
+     "option_b": "60 km",
+     "option_c": "100 km",
+     "option_d": "45 km",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "7926444a-d706-4bea-880a-d5d385469192",
+     "question_text": "A car covers a distance of 125 km on 5 kg of LP Gas. How much distance will it cover with 3 kg of LP Gas?",
+     "option_a": "208.33 km",
+     "option_b": "60 km",
+     "option_c": "75 km",
+     "option_d": "100 km",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "6,738,9",
+   "rows": [
+    {
+     "id": "03bcd86d-fe92-4ae9-a2ce-ca9721001a21",
+     "question_text": "If a postman can sort out 738 letters in 6 hours, how many letters can he sort in 9 hours?",
+     "option_a": "1107 letters",
+     "option_b": "984 letters",
+     "option_c": "1230 letters",
+     "option_d": "1100 letters",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "e06fdcc8-b1f6-4ecc-b67e-38368562da64",
+     "question_text": "If a postman can sort out 738 letters in 6 hours, how many letters can be sorted in 9 hours?",
+     "option_a": "492 letters",
+     "option_b": "738 letters",
+     "option_c": "1107 letters",
+     "option_d": "1230 letters",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "30,6,8",
+   "rows": [
+    {
+     "id": "0e87ec6b-c118-46da-938f-d281aa892d7d",
+     "question_text": "The shadow of a pole of height 8 m is 6 m. If the shadow of another pole measured at the same time is 30 m, then find the height of that pole.",
+     "option_a": "22.5 m",
+     "option_b": "40 m",
+     "option_c": "27 m",
+     "option_d": "36 m",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 5,
+     "n_ans": 3
+    },
+    {
+     "id": "9edc5e09-71dd-4763-98f0-656c58b1e27a",
+     "question_text": "The shadow of a pole of height 8 m is 6 m. At the same time, another pole casts a shadow of 30 m. Find the height of the second pole.",
+     "option_a": "22.5 m",
+     "option_b": "40 m",
+     "option_c": "32 m",
+     "option_d": "36 m",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "11,54,77,9",
+   "rows": [
+    {
+     "id": "1f0eb8f3-9c79-44a1-b98c-48252d6a2b58",
+     "question_text": "Karmegam made 54 runs in 9 overs and Asif made 77 runs in 11 overs. Whose run rate is better? (run rate = ratio of runs to overs)",
+     "option_a": "Karmegam's run rate is better (6 vs 7)",
+     "option_b": "Asif's run rate is better (7 vs 6)",
+     "option_c": "Both have equal run rate",
+     "option_d": "Karmegam's run rate is better (9 vs 11)",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "8e294124-99dc-4a30-9310-c6742e4c6ed3",
+     "question_text": "Karmegam made 54 runs in 9 overs and Asif made 77 runs in 11 overs. Whose run rate (ratio of runs to overs) is better?",
+     "option_a": "Karmegam, run rate 6",
+     "option_b": "Both equal, run rate 6.5",
+     "option_c": "Asif, run rate 7",
+     "option_d": "Asif, run rate 6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,13,200,260",
+   "rows": [
+    {
+     "id": "25c0181f-544a-4da5-b109-797a0f3f9f0a",
+     "question_text": "Cost of 1 box of tomato is ₹ 200. Vendan had money to buy 13 boxes. If the cost per box is increased to ₹ 260, how many boxes can he buy with the same amount?",
+     "option_a": "13 boxes",
+     "option_b": "10 boxes",
+     "option_c": "12 boxes",
+     "option_d": "8 boxes",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "855329ec-d318-4971-b125-f7e061fd62b3",
+     "question_text": "Cost of 1 box of tomato is Rs. 200. Vendan had money to buy 13 boxes. If the cost of a box is increased to Rs. 260, then how many boxes can he buy with the same amount?",
+     "option_a": "16 boxes",
+     "option_b": "13 boxes",
+     "option_c": "17 boxes",
+     "option_d": "10 boxes",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "2,20,8",
+   "rows": [
+    {
+     "id": "306d5bfa-f4f8-4590-a918-29043d4ee3fb",
+     "question_text": "A person reads 20 pages of a book in 2 hours. How many pages will the person read in 8 hours at the same speed?",
+     "option_a": "40 pages",
+     "option_b": "80 pages",
+     "option_c": "100 pages",
+     "option_d": "160 pages",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "d48959cc-149e-422d-9424-ef5a4044a11f",
+     "question_text": "A person reads 20 pages of a book in 2 hours. How many pages will be read in 8 hours at the same speed?",
+     "option_a": "40 pages",
+     "option_b": "160 pages",
+     "option_c": "100 pages",
+     "option_d": "80 pages",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1400,2,280",
+   "rows": [
+    {
+     "id": "42990339-4aed-4ad6-a0f0-32ff78afaccb",
+     "question_text": "If an aircraft can accommodate 280 people in 2 trips, how many trips will it take to carry 1400 people?",
+     "option_a": "5 trips",
+     "option_b": "20 trips",
+     "option_c": "10 trips",
+     "option_d": "7 trips",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "6828c09f-900f-4ad3-8bf1-7ceebcaf5211",
+     "question_text": "An aircraft can carry 280 people in 2 trips. How many trips are needed to take 1400 people?",
+     "option_a": "5 trips",
+     "option_b": "20 trips",
+     "option_c": "10 trips",
+     "option_d": "14 trips",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 3
+    }
+   ]
+  },
+  {
+   "nums": "105,1863,2415",
+   "rows": [
+    {
+     "id": "63eca02c-e86f-464f-837f-de6aa408f09f",
+     "question_text": "Cost of 105 notebooks is Rs. 2415. How many notebooks can be bought for Rs. 1863?",
+     "option_a": "121 notebooks",
+     "option_b": "81 notebooks",
+     "option_c": "75 notebooks",
+     "option_d": "90 notebooks",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "e36c2d42-47da-4f9e-9952-d79c83652632",
+     "question_text": "The cost of 105 notebooks is ₹ 2415. How many notebooks can be bought for ₹ 1863?",
+     "option_a": "75",
+     "option_b": "90",
+     "option_c": "81",
+     "option_d": "84",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "10,14,21",
+   "rows": [
+    {
+     "id": "6cbce4f6-8456-4758-89f5-e33e6c008d8d",
+     "question_text": "10 farmers can plough a field in 21 days. By how many days is the time reduced if 14 farmers plough the same field?",
+     "option_a": "15 days",
+     "option_b": "6 days",
+     "option_c": "9 days",
+     "option_d": "5 days",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "87086085-06ad-4038-90a5-0f2754c684be",
+     "question_text": "10 farmers can plough a field in 21 days. Find the number of days reduced if 14 farmers plough the same field.",
+     "option_a": "15 days",
+     "option_b": "9 days",
+     "option_c": "6 days",
+     "option_d": "4 days",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "25,5,7",
+   "rows": [
+    {
+     "id": "73f5cd34-6ca5-4cd9-9406-a2151ab6d0e4",
+     "question_text": "If 7 : 5 is in proportion to x : 25, then find the value of x.",
+     "option_a": "x = 18",
+     "option_b": "x = 17.86",
+     "option_c": "x = 35",
+     "option_d": "x = 175",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "bd63d225-ea4a-4c7f-9d2c-58bedb6ec008",
+     "question_text": "If 7 : 5 is in proportion to x : 25, then the value of x is?",
+     "option_a": "35",
+     "option_b": "17",
+     "option_c": "45",
+     "option_d": "175",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "2,20,3,30",
+   "rows": [
+    {
+     "id": "872f0450-da86-4275-8e2b-0db42a9955b2",
+     "question_text": "By proportionality, check whether 3 : 2 and 30 : 20 are in proportion.",
+     "option_a": "No, they are not in proportion",
+     "option_b": "Yes, but only as 2 : 3 :: 20 : 30",
+     "option_c": "Cannot be determined",
+     "option_d": "Yes, 3 : 2 :: 30 : 20 are in proportion",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    },
+    {
+     "id": "a0e30394-c50c-4fce-9872-b551bb4a5fe3",
+     "question_text": "By the proportionality law, check whether 3 : 2 and 30 : 20 are in proportion. Which statement is correct?",
+     "option_a": "They are in proportion because 3 × 20 = 2 × 30 = 60",
+     "option_b": "They are not in proportion because 3 × 20 ≠ 2 × 30",
+     "option_c": "They are in proportion because 3 + 20 = 2 + 30",
+     "option_d": "They are not in proportion because 3 × 2 ≠ 30 × 20",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "10,11,84",
+   "rows": [
+    {
+     "id": "c4507582-7170-4e83-8cf6-76ee49a1b3ba",
+     "question_text": "The number of correct answers given by Kaarmugilan and Kavitha in a quiz are in the ratio 10 : 11. If they scored a total of 84 points, how many points did Kavitha get?",
+     "option_a": "40 points",
+     "option_b": "44 points",
+     "option_c": "42 points",
+     "option_d": "48 points",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "c7eda477-df49-40df-9927-57500f1858e0",
+     "question_text": "The number of correct answers given by Kaarmugilan and Kavitha in a quiz competition are in the ratio 10 : 11. If they scored a total of 84 points in the competition, then how many points did Kavitha get?",
+     "option_a": "40 points",
+     "option_b": "42 points",
+     "option_c": "46 points",
+     "option_d": "44 points",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 1
+    },
+    {
+     "id": "cb21a02b-2dc4-4350-9a8d-9c403950e306",
+     "question_text": "The number of correct answers given by karthi and kavitha in a quiz competition are in the ratio 10: 11. If they had scored a total of 84 points in the competition, then how many points did kavitha get?",
+     "option_a": "44",
+     "option_b": "40",
+     "option_c": "60",
+     "option_d": "24",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "18,24,6",
+   "rows": [
+    {
+     "id": "c7937410-b314-4212-bb00-94660485b246",
+     "question_text": "If 6 children shared 24 pencils equally, then how many pencils are required for 18 children?",
+     "option_a": "8 pencils",
+     "option_b": "54 pencils",
+     "option_c": "36 pencils",
+     "option_d": "72 pencils",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "d14796a5-3eaa-4441-90c1-4bfd6b09a14f",
+     "question_text": "If 6 children shared 24 pencils equally, how many pencils are required for 18 children?",
+     "option_a": "48 pencils",
+     "option_b": "72 pencils",
+     "option_c": "96 pencils",
+     "option_d": "60 pencils",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Number Series": [
+  {
+   "nums": "11,14,14,17,17,20,20",
+   "rows": [
+    {
+     "id": "51377b8f-2348-479e-bf9c-d21d1a330b9a",
+     "question_text": "11 14 14 17 17 20 20 __ __",
+     "option_a": "23 23",
+     "option_b": "23 26",
+     "option_c": "21 24",
+     "option_d": "24 24",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 1
+    },
+    {
+     "id": "faf7e782-a508-4167-8c64-880b3058aa96",
+     "question_text": "20 20 17 17 14 14 11 ?",
+     "option_a": "8 8",
+     "option_b": "11 11",
+     "option_c": "11 14",
+     "option_d": "8 9",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "3D - Volume & Surface Area": [
+  {
+   "nums": "12,16,18",
+   "rows": [
+    {
+     "id": "32234a4c-bc94-4f41-97d0-435b8563917c",
+     "question_text": "The side of a metallic cube is 12 cm. It is melted and formed into a cuboid where length and breadth are 18 cm and 16 cm respectively. Find the height of the cuboid.",
+     "option_a": "4 cm",
+     "option_b": "6 cm",
+     "option_c": "12 cm",
+     "option_d": "3 cm",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "c6705eb3-2c75-402e-ae9d-0e1f0474c4db",
+     "question_text": "A metallic cube of side 12 cm is melted and recast into a cuboid whose length and breadth are 18 cm and 16 cm. Find the height of the cuboid.",
+     "option_a": "6 cm",
+     "option_b": "8 cm",
+     "option_c": "12 cm",
+     "option_d": "4 cm",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "3,5",
+   "rows": [
+    {
+     "id": "6f4c57f6-175c-46e8-9f79-c8a360ccb97f",
+     "question_text": "Radii of two solid hemispheres are in the ratio 3:5. Find the ratio of their curved surface area",
+     "option_a": "12:25",
+     "option_b": "15:30",
+     "option_c": "9:25",
+     "option_d": "18: 35",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "a29492d6-4b74-46b7-b4b8-783b659e9923",
+     "question_text": "The internal and external radii of a hollow hemispherical shell are 3 m and 5 m respectively. Find the CSA and TSA of the shell.",
+     "option_a": "CSA = 264 m²; TSA = 213.71 m²",
+     "option_b": "CSA = 106.86 m²; TSA = 264 m²",
+     "option_c": "CSA = 213.71 m²; TSA = 264 m²",
+     "option_d": "CSA = 213.71 m²; TSA = 132 m²",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "7",
+   "rows": [
+    {
+     "id": "7132c9c8-763c-42e2-bbbc-d3f5f2e9b8f3",
+     "question_text": "Two identical cubes of side 7 cm are joined end to end. Find the total surface area (TSA) and lateral surface area (LSA) of the resulting cuboid.",
+     "option_a": "LSA = 490 cm²; TSA = 294 cm²",
+     "option_b": "LSA = 588 cm²; TSA = 882 cm²",
+     "option_c": "LSA = 294 cm²; TSA = 490 cm²",
+     "option_d": "LSA = 196 cm²; TSA = 392 cm²",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "e05d7cce-f8b4-42bb-a9aa-c6d0bd4736ad",
+     "question_text": "Two identical cubes of side 7 cm are joined end to end. Find the Total surface area of the new resulting cuboid?",
+     "option_a": "245 cm2",
+     "option_b": "450 cm2",
+     "option_c": "280 cm2",
+     "option_d": "490 cm2",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 3
+    }
+   ]
+  }
+ ],
+ "2D - Area": [
+  {
+   "nums": "120,14,35",
+   "rows": [
+    {
+     "id": "16b08308-a027-4bd7-ae73-21ab0ee11b1f",
+     "question_text": "A 14m wide athletic track consists of two straight sections each 120m long joined by semi-circular ends with inner radius is 35m. Calculate the area of the track.",
+     "option_a": "8046 m2",
+     "option_b": "7056 m2",
+     "option_c": "6586 m2",
+     "option_d": "7356 m2",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 5,
+     "n_ans": 2
+    },
+    {
+     "id": "e58b22bc-66c7-4fa9-98c9-d4282bee9eb2",
+     "question_text": "An athletic track consists of two straight sections each 120 m long joined by semicircular ends with inner radius 35 m. The track is 14 m wide. Calculate the area of the track.",
+     "option_a": "3360 m²",
+     "option_b": "3696 m²",
+     "option_c": "7056 m²",
+     "option_d": "6720 m²",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "5,50,80",
+   "rows": [
+    {
+     "id": "3f56c534-675c-4a14-a101-ffeb3d1cbf43",
+     "question_text": "In a right triangle ground, the sides adjacent to the right angle are 50 m and 80 m. Find the cost of cementing the ground at ₹ 5 per m².",
+     "option_a": "₹ 4,000",
+     "option_b": "₹ 10,000",
+     "option_c": "₹ 20,000",
+     "option_d": "₹ 2,000",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "5421ad91-2ee1-4a4c-978f-b9531af10d48",
+     "question_text": "In a right triangular ground, the sides adjacent to the right angle are 50 m and 80 m. Find the cost of cementing the ground at Rs. 5 per m².",
+     "option_a": "Rs. 10,000",
+     "option_b": "Rs. 20,000",
+     "option_c": "Rs. 5,000",
+     "option_d": "Rs. 2,000",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  }
+ ],
+ "Direction Based": [
+  {
+   "nums": "1,1,1,1,1,2,3,4,5",
+   "rows": [
+    {
+     "id": "0c7cd567-81e2-414f-89d5-4fee37bdfa16",
+     "question_text": "Each of the following questions is based on the following information: 1. A # B means B is at 1 metre to the right of A. 2. A $ B means B is at 1 metre to the North of A. 3. A * B means B is at 1 metre to the left of A. 4. A @ B means B is at 1 metre to the south of A. 5. In each question first person from the left is facing North.\n\nAccording to P # R $ A * U, in which direction is U with respect to P?",
+     "option_a": "East",
+     "option_b": "West",
+     "option_c": "North",
+     "option_d": "South",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "6cd060d6-bcf7-45e2-8747-1920d7932092",
+     "question_text": "Each of the following questions is based on the following information: 1. A # B means B is at 1 metre to the right of A. 2. A $ B means B is at 1 metre to the North of A. 3. A * B means B is at 1 metre to the left of A. 4. A @ B means B is at 1 metre to the south of A. 5. In each question first person from the left is facing North.\n\nAccording to M # N $ T, T is in which direction with respect to M?",
+     "option_a": "North-West",
+     "option_b": "North-East",
+     "option_c": "South-West",
+     "option_d": "South-East",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "eb58ce45-6cdc-4f01-8778-a5360c7af96b",
+     "question_text": "Each of the following questions is based on the following information: 1. A # B means B is at 1 metre to the right of A. 2. A $ B means B is at 1 metre to the North of A. 3. A * B means B is at 1 metre to the left of A. 4. A @ B means B is at 1 metre to the south of A. 5. In each question first person from the left is facing North.\n\nAccording to X @ B * P, P is in which direction with respect to X?",
+     "option_a": "North",
+     "option_b": "South",
+     "option_c": "North-East",
+     "option_d": "South-West",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,2,3,4",
+   "rows": [
+    {
+     "id": "0de8326a-1633-41b9-af98-2be2a26238c4",
+     "question_text": "Each of the following questions is based on the following information: 1. Six flats on a floor in two rows facing North and South are allotted to P, Q, R, S, T and U. 2. Q gets a North facing flat and is not next to S. 3. S and U get diagonally opposite flats. 4. R next to U, gets a south facing flat and T gets North facing flat.\n\nWhose flat is between Q and S?",
+     "option_a": "T",
+     "option_b": "U",
+     "option_c": "R",
+     "option_d": "P",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "437ff1d2-49db-4c43-b31c-500fb7170645",
+     "question_text": "Each of the following questions is based on the following information: 1. Six flats on a floor in two rows facing North and South are allotted to P, Q, R, S, T and U. 2. Q gets a North facing flat and is not next to S. 3. S and U get diagonally opposite flats. 4. R next to U, gets a south facing flat and T gets North facing flat.\n\nIf the flats of P and T are interchanged then whose flat will be next to that of U?",
+     "option_a": "P",
+     "option_b": "Q",
+     "option_c": "R",
+     "option_d": "T",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "5f656cbc-e817-4aec-8b7f-74521afb9287",
+     "question_text": "Each of the following questions is based on the following information: 1. Six flats on a floor in two rows facing North and South are allotted to P, Q, R, S, T and U. 2. Q gets a North facing flat and is not next to S. 3. S and U get diagonally opposite flats. 4. R next to U, gets a south facing flat and T gets North facing flat.\n\nThe flats of which of the other pair than SU, is diagonally opposite to each other?",
+     "option_a": "QP",
+     "option_b": "QR",
+     "option_c": "PT",
+     "option_d": "TS",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "f0503bcb-e991-4b99-a8d0-4dfeaac63046",
+     "question_text": "Each of the following questions is based on the following information: 1. Six flats on a floor in two rows facing North and South are allotted to P, Q, R, S, T and U. 2. Q gets a North facing flat and is not next to S. 3. S and U get diagonally opposite flats. 4. R next to U, gets a south facing flat and T gets North facing flat.\n\nWhich of the following combination get south facing flats?",
+     "option_a": "QTS",
+     "option_b": "UPT",
+     "option_c": "URP",
+     "option_d": "Data is inadequate",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "4,8",
+   "rows": [
+    {
+     "id": "162523fb-b036-4d98-89c0-20027b6a63e4",
+     "question_text": "Directions to Solve: 8-trees mango, guava, papaya, pomegranate, lemon, banana, raspberry and apple are in two rows 4 in each facing North and South. Lemon is between mango and apple but just opposite to guava. Banana is at one end of a line and is just next in the right of guava or either banana tree is just after guava tree. Raspberry tree which at one end of a line, is just diagonally opposite to mango tree.\n\nWhich of the following statements is definitely true?",
+     "option_a": "Papaya tree is just near to apple tree.",
+     "option_b": "Apple tree is just next to lemon tree.",
+     "option_c": "Raspberry tree is either left to Pomegranate or after.",
+     "option_d": "Pomegranate tree is diagonally opposite to banana tree.",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "8946c2b7-d34e-43ee-b0f3-583fc644f144",
+     "question_text": "Directions to Solve: 8-trees mango, guava, papaya, pomegranate, lemon, banana, raspberry and apple are in two rows 4 in each facing North and South. Lemon is between mango and apple but just opposite to guava. Banana is at one end of a line and is just next in the right of guava or either banana tree is just after guava tree. Raspberry tree which at one end of a line, is just diagonally opposite to mango tree.\n\nWhich tree is just opposite to raspberry tree?",
+     "option_a": "Papaya",
+     "option_b": "Pomegranate",
+     "option_c": "Papaya or Pomegranate",
+     "option_d": "Data is inadequate",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 0
+    },
+    {
+     "id": "c5443d1d-0938-4cba-a358-4b47362a47bb",
+     "question_text": "Directions to Solve: 8-trees mango, guava, papaya, pomegranate, lemon, banana, raspberry and apple are in two rows 4 in each facing North and South. Lemon is between mango and apple but just opposite to guava. Banana is at one end of a line and is just next in the right of guava or either banana tree is just after guava tree. Raspberry tree which at one end of a line, is just diagonally opposite to mango tree.\n\nWhich tree is just opposite to banana tree?",
+     "option_a": "Mango",
+     "option_b": "Pomegranate",
+     "option_c": "Papaya",
+     "option_d": "Data is inadequate",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "6,8",
+   "rows": [
+    {
+     "id": "28b9fc28-2ff5-49db-a42c-7bcc9fc28e6c",
+     "question_text": "Golu started from his house towards North. After covering a distance of 8 km. he turned towards left and covered a distance of 6 km. What is the shortest distance now from his house?",
+     "option_a": "10 km.",
+     "option_b": "16 km.",
+     "option_c": "14 km",
+     "option_d": "2 km.",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "f8d65aca-e99f-4aea-ae59-e14c2f12d3d9",
+     "question_text": "The length and breadth of a room are 8 m and 6 m respectively. A cat runs along all the four walls and finally along a diagonal order to catch a rat. How much total distance is covered by the cat?",
+     "option_a": "10",
+     "option_b": "14",
+     "option_c": "38",
+     "option_d": "48",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "3,5,5",
+   "rows": [
+    {
+     "id": "45e390b3-75de-4dfc-bc80-b86a18d8f598",
+     "question_text": "X started to walk straight towards south. After walking 5 m he turned to the left and walked 3 m. After this he turned to the right and walked 5 m Now to which direction X is facing?",
+     "option_a": "North-East",
+     "option_b": "South",
+     "option_c": "North",
+     "option_d": "South-West",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 0
+    },
+    {
+     "id": "bfd3fb26-27b3-480f-ba2b-eb13a967504f",
+     "question_text": "A man walks 5 km toward south and then turns to the right. After walking 3 km he turns to the left and walks 5 km. Now in which direction is he from the starting place?",
+     "option_a": "West",
+     "option_b": "South",
+     "option_c": "North-East",
+     "option_d": "South-West",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 2
+    }
+   ]
+  }
+ ],
+ "Probability": [
+  {
+   "nums": "3",
+   "rows": [
+    {
+     "id": "0ce82f7a-1479-41c5-a118-1f13a2ec16d6",
+     "question_text": "In a game, the entry fee is paid for tossing a coin 3 times. If one or two heads show, the player just gets her entry fee back. Find the probability that the player just gets her entry fee back.",
+     "option_a": "$\\dfrac{1}{8}$",
+     "option_b": "$\\dfrac{1}{2}$",
+     "option_c": "$\\dfrac{3}{4}$",
+     "option_d": "$\\dfrac{7}{8}$",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "df292c79-4eb2-4f9c-b2bf-7b6a77017cd4",
+     "question_text": "Write the sample space for tossing 3 coins.",
+     "option_a": "6",
+     "option_b": "9",
+     "option_c": "8",
+     "option_d": "16",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "5,6,7,8",
+   "rows": [
+    {
+     "id": "12790c95-8c3b-421a-b860-2531315376e7",
+     "question_text": "A bag contains 5 red, 6 white, 7 green and 8 black balls. One ball is drawn at random. Find the probability that the ball drawn is not white.",
+     "option_a": "$\\dfrac{3}{13}$",
+     "option_b": "$\\dfrac{10}{13}$",
+     "option_c": "$\\dfrac{1}{2}$",
+     "option_d": "$\\dfrac{6}{13}$",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 2
+    },
+    {
+     "id": "227525ee-2213-41ad-8511-64f1fc2d018b",
+     "question_text": "A bag contains 5 red balls, 6 white balls, 7 green balls and 8 black balls. One ball is drawn at random from the bag. Find the probability that the ball drawn is i) white, ii) black or red, iii) not white, iv) neither white nor black.",
+     "option_a": "$\\dfrac{3}{13}$, $\\dfrac{1}{2}$, $\\dfrac{3}{13}$, $\\dfrac{6}{13}$",
+     "option_b": "$\\dfrac{6}{26}$, $\\dfrac{1}{2}$, $\\dfrac{10}{13}$, $\\dfrac{6}{13}$",
+     "option_c": "$\\dfrac{3}{13}$, $\\dfrac{1}{2}$, $\\dfrac{10}{13}$, $\\dfrac{6}{13}$",
+     "option_d": "$\\dfrac{3}{13}$, $\\dfrac{1}{2}$, $\\dfrac{10}{13}$, $\\dfrac{7}{13}$",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "12,8",
+   "rows": [
+    {
+     "id": "1383477e-3b62-463c-b73d-3f8d60ad0b60",
+     "question_text": "A bag contains 12 blue balls and x red balls. If a ball is drawn at random, the probability that it is red is found. If 8 more red balls are put in the bag and the new probability of drawing a red ball is twice the earlier probability, find x.",
+     "option_a": "x=8",
+     "option_b": "x=-24",
+     "option_c": "x=4",
+     "option_d": "x=6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    },
+    {
+     "id": "3f2ecc31-35cd-4403-a7c7-d46837b4130a",
+     "question_text": "A bag contains 12 blue balls and x red balls. If 8 more red balls are added, the probability of drawing a red ball becomes twice the original probability of drawing a red ball. Find the value of x.",
+     "option_a": "2",
+     "option_b": "8",
+     "option_c": "4",
+     "option_d": "6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "1,1000,500",
+   "rows": [
+    {
+     "id": "1daf2b59-7c78-4332-afe0-6110740e637c",
+     "question_text": "At a fete, cards bearing numbers 1 to 1000 (one number per card) are put in a box. Each player selects one card at random and that card is not replaced. A player wins a prize if the selected card has a perfect square number greater than 500. Find i) the probability that the first player wins the prize, ii) the probability that the second player wins a prize, given that the first has won.",
+     "option_a": "9/1000, $\\dfrac{9}{999}$",
+     "option_b": "9/1000, $\\dfrac{8}{999}$",
+     "option_c": "8/1000, $\\dfrac{7}{999}$",
+     "option_d": "9/1000, 8/1000",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "731779c7-3a17-4031-b5d6-49aba1eaa62c",
+     "question_text": "Cards bearing numbers 1 to 1000 are put in a box. A player wins a prize if the selected card has a perfect square number greater than 500. What is the probability that the first player wins the prize?",
+     "option_a": "$\\dfrac{1}{100}$",
+     "option_b": "$\\dfrac{9}{500}$",
+     "option_c": "1 / 1000",
+     "option_d": "9 / 1000",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "15,17,640",
+   "rows": [
+    {
+     "id": "1fe40f76-2999-4f5f-a620-c4e97f7d845c",
+     "question_text": "A is an event of a random experiment such that P(A) : P(Ā) = 17 : 15 and n(S) = 640. Find n(A).",
+     "option_a": "300",
+     "option_b": "320",
+     "option_c": "360",
+     "option_d": "340",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "4446851a-f2e9-4de5-bb00-d57e7578c806",
+     "question_text": "If A is an event of a random experiment such that P(A) : P(Ā) = 17 : 15 and n(S) = 640, then find i) P(Ā), ii) n(A).",
+     "option_a": "P(Ā)=$\\dfrac{15}{32}$, n(A)=340",
+     "option_b": "P(Ā)=$\\dfrac{17}{32}$, n(A)=340",
+     "option_c": "P(Ā)=$\\dfrac{15}{32}$, n(A)=300",
+     "option_d": "P(Ā)=$\\dfrac{17}{32}$, n(A)=300",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 3
+    }
+   ]
+  },
+  {
+   "nums": "52",
+   "rows": [
+    {
+     "id": "361260b4-b5c9-4aaf-8a8d-06339dabc984",
+     "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. Find the probability of getting i) a red card, ii) a heart card, iii) a red king, iv) a face card, v) a number card.",
+     "option_a": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{26}$, $\\dfrac{4}{13}$, $\\dfrac{9}{13}$",
+     "option_b": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{26}$, $\\dfrac{3}{13}$, $\\dfrac{9}{13}$",
+     "option_c": "$\\dfrac{1}{4}$, $\\dfrac{1}{2}$, $\\dfrac{1}{26}$, $\\dfrac{3}{13}$, $\\dfrac{9}{13}$",
+     "option_d": "$\\dfrac{1}{2}$, $\\dfrac{1}{4}$, $\\dfrac{1}{13}$, $\\dfrac{3}{13}$, $\\dfrac{7}{13}$",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "8153e5a3-bf10-4705-a8ae-abd23f3fce6c",
+     "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. What is the probability of getting a heart card?",
+     "option_a": "$\\dfrac{1}{2}$",
+     "option_b": "$\\dfrac{4}{13}$",
+     "option_c": "$\\dfrac{1}{13}$",
+     "option_d": "$\\dfrac{1}{4}$",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "92226d1b-e1c8-4c74-b6a6-852498efae7d",
+     "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. What is the probability of getting a face card (Jack, Queen or King)?",
+     "option_a": "$\\dfrac{3}{13}$",
+     "option_b": "$\\dfrac{1}{13}$",
+     "option_c": "$\\dfrac{1}{4}$",
+     "option_d": "$\\dfrac{12}{52}$",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "a1d2984d-85f0-4dd1-8382-1efab5c0b0f1",
+     "question_text": "From a well shuffled pack of 52 cards, one card is drawn at random. What is the probability of getting a red king?",
+     "option_a": "$\\dfrac{1}{13}$",
+     "option_b": "$\\dfrac{1}{52}$",
+     "option_c": "$\\dfrac{1}{26}$",
+     "option_d": "$\\dfrac{2}{13}$",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "c2bb2242-4d2f-49b6-8a14-bc15dadf5cd4",
+     "question_text": "The king and queen of diamonds, queen and jack of hearts, and jack and king of spades are removed from a deck of 52 playing cards, which is then well shuffled. One card is drawn at random from the remaining cards. Determine the probability that the card is i) a clubs card, ii) a queen of red colour, iii) a king of black colour.",
+     "option_a": "$\\dfrac{13}{46}$, 0, $\\dfrac{1}{46}$",
+     "option_b": "$\\dfrac{13}{52}$, 0, $\\dfrac{1}{46}$",
+     "option_c": "$\\dfrac{13}{46}$, $\\dfrac{2}{46}$, $\\dfrac{2}{46}$",
+     "option_d": "$\\dfrac{13}{46}$, $\\dfrac{1}{46}$, 0",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    }
+   ]
+  },
+  {
+   "nums": "6",
+   "rows": [
+    {
+     "id": "5fda17a8-19aa-413f-bb01-510eab2ba7a4",
+     "question_text": "A bag contains 6 green balls and some black and red balls. The probability of getting a green ball is three times the probability of getting a red ball, and the number of black balls is twice the number of red balls. Find i) the number of black balls, ii) the total number of balls.",
+     "option_a": "6 black balls, 18 balls",
+     "option_b": "2 black balls, 12 balls",
+     "option_c": "4 black balls, 10 balls",
+     "option_d": "4 black balls, 12 balls",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "af27a0f3-c3c8-419c-846b-7645877d3bba",
+     "question_text": "A bag contains 6 green balls, some black balls and some red balls. The number of black balls is twice the number of red balls, and the probability of getting a green ball is three times the probability of getting a red ball. Find the total number of balls.",
+     "option_a": "9",
+     "option_b": "12",
+     "option_c": "15",
+     "option_d": "18",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,12,2,3",
+   "rows": [
+    {
+     "id": "63d416ee-9ac6-40e0-b44a-8711d12fd4b3",
+     "question_text": "A game consists of spinning an arrow which is equally likely to rest pointing to one of the numbers 1, 2, 3, ... 12. What is the probability that it will point to a prime number?",
+     "option_a": "$\\dfrac{1}{2}$",
+     "option_b": "$\\dfrac{5}{12}$",
+     "option_c": "$\\dfrac{1}{12}$",
+     "option_d": "$\\dfrac{1}{3}$",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "f8da5a70-abd6-4219-92c9-712870da8249",
+     "question_text": "A game consists of spinning an arrow which is equally likely to rest pointing to one of the numbers 1, 2, 3, ... 12. What is the probability that it will point to a composite number?",
+     "option_a": "$\\dfrac{5}{12}$",
+     "option_b": "$\\dfrac{1}{3}$",
+     "option_c": "$\\dfrac{1}{2}$",
+     "option_d": "$\\dfrac{7}{12}$",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Simple and Compound Interest": [
+  {
+   "nums": "2,640,774.40",
+   "rows": [
+    {
+     "id": "008ce1f6-a7b9-4f48-be07-8ed5dde9097f",
+     "question_text": "At what rate percent per annum will Rs. 640 amount to Rs. 774.40 in 2 years, when interest is being compounded annually?",
+     "option_a": "5%",
+     "option_b": "21%",
+     "option_c": "10%",
+     "option_d": "10.5%",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "8a58e5fc-d08a-4b17-b361-3d27b28ab9a7",
+     "question_text": "At what rate percent CI per annum will Rs. 640 amount to Rs. 774.40 in 2 years?",
+     "option_a": "5%",
+     "option_b": "21%",
+     "option_c": "10%",
+     "option_d": "12%",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "f6c19766-ba77-45d2-b355-1d33965733f6",
+     "question_text": "At what rate percent compound interest per annum will ₹ 640 amount to ₹ 774.40 in 2 years, compounded annually?",
+     "option_a": "5%",
+     "option_b": "12%",
+     "option_c": "8%",
+     "option_d": "10%",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,3,5,500,6,750",
+   "rows": [
+    {
+     "id": "00b1a9ce-82e1-413f-8281-078245c371d9",
+     "question_text": "A certain sum of money amounts to Rs. 6,500 in 3 years and Rs. 5,750 in 1½ years respectively. Find the principal and rate percent.",
+     "option_a": "Principal = Rs. 5,750, Rate = 10%",
+     "option_b": "Principal = Rs. 5,000, Rate = 5%",
+     "option_c": "Principal = Rs. 5,000, Rate = 10%",
+     "option_d": "Principal = Rs. 4,500, Rate = 10%",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "ecb40e6d-7317-41b8-8ba1-44a1053fc243",
+     "question_text": "A certain sum of money amounts to ₹ 6,500 in 3 years and ₹ 5,750 in 1½ years at simple interest. Find the principal.",
+     "option_a": "₹ 5,750",
+     "option_b": "₹ 5,000",
+     "option_c": "₹ 4,250",
+     "option_d": "₹ 1,500",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 3
+    }
+   ]
+  },
+  {
+   "nums": "10",
+   "rows": [
+    {
+     "id": "1141ccc1-0d9d-4ce4-9651-bfb9b55d1d4b",
+     "question_text": "A sum of money doubles itself in 10 years at simple interest. Find the rate of interest.",
+     "option_a": "8%",
+     "option_b": "12.5%",
+     "option_c": "10%",
+     "option_d": "20%",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 5,
+     "n_ans": 3
+    },
+    {
+     "id": "bae1ad8a-2d43-4190-8a4d-6446fb2afbfc",
+     "question_text": "A sum of money doubles itself in 10 years. Find the rate of interest.",
+     "option_a": "5%",
+     "option_b": "20%",
+     "option_c": "100%",
+     "option_d": "10%",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "12",
+   "rows": [
+    {
+     "id": "180b8f55-4243-40ad-8dc2-1b87fd04ef4d",
+     "question_text": "A sum of money doubles itself at 12½% per annum over a certain period of time. Find the number of years.",
+     "option_a": "16 years",
+     "option_b": "8 years",
+     "option_c": "4 years",
+     "option_d": "6.25 years",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 3
+    },
+    {
+     "id": "9cf35351-561a-4c1f-a086-35972256bdef",
+     "question_text": "A sum of money doubles itself at 12½% per annum simple interest over a certain period. Find the number of years.",
+     "option_a": "8 years",
+     "option_b": "12.5 years",
+     "option_c": "10 years",
+     "option_d": "16 years",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,2,4,632",
+   "rows": [
+    {
+     "id": "28a45787-3f20-4039-9201-4bd84b82cf49",
+     "question_text": "Find the principal that will yield a compound interest of ₹ 1,632 in 2 years at 4% per annum.",
+     "option_a": "₹ 20,000",
+     "option_b": "₹ 16,320",
+     "option_c": "₹ 25,000",
+     "option_d": "₹ 40,000",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "f2f4f322-0d6d-4a8b-aa50-f01bec298f38",
+     "question_text": "Find the principal that will yield a CI of Rs. 1,632 in 2 years at 4% rate per annum.",
+     "option_a": "Rs. 20,400",
+     "option_b": "Rs. 20,000",
+     "option_c": "Rs. 21,632",
+     "option_d": "Rs. 19,200",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "000,15,3,3,8",
+   "rows": [
+    {
+     "id": "33fde78c-9c93-405b-b010-7029a6c8bda8",
+     "question_text": "Ramlal deposited ₹ 8,000 with a finance company for 3 years at an interest of 15% per annum compounded annually. What is the compound interest he gets after 3 years?",
+     "option_a": "₹ 3,600",
+     "option_b": "₹ 12,167",
+     "option_c": "₹ 4,167",
+     "option_d": "₹ 4,500",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 2
+    },
+    {
+     "id": "5a2160cf-680b-4cc5-bded-87f6af924167",
+     "question_text": "Ramlal deposited Rs. 8,000 with a finance company for 3 years at an interest of 15% per annum compounded annually. What is the compound interest he gets after 3 years?",
+     "option_a": "Rs. 4,167",
+     "option_b": "Rs. 12,167",
+     "option_c": "Rs. 3,600",
+     "option_d": "Rs. 3,975",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "000,1,3,7",
+   "rows": [
+    {
+     "id": "4116ca36-284e-4c0a-852d-3efdef8ea5c4",
+     "question_text": "Kamal invested ₹ 3,000 for 1 year at 7% per annum. Find the simple interest received by him at the end of one year.",
+     "option_a": "₹ 210",
+     "option_b": "₹ 3,210",
+     "option_c": "₹ 300",
+     "option_d": "₹ 21",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "edb04414-1ab4-4444-87c8-8b3cdb860cba",
+     "question_text": "Kamal invested Rs. 3,000 for 1 year at 7% per annum. Find the simple interest and amount received by him at the end of one year.",
+     "option_a": "SI = Rs. 210, Amount = Rs. 3,210",
+     "option_b": "SI = Rs. 210, Amount = Rs. 2,790",
+     "option_c": "SI = Rs. 21, Amount = Rs. 3,021",
+     "option_d": "SI = Rs. 2,100, Amount = Rs. 5,100",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "3,372,6,6",
+   "rows": [
+    {
+     "id": "54f35142-9e4e-438e-840e-ea06c22135d5",
+     "question_text": "A certain sum of money amounts to Rs. 6,372 in 3 years at 6%. Find the principal.",
+     "option_a": "Rs. 5,400",
+     "option_b": "Rs. 5,372",
+     "option_c": "Rs. 6,372",
+     "option_d": "Rs. 5,355",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "96bb0e35-a8ee-4c93-a76f-9829776567ce",
+     "question_text": "A certain sum of money amounts to ₹ 6,372 in 3 years at 6% per annum simple interest. Find the principal.",
+     "option_a": "₹ 5,400",
+     "option_b": "₹ 6,000",
+     "option_c": "₹ 5,300",
+     "option_d": "₹ 972",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "080,16,2,3",
+   "rows": [
+    {
+     "id": "57bd6bbf-d6f0-416a-ba7e-98d8a7da237a",
+     "question_text": "Find the principal that earns Rs. 2,080 as SI in 3¼ years at 16% per annum.",
+     "option_a": "Rs. 4,000",
+     "option_b": "Rs. 13,000",
+     "option_c": "Rs. 3,250",
+     "option_d": "Rs. 6,080",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "d39ad183-2826-49e3-a4b9-a6467657e3c8",
+     "question_text": "Find the principal that earns ₹ 2,080 as simple interest in 3¼ years at 16% per annum.",
+     "option_a": "₹ 3,250",
+     "option_b": "₹ 4,000",
+     "option_c": "₹ 5,000",
+     "option_d": "₹ 2,080",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "13,146,2,500",
+   "rows": [
+    {
+     "id": "5916afc7-fb22-4699-8ecd-7bda6c784af3",
+     "question_text": "Find the amount when ₹ 2,500 is invested for 146 days at 13% per annum.",
+     "option_a": "₹ 2,500",
+     "option_b": "₹ 2,630",
+     "option_c": "₹ 2,825",
+     "option_d": "₹ 130",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "90ca673f-cbb0-467d-94f1-f84c29e918e0",
+     "question_text": "Find the amount when Rs. 2,500 is invested for 146 days at 13% per annum.",
+     "option_a": "Rs. 2,500",
+     "option_b": "Rs. 130",
+     "option_c": "Rs. 2,825",
+     "option_d": "Rs. 2,630",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "000,1,3,5",
+   "rows": [
+    {
+     "id": "5e4f609e-ebba-4aef-9271-1ea03c83613a",
+     "question_text": "Find the amount and compound interest on P = Rs. 1,000 at r = 5% for n = 3 years.",
+     "option_a": "Amount = Rs. 1,150, CI = Rs. 150",
+     "option_b": "Amount = Rs. 1,157.63, CI = Rs. 1,157.63",
+     "option_c": "Amount = Rs. 1,276.28, CI = Rs. 276.28",
+     "option_d": "Amount = Rs. 1,157.63, CI = Rs. 157.63",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "efa52a3f-4435-41f0-a1e9-040367df1818",
+     "question_text": "Find the compound interest on ₹ 1,000 at 5% per annum for 3 years, compounded annually.",
+     "option_a": "₹ 150.00",
+     "option_b": "₹ 1,157.63",
+     "option_c": "₹ 157.63",
+     "option_d": "₹ 1,150.00",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "10,2,250",
+   "rows": [
+    {
+     "id": "63f01f8f-b4f4-4e86-b974-77ff7e6bbeb6",
+     "question_text": "Find the principal that earns Rs. 250 as SI in 2½ years at 10% per annum.",
+     "option_a": "Rs. 2,500",
+     "option_b": "Rs. 625",
+     "option_c": "Rs. 1,250",
+     "option_d": "Rs. 1,000",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    },
+    {
+     "id": "fda1c441-d411-4589-96cb-20738bfa1e31",
+     "question_text": "Find the principal that earns ₹ 250 as simple interest in 2½ years at 10% per annum.",
+     "option_a": "₹ 1,000",
+     "option_b": "₹ 625",
+     "option_c": "₹ 2,500",
+     "option_d": "₹ 1,250",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "15,3,3,600,9",
+   "rows": [
+    {
+     "id": "6438d122-24af-4396-ab48-6632e254627d",
+     "question_text": "Find the simple interest on ₹ 3,600 at 15% per annum for 3 years and 9 months.",
+     "option_a": "₹ 5,625",
+     "option_b": "₹ 1,620",
+     "option_c": "₹ 2,025",
+     "option_d": "₹ 540",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 4,
+     "n_ans": 4
+    },
+    {
+     "id": "fc384858-2c60-4a91-bc55-ffa9d975b919",
+     "question_text": "Find SI and amount on Rs. 3,600 at 15% p.a. for 3 years and 9 months.",
+     "option_a": "SI = Rs. 1,620, Amount = Rs. 5,220",
+     "option_b": "SI = Rs. 2,025, Amount = Rs. 2,025",
+     "option_c": "SI = Rs. 2,025, Amount = Rs. 5,625",
+     "option_d": "SI = Rs. 5,625, Amount = Rs. 9,225",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "000,5,5,8,800",
+   "rows": [
+    {
+     "id": "817d3366-1451-4c7f-8efe-67dbf7d00249",
+     "question_text": "In how many years will a sum of Rs. 5,000 amount to Rs. 5,800 at the rate of 8% per annum?",
+     "option_a": "1.6 years",
+     "option_b": "2 years",
+     "option_c": "2.5 years",
+     "option_d": "1.45 years",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "db5af4dd-8af3-4aca-b928-d4701bfce45c",
+     "question_text": "In how many years will a sum of ₹ 5,000 amount to ₹ 5,800 at the rate of 8% per annum simple interest?",
+     "option_a": "4 years",
+     "option_b": "1 year",
+     "option_c": "2 years",
+     "option_d": "2.5 years",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "000,10,5,5",
+   "rows": [
+    {
+     "id": "a505a2c8-b521-4438-b729-ed953a622bfe",
+     "question_text": "Find SI and amount on Rs. 5,000 at 10% per annum for 5 years.",
+     "option_a": "SI = Rs. 2,500, Amount = Rs. 7,500",
+     "option_b": "SI = Rs. 2,500, Amount = Rs. 2,500",
+     "option_c": "SI = Rs. 500, Amount = Rs. 5,500",
+     "option_d": "SI = Rs. 7,500, Amount = Rs. 12,500",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "bc998e93-cfca-418b-a1be-88bdefe17987",
+     "question_text": "Find the simple interest on ₹ 5,000 at 10% per annum for 5 years.",
+     "option_a": "₹ 7,500",
+     "option_b": "₹ 500",
+     "option_c": "₹ 250",
+     "option_d": "₹ 2,500",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    }
+   ]
+  },
+  {
+   "nums": "000,10,2,8",
+   "rows": [
+    {
+     "id": "aa759f1b-bf3d-42ee-8df3-512371819aa7",
+     "question_text": "Find the difference between the simple interest and compound interest on ₹ 8,000 at 10% per annum in 2 years.",
+     "option_a": "₹ 80",
+     "option_b": "₹ 160",
+     "option_c": "₹ 800",
+     "option_d": "₹ 8",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "c897cc41-fe2d-4e21-a3dc-e65d0e5a1043",
+     "question_text": "Find the difference between SI and CI for a sum of Rs. 8,000 at 10% in 2 years.",
+     "option_a": "Rs. 80",
+     "option_b": "Rs. 800",
+     "option_c": "Rs. 8",
+     "option_d": "Rs. 1,680",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Dice Problems": [
+  {
+   "nums": "6",
+   "rows": [
+    {
+     "id": "0d74dca8-b07e-4997-b6a2-d5e5acba7fee",
+     "question_text": "The four different positions of dice are given below: Which number is on the face opposite 6?",
+     "option_a": "1",
+     "option_b": "2",
+     "option_c": "3",
+     "option_d": "4",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "63f79a7d-036a-4a04-960d-9c4495b6bead",
+     "question_text": "Three different positions X, Y and Z of a dice are shown in the figures given below. Which number lies opposite 6?",
+     "option_a": "1",
+     "option_b": "2",
+     "option_c": "4",
+     "option_d": "5",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "fb18e668-8115-4c88-9adc-5edef52abecd",
+     "question_text": "From the given two positions of a single dice, find the number of dots at top face of the dice, if its bottom face has 6 dots",
+     "option_a": "1",
+     "option_b": "5",
+     "option_c": "2",
+     "option_d": "4",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "2",
+   "rows": [
+    {
+     "id": "30f33a77-1973-4e03-a9e3-727e537045f3",
+     "question_text": "From the given four positions of a single dice, find the number of dots at the face opposite to the face having 2 dots",
+     "option_a": "6",
+     "option_b": "5",
+     "option_c": "4",
+     "option_d": "1",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "4973e71e-a623-4832-987a-37c6eebb01d6",
+     "question_text": "Three positions of a dice are given. Based on them find out which number is found opposite the number 2 in the given cube.",
+     "option_a": "6",
+     "option_b": "5",
+     "option_c": "3",
+     "option_d": "1",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "6547d5d2-4237-4e03-830d-295ff4733f51",
+     "question_text": "A dice is thrown four times and its four different positions are shown below. Find the number on the face opposite the face showing 2.",
+     "option_a": "3",
+     "option_b": "4",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "741fe7f3-4e30-4918-9e7f-9c9da4095c26",
+     "question_text": "Three different positions of a dice are shown below. How many dots lie opposite 2 dots?",
+     "option_a": "1",
+     "option_b": "3",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "aab748fa-d499-4afd-82ef-23ce85b7a56e",
+     "question_text": "Two positions of a block are shown below. When 2 is at the bottom, which number will be at the top?",
+     "option_a": "1",
+     "option_b": "4",
+     "option_c": "6",
+     "option_d": "Cannot be determined",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 1
+    },
+    {
+     "id": "b9316d33-2e73-404c-8f9d-95b27e8bcf58",
+     "question_text": "Two positions of a dice are shown below: When 2 is at the bottom, what number will be at the top?",
+     "option_a": "6",
+     "option_b": "4",
+     "option_c": "1",
+     "option_d": "5",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "3",
+   "rows": [
+    {
+     "id": "33b3b327-4873-408d-80a0-de01ca72a1bf",
+     "question_text": "Given below are three different positions of a dice. Find the number of dots on the face opposite the face bearing 3 dots.",
+     "option_a": "4",
+     "option_b": "5",
+     "option_c": "6",
+     "option_d": "Cannot be determined",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "3ce458fd-0ef6-41fe-a51a-3b724d41010c",
+     "question_text": "What is the opposite 3, if four different positions of dice are as shown below?",
+     "option_a": "6",
+     "option_b": "4",
+     "option_c": "3",
+     "option_d": "2",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "4f5d5fbd-4a4d-4388-bd28-984f3017f030",
+     "question_text": "Two positions of a dice are shown below. Identify the number at the bottom when the top is '3'?",
+     "option_a": "2",
+     "option_b": "4",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "87c35e51-6959-40df-b3cf-00f9328f33ee",
+     "question_text": "In the following question, two positions of a single dice are given. Find the dots at the face opposite to the face having 3 dots.",
+     "option_a": "1",
+     "option_b": "2",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "9be927f0-750a-43a8-b437-0a0c0fc7a056",
+     "question_text": "Two positions of a parallelepiped are shown below. When the number 3 will be on the top side, then which number will be at the bottom?",
+     "option_a": "1",
+     "option_b": "4",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "4",
+   "rows": [
+    {
+     "id": "4e2a408f-e5f1-42fa-b273-d4bb86ec2e18",
+     "question_text": "Which number is on the face opposite 4, if the four different positions of a dice are as shown in the figure given below.",
+     "option_a": "5",
+     "option_b": "3",
+     "option_c": "2",
+     "option_d": "1",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "540da5dd-5fa8-493e-961f-75eed62ff93d",
+     "question_text": "Two positions of a cube are shown below. When the number 4 will be at the bottom, then which number will be at the top?",
+     "option_a": "3",
+     "option_b": "5",
+     "option_c": "6",
+     "option_d": "Cannot be determined",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "9f448399-0d41-4525-a4d0-c5d07865c99c",
+     "question_text": "Two positions of a dice are shown. When 4 is at the bottom, what number will be on the top?",
+     "option_a": "1",
+     "option_b": "2",
+     "option_c": "5",
+     "option_d": "6",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1",
+   "rows": [
+    {
+     "id": "971026d8-6fa0-445a-88f2-c4b05eb2ed1b",
+     "question_text": "Two positions of a dice are shown below. If the face with 1 dot is at the bottom, then the number of dots on the top is",
+     "option_a": "2",
+     "option_b": "3",
+     "option_c": "4",
+     "option_d": "5",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 2
+    },
+    {
+     "id": "abf5f9e5-1328-49e9-b9c3-5cdc4b52d662",
+     "question_text": "Two positions of a block are given below. When 1 is at the top, which number will be at the bottom?",
+     "option_a": "2",
+     "option_b": "3",
+     "option_c": "4",
+     "option_d": "6",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    },
+    {
+     "id": "fc2e6d93-de71-4e49-80b8-81975d24d10d",
+     "question_text": "From the given two positions of a single dice, find the number of dots at the face opposite to the face having 1 dot.",
+     "option_a": "1",
+     "option_b": "2",
+     "option_c": "3",
+     "option_d": "6",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 3
+    },
+    {
+     "id": "fddcd12d-f4c2-43c3-a41a-dac5e03ccb9f",
+     "question_text": "Two positions of a dice are shown below. When number 1 is on the top, what number will be at the bottom?",
+     "option_a": "2",
+     "option_b": "3",
+     "option_c": "5",
+     "option_d": "Cannot be determined",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  }
+ ],
+ "Simplification": [
+  {
+   "nums": "18",
+   "rows": [
+    {
+     "id": "5b13efe6-d872-433e-abff-5133e966084d",
+     "question_text": "A two digit number is seven times the sum of its digits. The number formed by reversing the digits is 18 less than the given number. Find the given number",
+     "option_a": "52",
+     "option_b": "32",
+     "option_c": "63",
+     "option_d": "42",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 6,
+     "n_ans": 3
+    },
+    {
+     "id": "9a18b13e-cd0c-4689-92b1-d677369921d3",
+     "question_text": "One third of one half of one fifth of a number is 18. Find the number",
+     "option_a": "450",
+     "option_b": "540",
+     "option_c": "650",
+     "option_d": "520",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 2
+    }
+   ]
+  }
+ ],
+ "Time, Work , Speed And Distance": [
+  {
+   "nums": "12,24,8",
+   "rows": [
+    {
+     "id": "2e93aad4-a1fd-48c5-8a29-e7e70b90b49f",
+     "question_text": "A, B and C can do a work in 12, 24, and 8 days respectively. They all work for one day. Then C leaves the group .In how many days will A and B complete the rest of the work?",
+     "option_a": "4 days",
+     "option_b": "7 days",
+     "option_c": "6days",
+     "option_d": "10 days",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "37a96571-696b-4415-9188-fe4610357ab6",
+     "question_text": "12 men can do a piece of work in 24 days. How many days are needed to complete the work, if 8 men do this work?",
+     "option_a": "36",
+     "option_b": "28",
+     "option_c": "48",
+     "option_d": "52",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "b919ea92-f0ed-476f-a8bc-0cda70db243b",
+     "question_text": "12 men can do a piece of work in 24 days . How many days are needed to complete the work, if 8 men do this work?",
+     "option_a": "28",
+     "option_b": "36",
+     "option_c": "48",
+     "option_d": "6",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Time and Work": [
+  {
+   "nums": "18,8,96",
+   "rows": [
+    {
+     "id": "2718dfd4-964e-47d3-957e-280bc8684c40",
+     "question_text": "A man whitewashes 96 sq.m. of a compound wall in 8 days. How many sq.m. will be whitewashed in 18 days at the same rate?",
+     "option_a": "192 sq.m.",
+     "option_b": "216 sq.m.",
+     "option_c": "144 sq.m.",
+     "option_d": "240 sq.m.",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "6eb0f2e0-79ca-41f7-96bf-57eae5231d81",
+     "question_text": "A man whitewashes 96 sq.m. of a compound wall in 8 days. How many sq.m. will be whitewashed in 18 days?",
+     "option_a": "42.7 sq.m",
+     "option_b": "192 sq.m",
+     "option_c": "108 sq.m",
+     "option_d": "216 sq.m",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "20,30,70",
+   "rows": [
+    {
+     "id": "4e726af4-0fe5-4dd9-aa55-5a0dd20000c9",
+     "question_text": "A book has 70 pages with 30 lines of printed matter on each page. If each page is to have only 20 lines, how many pages will the book have?",
+     "option_a": "47 pages",
+     "option_b": "105 pages",
+     "option_c": "100 pages",
+     "option_d": "110 pages",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "9904978d-4ad9-428a-9688-e68980d6dc32",
+     "question_text": "A book has 70 pages with 30 lines of printed matter on each page. If each page is to have only 20 lines of printed matter, how many pages will the book have?",
+     "option_a": "46.7 pages",
+     "option_b": "105 pages",
+     "option_c": "47 pages",
+     "option_d": "140 pages",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "120,24,35",
+   "rows": [
+    {
+     "id": "81a544f0-2e29-4672-b3b2-2be3d22ca4aa",
+     "question_text": "A book contains 120 pages. Each page contains 35 lines. How many pages will the book contain if every page has 24 lines per page?",
+     "option_a": "82 pages",
+     "option_b": "144 pages",
+     "option_c": "120 pages",
+     "option_d": "175 pages",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "c9c5e38b-9057-4384-a3a9-425f04401d19",
+     "question_text": "A book contains 120 pages with 35 lines on each page. How many pages will the book contain if every page has 24 lines per page?",
+     "option_a": "175 pages",
+     "option_b": "82 pages",
+     "option_c": "168 pages",
+     "option_d": "150 pages",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "400,60,800",
+   "rows": [
+    {
+     "id": "8c07798e-6c9d-468a-9454-f7bedcbb2743",
+     "question_text": "There are 800 soldiers in an army camp. There is enough provision for them for 60 days. If 400 soldiers join the camp, for how many days will the provisions last?",
+     "option_a": "90 days",
+     "option_b": "30 days",
+     "option_c": "40 days",
+     "option_d": "45 days",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "8d906932-478e-4386-b01a-f8be246c0a25",
+     "question_text": "There are 800 soldiers in an army camp with enough provisions for 60 days. If 400 soldiers join the camp, for how many days will the provisions last?",
+     "option_a": "30 days",
+     "option_b": "45 days",
+     "option_c": "40 days",
+     "option_d": "90 days",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "18,20,24",
+   "rows": [
+    {
+     "id": "bc064a56-ce0b-42e5-881a-fbbf6fa37deb",
+     "question_text": "If 18 men can do a work in 20 days, then in how many days will 24 men complete the same work?",
+     "option_a": "12 days",
+     "option_b": "18 days",
+     "option_c": "15 days",
+     "option_d": "16 days",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "c81d1548-18fa-40e8-8c52-f82aaf5d0a71",
+     "question_text": "If 18 men can do a work in 20 days, then in how many days will 24 workers complete the work?",
+     "option_a": "27 days",
+     "option_b": "26.7 days",
+     "option_c": "18 days",
+     "option_d": "15 days",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "20,276,46",
+   "rows": [
+    {
+     "id": "bd3a3c69-d969-4740-9556-07e78db6e03f",
+     "question_text": "A troop has provisions for 276 soldiers for 20 days. How many soldiers should leave the troop so that the provisions may last for 46 days?",
+     "option_a": "120 soldiers",
+     "option_b": "635 soldiers",
+     "option_c": "634 soldiers",
+     "option_d": "156 soldiers",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "db9fd1f4-b405-4dbd-826d-805e53144321",
+     "question_text": "A troop has provisions for 276 soldiers for 20 days. How many soldiers must leave the troop so that the provisions may last for 46 days?",
+     "option_a": "120 soldiers",
+     "option_b": "100 soldiers",
+     "option_c": "130 soldiers",
+     "option_d": "156 soldiers",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    }
+   ]
+  }
+ ],
+ "Perimeter, Circumference & Diameter": [
+  {
+   "nums": "10,15",
+   "rows": [
+    {
+     "id": "2f2dc317-44b8-4910-b8d0-440acb26e313",
+     "question_text": "The radius and length of arc of a sector are 10 cm and 15 cm respectively. Find its perimeter",
+     "option_a": "25 cm",
+     "option_b": "5cm",
+     "option_c": "50 cm",
+     "option_d": "35 cm",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    },
+    {
+     "id": "d77d5c48-4ef9-45d3-a22f-dd0bfef9fcca",
+     "question_text": "Find the perimeter of a rectangular field of length 15 m and breadth 10 m.",
+     "option_a": "150 m",
+     "option_b": "25 m",
+     "option_c": "60 m",
+     "option_d": "50 m",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "eca85989-09cd-4370-9bff-b4043ee7d507",
+     "question_text": "Find the area and perimeter of a rectangular field of length 15 m and breadth 10 m.",
+     "option_a": "Area = 150 m²; Perimeter = 25 m",
+     "option_b": "Area = 150 m²; Perimeter = 50 m",
+     "option_c": "Area = 25 m²; Perimeter = 150 m",
+     "option_d": "Area = 150 m²; Perimeter = 150 m",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,6",
+   "rows": [
+    {
+     "id": "4b183f70-aac5-43cc-aebf-f98307fb2bb6",
+     "question_text": "The perimeter of a rectangular black board is 6 m and its breadth is 1 m. Find its length.",
+     "option_a": "2 m",
+     "option_b": "3 m",
+     "option_c": "4 m",
+     "option_d": "5 m",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "d47894c5-7782-4fda-bd3f-496a2789a0c4",
+     "question_text": "Find the length of a rectangular black board whose perimeter is 6 m and breadth is 1 m.",
+     "option_a": "3 m",
+     "option_b": "4 m",
+     "option_c": "2 m",
+     "option_d": "5 m",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "12,15",
+   "rows": [
+    {
+     "id": "4eb7a25d-c06e-4777-ab1b-9fe34ec21de6",
+     "question_text": "Find the cost of fencing a square plot of side 12 m at the rate of Rs. 15 per metre.",
+     "option_a": "Rs. 720",
+     "option_b": "Rs. 180",
+     "option_c": "Rs. 2,160",
+     "option_d": "Rs. 1,440",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "e06f2e67-6f70-42ec-a4e4-2fe6861d87b7",
+     "question_text": "Find the cost of fencing a square plot of side 12 m at the rate of ₹ 15 per metre.",
+     "option_a": "₹ 720",
+     "option_b": "₹ 180",
+     "option_c": "₹ 2,160",
+     "option_d": "₹ 480",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    }
+   ]
+  },
+  {
+   "nums": "21",
+   "rows": [
+    {
+     "id": "68353527-0646-4bfa-a8b6-c548c74dee87",
+     "question_text": "Calculate the area and perimeter of a quadrant of a circle of radius 21 cm.",
+     "option_a": "72 & 284",
+     "option_b": "62 & 346.5",
+     "option_c": "75 & 346.5",
+     "option_d": "75 & 284",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 1
+    },
+    {
+     "id": "e6b87a9f-81e5-4443-8088-fa0eea971111",
+     "question_text": "The radius of a circle is 21 cm. Find the perimeter and area of a quadrant of the circle",
+     "option_a": "75 & 346",
+     "option_b": "63 & 121",
+     "option_c": "84 & 320",
+     "option_d": "72 & 342",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 2
+    }
+   ]
+  }
+ ],
+ "Clock Problems": [
+  {
+   "nums": "4.20",
+   "rows": [
+    {
+     "id": "3605d6d5-68ed-48fb-9ea9-f2f0ecde63a9",
+     "question_text": "The angle between the minute hand and the hour hand of a clock when the time is 4.20, is:",
+     "option_a": "0°",
+     "option_b": "10°",
+     "option_c": "5°",
+     "option_d": "20°",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "79b0713b-b8bf-420f-80a5-b6425d9ba332",
+     "question_text": "The angle between the minute and the hour hand of a clock when the time is 4.20 is",
+     "option_a": "15˚",
+     "option_b": "10˚",
+     "option_c": "5˚",
+     "option_d": "20˚",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  }
+ ],
+ "Conversion of Information to Data": [
+  {
+   "nums": "11,111,120,121,130,131,140,141,15,150,151,160,161,170,3,4,50,8,9",
+   "rows": [
+    {
+     "id": "096d282c-a9b2-4e10-bc38-b39f4932db22",
+     "question_text": "A histogram shows the heights of 50 students in a class: 111–120 cm = 4, 121–130 cm = 11, 131–140 cm = 15, 141–150 cm = 9, 151–160 cm = 8, 161–170 cm = 3. In which height range do the maximum number of students fall?",
+     "option_a": "121–130 cm",
+     "option_b": "131–140 cm",
+     "option_c": "141–150 cm",
+     "option_d": "111–120 cm",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "94eeff89-e23f-4cc2-be49-e1a0f4209958",
+     "question_text": "The heights (in cm) of 50 students in a class are distributed as: 111-120 = 4, 121-130 = 11, 131-140 = 15, 141-150 = 9, 151-160 = 8, 161-170 = 3. A histogram is to be drawn. Find the height range in which the maximum number of students fall (use continuous class boundaries).",
+     "option_a": "120.5 - 130.5 cm (11 students)",
+     "option_b": "130.5 - 140.5 cm (15 students)",
+     "option_c": "131 - 140 cm (15 students)",
+     "option_d": "140.5 - 150.5 cm (9 students)",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    }
+   ]
+  },
+  {
+   "nums": "25,30,30,35,40,40,45,50,80,90",
+   "rows": [
+    {
+     "id": "0e67c8a0-6948-4fac-86be-01b6363cc5eb",
+     "question_text": "The expenditure (in lakhs) of two schools on various heads is: Construction/Repairs = School I 80, School II 90; Computers = 35, 50; Laboratory = 30, 25; Watering plants = 45, 40; Library books = 40, 30. Which school spent more on (a) Construction/Repairs and (b) Watering plants?",
+     "option_a": "(a) Construction/Repairs: School II (90 > 80); (b) Watering plants: School I (45 > 40)",
+     "option_b": "(a) Construction/Repairs: School I (80); (b) Watering plants: School II (40)",
+     "option_c": "(a) Construction/Repairs: School I (90 > 80); (b) Watering plants: School I (45 > 40)",
+     "option_d": "(a) Construction/Repairs: School II (90 > 80); (b) Watering plants: School II (45 > 40)",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "e4cb0ccb-3c3c-4495-85c7-1ae82bb40418",
+     "question_text": "A component bar diagram shows yearly expenditure of two schools (in lakhs). School I: Construction/Repairs 80, Computers 35, Laboratory 30, Watering plants 45, Library books 40. School II: Construction/Repairs 90, Computers 50, Laboratory 25, Watering plants 40, Library books 30. Which school spent more on Construction/Repairs, and by how much?",
+     "option_a": "School I, by 10 lakhs",
+     "option_b": "School II, by 20 lakhs",
+     "option_c": "School II, by 10 lakhs",
+     "option_d": "School I, by 20 lakhs",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "15,16,18,2,2,20,24,25,25,27,3,3,4,5,6",
+   "rows": [
+    {
+     "id": "18001fe9-b642-410a-beb2-9450ab041a5f",
+     "question_text": "An ungrouped frequency table of the weights (kg) of 25 students gives: 15 (3), 16 (4), 18 (3), 20 (5), 24 (2), 25 (6), 27 (2). To which weight do the maximum number of students belong?",
+     "option_a": "20 kg",
+     "option_b": "25 kg",
+     "option_c": "27 kg",
+     "option_d": "16 kg",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "422ebb3d-bda6-4a44-88f6-cd0c8883be26",
+     "question_text": "An ungrouped frequency table of the weights (kg) of 25 students gives: 15 (3), 16 (4), 18 (3), 20 (5), 24 (2), 25 (6), 27 (2). What is the range of the weights?",
+     "option_a": "10",
+     "option_b": "27",
+     "option_c": "12",
+     "option_d": "15",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    }
+   ]
+  },
+  {
+   "nums": "2,24,3,5,6,8",
+   "rows": [
+    {
+     "id": "31c5acf5-9be6-4c2a-8e25-7056711bf798",
+     "question_text": "The number of hours a school student spends on various activities in a 24-hour working day are: Sleep = 8, School = 6, Play = 2, Home work = 3, Other = 5. For a pie chart: (a) Find the percentage of sleeping hours. (b) By what angle is home work more than play? (c) By what angle are other activities less than sleep?",
+     "option_a": "(a) 33.33%; (b) 1° more; (c) 3° less",
+     "option_b": "(a) 120%; (b) 15° more; (c) 45° less",
+     "option_c": "(a) 33.33%; (b) 15° more; (c) 45° less",
+     "option_d": "(a) 25%; (b) 15° more; (c) 30° less",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "46a0260d-e918-4eb4-b879-e576ff97e2ca",
+     "question_text": "A school student spends a 24-hour day as follows: Sleep 8 hours, School 6 hours, Play 2 hours, Home work 3 hours, Other 5 hours. In a pie chart of this data, what is the percentage of sleeping hours?",
+     "option_a": "33.33%",
+     "option_b": "25%",
+     "option_c": "8%",
+     "option_d": "40%",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Parametric Representation": [
+  {
+   "nums": "10,24,38,45,65,70,70,75,75,8,80,80,85,85,90",
+   "rows": [
+    {
+     "id": "52e2342c-0de7-4b8b-a10b-330d3fdb3a0f",
+     "question_text": "The ages of a group of pensioners are distributed as: 65-70 = 38, 70-75 = 45, 75-80 = 24, 80-85 = 10, 85-90 = 8 pensioners. A frequency curve is drawn for this data. What is the total number of pensioners in the group?",
+     "option_a": "115",
+     "option_b": "125",
+     "option_c": "107",
+     "option_d": "120",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 1
+    },
+    {
+     "id": "a166e919-11dd-4734-a98f-bf76f9490111",
+     "question_text": "The ages of a group of pensioners are: 65-70 = 38, 70-75 = 45, 75-80 = 24, 80-85 = 10, 85-90 = 8 pensioners. A frequency curve is drawn to show the tendency of the data. Which age class has the highest frequency (the modal class)?",
+     "option_a": "65-70",
+     "option_b": "75-80",
+     "option_c": "70-75",
+     "option_d": "80-85",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "100,112,117,12,120,13,133,14,15,16,2011,2012,2013,2014,2015",
+   "rows": [
+    {
+     "id": "661247fc-1110-4576-b7e1-1257d363c094",
+     "question_text": "A firm's Net Worth (` in lakhs) over five years is: 2011-12 = 100, 2012-13 = 112, 2013-14 = 120, 2014-15 = 133, 2015-16 = 117. What is the average (mean) Net Worth over these five years?",
+     "option_a": "` 116.4 lakhs",
+     "option_b": "` 120.0 lakhs",
+     "option_c": "` 114.0 lakhs",
+     "option_d": "` 118.5 lakhs",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "fb5ad431-7266-470b-9eb5-be774895a543",
+     "question_text": "A firm reported its Net Worth (` in lakhs) over five years: 2011-12 = 100, 2012-13 = 112, 2013-14 = 120, 2014-15 = 133, 2015-16 = 117. A frequency polygon is drawn for this data. In which year did the firm record its highest Net Worth?",
+     "option_a": "2013-14",
+     "option_b": "2014-15",
+     "option_c": "2015-16",
+     "option_d": "2012-13",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    }
+   ]
+  }
+ ],
+ "Seating Arrangement": [
+  {
+   "nums": "1,2,3,4",
+   "rows": [
+    {
+     "id": "08c00151-c141-483f-b38f-036ec493a035",
+     "question_text": "In an Exhibition seven cars of different companies - Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford and Fargo are standing facing to east in the following order:\n1. Cadillac is next to right of Fargo.\n2. Fargo is fourth to the right of Fiat.\n3. Maruti car is between Ambassador and Bedford.\n4. Fiat which is third to the left of Ambassador, is at one end.\n\nWhich one of the following is the correct position of Mercedes?",
+     "option_a": "Next to the left of Cadillac",
+     "option_b": "Next to the left of Bedford",
+     "option_c": "Between Bedford and Fargo",
+     "option_d": "Fourth to the right of Maruti.",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "131f1684-0dbc-42cd-bc5c-dd5f10668a32",
+     "question_text": "In an Exhibition seven cars of different companies - Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford and Fargo are standing facing to east in the following order:\n1. Cadillac is next to right of Fargo.\n2. Fargo is fourth to the right of Fiat.\n3. Maruti car is between Ambassador and Bedford.\n4. Fiat which is third to the left of Ambassador, is at one end.\n\nWhich one of the following statements is correct?",
+     "option_a": "Fargo car is in between Ambassador and Fiat.",
+     "option_b": "Cadillac is next left to Mercedes car.",
+     "option_c": "Fargo is next right of Cadillac.",
+     "option_d": "Maruti is fourth right of Mercedes.",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "a49c39a3-3211-474c-9b2a-26b2867901be",
+     "question_text": "In an Exhibition seven cars of different companies - Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford and Fargo are standing facing to east in the following order:\n1. Cadillac is next to right of Fargo.\n2. Fargo is fourth to the right of Fiat.\n3. Maruti car is between Ambassador and Bedford.\n4. Fiat which is third to the left of Ambassador, is at one end.\n\nWhich of the following groups of cars is to the right of Ambassador?",
+     "option_a": "Cadillac, Fargo and Maruti",
+     "option_b": "Mercedes, Cadillac and Fargo",
+     "option_c": "Maruti, Bedford and Fiat",
+     "option_d": "Bedford, Cadillac and Fargo",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    },
+    {
+     "id": "ad4a2afa-1ab3-40bf-a8d6-ef1057d7df2e",
+     "question_text": "In an Exhibition seven cars of different companies - Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford and Fargo are standing facing to east in the following order:\n1. Cadillac is next to right of Fargo.\n2. Fargo is fourth to the right of Fiat.\n3. Maruti car is between Ambassador and Bedford.\n4. Fiat which is third to the left of Ambassador, is at one end.\n\nWhich of the cars are on both the sides of cadillac car?",
+     "option_a": "Ambassador and Maruti",
+     "option_b": "Maruti and Fiat",
+     "option_c": "Fargo and Mercedes",
+     "option_d": "Ambassador and Fargo",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 0
+    },
+    {
+     "id": "dffefbfd-1f4a-4329-8d9a-1064219e5ab9",
+     "question_text": "In an Exhibition seven cars of different companies - Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford and Fargo are standing facing to east in the following order:\n1. Cadillac is next to right of Fargo.\n2. Fargo is fourth to the right of Fiat.\n3. Maruti car is between Ambassador and Bedford.\n4. Fiat which is third to the left of Ambassador, is at one end.\n\nWhich of the following statement is correct?",
+     "option_a": "Maruti is next left of Ambassador.",
+     "option_b": "Bedford is next left of Fiat.",
+     "option_c": "Bedford is at one end.",
+     "option_d": "Fiat is next second to the right of Maruti.",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 0
+    }
+   ]
+  },
+  {
+   "nums": "1,2,3,4,4",
+   "rows": [
+    {
+     "id": "49150b73-bc37-44e7-9778-492a052f8931",
+     "question_text": "A, B, C, D, E, F and G are sitting in a row facing North:\n1. F is to the immediate right of E.\n2. E is 4th to the right of G.\n3. C is the neighbour of B and D.\n4. Person who is third to the left of D is at one of ends.\n\nWho are the neighbours of B?",
+     "option_a": "C and D",
+     "option_b": "C and G",
+     "option_c": "G and F",
+     "option_d": "C and E",
+     "correct_answer": "B",
+     "n_book": 0,
+     "n_seen": 1,
+     "n_ans": 1
+    },
+    {
+     "id": "9befd85e-c6fc-453b-b186-96e15bdc4875",
+     "question_text": "A, B, C, D, E, F and G are sitting in a row facing North:\n1. F is to the immediate right of E.\n2. E is 4th to the right of G.\n3. C is the neighbour of B and D.\n4. Person who is third to the left of D is at one of ends.\n\nWho are to the left of C?",
+     "option_a": "Only B",
+     "option_b": "G, B and D",
+     "option_c": "G and B",
+     "option_d": "D, E, F and A",
+     "correct_answer": "C",
+     "n_book": 0,
+     "n_seen": 3,
+     "n_ans": 1
+    },
+    {
+     "id": "a6c707f1-1ebe-42cd-8655-b5c7252420b4",
+     "question_text": "A, B, C, D, E, F and G are sitting in a row facing North:\n1. F is to the immediate right of E.\n2. E is 4th to the right of G.\n3. C is the neighbour of B and D.\n4. Person who is third to the left of D is at one of ends.\n\nWhat is the position of A?",
+     "option_a": "Between E and D",
+     "option_b": "Extreme left",
+     "option_c": "Centre",
+     "option_d": "Extreme right",
+     "correct_answer": "D",
+     "n_book": 0,
+     "n_seen": 2,
+     "n_ans": 2
+    },
+    {
+     "id": "f6cdb108-2f0f-4672-865a-f65298ec0009",
+     "question_text": "A, B, C, D, E, F and G are sitting in a row facing North:\n1. F is to the immediate right of E.\n2. E is 4th to the right of G.\n3. C is the neighbour of B and D.\n4. Person who is third to the left of D is at one of ends.\n\nWhich of the following statement is not true?",
+     "option_a": "E is to the immediate left of D",
+     "option_b": "A is at one of the ends",
+     "option_c": "G is to the immediate left of B",
+     "option_d": "F is second to the right of D",
+     "correct_answer": "A",
+     "n_book": 0,
+     "n_seen": 0,
+     "n_ans": 0
+    }
+   ]
+  }
+ ]
+}

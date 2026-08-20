@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { AnswerLetter, DisplayLang, Question } from '../../types'
 import { optionLetters, displayOption, displayExplanation } from '../../types'
 import OptionButton from './OptionButton'
@@ -30,7 +31,7 @@ interface QuestionCardProps {
  * the surface for a zero-chrome, type-driven feel; otherwise it's the boxed card
  * used in review/admin grading.
  */
-export default function QuestionCard({
+function QuestionCard({
   question,
   index,
   total,
@@ -68,23 +69,23 @@ export default function QuestionCard({
           <div className={`flex min-w-0 items-center gap-2 ${bare ? 'flex-wrap' : 'justify-end'}`}>
             {/* PYQ year badge - the exam year the question was asked in. */}
             {question.year && (
-              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-primary">
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-primary">
                 {question.year}
               </span>
             )}
             {/* Topic label - useful for PYQ (each question carries its topic). */}
             {question.topic && (
-              <span className="tamil max-w-[55vw] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary sm:max-w-[16rem]">
+              <span className="tamil max-w-[55vw] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-2xs font-semibold text-primary sm:max-w-[16rem]">
                 {topicName(question.topic, lang)}
               </span>
             )}
             {question.category === 'current_affairs' && question.ca_month && (
-              <span className="rounded-full bg-tint-blue px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-sky">
+              <span className="rounded-full bg-tint-blue px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-sky">
                 {question.ca_month}
               </span>
             )}
             {question.difficulty && (
-              <span className="rounded-full bg-tint-coral px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-accent">
+              <span className="rounded-full bg-tint-coral px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-accent">
                 {question.difficulty}
               </span>
             )}
@@ -139,3 +140,5 @@ export default function QuestionCard({
     </div>
   )
 }
+
+export default memo(QuestionCard)

@@ -47,7 +47,7 @@ export default function PolicyPage({ slug }: { slug: string }) {
   return (
     <div className="min-h-screen bg-canvas">
       {/* Top bar */}
-      <header className="sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
+      <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
           <Link to="/" className="group flex items-center gap-2.5">
             {/* Same mark, size and hover as the landing page and app shell — a
@@ -132,7 +132,7 @@ export default function PolicyPage({ slug }: { slug: string }) {
             <section key={b.h}>
               <h2 className="font-heading text-lg font-semibold tracking-tight text-ink">{b.h}</h2>
               {b.p?.map((para, i) => (
-                <p key={i} className="mt-2 font-body text-[15px] leading-relaxed text-ink2">
+                <p key={i} className="mt-2 font-body text-base leading-relaxed text-ink2">
                   {para}
                 </p>
               ))}
@@ -141,7 +141,7 @@ export default function PolicyPage({ slug }: { slug: string }) {
                   {b.list.map((item, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand" />
-                      <span className="font-body text-[15px] leading-relaxed text-ink2">{item}</span>
+                      <span className="font-body text-base leading-relaxed text-ink2">{item}</span>
                     </li>
                   ))}
                 </ul>

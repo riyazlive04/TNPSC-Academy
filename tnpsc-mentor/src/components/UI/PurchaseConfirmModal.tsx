@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { Check, Crown, Trophy, AlertCircle } from 'lucide-react'
+import { Check, Crown, Trophy, Rocket, ListChecks, AlertCircle } from 'lucide-react'
 import Spinner from './Spinner'
 import { useFocusTrap } from './useFocusTrap'
 import { useT } from '../../lib/i18n'
@@ -9,7 +9,7 @@ interface PurchaseConfirmModalProps {
   open: boolean
   /** Plan being bought, e.g. "Premium" or "Vettri Nichayam · Full". */
   planName: string
-  /** Validity line, e.g. "3-month plan". */
+  /** Validity line, e.g. "6-month plan". */
   validity: string
   /** Already-translated benefit lines shown as a checklist. */
   perks: string[]
@@ -21,8 +21,9 @@ interface PurchaseConfirmModalProps {
   note?: string
   /** Free unlock (100% coupon) - changes the OK label, no Razorpay opens. */
   isFree?: boolean
-  /** 'warm' = Premium mint green, 'brand' = Vettri violet. */
-  accent?: 'warm' | 'brand'
+  /** 'warm' = Premium mint green, 'brand' = Vettri violet, 'gold' = Rank Booster
+   *  amber, 'sky' = Mock Pack blue. */
+  accent?: 'warm' | 'brand' | 'gold' | 'sky'
   busy?: boolean
   onConfirm: () => void
   onCancel: () => void
@@ -64,9 +65,13 @@ export default function PurchaseConfirmModal({
 
   if (!open) return null
 
-  const warm = accent === 'warm'
-  const accentText = warm ? 'text-mint' : 'text-brand'
-  const Icon = warm ? Crown : Trophy
+  const ACCENTS = {
+    warm: { text: 'text-mint', badgeBg: 'bg-mintsoft', Icon: Crown, button: 'bg-mint hover:brightness-105' },
+    brand: { text: 'text-brand', badgeBg: 'bg-brand-soft', Icon: Trophy, button: 'bg-brand hover:bg-brand-dark' },
+    gold: { text: 'text-gold', badgeBg: 'bg-goldsoft', Icon: Rocket, button: 'bg-gold hover:brightness-105' },
+    sky: { text: 'text-sky', badgeBg: 'bg-tint-blue', Icon: ListChecks, button: 'bg-sky hover:brightness-105' },
+  } as const
+  const { text: accentText, badgeBg, Icon, button: confirmButtonBg } = ACCENTS[accent]
 
   // Portalled to <body>: the card that owns this recap can sit inside a
   // transformed/animated container (the Vettri offer sheet drags on the Y axis),
@@ -89,9 +94,7 @@ export default function PurchaseConfirmModal({
       >
         <div className="flex flex-col items-center text-center">
           <span
-            className={`mb-3 grid h-12 w-12 place-items-center rounded-full ${
-              warm ? 'bg-mintsoft text-mint' : 'bg-brand-soft text-brand'
-            }`}
+            className={`mb-3 grid h-12 w-12 place-items-center rounded-full ${badgeBg} ${accentText}`}
           >
             <Icon size={22} />
           </span>
@@ -103,7 +106,7 @@ export default function PurchaseConfirmModal({
 
         {/* What you get */}
         <div className="mt-4 rounded-field bg-tint p-4">
-          <p className={`tamil font-heading text-[11px] font-bold uppercase tracking-wide ${accentText}`}>
+          <p className={`tamil font-heading text-2xs font-bold uppercase tracking-wide ${accentText}`}>
             {t('buyConfirmWhatYouGet')}
           </p>
           <ul className="mt-2 space-y-1.5">
@@ -156,9 +159,7 @@ export default function PurchaseConfirmModal({
             ref={confirmRef}
             onClick={onConfirm}
             disabled={busy}
-            className={`btn press flex-1 px-4 py-2.5 text-sm text-white ${
-              warm ? 'bg-mint hover:brightness-105' : 'bg-brand hover:bg-brand-dark'
-            }`}
+            className={`btn press flex-1 px-4 py-2.5 text-sm text-white ${confirmButtonBg}`}
           >
             {busy && <Spinner size={15} />}
             <span className="tamil">{t(isFree ? 'buyConfirmOkFree' : 'buyConfirmOk')}</span>

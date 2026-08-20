@@ -12,6 +12,7 @@ import { useCreditsStore } from '../../store/creditsStore'
 import { api, type CouponValidation } from '../../lib/api'
 import { useT } from '../../lib/i18n'
 import { trackInitiateCheckout, trackCheckoutConfirmed } from '../../lib/tracking'
+import { hapticSuccess } from '../../lib/haptics'
 import PurchaseConfirmModal from './PurchaseConfirmModal'
 import StoreCodeRow from './StoreCodeRow'
 
@@ -173,6 +174,7 @@ export default function VettriCard({
         userId: user?.id ?? null,
       })
       if (result.status === 'paid') {
+        hapticSuccess()
         markVettri() // hide the card immediately…
         refresh() // …then reconcile with the server (expiry etc.)
         reloadCredits() // …and drop the finite credit meter (now unlimited).
@@ -211,7 +213,7 @@ export default function VettriCard({
           onClick={dismiss}
           aria-label={t('dismiss')}
           title={t('dismiss')}
-          className="absolute right-2.5 top-2.5 z-10 grid h-7 w-7 place-items-center rounded-full text-ink2/60 transition hover:bg-tint hover:text-ink focus-ring active:scale-90"
+          className="absolute right-1 top-1 z-10 grid h-11 w-11 place-items-center rounded-full text-ink2/60 transition hover:bg-tint hover:text-ink focus-ring active:scale-90"
         >
           <X size={16} />
         </button>
@@ -236,7 +238,7 @@ export default function VettriCard({
                 </p>
               </div>
             </div>
-            <span className="tamil flex-shrink-0 rounded-pill bg-white/15 px-3 py-1 font-heading text-[11px] font-semibold">
+            <span className="tamil flex-shrink-0 rounded-pill bg-white/15 px-3 py-1 font-heading text-2xs font-semibold">
               {t('marathonIncluded')}
             </span>
           </div>
@@ -246,7 +248,7 @@ export default function VettriCard({
       <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-brand">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
             <Trophy size={13} /> {t('vettriBadge')}
           </span>
           <h2 className="mt-3 font-display text-xl font-bold tracking-tight text-ink">
@@ -278,7 +280,7 @@ export default function VettriCard({
 
           {/* Bonus extras - a distinct block under the core perk. */}
           <div className="mt-4 rounded-field border border-brand/25 bg-brand-soft/60 p-3">
-            <p className="tamil flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-brand">
+            <p className="tamil flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
               <Gift size={13} /> {t('vettriBonusTitle')}
             </p>
             <ul className="mt-2 space-y-1">
@@ -370,7 +372,7 @@ export default function VettriCard({
                   {checking ? <Loader2 size={14} className="animate-spin" /> : t('premiumApply')}
                 </button>
               </div>
-              {couponError && <span className="font-body text-xs text-coral">{couponError}</span>}
+              {couponError && <span className="font-body text-xs text-error">{couponError}</span>}
             </div>
           )}
 

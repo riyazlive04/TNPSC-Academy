@@ -1,0 +1,510 @@
+[
+ {
+  "category": "mock",
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "classification": "false_positive",
+  "notes": "3 different compound-interest problems: ₹4,000 @5% (mock_set6), ₹10,000 @10% (mock_set1), ₹8,000 @15% (mock_set2) — all different principal/rate combinations with different correct answers/computations. Classic \"same vocabulary, different math\" false positive per the precedent example. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "ambedkar|article|constitution|described|heart",
+  "classification": "true_duplicate",
+  "notes": "Identical fact tested twice: Ambedkar called Article 32 the \"heart and soul\" of the Constitution. cebb89f5 (mock_set1, n_ans=5) vs 3bee8175 (mock_set5, n_ans=0) — same question reworded, options reshuffled. Kept the higher-engagement mock_set1 row; rewrote the mock_set5 copy into a different Polity/writs question (Mandamus) on the same broader Fundamental-Rights-remedies topic.",
+  "keep_id": "cebb89f5-feb4-4599-85a2-c754be0ae1f3",
+  "rewrites": [
+   {
+    "id": "3bee8175-cbff-4006-b111-5260d3505463",
+    "question_text": "Which writ, meaning 'we command', is issued by a court to compel a public authority to perform a duty it has failed to perform?",
+    "question_text_ta": "'நாம் கட்டளையிடுகிறோம்' என்று பொருள்படும் எந்த ஆணை, ஒரு பொது அதிகாரம் நிறைவேற்றத் தவறிய கடமையைச் செய்யுமாறு கட்டாயப்படுத்த நீதிமன்றத்தால் பிறப்பிக்கப்படுகிறது?",
+    "option_a": "Habeas Corpus",
+    "option_b": "Mandamus",
+    "option_c": "Prohibition",
+    "option_d": "Certiorari",
+    "option_a_ta": "ஹேபியஸ் கார்பஸ்",
+    "option_b_ta": "மாண்டமஸ்",
+    "option_c_ta": "தடையாணை (ப்ரொஹிபிஷன்)",
+    "option_d_ta": "செர்சியோரரி",
+    "correct_answer": "B",
+    "explanation": "Mandamus, meaning 'we command', is a writ issued by a court (under Article 32 for the Supreme Court, or Article 226 for High Courts) directing a public authority, official, or lower court to perform a public or statutory duty that it has failed or refused to perform. It cannot be issued against a private individual or to compel discretionary action.",
+    "explanation_ta": "'நாம் கட்டளையிடுகிறோம்' என்று பொருள்படும் மாண்டமஸ் (Mandamus) ஆணை, ஒரு பொது அதிகாரம், அலுவலர் அல்லது கீழமை நீதிமன்றம் தான் நிறைவேற்றத் தவறிய அல்லது மறுத்த பொது அல்லது சட்டரீதியான கடமையைச் செய்யுமாறு உத்தரவிட, நீதிமன்றத்தால் (உச்ச நீதிமன்றத்திற்கு விதி 32-ன் கீழும், உயர் நீதிமன்றங்களுக்கு விதி 226-ன் கீழும்) பிறப்பிக்கப்படுகிறது. இது தனிநபருக்கு எதிராகவோ, விருப்புரிமைச் செயலைக் கட்டாயப்படுத்தவோ பிறப்பிக்க முடியாது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "annadurai|karunanidhi|kazhagam|munnetra|ramachandran|ramasamy",
+  "classification": "false_positive",
+  "notes": "Two genuinely different facts: DMK founding (1949, Annadurai) vs AIADMK founding (1972, MGR). Shared vocabulary (party names, Dravidian-movement leaders) but different questions and different correct answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "annum|double|interest|itself|money|simple",
+  "classification": "false_positive",
+  "notes": "Two different simple-interest \"doubling time\" problems: 12.5 years → 8% vs 8 years → 12.5%. Different numbers, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "friday|january|saturday|thursday|wednesday",
+  "classification": "true_duplicate",
+  "notes": "Identical calendar computation (1 Jan 2020 Wed → 1 Jan 2021 = Friday, same options, same reasoning) in two papers. 126aeba2 (mock_set2, n_ans=1) vs b513d90f (mock_set4, n_ans=0). Kept the higher-engagement copy; rewrote the other into a follow-on calendar problem (2021→2022) that is internally consistent with the kept fact (1 Jan 2021 = Friday) but requires a different (non-leap) day-offset computation.",
+  "keep_id": "126aeba2-b8b6-48ae-a856-f5fbec415241",
+  "rewrites": [
+   {
+    "id": "b513d90f-0ea8-4bf1-ad20-cbc97bfef98b",
+    "question_text": "If 1st January 2021 was a Friday, what day of the week was 1st January 2022? (2021 is not a leap year.)",
+    "question_text_ta": "2021 ஜனவரி 1 வெள்ளிக்கிழமை எனில், 2022 ஜனவரி 1 எந்த நாள்? (2021 லீப் ஆண்டு அல்ல.)",
+    "option_a": "Friday",
+    "option_b": "Saturday",
+    "option_c": "Sunday",
+    "option_d": "Monday",
+    "option_a_ta": "வெள்ளி",
+    "option_b_ta": "சனி",
+    "option_c_ta": "ஞாயிறு",
+    "option_d_ta": "திங்கள்",
+    "correct_answer": "B",
+    "explanation": "2021 is not a leap year, so it has 365 days = 52 weeks + 1 odd day. So 1st January 2022 falls one day of the week after 1st January 2021. Friday + 1 = Saturday.",
+    "explanation_ta": "2021 லீப் ஆண்டு அல்ல, எனவே அதில் 365 நாட்கள் = 52 வாரங்கள் + 1 ஒற்றை நாள் உள்ளது. எனவே 2022 ஜனவரி 1, 2021 ஜனவரி 1-க்குப் பிறகு வாரத்தில் ஒரு நாள் கழித்து வருகிறது. வெள்ளி + 1 = சனி."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "advisory|article|importance|opinion|president|supreme",
+  "classification": "true_duplicate",
+  "notes": "Same fact tested twice: Article 143 lets the President seek the Supreme Court's advisory opinion. a7245c38 (mock_set3, n_ans=0) vs c6b7a7d2 (mock_set5, n_ans=0) — tied engagement (both 0 across bookmarks/seen/answers); kept mock_set3 arbitrarily. Rewrote the mock_set5 copy into a different Supreme-Court-jurisdiction question (Article 137 review power), reusing one of the original's own distractor options as the new correct fact — verified independently.",
+  "keep_id": "a7245c38-a70a-410a-acd9-6d80acc9a243",
+  "rewrites": [
+   {
+    "id": "c6b7a7d2-646b-4413-b3eb-7c90b0450c1e",
+    "question_text": "Under which Article of the Constitution does the Supreme Court have the power to review any judgment or order made by it?",
+    "question_text_ta": "அரசியலமைப்பின் எந்த விதியின் கீழ், தான் வழங்கிய எந்தத் தீர்ப்பையும் அல்லது உத்தரவையும் மறுஆய்வு செய்யும் அதிகாரம் உச்ச நீதிமன்றத்திற்கு உள்ளது?",
+    "option_a": "Article 32",
+    "option_b": "Article 136",
+    "option_c": "Article 137",
+    "option_d": "Article 141",
+    "option_a_ta": "விதி 32",
+    "option_b_ta": "விதி 136",
+    "option_c_ta": "விதி 137",
+    "option_d_ta": "விதி 141",
+    "correct_answer": "C",
+    "explanation": "Article 137 empowers the Supreme Court, subject to the provisions of any law made by Parliament or any rules made under Article 145, to review any judgment or order pronounced or made by it. (Article 136 deals with special leave to appeal, and Article 141 makes the law declared by the Supreme Court binding on all courts in India.)",
+    "explanation_ta": "பாராளுமன்றம் இயற்றும் எந்தச் சட்டத்திற்கும் அல்லது விதி 145-ன் கீழ் உருவாக்கப்படும் விதிகளுக்கும் உட்பட்டு, தான் வழங்கிய எந்தத் தீர்ப்பையும் அல்லது உத்தரவையும் மறுஆய்வு செய்யும் அதிகாரத்தை விதி 137, உச்ச நீதிமன்றத்திற்கு வழங்குகிறது. (விதி 136 சிறப்பு மேல்முறையீட்டு அனுமதியையும், விதி 141 உச்ச நீதிமன்றம் அறிவிக்கும் சட்டம் இந்தியாவின் அனைத்து நீதிமன்றங்களுக்கும் கட்டுப்படுத்தும் என்பதையும் கையாள்கின்றன.)"
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "amount|annually|annum|compounded|years",
+  "classification": "false_positive",
+  "notes": "Different CI-amount problems: ₹6,250 @4% vs ₹8,000 @10%. Different principal/rate, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "between|compound|difference|interest|simple|years",
+  "classification": "false_positive",
+  "notes": "Different CI−SI difference problems: ₹4,000 @10%/2yr (diff ₹40) vs ₹10,000 @10%/2yr (diff ₹100). Different principal, different answers — matches the precedent's explicit \"different compound-interest problems with different principal amounts\" false-positive example. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "foodgrains|national|population|provides|security|subsidised",
+  "classification": "true_duplicate",
+  "notes": "Same fact (NFSA enacted 2013) tested twice, reworded. 432498bd (mock_set1, n_ans=5) vs 8aec566f (mock_set6, n_ans=0). Kept the higher-engagement copy; rewrote the other into a different, verified NFSA fact (subsidised PDS prices ₹3/₹2/₹1 per kg for rice/wheat/coarse grains) on the same Food-Security topic.",
+  "keep_id": "432498bd-f3cc-4775-a00e-9c8f14203922",
+  "rewrites": [
+   {
+    "id": "8aec566f-d44e-47a3-9631-c23afe547ace",
+    "question_text": "Under the National Food Security Act, 2013, priority households are entitled to receive rice, wheat, and coarse grains through the Public Distribution System at what subsidised prices per kg respectively?",
+    "question_text_ta": "தேசிய உணவுப் பாதுகாப்புச் சட்டம், 2013-ன் கீழ், முன்னுரிமைக் குடும்பங்கள் பொது விநியோக முறை மூலம் அரிசி, கோதுமை, சிறுதானியங்களை முறையே கிலோவிற்கு என்ன மானிய விலையில் பெறத் தகுதியுடையவை?",
+    "option_a": "₹3, ₹2, ₹1",
+    "option_b": "₹2, ₹3, ₹1",
+    "option_c": "₹5, ₹3, ₹2",
+    "option_d": "₹1, ₹2, ₹3",
+    "option_a_ta": "₹3, ₹2, ₹1",
+    "option_b_ta": "₹2, ₹3, ₹1",
+    "option_c_ta": "₹5, ₹3, ₹2",
+    "option_d_ta": "₹1, ₹2, ₹3",
+    "correct_answer": "A",
+    "explanation": "Under the National Food Security Act, 2013, priority households are legally entitled to receive foodgrains through the PDS at ₹3 per kg for rice, ₹2 per kg for wheat, and ₹1 per kg for coarse grains/millets. Antyodaya Anna Yojana households receive the same items at these same prices.",
+    "explanation_ta": "தேசிய உணவுப் பாதுகாப்புச் சட்டம், 2013-ன் கீழ், முன்னுரிமைக் குடும்பங்கள் பொது விநியோக முறை மூலம் அரிசியை கிலோவிற்கு ₹3, கோதுமையை கிலோவிற்கு ₹2, சிறுதானியங்களை கிலோவிற்கு ₹1 என்ற மானிய விலையில் பெறச் சட்டப்பூர்வ உரிமை பெற்றுள்ளன. அந்த்யோதயா அன்ன யோஜனா குடும்பங்களும் இதே பொருட்களை இதே விலையில் பெறுகின்றன."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "amendment|commission|committee|constitution|fundamental|recommendation",
+  "classification": "true_duplicate",
+  "notes": "Same fact (Fundamental Duties added by 42nd Amendment on Swaran Singh Committee's recommendation) tested twice, reworded. f4cfaf82 (mock_set1, n_ans=5) vs de8048c1 (mock_set5, n_ans=0). Kept the higher-engagement copy; rewrote the other into a different, verified fact on the same topic (total count of Fundamental Duties = 11, after the 86th Amendment).",
+  "keep_id": "f4cfaf82-b9f3-422b-88df-2c10a3a0ae01",
+  "rewrites": [
+   {
+    "id": "de8048c1-5564-44d5-8388-347808606851",
+    "question_text": "How many Fundamental Duties are currently listed under Article 51A (Part IV-A) of the Indian Constitution?",
+    "question_text_ta": "இந்திய அரசியலமைப்பின் விதி 51A (பகுதி IV-A)-ன் கீழ் தற்போது எத்தனை அடிப்படை கடமைகள் பட்டியலிடப்பட்டுள்ளன?",
+    "option_a": "9",
+    "option_b": "10",
+    "option_c": "11",
+    "option_d": "12",
+    "option_a_ta": "9",
+    "option_b_ta": "10",
+    "option_c_ta": "11",
+    "option_d_ta": "12",
+    "correct_answer": "C",
+    "explanation": "The 42nd Amendment Act, 1976 originally added ten Fundamental Duties to the Constitution as Article 51A. An eleventh duty — for a parent or guardian to provide opportunities for education to their child between the ages of six and fourteen — was added later by the 86th Amendment Act, 2002. So there are currently 11 Fundamental Duties.",
+    "explanation_ta": "42வது திருத்தச் சட்டம், 1976, முதலில் விதி 51A ஆக பத்து அடிப்படை கடமைகளை அரசியலமைப்பில் சேர்த்தது. ஆறு முதல் பதினான்கு வயதுவரை உள்ள தமது குழந்தைக்குக் கல்வி வாய்ப்பு வழங்குவது என்ற பதினொன்றாவது கடமை, பின்னர் 86வது திருத்தச் சட்டம், 2002 மூலம் சேர்க்கப்பட்டது. எனவே தற்போது 11 அடிப்படை கடமைகள் உள்ளன."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "distinction|governor|minister|president|prominent|rajagopalachari",
+  "classification": "true_duplicate",
+  "notes": "Same fact (Rajaji = first/only Indian Governor-General) tested twice, reworded. 81f6e098 (mock_set2, n_ans=1) vs 9b9ca130 (mock_set5, n_ans=0). Kept the higher-engagement copy; rewrote the other into a different, verified Rajaji fact (founding the Swatantra Party, 1959) on the same topic.",
+  "keep_id": "81f6e098-0e55-4121-aa31-55232cf705e3",
+  "rewrites": [
+   {
+    "id": "9b9ca130-6c49-4fa8-b3d9-ab599cf19836",
+    "question_text": "C. Rajagopalachari (Rajaji) founded which political party in 1959, opposing the Congress's socialist economic policies?",
+    "question_text_ta": "காங்கிரஸின் சோசலிசப் பொருளாதாரக் கொள்கைகளை எதிர்த்து, சி. ராஜகோபாலாச்சாரி (ராஜாஜி) 1959-ல் எந்த அரசியல் கட்சியை நிறுவினார்?",
+    "option_a": "Swatantra Party",
+    "option_b": "Forward Bloc",
+    "option_c": "Justice Party",
+    "option_d": "Indian National Liberal Federation",
+    "option_a_ta": "சுதந்திரக் கட்சி",
+    "option_b_ta": "ஃபார்வர்டு பிளாக்",
+    "option_c_ta": "நீதிக் கட்சி",
+    "option_d_ta": "இந்திய தேசிய தாராளவாத கூட்டமைப்பு",
+    "correct_answer": "A",
+    "explanation": "C. Rajagopalachari founded the Swatantra Party in 1959, along with leaders like N.G. Ranga and Minoo Masani, as a right-of-centre party opposing the Congress's socialist economic model, state planning, and cooperative farming, and advocating free enterprise and limited government intervention.",
+    "explanation_ta": "சி. ராஜகோபாலாச்சாரி, என்.ஜி. ரங்கா, மினு மசானி போன்ற தலைவர்களுடன் இணைந்து 1959-ல் சுதந்திரக் கட்சியை (Swatantra Party) நிறுவினார்; இது காங்கிரஸின் சோசலிசப் பொருளாதார மாதிரி, அரசு திட்டமிடல், கூட்டுறவு விவசாயம் ஆகியவற்றை எதிர்த்து, சுதந்திர வணிகத்தையும் குறைந்த அரசு தலையீட்டையும் ஆதரித்த வலதுசாரி-மைய அரசியல் கட்சியாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "mock",
+  "sig": "between|candidates|election|margin|secured|winner",
+  "classification": "false_positive",
+  "notes": "Different election-margin percentage problems: 60% margin 9,000 votes (total 45,000) vs 56% margin 4,800 votes (total 40,000). Different percentages, margins, and answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "gitanjali|jallianwala|knighthood|literature|rabindranath|renounced",
+  "classification": "true_duplicate",
+  "notes": "Both questions rehash the same core fact cluster about Tagore (1913 Nobel for Gitanjali; renounced knighthood after Jallianwala Bagh) with only a swapped third statement, and in both the intended learning is just \"know these Tagore facts\". f39a2606 (test_set2) vs 68e2082c (test_set7), both n_ans=0 — kept test_set2 arbitrarily. Rewrote the test_set7 copy into a fresh, independently-verified statement set about Subramania Bharati (Bharathiar), who is separately named in this topic's syllabus list.",
+  "keep_id": "f39a2606-5ca7-44a0-8daf-8e561868a623",
+  "rewrites": [
+   {
+    "id": "68e2082c-522e-4a3d-a965-79db3ee505ed",
+    "question_text": "Consider the following statements about Subramania Bharati (Bharathiar):\n1. He translated Bankim Chandra Chatterjee's 'Vande Mataram' into Tamil.\n2. He was a strong advocate of women's emancipation and opposed caste discrimination through his writings.\n3. He served as the editor of the Tamil weekly newspaper 'India'.\nWhich of the statements given above are correct?",
+    "question_text_ta": "சுப்பிரமணிய பாரதி (பாரதியார்) குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. அவர் பங்கிம் சந்திர சட்டோபாத்யாயின் 'வந்தே மாதரம்' பாடலை தமிழில் மொழிபெயர்த்தார்.\n2. அவர் தமது படைப்புகள் மூலம் பெண் விடுதலையை ஆதரித்தும் சாதிப் பாகுபாட்டை எதிர்த்தும் வலுவாகக் குரல் கொடுத்தார்.\n3. அவர் 'இந்தியா' என்ற தமிழ் வார இதழின் ஆசிரியராகப் பணியாற்றினார்.\nமேற்கண்ட கூற்றுகளில் சரியானவை எவை?",
+    "option_a": "1, 2 and 3",
+    "option_b": "1 and 2 only",
+    "option_c": "2 and 3 only",
+    "option_d": "1 and 3 only",
+    "option_a_ta": "1, 2 மற்றும் 3",
+    "option_b_ta": "1 மற்றும் 2 மட்டும்",
+    "option_c_ta": "2 மற்றும் 3 மட்டும்",
+    "option_d_ta": "1 மற்றும் 3 மட்டும்",
+    "correct_answer": "A",
+    "explanation": "All three statements are correct. Subramania Bharati translated 'Vande Mataram' into Tamil, popularising the nationalist song among Tamil readers; through poems such as 'Panchali Sabatham' and 'Kuyil Pattu' he strongly championed women's emancipation and social equality, opposing caste discrimination; and he served as editor of the Tamil weekly 'India', published from Madras from 1906, using it as a platform for nationalist and revolutionary ideas.",
+    "explanation_ta": "மூன்று கூற்றுகளும் சரி. சுப்பிரமணிய பாரதி 'வந்தே மாதரம்' பாடலைத் தமிழில் மொழிபெயர்த்து, அந்த தேசியப் பாடலைத் தமிழ் வாசகர்களிடையே பிரபலப்படுத்தினார்; 'பாஞ்சாலி சபதம்', 'குயில் பாட்டு' போன்ற கவிதைகள் மூலம் பெண் விடுதலையையும் சமூக சமத்துவத்தையும் வலுவாக ஆதரித்து, சாதிப் பாகுபாட்டை எதிர்த்தார்; மேலும் 1906 முதல் சென்னையிலிருந்து வெளிவந்த 'இந்தியா' என்ற தமிழ் வார இதழின் ஆசிரியராகப் பணியாற்றி, அதை தேசியவாத மற்றும் புரட்சிகர கருத்துகளை பரப்பும் தளமாகப் பயன்படுத்தினார்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "beverages|consider|consumer|increased|inflation|revised",
+  "classification": "true_duplicate",
+  "notes": "Both rows are in the SAME paper (test_set4) and test the exact same CPI-revision fact bundle (base year 2011-12→2023-24; food/beverage weight actually DECREASED to ~37%, not increased; 358 items; Jan-2026 inflation 2.75%), with the same \"food/beverage weight increased\" false statement as the answer key in both. This is a same-paper repeat and the clearest duplicate in the batch. Both n_ans=0 — kept the 4-statement version. Rewrote the duplicate into an evergreen, independently-verifiable Economy fact (GST rollout date + tax structure) rather than another very-recent/hard-to-verify current-affairs claim, following the same approach used for the prior aptitude-bank cleanup.",
+  "keep_id": "5503ce43-819e-4093-b7d6-765fd9d92880",
+  "rewrites": [
+   {
+    "id": "2ce47763-78b1-4f65-af71-5e67345c8213",
+    "question_text": "Consider the following statements about the Goods and Services Tax (GST) in India:\n1. It was implemented with effect from 1 July 2017, subsuming most central and state indirect taxes such as excise duty, service tax, and VAT.\n2. It follows a triple-tier structure — CGST, SGST/UTGST, and IGST — for taxing intra-State and inter-State supplies.\nWhich of the statements given above is/are correct?",
+    "question_text_ta": "இந்தியாவின் பொருட்கள் மற்றும் சேவைகள் வரி (GST) குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. இது 2017 ஜூலை 1 முதல் நடைமுறைக்கு வந்தது; கலால் வரி, சேவை வரி, VAT போன்ற பெரும்பாலான மத்திய மற்றும் மாநில மறைமுக வரிகளை உள்ளடக்கியது.\n2. இது மாநிலத்திற்குள் மற்றும் மாநிலங்களுக்கு இடையேயான விற்பனைகளுக்கு வரி விதிக்க CGST, SGST/UTGST, IGST என்ற முப்படுகை அமைப்பைப் பின்பற்றுகிறது.\nமேற்கண்ட கூற்றுகளில் சரியானது / சரியானவை எவை?",
+    "option_a": "1 only",
+    "option_b": "2 only",
+    "option_c": "Neither 1 nor 2",
+    "option_d": "Both 1 and 2",
+    "option_a_ta": "1 மட்டும்",
+    "option_b_ta": "2 மட்டும்",
+    "option_c_ta": "1 அல்லது 2 எதுவுமில்லை",
+    "option_d_ta": "1 மற்றும் 2 இரண்டும்",
+    "correct_answer": "D",
+    "explanation": "Both statements are correct. GST was rolled out across India from 1 July 2017, replacing a web of central taxes (excise duty, service tax) and state taxes (VAT, entry tax, etc.) with a single indirect tax. It operates on a triple-tier structure: CGST and SGST/UTGST are levied together on intra-State supplies, while IGST is levied on inter-State supplies and imports.",
+    "explanation_ta": "இரு கூற்றுகளும் சரி. GST 2017 ஜூலை 1 முதல் இந்தியா முழுவதும் அமல்படுத்தப்பட்டது; கலால் வரி, சேவை வரி போன்ற மத்திய வரிகளையும், VAT, நுழைவு வரி போன்ற மாநில வரிகளையும் ஒரே மறைமுக வரியாக இணைத்தது. இது முப்படுகை அமைப்பில் இயங்குகிறது: மாநிலத்திற்குள் நடைபெறும் விற்பனைகளுக்கு CGST மற்றும் SGST/UTGST ஒன்றாக விதிக்கப்படுகின்றன, மாநிலங்களுக்கு இடையேயான விற்பனை மற்றும் இறக்குமதிகளுக்கு IGST விதிக்கப்படுகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "consider|federation|founded|justice|liberal|newspaper",
+  "classification": "true_duplicate",
+  "notes": "Both test the same 2 core facts (Justice Party founded 1916 as the South Indian Liberal Federation; English organ 'Justice'). c785460b (test_set5) vs d46445b3 (test_set12), both n_ans=0 — kept test_set5. Rewrote the other into a different, independently-verified Justice-Party fact (the 1921 Communal G.O.) on the same topic.",
+  "keep_id": "c785460b-52a1-4e23-8b15-ca1d070f114c",
+  "rewrites": [
+   {
+    "id": "d46445b3-da7c-45c2-81eb-747e4a759d0c",
+    "question_text": "The Justice Party government of the Madras Presidency issued the 'Communal Government Order' (Communal G.O.) in 1921, primarily to provide:",
+    "question_text_ta": "சென்னை மாகாண நீதிக் கட்சி அரசு 1921-ல் 'சமூக அரசாணை' (Communal G.O.) ஐப் பிறப்பித்தது; இது முதன்மையாக எதை வழங்குவதற்காக?",
+    "option_a": "Reservation in government jobs and education based on communal representation for non-Brahmin communities",
+    "option_b": "Free and compulsory primary education for all children",
+    "option_c": "Abolition of the zamindari system through land reforms",
+    "option_d": "Prohibition on the manufacture and sale of alcohol",
+    "option_a_ta": "பிராமணரல்லாத சமூகங்களுக்கு சமூகப் பிரதிநிதித்துவத்தின் அடிப்படையில் அரசு வேலைவாய்ப்பு மற்றும் கல்வியில் இட ஒதுக்கீடு",
+    "option_b_ta": "அனைத்துக் குழந்தைகளுக்கும் இலவச மற்றும் கட்டாய தொடக்கக் கல்வி",
+    "option_c_ta": "நில சீர்திருத்தம் மூலம் ஜமீன்தாரி முறையை ஒழித்தல்",
+    "option_d_ta": "மது தயாரிப்பு மற்றும் விற்பனை மீதான தடை",
+    "correct_answer": "A",
+    "explanation": "The Communal Government Order (G.O. No. 613) of 1921, issued by the Justice Party government, reserved a proportion of government jobs and educational seats for non-Brahmin communities, Muslims, Christians, and other underrepresented groups, based on their share in the population. It was a landmark early affirmative-action measure and later became the subject of the State of Madras v. Champakam Dorairajan (1951) case, which led to the First Constitutional Amendment introducing Article 15(4).",
+    "explanation_ta": "நீதிக் கட்சி அரசால் 1921-ல் பிறப்பிக்கப்பட்ட 'சமூக அரசாணை' (G.O. எண். 613), மக்கள்தொகையில் அவற்றின் பங்கின் அடிப்படையில், பிராமணரல்லாத சமூகங்கள், முஸ்லிம்கள், கிறிஸ்தவர்கள் மற்றும் பிற பிரதிநிதித்துவம் குறைவான பிரிவினருக்கு அரசு வேலைவாய்ப்பு மற்றும் கல்வி இடங்களில் ஒரு பங்கை ஒதுக்கீடு செய்தது. இது ஆரம்பகால முக்கியமான இட ஒதுக்கீட்டு நடவடிக்கையாகும்; பின்னர் இது சென்னை மாநிலம் Vs சம்பகம் தொரைராஜன் (1951) வழக்கிற்கு உள்ளானது, இது விதி 15(4)-ஐ அறிமுகப்படுத்திய முதல் அரசியலமைப்புத் திருத்தத்திற்கு வழிவகுத்தது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "annum|certain|interest|simple|years",
+  "classification": "false_positive",
+  "notes": "Different SI \"find the sum\" problems: ₹750/2yr/10% → ₹3,750 vs ₹960/3yr/8% → ₹4,000. Different givens, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "annum|between|compound|difference|interest|simple",
+  "classification": "false_positive",
+  "notes": "Three different CI−SI difference problems (all in test_set6, but each with different principal/rate/years and different answers): ₹10,000@10%/2yr, ₹8,000@10%/2yr, ₹8,000@5%/3yr. Genuinely different computations, legitimately co-existing in one paper. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "classification": "false_positive",
+  "notes": "Three different CI problems (all in test_set6): ₹8,000@10%/2yr, ₹15,625@8%/3yr, ₹20,000@15%/2yr. Different principal/rate/years/answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "height|parallel|sides|trapezium|whose",
+  "classification": "false_positive",
+  "notes": "Two different trapezium-area problems (both in test_set7): sides 12&8/h10 → 100 cm² vs sides 18&9/h14 → 189 cm². Different dimensions, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "employment|financial|guarantee|guarantees|household|volunteer",
+  "classification": "true_duplicate",
+  "notes": "Both boil down to testing the same headline MGNREGA fact (100-day wage-employment guarantee) with an \"all statements are true\" answer key in both cases, giving low discriminating value between the two papers. f543864e (test_set9) vs f0bd1111 (test_set11, richer 3-statement version), both n_ans=0 — kept the richer test_set11 version. Rewrote the test_set9 copy into a different, verified rural-welfare-scheme fact (PMAY-G) on the same broader topic.",
+  "keep_id": "f0bd1111-2c37-4ba0-83f4-48918bf146c5",
+  "rewrites": [
+   {
+    "id": "f543864e-7c0d-4451-8576-2f7b0091cd10",
+    "question_text": "Consider the following statements about the Pradhan Mantri Awas Yojana – Gramin (PMAY-G):\n1. It was launched in 2016 to provide pucca houses with basic amenities to rural households living in kutcha or dilapidated houses.\n2. It is implemented as a Centrally Sponsored Scheme, with the cost shared between the Centre and the States.\nWhich of the statements given above is/are correct?",
+    "question_text_ta": "பிரதான் மந்திரி ஆவாஸ் யோஜனா – கிராமீன் (PMAY-G) குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. குடிசை அல்லது சிதிலமான வீடுகளில் வாழும் ஊரக குடும்பங்களுக்கு அடிப்படை வசதிகளுடன் கூடிய நிரந்தர வீடுகளை வழங்க இது 2016-ல் தொடங்கப்பட்டது.\n2. இது மத்திய மற்றும் மாநிலங்களுக்கு இடையே செலவு பகிரப்படும் மத்திய நிதியுதவித் திட்டமாக (Centrally Sponsored Scheme) செயல்படுத்தப்படுகிறது.\nமேற்கண்ட கூற்றுகளில் சரியானது / சரியானவை எவை?",
+    "option_a": "1 only",
+    "option_b": "2 only",
+    "option_c": "Both 1 and 2",
+    "option_d": "Neither 1 nor 2",
+    "option_a_ta": "1 மட்டும்",
+    "option_b_ta": "2 மட்டும்",
+    "option_c_ta": "1 மற்றும் 2 இரண்டும்",
+    "option_d_ta": "1 அல்லது 2 எதுவுமில்லை",
+    "correct_answer": "C",
+    "explanation": "Both statements are correct. PMAY-G was launched in 2016, replacing the earlier Indira Awaas Yojana, to provide pucca houses with basic amenities (toilet, LPG connection, electricity, drinking water) to rural households living in kutcha or dilapidated houses. It is a Centrally Sponsored Scheme, with the unit cost shared between the Centre and States in a 60:40 ratio (90:10 for North-Eastern and Himalayan States, and 100% Centre-funded for Union Territories).",
+    "explanation_ta": "முன்பிருந்த இந்திரா ஆவாஸ் யோஜனாவிற்குப் பதிலாக, குடிசை அல்லது சிதிலமான வீடுகளில் வாழும் ஊரக குடும்பங்களுக்கு கழிப்பறை, எல்.பி.ஜி இணைப்பு, மின்சாரம், குடிநீர் போன்ற அடிப்படை வசதிகளுடன் கூடிய நிரந்தர வீடுகளை வழங்க PMAY-G 2016-ல் தொடங்கப்பட்டது. இது ஒரு மத்திய நிதியுதவித் திட்டமாகும்; வீட்டு அலகு செலவு மத்திய அரசுக்கும் மாநில அரசுக்கும் இடையே 60:40 என்ற விகிதத்தில் (வடகிழக்கு மற்றும் இமயமலை மாநிலங்களுக்கு 90:10, ஒன்றியப் பிரதேசங்களுக்கு 100% மத்திய நிதி) பகிரப்படுகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "components|consider|electronics|expenditure|manufacturing|targeted",
+  "classification": "true_duplicate",
+  "notes": "Both recycle the same three Union Budget 2026-27 figures (fiscal deficit 4.3% of GDP, capex ₹12.2 lakh crore, ECMS outlay ₹40,000 crore) as their \"correct\" statements. df5a4e8e (test_set9) vs 9513def4 (test_set12), both n_ans=0 — kept the 4-statement/harder test_set9 version. Since the source facts here are very recent (2026) current-affairs figures I cannot independently re-verify against outside sources, the rewrite deliberately swaps in an evergreen, independently-verifiable Economy fact (GST Council's constitutional basis) rather than fabricating another very-recent budget claim — same approach used for the prior aptitude-bank cleanup when trustworthy fresh facts weren't available.",
+  "keep_id": "df5a4e8e-dcc5-4877-a06f-69dd1a6ec056",
+  "rewrites": [
+   {
+    "id": "9513def4-ee8e-4446-8bc0-a68bb5a775d3",
+    "question_text": "Consider the following statements about the Goods and Services Tax (GST) Council:\n1. It is a constitutional body established under Article 279A of the Constitution.\n2. It is chaired by the Union Finance Minister.\n3. It makes recommendations to the Union and State Governments on GST rates, exemptions, and related matters.\nWhich of the statements given above are correct?",
+    "question_text_ta": "பொருட்கள் மற்றும் சேவைகள் வரி (GST) கவுன்சில் குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. இது அரசியலமைப்பின் விதி 279A-ன் கீழ் நிறுவப்பட்ட ஒரு அரசியலமைப்பு அமைப்பாகும்.\n2. இதன் தலைவராக ஒன்றிய நிதியமைச்சர் செயல்படுகிறார்.\n3. இது GST வரி விகிதங்கள், விலக்குகள் மற்றும் தொடர்புடைய விவகாரங்களில் மத்திய மற்றும் மாநில அரசுகளுக்குப் பரிந்துரைகளை வழங்குகிறது.\nமேற்கண்ட கூற்றுகளில் சரியானவை எவை?",
+    "option_a": "1, 2 and 3",
+    "option_b": "1 and 2 only",
+    "option_c": "2 and 3 only",
+    "option_d": "1 and 3 only",
+    "option_a_ta": "1, 2 மற்றும் 3",
+    "option_b_ta": "1 மற்றும் 2 மட்டும்",
+    "option_c_ta": "2 மற்றும் 3 மட்டும்",
+    "option_d_ta": "1 மற்றும் 3 மட்டும்",
+    "correct_answer": "A",
+    "explanation": "All three statements are correct. The GST Council was established under Article 279A, inserted by the 101st Constitutional Amendment Act, 2016. It is chaired by the Union Finance Minister, with State Finance/Revenue Ministers as members, and makes recommendations to the Union and States on GST rates, exemptions, thresholds, and related matters — recommendations that are treated as the basis for GST administration across the country.",
+    "explanation_ta": "மூன்று கூற்றுகளும் சரி. GST கவுன்சில், 101வது அரசியலமைப்புத் திருத்தச் சட்டம், 2016 மூலம் சேர்க்கப்பட்ட விதி 279A-ன் கீழ் நிறுவப்பட்டது. இதன் தலைவராக ஒன்றிய நிதியமைச்சர் செயல்படுகிறார்; மாநில நிதி/வருவாய் அமைச்சர்கள் உறுப்பினர்களாக உள்ளனர். GST வரி விகிதங்கள், விலக்குகள், வரம்புகள் மற்றும் தொடர்புடைய விவகாரங்களில் மத்திய, மாநில அரசுகளுக்கு இது பரிந்துரைகளை வழங்குகிறது; இப்பரிந்துரைகள் நாடு முழுவதும் GST நிர்வாகத்திற்கு அடிப்படையாகக் கருதப்படுகின்றன."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "breadth|cuboid|height|length|respectively|volume",
+  "classification": "false_positive",
+  "notes": "Two different cuboid-volume problems (both in test_set7): 12×10×8 → 960 cm³ vs 5×2×11 → 110 cm³. Different dimensions and answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "brahmaputra|consider|godavari|himalayan|peninsular|perennial",
+  "classification": "true_duplicate",
+  "notes": "Both statement sets test the identical three river facts (Ganga/Brahmaputra/Indus are Himalayan perennial rivers; Godavari is the longest/largest peninsular river; Narmada/Tapi flow west to the Arabian Sea), just reordered, with \"all three correct\" in both. 3a100663 (test_set12, n_ans=0) vs d347f6ec (test_set13, n_ans=1). Kept the higher-engagement copy; rewrote the other into a fresh, verified set of river facts (Indus source, Krishna's ranking, Chambal/Betwa as Yamuna tributaries) on the same Rivers-of-India topic.",
+  "keep_id": "d347f6ec-66ee-46ab-8866-c9621e6fc04d",
+  "rewrites": [
+   {
+    "id": "3a100663-e197-4842-b4af-bfa1d9f5ebcd",
+    "question_text": "Consider the following statements about the rivers of India:\n1. The Indus originates near Lake Mansarovar in Tibet.\n2. The Krishna is the second-longest river of peninsular India, after the Godavari.\n3. The Chambal and the Betwa are major tributaries of the Yamuna.\nWhich of the statements given above are correct?",
+    "question_text_ta": "இந்திய நதிகள் குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. சிந்து நதி திபெத்தில் உள்ள மானசரோவர் ஏரிக்கு அருகில் தோன்றுகிறது.\n2. கோதாவரிக்கு அடுத்தபடியாக, கிருஷ்ணா நதி தீபகற்ப இந்தியாவின் இரண்டாவது நீளமான நதி ஆகும்.\n3. சம்பல் மற்றும் பேட்வா நதிகள் யமுனையின் முக்கிய துணை நதிகள் ஆகும்.\nமேற்கண்ட கூற்றுகளில் சரியானவை எவை?",
+    "option_a": "1 and 2 only",
+    "option_b": "1, 2 and 3",
+    "option_c": "2 and 3 only",
+    "option_d": "1 and 3 only",
+    "option_a_ta": "1 மற்றும் 2 மட்டும்",
+    "option_b_ta": "1, 2 மற்றும் 3",
+    "option_c_ta": "2 மற்றும் 3 மட்டும்",
+    "option_d_ta": "1 மற்றும் 3 மட்டும்",
+    "correct_answer": "B",
+    "explanation": "All three are correct. The Indus originates near Lake Mansarovar in Tibet, close to Mount Kailash, and flows through Ladakh and Pakistan into the Arabian Sea. The Krishna, rising in the Western Ghats near Mahabaleshwar, is the second-longest river of peninsular India after the Godavari. The Chambal and Betwa are major tributaries that join the Yamuna from the south, draining parts of Madhya Pradesh, Rajasthan, and Uttar Pradesh.",
+    "explanation_ta": "மூன்றும் சரி. சிந்து நதி திபெத்தில் கைலாச மலைக்கு அருகில் உள்ள மானசரோவர் ஏரிக்குச் சமீபமாகத் தோன்றி, லடாக் மற்றும் பாகிஸ்தான் வழியாக ஓடி அரபிக் கடலில் கலக்கிறது. மகாபலேஸ்வருக்கு அருகில் மேற்குத் தொடர்ச்சி மலையில் தோன்றும் கிருஷ்ணா நதி, கோதாவரிக்கு அடுத்தபடியாக தீபகற்ப இந்தியாவின் இரண்டாவது நீளமான நதி ஆகும். சம்பல் மற்றும் பேட்வா நதிகள் மத்தியப் பிரதேசம், ராஜஸ்தான், உத்தரப் பிரதேசத்தின் பகுதிகளை வடிகட்டி, தெற்கிலிருந்து யமுனையுடன் இணையும் முக்கிய துணை நதிகளாகும்."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries",
+  "sig": "assistance|daughters|dharmambal|maniammaiyar|muthulakshmi|remarriage",
+  "classification": "true_duplicate",
+  "notes": "Both rows are in the SAME paper (test_set9) and are literally the same match-list question (identical A-2,B-4,C-3,D-1 mapping) with only the option-lettering shuffled — a same-paper exact repeat. Both n_ans=0 — kept e9c0cf56. Rewrote the duplicate into a different, verified welfare-scheme fact (Antyodaya Anna Yojana) on the same Social-Welfare-Schemes topic, avoiding re-use of the same niche scheme-name-matching content (which carries higher fact-check risk for fabricated new pairings).",
+  "keep_id": "e9c0cf56-03d0-4fc5-a93c-f582e50043b1",
+  "rewrites": [
+   {
+    "id": "71f6b244-85e9-425c-a033-893e63086dc8",
+    "question_text": "Consider the following statements about the Antyodaya Anna Yojana (AAY):\n1. It was launched in the year 2000 to provide highly subsidised foodgrains to the poorest of the poor among Below Poverty Line (BPL) families.\n2. Each AAY household is entitled to 35 kg of foodgrains per month, at ₹2 per kg for wheat and ₹3 per kg for rice.\nWhich of the statements given above is/are correct?",
+    "question_text_ta": "அந்த்யோதயா அன்ன யோஜனா (AAY) குறித்த பின்வரும் கூற்றுகளைக் கருதுக:\n1. வறுமைக் கோட்டிற்குக் கீழுள்ள (BPL) குடும்பங்களில் மிகவும் ஏழையான பிரிவினருக்கு அதிக மானியத்துடன் உணவு தானியங்களை வழங்க இது 2000ஆம் ஆண்டில் தொடங்கப்பட்டது.\n2. ஒவ்வொரு AAY குடும்பமும் மாதம் 35 கிலோ உணவு தானியங்களை, கோதுமைக்கு கிலோ ₹2, அரிசிக்கு கிலோ ₹3 என்ற விலையில் பெறத் தகுதியுடையது.\nமேற்கண்ட கூற்றுகளில் சரியானது / சரியானவை எவை?",
+    "option_a": "1 only",
+    "option_b": "2 only",
+    "option_c": "Both 1 and 2",
+    "option_d": "Neither 1 nor 2",
+    "option_a_ta": "1 மட்டும்",
+    "option_b_ta": "2 மட்டும்",
+    "option_c_ta": "1 மற்றும் 2 இரண்டும்",
+    "option_d_ta": "1 அல்லது 2 எதுவுமில்லை",
+    "correct_answer": "C",
+    "explanation": "Both statements are correct. The Antyodaya Anna Yojana was launched in December 2000 to identify and provide highly subsidised foodgrains to the poorest of the poor households among the BPL population. Each AAY household is entitled to 35 kg of foodgrains per month, at the concessional rates of ₹2 per kg for wheat and ₹3 per kg for rice, later subsumed under the coverage of the National Food Security Act, 2013.",
+    "explanation_ta": "இரு கூற்றுகளும் சரி. வறுமைக் கோட்டிற்குக் கீழுள்ள மக்களில் மிகவும் ஏழையான குடும்பங்களைக் கண்டறிந்து, அவர்களுக்கு அதிக மானியத்துடன் உணவு தானியங்களை வழங்க அந்த்யோதயா அன்ன யோஜனா 2000ஆம் ஆண்டு டிசம்பரில் தொடங்கப்பட்டது. ஒவ்வொரு AAY குடும்பமும் மாதம் 35 கிலோ உணவு தானியங்களை, கோதுமைக்கு கிலோ ₹2, அரிசிக்கு கிலோ ₹3 என்ற சலுகை விலையில் பெறத் தகுதியுடையது; பின்னர் இது தேசிய உணவுப் பாதுகாப்புச் சட்டம், 2013-ன் கவரேஜின் கீழ் இணைக்கப்பட்டது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "classification": "false_positive",
+  "notes": "5 different CI problems, all different principal/rate/years combinations and answers (12,000@10%/2yr; 6,000@20%/2yr; 20,000@5%/3yr; 10,000@10%/2yr; 8,000@5%/2yr). No action. (Aside, out of scope for this dedup task: row 27946226's explanation text says \"Answer: Rs. 2,640 → Option (B)\" but Rs. 2,640 is actually option C in that row — a pre-existing explanation mislabel bug, unrelated to duplication, not fixed here since this row is not being touched.)",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "annually|between|compound|compounded|difference|interest",
+  "classification": "false_positive",
+  "notes": "2 different CI−SI difference problems: ₹10,000@10%/3yr (diff ₹310) vs ₹25,000@8%/2yr (diff ₹160). Different principal/rate/years, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "annum|compound|compounded|interest|months|quarterly",
+  "classification": "false_positive",
+  "notes": "2 different quarterly-compounding problems: ₹40,000@20%/9mo → ₹6,305 vs ₹10,000@8%/6mo → ₹404. Different principal/rate/duration, different answers. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "between|compound|difference|interest|simple|years",
+  "classification": "false_positive",
+  "notes": "2 different \"find the sum from CI−SI difference\" problems: 6%/2yr/diff ₹180 → ₹50,000 vs 5%/3yr/diff ₹183 → ₹24,000. Different rate/years/difference, different answers (also different formula: 2-year vs 3-year difference formula). No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "continuously|democracy|established|functioning|parliament|thingvellir",
+  "classification": "true_duplicate",
+  "notes": "Same fact (Iceland's Althingi at Thingvellir, 930 CE, oldest continuously functioning parliament) tested twice with only the wrong options changed. 8590058e (test_set6, n_ans=0) vs c64492c8 (test_set8, n_ans=0) — tied engagement, kept test_set6 arbitrarily. Rewrote the other into a different, well-established fact from the same \"oldest democracies\" theme referenced in its own explanation text (the Magna Carta, 1215).",
+  "keep_id": "8590058e-61b5-438f-98c9-cf039d3f675e",
+  "rewrites": [
+   {
+    "id": "c64492c8-3198-4920-980d-c41224883d21",
+    "question_text": "The Magna Carta, a landmark document that limited the powers of the monarchy and is often cited as an early milestone in the development of democracy and the rule of law, was signed in England in which year?",
+    "question_text_ta": "மன்னராட்சியின் அதிகாரங்களைக் கட்டுப்படுத்திய, ஜனநாயகம் மற்றும் சட்டத்தின் ஆட்சி வளர்ச்சியில் ஆரம்பகால மைல்கல்லாகக் கருதப்படும் மேக்னா கார்ட்டா ஆவணம், இங்கிலாந்தில் எந்த ஆண்டு கையொப்பமிடப்பட்டது?",
+    "option_a": "1066",
+    "option_b": "1215",
+    "option_c": "1381",
+    "option_d": "1689",
+    "option_a_ta": "1066",
+    "option_b_ta": "1215",
+    "option_c_ta": "1381",
+    "option_d_ta": "1689",
+    "correct_answer": "B",
+    "explanation": "The Magna Carta ('Great Charter') was signed by King John of England at Runnymede in 1215, under pressure from rebel barons. It established the principle that the monarch was not above the law and that certain rights and liberties had to be respected, making it a foundational document in the history of constitutional government and the rule of law.",
+    "explanation_ta": "மேக்னா கார்ட்டா ('பெரும் சாசனம்') 1215-ல் கிளர்ச்சி செய்த பிரபுக்களின் அழுத்தத்தின் பேரில், இங்கிலாந்தின் மன்னன் ஜான் அவர்களால் ரன்னிமீட் என்ற இடத்தில் கையொப்பமிடப்பட்டது. மன்னரும் சட்டத்திற்குக் கட்டுப்பட்டவரே என்றும், சில உரிமைகளையும் சுதந்திரங்களையும் மதிக்க வேண்டும் என்றும் இது நிலைநாட்டியது; இதனால் அரசியலமைப்பு ஆட்சி மற்றும் சட்டத்தின் ஆட்சி வரலாற்றில் இது ஒரு அடிப்படை ஆவணமாக விளங்குகிறது."
+   }
+  ],
+  "conflict_details": null
+ },
+ {
+  "category": "testseries_g2",
+  "sig": "faces|number|numbered|opposite|position|positions",
+  "classification": "false_positive",
+  "notes": "Two different dice-reasoning configurations with different given faces/positions and different correct answers (opposite-of-1 = 6 in a 2-position problem vs opposite-of-2 = 1 in a 3-position problem). Different specific setups, not the same underlying puzzle instance. No action.",
+  "keep_id": null,
+  "rewrites": [],
+  "conflict_details": null
+ }
+]

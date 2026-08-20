@@ -33,11 +33,11 @@ export default function ThirukuralQuestionCard({ q, lang, selected, onSelect, re
       {/* Quiet badges: chapter + difficulty. */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {q.adhigaram_en && (
-          <span className="tamil max-w-[60vw] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary sm:max-w-[18rem]">
+          <span className="tamil max-w-[60vw] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-2xs font-semibold text-primary sm:max-w-[18rem]">
             {lang === 'ta' ? q.adhigaram_ta ?? q.adhigaram_en : q.adhigaram_en}
           </span>
         )}
-        <span className="rounded-full bg-tint-coral px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-accent">
+        <span className="rounded-full bg-tint-coral px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-accent">
           {q.difficulty}
         </span>
       </div>
@@ -86,7 +86,7 @@ export default function ThirukuralQuestionCard({ q, lang, selected, onSelect, re
 
       {/* For match items, label the columns the option strings map onto. */}
       {q.left && (
-        <p className="mb-2 px-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-muted">
+        <p className="mb-2 px-1 font-heading text-2xs font-semibold uppercase tracking-wide text-muted">
           {Object.keys(q.left).join('  ·  ')}
         </p>
       )}
@@ -132,12 +132,12 @@ function VerseBlock({
     : []
   return (
     <div className={`rounded-card border border-line bg-tint-violet/40 p-4 ${className}`}>
-      <span className="mb-2 flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-primary">
+      <span className="mb-2 flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
         <ScrollText size={13} />
         <span className="tamil">{label}</span>
       </span>
       {showTa && taLines.length > 0 && (
-        <p className="tamil font-display text-[16px] font-semibold leading-relaxed text-ink sm:text-[17px]">
+        <p className="tamil font-display text-base font-semibold leading-relaxed text-ink sm:text-lg">
           {taLines.map((line, i) => (
             <span key={i}>
               {i > 0 && <br />}
@@ -149,7 +149,7 @@ function VerseBlock({
       {showEn && (
         <p
           className={`font-display italic leading-relaxed ${
-            showTa ? 'mt-1.5 text-[13px] font-medium text-muted' : 'text-[15px] font-semibold text-ink'
+            showTa ? 'mt-1.5 text-sm font-medium text-muted' : 'text-base font-semibold text-ink'
           }`}
         >
           {couplet.en}

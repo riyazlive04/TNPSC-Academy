@@ -58,7 +58,7 @@ export default function StreakCalendar({
       <div className="flex items-center justify-between">
         {days.map((d, i) => (
           <div key={i} className="flex flex-col items-center gap-1.5">
-            <span className="font-heading text-[10px] font-medium uppercase text-ink2">
+            <span className="font-heading text-2xs font-medium uppercase text-ink2">
               {d.label}
             </span>
             <span

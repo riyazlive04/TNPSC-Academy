@@ -31,6 +31,11 @@ export function useAuth() {
   const verifyOtp = useAuthStore((s) => s.verifyOtp)
   const replaceDeviceOtp = useAuthStore((s) => s.replaceDeviceOtp)
   const replaceDeviceGoogle = useAuthStore((s) => s.replaceDeviceGoogle)
+  const verifyTotp = useAuthStore((s) => s.verifyTotp)
+  const replaceDeviceTotp = useAuthStore((s) => s.replaceDeviceTotp)
+  const totpEnroll = useAuthStore((s) => s.totpEnroll)
+  const totpConfirm = useAuthStore((s) => s.totpConfirm)
+  const totpDisable = useAuthStore((s) => s.totpDisable)
   const signUp = useAuthStore((s) => s.signUp)
   const sendSignupOtp = useAuthStore((s) => s.sendSignupOtp)
   const verifySignupOtp = useAuthStore((s) => s.verifySignupOtp)
@@ -59,6 +64,11 @@ export function useAuth() {
     verifyOtp,
     replaceDeviceOtp,
     replaceDeviceGoogle,
+    verifyTotp,
+    replaceDeviceTotp,
+    totpEnroll,
+    totpConfirm,
+    totpDisable,
     signUp,
     sendSignupOtp,
     verifySignupOtp,

@@ -24,3 +24,33 @@ export function postAuthDestination(fromPath?: string): string {
   const langAlreadySet = useLanguageStore.getState().lang !== null
   return langAlreadySet ? '/test-arena' : '/language'
 }
+
+/** Landing pages where a successful auth should resume checkout immediately
+ *  rather than dropping the user back on the page cold. */
+const AUTO_ENROLL_PATHS = new Set(['/rank-booster'])
+
+export function isAutoEnrollPath(fromPath?: string): boolean {
+  return !!fromPath && AUTO_ENROLL_PATHS.has(fromPath)
+}
+
+/**
+ * Router state to pass alongside postAuthDestination(fromPath). Two jobs:
+ *
+ *  - Landing straight on an auto-enroll page (e.g. /rank-booster) → tells it
+ *    to resume checkout immediately instead of waiting for a second "Enroll"
+ *    tap right when intent was highest.
+ *  - Landing on /complete-profile instead (a fresh Google signup still needs
+ *    a phone number) → carries the ORIGINAL fromPath forward as the same
+ *    `{ from: { pathname } }` shape login/register already read from
+ *    location.state, so CompleteProfilePage's own postAuthDestination() call
+ *    at the end still resolves back to the intended page — otherwise the
+ *    deep link is lost the moment onboarding gets in the way.
+ */
+export function postAuthState(
+  fromPath?: string
+): { autoEnroll: true } | { from: { pathname: string } } | undefined {
+  const dest = postAuthDestination(fromPath)
+  if (fromPath && dest === fromPath && isAutoEnrollPath(fromPath)) return { autoEnroll: true }
+  if (dest === '/complete-profile' && fromPath) return { from: { pathname: fromPath } }
+  return undefined
+}

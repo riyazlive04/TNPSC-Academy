@@ -41,29 +41,18 @@ const CREDENTIALS: RequestCredentials = isNative ? 'same-origin' : 'include'
 export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
 
 /**
- * Whether to show the "Sign in with phone" (OTP) tab. The server independently
- * gates the OTP endpoints on its MSG91 credentials; this build flag just hides
- * the UI until phone login is actually live. Set VITE_OTP_LOGIN=true to enable.
+ * Which optional auth methods the server currently has configured — phone-OTP
+ * login, WhatsApp-OTP signup verification, its Telegram fallback, and Google.
+ * Fetched once at boot (see authConfigStore) instead of mirrored by hand
+ * through separate VITE_* build flags, which could (and once did) drift out
+ * of sync with the server's own AiSensy/MSG91/Telegram-bot config state.
  */
-export const isPhoneOtpConfigured =
-  String(import.meta.env.VITE_OTP_LOGIN ?? '').toLowerCase() === 'true'
-
-/**
- * Whether signup requires WhatsApp OTP verification of the mobile number. The
- * server independently gates on its AiSensy credentials (and REJECTS an
- * unverified register when they're set), so this flag must match the server's
- * state: set VITE_SIGNUP_WA_OTP=true once the AiSensy campaign is live.
- */
-export const isSignupWaOtpConfigured =
-  String(import.meta.env.VITE_SIGNUP_WA_OTP ?? '').toLowerCase() === 'true'
-
-/**
- * Whether the Telegram fallback for signup phone verification is available
- * (offered when the number has no WhatsApp). Mirrors the server's
- * TELEGRAM_BOT_* config: set VITE_SIGNUP_TG_VERIFY=true once the bot is live.
- */
-export const isTelegramVerifyConfigured =
-  String(import.meta.env.VITE_SIGNUP_TG_VERIFY ?? '').toLowerCase() === 'true'
+export interface AuthConfig {
+  google: boolean
+  whatsappOtp: boolean
+  telegramVerify: boolean
+  phoneOtp: boolean
+}
 
 /**
  * Fire-and-forget ping to /api/health on app mount. The API now runs always-on
@@ -251,9 +240,11 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
 
   // Cached reads are keyed by path + query (never the absolute URL), so a
   // different query is a different entry AND invalidateReads('/api/analytics')
-  // matches the way a caller would write it.
-  const cacheKey = url.slice(API_URL.length)
-  const cacheable = swr !== undefined && method === 'GET'
+  // matches the way a caller would write it. POST "reads" (a filter/config
+  // body instead of a query string, e.g. countQuestions) fold the body into
+  // the key too, so distinct configs don't collide.
+  const cacheKey = url.slice(API_URL.length) + (method === 'POST' && body ? `:${JSON.stringify(body)}` : '')
+  const cacheable = swr !== undefined && (method === 'GET' || method === 'POST')
   if (cacheable) {
     // The real network call, storing what it gets. `swr: undefined` on the inner
     // call is what stops this from recursing.
@@ -327,6 +318,14 @@ export interface SessionResponse {
   profile: Profile | null
 }
 
+/** Returned by /login and /google instead of a session when the account is
+ * admin/superadmin with TOTP enabled — the ticket proves password/Google
+ * already succeeded and is redeemed by totpStepUp(). */
+export interface TotpRequiredResponse {
+  totpRequired: true
+  ticket: string
+}
+
 /** One active device session (manage-devices screen). The raw device/session key
  * is never sent to the client; `current` (set by the server from the request's own
  * session) marks "this device". */
@@ -354,13 +353,20 @@ export type LatestRelease = Omit<AppRelease, 'id'>
 
 export const api = {
   auth: {
-    async login(email: string, password: string): Promise<SessionResponse> {
-      const data = await request<SessionResponse>('/api/auth/login', {
+    /** Which optional auth methods are live right now — see AuthConfig. */
+    async config(): Promise<AuthConfig> {
+      return request('/api/auth/config', { auth: false })
+    },
+    async login(
+      email: string,
+      password: string
+    ): Promise<SessionResponse | TotpRequiredResponse> {
+      const data = await request<SessionResponse | TotpRequiredResponse>('/api/auth/login', {
         method: 'POST',
         auth: false,
         body: { email, password, device_id: getDeviceId() },
       })
-      tokens.set(data.access_token, data.refresh_token)
+      if ('access_token' in data) tokens.set(data.access_token, data.refresh_token)
       return data
     },
     /** After a `device_limit` block: sign out the chosen device and sign in here.
@@ -435,13 +441,13 @@ export const api = {
     /** Exchange a Google ID token (from Google Identity Services in the browser)
      * for the same session the email/password flow returns. Auto-creates the
      * account on first sign-in. */
-    async google(idToken: string): Promise<SessionResponse> {
-      const data = await request<SessionResponse>('/api/auth/google', {
+    async google(idToken: string): Promise<SessionResponse | TotpRequiredResponse> {
+      const data = await request<SessionResponse | TotpRequiredResponse>('/api/auth/google', {
         method: 'POST',
         auth: false,
         body: { idToken, device_id: getDeviceId() },
       })
-      tokens.set(data.access_token, data.refresh_token)
+      if ('access_token' in data) tokens.set(data.access_token, data.refresh_token)
       return data
     },
     /** After a Google `device_limit` block: sign out the chosen device and finish
@@ -505,6 +511,45 @@ export const api = {
       tokens.set(data.access_token, data.refresh_token)
       return data
     },
+    // ─── TOTP two-factor authentication (admin/superadmin) ───────────────────
+    /** Redeem a totpRequired ticket + a 6-digit (or backup) code into the
+     * real session that /login or /google withheld. */
+    async totpStepUp(ticket: string, code: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/totp/step-up', {
+        method: 'POST',
+        auth: false,
+        body: { ticket, code, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
+    /** After a device_limit block on totpStepUp itself: sign out the chosen
+     * device and finish using the fresh ticket that block returned (the code
+     * was already spent, no need to re-enter it). */
+    async totpReplaceDevice(ticket: string, sessionId: string): Promise<SessionResponse> {
+      const data = await request<SessionResponse>('/api/auth/totp/replace-device', {
+        method: 'POST',
+        auth: false,
+        body: { ticket, session_id: sessionId, device_id: getDeviceId() },
+      })
+      tokens.set(data.access_token, data.refresh_token)
+      return data
+    },
+    /** Start enrollment for the SIGNED-IN admin/superadmin: a fresh secret +
+     * a scannable QR data-URI. Not yet active — totpConfirm() activates it. */
+    async totpEnroll(): Promise<{ secret: string; qr: string }> {
+      return request('/api/auth/totp/enroll', { method: 'POST' })
+    },
+    /** Verify the first code from the authenticator app and activate 2FA.
+     * Returns the one-time backup codes — shown to the user exactly once. */
+    async totpConfirm(code: string): Promise<{ backupCodes: string[] }> {
+      return request('/api/auth/totp/confirm', { method: 'POST', body: { code } })
+    },
+    /** Turn 2FA off. Requires re-proving ownership with the current password
+     * or an unused backup code. */
+    async totpDisable(params: { password?: string; backupCode?: string }): Promise<{ ok: true }> {
+      return request('/api/auth/totp/disable', { method: 'POST', body: params })
+    },
     async me(): Promise<{ user: { id: string }; profile: Profile | null }> {
       return request('/api/auth/me')
     },
@@ -536,6 +581,22 @@ export const api = {
     })
     return data.questions
   },
+  /** Practice-mode instant reveal for ONE already-served question (see
+   *  supabase/check_answer.sql - server-gated on seen_questions, not a bare
+   *  answer-key lookup). Never call this for Mock/PYQ; they stay exam-style. */
+  async checkAnswer(
+    questionId: string
+  ): Promise<
+    Pick<
+      Question,
+      'correct_answer' | 'explanation' | 'explanation_ta' | 'explanation_video_url' | 'why_wrong' | 'why_wrong_ta'
+    >
+  > {
+    return request('/api/questions/check-answer', {
+      method: 'POST',
+      body: { questionId },
+    })
+  },
   /** The new-user Starter Challenge paper (fixed hard mixed set, ≤18 questions). */
   async starterQuestions(count: number): Promise<Question[]> {
     const data = await request<{ questions: Question[] }>('/api/questions/starter-test', {
@@ -548,6 +609,7 @@ export const api = {
     const data = await request<{ count: number }>('/api/questions/count', {
       method: 'POST',
       body: { config },
+      swr: 60_000,
     })
     return data.count
   },
@@ -710,17 +772,19 @@ export const api = {
   }): Promise<void> {
     await request('/api/questions/mock-exam/attempt', { method: 'POST', body: p })
   },
-  /** Scheduled test-series papers visible to this user + lock/schedule/attempts. */
-  async testSeries(): Promise<{ tests: TestSeriesItem[]; premium: boolean }> {
-    return request<{ tests: TestSeriesItem[]; premium: boolean }>('/api/questions/test-series', {
-      swr: 60_000,
-    })
+  /** Scheduled test-series papers visible to this user + lock/schedule/attempts.
+   *  `series` defaults server-side to the original Group 1 Marathon. */
+  async testSeries(series?: string): Promise<{ tests: TestSeriesItem[]; premium: boolean }> {
+    return request<{ tests: TestSeriesItem[]; premium: boolean }>(
+      `/api/questions/test-series${series ? `?series=${series}` : ''}`,
+      { swr: 60_000 }
+    )
   },
   /** The fixed question set for one test. Server re-checks premium/date/attempts. */
-  async testSeriesQuestions(testId: string): Promise<Question[]> {
+  async testSeriesQuestions(testId: string, series?: string): Promise<Question[]> {
     const data = await request<{ questions: Question[] }>('/api/questions/test-series', {
       method: 'POST',
-      body: { test_id: testId },
+      body: { test_id: testId, series },
     })
     return data.questions
   },
@@ -733,9 +797,17 @@ export const api = {
   }): Promise<void> {
     await request('/api/questions/test-series/attempt', { method: 'POST', body: p })
   },
-  /** This user's Test Marathon attempt history + per-answer weak-area breakdown. */
-  async testSeriesAnalytics(): Promise<TestSeriesAnalyticsResponse> {
-    return request<TestSeriesAnalyticsResponse>('/api/questions/test-series/analytics', {
+  /** This user's attempt history for one series + per-answer weak-area breakdown. */
+  async testSeriesAnalytics(series?: string): Promise<TestSeriesAnalyticsResponse> {
+    return request<TestSeriesAnalyticsResponse>(
+      `/api/questions/test-series/analytics${series ? `?series=${series}` : ''}`,
+      { swr: 60_000 }
+    )
+  },
+  /** Combined attempt history + weak-area breakdown across EVERY scheduled
+   *  test series (Vettri Nichayam + Rank Booster + any future series). */
+  async testSeriesAnalyticsOverall(): Promise<TestSeriesAnalyticsResponse> {
+    return request<TestSeriesAnalyticsResponse>('/api/questions/test-series/analytics/overall', {
       swr: 60_000,
     })
   },
@@ -839,13 +911,13 @@ export const api = {
     return data.profile
   },
   async percentile(): Promise<number | null> {
-    const data = await request<{ percentile: number | null }>('/api/profile/percentile')
+    const data = await request<{ percentile: number | null }>('/api/profile/percentile', { swr: 60_000 })
     return data.percentile
   },
   async activityRows(days = 60): Promise<{ activity_date: string; questions: number; tests: number }[]> {
     const data = await request<{
       rows: { activity_date: string; questions: number; tests: number }[]
-    }>('/api/profile/activity', { query: { days } })
+    }>('/api/profile/activity', { query: { days }, swr: 60_000 })
     return data.rows
   },
   async recordActivity(questions: number, tests = 1): Promise<void> {
@@ -999,6 +1071,14 @@ export const api = {
       })
       return data.revoked
     },
+    /** Withdraw a user's Rank Booster plan (revokes their paid rank_booster_g2 rows). */
+    async revokeRankBooster(userId: string): Promise<number> {
+      const data = await request<{ revoked: number }>(
+        '/api/superadmin/users/revoke-rank-booster',
+        { method: 'POST', body: { userId } }
+      )
+      return data.revoked
+    },
     /** Comp a plan (₹0 paid ledger row) — entitlement starts now for the plan's window. */
     async grantPlan(userId: string, plan: GrantablePlan): Promise<void> {
       await request('/api/superadmin/users/grant-plan', { method: 'POST', body: { userId, plan } })
@@ -1056,9 +1136,12 @@ export const api = {
       })
       return data.exam
     },
-    /** All scheduled test-series papers (incl. disabled), with loaded counts. */
-    async testSeries(): Promise<TestSeriesAdmin[]> {
-      const data = await request<{ tests: TestSeriesAdmin[] }>('/api/superadmin/test-series')
+    /** All tests for one series (incl. disabled), with loaded counts. `series`
+     *  defaults server-side to the original Group 1 Marathon. */
+    async testSeries(series?: string): Promise<TestSeriesAdmin[]> {
+      const data = await request<{ tests: TestSeriesAdmin[] }>(
+        `/api/superadmin/test-series${series ? `?series=${series}` : ''}`
+      )
       return data.tests
     },
     /** Patch a test's gating/schedule. Only the supplied fields change. */
@@ -1071,6 +1154,7 @@ export const api = {
         duration_seconds: number
         negative_mark: number
         title: string
+        tier: 'free' | 'paid'
       }>
     ): Promise<TestSeriesAdmin> {
       const data = await request<{ test: TestSeriesAdmin }>(`/api/superadmin/test-series/${id}`, {
@@ -2041,8 +2125,19 @@ export interface BundleEntitlement {
   premiumUntil: string | null
   vettri: boolean
   vettriUntil: string | null
-  /** premium || vettri — unlocks the Vettri bank + unlimited PYQ/CA. */
+  /** premium || vettri — unlocks the Vettri bank (Test Marathon). */
   unlimited: boolean
+  rankBooster: boolean
+  rankBoosterUntil: string | null
+  /** premium || rankBooster — unlocks the Group II/IIA Rank Booster series. */
+  rankBoosterUnlocked: boolean
+  /** unlimited || rankBooster — the credit-gate bypass (unlimited PYQ/CA/
+   *  Subject-practice). Mirrors GET /api/credits' own `unlimited` field. */
+  creditsUnlimited: boolean
+  /** The standalone ₹399/80-day Group 1 Mock Test Pack. Grants a boosted daily
+   *  credit allowance (50 instead of 10), not unlimited credits. */
+  mockPack: boolean
+  mockPackUntil: string | null
 }
 
 /** Public, superadmin-controlled feature flags (defaults applied server-side). */
@@ -2051,10 +2146,12 @@ export interface AppSettings {
   mock_group_enabled: boolean
   /** Show the Subject / Topic mock tab. */
   mock_subject_enabled: boolean
-  /** Show the scheduled Test Series nav tab + Test Arena tile. */
+  /** Show the scheduled Test Series (Group 1 Marathon) nav tab + Test Arena tile. */
   test_series_enabled: boolean
   /** Show the Vettri Nichayam nav tab + Test Arena tile. */
   vettri_enabled: boolean
+  /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
+  rank_booster_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining
@@ -2203,10 +2300,16 @@ export interface AdminUserRow {
   premium_until: string | null
   vettri: boolean
   vettri_until: string | null
+  rank_booster: boolean
+  rank_booster_until: string | null
 }
 
 /** Plans a superadmin can comp to a user (mirrors the server allow-list). */
-export type GrantablePlan = 'premium_annual' | 'vettri_nichayam' | 'vettri_month'
+export type GrantablePlan =
+  | 'premium_annual'
+  | 'vettri_nichayam'
+  | 'vettri_month'
+  | 'rank_booster_g2'
 
 /** Per-user activity + credit snapshot (superadmin user-detail popup).
  *  Mirrors the superadmin_user_insights RPC. Accuracy is null until the user

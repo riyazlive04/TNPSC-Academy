@@ -11,6 +11,12 @@ router.get(
   '/',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
+    // Bound to the last year — an unbounded query returned a user's entire
+    // lifetime of sessions (and every answer in them) on every Insights page
+    // open. Mirrors the 365-day clamp ceiling in profile.ts's /activity route.
+    const since = new Date()
+    since.setDate(since.getDate() - 365)
+
     const { data: sessions, error: sErr } = await req.db!
       .from('test_sessions')
       .select(
@@ -18,6 +24,7 @@ router.get(
       )
       .eq('user_id', req.userId)
       .eq('status', 'completed')
+      .gte('completed_at', since.toISOString())
       .order('completed_at', { ascending: true })
     if (sErr) return sendDbError(res, sErr)
 

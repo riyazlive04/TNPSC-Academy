@@ -20,7 +20,7 @@ export default function RevisionCard({ item, onStart, onDismiss, busy }: Props) 
     <div className="rounded-card border border-line bg-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="tamil truncate font-heading text-[15px] font-semibold text-ink" title={title}>
+          <p className="tamil truncate font-heading text-base font-semibold text-ink" title={title}>
             {title}
           </p>
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-body text-xs text-muted">
@@ -80,20 +80,20 @@ function StatusBadge({ status, countdown }: { status: RevisionTopic['status']; c
   const { t } = useT()
   if (status === 'cleared') {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2.5 py-1 font-heading text-[11px] font-semibold text-mint">
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2.5 py-1 font-heading text-2xs font-semibold text-mint">
         <CheckCircle2 size={13} /> {t('revClearedTitle')}
       </span>
     )
   }
   if (status === 'available') {
     return (
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2.5 py-1 font-heading text-[11px] font-semibold text-mint">
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-mint/15 px-2.5 py-1 font-heading text-2xs font-semibold text-mint">
         <Play size={12} /> {t('revStatReady')}
       </span>
     )
   }
   return (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 font-heading text-[11px] font-semibold text-gold">
+    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 font-heading text-2xs font-semibold text-gold">
       <Lock size={12} /> {t('revUnlocksIn')} {countdown}
     </span>
   )

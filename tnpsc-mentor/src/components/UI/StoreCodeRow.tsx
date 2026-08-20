@@ -31,7 +31,7 @@ export default function StoreCodeRow({ onRedeemed }: { onRedeemed?: () => void }
 
   if (mode === 'play-sheet') {
     return (
-      <p className="tamil flex items-start gap-1.5 rounded-field bg-tint/50 px-3 py-2 font-body text-[11px] leading-relaxed text-ink2">
+      <p className="tamil flex items-start gap-1.5 rounded-field bg-tint/50 px-3 py-2 font-body text-2xs leading-relaxed text-ink2">
         <Tag size={12} className="mt-0.5 flex-shrink-0 text-brand" />
         {t('playRedeemHint')}
       </p>

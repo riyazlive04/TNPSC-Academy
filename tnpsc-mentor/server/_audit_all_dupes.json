@@ -1,0 +1,287 @@
+[
+ {
+  "id": "b7d85f5a-1494-4296-95c6-aaef71b1133c",
+  "topic": "Probability",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "\"Three coins are tossed together. What is the probability of getting two consecutive tails?\" Options: A)1/8 B)2/8 C)5/8 D)3/8. Marked correct: D (3/8). Math verified correct (favourable={HTT,TTH,TTT}, n=3, P=3/8).",
+  "your_independent_calculation": "n(S)=8. Outcomes with two consecutive tails: HTT, TTH, TTT → 3/8. Matches marked answer D. No computational error in this row by itself.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "No fix needed for correctness — flagging per the duplicate-check step only. This row is a near-duplicate of id 657765b2-584b-45f6-8453-b97158347f9d in the same batch (\"Three fair coins are tossed together. What is the probability of getting two consecutive tails?\", options reordered, same correct value 3/8 marked as option A there). Recommend the prior dedup pass re-examine this pair; since both are individually correct, either may be kept and the other retired.",
+  "confidence": "high",
+  "notes": "Sanity-check duplicate flag per audit methodology STEP 2/3 — not a math/content error, reported only.",
+  "_batch": 1
+ },
+ {
+  "id": "c956d9d0-5876-4eb7-982b-b765552acb06",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "\"If a dozen tennis balls cost ₹ 180, how much should Pari pay to buy 5 balls?\" Options: A)60 B)90 C)75 D)36. Marked correct: C (75). Math verified correct (180/12=15 per ball, 15×5=75).",
+  "your_independent_calculation": "12 balls = Rs.180 → 1 ball = Rs.15 → 5 balls = Rs.75. Matches marked answer C. No computational error in this row by itself.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "No fix needed for correctness — flagging per the duplicate-check step only. This row is a near-duplicate of id 369bf481-6cb8-4228-99f6-0bca2091beeb in the same batch (\"Pari wants to buy 5 tennis balls from a sports shop. If a dozen balls cost Rs. 180, how much should Pari pay to buy 5 balls?\", same numbers, same correct value 75 marked as option B there).",
+  "confidence": "high",
+  "notes": "Sanity-check duplicate flag per audit methodology STEP 2/3 — not a math/content error, reported only.",
+  "_batch": 1
+ },
+ {
+  "id": "959f445f-1344-4d14-836d-e4a2eccdf968",
+  "topic": "Ratio And Proportion",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "\"Cost of 15 chairs is Rs. 7,500. Find the number of such chairs purchased for Rs. 12,000.\" Options: A)18 B)24 C)9 D)30. Marked correct: B (24). Math verified correct (7500/15=500 per chair, 12000/500=24).",
+  "your_independent_calculation": "15 chairs = Rs.7500 → 1 chair = Rs.500 → chairs for Rs.12000 = 24. Matches marked answer B. No computational error in this row by itself.",
+  "recommended_correct_answer": null,
+  "recommended_fix": "No fix needed for correctness — flagging per the duplicate-check step only. This row is a near-duplicate of id 5ec888a6-1540-44f9-804b-f8666997e2b4 in the same batch (\"The cost of 15 chairs is ₹ 7500. How many such chairs can be purchased for ₹ 12000?\", same numbers, same correct value 24 marked as option D there).",
+  "confidence": "high",
+  "notes": "Sanity-check duplicate flag per audit methodology STEP 2/3 — not a math/content error, reported only.",
+  "_batch": 1
+ },
+ {
+  "id": "68a5f574-002f-4b04-88e9-438c2432929e",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "Traffic lights at 3 junctions change every 40s, 60s, 72s; changed together at 8 a.m.; when do they next change together? Answer: 8:06 a.m. (LCM=360s=6min).",
+  "your_independent_calculation": "LCM(40,60,72): 40=2^3x5, 60=2^2x3x5, 72=2^3x3^2 -> LCM=2^3x3^2x5=360s=6min. 8:00+6min=8:06am. Verified correct as marked.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: near-identical to id b96e760e-c358-4762-b3fe-8ba81d76699d (same 40s/60s/72s/8am setup, same 8:06am answer, different distractor options) and to a lesser extent id c5989dfb-ac43-4b13-8070-32c631e4bfa7 (same numbers, answer expressed in raw seconds instead of clock time). Consider merging/diversifying this cluster.",
+  "confidence": "high",
+  "notes": "Duplicate cluster: 68a5f574, b96e760e, c5989dfb all reuse the identical 40s/60s/72s traffic-light scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "b96e760e-c358-4762-b3fe-8ba81d76699d",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Traffic lights at 3 junctions change every 40s, 60s, 72s; changed together at 8 a.m.; when do they next change together? Answer: 8:06 a.m. (LCM=360s=6min).",
+  "your_independent_calculation": "LCM(40,60,72)=360s=6min. 8:00+6min=8:06am. Verified correct as marked.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: near-identical to id 68a5f574-002f-4b04-88e9-438c2432929e (same setup, same 8:06am answer, different distractor options) and id c5989dfb-ac43-4b13-8070-32c631e4bfa7 (same numbers, seconds instead of clock time).",
+  "confidence": "high",
+  "notes": "Duplicate cluster: 68a5f574, b96e760e, c5989dfb all reuse the identical 40s/60s/72s traffic-light scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "c5989dfb-ac43-4b13-8070-32c631e4bfa7",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Traffic lights at 3 junctions change every 40s, 60s, 72s; changed together at 8:00 a.m.; after how many seconds do they next change together? Answer: 360 seconds.",
+  "your_independent_calculation": "LCM(40,60,72)=2^3x3^2x5=360 seconds. Verified correct as marked.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: same 40s/60s/72s/8am scenario as id 68a5f574-002f-4b04-88e9-438c2432929e and id b96e760e-c358-4762-b3fe-8ba81d76699d, just asked in raw seconds instead of a clock time.",
+  "confidence": "high",
+  "notes": "Duplicate cluster: 68a5f574, b96e760e, c5989dfb all reuse the identical 40s/60s/72s traffic-light scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "1dc0c379-6bdb-4e5e-b098-763308f9a6e5",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "Four mobile phones ring every 15, 20, 25, 30 minutes; ring together now; after how many minutes will they next ring together? Answer: 300 minutes.",
+  "your_independent_calculation": "LCM(15,20,25,30): 15=3x5, 20=2^2x5, 25=5^2, 30=2x3x5 -> LCM=2^2x3x5^2=300 minutes. Verified correct as marked.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: same 15/20/25/30-minute phone-ringing scenario as id 863eab10-33b2-4ad2-a3b3-ccc3216bc4be, just asked in raw minutes instead of a clock time (that row starts the phones at 5:00 a.m. and asks for the next clock time, 10:00 a.m.).",
+  "confidence": "high",
+  "notes": "Duplicate pair: 1dc0c379 and 863eab10 reuse the identical 15/20/25/30-minute 4-phone scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "863eab10-33b2-4ad2-a3b3-ccc3216bc4be",
+  "topic": "LCM and HCF",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Four mobile phones ring every 15, 20, 25, 30 minutes; all rang together at 5:00 a.m.; at what time will all 4 ring together again? Answer: 10:00 a.m. (LCM=300min=5hr).",
+  "your_independent_calculation": "LCM(15,20,25,30)=300 minutes=5 hours. 5:00am+5h=10:00am. Verified correct as marked.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: same 15/20/25/30-minute phone-ringing scenario as id 1dc0c379-6bdb-4e5e-b098-763308f9a6e5, just asked as a clock time instead of raw minutes.",
+  "confidence": "high",
+  "notes": "Duplicate pair: 1dc0c379 and 863eab10 reuse the identical 15/20/25/30-minute 4-phone scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "366fd959-ac3d-4601-ab48-7682a2367d97",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Village population 32,000; 40% men, 25% women, rest children. Find men and children. Answer: 12,800 & 11,200.",
+  "your_independent_calculation": "Men = 40% x 32000 = 12800. Children% = 100-40-25 = 35%; children = 35% x 32000 = 11200. Verified correct as marked.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: identical population/percentages to id 7b4a0f6d-03e5-465a-a55c-ef5c60dc393d, which asks for children only (same 11,200 figure).",
+  "confidence": "high",
+  "notes": "Duplicate pair: 366fd959 and 7b4a0f6d reuse the identical 32,000-population/40%-men/25%-women scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "7b4a0f6d-03e5-465a-a55c-ef5c60dc393d",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Village population 32,000; 40% men, 25% women, rest children. Find the number of children. Answer: 11,200.",
+  "your_independent_calculation": "Children% = 100-40-25 = 35%; children = 35% x 32000 = 11200. Verified correct as marked.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: identical population/percentages to id 366fd959-ac3d-4601-ab48-7682a2367d97, which asks for both men and children.",
+  "confidence": "high",
+  "notes": "Duplicate pair: 366fd959 and 7b4a0f6d reuse the identical 32,000-population/40%-men/25%-women scenario.",
+  "_batch": 3
+ },
+ {
+  "id": "a43bd9f0-3afc-41a0-9622-9379ecd018dc",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Price of a house decreased from Rs. 15,00,000 to Rs. 12,00,000; find percentage decrease. Answer: 20%.",
+  "your_independent_calculation": "Decrease = 1,500,000-1,200,000 = 300,000. %decrease = 300000/1500000 x100 = 20%. Verified correct as marked.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: this is essentially the exact same question as id c8222b55-ba97-474c-8899-4eb9c8299f38 (same 1,500,000 to 1,200,000 values, just written as 'Rs. 15 lakhs to Rs. 12 lakhs' there instead of 'Rs. 15,00,000 to Rs. 12,00,000' here).",
+  "confidence": "high",
+  "notes": "Near-exact duplicate pair: a43bd9f0 and c8222b55 are the same house-price problem with only the number formatting changed (15,00,000 vs 15 lakhs).",
+  "_batch": 3
+ },
+ {
+  "id": "c8222b55-ba97-474c-8899-4eb9c8299f38",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "Price of a house decreased from Rs. 15 lakhs to Rs. 12 lakhs; find percentage decrease. Answer: 20%.",
+  "your_independent_calculation": "Decrease = 1,500,000-1,200,000 = 300,000. %decrease = 300000/1500000 x100 = 20%. Verified correct as marked.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: this is essentially the exact same question as id a43bd9f0-3afc-41a0-9622-9379ecd018dc (same 1,500,000 to 1,200,000 values, written there as 'Rs. 15,00,000 to Rs. 12,00,000' instead of 'Rs. 15 lakhs to Rs. 12 lakhs' here).",
+  "confidence": "high",
+  "notes": "Near-exact duplicate pair: a43bd9f0 and c8222b55 are the same house-price problem with only the number formatting changed (15,00,000 vs 15 lakhs).",
+  "_batch": 3
+ },
+ {
+  "id": "07ae6028-52d2-423d-9549-ad1dd9825dc3",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "D",
+  "current_question_summary": "250 students in a school; 63 like throw ball. Find the percentage who like throw ball. Answer: 25.2%.",
+  "your_independent_calculation": "63/250 x100 = 25.2%. Verified correct as marked.",
+  "recommended_correct_answer": "D",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: reuses the same 250-student/55-basketball/63-throw-ball dataset as id 9c61a76e-e624-4834-9020-8d4f262cf9f0 (basketball+throwball) and id b66c0f41-b424-4754-a747-136d51af25e7 (basketball only).",
+  "confidence": "high",
+  "notes": "Overlapping cluster: 07ae6028, 9c61a76e, b66c0f41 all reuse the identical 250-student sports-preference dataset, only asking for different subsets of the percentages.",
+  "_batch": 3
+ },
+ {
+  "id": "9c61a76e-e624-4834-9020-8d4f262cf9f0",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "250 students; 55 like basketball, 75 like football, 63 like throw ball, rest cricket. Find % who like (a) basketball (b) throw ball. Answer: Basketball 22%, Throw ball 25.2%.",
+  "your_independent_calculation": "Basketball = 55/250x100 = 22%. Throw ball = 63/250x100 = 25.2%. Verified correct as marked.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: reuses the same 250-student/55-basketball/63-throw-ball dataset as id 07ae6028-52d2-423d-9549-ad1dd9825dc3 (throw ball only) and id b66c0f41-b424-4754-a747-136d51af25e7 (basketball only).",
+  "confidence": "high",
+  "notes": "Overlapping cluster: 07ae6028, 9c61a76e, b66c0f41 all reuse the identical 250-student sports-preference dataset, only asking for different subsets of the percentages.",
+  "_batch": 3
+ },
+ {
+  "id": "b66c0f41-b424-4754-a747-136d51af25e7",
+  "topic": "Percentage",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "A",
+  "current_question_summary": "250 students in a school; 55 like basketball. Find the percentage who like basketball. Answer: 22%.",
+  "your_independent_calculation": "55/250 x100 = 22%. Verified correct as marked.",
+  "recommended_correct_answer": "A",
+  "recommended_fix": "No content fix needed -- answer verified correct. Flagged only under the duplicate-check step: reuses the same 250-student/55-basketball/63-throw-ball dataset as id 07ae6028-52d2-423d-9549-ad1dd9825dc3 (throw ball only) and id 9c61a76e-e624-4834-9020-8d4f262cf9f0 (basketball+throwball).",
+  "confidence": "high",
+  "notes": "Overlapping cluster: 07ae6028, 9c61a76e, b66c0f41 all reuse the identical 250-student sports-preference dataset, only asking for different subsets of the percentages.",
+  "_batch": 3
+ },
+ {
+  "id": "710d0586-fdfb-4096-b4ca-28e3cb2279f7",
+  "topic": "Compound Interest",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Find the compound interest on Rs.15,625 for 9 months at 16% p.a. compounded quarterly. (Options A)1852 B)1989 C)1951 D)1991)",
+  "your_independent_calculation": "Quarterly rate=4%, periods=3. A=15625*(26/25)^3=15625*(17576/15625)=17576. CI=17576-15625=1951. Correct, matches Option C. No math error.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": null,
+  "confidence": "high",
+  "notes": "Near-duplicate of id ea987b69-d0b9-4f2c-9a53-a62c94cb6593 (same principal, months, rate, compounding frequency, and correct value 1951; only the wrong-answer distractor options differ). Flagging per duplicate-check instructions — no math error in either, just redundant content in the bank.",
+  "_batch": 6
+ },
+ {
+  "id": "ea987b69-d0b9-4f2c-9a53-a62c94cb6593",
+  "topic": "Compound Interest",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "Find the compound interest on Rs.15625 for 9 months at 16% p.a. compounded quarterly. (Options A)1851 B)1941 C)1951 D)1961)",
+  "your_independent_calculation": "Same computation as its duplicate: CI=1951, matches Option C. No math error.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": null,
+  "confidence": "high",
+  "notes": "Near-duplicate of id 710d0586-fdfb-4096-b4ca-28e3cb2279f7 — identical problem (same numbers, same correct value 1951), only wrong-answer distractors differ. Flagging per duplicate-check instructions — no math error, just redundant content.",
+  "_batch": 6
+ },
+ {
+  "id": "a3c7a607-955e-450c-919c-db72b2ede2c2",
+  "topic": "Time and Work",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "B",
+  "current_question_summary": "6 men can complete a work in 12 days. After the second day, 6 more men join. Days to finish remaining work? (Options A)4 B)5 C)6 D)7)",
+  "your_independent_calculation": "Total work=6*12=72 man-days. First 2 days by 6 men=12 man-days. Remaining=60 man-days at 12 men=5 days. Correct, matches Option B. No math error.",
+  "recommended_correct_answer": "B",
+  "recommended_fix": null,
+  "confidence": "high",
+  "notes": "Near-duplicate of id 540cc703-a8a8-481f-a325-b67e0bb95c12 (identical numbers: 6 men/12 days/2 days elapsed/6 more men join, same correct answer of 5 days), just under a different topic tag ('Time, Work, Speed And Distance') and reworded ('Two days later' vs 'After the second day'). No math error in either; flagged per duplicate-check instructions.",
+  "_batch": 6
+ },
+ {
+  "id": "540cc703-a8a8-481f-a325-b67e0bb95c12",
+  "topic": "Time, Work , Speed And Distance",
+  "issue_types": [
+   "DUPLICATE"
+  ],
+  "current_correct_answer": "C",
+  "current_question_summary": "6 men can complete a work in 12 days. Two days later, 6 more men join. Days to finish remaining work? (Options A)3 B)7 C)5 D)9)",
+  "your_independent_calculation": "Total work=72 man-days. 2 days by 6 men=12 man-days. Remaining=60 man-days at 12 men=5 days. Correct, matches Option C. No math error.",
+  "recommended_correct_answer": "C",
+  "recommended_fix": null,
+  "confidence": "high",
+  "notes": "Near-duplicate of id a3c7a607-955e-450c-919c-db72b2ede2c2 — same underlying numbers and answer (5 days), just phrased slightly differently and under a different topic tag. No math error; flagged per duplicate-check instructions.",
+  "_batch": 6
+ }
+]

@@ -62,7 +62,7 @@ export default function CreditWall({ className = '' }: { className?: string }) {
   return (
     <section className={`space-y-4 ${className}`} aria-labelledby="credit-wall-title">
       <div className="rounded-card border border-coral/30 bg-coralsoft/60 p-5">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-coral/15 px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-coral">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-coral/15 px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-coral">
           <Coins size={13} /> {t('upsellCreditsTitle')}
         </span>
         <h2

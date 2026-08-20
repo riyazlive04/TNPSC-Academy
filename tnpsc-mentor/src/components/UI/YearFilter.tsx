@@ -29,7 +29,7 @@ export function YearFilter({
 
   return (
     <div className={className}>
-      <p className="tamil mb-2 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+      <p className="tamil mb-2 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
         {t('filterByYear')}
       </p>
       <div className="-mx-1 flex flex-wrap gap-2 px-1">
@@ -77,7 +77,7 @@ function YearChip({ label, active, onClick }: { label: string; active: boolean; 
     <button
       type="button"
       onClick={onClick}
-      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-[13px] font-semibold tabular-nums transition-colors ${
+      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-sm font-semibold tabular-nums transition-colors ${
         active ? 'bg-primary text-white' : 'bg-tint-violet text-primary hover:bg-primary/15'
       }`}
     >

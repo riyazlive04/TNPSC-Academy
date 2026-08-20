@@ -124,11 +124,11 @@ export default function OfferSheet({
                 <div className="min-w-0">
                   <h2
                     id="offer-sheet-title"
-                    className="tamil font-display text-[17px] font-bold tracking-tight text-ink"
+                    className="tamil font-display text-lg font-bold tracking-tight text-ink"
                   >
                     {title}
                   </h2>
-                  <p className="tamil mt-0.5 font-body text-[12px] text-muted">
+                  <p className="tamil mt-0.5 font-body text-xs text-muted">
                     {t('offerSheetHint')}
                   </p>
                 </div>

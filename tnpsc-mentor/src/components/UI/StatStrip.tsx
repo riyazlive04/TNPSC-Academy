@@ -31,13 +31,13 @@ export default function StatStrip({
           ].join(' ')}
         >
           <div
-            className={`font-display text-[22px] font-bold leading-none ${
+            className={`font-display text-2xl font-bold leading-none ${
               s.accent ? 'text-accent' : 'text-ink'
             }`}
           >
             {s.value}
           </div>
-          <div className="tamil mt-2 font-body text-[13px] leading-snug text-muted">
+          <div className="tamil mt-2 font-body text-sm leading-snug text-muted">
             {s.label}
           </div>
         </div>

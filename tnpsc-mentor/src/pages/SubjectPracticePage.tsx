@@ -390,13 +390,13 @@ export default function SubjectPracticePage() {
 
         {/* Title block */}
         <div className="mb-5">
-          <span className="tamil font-display text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+          <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
             {t('subjectPracticeBadge')}
           </span>
-          <h1 className="tamil mt-1.5 font-display text-[22px] font-bold tracking-tight text-ink lg:text-[26px]">
+          <h1 className="tamil mt-1.5 font-display text-2xl font-bold tracking-tight text-ink lg:text-2xl">
             {heading}
           </h1>
-          <p className="tamil mt-1 font-body text-[15px] text-muted">{hint}</p>
+          <p className="tamil mt-1 font-body text-base text-muted">{hint}</p>
         </div>
 
         {/* Premium upsell — shown when a free user taps a subject whose one free
@@ -404,7 +404,7 @@ export default function SubjectPracticePage() {
             a different (unlocked) subject below. */}
         {showUpsell && step === 'subject' && (
           <div className="mb-5 animate-fadeInFast">
-            <p className="tamil mb-3 font-body text-[15px] text-muted">{t('subjectFreeUsed')}</p>
+            <p className="tamil mb-3 font-body text-base text-muted">{t('subjectFreeUsed')}</p>
             <PremiumCard />
           </div>
         )}

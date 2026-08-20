@@ -163,13 +163,13 @@ export default function PreviousYearPage() {
   return (
     <PickerPage badge={t('pyq1Badge')} backTo="/test-arena/pyq">
       <div className="mb-5">
-        <h2 className="font-display text-[22px] font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
-        <p className="tamil mt-1 font-body text-[15px] text-muted">{t('subjectStepHint')}</p>
+        <h2 className="font-display text-2xl font-bold tracking-tight text-ink">{t('pickSubject')}</h2>
+        <p className="tamil mt-1 font-body text-base text-muted">{t('subjectStepHint')}</p>
       </div>
 
       {/* Exam-year filter. "All Years" + each year; scopes every subject below. */}
       <div className="mb-5">
-        <p className="tamil mb-2 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+        <p className="tamil mb-2 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
           {t('filterByYear')}
         </p>
         <div className="-mx-1 flex flex-wrap gap-2 px-1">
@@ -182,7 +182,7 @@ export default function PreviousYearPage() {
 
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
-          <p className="tamil mb-3 font-body text-[15px] text-muted">{t('topicFreeUsed')}</p>
+          <p className="tamil mb-3 font-body text-base text-muted">{t('topicFreeUsed')}</p>
           <VettriCard />
         </div>
       )}
@@ -235,7 +235,7 @@ function YearChip({ label, active, onClick }: { label: string; active: boolean; 
     <button
       type="button"
       onClick={onClick}
-      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-[13px] font-semibold tabular-nums transition-colors ${
+      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-sm font-semibold tabular-nums transition-colors ${
         active ? 'bg-primary text-white' : 'bg-tint-violet text-primary hover:bg-primary/15'
       }`}
     >

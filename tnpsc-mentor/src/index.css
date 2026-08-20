@@ -58,6 +58,12 @@ html.no-copy [contenteditable='true'] {
   --c-mint-soft: 221 242 234; /* #DDF2EA tint-green */
   --c-coral: 255 91 91; /* #FF5B5B wrong - bolder red */
   --c-coral-soft: 253 230 230;
+  /* Darker AA-safe red for small/functional text (errors, invalid input) -
+   * --c-coral is ~3.0:1 on white and fails WCAG AA at text-xs sizes; this
+   * clears ~5.4:1. Decorative coral (chips, tints, streak flame) keeps using
+   * --c-coral unchanged - only semantic error text should use this one. */
+  --c-error: 196 54 43; /* #C4362B */
+  --c-error-soft: 253 232 230;
   --c-sky: 59 130 217; /* #3B82D9 tint-blue icon - bolder */
   --c-sky-soft: 223 235 250; /* #DFEBFA tint-blue */
   --c-streak: 255 107 74; /* accent */
@@ -113,6 +119,10 @@ html.no-copy [contenteditable='true'] {
   --c-mint-soft: 22 52 44; /* tint-green dark */
   --c-coral: 255 120 120; /* wrong dark */
   --c-coral-soft: 58 30 32;
+  /* Already ~6.2:1 on the dark card, so no separate darkening is needed here -
+   * kept as its own token for parity with the light-mode --c-error. */
+  --c-error: 255 120 120;
+  --c-error-soft: 58 30 32;
   --c-sky: 122 168 224; /* lifted blue icon for dark */
   --c-sky-soft: 30 46 61; /* tint-blue dark */
   --c-streak: 255 130 102;

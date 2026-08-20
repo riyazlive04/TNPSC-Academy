@@ -33,6 +33,10 @@ export default {
         mintsoft: 'rgb(var(--c-mint-soft) / <alpha-value>)',
         coral: 'rgb(var(--c-coral) / <alpha-value>)',
         coralsoft: 'rgb(var(--c-coral-soft) / <alpha-value>)',
+        // AA-contrast-safe red for small/functional text (errors, invalid
+        // input) - see index.css for why this is split from --c-coral.
+        error: 'rgb(var(--c-error) / <alpha-value>)',
+        errorsoft: 'rgb(var(--c-error-soft) / <alpha-value>)',
         sky: 'rgb(var(--c-sky) / <alpha-value>)',
         skysoft: 'rgb(var(--c-sky-soft) / <alpha-value>)',
         streak: 'rgb(var(--c-streak) / <alpha-value>)',
@@ -49,7 +53,7 @@ export default {
         surface: 'rgb(var(--c-canvas) / <alpha-value>)',
         muted: 'rgb(var(--c-ink2) / <alpha-value>)',
         correct: 'rgb(var(--c-correct) / <alpha-value>)',
-        wrong: 'rgb(var(--c-wrong) / <alpha-value>)',
+        wrong: 'rgb(var(--c-error) / <alpha-value>)',
         selected: 'rgb(var(--c-selected) / <alpha-value>)',
         'tint-violet': 'rgb(var(--c-tint-violet) / <alpha-value>)',
         'tint-coral': 'rgb(var(--c-tint-coral) / <alpha-value>)',
@@ -60,7 +64,14 @@ export default {
         secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
         accent: 'rgb(var(--c-accentwarm) / <alpha-value>)',
         navytext: 'rgb(var(--c-ink) / <alpha-value>)',
-        warn: 'rgb(var(--c-coral) / <alpha-value>)',
+        warn: 'rgb(var(--c-error) / <alpha-value>)',
+      },
+      fontSize: {
+        // Extra step below `xs` (12px) for the badge/label-scale text that
+        // used to be a hardcoded `text-[9px]`/`text-[10px]`/`text-[11px]` -
+        // rem-based like the rest of the scale, so it still responds to
+        // Android "Font size" / iOS Dynamic Type.
+        '2xs': ['0.6875rem', { lineHeight: '1rem' }],
       },
       fontFamily: {
         // Display = Plus Jakarta Sans (Latin) → Anek Tamil (Tamil). Body = Inter
@@ -196,6 +207,18 @@ export default {
           '0%,100%': { transform: 'scale(1)', opacity: '1' },
           '50%': { transform: 'scale(0.86)', opacity: '0.75' },
         },
+        // Bell "ring" jiggle — a decaying rotational wobble, pivoting from the
+        // top (pair with `origin-top`) so it reads as the bell swinging, not
+        // the whole icon spinning. Fires once when a new notification arrives.
+        ring: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '15%': { transform: 'rotate(18deg)' },
+          '30%': { transform: 'rotate(-14deg)' },
+          '45%': { transform: 'rotate(10deg)' },
+          '60%': { transform: 'rotate(-6deg)' },
+          '75%': { transform: 'rotate(3deg)' },
+          '90%': { transform: 'rotate(-1deg)' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 0.35s ease-out',
@@ -216,6 +239,7 @@ export default {
         checkPop: 'checkPop 0.3s cubic-bezier(0.22,1,0.36,1)',
         breathe: 'breathe 1.05s ease-in-out infinite',
         logoPulse: 'logoPulse 1.2s ease-in-out infinite',
+        ring: 'ring 0.65s cubic-bezier(0.36,0.07,0.19,0.97) both',
       },
     },
   },

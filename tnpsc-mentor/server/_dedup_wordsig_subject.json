@@ -1,0 +1,649 @@
+[
+ {
+  "sig": "development|establishment|industrial|institution",
+  "rows": [
+   {
+    "id": "79c5cd83-9b41-4567-9b4a-6fc8e372175f",
+    "question_text": "Match List I (Financial institution) with List II (Year of establishment) and select the correct answer using the codes given below:\nList I (Institution)\n(a) Reserve Bank of India\n(b) Unit Trust of India (UTI)\n(c) Industrial Development Bank of India (IDBI)\nList II (Year)\n1. 1935\n2. 1964\n3. 1964 (set up as an RBI subsidiary)"
+   },
+   {
+    "id": "545aa84b-6171-4a76-a8ce-020415a0862e",
+    "question_text": "Match List I (Institution) with List II (Month and year of establishment) and select the correct answer using the codes given below:\nList I (Institution)\n(a) Reserve Bank of India\n(b) Unit Trust of India (UTI)\n(c) Industrial Development Bank of India (IDBI)\nList II (Establishment)\n1. April 1935\n2. February 1964\n3. July 1964"
+   }
+  ]
+ },
+ {
+  "sig": "development|employment|integrated|programme",
+  "rows": [
+   {
+    "id": "8ce6d14e-7d51-4081-8af0-0fa3718df16f",
+    "question_text": "Match List I (Rural development programme) with List II (Year of launch) and select the correct answer using the codes below:\nList I\n(a) Integrated Rural Development Programme (IRDP)\n(b) Training Rural Youth for Self Employment (TRYSEM)\n(c) National Rural Employment Programme (NREP)\n(d) Jawahar Rozgar Yojana (JRY)\nList II\n1. 1978\n2. 1979\n3. 1980\n4. 1989"
+   },
+   {
+    "id": "b3f2c852-73e7-4081-800f-81b8d9537d98",
+    "question_text": "Match List I (Acronym) with List II (Full form) and select the correct answer using the codes given below:\nList I\n(a) NREP\n(b) IRDP\n(c) TRYSEM\n(d) SFDA\nList II\n1. Small Farmers Development Agency\n2. National Rural Employment Programme\n3. Training of Rural Youth for Self Employment\n4. Integrated Rural Development Programme"
+   },
+   {
+    "id": "c9114339-19fd-4341-9551-a748e188c87a",
+    "question_text": "Match List I (Acronym) with List II (Full form / nature) and choose the correct code:\nList I\n(a) RLEGP\n(b) NREP\n(c) IRDP\n(d) TRYSEM\nList II\n1. National Rural Employment Programme\n2. Rural Landless Employment Guarantee Programme\n3. Training of Rural Youth for Self Employment\n4. Integrated Rural Development Programme"
+   }
+  ]
+ },
+ {
+  "sig": "development|employment|integrated|programmes",
+  "rows": [
+   {
+    "id": "9afe4775-cf18-4382-9405-2ab07c15d977",
+    "question_text": "Consider the following programmes:\n(i) National Rural Employment Programme (NREP)\n(ii) Rural Landless Employment Guarantee Programme (RLEGP)\n(iii) Integrated Rural Development Programme (IRDP)\n(iv) Jawahar Rozgar Yojana (JRY)\nWhich of the above were started during the Sixth Five Year Plan?"
+   },
+   {
+    "id": "4a75e11b-5543-4dde-bee0-732fabe951f3",
+    "question_text": "Consider the following programmes:\n(i) Integrated Rural Development Programme (IRDP)\n(ii) Jawahar Rozgar Yojana (JRY)\n(iii) Training of Rural Youth for Self Employment (TRYSEM)\nWhich of the above are employment / self-employment oriented programmes?"
+   }
+  ]
+ },
+ {
+  "sig": "consumption|expenditure|government|investment",
+  "rows": [
+   {
+    "id": "0933e617-c71f-4d0d-a283-08b99a5bcba3",
+    "question_text": "In an open economy, GDP by the expenditure method is the sum of consumption, gross investment, government spending and net exports. Consider the following statements:\n(i) Net exports equal exports minus imports.\n(ii) The investment component used is gross investment, not net investment.\n(iii) Wages, rent, interest and profit are the components summed in this expenditure formula.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "a68fcfb0-f2c6-4696-b7fd-27c1288c2c6c",
+    "question_text": "Consider the following statements:\nAssertion [A]: The formula C + I + G + (X - M) is used to calculate Gross Domestic Product (GDP).\nReason [R]: This expenditure formula adds up consumption, investment, government spending and net exports to value output produced within a country.\nSelect the correct answer using the codes given below:"
+   }
+  ]
+ },
+ {
+  "sig": "abandoning|difficulty|eleventh|something",
+  "rows": [
+   {
+    "id": "4225f6aa-74ce-4025-bead-4c3eb209811c",
+    "question_text": "Match each idiom in List I with its correct meaning in List II and choose the correct code:\nList I\n(a) Alarm bells ringing\n(b) Leave in the lurch\n(c) Back to the wall\n(d) Help at the eleventh hour\nList II\n1. Abandoning one who is in difficulty\n2. In serious difficulty\n3. Sign of something going wrong\n4. Rescuing one at the last moment"
+   },
+   {
+    "id": "7faf09df-2640-4eeb-8419-9070abb2697b",
+    "question_text": "Match each idiom in List I with its meaning in List II and choose the correct code:\nList I\n(a) Back to the wall\n(b) Alarm bells ringing\n(c) Leave in the lurch\n(d) Eleventh-hour help\nList II\n1. Sign of something going wrong\n2. In serious difficulty\n3. Rescuing one at the last moment\n4. Abandoning one who is in difficulty"
+   }
+  ]
+ },
+ {
+  "sig": "completion|completions|conditional|grammatically",
+  "rows": [
+   {
+    "id": "10aeed29-4087-4ff5-8bd0-dea2214b9209",
+    "question_text": "Consider the following completions of \"If you had studied, you ____ passed the exam.\":\n(i) ...you would have passed the exam.\n(ii) ...you will have passed the exam.\n(iii) ...you may passed the exam.\nWhich completion is grammatically correct for this third-conditional sentence?"
+   },
+   {
+    "id": "d95d5fb0-c97b-47f5-8178-b3008a1e46e2",
+    "question_text": "Consider the following completions of the first-conditional sentence \"If it rains, we ____ the trip.\":\n(i) ...we will cancel the trip.\n(ii) ...we would cancel the trip.\n(iii) ...we cancels the trip.\nWhich completion is grammatically correct?"
+   }
+  ]
+ },
+ {
+  "sig": "consider|conversion|reporting|sentence",
+  "rows": [
+   {
+    "id": "93c54b7e-3d2a-45c4-b641-b0d57ebcea6e",
+    "question_text": "Direct sentence: Sindhu said, \"I play chess.\" Consider the following statements about its conversion to reported speech:\n(i) The pronoun \"I\" changes to \"she\" to agree with the subject Sindhu.\n(ii) Because the reporting verb \"said\" is past, the present \"play\" shifts to the past \"played\".\n(iii) The correct reported form is: Sindhu said that she was played chess.\nWhich of the statements is/are correct?"
+   },
+   {
+    "id": "9ee26842-a23d-4649-a554-7aae0b0b234f",
+    "question_text": "The direct sentence is: Sundar said to me, \"I'll see you later.\" Consider the following statements about its conversion to reported speech:\n(i) When the reporting verb is in the past, \"will\" in direct speech changes to \"would\".\n(ii) The correct reported form is: Sundar told me that he would see me later.\n(iii) The correct reported form is: Sundar told me that he will see me later.\nWhich of the statements is/are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "abhijnanashakuntalam|mrichchhakatika|mudrarakshasa|vishakhadatta",
+  "rows": [
+   {
+    "id": "73433c5d-938e-41a3-96a4-383785a1bba3",
+    "question_text": "Match List I (ancient text) with List II (author / subject) and choose the correct code:\nList I\n(i) Arthashastra\n(ii) Mrichchhakatika\n(iii) Mudrarakshasa\n(iv) Abhijnanashakuntalam\nList II\n1. Kautilya (statecraft)\n2. Sudraka\n3. Vishakhadatta\n4. Kalidasa"
+   },
+   {
+    "id": "914d0605-128d-451d-b77e-92b4cbca25ec",
+    "question_text": "Match List I (Sanskrit work) with List II (author) and choose the correct code:\nList I\n(i) Mrichchhakatika\n(ii) Abhijnanashakuntalam\n(iii) Mudrarakshasa\n(iv) Panchatantra\nList II\n1. Sudraka\n2. Kalidasa\n3. Vishakhadatta\n4. Vishnu Sarma\n(Note: Mrichchhakatika = 'The Little Clay Cart')"
+   }
+  ]
+ },
+ {
+  "sig": "kattabomman|palayakkarar|panchalamkuruchi|sivasubramania",
+  "rows": [
+   {
+    "id": "84af96cc-1d43-4c8d-b2e5-e99999d5a090",
+    "question_text": "Match List I (Person) with List II (Role / Identity) and select the correct answer using the codes given below.\nList I:\n(a) Vira Pandya Kattabomman\n(b) Jagavira Pandya Kattabomman\n(c) Collector Jackson\n(d) Sivasubramania Pillai\nList II:\n1. Father and predecessor as Palayakkarar of Panchalamkuruchi\n2. Palayakkarar of Panchalamkuruchi who resisted the Company\n3. Trusted minister of the Panchalamkuruchi chief\n4. East India Company officer who clashed with the Palayakkarar"
+   },
+   {
+    "id": "6af728b1-ba60-4e24-bff7-432d01460204",
+    "question_text": "Match List I (Figure) with List II (Place / Role associated with them) and select the correct answer using the codes given below.\nList I:\n(a) Marudu Pandyan\n(b) Vira Pandya Kattabomman\n(c) Collector Jackson\n(d) Sivasubramania Pillai\nList II:\n1. Palayakkarar of Panchalamkuruchi\n2. Organiser of the South Indian Confederacy at Sivaganga\n3. Trusted minister of Kattabomman\n4. East India Company Collector who clashed with Kattabomman"
+   },
+   {
+    "id": "2630280f-0bb2-43e1-b66c-db3fe1713b18",
+    "question_text": "With reference to the Panchalamkuruchi expedition, match List I (Person) with List II (Function) and select the correct answer using the codes given below.\nList I:\n(a) Lord Wellesley\n(b) Major Bannerman\n(c) Vira Pandya Kattabomman\n(d) Sivasubramania Pillai\nList II:\n1. Assumed field command of the expedition\n2. Issued the orders from Madras for the advance of forces\n3. Palayakkarar whom the expedition was sent against\n4. Minister captured along with the Palayakkarar's cause"
+   }
+  ]
+ },
+ {
+  "sig": "movement|periyar|ramasamy|respect",
+  "rows": [
+   {
+    "id": "9137afb7-044b-4687-ac59-fd41f0ef38e5",
+    "question_text": "E. V. Ramasamy Periyar, the leader of the Self-Respect Movement, was born in which town of Tamil Nadu?"
+   },
+   {
+    "id": "549150b5-461f-460f-8a46-f6fced65c3d2",
+    "question_text": "In which year did Periyar E.V. Ramasamy start the Self-Respect Movement?"
+   }
+  ]
+ },
+ {
+  "sig": "consider|contains|electrons|neutrons",
+  "rows": [
+   {
+    "id": "805536a6-a503-42a0-a116-1bdca259f2b2",
+    "question_text": "Consider the following statements about the nucleus of an atom:\n(i) It contains protons.\n(ii) It contains neutrons.\n(iii) It contains electrons.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "089dfe7a-d576-4ece-8ed0-56acbfee96be",
+    "question_text": "Consider the following statements about the neutral atom of the isotope ₇N¹⁴:\n(i) It contains 7 protons.\n(ii) It contains 7 electrons.\n(iii) It contains 14 neutrons.\nWhich of the statements is/are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|fundamental|principles|provisions",
+  "rows": [
+   {
+    "id": "42e452d9-b44b-4847-8d79-b1ecd16c3548",
+    "question_text": "Match List I (Feature of the Indian Constitution) with List II (Country it was borrowed from) and select the correct answer:\nList I\nA. Fundamental Rights\nB. Directive Principles of State Policy\nC. Federal system with a strong Centre\nD. Concept of a written Constitution with detailed provisions\nList II\n1. Irish Constitution\n2. Canada\n3. United States of America\n4. (Borrowed feature)\nWhich pairing is correct for Fundamental Rights?"
+   },
+   {
+    "id": "0d9ca7af-9cf3-46c2-a791-a81217f68a56",
+    "question_text": "Consider the following statements about the location of provisions in the Constitution of India:\n(i) The Fundamental Rights are enshrined in Part III.\n(ii) The Directive Principles of State Policy are contained in Part IV.\n(iii) The Fundamental Rights are part of the Preamble.\nWhich of the statements given above is/are correct?"
+   },
+   {
+    "id": "c82e66d7-f389-458d-962a-3fbdf2812128",
+    "question_text": "Consider the following statements about provisions borrowed for the Indian Constitution:\n(i) The concept of Fundamental Rights was primarily inspired by the Constitution of the United States of America.\n(ii) The Directive Principles of State Policy were borrowed from the Canadian Constitution.\n(iii) The concept of Judicial Review was adopted from the United States of America.\n\nWhich of the above statements is/are correct?"
+   },
+   {
+    "id": "a64f0824-2660-4a02-858c-c295f1d2f98b",
+    "question_text": "Consider the following statements about the placement of provisions in the Indian Constitution:\n(i) The Directive Principles of State Policy are contained in Part IV.\n(ii) Fundamental Duties are contained in Part IV-A.\n(iii) The Directive Principles are contained in Part III, alongside the Fundamental Rights.\nWhich of the statements given above is/are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|constitutional|fundamental|information",
+  "rows": [
+   {
+    "id": "ff4f9749-541f-47e6-8aca-a3e07a72aea1",
+    "question_text": "Match List I (Provision) with List II (Constitutional category) and select the correct answer using the codes given below:\nList I\n(a) Right to Equality\n(b) Right to Information\n(c) To abide by the Constitution\n(d) Right to Constitutional Remedies\nList II\n1. Fundamental Right\n2. Tool for transparent and responsible government\n3. Fundamental Duty\n4. Means to enforce Fundamental Rights"
+   },
+   {
+    "id": "de16b21c-d14b-4a0d-b8d4-9f9876bd1694",
+    "question_text": "A citizen files a request under the Right to Information Act, 2005, citing it as her constitutional right. Which of the following most accurately describes the legal status of the RTI Act in India?\n(1) It is a Fundamental Right directly guaranteed by Part III of the Constitution.\n(2) It is a statutory/legal right created by an Act of Parliament.\n(3) It derives its constitutional spirit from Articles 19 and 21 but is enforceable as a legal right under statute.\n\nChoose the correct option:"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|fundamental|parliamentary|principles",
+  "rows": [
+   {
+    "id": "72445b27-98cc-46f8-94d4-8dd59bf5de79",
+    "question_text": "Match List I (Feature of the Indian Constitution) with List II (Country it was chiefly borrowed from) and select the correct answer using the codes below:\nList I\n(a) Federal system with a strong Centre\n(b) Fundamental Rights\n(c) Directive Principles of State Policy\n(d) Parliamentary form of government\nList II\n1. United States\n2. Ireland\n3. Canada\n4. United Kingdom"
+   },
+   {
+    "id": "72afdaf7-7a09-45ca-b211-968667648cd4",
+    "question_text": "Match the features borrowed in List I with the source constitution in List II.\n\nList I (Feature borrowed into Indian Constitution)\n(A) Directive Principles of State Policy\n(B) Fundamental Rights\n(C) Parliamentary form of Government\n(D) Emergency provisions\n\nList II (Source Constitution)\n(1) Germany (Weimar Constitution)\n(2) Britain (UK)\n(3) USA\n(4) Ireland"
+   },
+   {
+    "id": "c60c9c40-5a92-47c4-838f-475b126a22ae",
+    "question_text": "Match List I (Feature of the Indian Constitution) with List II (Source country/constitution from which it was borrowed) and select the correct answer using the codes given below:\nList I\n(a) Directive Principles of State Policy\n(b) Fundamental Rights\n(c) Parliamentary form of government\n(d) Emergency provisions\nList II\n1. British Constitution\n2. U.S. Constitution\n3. Irish Constitution\n4. Government of India Act, 1935 / Weimar Constitution"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|fundamental|guaranteed|originally",
+  "rows": [
+   {
+    "id": "b80d3509-da22-4618-ac73-1fe14baa3151",
+    "question_text": "Consider the following statements about the Fundamental Rights as originally provided in the Constitution of India:\n(i) Seven Fundamental Rights were originally guaranteed to citizens.\n(ii) The Right to Property was one of the seven original Fundamental Rights.\n(iii) After the removal of one right, six Fundamental Rights are now recognised.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "c194c05c-48e1-4d4f-8ad6-6b28a085dea8",
+    "question_text": "Originally the Constitution guaranteed seven Fundamental Rights. After the Right to Property was deleted by the 44th Amendment Act, 1978, how many Fundamental Rights remain?"
+   }
+  ]
+ },
+ {
+  "sig": "assemblies|consisting|legislative|parliament",
+  "rows": [
+   {
+    "id": "a3259498-e681-45f3-9a3f-c5a8cb5cc317",
+    "question_text": "Consider the following statements regarding the election of the President of India:\n(i) The President is elected by an electoral college consisting of elected members of both Houses of Parliament.\n(ii) Elected members of the Legislative Assemblies of the States are part of the electoral college.\n(iii) The President is directly appointed by the Prime Minister.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "de8dd214-6730-4b64-804f-6f23064842a2",
+    "question_text": "Read the following statements and choose the correct option.\nAssertion [A]: The Vice-President of India is elected by an electoral college consisting of the members of both Houses of Parliament.\nReason [R]: The members of the State Legislative Assemblies do not take part in the election of the Vice-President."
+   }
+  ]
+ },
+ {
+  "sig": "idappeyar|panbuppeyar|porutpeyar|sinaippeyar",
+  "rows": [
+   {
+    "id": "cf3460d6-c115-4b04-9abf-5f4604b337ef",
+    "question_text": "Match each kind of noun (List I) with what it denotes (List II) and choose the correct code.\nList I\n(a) Porutpeyar\n(b) Idappeyar\n(c) Panbuppeyar\n(d) Sinaippeyar\nList II\n1. A place\n2. A quality / attribute\n3. Living and non-living things\n4. A part / limb of a thing"
+   },
+   {
+    "id": "b0451e36-2631-49d6-92e3-bb7facbaab52",
+    "question_text": "Match each noun-type (List I) with its defining feature (List II) and choose the correct code.\nList I\n(a) Sinaippeyar\n(b) Idappeyar\n(c) Panbuppeyar\n(d) Porutpeyar\nList II\n1. Names a place\n2. Names a quality\n3. Names a thing\n4. Names a part / limb of a thing"
+   }
+  ]
+ },
+ {
+  "sig": "kavalur|located|observatory|operations",
+  "rows": [
+   {
+    "id": "bc347700-768d-413b-891c-94750ad72242",
+    "question_text": "The Vainu Bappu Observatory (VBO) at Kavalur, located on the Javadhu Hills, began its operations in"
+   },
+   {
+    "id": "dafada8e-dbc4-400d-80b1-de97f359716e",
+    "question_text": "The Vainu Bappu Observatory (VBO) at Kavalur, which began operations in 1967, is located on which hill range?"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|constitutional|fundamental|justiciable",
+  "rows": [
+   {
+    "id": "3c1c41ac-ece5-4ede-8df6-40ca3437ee0d",
+    "question_text": "Consider the following statements about the Rule of Law and the Indian Constitution:\n(i) Part III of the Indian Constitution (Articles 12-35) is often called the 'Magna Carta of India' because it guarantees justiciable fundamental rights against arbitrary state action.\n(ii) In the Indira Nehru Gandhi v. Raj Narain (1975) case, the Supreme Court upheld the 39th Constitutional Amendment which placed the Prime Minister's election beyond judicial review.\n(iii) The writ of Habeas Corpus is a tool for enforcing the Rule of Law by allowing a detained person to challenge the legality of detention before a court.\nWhich of the above statements is/are correct?"
+   },
+   {
+    "id": "332ff5ea-3e9b-446c-938e-04b7ad9f1415",
+    "question_text": "Consider the following statements about village panchayats and the Indian Constitution:\n(i) Article 40, which directs the State to organise village panchayats, falls under the Fundamental Rights chapter.\n(ii) The Directive Principles of State Policy are non-justiciable guidelines that direct State policy towards social and economic goals.\n(iii) The 73rd Constitutional Amendment (1992) gave constitutional status to panchayats and added the Eleventh Schedule."
+   }
+  ]
+ },
+ {
+  "sig": "agriculture|correlation|percentage|population",
+  "rows": [
+   {
+    "id": "fa3a6ff2-2790-48b7-9f4c-908fa1c59028",
+    "question_text": "With respect to the composite index of HRD, match List I (Variable) with List II (Nature of correlation) and select the correct code:\nList I\n(a) G.N.P. per capita (US dollars)\n(b) PPP per capita (US dollars)\n(c) Percentage of active population engaged in agriculture\nList II\n1. Positive correlation\n2. Positive correlation\n3. High negative correlation"
+   },
+   {
+    "id": "c6613a50-ca40-4525-93fd-c9cf27f238b8",
+    "question_text": "Match List I (Variable paired with the composite index of HRD) with List II (Nature of correlation) and select the correct code:\nList I\n(a) G.N.P. per capita (US dollars)\n(b) Percentage of active population engaged in agriculture\nList II\n1. Very high positive correlation\n2. High negative correlation"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|directive|fundamental|principles",
+  "rows": [
+   {
+    "id": "6030b418-6920-4c52-95ea-1ba3bd806cd3",
+    "question_text": "Match List I (Borrowed feature) with List II (Source Constitution) and select the correct answer using the codes given below:\nList I\n(a) Equality before law\n(b) Directive Principles of State Policy\n(c) Fundamental Rights / Judicial review\n(d) Fundamental Duties\nList II\n1. Ireland\n2. USA\n3. USSR\n4. United Kingdom"
+   },
+   {
+    "id": "7818a665-3d59-476f-aa8c-ab92aa20c69a",
+    "question_text": "Consider the following statements about the source of Fundamental Duties in the Indian Constitution:\n(i) Fundamental Duties were borrowed from the Russian (Soviet) Constitution.\n(ii) The concept of Fundamental Duties was borrowed from the American Constitution.\n(iii) Fundamental Rights were borrowed from the US Constitution.\n(iv) The idea of a Welfare State in Directive Principles was borrowed from the Irish Constitution.\nWhich of the above statements are correct?"
+   },
+   {
+    "id": "f4edeb5c-e4ea-420b-baf1-5d715bb1ee4c",
+    "question_text": "If Part III (Fundamental Rights) of the Constitution spans Articles 12 to 35, the Directive Principles of State Policy in Part IV are contained in which range of Articles?"
+   }
+  ]
+ },
+ {
+  "sig": "citizenship|constitution|fundamental|principles",
+  "rows": [
+   {
+    "id": "40c20457-a3e0-4535-8b8d-3b5fa59c4a44",
+    "question_text": "Arrange the following Parts of the Indian Constitution in the order they appear (lowest to highest Article number range):\n(1) Fundamental Duties (Part IV-A)\n(2) Directive Principles of State Policy (Part IV, Articles 36-51)\n(3) Fundamental Rights (Part III, Articles 12-35)\n(4) Citizenship (Part II, Articles 5-11)"
+   },
+   {
+    "id": "3876463f-524e-46a2-8a52-30fe1e431627",
+    "question_text": "Match the Part of the Indian Constitution in List I with its subject matter in List II:\n\nList I:\nA) Part II\nB) Part III\nC) Part IV\nD) Part IVA\n\nList II:\n1) Directive Principles\n2) Citizenship\n3) Fundamental Duties\n4) Fundamental Rights\n\nSelect the correct matching code:"
+   },
+   {
+    "id": "bd79c381-7b88-4eeb-b6bd-2d5a83ccfb30",
+    "question_text": "Arrange the following Parts of the Indian Constitution in the correct numerical order:\n(1) Part I - Name and Territory of the Union\n(2) Part II - Citizenship\n(3) Part III - Fundamental Rights\n(4) Part IV - Directive Principles of State Policy\n\nWhich of the following represents the correct sequential order?"
+   },
+   {
+    "id": "2e8cac91-c67c-4b76-9645-5a77ee11c264",
+    "question_text": "Arrange the following Parts of the Indian Constitution in the order they appear (from earliest to latest Part number):\n(1) Fundamental Duties\n(2) Directive Principles of State Policy\n(3) Fundamental Rights\n(4) Citizenship"
+   },
+   {
+    "id": "bac076ad-9aff-4607-9cf1-0d18617180e7",
+    "question_text": "Consider the following statements about Articles of the Indian Constitution:\n(i) Fundamental Rights are covered under Articles 12 to 35.\n(ii) Fundamental Duties are found in Articles 36 to 51.\n(iii) Directive Principles of State Policy are covered under Articles 36 to 51.\n(iv) Citizenship provisions are in Articles 1 to 4.\nWhich of the above statements are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "chronological|constitution|constitutional|institutions",
+  "rows": [
+   {
+    "id": "e38a305c-d81a-4019-8297-3ddac2e720f7",
+    "question_text": "Arrange the following Constitutional Amendment Acts related to local self-governance and women's reservation in India in the chronological order of their enactment:\n(1) 74th Constitutional Amendment Act - Urban Local Bodies\n(2) 73rd Constitutional Amendment Act - Panchayati Raj institutions\n(3) The Constitution (One Hundred and Sixth Amendment) Act, 2023 - Women's reservation in Parliament\n(4) 42nd Constitutional Amendment Act - Added 'Socialist' and 'Secular' to the Preamble"
+   },
+   {
+    "id": "a2e65b06-bf9c-4106-9da3-9b862d257053",
+    "question_text": "Arrange the following Constitutional Amendments related to local self-governance in India in the correct chronological order (earliest to latest):\n(1) 73rd Constitutional Amendment Act (Panchayati Raj Institutions)\n(2) 74th Constitutional Amendment Act (Urban Local Bodies / Nagar Palikas)\n(3) 44th Constitutional Amendment Act (removal of right to property from Fundamental Rights)\n(4) 42nd Constitutional Amendment Act (added Directive Principles-related provisions, 'mini-constitution')\n\nWhich sequence is correct?"
+   }
+  ]
+ },
+ {
+  "sig": "descending|maharashtra|population|populous",
+  "rows": [
+   {
+    "id": "74591d9d-6f9d-45b0-ac1d-2821150c29cb",
+    "question_text": "Arrange the following Indian states in descending order of their population (most populous first):\n(I) Uttar Pradesh\n(II) West Bengal\n(III) Madhya Pradesh\n(IV) Maharashtra"
+   },
+   {
+    "id": "7f17693e-197c-4605-a67e-60aeb97953eb",
+    "question_text": "Arrange the following Indian states in descending order of population (most populous first):\n(1) Bihar\n(2) Maharashtra\n(3) Madhya Pradesh\n(4) Uttar Pradesh\nSelect the correct order:"
+   }
+  ]
+ },
+ {
+  "sig": "arrange|descending|highest|production",
+  "rows": [
+   {
+    "id": "cf2d6385-ad84-4957-beeb-6b65e73053c5",
+    "question_text": "Arrange the following Indian states in descending order of their tea production (highest to lowest):\n(1) West Bengal\n(2) Tamil Nadu\n(3) Assam\n(4) Kerala"
+   },
+   {
+    "id": "16b7e57c-d6ce-400e-87f2-23ce588e5447",
+    "question_text": "Arrange the following Indian states in DESCENDING order of fish production (highest to lowest):\n(1) West Bengal and Odisha\n(2) Kerala\n(3) Tamil Nadu\n(4) Andhra Pradesh"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|dalhousie|doctrine|princely",
+  "rows": [
+   {
+    "id": "80b4be76-949b-44b8-9746-fbbe812d5018",
+    "question_text": "Assertion [A]: Lord Dalhousie annexed several Indian princely states through the 'Doctrine of Lapse'.\nReason [R]: The British annexed Awadh (Oudh) on the grounds of 'good of the governed' - citing misrule by the Nawab.\n\nSelect the correct answer:"
+   },
+   {
+    "id": "3df2ceb1-75e6-4b9c-bfcf-71db6b2adf00",
+    "question_text": "Choose the correct option:\nAssertion [A]: The Doctrine of Lapse enabled the British to annex several Indian princely states.\nReason [R]: Under the Doctrine, a princely state whose ruler died without a natural heir could be annexed by the British, and it was applied by Lord Dalhousie."
+   }
+  ]
+ },
+ {
+  "sig": "chronological|constitution|constitutional|fundamental",
+  "rows": [
+   {
+    "id": "d3732fb3-5216-470d-9159-712248744955",
+    "question_text": "Arrange the following Constitutional Amendments related to the Preamble and fundamental structure in the correct chronological order:\n(1) Addition of 'Socialist' and 'Secular' to the Preamble\n(2) Adoption of the original Constitution (no amendment yet)\n(3) Supreme Court upholds Preamble as part of the Constitution in Kesavananda Bharati case\n(4) 44th Amendment restores certain rights curtailed during Emergency"
+   },
+   {
+    "id": "2f28ccb3-48a0-424c-ba03-f28857bf2002",
+    "question_text": "Arrange the following constitutional events in chronological order:\n(1) Indian Constitution came into force\n(2) Fundamental Duties added by 42nd Amendment\n(3) Verma Committee set up to review Fundamental Duties\n(4) 86th Amendment added the 11th Fundamental Duty"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|development|fertilization|parthenocarpy",
+  "rows": [
+   {
+    "id": "4e004929-e6f8-472d-85b4-8ed5c14e48fd",
+    "question_text": "Assertion [A]: Bananas and certain grapes are seedless fruits.\nReason [R]: Parthenocarpy is the development of fruit without fertilization, producing seedless fruits.\nSelect the correct answer using the codes below:"
+   },
+   {
+    "id": "4a63655b-b70c-4365-9244-4ac410e702ac",
+    "question_text": "Assertion [A]: Parthenocarpy results in the development of seedless fruits.\nReason [R]: In parthenocarpy, fruit development occurs without fertilization, so seeds are not formed."
+   }
+  ]
+ },
+ {
+  "sig": "alkaloid|caffeine|cinchona|nicotine",
+  "rows": [
+   {
+    "id": "3b0fa732-f8a6-49a2-b38e-67ac2d8e1ad9",
+    "question_text": "Match List I (Alkaloid) with List II (Source plant) and select the correct answer using the codes given below:\nList I\n(a) Caffeine\n(b) Opium\n(c) Nicotine\n(d) Quinine\nList II\n1. Cinchona\n2. Coffee\n3. Tobacco\n4. Poppy"
+   },
+   {
+    "id": "12c19329-b9da-4dbb-8757-e086e1786789",
+    "question_text": "Match List I (alkaloid / drug) with List II (natural source) and select the correct answer using the codes given below:\nList I\n(a) Caffeine\n(b) Opium\n(c) Nicotine\n(d) Quinine\nList II\n1. Tobacco\n2. Coffee\n3. Cinchona\n4. Poppy"
+   }
+  ]
+ },
+ {
+  "sig": "antibodies|assertion|recipient|universal",
+  "rows": [
+   {
+    "id": "a71ae7c7-75d4-4164-a52e-52621508eeef",
+    "question_text": "Read the following statements and choose the correct option.\nAssertion [A]: Blood group AB is the universal recipient.\nReason [R]: AB plasma carries neither anti-A nor anti-B antibodies, so it does not react against donor red cells of any group."
+   },
+   {
+    "id": "70cb3c3f-3b31-4654-9e3b-d67900f239a0",
+    "question_text": "Assertion [A]: A person with AB blood group can receive blood from any ABO group (a universal recipient).\nReason [R]: AB blood has both antigens A and B on the red cells but no anti-A or anti-B antibodies in the plasma.\nSelect the correct option:"
+   }
+  ]
+ },
+ {
+  "sig": "countries|descending|estimates|population",
+  "rows": [
+   {
+    "id": "dec74935-5f48-4c27-a7ca-9ce4c80b673e",
+    "question_text": "Arrange the following countries in descending order of the size of their sheep population (highest to lowest), as per global estimates:\n\n(1) Australia\n(2) China\n(3) India\n(4) Sudan"
+   },
+   {
+    "id": "bef38c87-a871-4751-998b-6b1674204e67",
+    "question_text": "Arrange the following countries in descending order of population (highest to lowest) as per recent estimates:\n(1) USA\n(2) China\n(3) India\n(4) Indonesia\n\nChoose the correct descending sequence:"
+   }
+  ]
+ },
+ {
+  "sig": "arrange|ascending|population|sequence",
+  "rows": [
+   {
+    "id": "315d5a3f-db06-40a6-a86b-9a0962bbda6e",
+    "question_text": "Arrange the following population growth rates of India across census decades in ascending order (lowest to highest):\n(1) 1981 census - 2.20% per year\n(2) 1991 census - 2.11% per year\n(3) 2001 census - 1.93% per year\n(4) 1971 census - 2.24% per year\n\nChoose the correct ascending sequence:"
+   },
+   {
+    "id": "7d0373a0-e829-47ef-9ae9-d647ab88b3e8",
+    "question_text": "Arrange the following census data points for India's population density in ascending order (lowest to highest):\n(1) 1991 census - 267 persons per sq. km\n(2) 1971 census - 177 persons per sq. km\n(3) 2011 census - 382 persons per sq. km\n(4) 1981 census - 216 persons per sq. km\n\nChoose the correct ascending sequence:"
+   }
+  ]
+ },
+ {
+  "sig": "arrange|australia|countries|descending",
+  "rows": [
+   {
+    "id": "4a15b56f-1b73-4e89-a178-08ad4bbdc7ac",
+    "question_text": "Arrange the following countries in descending order of their total land area (largest first):\n(1) India\n(2) Brazil\n(3) China\n(4) Australia"
+   },
+   {
+    "id": "b678b9ec-1c8a-4698-bec4-9fc0c71dd22d",
+    "question_text": "Arrange the following countries in descending order of their total land area (largest first):\n(1) India\n(2) Russia\n(3) Brazil\n(4) Australia\nChoose the correct order:"
+   }
+  ]
+ },
+ {
+  "sig": "buddhist|chronological|pataliputra|rajagriha",
+  "rows": [
+   {
+    "id": "b4d620b6-3c62-42fb-8053-833514036ecd",
+    "question_text": "Arrange the following Buddhist Councils in the correct chronological order:\n\n(1) Second Buddhist Council - Vaishali\n(2) First Buddhist Council - Rajagriha\n(3) Fourth Buddhist Council - Kashmir (under Kanishka)\n(4) Third Buddhist Council - Pataliputra (under Ashoka)"
+   },
+   {
+    "id": "fe8761db-4173-4296-903c-3bf9b0855c9a",
+    "question_text": "Arrange the following Buddhist councils in the correct chronological order:\n(1) Fourth Buddhist Council (convened by Kanishka I, Kashmir)\n(2) First Buddhist Council (Rajagriha)\n(3) Third Buddhist Council (Pataliputra, under Ashoka)\n(4) Second Buddhist Council (Vaishali)"
+   }
+  ]
+ },
+ {
+  "sig": "chronological|dhammacakkappavattana|enlightenment|mahaparinirvana",
+  "rows": [
+   {
+    "id": "bf039986-fec4-485e-8dcc-a09edf7f29b1",
+    "question_text": "Arrange the following events in the life of Gautama Buddha in the correct chronological order:\n\n(1) Attained Mahaparinirvana (death) at Kushinagar\n(2) Born at Lumbini (present-day Nepal)\n(3) Attained enlightenment (Bodhi) under the Bodhi tree at Bodh Gaya\n(4) Delivered the first sermon (Dhammacakkappavattana Sutta) at Sarnath"
+   },
+   {
+    "id": "1700188e-395f-4f94-afa1-4c515f0f017e",
+    "question_text": "Arrange the following key events in the life of Gautama Buddha in the correct chronological order:\n(1) Attainment of Enlightenment at Bodh Gaya\n(2) Birth at Lumbini\n(3) First sermon at Sarnath (Dhammacakkappavattana)\n(4) Mahaparinirvana at Kushinagar"
+   }
+  ]
+ },
+ {
+  "sig": "constitution|constitutional|fundamental|principles",
+  "rows": [
+   {
+    "id": "adae9b0d-892d-43d9-8f2e-22b548d2203b",
+    "question_text": "Direction: In the following question, a statement of Assertion [A] is followed by a statement of Reason [R]. Choose the correct answer.\n\n[A]: The 42nd Constitutional Amendment Act is often called the 'Mini Constitution'.\n[R]: The 42nd Amendment (1976) made extensive changes to the Constitution, including adding Fundamental Duties (Part IV-A), Directive Principles' primacy, and altering the balance between Parliament and Judiciary."
+   },
+   {
+    "id": "80acd692-d3b7-4d83-aa0d-f43f43e7f9bd",
+    "question_text": "Consider the following statements regarding the Directive Principles of State Policy (DPSP):\n(i) They are often described as embodying the social and economic ideals of the Constitution.\n(ii) Their primary function is the protection of individual fundamental rights.\n(iii) They are the basis on which the right to constitutional remedies operates.\n(iv) They are mainly aimed at promoting private property.\nWhich of the statements given above is/are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "committees|disinvestment|rajamannar|rangarajan",
+  "rows": [
+   {
+    "id": "fc9dc0e2-e85f-4b4c-b416-3229ea289375",
+    "question_text": "Match the committees in List I with the subject they examined in List II.\n\nList I\n(A) Dutt Committee\n(B) Wanchoo Committee\n(C) Rajamannar Committee\n(D) Rangarajan Committee\n\nList II\n(1) Disinvestment of public sector units\n(2) Centre-State financial relations\n(3) Direct taxes\n(4) Industrial licensing"
+   },
+   {
+    "id": "9a2d1ce2-4aa4-4fbb-8726-637844e4b481",
+    "question_text": "Match the committees in List I with their subject of inquiry in List II:\n\nList I (Committee)\n(A) Dutt Committee\n(B) Wanchoo Committee\n(C) Rajamannar Committee\n(D) Rangarajan Committee\n\nList II (Subject)\n(1) Centre-State Relations\n(2) Disinvestment\n(3) Industrial Licensing\n(4) Direct Taxes\n\nSelect the correct match:"
+   }
+  ]
+ },
+ {
+  "sig": "chronological|harshavardhana|prabhakaravardhana|rajyavardhana",
+  "rows": [
+   {
+    "id": "442b9c7d-36a6-4240-b5fa-1a7e0f6d0d60",
+    "question_text": "Arrange the following rulers of the Vardhana (Pushyabhuti) dynasty in the correct chronological order of their reigns:\n(1) Harshavardhana\n(2) Prabhakaravardhana\n(3) Rajyavardhana\n(4) Pushyabhuti (founder)"
+   },
+   {
+    "id": "aee7092c-e691-48f2-ac6a-39f6534bab42",
+    "question_text": "Arrange the following events in the correct chronological order leading to Harshavardhana ascending the throne:\n(1) Rajyashri is imprisoned by Shashanka after Grahavarman's murder\n(2) Prabhakaravardhana dies; Rajyavardhana becomes king\n(3) Rajyavardhana is treacherously killed by Shashanka\n(4) Harsha ascends both the Thanesar and Kannauj thrones"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|hydrolysis|solution|undergoes",
+  "rows": [
+   {
+    "id": "e88fcada-e457-4e29-9c1d-5326226ead3d",
+    "question_text": "Assertion [A]: A solution of sodium acetate in water turns red litmus blue.\nReason [R]: Sodium acetate is a salt of a weak acid and a strong base, and its acetate ion undergoes hydrolysis to give a basic solution.\nSelect the correct option:"
+   },
+   {
+    "id": "202ac98f-0283-4114-a6f0-dadfd677d3f5",
+    "question_text": "Assertion [A]: An aqueous solution of copper sulphate is acidic in nature.\nReason [R]: The Cu(2+) ion, being a cation of a weak base, undergoes hydrolysis to release H+ ions.\nSelect the correct option:"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|carbonated|dissolved|drinking",
+  "rows": [
+   {
+    "id": "ca3c22be-f847-47b6-88cc-46c7cb455976",
+    "question_text": "Assertion [A]: Carbonated drinking soda is acidic in nature.\nReason [R]: Carbon dioxide dissolved in the drink forms carbonic acid, lowering its pH below 7.\nSelect the correct option:"
+   },
+   {
+    "id": "fc1185c4-2947-4629-8896-c7f420b1ca36",
+    "question_text": "Read the assertion and reason and choose the correct option.\nAssertion [A]: Drinking soda (carbonated water) is mildly acidic in nature.\nReason [R]: It contains dissolved carbon dioxide, which forms carbonic acid in water."
+   }
+  ]
+ },
+ {
+  "sig": "author|canfield|chicken|little",
+  "rows": [
+   {
+    "id": "8867079f-27fb-4fdd-9694-80695b7d176e",
+    "question_text": "Match List I (Book) with List II (Author) and select the correct answer using the codes given below:\nList I (Book)\n(a) The Fault in Our Stars\n(b) Little Women\n(c) Chicken Soup for the Soul\n(d) 1984\nList II (Author)\n1. Louisa May Alcott\n2. George Orwell\n3. John Green\n4. Jack Canfield & Mark Victor Hansen"
+   },
+   {
+    "id": "ae72b30e-a95d-4444-bf9b-a1f4365e3247",
+    "question_text": "Match List I (Work) with List II (Author) and select the correct answer using the codes given below:\nList I (Work)\n(a) Chicken Soup for the Soul\n(b) Little Women\n(c) 1984\n(d) The Fault in Our Stars\nList II (Author)\n1. George Orwell\n2. John Green\n3. Jack Canfield & Mark Victor Hansen\n4. Louisa May Alcott"
+   }
+  ]
+ },
+ {
+  "sig": "assertion|civilization|classified|standardized",
+  "rows": [
+   {
+    "id": "0195f268-1819-4723-845c-77bf2ed6b67d",
+    "question_text": "Read the following statements and choose the correct option:\nAssertion [A]: The Indus Valley Civilization is classified as an urban civilization.\nReason [R]: It had well-planned cities with advanced drainage, granaries and standardized weights."
+   },
+   {
+    "id": "912966c2-55ee-441c-b4f1-4bdd4b053bd7",
+    "question_text": "Assertion [A]: The Indus Valley Civilization is classified as an urban civilization.\nReason [R]: Its cities had well-organized streets, drainage systems, brick houses, granaries, public baths and standardized weights and measures.\nSelect the correct option:"
+   }
+  ]
+ },
+ {
+  "sig": "microscope|resolution|transmission|wavelength",
+  "rows": [
+   {
+    "id": "8fd69823-28c1-49a2-b357-ab3167b9693c",
+    "question_text": "Consider the following statements about the electron microscope:\n(i) It can achieve much greater resolution than a light microscope.\n(ii) The greater resolution is possible because electrons have a much shorter wavelength than visible light.\n(iii) Transmission (TEM) and scanning (SEM) types are both available.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "c34def3c-42d9-4e2c-821c-9c19fb598d66",
+    "question_text": "A Transmission Electron Microscope (TEM) achieves far higher resolution than an optical microscope because the probe it uses has a much shorter wavelength than visible light. What does a TEM use to magnify the specimen?"
+   }
+  ]
+ },
+ {
+  "sig": "collectively|confidence|legislative|responsible",
+  "rows": [
+   {
+    "id": "8f6ec8e2-bcbb-4734-9bd1-3548be867dce",
+    "question_text": "Assertion [A]: The Council of Ministers in a State is collectively responsible to the Legislative Assembly.\nReason [R]: The Council of Ministers remains in office only so long as it enjoys the confidence of the popularly elected Legislative Assembly.\nSelect the correct answer using the codes given below:"
+   },
+   {
+    "id": "63eb252f-8905-4703-bde1-839064a1192d",
+    "question_text": "Read the following statements and choose the correct option:\nAssertion [A]: The State Council of Ministers is collectively responsible to the State Legislative Assembly.\nReason [R]: If the Legislative Assembly passes a vote of no confidence, the entire Council of Ministers must resign."
+   }
+  ]
+ },
+ {
+  "sig": "commission|constitution|constitutional|established",
+  "rows": [
+   {
+    "id": "85dd72b0-2ea8-4e41-af21-24bad0447cd9",
+    "question_text": "Assertion [A]: The Election Commission of India enjoys a constitutional basis.\nReason [R]: The Election Commission is established and its powers are derived from Article 324 of the Constitution.\nSelect the correct option:"
+   },
+   {
+    "id": "0bef9fab-be4a-4cff-887e-68c26a5cf019",
+    "question_text": "Consider the following statements about the Planning Commission of India:\n(i) It was established by a Cabinet resolution, not by an Act of Parliament.\n(ii) It was a constitutional body created directly under the Constitution.\n(iii) It was set up in 1950.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "celebrated|இராஜஸ்தான்|உத்தராயன்|மகரசங்கராந்தி",
+  "rows": [
+   {
+    "id": "a35fb89d-fd50-4187-aa59-bc90cf5a31dd",
+    "question_text": "Match each harvest festival name in List I with the state(s) where it is celebrated in List II:\nList I\n(a) மகரசங்கராந்தி\n(b) லோரி\n(c) உத்தராயன்\n(d) பொங்கல்\nList II\n1. பஞ்சாப்\n2. தமிழ்நாடு\n3. ஆந்திரா / கர்நாடகா\n4. குஜராத் / இராஜஸ்தான்"
+   },
+   {
+    "id": "b533d698-550f-4395-8c05-6d14405771a9",
+    "question_text": "Match each harvest-festival name in List I with the state(s) where it is celebrated in List II:\nList I\n(a) லோரி\n(b) உத்தராயன்\n(c) பொங்கல்\n(d) மகரசங்கராந்தி\nList II\n1. குஜராத் / இராஜஸ்தான்\n2. தமிழ்நாடு\n3. பஞ்சாப்\n4. ஆந்திரா / கர்நாடகா"
+   }
+  ]
+ },
+ {
+  "sig": "articulation|இருபக்கங்கள்|நடுப்பகுதியைத்|மேல்நோக்கி",
+  "rows": [
+   {
+    "id": "ac81fdc4-a4eb-4eae-b9c3-767d68ee5553",
+    "question_text": "Match each consonant (மெய்) in List I with its correct articulation in List II:\nList I\n(a) ல்\n(b) ள்\n(c) ழ்\n(d) ண்\nList II\n1. நாவின் நுனி மேல்நோக்கி வளைந்து வருடுதல்\n2. நாவின் இருபக்கங்கள் தடித்து மேல் பற்களின் அடியைத் தொடுதல்\n3. நாவின் இருபக்கங்கள் தடித்து மேல் அண்ணத்தின் நடுப்பகுதியைத் தொடுதல்\n4. நாவின் நுனி மேல்வாய் அண்ணத்தின் நடுப்பகுதியைத் தொடுதல்"
+   },
+   {
+    "id": "0fa3163d-64d8-48cc-91b4-0d956d7c9ea7",
+    "question_text": "Match each consonant (மெய்) in List I with its correct articulation in List II:\nList I\n(a) ழ்\n(b) ள்\n(c) ண்\n(d) ர்\nList II\n1. நாவின் நுனி மேல்நோக்கி வளைந்து வருடுதல்\n2. நாவின் இருபக்கங்கள் மேல் அண்ணத்தின் நடுப்பகுதியைத் தொடுதல்\n3. நாவின் நுனி மேல்வாய் அண்ணத்தின் நடுப்பகுதியைத் தொடுதல்\n4. நாவின் நுனி மேல் அண்ணத்தின் முதல் பகுதியைத் தொடுதல்"
+   }
+  ]
+ }
+]

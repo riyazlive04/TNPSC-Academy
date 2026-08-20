@@ -21,12 +21,22 @@ const SOFT = {
   green: 'bg-tint-green text-mint',
 } as const
 
+// Background-only tints for a PNG illustration - the artwork carries its own
+// colour, so it sits on a plain tint rather than SOFT's glyph-coloured text.
+const SOFT_BG = {
+  violet: 'bg-tint-violet',
+  coral: 'bg-tint-coral',
+  blue: 'bg-tint-blue',
+  green: 'bg-tint-green',
+} as const
+
 export type Tint = keyof typeof GRADIENTS
 
 export default function IconTile({
   tint = 'violet',
   size = 38,
   variant = 'gradient',
+  iconSrc,
   className = '',
   children,
 }: {
@@ -35,9 +45,23 @@ export default function IconTile({
   size?: number
   /** 'gradient' (default) = white glyph on a brand gradient; 'soft' = flat pastel. */
   variant?: 'gradient' | 'soft'
+  /** PNG illustration (public/subject-icons); when set it replaces `children`
+   *  entirely and always renders on a soft tint - the artwork carries its own
+   *  colour, so it never sits on the brand gradient. */
+  iconSrc?: string
   className?: string
-  children: ReactNode
+  children?: ReactNode
 }) {
+  if (iconSrc) {
+    return (
+      <span
+        style={{ width: size, height: size }}
+        className={`grid flex-shrink-0 place-items-center overflow-hidden rounded-tile p-1 ${SOFT_BG[tint]} ${className}`}
+      >
+        <img src={iconSrc} alt="" className="h-full w-full object-contain" loading="lazy" />
+      </span>
+    )
+  }
   const skin =
     variant === 'gradient'
       ? `bg-gradient-to-br ${GRADIENTS[tint]} text-white shadow-sm`

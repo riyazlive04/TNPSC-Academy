@@ -93,7 +93,7 @@ export default function ReportResolvedMessageEditor() {
           </span>
         </span>
         {dirty && (
-          <span className="flex-shrink-0 rounded-full bg-coralsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase text-coral">
+          <span className="flex-shrink-0 rounded-full bg-coralsoft px-2 py-0.5 font-heading text-2xs font-bold uppercase text-coral">
             Unsaved
           </span>
         )}
@@ -155,7 +155,7 @@ export default function ReportResolvedMessageEditor() {
                 tamil
               />
 
-              <p className="mb-4 rounded-lg bg-tint px-3 py-2 font-body text-[11px] leading-relaxed text-ink2">
+              <p className="mb-4 rounded-lg bg-tint px-3 py-2 font-body text-2xs leading-relaxed text-ink2">
                 Placeholders:{' '}
                 <code className="font-mono font-semibold text-brand">{'{subject}'}</code> — the
                 question&rsquo;s subject.{' '}
@@ -211,7 +211,7 @@ function Field({
   }`
   return (
     <div className="mb-3">
-      <label className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+      <label className="mb-1 block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
         {label}
       </label>
       {rows ? (
@@ -231,7 +231,7 @@ function Field({
           className={cls}
         />
       )}
-      {hint && <p className="mt-1 font-body text-[11px] text-ink2">{hint}</p>}
+      {hint && <p className="mt-1 font-body text-2xs text-ink2">{hint}</p>}
     </div>
   )
 }

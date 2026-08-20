@@ -92,7 +92,7 @@ export function ChoiceCard({
     >
       {/* Lock chip (free-tier spent) — sits over the top-right corner. */}
       {locked && (
-        <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-accentwarmsoft px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-accentwarm">
+        <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-accentwarmsoft px-1.5 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-accentwarm">
           <Lock size={10} /> {lockedLabel}
         </span>
       )}
@@ -117,11 +117,11 @@ export function ChoiceCard({
           {title}
         </span>
         {subtitle ? (
-          <span className="tamil mt-1 line-clamp-2 block font-body text-[11.5px] leading-snug text-muted">
+          <span className="tamil mt-1 line-clamp-2 block font-body text-xs leading-snug text-muted">
             {subtitle}
           </span>
         ) : count != null && count > 0 ? (
-          <span className="mt-1 block font-body text-[11.5px] text-muted">
+          <span className="mt-1 block font-body text-xs text-muted">
             <span className="font-heading font-bold tabular-nums text-primary">
               {count.toLocaleString()}
             </span>{' '}

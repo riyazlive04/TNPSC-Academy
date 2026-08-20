@@ -1,0 +1,136 @@
+[
+ {
+  "sig": "annually|annum|compound|compounded|interest|years",
+  "rows": [
+   {
+    "id": "a6cc1e6d-1e17-4309-a7e8-514b10554666",
+    "question_text": "Find the compound interest on ₹4,000 at 5% per annum for 2 years, compounded annually.",
+    "option_a": "₹400",
+    "option_b": "₹410",
+    "option_c": "₹420",
+    "option_d": "₹441"
+   },
+   {
+    "id": "b4b4dc53-2448-4241-86a2-ed93402fc38b",
+    "question_text": "Find the compound interest on ₹10,000 at 10% per annum for 2 years, compounded annually.",
+    "option_a": "₹2,000",
+    "option_b": "₹2,100",
+    "option_c": "₹1,000",
+    "option_d": "₹2,200"
+   },
+   {
+    "id": "b54df41b-76bf-43dc-924c-2173260f9b03",
+    "question_text": "Find the compound interest on ₹8,000 at 15% per annum for 2 years, compounded annually.",
+    "option_a": "₹2,400",
+    "option_b": "₹2,580",
+    "option_c": "₹2,760",
+    "option_d": "₹3,000"
+   }
+  ]
+ },
+ {
+  "sig": "annadurai|karunanidhi|kazhagam|munnetra|ramachandran|ramasamy",
+  "rows": [
+   {
+    "id": "4aaf7b09-6e0f-450d-b993-cd62af145ef1",
+    "question_text": "The Dravida Munnetra Kazhagam (DMK) was founded in 1949 by",
+    "option_a": "Periyar E.V. Ramasamy",
+    "option_b": "C.N. Annadurai",
+    "option_c": "M. Karunanidhi",
+    "option_d": "M.G. Ramachandran"
+   },
+   {
+    "id": "82ad642f-3e37-4a23-a6e2-2e7a2c4f86be",
+    "question_text": "The All India Anna Dravida Munnetra Kazhagam (AIADMK) was founded in 1972 by",
+    "option_a": "C.N. Annadurai",
+    "option_b": "M.G. Ramachandran",
+    "option_c": "M. Karunanidhi",
+    "option_d": "Periyar E.V. Ramasamy"
+   }
+  ]
+ },
+ {
+  "sig": "annum|double|interest|itself|money|simple",
+  "rows": [
+   {
+    "id": "4f775237-8292-4c7f-b883-e5c8ecd47a6f",
+    "question_text": "At what rate of simple interest per annum will a sum of money double itself in 12.5 years?",
+    "option_a": "6%",
+    "option_b": "8%",
+    "option_c": "10%",
+    "option_d": "12.5%"
+   },
+   {
+    "id": "e58f8437-54d2-4d3c-97ca-99f70d4c3baf",
+    "question_text": "At what rate of simple interest per annum will a sum of money double itself in 8 years?",
+    "option_a": "10%",
+    "option_b": "12%",
+    "option_c": "12.5%",
+    "option_d": "15%"
+   }
+  ]
+ },
+ {
+  "sig": "amount|annually|annum|compounded|years",
+  "rows": [
+   {
+    "id": "096ff6e9-80ff-4e31-b0ae-078e7e8d51ed",
+    "question_text": "Find the amount on ₹6,250 at 4% per annum for 2 years, compounded annually.",
+    "option_a": "₹6,760",
+    "option_b": "₹6,720",
+    "option_c": "₹6,800",
+    "option_d": "₹6,500"
+   },
+   {
+    "id": "ff4f0c14-e723-4e66-afb3-2ff0da95e131",
+    "question_text": "What will be the amount on ₹8,000 at 10% per annum compounded annually for 2 years?",
+    "option_a": "₹9,600",
+    "option_b": "₹9,680",
+    "option_c": "₹9,720",
+    "option_d": "₹9,800"
+   }
+  ]
+ },
+ {
+  "sig": "between|compound|difference|interest|simple|years",
+  "rows": [
+   {
+    "id": "ed9061c4-7ae3-494f-99b2-274742206105",
+    "question_text": "The difference between the compound interest and the simple interest on ₹4,000 for 2 years at 10% per annum is",
+    "option_a": "₹40",
+    "option_b": "₹400",
+    "option_c": "₹80",
+    "option_d": "₹20"
+   },
+   {
+    "id": "73df44e5-9c08-467a-a276-de478dece066",
+    "question_text": "The difference between the compound interest and the simple interest on a sum of ₹10,000 for 2 years at 10% per annum is",
+    "option_a": "₹50",
+    "option_b": "₹100",
+    "option_c": "₹150",
+    "option_d": "₹200"
+   }
+  ]
+ },
+ {
+  "sig": "between|candidates|election|margin|secured|winner",
+  "rows": [
+   {
+    "id": "accd6d66-03e1-4e5c-b642-94c76ffd16e3",
+    "question_text": "In an election between two candidates, the winner secured 60% of the valid votes and won by a margin of 9,000 votes. What was the total number of valid votes?",
+    "option_a": "36,000",
+    "option_b": "45,000",
+    "option_c": "54,000",
+    "option_d": "60,000"
+   },
+   {
+    "id": "edffac02-fa30-46f3-93d0-12deb005876b",
+    "question_text": "In an election between two candidates, the winner secured 56% of the valid votes and won by a margin of 4,800 votes. What was the total number of valid votes?",
+    "option_a": "36,000",
+    "option_b": "40,000",
+    "option_c": "44,000",
+    "option_d": "48,000"
+   }
+  ]
+ }
+]

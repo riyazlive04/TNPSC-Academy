@@ -1,0 +1,122 @@
+[
+  {
+    "topic": "Direction Based",
+    "group_nums": "1,1,1,1,1,2,3,4,5",
+    "row_ids": ["0c7cd567-81e2-414f-89d5-4fee37bdfa16", "6cd060d6-bcf7-45e2-8747-1920d7932092", "eb58ce45-6cdc-4f01-8778-a5360c7af96b"],
+    "classification": "false_positive",
+    "notes": "All 3 rows share only the boilerplate instructional legend for the #/$/*/@ symbolic-direction puzzle type ('A # B means B is at 1 metre to the right of A ... first person from the left is facing North'). The shared numeric signature '1,1,1,1,1,2,3,4,5' comes entirely from that legend text (five separate '1 metre' mentions + the numbered list 1-5), not from the actual puzzle content. Each row's specific symbol chain is a genuinely different puzzle: (a) 0c7cd567 solves 'P # R $ A * U -> direction of U from P'; (b) 6cd060d6 solves 'M # N $ T -> direction of T from M'; (c) eb58ce45 solves 'X @ B * P -> direction of P from X'. I independently walked each chain on a coordinate grid using the stated legend (# = +1 East, $ = +1 North, * = +1 West, @ = +1 South): chain (a) places U at (0,1) relative to P = due North, matching the DB's answer C (North); chain (b) places T at (1,1) relative to M = North-East, matching answer B (North-East); chain (c) places P at (-1,-1) relative to X = South-West, matching answer D (South-West). Three distinct symbol chains, three distinct correct directions, all independently verified correct. Textbook false positive from shared-legend text - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Direction Based",
+    "group_nums": "1,2,3,4",
+    "row_ids": ["0de8326a-1633-41b9-af98-2be2a26238c4", "437ff1d2-49db-4c43-b31c-500fb7170645", "5f656cbc-e817-4aec-8b7f-74521afb9287", "f0503bcb-e991-4b99-a8d0-4dfeaac63046"],
+    "classification": "false_positive",
+    "notes": "Classic 'one passage, several sub-questions' reasoning set: all 4 rows share the identical setup paragraph (six flats P,Q,R,S,T,U in two rows N/S-facing, 4 numbered clues) which is where the shared '1,2,3,4' signature comes from (the clue numbering), not from any restated math. Each row then asks a genuinely different specific question about that ONE solved arrangement: (1) 0de8326a asks whose flat is between Q and S; (2) 437ff1d2 asks who is next to U if P and T are swapped; (3) 5f656cbc asks which pair (other than S-U) is diagonally opposite; (4) f0503bcb asks which trio gets south-facing flats. No two rows ask the same specific question - this is intentional multi-question passage design (common in analytical reasoning sets), not redundant duplication. False positive - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Direction Based",
+    "group_nums": "4,8",
+    "row_ids": ["162523fb-b036-4d98-89c0-20027b6a63e4", "8946c2b7-d34e-43ee-b0f3-583fc644f144", "c5443d1d-0938-4cba-a358-4b47362a47bb"],
+    "classification": "false_positive",
+    "notes": "Same 'one passage, several sub-questions' pattern: all 3 rows share the identical '8 trees in two rows of 4, facing N/S' setup paragraph (source of the '4,8' signature - 4 per row, 8 trees total), then ask 3 different specific questions about the single solved layout: (1) 162523fb asks which statement is definitely true; (2) 8946c2b7 asks which tree is opposite raspberry; (3) c5443d1d asks which tree is opposite banana. Different questions about the same solved puzzle, not restated duplicates. False positive - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Direction Based",
+    "group_nums": "6,8",
+    "row_ids": ["28b9fc28-2ff5-49db-a42c-7bcc9fc28e6c", "f8d65aca-e99f-4aea-ae59-e14c2f12d3d9"],
+    "classification": "false_positive",
+    "notes": "Two completely unrelated puzzles that merely both mention '6' and '8': (1) 28b9fc28 is a walking-direction problem (Golu walks 8km North, turns left, walks 6km, find shortest distance from house). Verified independently: North 8km then left-turn = West, so displacement is (8N, 6W); shortest distance = sqrt(8^2+6^2) = sqrt(100) = 10 km, matching the DB's answer A (10 km). (2) f8d65aca is a room-geometry/perimeter problem (8m x 6m room, a cat runs all 4 walls then the diagonal - total distance traveled). Verified: perimeter = 2*(8+6) = 28m, diagonal = sqrt(8^2+6^2) = 10m, total = 38m, matching the DB's answer C (38). These are a walking/bearing puzzle and a room-geometry/Pythagoras puzzle respectively - different scenario, different skill framing, only the numbers 6 and 8 (very common small integers, and a 6-8-10 Pythagorean triple that recurs constantly in these banks) coincide. Both existing answers independently verified correct; false positive, no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Direction Based",
+    "group_nums": "3,5,5",
+    "row_ids": ["45e390b3-75de-4dfc-bc80-b86a18d8f598", "bfd3fb26-27b3-480f-ba2b-eb13a967504f"],
+    "classification": "false_positive",
+    "notes": "The closest-looking pair to a real duplicate in this whole batch (same 'walk south, two turns, distances 5/3/5' shape), but the actual turn sequence and the question being asked both differ, so it's a different puzzle, not a restatement. (1) 45e390b3: 'walks South 5m, turns LEFT, walks 3m, turns RIGHT, walks 5m - which direction is X now FACING?' Verified with compass bearings (South=180 deg, left turn = -90 deg, right turn = +90 deg): South(180) -> left -> East(90) -> right -> South(180). Final facing = South, matching DB answer B. (2) bfd3fb26: 'walks South 5km, turns RIGHT, walks 3km, turns LEFT, walks 5km - which direction is he FROM THE STARTING PLACE?' (a displacement/bearing question, not a facing question). Verified: South(180) -> right -> West(270) -> left -> South(180). Position track: (0,0) -> (0,-5) -> (-3,-5) -> (-3,-10). Endpoint (-3,-10) relative to origin has both a West and a South component, so direction from start = South-West, matching DB answer D. The turn order is mirrored (Left-then-Right vs Right-then-Left) AND the question type differs (final facing direction vs. displacement direction from origin) - these are two distinct puzzles testing the same skill with the same distances, not the same problem restated with shuffled options. Both existing answers independently verified correct. False positive per the task's explicit skepticism guidance - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Dice Problems",
+    "group_nums": "6",
+    "row_ids": ["0d74dca8-b07e-4997-b6a2-d5e5acba7fee", "63f79a7d-036a-4a04-960d-9c4495b6bead", "fb18e668-8115-4c88-9adc-5edef52abecd"],
+    "classification": "false_positive",
+    "notes": "IMPORTANT META-NOTE (applies to all 5 Dice Problems groups): every dice question in this bank refers to dice-face images ('positions shown below' / 'figures given below') that are NOT present in the JSON export - only the question text and options are available. The actual correct answer for any 'find the opposite/top/bottom face' dice question is entirely determined by the pictured net/orientation, which cannot be independently re-derived from text alone. This is exactly the false-positive trap flagged in the task brief: dice faces only range 1-6, and 'find the number opposite N' is the single most common dice-question template, so completely unrelated source images collide constantly on the same face-value mentions. For THIS group: all 3 rows ask about the face opposite 6, but explicitly reference a different number of pictured positions (row 0d74dca8 = 'four different positions', row 63f79a7d = 'three positions X,Y,Z', row fb18e668 = 'two positions... bottom face has 6') - strong textual evidence each references a distinct image set, i.e. distinct dice puzzles. Rows 0d74dca8 and 63f79a7d both answer 'opposite 6 = 1', but that is simply the universal standard Western-die convention (opposite faces sum to 7: 1-6, 2-5, 3-4), so two independently-sourced standard dice landing on the same textbook-default answer is expected coincidence, not evidence of a shared origin. Row fb18e668 answers 'opposite 6 = 5' (sum=11), a non-standard/custom die, clearly a different image. No reliable basis to treat any pair here as a true duplicate. False positive - no action needed; would require the original images to ever resolve with confidence.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Dice Problems",
+    "group_nums": "2",
+    "row_ids": ["30f33a77-1973-4e03-a9e3-727e537045f3", "4973e71e-a623-4832-987a-37c6eebb01d6", "6547d5d2-4237-4e03-830d-295ff4733f51", "741fe7f3-4e30-4918-9e7f-9c9da4095c26", "aab748fa-d499-4afd-82ef-23ce85b7a56e", "b9316d33-2e73-404c-8f9d-95b27e8bcf58"],
+    "classification": "false_positive",
+    "notes": "Same image-dependency caveat as the '6' group above applies. 6 rows all ask about the face opposite/related to 2, each citing a different number of pictured positions (4, 3, 4, 3, 2, 2 respectively) and, critically, giving CONFLICTING opposite-face values: 30f33a77 and 4973e71e say opposite(2)=6; 6547d5d2 and 741fe7f3 say opposite(2)=5; aab748fa says bottom(2)->top=6; b9316d33 says bottom(2)->top=1. Rows aab748fa and b9316d33 are near-identical in PHRASING ('Two positions... When 2 is at the bottom, what/which number will be at the top?') yet give opposite answers (6 vs 1) - since for one specific physical die the face opposite a fixed value cannot be two different numbers, this proves aab748fa and b9316d33 are two different dice/images despite the templated wording, not a duplicate pair with a genuine conflict (their scenarios/images are not actually the same, so this isn't a 'same puzzle, disagreeing answer' conflict - it's confirmation of distinct source images sharing a copied phrasing template). The 6->6 match between 30f33a77/4973e71e/aab748fa (non-standard, sum=8) is suggestive but still just 3 of many possible non-standard pairings recurring across a large recycled question pool - insufficient to confirm shared origin without seeing the images. Flagging for a human with image access: 30f33a77 + 4973e71e + aab748fa show a matching 2<->6 relationship and could be worth a manual visual check, but per the task's default-to-false-positive guidance I am NOT treating them as confirmed duplicates. False positive - no action taken on any row in this group.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Dice Problems",
+    "group_nums": "3",
+    "row_ids": ["33b3b327-4873-408d-80a0-de01ca72a1bf", "3ce458fd-0ef6-41fe-a51a-3b724d41010c", "4f5d5fbd-4a4d-4388-bd28-984f3017f030", "87c35e51-6959-40df-b3cf-00f9328f33ee", "9be927f0-750a-43a8-b437-0a0c0fc7a056"],
+    "classification": "false_positive",
+    "notes": "Same image-dependency caveat applies. 5 rows about the face opposite/related to 3, with differing implied position-counts (3, 4, 2, 2, 2) and mostly conflicting values: 33b3b327 says opposite(3)=6; 3ce458fd says opposite(3)=4 (the standard convention, sum=7); 87c35e51 says opposite(3)=2; and two rows - 4f5d5fbd ('Two positions of a dice... top is 3... bottom?' = 5) and 9be927f0 ('Two positions of a parallelepiped... 3 on top... bottom?' = 5) - both give a matching NON-standard relationship (3<->5, sum=8) with a near-identical question template. This pair is the single most suspicious candidate for a true duplicate in the whole reasoning batch (unusual matching non-standard pairing + very similar phrasing), but 'parallelepiped' vs 'dice' is a real terminology difference that could just as easily indicate two different source books independently reusing a common textbook trick-question, and I cannot see either image to confirm they are literally the same two views of the same physical cube. Per the task's instruction to independently verify LOGIC before calling something a true duplicate, and given that verification is impossible here without the source images, I am defaulting to false_positive and flagging ids 4f5d5fbd-4a4d-4388-bd28-984f3017f030 and 9be927f0-750a-43a8-b437-0a0c0fc7a056 for manual review by someone with access to the original figures. No action taken.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Dice Problems",
+    "group_nums": "4",
+    "row_ids": ["4e2a408f-e5f1-42fa-b273-d4bb86ec2e18", "540da5dd-5fa8-493e-961f-75eed62ff93d", "9f448399-0d41-4525-a4d0-c5d07865c99c"],
+    "classification": "false_positive",
+    "notes": "Same image-dependency caveat applies. 3 rows about the face opposite/related to 4: 4e2a408f says opposite(4)=1 ('four different positions'); 540da5dd says bottom(4)->top=3, i.e. opposite(4)=3, the standard convention sum=7 ('two positions'); 9f448399 says bottom(4)->top=1, i.e. opposite(4)=1 ('two positions'). 4e2a408f and 9f448399 share a matching non-standard relationship (4<->1, sum=5) despite one citing 'four positions' and the other 'two positions', which is a weak signal of possibly-shared origin but not confirmable without the images (same reasoning as the '3' and '2' groups above). Flagging ids 4e2a408f-e5f1-42fa-b273-d4bb86ec2e18 and 9f448399-0d41-4525-a4d0-c5d07865c99c for optional manual image review. Defaulting to false_positive - no action taken.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Dice Problems",
+    "group_nums": "1",
+    "row_ids": ["971026d8-6fa0-445a-88f2-c4b05eb2ed1b", "abf5f9e5-1328-49e9-b9c3-5cdc4b52d662", "fc2e6d93-de71-4e49-80b8-81975d24d10d", "fddcd12d-f4c2-43c3-a41a-dac5e03ccb9f"],
+    "classification": "false_positive",
+    "notes": "Same image-dependency caveat applies. 4 rows about the face opposite/related to 1: 971026d8 says bottom(1)->top=3 (non-standard, sum=4); abf5f9e5 says top(1)->bottom=6 (standard convention, sum=7); fc2e6d93 says opposite(1)=6 (standard, matches abf5f9e5's relationship but that's just the textbook default, weak evidence); fddcd12d says top(1)->bottom=5 (non-standard, sum=6, matches none of the others). No two rows share a distinctively non-standard relationship here (the one match, abf5f9e5/fc2e6d93 at 1<->6, is the universal default convention any independent standard die would produce), so there isn't even a suspicious candidate pair in this group. False positive - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Seating Arrangement",
+    "group_nums": "1,2,3,4",
+    "row_ids": ["08c00151-c141-483f-b38f-036ec493a035", "131f1684-0dbc-42cd-bc5c-dd5f10668a32", "a49c39a3-3211-474c-9b2a-26b2867901be", "ad4a2afa-1ab3-40bf-a8d6-ef1057d7df2e", "dffefbfd-1f4a-4329-8d9a-1064219e5ab9"],
+    "classification": "false_positive",
+    "notes": "'One passage, several sub-questions' pattern again: all 5 rows share the identical 'seven cars' setup paragraph (Cadillac, Ambassador, Fiat, Maruti, Mercedes, Bedford, Fargo standing in a row facing East, 4 numbered clues) - the source of the shared '1,2,3,4' signature is the clue numbering, not restated math. Each row asks a different specific question about the ONE solved arrangement: (1) 08c00151 - position of Mercedes; (2) 131f1684 - which statement is correct (about Fargo/Ambassador/Fiat/Cadillac/Mercedes relative positions); (3) a49c39a3 - which 3 cars are right of Ambassador; (4) ad4a2afa - which 2 cars flank Cadillac; (5) dffefbfd - a second, differently-worded 'which statement is correct' question testing different specific claims (about Maruti/Ambassador/Bedford/Fiat) than row 131f1684. Even the two 'which statement is correct' rows (131f1684, dffefbfd) test entirely different claims/options, so they are not duplicates of each other either. All 5 are genuinely different questions about the same solved layout - standard multi-question passage design, not redundancy. False positive - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  },
+  {
+    "topic": "Seating Arrangement",
+    "group_nums": "1,2,3,4,4",
+    "row_ids": ["49150b73-bc37-44e7-9778-492a052f8931", "9befd85e-c6fc-453b-b186-96e15bdc4875", "a6c707f1-1ebe-42cd-8655-b5c7252420b4", "f6cdb108-2f0f-4672-865a-f65298ec0009"],
+    "classification": "false_positive",
+    "notes": "Same 'one passage, several sub-questions' pattern: all 4 rows share the identical 'A,B,C,D,E,F,G sitting in a row facing North' setup paragraph and 4 numbered clues (source of the '1,2,3,4,4' signature - clue numbering plus the repeated '4th'/'third' ordinal references in clues 2 and 4). Each row asks a different specific question about the ONE solved seating order: (1) 49150b73 - who are B's neighbours; (2) 9befd85e - who is to the left of C; (3) a6c707f1 - what is A's position; (4) f6cdb108 - which statement is NOT true. Four genuinely different questions about the same solved arrangement, not restated duplicates. False positive - no action needed.",
+    "keep_id": null,
+    "rewrites": [],
+    "conflict_details": null
+  }
+]

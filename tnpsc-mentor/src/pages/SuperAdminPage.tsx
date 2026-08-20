@@ -53,6 +53,7 @@ import {
   ListChecks,
   FileDown,
   Presentation,
+  Rocket,
 } from 'lucide-react'
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
@@ -340,7 +341,7 @@ function OverviewTab() {
                 <Icon size={18} />
               </span>
               <div className="font-heading text-2xl font-semibold leading-none text-ink">{c.value}</div>
-              <div className="tamil mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">
+              <div className="tamil mt-1.5 font-body text-2xs uppercase tracking-wide text-ink2">
                 {t(c.label)}
               </div>
             </div>
@@ -379,7 +380,7 @@ function SignupsChart({ data = [] }: { data?: { date: string; count: number }[] 
                   className="w-full min-h-[3px] rounded-t-md bg-brand/80 transition-colors duration-200 group-hover:bg-brand"
                   title={`${d.date}: ${d.count}`}
                 />
-                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-[10px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-2xs font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
                   {d.count}
                 </span>
               </div>
@@ -387,7 +388,7 @@ function SignupsChart({ data = [] }: { data?: { date: string; count: number }[] 
           </div>
           <div className="mt-1.5 flex gap-1.5">
             {data.map((d) => (
-              <span key={d.date} className="flex-1 text-center font-body text-[9px] text-ink2/70">
+              <span key={d.date} className="flex-1 text-center font-body text-2xs text-ink2/70">
                 {d.date.slice(8, 10)}
               </span>
             ))}
@@ -495,7 +496,7 @@ function RevenueTab() {
               <div className="font-heading text-2xl font-semibold leading-none text-ink">
                 {c.value}
               </div>
-              <div className="mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">
+              <div className="mt-1.5 font-body text-2xs uppercase tracking-wide text-ink2">
                 {c.label}
               </div>
             </div>
@@ -508,7 +509,7 @@ function RevenueTab() {
         {stats.map((s) => (
           <div key={s.label} className="card p-4">
             <div className="font-heading text-xl font-semibold leading-none text-ink">{s.value}</div>
-            <div className="mt-1.5 font-body text-[11px] uppercase tracking-wide text-ink2">
+            <div className="mt-1.5 font-body text-2xs uppercase tracking-wide text-ink2">
               {s.label}
             </div>
           </div>
@@ -571,7 +572,7 @@ function RevenueChart({ data = [] }: { data?: { month: string; revenue: number }
                   className="w-full min-h-[3px] rounded-t-md bg-brand/80 transition-colors duration-200 group-hover:bg-brand"
                   title={`${d.month}: ${formatINR(d.revenue)}`}
                 />
-                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-[9px] font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="pointer-events-none absolute inset-x-0 -top-4 text-center font-heading text-2xs font-semibold text-ink2 opacity-0 transition-opacity group-hover:opacity-100">
                   {formatINR(d.revenue)}
                 </span>
               </div>
@@ -579,7 +580,7 @@ function RevenueChart({ data = [] }: { data?: { month: string; revenue: number }
           </div>
           <div className="mt-1.5 flex gap-1.5">
             {data.map((d) => (
-              <span key={d.month} className="flex-1 text-center font-body text-[9px] text-ink2/70">
+              <span key={d.month} className="flex-1 text-center font-body text-2xs text-ink2/70">
                 {d.month.slice(5)}
               </span>
             ))}
@@ -883,22 +884,30 @@ function UsersTab() {
                     {/* Plan chips carry the subscription's expiry so validity is
                         readable straight off the list, without opening details. */}
                     {u.premium && (
-                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-amber-500">
                         <Crown size={11} />
                         {t('premiumBadge')}
                         {u.premium_until && ` · ${new Date(u.premium_until).toLocaleDateString()}`}
                       </span>
                     )}
                     {u.vettri && (
-                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
                         <Trophy size={11} />
                         Vettri
                         {u.vettri_until && ` · ${new Date(u.vettri_until).toLocaleDateString()}`}
                       </span>
                     )}
+                    {u.rank_booster && (
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
+                        <Rocket size={11} />
+                        Rank Booster
+                        {u.rank_booster_until &&
+                          ` · ${new Date(u.rank_booster_until).toLocaleDateString()}`}
+                      </span>
+                    )}
                   </div>
                   <p className="truncate font-body text-xs text-ink2">{u.email}</p>
-                  <p className="truncate font-body text-[11px] text-ink2/80">
+                  <p className="truncate font-body text-2xs text-ink2/80">
                     Joined {new Date(u.created_at).toLocaleDateString()}
                     {u.last_active ? ` · ${relativeTime(u.last_active)}` : ' · never active'}
                   </p>
@@ -906,7 +915,7 @@ function UsersTab() {
               </button>
               <div className="hidden text-center sm:block">
                 <p className="font-heading text-sm font-semibold text-ink">{u.tests_taken}</p>
-                <p className="font-body text-[10px] uppercase tracking-wide text-ink2">{t('testsTakenCol')}</p>
+                <p className="font-body text-2xs uppercase tracking-wide text-ink2">{t('testsTakenCol')}</p>
               </div>
               <select
                 value={u.role}
@@ -1133,7 +1142,7 @@ function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => vo
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-heading text-sm font-semibold text-ink">
                         {s.label || 'Unknown device'}
-                        <span className="ml-1.5 font-body text-[10px] uppercase tracking-wide text-ink2">
+                        <span className="ml-1.5 font-body text-2xs uppercase tracking-wide text-ink2">
                           {type}
                         </span>
                       </p>
@@ -1170,12 +1179,18 @@ function DevicesModal({ user, onClose }: { user: AdminUserRow; onClose: () => vo
 // Actions use an inline two-step confirm — ConfirmDialog sits at z-[55], below
 // this z-[60] overlay, so a nested dialog would render behind the popup.
 
-type PlanAction = 'grant-premium' | 'revoke-premium' | 'grant-vettri' | 'revoke-vettri'
+type PlanAction =
+  | 'grant-premium'
+  | 'revoke-premium'
+  | 'grant-vettri'
+  | 'revoke-vettri'
+  | 'grant-rank-booster'
+  | 'revoke-rank-booster'
 
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-card border border-line bg-surface px-3 py-2">
-      <p className="font-heading text-[10px] font-semibold uppercase tracking-wide text-ink2">
+      <p className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
         {label}
       </p>
       <p className="mt-0.5 truncate font-body text-sm text-ink" title={value}>
@@ -1301,20 +1316,31 @@ function UserDetailModal({
         await api.superadmin.grantPlan(user.id, 'premium_annual')
         onChange({
           premium: true,
-          premium_until: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          premium_until: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
         })
-        toast.success('Premium granted for 90 days.')
+        toast.success('Premium granted for 180 days.')
       } else if (action === 'revoke-vettri') {
         await api.superadmin.revokeVettri(user.id)
         onChange({ vettri: false, vettri_until: null })
         toast.success('Vettri Nichayam revoked.')
-      } else {
+      } else if (action === 'grant-vettri') {
         await api.superadmin.grantPlan(user.id, 'vettri_nichayam')
         onChange({
           vettri: true,
           vettri_until: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
         })
         toast.success('Vettri Nichayam granted for 60 days.')
+      } else if (action === 'revoke-rank-booster') {
+        await api.superadmin.revokeRankBooster(user.id)
+        onChange({ rank_booster: false, rank_booster_until: null })
+        toast.success('Group II/ IIA- Rank Booster revoked.')
+      } else {
+        await api.superadmin.grantPlan(user.id, 'rank_booster_g2')
+        onChange({
+          rank_booster: true,
+          rank_booster_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        toast.success('Group II/ IIA- Rank Booster granted for 30 days.')
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Action failed.')
@@ -1415,17 +1441,22 @@ function UserDetailModal({
             </h2>
             <p className="truncate font-body text-xs text-ink2">{user.email ?? '—'}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                 {user.role}
               </span>
               {user.premium && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-500">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-amber-500">
                   <Crown size={11} /> Premium
                 </span>
               )}
               {user.vettri && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
                   <Trophy size={11} /> Vettri
+                </span>
+              )}
+              {user.rank_booster && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
+                  <Rocket size={11} /> Rank Booster
                 </span>
               )}
             </div>
@@ -1451,7 +1482,7 @@ function UserDetailModal({
           <DetailItem label="User ID" value={user.id} />
         </div>
 
-        <h3 className="mb-2 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+        <h3 className="mb-2 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
           Plans
         </h3>
         <div className="space-y-2">
@@ -1463,7 +1494,7 @@ function UserDetailModal({
             until: user.premium_until,
             grant: 'grant-premium',
             revoke: 'revoke-premium',
-            grantLabel: 'Grant 90 days',
+            grantLabel: 'Grant 180 days',
           })}
           {planRow({
             icon: <Trophy size={18} />,
@@ -1475,12 +1506,22 @@ function UserDetailModal({
             revoke: 'revoke-vettri',
             grantLabel: 'Grant 60 days',
           })}
+          {planRow({
+            icon: <Rocket size={18} />,
+            iconClass: 'bg-brand-soft text-brand',
+            name: 'Group II/ IIA- Rank Booster',
+            active: user.rank_booster,
+            until: user.rank_booster_until,
+            grant: 'grant-rank-booster',
+            revoke: 'revoke-rank-booster',
+            grantLabel: 'Grant 30 days',
+          })}
         </div>
 
         <MessageThreadSection userId={user.id} />
 
         {/* ── Targeting / activity / weakness / credits (superadmin_user_insights RPC) ── */}
-        <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+        <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
           Insights
         </h3>
         {insightsLoading ? (
@@ -1560,7 +1601,7 @@ function UserDetailModal({
                     {insights.targeting.devices.map((d, i) => (
                       <span
                         key={i}
-                        className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-[11px] font-semibold text-ink2"
+                        className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-2xs font-semibold text-ink2"
                       >
                         <MonitorSmartphone size={12} /> {d.label || 'Unknown device'} ·{' '}
                         {relativeTime(d.last_seen_at)}
@@ -1571,7 +1612,7 @@ function UserDetailModal({
               </>
             )}
 
-            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               Activity
             </h3>
             <div className="grid grid-cols-2 gap-2.5">
@@ -1593,7 +1634,7 @@ function UserDetailModal({
               />
             </div>
 
-            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               Weak areas
             </h3>
             {weakAreas.length > 0 ? (
@@ -1601,7 +1642,7 @@ function UserDetailModal({
                 {weakAreas.map((s) => (
                   <span
                     key={s.subject}
-                    className="inline-flex items-center gap-1 rounded-full bg-coralsoft px-2.5 py-1 font-heading text-[11px] font-semibold text-coral"
+                    className="inline-flex items-center gap-1 rounded-full bg-coralsoft px-2.5 py-1 font-heading text-2xs font-semibold text-coral"
                   >
                     <TrendingDown size={12} /> {s.subject} · {s.accuracy}%
                   </span>
@@ -1613,7 +1654,7 @@ function UserDetailModal({
               </p>
             )}
 
-            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               Subjects practised
             </h3>
             {insights.subjects.length === 0 ? (
@@ -1641,7 +1682,7 @@ function UserDetailModal({
                           style={{ width: `${Math.max(2, Math.min(100, s.accuracy ?? 0))}%` }}
                         />
                       </div>
-                      <p className="mt-1 font-body text-[11px] text-ink2">
+                      <p className="mt-1 font-body text-2xs text-ink2">
                         {s.tests} tests · {s.questions} questions · {formatStudyTime(s.time_seconds)}
                       </p>
                     </div>
@@ -1650,7 +1691,7 @@ function UserDetailModal({
               </div>
             )}
 
-            <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               Sections used
             </h3>
             {insights.categories.length === 0 ? (
@@ -1660,7 +1701,7 @@ function UserDetailModal({
                 {insights.categories.map((c) => (
                   <span
                     key={c.category}
-                    className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-[11px] font-semibold text-ink2"
+                    className="inline-flex items-center gap-1 rounded-full bg-tint px-2.5 py-1 font-heading text-2xs font-semibold text-ink2"
                   >
                     {sectionLabel(c.category)} · {c.tests}
                     {c.accuracy !== null && (
@@ -1671,7 +1712,7 @@ function UserDetailModal({
               </div>
             )}
 
-            <h3 className="mb-2 mt-5 flex items-center gap-1.5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+            <h3 className="mb-2 mt-5 flex items-center gap-1.5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
               <Coins size={12} /> Credits
             </h3>
             <div className="grid grid-cols-2 gap-2.5">
@@ -1743,7 +1784,7 @@ function MessageThreadSection({ userId }: { userId: string }) {
 
   return (
     <>
-      <h3 className="mb-2 mt-5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+      <h3 className="mb-2 mt-5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
         Messages
       </h3>
       <div className="rounded-card border border-line bg-surface p-3">
@@ -1763,7 +1804,7 @@ function MessageThreadSection({ userId }: { userId: string }) {
                   }`}
                 >
                   <p className="whitespace-pre-line">{m.body}</p>
-                  <p className={`mt-1 text-[10px] ${m.sender === 'admin' ? 'text-white/70' : 'text-ink2'}`}>
+                  <p className={`mt-1 text-2xs ${m.sender === 'admin' ? 'text-white/70' : 'text-ink2'}`}>
                     {msgTime(m.created_at)}
                   </p>
                 </div>
@@ -1992,36 +2033,48 @@ function MockExamsTab() {
 }
 
 // ─── Test Series ────────────────────────────────────────────────────────────────
+type AdminSeries = 'g1_marathon' | 'g2a_rankbooster'
+
+// Labeled to match the student-facing hub tabs exactly ("Vettri Nichayam" /
+// "Rank Booster" inside the Test Marathon hub — see TestSeriesPage.tsx).
+const SERIES_TABS: { key: AdminSeries; labelKey: 'vettriTitle' | 'rankBoosterTab'; settingKey: 'test_series_enabled' | 'rank_booster_enabled' }[] = [
+  { key: 'g1_marathon', labelKey: 'vettriTitle', settingKey: 'test_series_enabled' },
+  { key: 'g2a_rankbooster', labelKey: 'rankBoosterTab', settingKey: 'rank_booster_enabled' },
+]
+
 function TestSeriesTab() {
   const { t } = useT()
+  const [series, setSeries] = useState<AdminSeries>('g1_marathon')
   const [tests, setTests] = useState<TestSeriesAdmin[]>([])
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [savingId, setSavingId] = useState<string | null>(null)
 
-  // Master visibility flag (app_settings) — hides the whole Test Series tab +
-  // Test Arena tile for all students until turned on.
+  const active = SERIES_TABS.find((s) => s.key === series)!
+
+  // Master visibility flag (app_settings) — hides the whole tab + Test Arena
+  // tile for all students until turned on. One flag per series.
   const [seriesOn, setSeriesOn] = useState(false)
   const [savingFlag, setSavingFlag] = useState(false)
 
   const load = () => {
     setLoading(true)
     setError(false)
-    Promise.all([api.superadmin.testSeries(), api.superadmin.settings()])
+    Promise.all([api.superadmin.testSeries(series), api.superadmin.settings()])
       .then(([ts, settings]) => {
         setTests(ts)
-        setSeriesOn(Boolean(settings.test_series_enabled))
+        setSeriesOn(Boolean(settings[active.settingKey]))
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }
-  useEffect(load, [])
+  useEffect(load, [series])
 
   const toggleSeries = async (next: boolean) => {
     setSavingFlag(true)
     setSeriesOn(next) // optimistic
     try {
-      await api.superadmin.setSetting('test_series_enabled', next)
+      await api.superadmin.setSetting(active.settingKey, next)
     } catch {
       toast.error(t('couldNotLoad'))
       setSeriesOn(!next)
@@ -2037,6 +2090,7 @@ function TestSeriesTab() {
       open_override: 'auto' | 'open' | 'closed'
       scheduled_date: string
       duration_seconds: number
+      tier: 'free' | 'paid'
     }>
   ) => {
     setSavingId(id)
@@ -2050,17 +2104,75 @@ function TestSeriesTab() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="skeleton h-24 w-full" />
+  return (
+    <div>
+      {/* Series switcher — one catalog table, two products. */}
+      <div className="mb-4 flex w-full rounded-field bg-tint p-0.5 sm:w-auto sm:inline-flex">
+        {SERIES_TABS.map((s) => (
+          <button
+            key={s.key}
+            type="button"
+            onClick={() => setSeries(s.key)}
+            aria-pressed={series === s.key}
+            className={`flex-1 rounded-[10px] px-3 py-1.5 text-center font-heading text-xs font-semibold leading-tight transition-colors sm:flex-none ${
+              series === s.key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
+            }`}
+          >
+            {t(s.labelKey)}
+          </button>
         ))}
       </div>
-    )
-  }
-  if (error) return <ErrorState onRetry={load} />
 
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton h-24 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <ErrorState onRetry={load} />
+      ) : (
+        <TestSeriesTabBody
+          active={active}
+          tests={tests}
+          seriesOn={seriesOn}
+          savingFlag={savingFlag}
+          savingId={savingId}
+          onToggleSeries={toggleSeries}
+          onPatch={patch}
+        />
+      )}
+    </div>
+  )
+}
+
+function TestSeriesTabBody({
+  active,
+  tests,
+  seriesOn,
+  savingFlag,
+  savingId,
+  onToggleSeries,
+  onPatch,
+}: {
+  active: (typeof SERIES_TABS)[number]
+  tests: TestSeriesAdmin[]
+  seriesOn: boolean
+  savingFlag: boolean
+  savingId: string | null
+  onToggleSeries: (next: boolean) => void
+  onPatch: (
+    id: string,
+    p: Partial<{
+      enabled: boolean
+      open_override: 'auto' | 'open' | 'closed'
+      scheduled_date: string
+      duration_seconds: number
+      tier: 'free' | 'paid'
+    }>
+  ) => void
+}) {
+  const { t } = useT()
   const enabledCount = tests.filter((e) => e.enabled).length
 
   return (
@@ -2074,20 +2186,20 @@ function TestSeriesTab() {
             <p className="font-heading text-xl font-semibold text-ink">
               {enabledCount}/{tests.length}
             </p>
-            <p className="font-body text-xs text-ink2">{t('testSeriesTab')} · enabled</p>
+            <p className="font-body text-xs text-ink2">{t(active.labelKey)} · enabled</p>
           </div>
         </div>
       </div>
 
-      {/* Master visibility — show/hide the whole Test Series feature for students */}
+      {/* Master visibility — show/hide this series' tab + tile for students */}
       <div className="card mb-4 p-4">
         <p className="mb-1 font-heading text-sm font-semibold text-ink">{t('testSeriesShowTitle')}</p>
         <p className="mb-3 font-body text-xs text-ink2">{t('testSeriesShowSub')}</p>
         <div className="flex items-center justify-between gap-3">
-          <span className="tamil font-body text-sm text-ink">{t('testSeriesTitle')}</span>
+          <span className="tamil font-body text-sm text-ink">{t(active.labelKey)}</span>
           <button
             disabled={savingFlag}
-            onClick={() => toggleSeries(!seriesOn)}
+            onClick={() => onToggleSeries(!seriesOn)}
             aria-pressed={seriesOn}
             className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
               seriesOn ? 'bg-correct' : 'bg-ink2/30'
@@ -2124,12 +2236,23 @@ function TestSeriesTab() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* Tier: free trial vs paid-bundle-gated */}
+                  <select
+                    value={e.tier}
+                    disabled={busy}
+                    onChange={(ev) => onPatch(e.id, { tier: ev.target.value as 'free' | 'paid' })}
+                    className="rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs text-ink outline-none disabled:opacity-50"
+                  >
+                    <option value="paid">{t('testSeriesTierPaid')}</option>
+                    <option value="free">{t('testSeriesTierFree')}</option>
+                  </select>
+
                   {/* Availability override */}
                   <select
                     value={e.open_override}
                     disabled={busy}
                     onChange={(ev) =>
-                      patch(e.id, {
+                      onPatch(e.id, {
                         open_override: ev.target.value as 'auto' | 'open' | 'closed',
                       })
                     }
@@ -2149,7 +2272,7 @@ function TestSeriesTab() {
                       disabled={busy}
                       onBlur={(ev) => {
                         const v = ev.target.value
-                        if (v && v !== e.scheduled_date) patch(e.id, { scheduled_date: v })
+                        if (v && v !== e.scheduled_date) onPatch(e.id, { scheduled_date: v })
                       }}
                       className="bg-transparent font-heading text-xs text-ink outline-none"
                     />
@@ -2165,7 +2288,7 @@ function TestSeriesTab() {
                       disabled={busy}
                       onBlur={(ev) => {
                         const m = Math.trunc(Number(ev.target.value))
-                        if (m > 0 && m !== minutes) patch(e.id, { duration_seconds: m * 60 })
+                        if (m > 0 && m !== minutes) onPatch(e.id, { duration_seconds: m * 60 })
                       }}
                       className="w-14 bg-transparent font-heading text-sm text-ink outline-none"
                     />
@@ -2175,7 +2298,7 @@ function TestSeriesTab() {
                   {/* Enabled toggle */}
                   <button
                     disabled={busy}
-                    onClick={() => patch(e.id, { enabled: !e.enabled })}
+                    onClick={() => onPatch(e.id, { enabled: !e.enabled })}
                     aria-pressed={e.enabled}
                     className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
                       e.enabled ? 'bg-correct' : 'bg-ink2/30'
@@ -2449,7 +2572,7 @@ function FeedbackTab() {
             >
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <Stars rating={f.rating} />
-                <span className="font-body text-[11px] text-ink2">
+                <span className="font-body text-2xs text-ink2">
                   {new Date(f.created_at).toLocaleDateString()}
                 </span>
               </div>
@@ -2579,7 +2702,7 @@ function Pager({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+      <span className="mb-1 block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
         {label}
       </span>
       {children}
@@ -2799,7 +2922,7 @@ function CouponsTab() {
                     <Copy size={13} />
                   </button>
                   {!c.active && (
-                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-semibold uppercase text-ink2">
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-semibold uppercase text-ink2">
                       Paused
                     </span>
                   )}
@@ -2812,13 +2935,13 @@ function CouponsTab() {
               </div>
               <div className="text-center">
                 <p className="font-heading text-sm font-semibold text-ink">{c.redemptions}</p>
-                <p className="font-body text-[10px] uppercase tracking-wide text-ink2">used</p>
+                <p className="font-body text-2xs uppercase tracking-wide text-ink2">used</p>
               </div>
               <div className="text-center">
                 <p className="font-heading text-sm font-semibold text-ink">
                   ₹{paiseToRupees(c.total_discount)}
                 </p>
-                <p className="font-body text-[10px] uppercase tracking-wide text-ink2">given</p>
+                <p className="font-body text-2xs uppercase tracking-wide text-ink2">given</p>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
@@ -3038,7 +3161,7 @@ function NotificationsTab() {
             Tamil users get this copy, "both" users see English + Tamil, and
             English users always get the fields above. Blank = English to all. */}
         <div className="rounded-card border border-dashed border-line bg-tint/40 p-3.5">
-          <p className="mb-2.5 font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">
+          <p className="mb-2.5 font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
             Tamil version (optional) — sent to users whose app language is Tamil
           </p>
           <div className="space-y-3">
@@ -3138,7 +3261,7 @@ function NotificationsTab() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-heading text-sm font-semibold text-ink">{n.title}</p>
                   <p className="line-clamp-2 font-body text-xs text-ink2">{n.body}</p>
-                  <p className="mt-1 font-body text-[11px] text-ink2/80">
+                  <p className="mt-1 font-body text-2xs text-ink2/80">
                     {n.kind === 'push' ? 'Push' : 'System'} · {audienceLabel(n)}
                     {(n.title_ta || n.body_ta) && ' · EN+TA'}
                     {n.kind === 'push' ? ` · ${n.push_sent} sent` : ''} ·{' '}
@@ -3455,19 +3578,19 @@ function AlertsPanel() {
                   <p className="truncate font-heading text-sm font-semibold text-ink">
                     {a.title}
                     {!a.active && (
-                      <span className="ml-2 rounded bg-tint px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase text-ink2">
+                      <span className="ml-2 rounded bg-tint px-1.5 py-0.5 font-heading text-2xs font-bold uppercase text-ink2">
                         Off
                       </span>
                     )}
                     {a.active && expired(a) && (
-                      <span className="ml-2 rounded bg-goldsoft px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase text-gold">
+                      <span className="ml-2 rounded bg-goldsoft px-1.5 py-0.5 font-heading text-2xs font-bold uppercase text-gold">
                         Expired
                       </span>
                     )}
                   </p>
                   <p className="line-clamp-2 font-body text-xs text-ink2">{a.body}</p>
-                  <p className="mt-1 font-body text-[11px] text-ink2/80">
-                    <span className={`mr-0.5 rounded px-1.5 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide ${cfg.chip}`}>
+                  <p className="mt-1 font-body text-2xs text-ink2/80">
+                    <span className={`mr-0.5 rounded px-1.5 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${cfg.chip}`}>
                       {t(cfg.labelKey)}
                     </span>{' '}
                     {audienceLabel(a)} · seen by {a.dismissed_count} ·{' '}
@@ -3771,7 +3894,7 @@ function AppReleasesTab() {
                       v{r.version_name}
                     </p>
                     {isCurrent && (
-                      <span className="rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                      <span className="rounded-full bg-mintsoft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
                         Live
                       </span>
                     )}
@@ -4094,23 +4217,23 @@ function MaterialsTab() {
                   <div className="min-w-0 flex-1">
                     <p className="tamil truncate font-heading text-sm font-semibold text-ink">{m.title}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
                         {kindLabel(m.kind)}
                       </span>
-                      <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                      <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                         {m.placement === 'profile' ? 'Profile' : 'Materials'}
                       </span>
                       {isFile && m.downloadable && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
                           <Download size={10} /> Download
                         </span>
                       )}
                       {!m.active && (
-                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-coral">
                           Hidden
                         </span>
                       )}
-                      {m.file_size > 0 && <span className="font-body text-[11px] text-ink2">{formatFileSize(m.file_size)}</span>}
+                      {m.file_size > 0 && <span className="font-body text-2xs text-ink2">{formatFileSize(m.file_size)}</span>}
                     </div>
                   </div>
                   {/* Actions */}
@@ -4198,16 +4321,16 @@ function QuestionCard({ q, i }: { q: CaQuestionItem; i: number }) {
   return (
     <div style={{ '--i': i } as React.CSSProperties} className="card stagger-item p-4">
       <div className="mb-2 flex flex-wrap items-center gap-1.5">
-        <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
           {q.topic}
         </span>
-        <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+        <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
           {q.question_type.replace(/_/g, ' ')}
         </span>
-        <span className={`rounded-full px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide ${DIFF_BADGE[q.difficulty] ?? 'bg-tint text-ink2'}`}>
+        <span className={`rounded-full px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${DIFF_BADGE[q.difficulty] ?? 'bg-tint text-ink2'}`}>
           {q.difficulty}
         </span>
-        <span className="ml-auto font-mono text-[10px] text-ink2">{q.external_id}</span>
+        <span className="ml-auto font-mono text-2xs text-ink2">{q.external_id}</span>
       </div>
 
       <p className="whitespace-pre-wrap font-body text-sm text-ink">
@@ -4242,7 +4365,7 @@ function QuestionCard({ q, i }: { q: CaQuestionItem; i: number }) {
       {hasTa && (
         <button
           onClick={() => setTa((v) => !v)}
-          className="mt-2 font-heading text-[11px] font-semibold text-primary hover:underline"
+          className="mt-2 font-heading text-2xs font-semibold text-primary hover:underline"
         >
           {ta ? 'Show English' : 'Show தமிழ்'}
         </button>
@@ -4524,7 +4647,7 @@ function QuestionForm({
   // host nodes stay stable across renders and never lose focus while typing.
   const field = (label: string, k: keyof CaQuestionItem, area = false) => (
     <label className="block">
-      <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">{label}</span>
+      <span className="mb-1 block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">{label}</span>
       {area ? (
         <textarea
           value={String(f[k] ?? '')}
@@ -4556,7 +4679,7 @@ function QuestionForm({
           {field('Topic', 'topic')}
           {field('Type', 'question_type')}
           <label className="block">
-            <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">Difficulty</span>
+            <span className="mb-1 block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">Difficulty</span>
             <select value={String(f.difficulty ?? '')} onChange={(e) => set('difficulty', e.target.value)} className="input-soft w-full px-3 py-2 text-sm">
               {DIFF_OPTS.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
@@ -4574,7 +4697,7 @@ function QuestionForm({
 
         <div className="grid grid-cols-3 gap-2">
           <label className="block">
-            <span className="mb-1 block font-heading text-[11px] font-semibold uppercase tracking-wide text-ink2">Answer</span>
+            <span className="mb-1 block font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">Answer</span>
             <select value={String(f.correct_answer ?? 'A')} onChange={(e) => set('correct_answer', e.target.value)} className="input-soft w-full px-3 py-2 text-sm">
               {ANS_OPTS.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
@@ -4586,7 +4709,7 @@ function QuestionForm({
 
         {showTa ? (
           <div className="space-y-3 rounded-lg border border-line bg-bg/60 p-3">
-            <p className="font-heading text-[11px] font-bold uppercase tracking-wide text-ink2">தமிழ் (optional)</p>
+            <p className="font-heading text-2xs font-bold uppercase tracking-wide text-ink2">தமிழ் (optional)</p>
             {field('Question (TA)', 'question_text_ta', true)}
             <div className="grid grid-cols-2 gap-2">
               {field('Option A (TA)', 'option_a_ta')}
@@ -4597,7 +4720,7 @@ function QuestionForm({
             {field('Explanation (TA)', 'explanation_ta', true)}
           </div>
         ) : (
-          <button onClick={() => setShowTa(true)} className="font-heading text-[11px] font-semibold text-primary hover:underline">
+          <button onClick={() => setShowTa(true)} className="font-heading text-2xs font-semibold text-primary hover:underline">
             + Add Tamil version
           </button>
         )}
@@ -4706,10 +4829,10 @@ function CaQuestionsTab() {
           <div className="min-w-0 flex-1">
             <p className="truncate font-heading text-sm font-semibold text-ink">{label}</p>
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
                 {daily ? 'Daily' : 'Monthly'}
               </span>
-              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+              <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                 {set.total} questions
               </span>
             </div>
@@ -4731,7 +4854,7 @@ function CaQuestionsTab() {
               ? 'Students CAN download this PDF — click to disable'
               : 'Students cannot download this PDF — click to enable'
           }
-          className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-[11px] font-semibold transition disabled:opacity-50 ${
+          className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-2xs font-semibold transition disabled:opacity-50 ${
             on ? 'bg-brand text-white' : 'border border-line text-ink2 hover:border-brand-ring hover:text-brand'
           }`}
         >
@@ -4970,24 +5093,24 @@ function CaMagazineTab() {
                     {issueDateLabel(issue.ca_type, issue.date)}
                   </p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
                       {daily ? 'Daily' : 'Monthly'}
                     </span>
-                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                       {issue.items} items
                     </span>
                     {issue.material ? (
                       issue.material.active ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-mint">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-mintsoft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
                           <CheckCircle2 size={10} /> Live
                         </span>
                       ) : (
-                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
+                        <span className="rounded-full bg-coral/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-coral">
                           Hidden
                         </span>
                       )
                     ) : (
-                      <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-amber-600">
+                      <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-amber-600">
                         Pending review
                       </span>
                     )}
@@ -4996,7 +5119,7 @@ function CaMagazineTab() {
                       if (!tg) return null
                       const langs = [tg.en && 'EN', tg.ta && 'TA'].filter(Boolean).join(' + ')
                       return (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
                           <Send size={10} /> {langs}
                         </span>
                       )
@@ -5041,7 +5164,7 @@ function CaMagazineTab() {
                       <button
                         onClick={() => toggleDownloadable(issue)}
                         disabled={busy}
-                        className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-[11px] font-semibold transition disabled:opacity-50 ${
+                        className={`press inline-flex flex-shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 font-heading text-2xs font-semibold transition disabled:opacity-50 ${
                           issue.material.downloadable
                             ? 'bg-brand text-white'
                             : 'border border-line text-ink2 hover:border-brand-ring hover:text-brand'
@@ -5229,14 +5352,14 @@ function CaSlidesTab() {
                     {issueDateLabel(issue.ca_type, issue.date)}
                   </p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-primary">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-primary">
                       {issue.ca_type === 'day_wise' ? 'Daily' : 'Monthly'}
                     </span>
-                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+                    <span className="rounded-full bg-tint px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
                       {issue.items} items
                     </span>
                     {thisBusy && progress && (
-                      <span className="rounded-full bg-brand-soft px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wide text-brand">
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
                         {progress}
                       </span>
                     )}

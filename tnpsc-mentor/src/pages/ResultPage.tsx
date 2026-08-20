@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useReducedMotion } from 'motion/react'
 import {
@@ -106,6 +106,14 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   useEffect(() => {
     if (isApiConfigured) api.pdfQuota().then(setQuota).catch(() => {})
   }, [])
+  // Overall percentile across every completed test - the same figure already
+  // shown on Insights, surfaced here too since "how do I compare" is a strong
+  // motivator right where a score just landed. null until loaded (or for a
+  // learner with no completed tests yet), in which case the stat just hides.
+  const [percentile, setPercentile] = useState<number | null>(null)
+  useEffect(() => {
+    if (isApiConfigured) api.percentile().then(setPercentile).catch(() => {})
+  }, [])
   const [rewards, setRewards] = useState<{
     leveledTo: number | null
     newBadges: Badge[]
@@ -208,6 +216,59 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   const animCorrect = useCountUp(payload?.correct ?? 0)
   const animPct = useCountUp(payload?.scorePercentage ?? 0)
 
+  // Review list (attended questions, filtered) - memoised so a bookmark toggle
+  // (which just flips one id in `bookmarkIds`) doesn't rebuild this array/re-map
+  // up to 200 questions on every render. Also driven from the possibly-null
+  // payload, before the guard below, so hook order stays unconditional.
+  const reviewItems = useMemo<{ q: Question; index: number }[]>(() => {
+    if (!payload) return []
+    const attended = (q: Question) => classifyAnswer(payload.answers[q.id]) !== 'skipped'
+    return payload.questions
+      .map((q, index) => ({ q, index }))
+      .filter(({ q }) => attended(q))
+      .filter(({ q }) => {
+        if (reviewFilter === 'all') return true
+        if (reviewFilter === 'flagged') return Boolean(payload.answers[q.id]?.flagged)
+        return classifyAnswer(payload.answers[q.id]) === reviewFilter
+      })
+  }, [payload, reviewFilter])
+
+  // Latest bookmarkIds, read (not subscribed) inside `toggleBookmark` below so
+  // that callback's identity stays stable across every bookmark toggle - see
+  // the comment on `toggleBookmark` for why that stability matters.
+  const bookmarkIdsRef = useRef(bookmarkIds)
+  useEffect(() => {
+    bookmarkIdsRef.current = bookmarkIds
+  }, [bookmarkIds])
+
+  // Optimistic bookmark toggle - revert the local set if the write fails.
+  // Memoised with a stable (never-changing) identity: it's passed directly into
+  // every visible ResultCard (up to 200 on a full mock, now React.memo'd), so if
+  // this closed over `bookmarkIds` directly (and thus got a new reference every
+  // time a bookmark toggles) every card would see a "changed" onToggleBookmark
+  // prop and re-render right along with the toggled one, defeating the memo for
+  // the exact interaction it's meant to help. Reading the latest set via
+  // `bookmarkIdsRef` instead keeps this callback's reference constant forever.
+  const toggleBookmark = useCallback(async (questionId: string) => {
+    const saved = bookmarkIdsRef.current.has(questionId)
+    setBookmarkIds((prev) => {
+      const next = new Set(prev)
+      if (saved) next.delete(questionId)
+      else next.add(questionId)
+      return next
+    })
+    try {
+      await (saved ? removeBookmark(questionId) : addBookmark(questionId))
+    } catch {
+      setBookmarkIds((prev) => {
+        const next = new Set(prev)
+        if (saved) next.add(questionId)
+        else next.delete(questionId)
+        return next
+      })
+    }
+  }, [])
+
   if (!payload) return null
 
   const {
@@ -281,16 +342,10 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
 
   // Review filter: keep original question numbers while showing a subset.
   // Unattended (skipped) questions are never shown - only ones the user answered.
+  // (`reviewItems` itself is computed above, via useMemo, before the early
+  // `if (!payload) return null` guard.)
   const isAttended = (q: Question) => classifyAnswer(answers[q.id]) !== 'skipped'
   const flaggedCount = questions.filter((q) => isAttended(q) && answers[q.id]?.flagged).length
-  const reviewItems: { q: Question; index: number }[] = questions
-    .map((q, index) => ({ q, index }))
-    .filter(({ q }) => isAttended(q))
-    .filter(({ q }) => {
-      if (reviewFilter === 'all') return true
-      if (reviewFilter === 'flagged') return Boolean(answers[q.id]?.flagged)
-      return classifyAnswer(answers[q.id]) === reviewFilter
-    })
 
   const verdictKey =
     scorePercentage >= 80 ? 'verdictGreat' : scorePercentage >= 50 ? 'verdictGood' : 'verdictKeepGoing'
@@ -305,27 +360,6 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
       navigate('/mock/instructions', { state: config, replace: true })
     } else {
       navigate('/quiz', { state: config, replace: true })
-    }
-  }
-
-  // Optimistic bookmark toggle - revert the local set if the write fails.
-  const toggleBookmark = async (questionId: string) => {
-    const saved = bookmarkIds.has(questionId)
-    setBookmarkIds((prev) => {
-      const next = new Set(prev)
-      if (saved) next.delete(questionId)
-      else next.add(questionId)
-      return next
-    })
-    try {
-      await (saved ? removeBookmark(questionId) : addBookmark(questionId))
-    } catch {
-      setBookmarkIds((prev) => {
-        const next = new Set(prev)
-        if (saved) next.add(questionId)
-        else next.delete(questionId)
-        return next
-      })
     }
   }
 
@@ -350,16 +384,16 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
             >
               <div className="flex flex-col items-center">
                 <span className="font-display text-3xl font-bold leading-none text-white">{animPct}%</span>
-                <span className="mt-1 font-body text-[11px] uppercase tracking-wide text-white/70">
+                <span className="mt-1 font-body text-2xs uppercase tracking-wide text-white/70">
                   {t('scoreLabel')}
                 </span>
               </div>
             </CircularProgress>
             <div className="min-w-0 flex-1">
-              <p className="font-body text-[13px] font-medium uppercase tracking-[0.14em] text-white/70">
+              <p className="font-body text-sm font-medium uppercase tracking-[0.14em] text-white/70">
                 {t('testCompleteLabel')}
               </p>
-              <div className="mt-2 font-display text-[32px] font-bold leading-none tracking-tight text-white sm:text-4xl">
+              <div className="mt-2 font-display text-3xl font-bold leading-none tracking-tight text-white sm:text-4xl">
                 {animCorrect}
                 <span className="text-white/50"> / {totalQuestions}</span>
               </div>
@@ -374,6 +408,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
             <HeroStat label={t('accuracy')} value={`${accuracy}%`} />
             <HeroStat label={t('attended')} value={`${attempted}/${totalQuestions}`} divider />
             <HeroStat label={t('timeTaken')} value={formatTime(timeTakenSeconds)} divider />
+            {percentile != null && (
+              <HeroStat label={t('yourRank')} value={`Top ${100 - percentile}%`} divider />
+            )}
           </div>
         </section>
 
@@ -469,14 +506,14 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
             {focus.length > 0 && (
               <section>
                 <SectionHeader title={t('focusAreas')} />
-                <p className="tamil mb-1 mt-1 font-body text-[13px] text-muted">{t('focusHint')}</p>
+                <p className="tamil mb-1 mt-1 font-body text-sm text-muted">{t('focusHint')}</p>
                 <div className="divide-y divide-line">
                   {focus.map((f) => {
                     const asset = assetsFor(f.key)
                     return (
                       <div key={f.key} className="py-4">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="tamil font-display text-[15px] font-semibold text-ink">
+                          <span className="tamil font-display text-base font-semibold text-ink">
                             {subjectName(f.key, lang)}
                           </span>
                           <span className="font-display text-sm font-bold text-accent">
@@ -486,7 +523,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                             </span>
                           </span>
                         </div>
-                        <p className="tamil mt-1.5 font-body text-[13px] leading-relaxed text-muted">
+                        <p className="tamil mt-1.5 font-body text-sm leading-relaxed text-muted">
                           {lang === 'ta' ? asset.tipTa : asset.tip}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
@@ -496,7 +533,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                               href={l.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="font-body text-[13px] font-medium text-accent transition-opacity hover:opacity-80"
+                              className="font-body text-sm font-medium text-accent transition-opacity hover:opacity-80"
                             >
                               {t('learnThis')}: {l.label} ↗
                             </a>
@@ -601,9 +638,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                     // bookmarks table can't reference them — hide the control
                     // (an undefined `bookmarked` drops the button entirely).
                     bookmarked={config.caDailyId ? undefined : bookmarkIds.has(q.id)}
-                    onToggleBookmark={
-                      user && !config.caDailyId ? () => toggleBookmark(q.id) : undefined
-                    }
+                    onToggleBookmark={user && !config.caDailyId ? toggleBookmark : undefined}
                   />
                 ))
               )}
@@ -641,7 +676,7 @@ function HeroStat({ label, value, divider = false }: { label: string; value: str
   return (
     <div className={`flex-1 ${divider ? 'border-l border-white/15 pl-4' : 'pr-4'}`}>
       <div className="font-display text-xl font-bold leading-none text-white">{value}</div>
-      <div className="tamil mt-2 font-body text-[12px] uppercase tracking-wide text-white/65">{label}</div>
+      <div className="tamil mt-2 font-body text-xs uppercase tracking-wide text-white/65">{label}</div>
     </div>
   )
 }

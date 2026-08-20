@@ -60,7 +60,7 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     setTouched(true)
     setError('')
-    if (password.length < 6) return setError(t('errPasswordShort'))
+    if (password.length < 8) return setError(t('errPasswordShort'))
     if (password !== confirm) return setError(t('errPasswordMismatch'))
     if (!creds) return setError(t('resetLinkInvalid'))
 
@@ -128,7 +128,7 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={setPassword}
                 autoComplete="new-password"
-                invalid={touched && password.length > 0 && password.length < 6}
+                invalid={touched && password.length > 0 && password.length < 8}
               />
             </div>
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -56,6 +56,14 @@ export default function AdminQuestionsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  // Debounced ~250ms after typing pauses, so `filtered` below (and the up-to-500
+  // memoised rows it drives) don't re-filter on every keystroke — the input
+  // itself still binds to the raw `search` state so typing feels instant.
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedSearch(search), 250)
+    return () => window.clearTimeout(id)
+  }, [search])
   const [subject, setSubject] = useState<string | undefined>(config?.subject)
   const [yearFilter, setYearFilter] = useState<number | null>(null)
   const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null)
@@ -92,7 +100,11 @@ export default function AdminQuestionsPage() {
 
   // Enable/disable a question for students (toggles active). Inactive questions
   // stay in this admin list but are hidden from quizzes/revision.
-  const handleToggleActive = async (q: Question) => {
+  // Memoised with a stable identity (empty deps - it only closes over setters,
+  // which React guarantees are stable) since it's passed straight into every
+  // AdminQuestionRow below; a fresh reference per render would make every row
+  // look "changed" to React.memo on every keystroke in the search box.
+  const handleToggleActive = useCallback(async (q: Question) => {
     setTogglingId(q.id)
     setActionError('')
     try {
@@ -103,7 +115,13 @@ export default function AdminQuestionsPage() {
     } finally {
       setTogglingId(null)
     }
-  }
+  }, [])
+
+  // Same stability reasoning as handleToggleActive above.
+  const handleEditQuestion = useCallback(
+    (q: Question) => setEditor({ mode: 'edit', question: q }),
+    []
+  )
 
   const handleDelete = async () => {
     const q = pendingDelete
@@ -176,7 +194,7 @@ export default function AdminQuestionsPage() {
   }, [questions])
 
   const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase()
+    const term = debouncedSearch.trim().toLowerCase()
     return questions.filter((q) => {
       if (yearFilter != null && q.year !== yearFilter) return false
       if (difficultyFilter != null && q.difficulty !== difficultyFilter) return false
@@ -190,7 +208,7 @@ export default function AdminQuestionsPage() {
         (q.explanation ?? '').toLowerCase().includes(term)
       )
     })
-  }, [questions, search, yearFilter, difficultyFilter])
+  }, [questions, debouncedSearch, yearFilter, difficultyFilter])
 
   const handleDownloadPdf = async () => {
     if (!filtered.length || !activeConfig) return
@@ -416,129 +434,19 @@ export default function AdminQuestionsPage() {
 
         {!loading && !error && filtered.length > 0 && (
           <div className="flex flex-col gap-4">
-            {filtered.map((q, i) => {
-              const isActive = q.active ?? true
-              return (
-              <article
+            {filtered.map((q, i) => (
+              <AdminQuestionRow
                 key={q.id}
-                className={[
-                  'rounded-2xl border bg-card p-4 shadow-card sm:p-5',
-                  isActive ? 'border-line' : 'border-coral/40 bg-coralsoft/30',
-                ].join(' ')}
-              >
-                {/* Controls float top-right so the question text flows the FULL
-                    width and only wraps beside the buttons on the first line(s),
-                    reclaiming the space below them (was a flex row that boxed the
-                    text into `width − buttons` on every line). Float must precede
-                    the text in the DOM; the clearfix contains it. */}
-                <div className="mb-3 after:clear-both after:block after:content-['']">
-                  <div className="float-right ml-3 flex flex-shrink-0 gap-1">
-                    <button
-                      onClick={() => handleToggleActive(q)}
-                      disabled={togglingId === q.id}
-                      className={[
-                        'grid h-8 w-8 place-items-center rounded-lg transition active:scale-90 focus-ring disabled:opacity-50',
-                        isActive
-                          ? 'text-mint hover:bg-mintsoft'
-                          : 'text-ink2/50 hover:bg-ink/5 hover:text-ink2',
-                      ].join(' ')}
-                      aria-label={isActive ? 'Disable (hide from students)' : 'Enable (show to students)'}
-                      title={isActive ? 'Shown to students - click to hide' : 'Hidden from students - click to show'}
-                    >
-                      {togglingId === q.id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : isActive ? (
-                        <Eye size={16} />
-                      ) : (
-                        <EyeOff size={16} />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setEditor({ mode: 'edit', question: q })}
-                      className="icon-btn h-8 w-8"
-                      aria-label="Edit question"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => setPendingDelete(q)}
-                      disabled={deletingId === q.id}
-                      className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral active:scale-90 focus-ring disabled:opacity-50"
-                      aria-label="Delete question"
-                    >
-                      {deletingId === q.id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Trash2 size={16} />
-                      )}
-                    </button>
-                  </div>
-                  <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
-                    <span className="mr-1 text-secondary">{i + 1}.</span>
-                    {!isActive && (
-                      <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 align-middle font-heading text-[10px] font-bold uppercase tracking-wide text-coral">
-                        <EyeOff size={11} /> Hidden
-                      </span>
-                    )}
-                    <MathText text={displayQuestion(q, lang)} />
-                  </p>
-                </div>
-                <QuestionFigures images={q.images} className="mb-3" />
-                <div className="flex flex-col gap-1.5">
-                  {optionLetters(q).map((letter) => {
-                    const isCorrect = q.correct_answer != null && q.correct_answer === letter
-                    return (
-                      <div
-                        key={letter}
-                        className={[
-                          'tamil flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm',
-                          isCorrect
-                            ? 'bg-green-50 font-semibold text-green-700'
-                            : 'text-navytext/75',
-                        ].join(' ')}
-                      >
-                        <span
-                          className={[
-                            'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                            isCorrect ? 'bg-green-500 text-white' : 'bg-primary/10 text-primary',
-                          ].join(' ')}
-                        >
-                          {letter}
-                        </span>
-                        <MathText text={displayOption(q, letter, lang)} />
-                        {isCorrect && (
-                          <span className="ml-auto text-xs font-bold">✓ {t('correctMark')}</span>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-                {displayExplanation(q, lang) && (
-                  <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
-                    <p className="tamil whitespace-pre-line text-xs leading-loose text-navytext/80">
-                      <span className="font-heading font-bold text-secondary">
-                        Explanation:{' '}
-                      </span>
-                      <MathText text={displayExplanation(q, lang)} />
-                    </p>
-                  </div>
-                )}
-                {(q.difficulty || q.topic || q.year || q.source_tag) && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {q.difficulty && <Tag>{q.difficulty}</Tag>}
-                    {q.topic && <Tag>{q.topic}</Tag>}
-                    {q.year && <Tag>{q.year}</Tag>}
-                    {/* Provenance marker - admin/superadmin only (never sent to students). */}
-                    {q.source_tag && (
-                      <span className="inline-flex items-center rounded-full bg-tint-violet px-2.5 py-1 font-heading text-[11px] font-semibold text-primary">
-                        {q.source_tag}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </article>
-              )
-            })}
+                question={q}
+                index={i}
+                lang={lang}
+                toggling={togglingId === q.id}
+                deleting={deletingId === q.id}
+                onToggleActive={handleToggleActive}
+                onEdit={handleEditQuestion}
+                onDelete={setPendingDelete}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -571,6 +479,157 @@ export default function AdminQuestionsPage() {
   )
 }
 
+/** One question row in the admin bank list. Extracted out of `filtered.map()`
+ * above and wrapped in `React.memo` so a search keystroke (which re-renders
+ * this page on every character, even though `filtered` itself is debounced)
+ * doesn't force up to 500 rows - each doing 2-6 unmemoised-before-this KaTeX
+ * calls via MathText - to re-render along with it. Props are either
+ * primitive/stable data (question, index, lang, toggling, deleting) or
+ * `useCallback`-memoised handlers from the parent, so a row only re-renders
+ * when something about THAT row actually changes. `t` is looked up via
+ * `useT()` internally (matching QuestionCard/ResultCard/OmrQuestionRow)
+ * rather than taken as a prop, since `useT()` hands back a fresh closure
+ * every render. */
+const AdminQuestionRow = memo(function AdminQuestionRow({
+  question: q,
+  index: i,
+  lang,
+  toggling,
+  deleting,
+  onToggleActive,
+  onEdit,
+  onDelete,
+}: {
+  question: Question
+  index: number
+  lang: DisplayLang
+  toggling: boolean
+  deleting: boolean
+  onToggleActive: (q: Question) => void
+  onEdit: (q: Question) => void
+  onDelete: (q: Question) => void
+}) {
+  const { t } = useT()
+  const isActive = q.active ?? true
+  return (
+    <article
+      className={[
+        'rounded-2xl border bg-card p-4 shadow-card sm:p-5',
+        isActive ? 'border-line' : 'border-coral/40 bg-coralsoft/30',
+      ].join(' ')}
+    >
+      {/* Controls float top-right so the question text flows the FULL
+          width and only wraps beside the buttons on the first line(s),
+          reclaiming the space below them (was a flex row that boxed the
+          text into `width − buttons` on every line). Float must precede
+          the text in the DOM; the clearfix contains it. */}
+      <div className="mb-3 after:clear-both after:block after:content-['']">
+        <div className="float-right ml-3 flex flex-shrink-0 gap-1">
+          <button
+            onClick={() => onToggleActive(q)}
+            disabled={toggling}
+            className={[
+              'grid h-8 w-8 place-items-center rounded-lg transition active:scale-90 focus-ring disabled:opacity-50',
+              isActive
+                ? 'text-mint hover:bg-mintsoft'
+                : 'text-ink2/50 hover:bg-ink/5 hover:text-ink2',
+            ].join(' ')}
+            aria-label={isActive ? 'Disable (hide from students)' : 'Enable (show to students)'}
+            title={isActive ? 'Shown to students - click to hide' : 'Hidden from students - click to show'}
+          >
+            {toggling ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : isActive ? (
+              <Eye size={16} />
+            ) : (
+              <EyeOff size={16} />
+            )}
+          </button>
+          <button
+            onClick={() => onEdit(q)}
+            className="icon-btn h-8 w-8"
+            aria-label="Edit question"
+          >
+            <Pencil size={16} />
+          </button>
+          <button
+            onClick={() => onDelete(q)}
+            disabled={deleting}
+            className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-coralsoft hover:text-coral active:scale-90 focus-ring disabled:opacity-50"
+            aria-label="Delete question"
+          >
+            {deleting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Trash2 size={16} />
+            )}
+          </button>
+        </div>
+        <p className="tamil whitespace-pre-line font-heading text-base font-bold leading-snug text-navytext">
+          <span className="mr-1 text-secondary">{i + 1}.</span>
+          {!isActive && (
+            <span className="mr-1.5 inline-flex items-center gap-1 rounded-full bg-coral/15 px-2 py-0.5 align-middle font-heading text-2xs font-bold uppercase tracking-wide text-coral">
+              <EyeOff size={11} /> Hidden
+            </span>
+          )}
+          <MathText text={displayQuestion(q, lang)} />
+        </p>
+      </div>
+      <QuestionFigures images={q.images} className="mb-3" />
+      <div className="flex flex-col gap-1.5">
+        {optionLetters(q).map((letter) => {
+          const isCorrect = q.correct_answer != null && q.correct_answer === letter
+          return (
+            <div
+              key={letter}
+              className={[
+                'tamil flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm',
+                isCorrect
+                  ? 'bg-green-50 font-semibold text-green-700'
+                  : 'text-navytext/75',
+              ].join(' ')}
+            >
+              <span
+                className={[
+                  'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
+                  isCorrect ? 'bg-green-500 text-white' : 'bg-primary/10 text-primary',
+                ].join(' ')}
+              >
+                {letter}
+              </span>
+              <MathText text={displayOption(q, letter, lang)} />
+              {isCorrect && (
+                <span className="ml-auto text-xs font-bold">✓ {t('correctMark')}</span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      {displayExplanation(q, lang) && (
+        <div className="mt-3 rounded-lg border-l-4 border-secondary bg-secondary/5 p-3">
+          <p className="tamil whitespace-pre-line text-xs leading-loose text-navytext/80">
+            <span className="font-heading font-bold text-secondary">Explanation: </span>
+            <MathText text={displayExplanation(q, lang)} />
+          </p>
+        </div>
+      )}
+      {(q.difficulty || q.topic || q.year || q.source_tag) && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {q.difficulty && <Tag>{q.difficulty}</Tag>}
+          {q.topic && <Tag>{q.topic}</Tag>}
+          {q.year && <Tag>{q.year}</Tag>}
+          {/* Provenance marker - admin/superadmin only (never sent to students). */}
+          {q.source_tag && (
+            <span className="inline-flex items-center rounded-full bg-tint-violet px-2.5 py-1 font-heading text-2xs font-semibold text-primary">
+              {q.source_tag}
+            </span>
+          )}
+        </div>
+      )}
+    </article>
+  )
+})
+
 function SubjectChip({
   label,
   active,
@@ -597,7 +656,7 @@ function SubjectChip({
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-[11px] font-semibold uppercase tracking-wide text-primary">
+    <span className="rounded-full bg-primary/10 px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide text-primary">
       {children}
     </span>
   )

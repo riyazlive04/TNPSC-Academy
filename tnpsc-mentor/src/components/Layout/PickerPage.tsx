@@ -43,7 +43,7 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
         </button>
 
         <div className="mb-7 mt-4 text-center">
-          <span className="tamil font-display text-[13px] font-bold uppercase tracking-[0.14em] text-accent">
+          <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
             {badge}
           </span>
         </div>

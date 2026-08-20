@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Coins, Crown, Trophy, X } from 'lucide-react'
+import { Coins, Crown, Trophy, Rocket, X } from 'lucide-react'
 import PremiumCard from './PremiumCard'
 import VettriCard from './VettriCard'
+import RankBoosterCard from './RankBoosterCard'
 import { useFocusTrap } from './useFocusTrap'
 import { useUpsellStore } from '../../store/upsellStore'
 import { useCreditsStore } from '../../store/creditsStore'
+import { useEntitlementsStore } from '../../store/entitlementsStore'
 import { useT, type StringKey } from '../../lib/i18n'
 
 /**
@@ -29,6 +31,10 @@ export default function UpsellModal() {
   const close = useUpsellStore((s) => s.close)
   const balance = useCreditsStore((s) => s.balance)
   const unlimited = useCreditsStore((s) => s.loaded && s.unlimited)
+  // Rank Booster's entitlement is NOT the same as credits' `unlimited` (which
+  // is true for a Vettri owner — Vettri deliberately does not unlock Rank
+  // Booster), so that variant watches its own flag instead.
+  const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
 
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(open, dialogRef)
@@ -47,8 +53,9 @@ export default function UpsellModal() {
 
   // Purchase landed (or the account was already paid) → nothing to sell.
   useEffect(() => {
-    if (open && unlimited) close()
-  }, [open, unlimited, close])
+    const satisfied = variant === 'rankbooster' ? rankBoosterUnlocked : unlimited
+    if (open && satisfied) close()
+  }, [open, variant, unlimited, rankBoosterUnlocked, close])
 
   useEffect(() => {
     if (!open) return
@@ -82,6 +89,12 @@ export default function UpsellModal() {
       tone: 'bg-gold/15 text-gold',
       titleKey: 'upsellBundleTitle',
       bodyKey: 'upsellBundleBody',
+    },
+    rankbooster: {
+      icon: <Rocket size={22} />,
+      tone: 'bg-goldsoft text-gold',
+      titleKey: 'upsellRankBoosterTitle',
+      bodyKey: 'upsellRankBoosterBody',
     },
   }
   const h = head[variant]
@@ -132,11 +145,17 @@ export default function UpsellModal() {
         </div>
 
         {/* The real purchase cards. Vettri (cheaper) leads except on
-            Premium-ONLY features, where pitching it would mislead. A Vettri
-            owner hitting a Premium-only lock must still get an answer here,
-            so the Premium card opts in via showForVettri. */}
+            Premium-ONLY features, where pitching it would mislead, and on the
+            Rank Booster variant, where Vettri doesn't even unlock the thing —
+            RankBoosterCard is pitched instead. A Vettri owner hitting any of
+            these locks must still get an answer here, so the Premium card
+            opts in via showForVettri. */}
         <div className="space-y-4">
-          {variant !== 'premium' && <VettriCard />}
+          {variant === 'rankbooster' ? (
+            <RankBoosterCard />
+          ) : (
+            variant !== 'premium' && <VettriCard />
+          )}
           <PremiumCard showForVettri />
         </div>
 

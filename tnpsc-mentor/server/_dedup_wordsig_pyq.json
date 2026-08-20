@@ -1,0 +1,41 @@
+[
+ {
+  "sig": "between|compound|difference|interest",
+  "rows": [
+   {
+    "id": "a0c534dc-d4c1-408e-9d37-159cdf32c537",
+    "question_text": "The difference between the compound interest and simple interest accrued on an amount of ₹ 18,000 in two years is ₹ 405. Then the rate of interest per annum is"
+   },
+   {
+    "id": "ae726d94-65d1-420a-98c8-a3c3e2effc97",
+    "question_text": "The difference between simple and compound interest on a certain sum of money for 2 years at 2% per annum is ₹ 4. Find the sum of money"
+   }
+  ]
+ },
+ {
+  "sig": "akila|examination|maximum|scored",
+  "rows": [
+   {
+    "id": "f548288f-b95e-4e83-89d7-a7215222c021",
+    "question_text": "Akila scored 80% of marks in an examination. If her score was 576 marks. Find the maximum marks of the examination."
+   },
+   {
+    "id": "06477636-0d70-4211-9580-304670807023",
+    "question_text": "Akila scored 80% of marks in an examination. If her score was 576 marks then find the maximum marks of the examination"
+   }
+  ]
+ },
+ {
+  "sig": "number|opposite|pictures",
+  "rows": [
+   {
+    "id": "241c7f24-08c0-4d2b-9a2e-b4d21191feef",
+    "question_text": "Four pictures of a cube are given below which number is on the face opposite to 3?"
+   },
+   {
+    "id": "db885766-c9da-40f5-ac99-a85025297478",
+    "question_text": "Given below are 4 pictures of a cube.\nWhich number is on the face opposite to 3?"
+   }
+  ]
+ }
+]

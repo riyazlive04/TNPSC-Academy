@@ -1,0 +1,337 @@
+[
+ {
+  "sig": "active|sentence|voice",
+  "rows": [
+   {
+    "id": "0eccf20d-20a5-4c7e-a492-1901fd999051",
+    "question_text": "Pick out the sentence which is in active voice."
+   },
+   {
+    "id": "4e7e70e8-d10a-4b31-ae76-110370ac8563",
+    "question_text": "Which of the following options has a sentence with the verb in the active voice?"
+   },
+   {
+    "id": "4d13f94a-165a-4488-a84f-0a6a258c3b1d",
+    "question_text": "Which of the following options has a sentence with a verb in the active voice?"
+   },
+   {
+    "id": "9d669d06-0a5a-4175-87a6-31488622c1ff",
+    "question_text": "Select the correct voice.\nWhich of the following options has a sentence with the verb in the active voice?"
+   }
+  ]
+ },
+ {
+  "sig": "இணையைக்|கண்டறிக|பொருந்தா",
+  "rows": [
+   {
+    "id": "1f762caf-1093-4c60-9265-41d63c4959a8",
+    "question_text": "பொருந்தா இணையைக் கண்டறிக :"
+   },
+   {
+    "id": "134633df-85e0-446f-a659-72ca1a0e9fcd",
+    "question_text": "பொருந்தா இணையைக் கண்டறிக:"
+   },
+   {
+    "id": "51640e19-c0dc-4e55-b766-7a3e6cd20550",
+    "question_text": "பொருந்தா இணையைக் கண்டறிக:"
+   },
+   {
+    "id": "44fdb8ba-9371-4415-a2e6-d8e72caa8e2e",
+    "question_text": "பொருந்தா இணையைக் கண்டறிக"
+   }
+  ]
+ },
+ {
+  "sig": "தொகுப்பிலிருந்து|பட்டியல்|பட்டியல்களுக்குக்|விடையினைத்",
+  "rows": [
+   {
+    "id": "a2d9b704-32f1-4910-b014-f703118b38c7",
+    "question_text": "பட்டியல் ஒன்றுடன், பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க.\nபட்டியல் ஒன்று\n(a) பெண்மை தாயாய் நின்று\n(b) பெண்மை அயலார் தமக்கும்\n(c) பெண்மை மகளாய்ப் பிறந்து\n(d) பெண்மை தாரமாய் வந்து\nபட்டியல் இரண்டு\n1. அன்பே செய்யும்\n2. தரணியைத் தாங்கும்\n3. தளர்வைப் போக்கும்\n4. சேலையில் மகிழும்"
+   },
+   {
+    "id": "4b65f855-58ee-4b2c-bf2e-de18073b480a",
+    "question_text": "பட்டியல் ஒன்றுடன், பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க.\nபட்டியல் ஒன்று\n(a) கனகம்\n(b) மேழி\n(c) கலிங்கம்\n(d) ஆழி\nபட்டியல் இரண்டு\n1. மோதிரம்\n2. ஆடை\n3. பொன்\n4. கலப்பை"
+   },
+   {
+    "id": "fc9395e9-add3-452f-9d19-9c0980f31677",
+    "question_text": "பட்டியல் I உடன் பட்டியல் II-ஐப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து உரிய விடையினைத் தேர்ந்து எழுதுக.\nபட்டியல் I\n(a) கொண்டல்\n(b) தாமம்\n(c) புரிசை\n(d) மல்லல்\nபட்டியல் II\n1. மாலை\n2. வளம்\n3. மேகம்\n4. மதில்"
+   },
+   {
+    "id": "ebe7e303-4acc-4ae2-ade7-9095013bd319",
+    "question_text": "பட்டியல் ஒன்றுடன் பட்டியல் இரண்டைப் பொருத்தி, பட்டியல்களுக்குக் கீழே உள்ள தொகுப்பிலிருந்து சரியான விடையினைத் தெரிவு செய்க :\nபட்டியல் ஒன்று\n(a) சரதம்\n(b) சூளிகை\n(c) மகோததி\n(d) அவனி\nபட்டியல் இரண்டு\n1. நிலா முற்றம்\n2. நாடு\n3. வாய்மை\n4. கடல்"
+   }
+  ]
+ },
+ {
+  "sig": "choose|error|sentence",
+  "rows": [
+   {
+    "id": "7e87068b-d633-44d2-bab3-a6b297fb07c9",
+    "question_text": "Choose the sentence which has no error."
+   },
+   {
+    "id": "d0803851-ff59-42f5-bc27-5ec6cfc28e39",
+    "question_text": "Choose the correct sentence which has no error"
+   }
+  ]
+ },
+ {
+  "sig": "இலக்கணம்|உண்டாக்குவது|கூறியவர்|விருப்பத்தை",
+  "rows": [
+   {
+    "id": "60aaae09-b144-42a8-93df-a7ca691c70a7",
+    "question_text": "தமிழ் இலக்கணம் படிக்க படிக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்"
+   },
+   {
+    "id": "a89b865a-ad92-4e35-9d36-d4c6d3f424fd",
+    "question_text": "தமிழ் இலக்கணம் பகுக்க பகுக்க விருப்பத்தை உண்டாக்குவது என்று கூறியவர்"
+   }
+  ]
+ },
+ {
+  "sig": "கண்டறிக|தொடரைக்|பிழையான",
+  "rows": [
+   {
+    "id": "8bcd4391-911d-46ea-a9e6-571ba50514b5",
+    "question_text": "பிழையான தொடரைக் கண்டறிக?"
+   },
+   {
+    "id": "7f8ce325-2d9c-462b-9863-be3228fcd8ad",
+    "question_text": "பிழையான தொடரைக் கண்டறிக."
+   }
+  ]
+ },
+ {
+  "sig": "இணையினைக்|காண்க|பொருந்தாத",
+  "rows": [
+   {
+    "id": "1cdef73b-5fb9-4e5e-9fb2-e0cc6d31a2db",
+    "question_text": "பொருந்தாத இணையினைக் காண்க :"
+   },
+   {
+    "id": "ab3853b2-dbfc-4819-9edd-3e3b3490aa08",
+    "question_text": "பொருந்தாத இணையினைக் காண்க"
+   }
+  ]
+ },
+ {
+  "sig": "honourable|identify|pattern|sentence",
+  "rows": [
+   {
+    "id": "77bf7706-4700-44c0-8dd3-efb123a857d7",
+    "question_text": "Identify the sentence pattern :\nBrutus is an honourable man."
+   },
+   {
+    "id": "94c90ad0-dd70-4dda-a8d0-e79973d3a1b0",
+    "question_text": "Identify the sentence pattern.\nBrutus is an honourable man."
+   }
+  ]
+ },
+ {
+  "sig": "author|choose|containing|option",
+  "rows": [
+   {
+    "id": "d75e6eb5-61bb-4aa6-9105-de62cf9adc3a",
+    "question_text": "Choose the option containing the author of the following line :\n\"Where words come out from the depths of truth\"."
+   },
+   {
+    "id": "5cbe0c80-4f43-4dcc-aa61-f2a40a6cfb87",
+    "question_text": "Choose the option containing the name of the author and the work in which these lines occur :\nI was then too young to read\nAnd my blood turned cold like the moon"
+   }
+  ]
+ },
+ {
+  "sig": "future|violence|women",
+  "rows": [
+   {
+    "id": "301e42ed-4949-4cf5-b77f-3cdc6820b46b",
+    "question_text": "Who said this?\nIf non-violence is the law of our being, the future is with women."
+   },
+   {
+    "id": "5ffb1c39-c800-4eb9-9160-43d7360235a8",
+    "question_text": "Who said this?\n\"If non-violence is the law of our being, the future is with women\"."
+   }
+  ]
+ },
+ {
+  "sig": "இணையைக்|கண்டறிக|பொருந்தாத",
+  "rows": [
+   {
+    "id": "eea04f9c-de95-4741-8398-3e7705431746",
+    "question_text": "பொருந்தாத இணையைக் கண்டறிக :"
+   },
+   {
+    "id": "936a7a9a-4e12-42e3-8b7a-496be19c5d58",
+    "question_text": "பொருந்தாத இணையைக் கண்டறிக :"
+   },
+   {
+    "id": "44e94713-4dfe-4ca4-a802-a5b78c1c26f8",
+    "question_text": "பொருந்தாத இணையைக் கண்டறிக :"
+   }
+  ]
+ },
+ {
+  "sig": "கண்டறிக|செயப்பாட்டு|வினைச்சொற்றொடரைக்",
+  "rows": [
+   {
+    "id": "3f2d859c-3039-4864-a78d-6cdb2ea76988",
+    "question_text": "செயப்பாட்டு வினைச்சொற்றொடரைக் கண்டறிக."
+   },
+   {
+    "id": "e0add0d8-cebf-47eb-9f73-60dcc9a49638",
+    "question_text": "செயப்பாட்டு வினைச்சொற்றொடரைக் கண்டறிக."
+   }
+  ]
+ },
+ {
+  "sig": "செய்க|சொற்களைச்|வரிசைப்படி",
+  "rows": [
+   {
+    "id": "abd5ba78-54bb-4857-a9f8-499d9d1d0eac",
+    "question_text": "அகர வரிசைப்படி சொற்களைச் சீர் செய்க:"
+   },
+   {
+    "id": "cfc2da40-f1a6-455e-bb73-72d7cef32467",
+    "question_text": "அகர வரிசைப்படி சொற்களைச் சீர் செய்க."
+   },
+   {
+    "id": "64a7c666-198c-4cfa-823d-3d578036c24a",
+    "question_text": "அகர வரிசைப்படி சொற்களைச் சீர் செய்க:"
+   }
+  ]
+ },
+ {
+  "sig": "degree|identify|positive|sentence",
+  "rows": [
+   {
+    "id": "0d1fe35b-98bd-4810-ba91-28a501953d8e",
+    "question_text": "Identify the sentence which is in the positive degree"
+   },
+   {
+    "id": "0d9f4537-9d37-42a4-a9aa-29d240256634",
+    "question_text": "Identify the sentence which is in the positive degree :"
+   },
+   {
+    "id": "5ce5f8c0-d4ac-4d42-a406-9ed87ceec3e8",
+    "question_text": "Identify the sentence which is in the Positive degree"
+   }
+  ]
+ },
+ {
+  "sig": "education|highest|result|tolerance",
+  "rows": [
+   {
+    "id": "c1f6dad8-2fc7-4027-b92b-ba23313966c1",
+    "question_text": "Who told the following statement?\n\"Tolerance is the highest result of education\"."
+   },
+   {
+    "id": "b6816ccd-3562-44d5-93bc-0b3d9ce86a56",
+    "question_text": "\"The highest result of education is tolerance\". Who made this statement?"
+   }
+  ]
+ },
+ {
+  "sig": "amounts|increased|interest|simple",
+  "rows": [
+   {
+    "id": "30841d8a-4cd1-43fd-9de4-ce20c2e9318e",
+    "question_text": "A sum of Rs. 800 amounts to Rs. 920 in 3 years at a simple interest. If the interest rate is increased by 3%. What would Rs. 800 amount to?"
+   },
+   {
+    "id": "bb514f9f-a12e-4229-9cc8-7229f1d76d3d",
+    "question_text": "Rs. 800 amounts to Rs. 920 in 3 years at simple interest. If the interest rate is increased by 3%, it would amount to"
+   }
+  ]
+ },
+ {
+  "sig": "between|compound|difference|interest",
+  "rows": [
+   {
+    "id": "78b6da96-a384-4820-92e0-c21d59196d03",
+    "question_text": "Find the difference between simple interest and compound interest for a sum of Rs.8,000 lent at 10% p.a. in 2 years."
+   },
+   {
+    "id": "ee29d212-3f27-4c1d-82de-114e6ac16d07",
+    "question_text": "The difference between simple and compound interest for a sum of Rs. 5,000 lent at 12% per annum in 2 years is"
+   }
+  ]
+ },
+ {
+  "sig": "choose|meaning|phrase",
+  "rows": [
+   {
+    "id": "07fa274b-5063-4625-b3ff-75bd298b8f7c",
+    "question_text": "Choose the correct meaning of the phrase\nCast Down"
+   },
+   {
+    "id": "1aff42a5-f916-4858-a309-cabc5de44313",
+    "question_text": "Choose the correct meaning of the phrase\nGiven to"
+   }
+  ]
+ },
+ {
+  "sig": "identify|pattern|sentence",
+  "rows": [
+   {
+    "id": "128af2da-1719-4a53-a743-f3f825ad50d7",
+    "question_text": "Identify the correct sentence for the pattern S V IO DO A?"
+   },
+   {
+    "id": "9d730783-416d-4624-bb08-bfb81aecbe14",
+    "question_text": "Identify the correct sentence for the pattern SVCA"
+   }
+  ]
+ },
+ {
+  "sig": "கீழ்க்காண்பவவற்றுள்|குறிப்பிடுக|பொருத்தமற்றதைக்",
+  "rows": [
+   {
+    "id": "c03f4750-ce5b-4848-b074-9c1b412bb899",
+    "question_text": "கீழ்க்காண்பவவற்றுள் பொருத்தமற்றதைக் குறிப்பிடுக."
+   },
+   {
+    "id": "f9365498-01c4-405c-95dd-95026272ad12",
+    "question_text": "கீழ்க்காண்பவவற்றுள் பொருத்தமற்றதைக் குறிப்பிடுக :"
+   }
+  ]
+ },
+ {
+  "sig": "எழுதுக|சீர்களை|மாறியுள்ள|முறைப்படுத்தி",
+  "rows": [
+   {
+    "id": "d225ba9d-7cb6-4404-b79b-9c540e2537b1",
+    "question_text": "மாறியுள்ள சீர்களை முறைப்படுத்தி எழுதுக"
+   },
+   {
+    "id": "f5bec50f-06f5-4467-9935-0ab08365c841",
+    "question_text": "மாறியுள்ள சீர்களை முறைப்படுத்தி எழுதுக"
+   }
+  ]
+ },
+ {
+  "sig": "அழைக்கப்படுபவர்|கவிராயர்|பகுத்தறிவுக்|மக்களால்",
+  "rows": [
+   {
+    "id": "ebeb025d-3fad-4c37-8c68-5de817d17f71",
+    "question_text": "'பகுத்தறிவுக் கவிராயர்' எனத் தமிழ் மக்களால் அழைக்கப்படுபவர் யார்?"
+   },
+   {
+    "id": "dbbb77e2-746a-43a6-aa38-4d33f56295f2",
+    "question_text": "'பகுத்தறிவுக் கவிராயர்' எனத் தமிழக மக்களால் அழைக்கப்படுபவர்"
+   }
+  ]
+ },
+ {
+  "sig": "ஒழுங்குபடுத்திச்|சொற்களை|சொற்றொடராக்குதல்",
+  "rows": [
+   {
+    "id": "b1346407-0fe5-4230-bc87-0f0b8a336b35",
+    "question_text": "சொற்களை ஒழுங்குபடுத்திச் சொற்றொடராக்குதல்"
+   },
+   {
+    "id": "d720935d-2570-43ae-b2a3-28de32973964",
+    "question_text": "சொற்களை ஒழுங்குபடுத்திச் சொற்றொடராக்குதல்"
+   }
+  ]
+ }
+]

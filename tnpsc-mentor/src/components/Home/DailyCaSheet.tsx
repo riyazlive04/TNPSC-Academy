@@ -88,12 +88,12 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
               <ListChecks size={20} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="tamil block font-heading text-[15px] font-semibold leading-tight text-ink">
+              <span className="tamil block font-heading text-base font-semibold leading-tight text-ink">
                 {latest.date === today
                   ? t('caDailyToday')
                   : issueDateLabel('day_wise', latest.date, lang)}
               </span>
-              <span className="tamil mt-0.5 block font-body text-[12.5px] leading-snug text-muted">
+              <span className="tamil mt-0.5 block font-body text-xs leading-snug text-muted">
                 <span className="font-heading font-bold tabular-nums text-primary">
                   {latest.total}
                 </span>{' '}
@@ -117,11 +117,11 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
                   className="focus-ring flex flex-col gap-1 rounded-card border border-line bg-card p-3 text-left transition-colors hover:border-brand/40"
                   whileTap={tapScaleSubtle}
                 >
-                  <span className="inline-flex items-center gap-1 font-heading text-[11px] font-bold uppercase tracking-wide text-muted">
+                  <span className="inline-flex items-center gap-1 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
                     <CalendarClock size={11} />
                     {shortDay(s.date, lang)}
                   </span>
-                  <span className="tamil font-body text-[12px] leading-snug text-ink2">
+                  <span className="tamil font-body text-xs leading-snug text-ink2">
                     <span className="font-heading font-bold tabular-nums text-primary">
                       {s.total}
                     </span>{' '}

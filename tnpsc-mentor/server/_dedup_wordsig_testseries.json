@@ -1,0 +1,339 @@
+[
+ {
+  "sig": "constructed|maintained|management|quadrilateral",
+  "rows": [
+   {
+    "id": "f0b25e8c-025e-40b0-be05-138707b93fd7",
+    "question_text": "Consider the following statements about transport in India:\n1. The Indian Railways is one of the largest rail networks in the world under a single management.\n2. National Highways are constructed and maintained by the central agency and connect major cities and states.\n3. The Golden Quadrilateral connects the four metros — Delhi, Mumbai, Chennai and Kolkata.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "2f84188c-d143-458c-a33c-3bbf0f33a7db",
+    "question_text": "Consider the following statements about transport in India:\n1. Indian Railways is one of the largest railway networks in the world under a single management.\n2. National Highways are constructed and maintained by the central government / NHAI.\n3. The Golden Quadrilateral is a network of highways connecting Delhi, Mumbai, Chennai and Kolkata.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "jallianwala|knighthood|literature|rabindranath",
+  "rows": [
+   {
+    "id": "f39a2606-5ca7-44a0-8daf-8e561868a623",
+    "question_text": "Consider the following statements about Rabindranath Tagore:\n1. He was awarded the Nobel Prize in Literature in 1913 for 'Gitanjali'.\n2. He composed the Indian national anthem 'Jana Gana Mana'.\n3. He renounced his knighthood in protest against the Jallianwala Bagh massacre.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "68e2082c-522e-4a3d-a965-79db3ee505ed",
+    "question_text": "Consider the following statements about Rabindranath Tagore:\n1. He won the Nobel Prize in Literature in 1913 for 'Gitanjali'.\n2. He renounced his knighthood in protest against the Jallianwala Bagh massacre.\n3. He composed the national anthems of both India and Pakistan.\nWhich of the statements given above is/are incorrect?"
+   }
+  ]
+ },
+ {
+  "sig": "architect|assertion|constituent|constitution",
+  "rows": [
+   {
+    "id": "c7dd4104-a6a1-48ab-b87b-3f305e7c3466",
+    "question_text": "Assertion [A]: Dr. B.R. Ambedkar is regarded as the chief architect of the Indian Constitution.\nReason [R]: He served as the Chairman of the Drafting Committee of the Constituent Assembly.\nSelect the correct option:"
+   },
+   {
+    "id": "679c9684-45f7-4e53-a0c4-3251e9155257",
+    "question_text": "Assertion [A]: Dr. B. R. Ambedkar is regarded as the chief architect of the Indian Constitution.\nReason [R]: He was the President of the Constituent Assembly.\nSelect the correct option:"
+   }
+  ]
+ },
+ {
+  "sig": "number|numbers|other",
+  "rows": [
+   {
+    "id": "43a0f1e5-019c-4592-8274-c74bab80eb91",
+    "question_text": "The LCM of two numbers is 432 and their HCF is 36. If one of the numbers is 108, find the other number."
+   },
+   {
+    "id": "b25e8491-b413-4368-8552-646ae0db96ed",
+    "question_text": "The HCF of two numbers is 6 and their LCM is 120. If one number is 24, the other number is"
+   }
+  ]
+ },
+ {
+  "sig": "legislative|proportional|representation|transferable",
+  "rows": [
+   {
+    "id": "132c6de8-17c5-4dc6-a4de-a80ab7b16f64",
+    "question_text": "Consider the following statements about the election of the President of India:\n1. The President is elected by an electoral college consisting of the elected members of both Houses of Parliament and the elected members of the Legislative Assemblies of the States.\n2. The election is held in accordance with the system of proportional representation by means of a single transferable vote.\nWhich of the statements given above is/are correct?"
+   },
+   {
+    "id": "9b50a399-cc74-44f3-8a72-c7f327901a6d",
+    "question_text": "Consider the following statements regarding the election of the President of India:\n1. The President is elected by an electoral college consisting of the elected members of both Houses of Parliament and the elected members of the Legislative Assemblies of the States.\n2. The election is held in accordance with the system of proportional representation by means of a single transferable vote.\n3. Nominated members of Parliament participate in the election of the President.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "finish|leaves|remaining|together",
+  "rows": [
+   {
+    "id": "2e7f40af-8cc9-491d-bb1c-fa5e33b06cec",
+    "question_text": "A can do a work in 20 days and B in 30 days. They work together for 8 days, then A leaves. In how many more days will B finish the remaining work?"
+   },
+   {
+    "id": "96e0757d-ae51-4aaa-b67e-36a96990e786",
+    "question_text": "A can do a work in 12 days and B in 20 days. They work together for 3 days and then A leaves. In how many days will B finish the remaining work?"
+   }
+  ]
+ },
+ {
+  "sig": "finish|together|working",
+  "rows": [
+   {
+    "id": "e0ac9344-e398-4462-9576-8f78fc3930ea",
+    "question_text": "A and B can do a work in 12 days, B and C in 15 days, and C and A in 20 days. In how many days can all three working together finish the work?"
+   },
+   {
+    "id": "d4c1db04-4926-4985-8bbb-fdf29b3ab1c6",
+    "question_text": "A can do a work in 12 days and B can do the same work in 6 days. Working together, in how many days will they finish the work?"
+   }
+  ]
+ },
+ {
+  "sig": "between|divide|ratio|share",
+  "rows": [
+   {
+    "id": "b64efe85-e082-407a-86b5-b479bfa14ac5",
+    "question_text": "Divide ₹1,500 between A and B in the ratio 3 : 2. What is A's share?"
+   },
+   {
+    "id": "87b7ab44-d11f-45c0-8554-9f0d47947599",
+    "question_text": "Divide ₹1200 between A and B in the ratio 2 : 3. What is B's share?"
+   }
+  ]
+ },
+ {
+  "sig": "beverages|consider|increased|inflation",
+  "rows": [
+   {
+    "id": "5503ce43-819e-4093-b7d6-765fd9d92880",
+    "question_text": "Consider the following statements about India's revised Consumer Price Index (CPI):\nI. The new CPI base year has been revised from 2011-12 to 2023-24.\nII. The weight of food and beverages has been increased from about 37% to 46%.\nIII. The new CPI series covers 358 items.\nIV. India's retail inflation stood at 2.75% in January 2026 under the new series.\nWhich of the following statements is/are INCORRECT?"
+   },
+   {
+    "id": "2ce47763-78b1-4f65-af71-5e67345c8213",
+    "question_text": "Consider the following statements about India's revised Consumer Price Index (CPI) series:\n1. The base year was revised from 2011-12 to 2023-24.\n2. The weight of food and beverages was increased from about 37% to about 46%.\n3. India's retail inflation stood at about 2.75% in January 2026 under the new series.\nWhich of the statements given above is/are incorrect?"
+   }
+  ]
+ },
+ {
+  "sig": "annadurai|dravidian|political|ramachandran",
+  "rows": [
+   {
+    "id": "545e02c4-2797-4c1f-a42c-a2c9db9d485e",
+    "question_text": "Consider the following statements about Dravidian political parties:\n1. The Dravida Munnetra Kazhagam was born in 1949.\n2. The AIADMK was founded by M.G. Ramachandran in 1972.\n3. C.N. Annadurai founded the AIADMK after splitting from the Dravidar Kazhagam.\nWhich of the statements given above is/are incorrect?"
+   },
+   {
+    "id": "2de96e45-c954-42c8-9b0e-9c3b85faa95e",
+    "question_text": "Consider the following statements about the timeline of Dravidian political parties:\n1. The Dravida Munnetra Kazhagam (DMK) was founded in 1949 by C.N. Annadurai.\n2. The All India Anna Dravida Munnetra Kazhagam (AIADMK) was founded by M.G. Ramachandran in 1972.\n3. The Justice Party became the Dravidar Kazhagam in 1944.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "kattabomman|palayakkarar|panchalamkurichi|veerapandiya",
+  "rows": [
+   {
+    "id": "b4862688-f3d3-4b9f-b5e7-7a4b7586946f",
+    "question_text": "Consider the following statements about Veerapandiya Kattabomman:\n1. He was the Palayakkarar of Panchalamkurichi.\n2. The immediate cause of his conflict with the East India Company was the arrears in the payment of tribute (kist).\n3. He was finally hanged near the old fort of Kayattar.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "e8410170-4910-4223-b917-ab2be813b7ce",
+    "question_text": "Consider the following statements about Veerapandiya Kattabomman:\n1. He was the Palayakkarar of Panchalamkurichi.\n2. He was executed by being shot by a firing squad at Panchalamkurichi.\n3. Collector Jackson was the East India Company officer who clashed with him.\nWhich of the statements given above is/are incorrect?"
+   }
+  ]
+ },
+ {
+  "sig": "certain|interest|simple|years",
+  "rows": [
+   {
+    "id": "be1b0a07-d292-46f9-9a64-ee363c3a50d2",
+    "question_text": "The simple interest on a certain sum for 2 years at 10% per annum is ₹750. Find the sum."
+   },
+   {
+    "id": "517959d1-a144-42a3-974a-3a56ef8c0960",
+    "question_text": "The simple interest on a certain sum for 3 years at 8% per annum is ₹960. Find the sum."
+   }
+  ]
+ },
+ {
+  "sig": "between|compound|difference|interest",
+  "rows": [
+   {
+    "id": "dab432fe-42e2-49d2-9dae-c61b2548477b",
+    "question_text": "The difference between the compound interest and simple interest on a sum of ₹10000 at 10% per annum for 2 years is"
+   },
+   {
+    "id": "655ed2d4-339a-4d90-b4ea-89107ec75a38",
+    "question_text": "Find the difference between the compound interest and the simple interest on ₹8,000 lent at 10% per annum for 2 years."
+   },
+   {
+    "id": "c97902de-40c9-412a-bcc0-f9c30c5c8881",
+    "question_text": "Find the difference between the compound interest and the simple interest on ₹8,000 at 5% per annum for 3 years."
+   }
+  ]
+ },
+ {
+  "sig": "annually|compound|compounded|interest",
+  "rows": [
+   {
+    "id": "05765b32-e4b3-4a0a-8382-616480b35284",
+    "question_text": "Find the compound interest on ₹8000 at 10% per annum for 2 years, compounded annually."
+   },
+   {
+    "id": "628c2624-26e5-4ab4-a3a4-fa666a4c6fe1",
+    "question_text": "What sum of money will amount to ₹6655 in 3 years at 10% per annum compound interest, compounded annually?"
+   },
+   {
+    "id": "5bdbaa4d-af7a-40a4-8c83-8256eae758bd",
+    "question_text": "Find the compound interest on ₹15,625 at 8% per annum for 3 years, compounded annually."
+   },
+   {
+    "id": "84b3036c-7782-410a-94d3-707eb1904a64",
+    "question_text": "Find the compound interest on ₹20,000 at 15% per annum for 2 years, compounded annually."
+   }
+  ]
+ },
+ {
+  "sig": "annum|interest|simple|years",
+  "rows": [
+   {
+    "id": "805d39f5-0570-4b82-809f-b1b02c4664e0",
+    "question_text": "Find the simple interest on ₹25,000 at 8% per annum for 3 years."
+   },
+   {
+    "id": "74775b31-6098-407d-8d89-ccaef2e878f3",
+    "question_text": "Find the simple interest on ₹18,000 at 6% per annum for 4 years."
+   }
+  ]
+ },
+ {
+  "sig": "consider|inscribed|satyameva|upanishad",
+  "rows": [
+   {
+    "id": "6d3b29cf-fad8-4aff-ba44-32c671a0f355",
+    "question_text": "Consider the following statements about the National Emblem of India:\n1. It is adapted from the Lion Capital of Ashoka at Sarnath.\n2. In the original Sarnath capital four lions are mounted back to back, but in the State Emblem only three are visible.\n3. The words 'Satyameva Jayate', inscribed below the abacus, are taken from the Mundaka Upanishad.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "3b278c7b-376c-4396-a754-60dff843adf9",
+    "question_text": "Consider the following statements about India's national emblem:\n1. It is adapted from the Lion Capital of Ashoka at Sarnath.\n2. The words 'Satyameva Jayate' are inscribed below it.\n3. The motto 'Satyameva Jayate' is taken from the Mundaka Upanishad.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "height|parallel|trapezium|whose",
+  "rows": [
+   {
+    "id": "ead887e1-2e35-4076-ba2e-94b3a87e0332",
+    "question_text": "Find the area of a trapezium whose parallel sides are 12 cm and 8 cm and whose height is 10 cm."
+   },
+   {
+    "id": "476618e1-7b16-4582-b4eb-ce920d35a4b9",
+    "question_text": "Find the area of a trapezium whose height is 14 cm and whose parallel sides are 18 cm and 9 cm."
+   }
+  ]
+ },
+ {
+  "sig": "committee|constitution|fundamental|recommendation",
+  "rows": [
+   {
+    "id": "0b947458-7783-46fd-b4e0-85dfefacd35f",
+    "question_text": "The Fundamental Duties were added to the Indian Constitution on the recommendation of which committee?"
+   },
+   {
+    "id": "dbb6808b-b6d4-418a-b182-17907b4244af",
+    "question_text": "The Fundamental Duties were added to the Constitution on the recommendation of which committee?"
+   }
+  ]
+ },
+ {
+  "sig": "employment|financial|guarantee|guarantees",
+  "rows": [
+   {
+    "id": "f543864e-7c0d-4451-8576-2f7b0091cd10",
+    "question_text": "Consider the following statements about the Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA):\n1. It guarantees 100 days of wage employment in a financial year to a rural household whose adult members volunteer to do unskilled manual work.\n2. It is a demand-driven employment programme.\nWhich of the statements given above is/are correct?"
+   },
+   {
+    "id": "f0bd1111-2c37-4ba0-83f4-48918bf146c5",
+    "question_text": "Consider the following statements about the Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA):\n1. It legally guarantees at least 100 days of wage employment in a financial year to every rural household whose adult members volunteer to do unskilled manual work.\n2. The World Bank has described it as the world's largest public works programme.\n3. It was enacted in the year 2005.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "agricultural|agriculture|employment|productivity",
+  "rows": [
+   {
+    "id": "a450ef59-9096-4d3f-b6a0-7a0ed3be9b04",
+    "question_text": "Consider the following statements about sectoral employment in India:\n1. The agricultural sector employs a larger share of the workforce than its share in Gross Value Added.\n2. This gap between employment share and output share reflects low productivity in agriculture.\nWhich of the statements given above is/are correct?"
+   },
+   {
+    "id": "a25e2864-bb46-4546-b536-43e33083327e",
+    "question_text": "Read the following statements and choose the correct option.\nAssertion [A]: As an economy develops, the share of the agricultural sector in total employment tends to decline.\nReason [R]: Workers move from low-productivity agriculture to higher-paying industry and service sector jobs as incomes rise."
+   }
+  ]
+ },
+ {
+  "sig": "components|electronics|expenditure|manufacturing",
+  "rows": [
+   {
+    "id": "df5a4e8e-dcc5-4877-a06f-69dd1a6ec056",
+    "question_text": "Consider the following statements about the Union Budget 2026-27:\nI. The fiscal deficit is targeted at 4.3% of GDP.\nII. The capital expenditure is set at Rs.12.2 lakh crore.\nIII. The Electronics Components Manufacturing Scheme has an outlay of Rs.40,000 crore.\nIV. SBI CHAKRA was launched to finance 18 sunrise sectors.\nWhich of the following statements is/are INCORRECT?"
+   },
+   {
+    "id": "9513def4-ee8e-4446-8bc0-a68bb5a775d3",
+    "question_text": "Consider the following statements about the Union Budget 2026-27:\n1. The fiscal deficit is targeted at 4.3% of GDP.\n2. The capital expenditure is set at Rs 12.2 lakh crore.\n3. The Electronics Components Manufacturing Scheme has an outlay of Rs 40,000 crore.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "acquisition|citizenship|parliament|termination",
+  "rows": [
+   {
+    "id": "5f0658e2-5afd-48af-930f-a2eb84a62b04",
+    "question_text": "Assertion [A]: Parliament alone can make laws on the acquisition and termination of Indian citizenship.\nReason [R]: Citizenship is a subject in the Union List of the Seventh Schedule.\nSelect the correct option:"
+   },
+   {
+    "id": "988df7f7-29a2-4dd1-a60e-233e1a700b67",
+    "question_text": "Which Act of Parliament governs the acquisition and termination of Indian citizenship?"
+   }
+  ]
+ },
+ {
+  "sig": "brahmaputra|himalayan|peninsular|perennial",
+  "rows": [
+   {
+    "id": "3a100663-e197-4842-b4af-bfa1d9f5ebcd",
+    "question_text": "Consider the following statements about the rivers of India:\n1. The Ganga, Brahmaputra and Indus are Himalayan (perennial) rivers.\n2. The Godavari is the longest river of peninsular India.\n3. The Narmada and the Tapi flow westward and drain into the Arabian Sea.\nWhich of the statements given above are correct?"
+   },
+   {
+    "id": "d347f6ec-66ee-46ab-8866-c9621e6fc04d",
+    "question_text": "Consider the following statements about the rivers of India:\n1. The Godavari is the largest river of peninsular India and is called the 'Dakshin Ganga'.\n2. The Narmada and the Tapi flow westward and drain into the Arabian Sea.\n3. The Indus, Ganga and Brahmaputra are the major Himalayan (perennial) rivers.\nWhich of the statements given above are correct?"
+   }
+  ]
+ },
+ {
+  "sig": "number|opposite|pictures",
+  "rows": [
+   {
+    "id": "4164801f-8bc8-4e18-862c-14970bd4c74e",
+    "question_text": "Given below are 4 pictures of a cube.\nWhich number is on the face opposite to 3?"
+   },
+   {
+    "id": "fc35a0e8-e750-47d1-8252-29cf5438086d",
+    "question_text": "Four pictures of a cube are given below which number is on the face opposite to 3?"
+   }
+  ]
+ },
+ {
+  "sig": "assistance|dharmambal|maniammaiyar|muthulakshmi",
+  "rows": [
+   {
+    "id": "e9c0cf56-03d0-4fc5-a93c-f582e50043b1",
+    "question_text": "Match List I (Marriage-assistance scheme) with List II (Target group) and select the correct code:\nList I\nA. E.V.R. Maniammaiyar Ninaivu\nB. Annai Theresa Ninaivu\nC. Dr. Dharmambal Ammaiyar Ninaivu\nD. Dr. Muthulakshmi Reddy Ninaivu\nList II\n1. Inter-caste couples\n2. Daughters of poor widows\n3. Widows (remarriage)\n4. Orphan girls"
+   },
+   {
+    "id": "71f6b244-85e9-425c-a033-893e63086dc8",
+    "question_text": "Match List I (Marriage-assistance scheme) with List II (Target group):\nList I\nA. E.V.R. Maniammaiyar Ninaivu\nB. Annai Theresa Ninaivu\nC. Dr. Dharmambal Ammaiyar Ninaivu\nD. Dr. Muthulakshmi Reddy Ninaivu\nList II\n1. Inter-caste couples\n2. Daughters of poor widows\n3. Widows (remarriage)\n4. Orphan girls\nSelect the correct answer using the codes given below:"
+   }
+  ]
+ }
+]

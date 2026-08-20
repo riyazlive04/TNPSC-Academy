@@ -41,7 +41,7 @@ export default function Toaster() {
             <button
               onClick={() => dismiss(item.id)}
               aria-label={t('dismiss')}
-              className="icon-btn -mr-1 -mt-0.5 h-7 w-7 flex-shrink-0"
+              className="icon-btn -mr-1 -mt-0.5 h-11 w-11 flex-shrink-0"
             >
               <X size={15} />
             </button>

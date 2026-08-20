@@ -10,6 +10,16 @@ import { notifyAdmins } from '../notify.js'
 
 const router = Router()
 
+// Columns the client actually consumes (src/types/index.ts Profile) plus a few
+// read internally by other server routes off this same row (credits,
+// pdf_downloads, created_at). Deliberately EXCLUDES totp_secret and
+// totp_backup_codes (supabase/admin_totp.sql) — those must never leave the
+// server — and the credit-bookkeeping columns last_daily_grant/daily_left
+// (supabase/credits.sql), which are internal-only and unused by any client read.
+const PROFILE_COLS =
+  'id, full_name, email, phone, gender, target_group, role, exam_date, daily_goal, ' +
+  'language, avatar_url, totp_enabled, credits, pdf_downloads, created_at'
+
 // ─── GET /api/profile ────────────────────────────────────────────────────────
 router.get(
   '/',
@@ -17,7 +27,7 @@ router.get(
   asyncH(async (req: AuthedRequest, res) => {
     const { data, error } = await req.db!
       .from('profiles')
-      .select('*')
+      .select(PROFILE_COLS)
       .eq('id', req.userId)
       .maybeSingle()
     if (error) return sendDbError(res, error)
@@ -46,7 +56,7 @@ router.get(
 
     const { data: healed, error: reReadErr } = await supabaseAdmin
       .from('profiles')
-      .select('*')
+      .select(PROFILE_COLS)
       .eq('id', req.userId)
       .single()
     if (reReadErr) return sendDbError(res, reReadErr)

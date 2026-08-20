@@ -62,8 +62,7 @@ function aggregate(answers: TestSeriesAnswerStat[], keyOf: (a: TestSeriesAnswerS
 const weakOf = (scores: TopicScore[]): TopicScore[] =>
   scores.filter((s) => s.attempted >= MIN_SAMPLE && s.accuracy < WEAK_THRESHOLD)
 
-export async function fetchTestSeriesAnalytics(): Promise<TestSeriesAnalytics> {
-  const { attempts, answers } = await api.testSeriesAnalytics()
+function computeAnalytics(attempts: TestSeriesAttempt[], answers: TestSeriesAnswerStat[]): TestSeriesAnalytics {
   if (!attempts || attempts.length === 0) return EMPTY
 
   const bySubject = aggregate(answers ?? [], (a) => a.subject || 'General')
@@ -88,6 +87,19 @@ export async function fetchTestSeriesAnalytics(): Promise<TestSeriesAnalytics> {
     overview,
     loaded: true,
   }
+}
+
+/** One series' attempts/weak-areas (Vettri Nichayam or Rank Booster). */
+export async function fetchTestSeriesAnalytics(series?: string): Promise<TestSeriesAnalytics> {
+  const { attempts, answers } = await api.testSeriesAnalytics(series)
+  return computeAnalytics(attempts, answers ?? [])
+}
+
+/** Combined attempts/weak-areas across EVERY scheduled test series the user
+ *  has attempted — the "overall" tab in the Test Marathon hub. */
+export async function fetchTestSeriesAnalyticsOverall(): Promise<TestSeriesAnalytics> {
+  const { attempts, answers } = await api.testSeriesAnalyticsOverall()
+  return computeAnalytics(attempts, answers ?? [])
 }
 
 /** Where in the app to go and revise a weak subject. */

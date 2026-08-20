@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
-import { premiumUserIds, matchesAudience } from './notifications.js'
+import { matchesAudience } from './notifications.js'
+import { premiumEntitlement } from '../lib/premium.js'
 
 /**
  * Popup Alerts — superadmin-authored announcements shown to users as a modal
@@ -22,9 +23,13 @@ router.get(
   '/active',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const [{ data: profile }, premiumIds, { data: rows }, { data: dismissals }] = await Promise.all([
+    const [{ data: profile }, premium, { data: rows }, { data: dismissals }] = await Promise.all([
       supabaseAdmin.from('profiles').select('target_group, role').eq('id', req.userId).single(),
-      premiumUserIds(),
+      // RLS-scoped to this one caller (req.db) instead of scanning every
+      // paying user's payment rows just to test one user's membership.
+      premiumEntitlement(req.db!)
+        .then((r) => r.premium)
+        .catch(() => false), // fail closed on a ledger read error
       supabaseAdmin
         .from('app_alerts')
         .select('id, kind, title, body, title_ta, body_ta, url, audience, audience_value, expires_at, created_at')
@@ -36,7 +41,7 @@ router.get(
 
     const role = (profile?.role as string | null) ?? null
     const ctx = {
-      premium: premiumIds.has(req.userId!),
+      premium,
       group: (profile?.target_group as string | null) ?? null,
       isAdmin: role === 'admin' || role === 'superadmin',
     }
@@ -144,16 +149,21 @@ router.get(
     if (error) return sendDbError(res, error)
 
     const rows = data ?? []
-    // Head-only count queries (no row payload): the list is capped at 100.
-    const counts = await Promise.all(
-      rows.map((a) =>
-        supabaseAdmin
-          .from('alert_dismissals')
-          .select('alert_id', { count: 'exact', head: true })
-          .eq('alert_id', a.id)
-          .then(({ count }) => count ?? 0)
-      )
-    )
+    // One query for every alert's dismissals, tallied in JS — was previously
+    // one head-count round trip PER alert (up to 100 queries for one page load).
+    const tally = new Map<string, number>()
+    if (rows.length > 0) {
+      const { data: dismissals, error: dErr } = await supabaseAdmin
+        .from('alert_dismissals')
+        .select('alert_id')
+        .in('alert_id', rows.map((a) => a.id))
+      if (dErr) return sendDbError(res, dErr)
+      for (const d of dismissals ?? []) {
+        const id = d.alert_id as string
+        tally.set(id, (tally.get(id) ?? 0) + 1)
+      }
+    }
+    const counts = rows.map((a) => tally.get(a.id as string) ?? 0)
     res.json({ alerts: rows.map((a, i) => ({ ...a, dismissed_count: counts[i] })) })
   })
 )

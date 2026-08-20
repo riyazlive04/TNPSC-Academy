@@ -1,0 +1,77 @@
+[
+  {
+    "id": "692c1b4a-1cec-4736-ab67-00f6338320bd",
+    "topic": "AP, GP and Special Series",
+    "issue_types": [
+      "A",
+      "E"
+    ],
+    "current_correct_answer": "B",
+    "current_question_summary": "Find the sum of the arithmetic series 2 + 4 + 6 + ... + 80. Options: A)300 B)800 C)600 D)500. Marked correct: B (800).",
+    "your_independent_calculation": "a=2, l=80, d=2, n=(80-2)/2+1=40. Sn = n/2*(a+l) = 40/2*(2+80) = 20*82 = 1640. (Equivalently, sum of first 40 even numbers = n(n+1) = 40*41 = 1640.) The stored explanation itself computes 1640 via the correct formula, then abandons that result and inserts a fabricated 'Note' claiming a different series (4+8+...+80) justifies 800, which is not the series in the question.",
+    "recommended_correct_answer": null,
+    "recommended_fix": "The correct sum is 1640, which is not among any of the four options. Options must be replaced, e.g. change option B from '800' to '1640' and keep correct_answer='B'; also rewrite the explanation to remove the self-contradictory 'Note' paragraph and simply show a=2,l=80,d=2,n=40,Sn=1640.",
+    "confidence": "high",
+    "notes": "The explanation text visibly self-contradicts: it correctly derives 1640 via the standard AP sum formula, then explicitly overrides it with an unrelated series to force-match the pre-set answer of 800. This is a clear fabricated/corrupted explanation, not a rounding or interpretation issue."
+  },
+  {
+    "id": "a51fd936-dbe3-463a-8dd2-9787c19aa4de",
+    "topic": "Conversion of Information to Data",
+    "issue_types": [
+      "A",
+      "B"
+    ],
+    "current_correct_answer": "D",
+    "current_question_summary": "Production cost 2010-2015 = 55,40,30,25,35,70 (lakhs). (a) year of max/min, (b) average, (c) % increase 2014(35) to 2015(70). Marked correct D: Max=2015, Min=2013, Average=42.5 lakhs, % increase=200%.",
+    "your_independent_calculation": "Max=70(2015), Min=25(2013) - correct. Average = 255/6 = 42.5 - correct. Percentage increase = (New-Old)/Old * 100 = (70-35)/35*100 = 35/35*100 = 100%, NOT 200%. The stored explanation mistakenly computes (70/35)*100=200%, which is 'new value as a % of old value' (i.e. new value IS 200% of old), not the percentage INCREASE. Percentage increase from 35 to 70 (a doubling) is 100%, since the increase itself (35) equals 100% of the original (35).",
+    "recommended_correct_answer": "B",
+    "recommended_fix": "Change correct_answer from 'D' to 'B' (option B: Max=2015, Min=2013, Average=Rs.42.5 lakhs, Percentage increase=100%). Fix explanation's last step to: Percentage increase = (70-35)/35 * 100 = 100%.",
+    "confidence": "high",
+    "notes": "Classic percentage-increase-vs-percentage-of mistake. Option B already contains the fully correct answer (same max/min/average as marked answer D, only the % increase figure differs and is correct in B)."
+  },
+  {
+    "id": "ea8e49f0-a34e-4b35-86a6-5aeb880cafa5",
+    "topic": "Conversion of Information to Data",
+    "issue_types": [
+      "A",
+      "B"
+    ],
+    "current_correct_answer": "C",
+    "current_question_summary": "A company's production cost was 35 lakhs in 2014 and 70 lakhs in 2015. What is the percentage increase in production cost from 2014 to 2015? Options: A)100% B)50% C)200% D)35%. Marked correct: C (200%).",
+    "your_independent_calculation": "Percentage increase = (increase/original)*100 = (70-35)/35*100 = 35/35*100 = 100%. The stored explanation computes increase=35 correctly, then in the final line inexplicably substitutes (70/35)*100=200% (labelled as 'book computes... ratio of new to base scaled') instead of using the increase it just calculated. 200% would be the value if the question asked 'what percent of the original value is the new value,' not 'percentage increase.'",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Change correct_answer from 'C' to 'A' (100%). Fix explanation to conclude (35/35)*100 = 100%, removing the fabricated 'Note' that swaps in the wrong ratio.",
+    "confidence": "high",
+    "notes": "Same systematic percentage-increase error as id a51fd936 above (both involve the identical 35->70 production-cost figures), suggesting a shared source-generation bug across both questions."
+  },
+  {
+    "id": "7359dd39-1779-421f-b178-c6557843297c",
+    "topic": "Parametric Representation",
+    "issue_types": [
+      "A",
+      "E"
+    ],
+    "current_correct_answer": "A",
+    "current_question_summary": "Daily wages of 230 workers grouped: 70-80=12, 80-90=18, 90-100=35, 100-110=42, 110-120=50, 120-130=45, 130-140=20, 140-150=8. Asked: (i) median, (ii) workers earning less than Rs.125. Marked correct A: (i) Median=Rs.120; (ii) 183 workers.",
+    "your_independent_calculation": "Cumulative frequencies: <80=12,<90=30,<100=65,<110=107,<120=157,<130=202,<140=222,<150=230 (N=230, matches explanation's own table). N/2=115. Since CF(<110)=107<115<=CF(<120)=157, the median class is 110-120 with L=110, cf=107, f=50, h=10. Median = L + [(N/2-cf)/f]*h = 110 + [(115-107)/50]*10 = 110 + 1.6 = 111.6 (~Rs.112). This is NOT close to Rs.120 -- it is off by ~8.4, far beyond any rounding/graph-reading tolerance. This same median formula is used correctly elsewhere in this very batch (e.g. id 2c88bb55/mango-yield median=66 checks out), confirming the method, so the 111.6 result should be trusted over the stated 120.",
+    "recommended_correct_answer": null,
+    "recommended_fix": "The true median (~Rs.111.6, i.e. ~Rs.112) is not among any of the 4 options (115, 120, 120, 125). The question needs a corrected option set with ~Rs.112 as the median value (keeping whichever '183 workers' or similar reading for part ii, which is a graph-reading figure not independently verifiable here). At minimum, correct the explanation's median-formula line, which currently jumps from '110 + 1.6' logic to an unexplained final claim of '~120' that contradicts its own numbers.",
+    "confidence": "high",
+    "notes": "Part (ii) of this question ('183 workers earning less than Rs.125') is a graphical-ogive-reading value that cannot be independently confirmed without the original curve image, so it is not flagged here; only the median figure is flagged, since it is derivable by exact formula from the fully-given frequency table and clearly contradicts the stated answer. A related question (id c44f3f50, 'daily-wages... intersection at Rs.120... find median') restates the same wrong Rs.120 figure as a given premise; it is not separately flagged since it is posed as a hypothetical/definitional question rather than a from-data computation, but it likely stems from the same underlying source error."
+  },
+  {
+    "id": "5d2b6d5e-9a43-4288-a49b-418dd569bb3a",
+    "topic": "Profit And Loss",
+    "issue_types": [
+      "A",
+      "E"
+    ],
+    "current_correct_answer": "A",
+    "current_question_summary": "A man sold two articles at Rs.375 each, gaining 25% on the first and losing 25% on the second. Find overall gain/loss %. Options: A)25% B)50% C)23% D)40%. Marked correct: A (25%).",
+    "your_independent_calculation": "Classic 'equal SP, equal +x%/-x% profit and loss' case always yields a net LOSS of (x/10)^2 percent = (25/10)^2 = 6.25%. Verified directly: CP1 = 375/1.25 = 300, CP2 = 375/0.75 = 500, Total CP = 800, Total SP = 750, Loss = 50, Loss% = 50/800*100 = 6.25%. The stored explanation itself derives Loss% = 6.25% twice (once via the shortcut formula, once via direct CP/SP verification) and explicitly writes 'Loss% = 6.25%' as its conclusion -- yet the record's correct_answer is set to option A (25%), which the explanation never even claims.",
+    "recommended_correct_answer": null,
+    "recommended_fix": "None of the four options (25%, 50%, 23%, 40%) equal the correct value of 6.25% loss. The option list must be corrected to include '6.25% Loss' as one of the choices (e.g., replace option A's '25%' with '6.25% Loss') and correct_answer set to that option.",
+    "confidence": "high",
+    "notes": "This is an unambiguous mismatch: the explanation's own final computed value (6.25% loss, shown twice, via two different methods) does not match any of the 4 supplied options, yet the record still marks option A as correct."
+  }
+]

@@ -392,12 +392,12 @@ interface GradedDaily {
   correct: boolean
 }
 
-/** premium OR vettri OR staff → the test is free of credit charge. */
+/** premium OR vettri OR rankBooster OR staff → the test is free of credit charge. */
 async function isUnlimited(req: AuthedRequest): Promise<boolean> {
   const role = await roleOf(req.userId!)
   if (role === 'admin' || role === 'superadmin') return true
   try {
-    return (await bundleAccess(req.db!)).unlimited
+    return (await bundleAccess(req.db!)).creditsUnlimited
   } catch {
     return false // fail closed: treat as a free learner (the gate applies)
   }

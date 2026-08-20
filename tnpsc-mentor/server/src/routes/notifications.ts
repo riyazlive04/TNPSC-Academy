@@ -5,13 +5,18 @@ import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middlewar
 import { supabaseAdmin } from '../supabase.js'
 import { sendPushTo } from '../notify.js'
 import { PREMIUM_VALIDITY_MS } from '../pricing.js'
+import { premiumEntitlement } from '../lib/premium.js'
 
 const router = Router()
 
 // ─── Audience helpers (shared with routes/alerts.ts) ─────────────────────────
 /** user_ids with an active (paid, within the validity window) premium_annual
  *  order — the 'premium' audience. Mirrors the entitlement rule in payments
- *  exactly via the shared PREMIUM_VALIDITY_MS so the two can't drift. */
+ *  exactly via the shared PREMIUM_VALIDITY_MS so the two can't drift.
+ *
+ *  Scans the whole payments table, so it's only for fan-out (resolving an
+ *  entire audience's user_ids to push to). A single caller's own membership
+ *  should use `premiumEntitlement(req.db!)` instead (RLS-scoped, one row read). */
 export async function premiumUserIds(): Promise<Set<string>> {
   const since = new Date(Date.now() - PREMIUM_VALIDITY_MS).toISOString()
   const { data } = await supabaseAdmin
@@ -174,9 +179,13 @@ router.get(
   '/',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const [{ data: profile }, premiumIds, { data: rows }, { data: reads }] = await Promise.all([
+    const [{ data: profile }, premium, { data: rows }, { data: reads }] = await Promise.all([
       supabaseAdmin.from('profiles').select('target_group, role').eq('id', req.userId).single(),
-      premiumUserIds(),
+      // RLS-scoped to this one caller (req.db), not a full-table scan of every
+      // paying user — premiumUserIds() is reserved for audience fan-out below.
+      premiumEntitlement(req.db!)
+        .then((r) => r.premium)
+        .catch(() => false), // fail closed on a ledger read error
       supabaseAdmin
         .from('notifications')
         .select('id, kind, title, body, title_ta, body_ta, url, audience, audience_value, target_user_id, created_at')
@@ -190,7 +199,7 @@ router.get(
 
     const role = (profile?.role as string | null) ?? null
     const ctx = {
-      premium: premiumIds.has(req.userId!),
+      premium,
       group: (profile?.target_group as string | null) ?? null,
       isAdmin: role === 'admin' || role === 'superadmin',
     }

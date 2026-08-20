@@ -1,10 +1,12 @@
 import { Router } from 'express'
+import { rateLimit } from 'express-rate-limit'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
 import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
 import { chargeTestStart, FREE_MOCK_LIMIT } from '../lib/credits.js'
 import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
+import { TEST_SERIES_CONFIG, DEFAULT_SERIES, resolveSeries } from '../lib/testSeriesCatalog.js'
 
 const router = Router()
 
@@ -14,7 +16,7 @@ const router = Router()
 // bank, not practised). The get_quiz_questions RPC already excludes these, but
 // this server-side backstop keeps the exclusion from depending on which migration
 // of the RPC is live (see the note in supabase/*.sql). Add any new paid bank here.
-const QUIZ_BLOCKED_CATEGORIES = new Set(['mock', 'testseries', 'vettri', 'outer'])
+const QUIZ_BLOCKED_CATEGORIES = new Set(['mock', 'testseries', 'testseries_g2', 'vettri', 'outer'])
 
 // Columns safe to return to the client during a quiz (answer/explanation columns
 // are stripped at the column-grant level; listed explicitly for the fallbacks).
@@ -164,14 +166,14 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
 }
 
 // ─── Unlimited-access check ──────────────────────────────────────────────────
-// premium OR vettri OR staff → unlimited tests: they never spend credits and skip
-// the free-mock cap. Everyone else is a credit-gated free learner.
+// premium OR vettri OR rankBooster OR staff → unlimited tests: they never spend
+// credits and skip the free-mock cap. Everyone else is a credit-gated free learner.
 
-/** premium OR vettri OR staff → unlimited. Fails closed (treat as free on error). */
+/** premium OR vettri OR rankBooster OR staff → unlimited. Fails closed (treat as free on error). */
 async function isUnlimited(req: AuthedRequest): Promise<boolean> {
   if (await isStaff(req)) return true
   try {
-    return (await bundleAccess(req.db!)).unlimited
+    return (await bundleAccess(req.db!)).creditsUnlimited
   } catch {
     return false // fail closed on entitlement: treat as free (gate may apply)
   }
@@ -240,6 +242,48 @@ router.post(
     // Mark these as seen so they sink to the back of future draws.
     void recordSeen(req, questions)
     res.json({ questions })
+  })
+)
+
+/** Validate a UUID so a malformed questionId can't reach the DB as a bad cast. */
+function isUuid(s: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)
+}
+
+// Defense-in-depth on top of check_answer's own seen_questions gate (see
+// supabase/check_answer.sql) — a generous per-user cap that easily covers a
+// full test's worth of instant checks but still bounds scripted abuse.
+const checkAnswerLimiter = rateLimit({
+  windowMs: 10 * 60_000,
+  max: 60,
+  keyGenerator: (req) => (req as AuthedRequest).userId || req.ip || 'anon',
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many answer checks. Please slow down.' },
+})
+
+// ─── POST /api/questions/check-answer ────────────────────────────────────────
+// Practice-mode instant feedback: reveals ONE question's correct answer +
+// explanation. Gated entirely inside the check_answer RPC (only questions this
+// user was already legitimately served, per seen_questions, are revealed) —
+// this route is just plumbing + input validation + rate limiting.
+router.post(
+  '/check-answer',
+  requireAuth,
+  checkAnswerLimiter,
+  asyncH(async (req: AuthedRequest, res) => {
+    const questionId = req.body?.questionId
+    if (typeof questionId !== 'string' || !isUuid(questionId)) {
+      return res.status(400).json({ error: 'questionId must be a UUID.' })
+    }
+    const { data, error } = await req.db!.rpc('check_answer', { p_question_id: questionId })
+    if (error) return sendDbError(res, error)
+    const row = (data ?? [])[0]
+    if (!row) {
+      return res.status(404).json({ error: 'Question not found, or not yet served to you.' })
+    }
+    res.json(row)
   })
 )
 
@@ -677,7 +721,11 @@ router.post(
             .eq('category', qdef.category)
             .eq('active', true)
           if (qdef.subjects?.length) q = q.in('subject', qdef.subjects)
-          const { data: qd, error: e2 } = await q
+          // Each qdef previously pulled its ENTIRE matching bank (no limit) just
+          // to shuffle and keep `slot.count` (≤ ~20) of them. Cap the worst case:
+          // a query-per-qdef merge risks cross-pairing different qdefs' category
+          // and subjects within one slot, so this stays conservative instead.
+          const { data: qd, error: e2 } = await q.limit(500)
           if (e2) return sendDbError(res, e2)
           for (const row of (qd ?? []) as unknown as Record<string, unknown>[]) {
             const id = row.id as string
@@ -813,26 +861,27 @@ router.get(
   '/mock-exams',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { data, error } = await req.db!
-      .from('mock_exams')
-      .select(
-        'id, mock_set, title, title_ta, total_questions, duration_seconds, negative_mark, tier, enabled, sort_order'
-      )
-      .eq('enabled', true)
-      .order('sort_order')
+    // Independent reads (none consumes another's result) fired together instead
+    // of sequentially — the exam list, staff status, ledger entitlement, and this
+    // user's attempt counts were four separate round trips one after another.
+    const [{ data, error }, staff, entitlementPremium, counts] = await Promise.all([
+      req.db!
+        .from('mock_exams')
+        .select(
+          'id, mock_set, title, title_ta, total_questions, duration_seconds, negative_mark, tier, enabled, sort_order'
+        )
+        .eq('enabled', true)
+        .order('sort_order'),
+      isStaff(req),
+      premiumEntitlement(req.db!)
+        .then((r) => r.premium)
+        .catch(() => false), // fail closed: treat as free if the ledger is unreachable
+      attemptCounts(req),
+    ])
     if (error) return sendDbError(res, error)
 
     // Staff (admin/superadmin) preview every exam as unlocked and uncapped.
-    const staff = await isStaff(req)
-    let premium = staff
-    if (!premium) {
-      try {
-        premium = (await premiumEntitlement(req.db!)).premium
-      } catch {
-        premium = false // fail closed: treat as free if the ledger is unreachable
-      }
-    }
-    const counts = await attemptCounts(req)
+    const premium = staff || entitlementPremium
 
     const exams = ((data ?? []) as MockExamRow[]).map((e) => {
       const locked = e.tier === 'paid' && !premium
@@ -1048,11 +1097,16 @@ router.post(
   })
 )
 
-// ─── Test Series (scheduled, fixed Group 1 "Test Marathon 2026" papers) ──────
-// Like Full Mock Exams (fixed rows tagged category='testseries' + test_set) but
-// the WHOLE series is paid-bundle-only (premium OR Vettri) and each paper is
-// date-gated: locked until its scheduled_date (IST), with a superadmin open/closed
-// override. Attempt-capped.
+// ─── Test Series (scheduled, fixed papers) ───────────────────────────────────
+// Like Full Mock Exams (fixed rows tagged by category + test_set) but the WHOLE
+// series is paid-bundle-only and each paper is date-gated: locked until its
+// scheduled_date (IST), with a superadmin open/closed override. Attempt-capped.
+// The catalog (`test_series` table) holds more than one product, discriminated
+// by its `series` column (see lib/testSeriesCatalog.ts): 'g1_marathon' (Test
+// Marathon 2026, category='testseries') and 'g2a_rankbooster' (Group II/IIA
+// Rank Booster, category='testseries_g2'). Every route below takes an optional
+// `series` param and defaults to 'g1_marathon' when absent, so already-shipped
+// clients (static Android bundles) keep working unchanged.
 
 interface TestSeriesRow {
   id: string
@@ -1101,34 +1155,40 @@ async function testSeriesAttemptCounts(req: AuthedRequest): Promise<Record<strin
 }
 
 // ─── GET /api/questions/test-series ──────────────────────────────────────────
-// The enabled tests, annotated with lock state (paid-bundle OR date), the date
-// they unlock, and attempts used. Access is derived from the payment ledger — any
-// paid bundle (premium OR Vettri) unlocks the whole series. Staff preview all.
+// The enabled tests for one series, annotated with lock state (paid-bundle OR
+// date), the date they unlock, and attempts used. Access is derived from the
+// payment ledger via whichever entitlement field this series' config names.
+// Staff preview all.
 router.get(
   '/test-series',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const { data, error } = await req.db!
-      .from('test_series')
-      .select(
-        'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
-      )
-      .eq('enabled', true)
-      .order('sort_order')
+    const series = resolveSeries(req.query.series)
+    if (!series) return res.status(400).json({ error: 'unknown series' })
+    const config = TEST_SERIES_CONFIG[series]
+
+    // Independent reads fired together instead of sequentially — the test list,
+    // staff status, bundle entitlement, and this user's attempt counts were four
+    // separate round trips one after another.
+    const [{ data, error }, staff, entitlement, counts] = await Promise.all([
+      req.db!
+        .from('test_series')
+        .select(
+          'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
+        )
+        .eq('series', series)
+        .eq('enabled', true)
+        .order('sort_order'),
+      isStaff(req),
+      bundleAccess(req.db!).catch(() => null), // fail closed
+      testSeriesAttemptCounts(req),
+    ])
     if (error) return sendDbError(res, error)
 
-    const staff = await isStaff(req)
-    // The whole series unlocks for ANY paid bundle — premium (₹1,699) OR Vettri
-    // (₹899) — plus staff. bundleAccess().unlimited = premium || vettri.
-    let unlocked = staff
-    if (!unlocked) {
-      try {
-        unlocked = (await bundleAccess(req.db!)).unlimited
-      } catch {
-        unlocked = false // fail closed
-      }
-    }
-    const counts = await testSeriesAttemptCounts(req)
+    // The whole series unlocks for whichever entitlement its config names
+    // (premium||vettri for the Marathon, premium||rankBooster for Rank
+    // Booster) — plus staff.
+    const unlocked = staff || Boolean(entitlement && entitlement[config.entitlementField])
 
     const tests = ((data ?? []) as TestSeriesRow[]).map((r) => {
       // A 'free' paper (the try-before-you-enroll trial) skips the bundle gate;
@@ -1166,19 +1226,23 @@ router.get(
 
 // ─── POST /api/questions/test-series ─────────────────────────────────────────
 // Returns the fixed question set for one test, shuffled. Re-checks every gate
-// server-side (enabled, paid-bundle, date/override, attempt cap). Answer columns
-// never appear (column grants + QUIZ_COLS). Staff bypass bundle+date+attempts.
+// server-side (series, enabled, paid-bundle, date/override, attempt cap). Answer
+// columns never appear (column grants + QUIZ_COLS). Staff bypass bundle+date+attempts.
 router.post(
   '/test-series',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
     const testId = String((req.body ?? {}).test_id ?? '')
     if (!testId) return res.status(400).json({ error: 'test_id is required' })
+    const series = resolveSeries((req.body ?? {}).series)
+    if (!series) return res.status(400).json({ error: 'unknown series' })
+    const config = TEST_SERIES_CONFIG[series]
 
     const { data: test, error: tErr } = await req.db!
       .from('test_series')
       .select('id, test_set, enabled, scheduled_date, open_override, tier')
       .eq('id', testId)
+      .eq('series', series)
       .maybeSingle()
     if (tErr) return sendDbError(res, tErr)
     if (!test || !(test as TestSeriesRow).enabled) {
@@ -1188,12 +1252,12 @@ router.post(
     const staff = await isStaff(req)
 
     if (!staff) {
-      // Any paid bundle (premium OR Vettri) unlocks the series; a 'free'-tier
-      // paper (the trial) needs no bundle. Date gate + attempt cap still apply.
+      // This series' entitlement unlocks it; a 'free'-tier paper (the trial)
+      // needs no bundle. Date gate + attempt cap still apply.
       if ((test as TestSeriesRow).tier !== 'free') {
         let unlocked = false
         try {
-          unlocked = (await bundleAccess(req.db!)).unlimited
+          unlocked = Boolean((await bundleAccess(req.db!))[config.entitlementField])
         } catch {
           unlocked = false
         }
@@ -1213,7 +1277,7 @@ router.post(
     const { data, error } = await req.db!
       .from('questions')
       .select(QUIZ_COLS)
-      .eq('category', 'testseries')
+      .eq('category', config.category)
       .eq('test_set', (test as TestSeriesRow).test_set)
     if (error) return sendDbError(res, error)
     res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
@@ -1236,89 +1300,139 @@ function deriveQType(questionType: string | null, subject: string | null, stem: 
   return 'factual'
 }
 
+type TestSeriesCatalogRow = {
+  id: string
+  title: string
+  title_ta: string | null
+  unit_label: string | null
+  unit_label_ta: string | null
+}
+
+/**
+ * Shared analytics body: attempt history + per-answer weak-area breakdown for
+ * whichever catalog rows the caller hands it — one series' rows (the per-series
+ * tab) or every series' rows (the "overall" tab). All rows are the user's own
+ * (RLS on attempts/sessions/answers). Answer stems are read server-side only to
+ * derive the type label — never sent to the client.
+ */
+async function testSeriesAnalyticsFor(req: AuthedRequest, catalog: TestSeriesCatalogRow[]) {
+  const testIds = catalog.map((c) => c.id)
+  if (testIds.length === 0) return { attempts: [], answers: [] }
+
+  // 1. The attempt ledger (score/total live here), newest first.
+  const { data: attemptRows, error: aErr } = await req.db!
+    .from('test_series_attempts')
+    .select('id, test_id, session_id, score, total, submitted_at')
+    .in('test_id', testIds)
+    .order('submitted_at', { ascending: false })
+  if (aErr) throw aErr
+  const attempts = (attemptRows ?? []) as {
+    id: string; test_id: string; session_id: string | null
+    score: number | null; total: number | null; submitted_at: string | null
+  }[]
+  if (attempts.length === 0) return { attempts: [], answers: [] }
+
+  // 2. Session stats (attempted/correct/time) for those attempts.
+  const sessionIds = attempts.map((a) => a.session_id).filter(Boolean) as string[]
+  const sessionsRes = sessionIds.length
+    ? await req.db!
+        .from('test_sessions')
+        .select('id, total_questions, attempted, correct, time_taken_seconds')
+        .in('id', sessionIds)
+    : { data: [] as unknown[] }
+  const titleById = new Map(catalog.map((c) => [c.id, c as Record<string, unknown>]))
+  const sessById = new Map(
+    ((sessionsRes.data ?? []) as { id: string }[]).map((s) => [s.id, s as Record<string, unknown>])
+  )
+
+  const outAttempts = attempts.map((a) => {
+    const cat = titleById.get(a.test_id)
+    const sess = a.session_id ? sessById.get(a.session_id) : undefined
+    return {
+      id: a.id,
+      test_id: a.test_id,
+      title: (cat?.title as string) ?? a.test_id,
+      title_ta: (cat?.title_ta as string) ?? null,
+      unit_label: (cat?.unit_label as string) ?? null,
+      unit_label_ta: (cat?.unit_label_ta as string) ?? null,
+      score: a.score == null ? 0 : Number(a.score),
+      total: a.total ?? (sess?.total_questions as number) ?? 0,
+      correct: (sess?.correct as number) ?? null,
+      attempted: (sess?.attempted as number) ?? null,
+      time_taken_seconds: (sess?.time_taken_seconds as number) ?? null,
+      submitted_at: a.submitted_at,
+    }
+  })
+
+  // 3. Per-answer subject/topic/type across every attempt session.
+  let answers: { is_correct: boolean | null; subject: string | null; topic: string | null; qtype: string }[] = []
+  if (sessionIds.length) {
+    const { data: ans, error: ansErr } = await req.db!
+      .from('test_answers')
+      .select('is_correct, question:questions(subject, topic, question_type, question_text)')
+      .in('session_id', sessionIds)
+    if (ansErr) throw ansErr
+    type Row = {
+      is_correct: boolean | null
+      question: { subject: string | null; topic: string | null; question_type: string | null; question_text: string | null } | null
+    }
+    // supabase-js types the to-one `question` join as an array; at runtime it's
+    // a single row (FK question_id → questions.id), so cast through unknown.
+    answers = ((ans ?? []) as unknown as Row[])
+      .filter((r) => r.question)
+      .map((r) => ({
+        is_correct: r.is_correct,
+        subject: r.question!.subject,
+        topic: r.question!.topic,
+        qtype: deriveQType(r.question!.question_type, r.question!.subject, r.question!.question_text),
+      }))
+  }
+
+  return { attempts: outAttempts, answers }
+}
+
 // ─── GET /api/questions/test-series/analytics ────────────────────────────────
-// This user's Test Marathon attempt history + a per-answer breakdown (subject,
-// topic, derived question-type) so the client can aggregate weak areas. All rows
-// are the user's own (RLS on attempts/sessions/answers). Answer stems are read
-// server-side only to derive the type label — never sent to the client.
+// This user's attempt history for ONE series (the per-series tab).
 router.get(
   '/test-series/analytics',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    // 1. The attempt ledger (score/total live here), newest first.
-    const { data: attemptRows, error: aErr } = await req.db!
-      .from('test_series_attempts')
-      .select('id, test_id, session_id, score, total, submitted_at')
-      .order('submitted_at', { ascending: false })
-    if (aErr) return sendDbError(res, aErr)
-    const attempts = (attemptRows ?? []) as {
-      id: string; test_id: string; session_id: string | null
-      score: number | null; total: number | null; submitted_at: string | null
-    }[]
-    if (attempts.length === 0) return res.json({ attempts: [], answers: [] })
+    const series = resolveSeries(req.query.series)
+    if (!series) return res.status(400).json({ error: 'unknown series' })
 
-    // 2. Paper titles (small catalog) and 3. session stats (attempted/correct/time).
-    const sessionIds = attempts.map((a) => a.session_id).filter(Boolean) as string[]
-    const [{ data: catalog }, sessionsRes] = await Promise.all([
-      req.db!.from('test_series').select('id, title, title_ta, unit_label, unit_label_ta'),
-      sessionIds.length
-        ? req.db!
-            .from('test_sessions')
-            .select('id, total_questions, attempted, correct, time_taken_seconds')
-            .in('id', sessionIds)
-        : Promise.resolve({ data: [] as unknown[] }),
-    ])
-    const titleById = new Map(
-      ((catalog ?? []) as { id: string }[]).map((c) => [c.id, c as Record<string, unknown>])
-    )
-    const sessById = new Map(
-      ((sessionsRes.data ?? []) as { id: string }[]).map((s) => [s.id, s as Record<string, unknown>])
-    )
+    // Scope to this series' catalog ids so a second series' history never
+    // bleeds into another's analytics tab.
+    const { data: catalog, error: cErr } = await req.db!
+      .from('test_series')
+      .select('id, title, title_ta, unit_label, unit_label_ta')
+      .eq('series', series)
+    if (cErr) return sendDbError(res, cErr)
 
-    const outAttempts = attempts.map((a) => {
-      const cat = titleById.get(a.test_id)
-      const sess = a.session_id ? sessById.get(a.session_id) : undefined
-      return {
-        id: a.id,
-        test_id: a.test_id,
-        title: (cat?.title as string) ?? a.test_id,
-        title_ta: (cat?.title_ta as string) ?? null,
-        unit_label: (cat?.unit_label as string) ?? null,
-        unit_label_ta: (cat?.unit_label_ta as string) ?? null,
-        score: a.score == null ? 0 : Number(a.score),
-        total: a.total ?? (sess?.total_questions as number) ?? 0,
-        correct: (sess?.correct as number) ?? null,
-        attempted: (sess?.attempted as number) ?? null,
-        time_taken_seconds: (sess?.time_taken_seconds as number) ?? null,
-        submitted_at: a.submitted_at,
-      }
-    })
-
-    // 4. Per-answer subject/topic/type across every attempt session.
-    let answers: { is_correct: boolean | null; subject: string | null; topic: string | null; qtype: string }[] = []
-    if (sessionIds.length) {
-      const { data: ans, error: ansErr } = await req.db!
-        .from('test_answers')
-        .select('is_correct, question:questions(subject, topic, question_type, question_text)')
-        .in('session_id', sessionIds)
-      if (ansErr) return sendDbError(res, ansErr)
-      type Row = {
-        is_correct: boolean | null
-        question: { subject: string | null; topic: string | null; question_type: string | null; question_text: string | null } | null
-      }
-      // supabase-js types the to-one `question` join as an array; at runtime it's
-      // a single row (FK question_id → questions.id), so cast through unknown.
-      answers = ((ans ?? []) as unknown as Row[])
-        .filter((r) => r.question)
-        .map((r) => ({
-          is_correct: r.is_correct,
-          subject: r.question!.subject,
-          topic: r.question!.topic,
-          qtype: deriveQType(r.question!.question_type, r.question!.subject, r.question!.question_text),
-        }))
+    try {
+      res.json(await testSeriesAnalyticsFor(req, (catalog ?? []) as TestSeriesCatalogRow[]))
+    } catch (err) {
+      sendDbError(res, err as { message?: string; code?: string })
     }
+  })
+)
 
-    res.json({ attempts: outAttempts, answers })
+// ─── GET /api/questions/test-series/analytics/overall ────────────────────────
+// Combined attempt history across EVERY scheduled test series (Vettri Nichayam
+// + Rank Booster + any future series) — the hub's "Overall Analytics" tab.
+router.get(
+  '/test-series/analytics/overall',
+  requireAuth,
+  asyncH(async (req: AuthedRequest, res) => {
+    const { data: catalog, error: cErr } = await req.db!
+      .from('test_series')
+      .select('id, title, title_ta, unit_label, unit_label_ta')
+    if (cErr) return sendDbError(res, cErr)
+
+    try {
+      res.json(await testSeriesAnalyticsFor(req, (catalog ?? []) as TestSeriesCatalogRow[]))
+    } catch (err) {
+      sendDbError(res, err as { message?: string; code?: string })
+    }
   })
 )
 

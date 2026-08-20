@@ -17,7 +17,12 @@
 // The server mirrors this table in server/src/iapCatalog.ts — change both.
 
 /** Internal plan ids, matching `notes.plan` on the payments ledger. */
-export type PlanId = 'premium_annual' | 'vettri_nichayam' | 'vettri_month'
+export type PlanId =
+  | 'premium_annual'
+  | 'vettri_nichayam'
+  | 'vettri_month'
+  | 'rank_booster_g2'
+  | 'group1_mock_pack'
 
 export interface CatalogEntry {
   plan: PlanId
@@ -34,7 +39,7 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
     plan: 'premium_annual',
     productId: 'com.tnpscmentor.app.premium90',
     webPricePaise: 169900,
-    label: 'TNPSC Mentors Premium - 3 months',
+    label: 'TNPSC Mentors Premium - 6 months',
   },
   {
     plan: 'vettri_nichayam',
@@ -47,6 +52,18 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
     productId: 'com.tnpscmentor.app.vettri30',
     webPricePaise: 49900,
     label: 'Vettri Nichayam - 1 month',
+  },
+  {
+    plan: 'rank_booster_g2',
+    productId: 'com.tnpscmentor.app.rankbooster90',
+    webPricePaise: 124900,
+    label: 'Group II/ IIA- Rank Booster - 90 days',
+  },
+  {
+    plan: 'group1_mock_pack',
+    productId: 'com.tnpscmentor.app.mockpack80',
+    webPricePaise: 39900,
+    label: 'Group 1 Mock Test Pack - 80 days',
   },
 ] as const
 

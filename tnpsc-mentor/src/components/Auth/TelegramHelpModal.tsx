@@ -35,7 +35,7 @@ function MockChat({ children }: { children: ReactNode }) {
 /** A bot chat bubble inside a mock screen. */
 function MockBubble({ children }: { children: ReactNode }) {
   return (
-    <div className="max-w-[90%] self-start rounded-card rounded-bl-sm border border-line bg-card px-3 py-2 font-body text-[11px] leading-snug text-ink">
+    <div className="max-w-[90%] self-start rounded-card rounded-bl-sm border border-line bg-card px-3 py-2 font-body text-2xs leading-snug text-ink">
       {children}
     </div>
   )

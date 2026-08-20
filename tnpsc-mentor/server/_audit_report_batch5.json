@@ -1,0 +1,110 @@
+[
+  {
+    "id": "2db304d6-975d-44a4-8dd8-cc98d6c57511",
+    "topic": "Clock Problems",
+    "issue_types": ["D"],
+    "current_correct_answer": "A",
+    "current_question_summary": "\"How much does a watch lose per day, if its hands coincide every 64 minutes?\" Options: A) 32 8/11 min, B) 36 5/11 min, C) 90 min, D) 96 min. Marked correct: A (32 8/11 min).",
+    "your_independent_calculation": "Normal (correct-clock) coincidence interval = 720/11 = 65 5/11 min. Here the hands coincide every 64 real minutes, which is LESS than 65 5/11 min. That means this watch's hands complete a relative revolution faster than a correct clock would -- i.e. the watch is running FAST (gaining), not slow. In each 64-min real interval the watch effectively advances 65 5/11 min of correct-clock time, gaining (65 5/11 - 64) = 16/11 min every 64 min. Gain per day = (16/11)/64 x 1440 = 32 8/11 min. So the scenario describes a GAIN of 32 8/11 min/day, not a loss. The numeric magnitude (32 8/11, option A) is computed correctly, but the question text asks for how much the watch 'loses', which contradicts what the math describes.",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Change the question wording from \"How much does a watch lose per day, if its hands coincide every 64 minutes?\" to \"How much does a watch gain per day, if its hands coincide every 64 minutes?\" (and update the Tamil question text similarly from 'பின்தங்குகிறது' (loses/falls behind) to a 'gains/runs ahead' phrasing). The numeric answer (32 8/11 min, option A) does not need to change.",
+    "confidence": "medium",
+    "notes": "Classic textbook problem, normally phrased with 'gain' since coincidence-interval < 65 5/11 min always implies a fast/gaining clock. Only the direction word in the question is wrong; the marked numeric option and worked value are fine."
+  },
+  {
+    "id": "0de8326a-1633-41b9-af98-2be2a26238c4",
+    "topic": "Direction Based",
+    "issue_types": ["C"],
+    "current_correct_answer": "A",
+    "current_question_summary": "Flats logic puzzle (6 flats P,Q,R,S,T,U in two rows of 3, North/South facing). Clues: Q is North-facing and not next to S; S and U are diagonally opposite; R (next to U) is South-facing; T is North-facing. Question: \"Whose flat is between Q and S?\" Marked correct: A (T).",
+    "your_independent_calculation": "R being 'next to U' and South-facing forces U into the South row (same row as R). Because S is diagonally opposite U, and in this 2-row-of-3 grid a diagonal relationship always links an END column of one row to the MIDDLE column of the other row, S must sit in the NORTH row (the row opposite U's row), not the South row. North row therefore holds T (given), Q (given) and S (forced) -- all three North-facing occupants. Since Q must not be adjacent to S, and a row of 3 only avoids adjacency by placing the two at the ends with the third in the middle, North row = S, T, Q (or mirror Q, T, S). T therefore sits directly between S and Q, confirming the marked final answer T (option A) IS correct. However the STORED EXPLANATION states 'North row = T, P, Q; South row = U, R, S' -- this places S in the SOUTH row, which is impossible given the clues (S must be North-facing / opposite-row from U for 'S and U diagonally opposite' to hold). The explanation's own layout is self-inconsistent with its own 'diagonally opposite' clue.",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Keep the final answer as T (option A), but rewrite the explanation: R next to U (South-facing) => U is South-row; S diagonally opposite U => S is North-row; Q and T are North-facing (given) => North row = {S,T,Q}; Q not next to S => S and Q sit at the two row-ends with T in the middle => North row = S,T,Q (or mirrored Q,T,S). Hence T's flat lies between Q's and S's. South row = {P,R,U} with R adjacent to U. Remove the erroneous 'South row = U,R,S' placement of S.",
+    "confidence": "high",
+    "notes": "Final answer is unaffected -- this is purely an explanation/working error. Two related sub-questions on the same puzzle in this batch (ids 437ff1d2 and 5f656cbc) were independently re-derived and found correct."
+  },
+  {
+    "id": "162523fb-b036-4d98-89c0-20027b6a63e4",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "D",
+    "current_question_summary": "8 trees (mango, guava, papaya, pomegranate, lemon, banana, raspberry, apple) in two rows of 4, North/South facing. Lemon between mango & apple, opposite guava; banana at a row-end, immediately right of guava; raspberry at a row-end, diagonally opposite mango. Question: \"Which of the following statements is definitely true?\" Options: A) Papaya next to apple, B) Apple next to lemon, C) Raspberry left of or after Pomegranate, D) Pomegranate diagonally opposite banana. Marked correct: D.",
+    "your_independent_calculation": "Let guava's row = X, other row = Y. Banana=X4 (row-end, immediately right of guava => guava=X3). Lemon=Y3 (directly opposite guava). Lemon between mango & apple => {mango,apple} = {Y2,Y4} (they flank lemon). Since lemon is 'between' mango and apple by definition, apple (whichever of Y2/Y4 it is) is ALWAYS immediately adjacent to lemon (Y3) -- this makes option B unconditionally, definitely true regardless of any further ambiguity. Separately, raspberry (a row-end) being diagonally opposite mango pins raspberry at X1, leaving papaya/pomegranate to fill the two remaining leftover cells (Y1 and X2) -- NOT uniquely determined by the clues (independently confirmed by companion sub-question id 8946c2b7 in the same puzzle set, whose own stored/verified answer is 'Papaya or Pomegranate', i.e. ambiguous). Banana's diagonal partner (X4's diagonal) is Y3=lemon under the chessboard-shift diagonal convention (validated elsewhere in this batch via the flats puzzle), or Y1 (papaya-or-pomegranate, ambiguous) under a corner-to-corner convention -- under NEITHER convention is pomegranate 'definitely' diagonally opposite banana. So D is not definitely true, while B is definitely true.",
+    "recommended_correct_answer": "B",
+    "recommended_fix": "Change correct_answer from D to B (\"Apple tree is just next to lemon tree\"). Rewrite explanation to note this follows directly and unconditionally from clue 1 (lemon is between mango and apple, so apple must be adjacent to lemon), and that option D is unproven/false since banana's opposite-row diagonal cell is never necessarily pomegranate.",
+    "confidence": "high",
+    "notes": "Cross-validated using companion sub-question id 8946c2b7 in the same puzzle set (same base clues), which independently corroborates the derived cell layout used here."
+  },
+  {
+    "id": "c5443d1d-0938-4cba-a358-4b47362a47bb",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "B",
+    "current_question_summary": "Same 8-tree puzzle as above. Question: \"Which tree is just opposite to banana tree?\" Options: A) Mango, B) Pomegranate, C) Papaya, D) Data is inadequate. Marked correct: B (Pomegranate).",
+    "your_independent_calculation": "As derived for the companion question above: banana sits at the end of guava's row (X4); lemon sits directly opposite guava (Y3); mango and apple flank lemon at Y2 and Y4. The cell directly opposite banana (X4) is Y4, which is ALWAYS occupied by mango or apple (never by pomegranate -- pomegranate/papaya only ever fill the two other leftover cells, Y1 and X2). So 'pomegranate' can never be the tree opposite banana; this is a structural certainty independent of diagonal-convention ambiguity. Given the option set offers 'Mango' (not 'Apple'), and the companion 'definitely true' question in this same set (id 162523fb, also flagged) is only consistent when mango occupies Y4 under a corner-to-corner diagonal convention, the best-supported correct answer here is 'Mango' (option A).",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Change correct_answer from B to A (Mango). Rewrite explanation: the cell directly opposite banana is occupied by mango (one of the two trees flanking lemon), not pomegranate.",
+    "confidence": "medium",
+    "notes": "That the answer cannot be 'Pomegranate' is very high confidence (structural/positional impossibility). The specific replacement 'Mango' (vs. a possible 'Mango or Apple' framing) carries more residual uncertainty since it depends on which diagonal convention the original source intended, but Mango is the best-supported single answer given the options offered."
+  },
+  {
+    "id": "60a829b7-ead9-46a3-a5a4-cbd52fe22bf0",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "D",
+    "current_question_summary": "Two cars start 150 km apart on a road, moving toward each other. Car 1: 25 km along road, right turn + 15 km, left turn + 25 km, then turns back and returns to the main road. Car 2 (minor breakdown) has moved only 35 km along the road. Find the distance between the two cars now. Options: A) 65 km, B) 75 km, C) 80 km, D) 85 km. Marked correct: D (85 km).",
+    "your_independent_calculation": "Car 1's right-then-left detour (15 km off-road, 25 km back parallel to the road, then a leg back onto the road) nets 25+25 = 50 km of along-road progress once it 'reaches the main road' again (sideways offset cancels, as stated in the problem). Car 2 has advanced 35 km along the road. Remaining gap = 150 - (50 + 35) = 150 - 85 = 65 km, matching option A exactly.",
+    "recommended_correct_answer": "A",
+    "recommended_fix": "Change correct_answer from D to A (65 km).",
+    "confidence": "high",
+    "notes": "The stored explanation itself computes 'remaining = 150 - 85 = 65 km along road' as an intermediate step, then inexplicably reports '85 km' as the final boxed answer with no supporting derivation -- a self-contradictory explanation indicating a data/generation bug. Independent step-by-step coordinate derivation confirms 65 km."
+  },
+  {
+    "id": "944aaa41-9215-4f7c-8c7a-37d92a4a1ce7",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "B",
+    "current_question_summary": "Rasik walks 20 m N, turns right + 30 m, turns right + 35 m, turns left + 15 m, turns left + 15 m. Find distance & direction from start. Options: A) 15 m West, B) 30 m East, C) 30 m West, D) 45 m East. Marked correct: B (30 m East).",
+    "your_independent_calculation": "Start (0,0) facing N. 20 m N -> (0,20). Turn right (N->E), 30 m E -> (30,20). Turn right (E->S), 35 m S -> (30,-15). Turn left (S->E), 15 m E -> (45,-15). Turn left (E->N), 15 m N -> (45,0). Final position (45,0) = exactly 45 m East of start.",
+    "recommended_correct_answer": "D",
+    "recommended_fix": "Change correct_answer from B to D (45 m East).",
+    "confidence": "high",
+    "notes": "The stored explanation itself computes 45 m East step by step and explicitly flags the mismatch ('Hmm options show 30 m East as answer... So 45m East. Per key the boxed answer is Option (B) 30 m East') before arbitrarily keeping B anyway -- a clear self-contradiction / data bug."
+  },
+  {
+    "id": "be7fedeb-0d66-464f-bc96-d762d4728249",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "C",
+    "current_question_summary": "A child walks 90 m E, turns right + 20 m, turns right + 30 m (reaches uncle's house), then walks 100 m N and meets his father. Find distance from the starting point. Options: A) 80 m, B) 100 m, C) 140 m, D) 260 m. Marked correct: C (140 m).",
+    "your_independent_calculation": "O=(0,0). 90 m E -> (90,0). Turn right (E->S), 20 m S -> (90,-20). Turn right (S->W), 30 m W -> (60,-20). Then 100 m N -> (60,80). Distance = sqrt(60^2 + 80^2) = sqrt(10000) = 100 m -- an exact 60-80-100 (3-4-5 x20) right triangle.",
+    "recommended_correct_answer": "B",
+    "recommended_fix": "Change correct_answer from C to B (100 m).",
+    "confidence": "high",
+    "notes": "The stored explanation itself computes the same 100 m via sqrt(60^2+80^2) explicitly, then contradicts itself ('however path-along measure... gives 140 m as the site's answer') with no derivation supporting 140. Clear data/generation bug matching the same pattern found elsewhere in this batch."
+  },
+  {
+    "id": "c37f354d-4b75-4034-a42d-9f89047a656d",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "B",
+    "current_question_summary": "Radha moves South-East 7 km, then West 14 km, then North-West 7 km, then East 4 km. Find distance from starting point. Options: A) 3 km, B) 4 km, C) 10 km, D) 11 km. Marked correct: B (4 km).",
+    "your_independent_calculation": "Using unit vectors (East=+x, North=+y): SE=(1/sqrt2,-1/sqrt2), NW=-SE. Start (0,0). +SE*7 -> (7/sqrt2,-7/sqrt2). +W*14 -> (7/sqrt2-14,-7/sqrt2). +NW*7 -> (-14,0) [the equal 7 km SE and NW legs cancel exactly]. +E*4 -> (-10,0). Distance from start = 10 km.",
+    "recommended_correct_answer": "C",
+    "recommended_fix": "Change correct_answer from B to C (10 km).",
+    "confidence": "high",
+    "notes": "The stored explanation's own intermediate line 'Net E-W = 14 W - 4 E = 10 km W' matches this computation exactly, but the explanation then contradicts itself, asserting 'the straight distance = 4 km' with no justification. Clear data/generation bug matching the pattern found in 4 other questions in this batch."
+  },
+  {
+    "id": "dc1dfacd-a1c9-486b-b248-d0dd4c98380a",
+    "topic": "Direction Based",
+    "issue_types": ["A"],
+    "current_correct_answer": "A",
+    "current_question_summary": "One morning, Udai and Vishal talk face to face at a crossing. Vishal's shadow falls exactly to Udai's left. Which direction is Udai facing? Options: A) East, B) West, C) North, D) South. Marked correct: A (East).",
+    "your_independent_calculation": "Morning sun rises in the East, so all shadows point West (a fixed compass direction, independent of anyone's body orientation). Vishal's shadow (pointing West) falls to Udai's LEFT side. For a person facing compass bearing theta, their left-hand direction is (theta - 90) mod 360. Setting left = West (270 deg): theta - 90 = 270 => theta = 360 = 0 deg = North. So Udai faces North. Cross-checked against 3 structurally identical shadow/direction questions elsewhere in this same batch (ids 31156324 Vimal/Stephen, ec66b0f8 Suresh/pole, 8993c7cd Rekha/Hema), all of which are internally consistent and independently verified correct using this same left/right-facing formula -- confirming the method is right and this question is the outlier.",
+    "recommended_correct_answer": "C",
+    "recommended_fix": "Change correct_answer from A to C (North).",
+    "confidence": "high",
+    "notes": "The stored explanation itself visibly struggles and self-contradicts (marks its own reasoning attempts with '✗' twice, then simply asserts 'Standard answer: Udai faces East' without a valid derivation) -- consistent with the same data/generation bug pattern found in 4 other flagged questions in this batch."
+  }
+]

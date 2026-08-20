@@ -73,6 +73,11 @@ android/local.properties
 android/app/release/
 android/app/google-services.json
 
+# Firebase Admin SDK service account key — never commit. Its content is copied
+# into server/.env (FIREBASE_SERVICE_ACCOUNT_JSON) instead; this covers the raw
+# download in case it's ever dropped into the repo tree.
+*firebase-adminsdk*.json
+
 # iOS build output + dependency checkouts
 ios/App/build/
 ios/App/Pods/

@@ -79,7 +79,7 @@ export default function RevisionPage() {
         </button>
 
         <header className="mb-7 mt-4">
-          <h1 className="tamil font-display text-[22px] font-bold tracking-tight text-ink">
+          <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
             {t('topicRevisionTitle')}
           </h1>
         </header>

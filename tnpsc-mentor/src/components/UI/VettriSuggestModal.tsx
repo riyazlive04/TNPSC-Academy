@@ -81,31 +81,31 @@ export default function VettriSuggestModal({
         {/* Price comparison - Vettri leads with its gold identity. */}
         <div className="mt-4 grid grid-cols-2 gap-2">
           <div className="rounded-tile border border-gold/40 bg-goldsoft/50 p-3 text-center">
-            <p className="tamil font-heading text-[10px] font-bold uppercase tracking-wide text-gold">
+            <p className="tamil font-heading text-2xs font-bold uppercase tracking-wide text-gold">
               {t('vettriBadge')}
             </p>
             <p className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
               ₹{VETTRI_PRICE_RUPEES}
             </p>
-            <p className="tamil font-body text-[11px] text-ink2">
+            <p className="tamil font-body text-2xs text-ink2">
               {t('vettriSuggestMonths')} · {t('vettriPlanMonth')} ₹{VETTRI_MONTH_RUPEES}
             </p>
           </div>
           <div className="rounded-tile border border-line bg-tint/40 p-3 text-center">
-            <p className="tamil font-heading text-[10px] font-bold uppercase tracking-wide text-ink2">
+            <p className="tamil font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
               {t('premiumBadge')}
             </p>
             <p className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
               ₹{premiumRupees}
             </p>
-            <p className="tamil font-body text-[11px] text-ink2">
+            <p className="tamil font-body text-2xs text-ink2">
               {t('vettriSuggestPremiumMonths')}
             </p>
           </div>
         </div>
         {savings > 0 && (
           <p className="mt-2.5 text-center">
-            <span className="tamil inline-flex items-center rounded-full bg-gold px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-wide text-white">
+            <span className="tamil inline-flex items-center rounded-full bg-gold px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-white">
               {t('premiumYouSave')} ₹{savings}
             </span>
           </p>
