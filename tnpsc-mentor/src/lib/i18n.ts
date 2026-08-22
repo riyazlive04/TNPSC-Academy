@@ -152,15 +152,15 @@ const STRINGS = {
     en: 'Not now - show me around first',
     ta: 'இப்போது வேண்டாம் - முதலில் செயலியை சுற்றிக் காட்டுங்கள்',
   },
-  // New-signup promo alert (MarathonFreeAlert): Test Marathon Test 1 is free.
+  // New-signup promo alert (MarathonFreeAlert): Test Series Test 1 is free.
   marathonFreeBadge: { en: 'Free', ta: 'இலவசம்' },
   marathonFreeTitle: {
-    en: 'Test Marathon: Test 1 is FREE!',
-    ta: 'தேர்வு மராத்தான்: தேர்வு 1 இலவசம்!',
+    en: 'Test Series: Test 1 is FREE!',
+    ta: 'தேர்வுத் தொடர்: தேர்வு 1 இலவசம்!',
   },
   marathonFreeBody: {
-    en: 'In the 13-test Group 1 Test Marathon, the first test (100 questions, Units I & II) is completely free for every aspirant. Try it before you enroll!',
-    ta: '13-தேர்வு குரூப் 1 தேர்வு மராத்தானில், முதல் தேர்வு (100 வினாக்கள், அலகு I & II) அனைவருக்கும் முற்றிலும் இலவசம். சேருவதற்கு முன் முயற்சித்துப் பாருங்கள்!',
+    en: 'In the 13-test Group 1 Test Series, the first test (100 questions, Units I & II) is completely free for every aspirant. Try it before you enroll!',
+    ta: '13-தேர்வு குரூப் 1 தேர்வுத் தொடரில், முதல் தேர்வு (100 வினாக்கள், அலகு I & II) அனைவருக்கும் முற்றிலும் இலவசம். சேருவதற்கு முன் முயற்சித்துப் பாருங்கள்!',
   },
   marathonFreeCta: {
     en: 'Take Test 1 free',
@@ -729,6 +729,13 @@ const STRINGS = {
   // Mock tests
   mockTest: { en: 'Mock Test', ta: 'மாதிரித் தேர்வு' },
   mockTests: { en: 'Mock Tests', ta: 'மாதிரித் தேர்வுகள்' },
+  // Dashboard hero tile only (TestArenaPage) - deliberately separate from
+  // mockTests, which is also read as a breadcrumb/back-button label on the
+  // mock quiz/instructions pages and shouldn't carry this longer marketing copy.
+  mockHeroTitle: {
+    en: 'Practice Group 1 Mock Test for Free',
+    ta: 'குரூப் 1 மாதிரித் தேர்வை இலவசமாகப் பயிற்சி செய்யுங்கள்',
+  },
   fullLength: { en: 'Full-length exam simulation', ta: 'முழு நீள தேர்வு உருவகப்படுத்துதல்' },
   negMarking: { en: 'Negative marking', ta: 'எதிர்மறை மதிப்பெண்' },
   startMock: { en: 'Start Mock', ta: 'மாதிரித் தேர்வைத் தொடங்கு' },
@@ -743,11 +750,22 @@ const STRINGS = {
   },
   mockExamsEmpty: { en: 'No mock exams are available yet.', ta: 'இன்னும் மாதிரித் தேர்வுகள் எதுவும் இல்லை.' },
 
-  // Test Marathon - the scheduled-series hub. Tile + page title stay "Test
-  // Marathon"; it now fans out into per-product tabs (Vettri Nichayam / Rank
+  // Test Series - the scheduled-series hub (nav tab, Practice-section card,
+  // page header). Fans out into per-product tabs (Vettri Nichayam / Rank
   // Booster / Overall) via TestSeriesPage's HubTab switcher.
-  testSeries: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
-  testSeriesTitle: { en: 'Test Marathon', ta: 'தேர்வு மாரத்தான்' },
+  testSeries: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  testSeriesTitle: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  // Neutral hub title for tabs that aren't the Group 1 series itself (Rank
+  // Booster / Overall) — kept as its own key since testSeriesTitle is also
+  // read as the offer-sheet title for the Group 1 (Vettri) tab specifically.
+  testSeriesHubTitle: { en: 'Test Series', ta: 'தேர்வுத் தொடர்' },
+  // Hub tab-pill labels ONLY (TestSeriesPage's tab capsule) — deliberately
+  // separate from vettriTitle/rankBoosterTab, which are also read by
+  // VettriCard, TestArenaPage tiles and the SuperAdmin series switcher; the
+  // pill wants a shorter, product-agnostic "Group N Test Series" label
+  // without touching those other surfaces.
+  testSeriesTabG1: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' },
+  testSeriesTabG2: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   testSeriesArenaSub: { en: 'Scheduled test series', ta: 'திட்டமிடப்பட்ட தேர்வுத் தொடர்கள்' },
   testSeriesSub: {
     en: 'A scheduled marathon of full-length papers. Each unlocks on its date and can be attempted twice.',
@@ -763,15 +781,15 @@ const STRINGS = {
     ta: 'இன்னும் எந்தத் தேர்வும் திட்டமிடப்படவில்லை.',
   },
   testSeriesLockedPremium: {
-    en: 'Unlock the full Test Marathon with Vettri Nichayam or Premium',
+    en: 'Unlock the full Test Series with Vettri Nichayam or Premium',
     ta: 'முழுத் தேர்வுத் தொடரை வெற்றி நிச்சயம் அல்லது பிரீமியம் மூலம் திறக்கலாம்',
   },
   unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
   scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
-  // Test Marathon promo strip — rendered as the VettriCard's header. The price
+  // Test Series promo strip — rendered as the VettriCard's header. The price
   // sits right below in the card, so it carries an "included" pill, not ₹899.
-  marathonBannerTitle: { en: 'Test Marathon 2026', ta: 'தேர்வு மாரத்தான் 2026' },
+  marathonBannerTitle: { en: 'Test Series 2026', ta: 'தேர்வுத் தொடர் 2026' },
   marathonBannerSub: {
     en: '13 Group 1 papers on a fixed schedule: 10 sectional + 3 full mocks',
     ta: 'திட்டமிட்ட அட்டவணையில் 13 குரூப் 1 தேர்வுத் தாள்கள்: 10 பிரிவு வாரியான + 3 முழு மாதிரி',
@@ -1299,10 +1317,10 @@ const STRINGS = {
     ta: 'நடப்பு நிகழ்வுகள்',
   },
   // Premium is a superset of Vettri Nichayam, so it includes the full Test
-  // Marathon series (all 13 scheduled papers) plus every future content update.
+  // Series (all 13 scheduled papers) plus every future content update.
   premiumPerk5: {
-    en: 'Test Marathon series (Vettri Nichayam) - all 13 papers',
-    ta: 'தேர்வு மாரத்தான் தொடர் (வெற்றி நிச்சயம்) - அனைத்து 13 தாள்களும்',
+    en: 'Test Series (Vettri Nichayam) - all 13 papers',
+    ta: 'தேர்வுத் தொடர் (வெற்றி நிச்சயம்) - அனைத்து 13 தாள்களும்',
   },
   premiumPerk6: {
     en: 'All future updates included for your plan duration',

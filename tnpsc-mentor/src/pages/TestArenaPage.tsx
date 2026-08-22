@@ -200,7 +200,13 @@ export default function TestArenaPage() {
     return () => {
       cancelled = true
     }
-  }, [user, isAdmin, profile?.daily_goal, profile?.exam_date, t])
+    // `t` is intentionally excluded: useT() returns a new function identity on
+    // every render, and it's only read inside the catch above. Including it
+    // re-runs this effect (and thus the fetch + its setState) after every
+    // render the fetch itself causes, which never settles - a live-locked
+    // refetch loop that pegs the tab.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isAdmin, profile?.daily_goal, profile?.exam_date])
 
   // Live bank sizes for the practice cards' subtitles (§ CARDS/withCount) -
   // purely decorative enrichment, so a failure here just leaves the structural
@@ -430,7 +436,7 @@ export default function TestArenaPage() {
         <div data-tour="mock">
           <Hero
             icon={featured.icon}
-            title={t(featured.titleKey)}
+            title={t('mockHeroTitle')}
             subtitle={featured.subtitle}
             cta={t('start')}
             onClick={() => navigate(featured.to)}

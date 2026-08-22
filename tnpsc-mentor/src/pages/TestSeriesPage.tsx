@@ -7,6 +7,12 @@ import RankBoosterCard, {
   RANK_BOOSTER_MRP_RUPEES,
   RANK_BOOSTER_PRICE_RUPEES,
 } from '../components/UI/RankBoosterCard'
+import {
+  useRankBoosterPurchase,
+  rupees,
+  RANK_BOOSTER_PERK_KEYS,
+  RANK_BOOSTER_BONUS_KEYS,
+} from '../hooks/useRankBoosterPurchase'
 import TestSeriesProductPanel from '../components/TestSeries/TestSeriesProductPanel'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { SkeletonAnalytics } from '../components/UI/Skeleton'
@@ -17,6 +23,7 @@ import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
+import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
 
 type HubTab = 'vettri' | 'rankbooster' | 'overall'
@@ -32,6 +39,11 @@ export default function TestSeriesPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { t } = useT()
+  // Staff always get `premium: true` back from the server (they can preview
+  // any exam's content without buying) — so without this, "preview as student"
+  // could never actually show an admin the paywall/buy-popup a real free
+  // learner would see on this page. See TestSeriesProductPanel's `previewLocked`.
+  const { previewAsStudent } = useAuth()
   const marathonOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
 
@@ -50,6 +62,7 @@ export default function TestSeriesPage() {
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
   const mockPackOwned = useEntitlementsStore((s) => s.mockPack)
   const mockPurchase = useMockPackPurchase()
+  const rbPurchase = useRankBoosterPurchase()
 
   const [overall, setOverall] = useState<TestSeriesAnalytics | null>(null)
   useEffect(() => {
@@ -60,8 +73,8 @@ export default function TestSeriesPage() {
   }, [tab, overall])
 
   const tabs: { key: HubTab; label: string }[] = [
-    ...(marathonOn ? [{ key: 'vettri' as const, label: t('vettriTitle') }] : []),
-    ...(rankBoosterOn ? [{ key: 'rankbooster' as const, label: t('rankBoosterTab') }] : []),
+    ...(marathonOn ? [{ key: 'vettri' as const, label: t('testSeriesTabG1') }] : []),
+    ...(rankBoosterOn ? [{ key: 'rankbooster' as const, label: t('testSeriesTabG2') }] : []),
     { key: 'overall' as const, label: t('tsOverallTab') },
   ]
 
@@ -94,7 +107,7 @@ export default function TestSeriesPage() {
 
       <header className="mb-6 mt-4">
         <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
-          {t('testSeriesTitle')}
+          {tab === 'vettri' ? t('testSeriesTitle') : t('testSeriesHubTitle')}
         </h1>
         <p className="tamil mt-1 font-body text-base text-muted">{t('testSeriesHubSub')}</p>
       </header>
@@ -129,8 +142,11 @@ export default function TestSeriesPage() {
           Vettri Nichayam regular actually notices the new series exists. */}
       {rankBoosterOn && tab !== 'rankbooster' && (
         <button
-          onClick={() => setTab('rankbooster')}
-          className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105"
+          onClick={() =>
+            rbPurchase.rankBoosterUnlocked ? setTab('rankbooster') : rbPurchase.startEnroll()
+          }
+          disabled={rbPurchase.paying}
+          className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
         >
           <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
             <Rocket size={20} />
@@ -143,10 +159,12 @@ export default function TestSeriesPage() {
               {t('rankBoosterBannerSub')}
             </span>
           </span>
-          <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-            <span className="font-body text-2xs text-white/70 line-through">₹{RANK_BOOSTER_MRP_RUPEES}</span>
-            <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
-          </span>
+          {!rbPurchase.rankBoosterUnlocked && (
+            <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+              <span className="font-body text-2xs text-white/70 line-through">₹{RANK_BOOSTER_MRP_RUPEES}</span>
+              <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
+            </span>
+          )}
         </button>
       )}
 
@@ -221,6 +239,7 @@ export default function TestSeriesPage() {
           offerTitleKey="testSeriesTitle"
           entitlementUnlocked={unlimited}
           onLockedTap={() => upsell.bundle()}
+          previewLocked={previewAsStudent}
           paywallCards={
             <>
               <VettriCard />
@@ -236,6 +255,7 @@ export default function TestSeriesPage() {
           offerTitleKey="rankBoosterPageTitle"
           entitlementUnlocked={rankBoosterUnlocked}
           onLockedTap={() => upsell.rankBooster()}
+          previewLocked={previewAsStudent}
           paywallCards={
             <>
               <RankBoosterCard />
@@ -260,6 +280,24 @@ export default function TestSeriesPage() {
         busy={mockPurchase.paying}
         onConfirm={mockPurchase.handleBuy}
         onCancel={() => mockPurchase.setConfirmOpen(false)}
+      />
+
+      {/* Pre-payment recap for the Rank Booster discovery banner above — same
+          confirm→Razorpay flow as RankBoosterCard's own CTA, so tapping the
+          banner buys the series directly instead of just switching tabs. */}
+      <PurchaseConfirmModal
+        open={rbPurchase.confirmOpen}
+        planName={t('rankBoosterTitle')}
+        validity={t('rankBoosterValidity')}
+        perks={[...RANK_BOOSTER_PERK_KEYS, ...RANK_BOOSTER_BONUS_KEYS].map((k) => t(k))}
+        priceLabel={rbPurchase.isFree ? t('premiumFree') : `₹${rupees(rbPurchase.finalPaise)}`}
+        strikePrice={rbPurchase.isFree ? undefined : `₹${RANK_BOOSTER_MRP_RUPEES}`}
+        note={t('rankBoosterOfferNote')}
+        isFree={rbPurchase.isFree}
+        accent="gold"
+        busy={rbPurchase.paying}
+        onConfirm={rbPurchase.handleBuy}
+        onCancel={() => rbPurchase.setConfirmOpen(false)}
       />
     </div>
   )

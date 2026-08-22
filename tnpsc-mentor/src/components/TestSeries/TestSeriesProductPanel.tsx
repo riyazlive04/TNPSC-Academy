@@ -24,6 +24,7 @@ export default function TestSeriesProductPanel({
   paywallCards,
   entitlementUnlocked,
   onLockedTap,
+  previewLocked = false,
 }: {
   series: 'g1_marathon' | 'g2a_rankbooster'
   offerTitleKey: StringKey
@@ -31,6 +32,12 @@ export default function TestSeriesProductPanel({
   /** Whichever entitlement flag unlocks THIS series (unlimited vs rankBoosterUnlocked). */
   entitlementUnlocked: boolean
   onLockedTap: () => void
+  /** Force the locked/paywall view even though the server reports this series
+   *  unlocked — staff always get `premium: true` from the API (they can preview
+   *  any exam's content), which otherwise makes "preview as student" unable to
+   *  ever show an admin what the paywall itself looks like. Client-side only,
+   *  matching how the rest of student-preview works (src/store/adminViewStore.ts). */
+  previewLocked?: boolean
 }) {
   const navigate = useNavigate()
   const { t, lang } = useT()
@@ -87,7 +94,7 @@ export default function TestSeriesProductPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entitlementUnlocked])
 
-  const seriesLocked = !premium
+  const seriesLocked = previewLocked || !premium
 
   useEffect(() => {
     if (loading || error || !seriesLocked || tests.length === 0) return
