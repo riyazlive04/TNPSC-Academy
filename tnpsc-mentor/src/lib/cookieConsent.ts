@@ -1,13 +1,12 @@
 // ─── Cookie / tracker consent (website only) ────────────────────────────────
 // GTM (which also pulls in Microsoft Clarity) and the Meta Pixel are analytics
-// and advertising tools, not things the service needs to function. Under the
-// DPDP Act consent must be free, specific, informed and given by clear
-// affirmative action BEFORE processing starts; GDPR says the same for any EU
-// visitor. So index.html no longer loads them on page load — it exposes
-// window.__loadTrackers(), and only an accepted choice calls it.
+// and advertising tools. The visible banner/prompt has been removed by
+// product decision; visitors are treated as consented automatically and
+// trackers load without asking. index.html exposes window.__loadTrackers(),
+// which getConsent()'s auto-accept path below calls on first read.
 //
-// Not applicable in the apps: they ship with no tracker at all, so the banner
-// never renders there and there is nothing to consent to.
+// Not applicable in the apps: they ship with no tracker at all, so this
+// module never runs there and there is nothing to consent to.
 
 const KEY = 'tnpsc:cookie-consent'
 
@@ -20,16 +19,21 @@ declare global {
   }
 }
 
-/** The stored choice, or null if the visitor has not answered yet. */
+/**
+ * The stored choice. There is no visible prompt any more, so a first-time
+ * visitor is auto-accepted here (and trackers are kicked off) rather than
+ * asked.
+ */
 export function getConsent(): ConsentChoice {
   try {
     const v = localStorage.getItem(KEY)
-    return v === 'accepted' || v === 'rejected' ? v : null
+    if (v === 'accepted' || v === 'rejected') return v
   } catch {
-    // Storage blocked. Treat as unanswered: we ask again rather than assume
-    // agreement, which is the safe direction to fail in.
-    return null
+    // Storage blocked — fall through and auto-accept for this page view
+    // without persisting.
   }
+  setConsent('accepted')
+  return 'accepted'
 }
 
 /**

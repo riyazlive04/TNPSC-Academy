@@ -21,7 +21,7 @@ import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
 import BackButtonGuard from './components/BackButtonGuard'
 import OfflineBanner from './components/OfflineBanner'
-import CookieBanner from './components/CookieBanner'
+import { getConsent } from './lib/cookieConsent'
 import PushPrimer from './components/Onboarding/PushPrimer'
 import Toaster from './components/UI/Toaster'
 import LogoLoader from './components/UI/LogoLoader'
@@ -172,6 +172,9 @@ export default function App() {
     void useAuthConfigStore.getState().init()
     // Block copy/cut/paste/long-press selection app-wide in the installed app.
     installCopyGuard()
+    // Cookie/tracker consent is auto-accepted (no banner) — this both reads
+    // and, on a first visit, records the choice and kicks off GTM/Clarity/Pixel.
+    getConsent()
   }, [init])
 
   // Warm the chunks for the most-likely next screens during browser idle time,
@@ -199,7 +202,6 @@ export default function App() {
     </Suspense>
     <UpdatePrompt />
     <OfflineBanner />
-    <CookieBanner />
     <BackButtonGuard />
     <PushPrimer />
     <Toaster />
