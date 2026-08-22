@@ -62,6 +62,16 @@ const RULES = {
   rateLimitedPerIp: { windowMs: 10 * 60_000, threshold: 60 },
   /** Server errors overall. A 5xx spike often IS the incident, or precedes it. */
   serverErrorGlobal: { windowMs: 5 * 60_000, threshold: 25 },
+  /**
+   * Postgres statement-timeout (57014) or an outbound Supabase call that
+   * exhausted all its network retries. Unlike the noisy 403/429/generic-5xx
+   * counters above, EITHER of these means the DB/infra itself is struggling —
+   * worth paging on a handful of occurrences, not 25. (2026-08-22: a
+   * full-table-scan bug in two RPCs caused ~332 of these over 6 days before
+   * anyone noticed, because the generic 25-in-5-minutes rule never tripped on
+   * a slow drip. See supabase/fix_quiz_scan_perf.sql.)
+   */
+  infraDegraded: { windowMs: 15 * 60_000, threshold: 3 },
 } as const
 
 const windows: Record<keyof typeof RULES, Window> = {
@@ -70,6 +80,7 @@ const windows: Record<keyof typeof RULES, Window> = {
   forbiddenPerIp: new Map(),
   rateLimitedPerIp: new Map(),
   serverErrorGlobal: new Map(),
+  infraDegraded: new Map(),
 }
 
 // ─── Alert delivery ──────────────────────────────────────────────────────────
@@ -209,6 +220,27 @@ export function recordServerError(path: string, status: number): void {
       'all',
       `${n} server errors in ${rule.windowMs / 60_000} minutes (last: ${status} ${path}).`,
       { path, status }
+    )
+  }
+}
+
+/**
+ * Called on a Postgres statement-timeout (57014) or an outbound Supabase call
+ * that exhausted every retry — the two failure shapes behind "Failed to fetch"
+ * / "can't reach server" reports. `reason` is a short machine tag ('db_timeout'
+ * | 'supabase_unreachable'), `detail` is a one-line description for the alert.
+ */
+export function recordInfraDegraded(reason: string, detail: string): void {
+  const rule = RULES.infraDegraded
+  const n = bump(windows.infraDegraded, 'all', rule.windowMs)
+  if (n === rule.threshold) {
+    raise(
+      'infra_degraded',
+      'all',
+      `${n} infra-level failures (DB statement timeouts / unreachable Supabase) in ` +
+        `${rule.windowMs / 60_000} minutes — users are likely seeing "Failed to fetch" ` +
+        `or "can't reach server". Last: ${reason} — ${detail}.`,
+      { reason, detail }
     )
   }
 }

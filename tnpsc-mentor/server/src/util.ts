@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import { recordInfraDegraded } from './lib/securityAlerts.js'
 
 /**
  * True when a Postgres function/RPC isn't deployed yet (migration not run), so
@@ -63,5 +64,8 @@ export function sendDbError(
   }
   // Genuine server/DB failure — log details, return a safe generic message.
   console.error('[db error]', error?.code, error?.message)
+  if (code === '57014') {
+    recordInfraDegraded('db_timeout', error?.message ?? 'statement timeout')
+  }
   return res.status(500).json({ error: 'A server error occurred. Please try again.' })
 }

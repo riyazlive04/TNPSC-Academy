@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { config } from './config.js'
+import { recordInfraDegraded } from './lib/securityAlerts.js'
 
 /**
  * The VPS's route to Supabase's Cloudflare-fronted edge occasionally hits a
@@ -17,7 +18,10 @@ async function resilientFetch(...args: Parameters<typeof fetch>): Promise<Respon
     try {
       return await fetch(...args)
     } catch (err) {
-      if (attempt === ATTEMPTS) throw err
+      if (attempt === ATTEMPTS) {
+        recordInfraDegraded('supabase_unreachable', (err as Error).message ?? 'fetch failed')
+        throw err
+      }
       await new Promise((r) => setTimeout(r, 300 * attempt))
     }
   }
