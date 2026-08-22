@@ -59,6 +59,13 @@ if (args[0] === '-e') {
     },
     { label: 'secure.sql', sql: readFileSync(join(sqlDir, 'secure.sql'), 'utf8') },
     { label: 'admin_write.sql', sql: readFileSync(join(sqlDir, 'admin_write.sql'), 'utf8') },
+    // secure.sql's get_quiz_questions/count_quiz_questions are a STALE snapshot
+    // (predates the testseries_g2 exclusion and year filter added later, and
+    // predates the 2026-08-22 perf fix — see fix_quiz_scan_perf.sql's own
+    // header). Re-running it alone would silently revert both. This step must
+    // stay LAST in the default set so a plain `node run-migration.mjs` always
+    // ends on the current, correct versions of these two functions.
+    { label: 'fix_quiz_scan_perf.sql', sql: readFileSync(join(sqlDir, 'fix_quiz_scan_perf.sql'), 'utf8') },
   ]
 }
 
