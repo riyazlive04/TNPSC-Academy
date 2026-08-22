@@ -16,6 +16,7 @@ import {
   RefreshCw,
   BarChart3,
   Trophy,
+  Rocket,
 } from 'lucide-react'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
@@ -37,6 +38,16 @@ import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
+import {
+  useRankBoosterPurchase,
+  rupees,
+  RANK_BOOSTER_MRP_RUPEES,
+  RANK_BOOSTER_PRICE_RUPEES,
+  RANK_BOOSTER_PERK_KEYS,
+  RANK_BOOSTER_BONUS_KEYS,
+} from '../hooks/useRankBoosterPurchase'
+import { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
+import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { starterTestConfig } from '../lib/starterTest'
 import { fetchHabit, type HabitState } from '../lib/habit'
 import { SHOW_STREAK, SHOW_MOMENTUM, isHiddenBadge } from '../lib/features'
@@ -132,6 +143,7 @@ export default function TestArenaPage() {
   const testSeriesOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
   const vettriOn = useVettriEnabled()
+  const rbPurchase = useRankBoosterPurchase()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
@@ -392,6 +404,67 @@ export default function TestArenaPage() {
           )}
         </header>
 
+        {/* Test Marathon (Vettri Nichayam) + Rank Booster discovery banners -
+            same cross-promo strips shown on the Test Series hub, surfaced here
+            too so a learner sees the offer before ever opening that hub. Sit
+            above the CA carousel: pricing/enrollment is the highest-intent
+            content on the page. Rank Booster's tap opens the buy popup
+            directly (via useRankBoosterPurchase) rather than just navigating,
+            mirroring the hub's own banner. */}
+        {testSeriesOn && (
+          <button
+            onClick={() => navigate('/test-series', { state: { tab: 'vettri' } })}
+            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
+          >
+            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+              <Trophy size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="tamil block font-display text-sm font-bold tracking-tight">
+                {t('marathonBannerTitle')}
+              </span>
+              <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+                {t('marathonBannerSub')}
+              </span>
+            </span>
+            <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+              <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
+            </span>
+          </button>
+        )}
+
+        {rankBoosterOn && (
+          <button
+            onClick={() =>
+              rbPurchase.rankBoosterUnlocked
+                ? navigate('/test-series', { state: { tab: 'rankbooster' } })
+                : rbPurchase.startEnroll()
+            }
+            disabled={rbPurchase.paying}
+            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
+          >
+            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+              <Rocket size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="tamil block font-display text-sm font-bold tracking-tight">
+                {t('rankBoosterBannerTitle')}
+              </span>
+              <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+                {t('rankBoosterBannerSub')}
+              </span>
+            </span>
+            {!rbPurchase.rankBoosterUnlocked && (
+              <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+                <span className="font-body text-2xs text-white/70 line-through">
+                  ₹{RANK_BOOSTER_MRP_RUPEES}
+                </span>
+                <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
+              </span>
+            )}
+          </button>
+        )}
+
         {/* Daily Current-Affairs magazines - the last 7 published issues, swiped
             horizontally. Sits directly under the kural: the day's reading is the
             reason most aspirants open the app, so it never waits below a fold.
@@ -419,12 +492,6 @@ export default function TestArenaPage() {
             </button>
           </section>
         )}
-
-        {/* Test Marathon + Rank Booster discovery banners removed from the
-            dashboard - they were competing with the main Hero/practice list for
-            attention right up front. Both products stay discoverable via the
-            Vettri Nichayam / Test Marathon cards in the Practice list below,
-            plus the plans nudge on the Profile page. */}
 
         {/* One-time web-push opt-in nudge (browsers only — the Android WebView
             has no Push API so it never renders there). Held back while the
@@ -565,6 +632,22 @@ export default function TestArenaPage() {
         open={thirukuralOpen}
         onClose={() => setThirukuralOpen(false)}
         initialKuralNo={dailyKural?.kural_no}
+      />
+
+      {/* Pre-payment recap for the Rank Booster discovery banner above. */}
+      <PurchaseConfirmModal
+        open={rbPurchase.confirmOpen}
+        planName={t('rankBoosterTitle')}
+        validity={t('rankBoosterValidity')}
+        perks={[...RANK_BOOSTER_PERK_KEYS, ...RANK_BOOSTER_BONUS_KEYS].map((k) => t(k))}
+        priceLabel={rbPurchase.isFree ? t('premiumFree') : `₹${rupees(rbPurchase.finalPaise)}`}
+        strikePrice={rbPurchase.isFree ? undefined : `₹${RANK_BOOSTER_MRP_RUPEES}`}
+        note={t('rankBoosterOfferNote')}
+        isFree={rbPurchase.isFree}
+        accent="gold"
+        busy={rbPurchase.paying}
+        onConfirm={rbPurchase.handleBuy}
+        onCancel={() => rbPurchase.setConfirmOpen(false)}
       />
 
       {rewards && (

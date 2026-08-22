@@ -900,7 +900,7 @@ function UsersTab() {
                     {u.rank_booster && (
                       <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
                         <Rocket size={11} />
-                        Rank Booster
+                        Group II/IIA Test Series
                         {u.rank_booster_until &&
                           ` · ${new Date(u.rank_booster_until).toLocaleDateString()}`}
                       </span>
@@ -1333,14 +1333,14 @@ function UserDetailModal({
       } else if (action === 'revoke-rank-booster') {
         await api.superadmin.revokeRankBooster(user.id)
         onChange({ rank_booster: false, rank_booster_until: null })
-        toast.success('Group II/ IIA- Rank Booster revoked.')
+        toast.success('Group II/IIA Test Series revoked.')
       } else {
         await api.superadmin.grantPlan(user.id, 'rank_booster_g2')
         onChange({
           rank_booster: true,
           rank_booster_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
-        toast.success('Group II/ IIA- Rank Booster granted for 30 days.')
+        toast.success('Group II/IIA Test Series granted for 30 days.')
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Action failed.')
@@ -1456,7 +1456,7 @@ function UserDetailModal({
               )}
               {user.rank_booster && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
-                  <Rocket size={11} /> Rank Booster
+                  <Rocket size={11} /> Group II/IIA Test Series
                 </span>
               )}
             </div>
@@ -1509,7 +1509,7 @@ function UserDetailModal({
           {planRow({
             icon: <Rocket size={18} />,
             iconClass: 'bg-brand-soft text-brand',
-            name: 'Group II/ IIA- Rank Booster',
+            name: 'Group II/IIA Test Series',
             active: user.rank_booster,
             until: user.rank_booster_until,
             grant: 'grant-rank-booster',

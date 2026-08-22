@@ -137,10 +137,12 @@ export default function TestSeriesPage() {
         </button>
       )}
 
-      {/* Announces the second product on the hub itself — visible from every
-          tab, not just once someone's already picked "Rank Booster" — so a
-          Vettri Nichayam regular actually notices the new series exists. */}
-      {rankBoosterOn && tab !== 'rankbooster' && (
+      {/* Announces the second product on the hub itself — visible on EVERY tab,
+          including Rank Booster's own (unlike the Vettri banner below, which
+          hides on its own tab): the 399 Mock Pack banner always shows here, and
+          this one should always sit alongside it rather than disappearing the
+          moment someone's already on the Rank Booster tab. */}
+      {rankBoosterOn && (
         <button
           onClick={() =>
             rbPurchase.rankBoosterUnlocked ? setTab('rankbooster') : rbPurchase.startEnroll()

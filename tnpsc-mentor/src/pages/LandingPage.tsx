@@ -173,7 +173,7 @@ const T = {
   // Ribbon band across the top of each pricing card.
   freeRibbon: { ta: 'புதிய கணக்கு சலுகை ', en: 'Signup bonus' },
   vettriRibbon: { ta: 'தேர்வு மாரத்தான்', en: 'Test Marathon' },
-  rankBoosterRibbon: { ta: 'Rank Booster', en: 'Rank Booster' },
+  rankBoosterRibbon: { ta: 'குரூப் 2 தேர்வுத் தொடர்', en: 'Group 2 Test Series' },
   premiumRibbon: { ta: 'பிரீமியம்', en: 'Premium' },
   premiumTitle: {
     ta: 'App-க்குள்ள - TNPSC Premium Prelims Kit (₹1,699, எப்பவும் unlock பண்ணலாம்)',

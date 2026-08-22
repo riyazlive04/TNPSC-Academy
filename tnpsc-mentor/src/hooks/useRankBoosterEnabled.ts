@@ -28,7 +28,11 @@ export function useRankBoosterEnabled(): boolean {
           return cache
         })
         .catch(() => {
-          cache = false
+          // Don't poison the shared cache on a transient failure (e.g. a
+          // dropped fetch during a cold dev-server start) - that would hide
+          // this feature for the rest of the session with no way to recover.
+          // Clear `inflight` so the next mount retries instead.
+          inflight = null
           return false
         })
     inflight.then((v) => !cancelled && setOn(v))

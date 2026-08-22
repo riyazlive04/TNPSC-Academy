@@ -72,7 +72,7 @@ const T = {
 
   rankBoosterRibbon: { ta: 'பரிந்துரைக்கப்படுகிறது', en: 'Recommended' },
   rankBoosterSeriesLabel: { ta: 'குரூப் 2 தேர்வுத் தொடர்', en: 'Group 2 Test Series' },
-  ctaRankBooster: { ta: 'Rank Booster பெறு', en: 'Get Rank Booster' },
+  ctaRankBooster: { ta: 'குரூப் II/IIA தேர்வுத் தொடரைப் பெறு', en: 'Get Group II/IIA Test Series' },
 
   premiumRibbon: { ta: 'பிரீமியம்', en: 'Premium' },
   premiumTitle: { ta: 'Premium Prelims Kit', en: 'Premium Prelims Kit' },

@@ -67,8 +67,8 @@ const T = {
     en: 'Exam Date: 01 November 2026 (Sunday)',
   },
   heroTitle: {
-    ta: 'TNPSC Group II / IIA Prelims Rank Booster தேர்வுத் தொடர் 2026',
-    en: 'TNPSC Group II / IIA Prelims Rank Booster Test Series 2026',
+    ta: 'TNPSC Group II / IIA Prelims தேர்வுத் தொடர் 2026',
+    en: 'TNPSC Group II / IIA Prelims Test Series 2026',
   },
   heroSub: {
     ta: '23 முழுமையான தேர்வுகள், real exam pattern-ல். GS + Aptitude, Language, மற்றும் 3 Grand Mock தேர்வுகள் அடங்கிய systematic schedule.',
@@ -108,8 +108,8 @@ const T = {
     en: 'See where you stand after every test',
   },
   rankTrackBody: {
-    ta: 'ஒரு தேர்வை சமர்ப்பித்தவுடனேயே, TNPSC Mentors-ல் இருக்கும் மற்ற அனைத்து aspirants-உடனும் ஒப்பிட்டு உங்க சராசரி மதிப்பெண் அடிப்படையில் ஒரு percentile ("Top X%") காட்டப்படும். இது உங்க Result திரையிலும், Insights பக்கத்திலும் எப்போதும் இருக்கும் - Rank Booster தேர்வுகளை அதிகம் எடுக்க எடுக்க, இந்த எண் உங்க உண்மையான நிலையை இன்னும் துல்லியமா காட்டும்.',
-    en: "The moment you submit a test, we show your percentile - a \"Top X%\" figure based on your average score compared with every other aspirant on TNPSC Mentors. It's on your result screen and your Insights page always, and gets sharper the more Rank Booster tests you take.",
+    ta: 'ஒரு தேர்வை சமர்ப்பித்தவுடனேயே, TNPSC Mentors-ல் இருக்கும் மற்ற அனைத்து aspirants-உடனும் ஒப்பிட்டு உங்க சராசரி மதிப்பெண் அடிப்படையில் ஒரு percentile ("Top X%") காட்டப்படும். இது உங்க Result திரையிலும், Insights பக்கத்திலும் எப்போதும் இருக்கும் - இந்தத் தொடரின் தேர்வுகளை அதிகம் எடுக்க எடுக்க, இந்த எண் உங்க உண்மையான நிலையை இன்னும் துல்லியமா காட்டும்.',
+    en: "The moment you submit a test, we show your percentile - a \"Top X%\" figure based on your average score compared with every other aspirant on TNPSC Mentors. It's on your result screen and your Insights page always, and gets sharper the more tests in this series you take.",
   },
   rankTrackPoint1: { ta: 'ஒவ்வொரு தேர்வு முடிவிலும் உடனடியாக தெரியும்', en: 'Shown instantly on every test result' },
   rankTrackPoint2: { ta: 'Insights பக்கத்தில் எப்போது வேண்டுமானாலும் பாருங்க', en: 'Always visible on your Insights page' },
@@ -121,16 +121,16 @@ const T = {
 
   allPlansTitle: { ta: 'அனைத்து திட்டங்களும்', en: 'All plans' },
   allPlansSub: {
-    ta: 'Rank Booster மட்டுமல்லாமல், TNPSC Mentors-ல் கிடைக்கும் மற்ற தேர்வுத் தொகுப்புகளையும் பாருங்கள்.',
-    en: 'Beyond Rank Booster, see the other test series and plans TNPSC Mentors offers.',
+    ta: 'இந்தத் தொடர் மட்டுமல்லாமல், TNPSC Mentors-ல் கிடைக்கும் மற்ற தேர்வுத் தொகுப்புகளையும் பாருங்கள்.',
+    en: 'Beyond this test series, see the other test series and plans TNPSC Mentors offers.',
   },
 
   faqEyebrow: { ta: 'கேள்வி-பதில்', en: 'FAQ' },
   faqTitle: { ta: 'அடிக்கடி கேட்கப்படும் கேள்விகள்', en: 'Frequently asked questions' },
 
   footerTagline: {
-    ta: 'TNPSC Group II / IIA Prelims-க்கான Rank Booster தேர்வுத் தொடர்.',
-    en: 'The Rank Booster test series for TNPSC Group II / IIA Prelims.',
+    ta: 'TNPSC Group II / IIA Prelims-க்கான தேர்வுத் தொடர்.',
+    en: 'The Test Series for TNPSC Group II / IIA Prelims.',
   },
   footerSupport: { ta: 'உதவி', en: 'Support' },
   footerLegal: { ta: 'Legal', en: 'Legal' },
@@ -431,8 +431,8 @@ export default function RankBoosterLandingPage() {
   useEffect(() => {
     document.title =
       lang === 'ta'
-        ? 'TNPSC Group II/IIA Rank Booster - இப்போதே Enroll ஆகுங்க'
-        : 'TNPSC Group II/IIA Rank Booster - Enroll now'
+        ? 'TNPSC Group II/IIA Test Series - இப்போதே Enroll ஆகுங்க'
+        : 'TNPSC Group II/IIA Test Series - Enroll now'
   }, [lang])
 
   useEffect(() => {

@@ -223,12 +223,12 @@ const STRINGS = {
     ta: 'இந்தப் பிரிவு எந்தக் கட்டணத் திட்டத்திலும் திறக்கும் - வெற்றி நிச்சயம் அல்லது பிரீமியம். உங்களுக்கு ஏற்றதைக் கீழே தேர்ந்தெடுங்கள்.',
   },
   upsellRankBoosterTitle: {
-    en: 'Unlock Group II/ IIA- Rank Booster',
-    ta: 'குரூப் II/ IIA - Rank Booster-ஐத் திறக்கவும்',
+    en: 'Unlock Group II/IIA Test Series',
+    ta: 'குரூப் II/IIA தேர்வுத் தொடரைத் திறக்கவும்',
   },
   upsellRankBoosterBody: {
-    en: 'The Group II/ IIA- Rank Booster series opens with its own plan, or with Premium. Vettri Nichayam does not include it.',
-    ta: 'குரூப் II/ IIA - Rank Booster தொடர் அதன் சொந்தத் திட்டத்துடன் அல்லது பிரீமியத்துடன் திறக்கும். வெற்றி நிச்சயம் இதைச் சேர்க்காது.',
+    en: 'The Group II/IIA Test Series opens with its own plan, or with Premium. Vettri Nichayam does not include it.',
+    ta: 'குரூப் II/IIA தேர்வுத் தொடர் அதன் சொந்தத் திட்டத்துடன் அல்லது பிரீமியத்துடன் திறக்கும். வெற்றி நிச்சயம் இதைச் சேர்க்காது.',
   },
   upsellLater: { en: 'Maybe later', ta: 'பிறகு பார்க்கலாம்' },
   howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
@@ -796,21 +796,23 @@ const STRINGS = {
   },
   marathonIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
 
-  // Group II/ IIA- Rank Booster — a second, independent scheduled test series.
-  // Every surface (including the hub tab pill) spells out the full name,
-  // matching how VettriCard/PremiumCard always spell out "Vettri Nichayam" in
-  // full — the tab bar wraps a two-line label rather than truncate it.
-  rankBoosterPageTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  // Group II/IIA scheduled test series — a second, independent product from
+  // the Group 1 Test Series. "Rank Booster" is retired as a display name
+  // everywhere (including the discovery banner) in favor of "Group II/IIA
+  // Test Series", matching the Group 1 side's naming. Internal identifiers
+  // (RankBoosterCard, useRankBoosterEnabled/Purchase, the rank_booster_g2
+  // plan id, the /rank-booster route) are unchanged — only display text.
+  rankBoosterPageTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterPageSub: {
     en: 'Group II/IIA prelims practice: 23 full-length papers, each unlocking on its date. Attempt each up to twice.',
     ta: 'குரூப் II/IIA முதல்நிலைத் தேர்வுப் பயிற்சி: 23 முழு நீளத் தேர்வுத் தாள்கள், ஒவ்வொன்றும் அதன் தேதியில் திறக்கும். ஒவ்வொன்றையும் இருமுறை வரை எழுதலாம்.',
   },
-  rankBoosterArenaTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterArenaTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterArenaSub: { en: 'Group II/IIA scheduled series', ta: 'குரூப் II/IIA திட்டமிட்ட தொடர்' },
-  /** Superadmin series switcher only — the hub tab pill now uses the full name. */
-  rankBoosterTab: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
-  rankBoosterBadge: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
-  rankBoosterTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  /** Superadmin series switcher only. */
+  rankBoosterTab: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
+  rankBoosterBadge: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
+  rankBoosterTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterValidity: { en: '90-day access', ta: '90 நாள் அணுகல்' },
   // Independence Day Month Offer — orange badge, matches the marketing flyer.
   rankBoosterOfferBadge: {
@@ -849,12 +851,13 @@ const STRINGS = {
     ta: 'தேர்வு 1 அனைவருக்கும் இலவசம் — சேருமுன் முயற்சிக்கவும்',
   },
   rankBoosterGet: {
-    en: 'Get Group II/ IIA- Rank Booster',
-    ta: 'குரூப் II/ IIA - Rank Booster பெறுங்கள்',
+    en: 'Get Group II/IIA Test Series',
+    ta: 'குரூப் II/IIA தேர்வுத் தொடரைப் பெறுங்கள்',
   },
   // Promo strip — mirrors marathonBannerTitle/Sub/Included (VettriCard's Test
-  // Marathon header) — used inside PremiumCard and the Test Marathon hub page.
-  rankBoosterBannerTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  // Series header) — used inside PremiumCard and the Test Series hub page's
+  // discovery banner, plus the dashboard discovery banner (Test Arena).
+  rankBoosterBannerTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterBannerSub: {
     en: '23 full-length Group II/IIA prelims papers on a fixed schedule',
     ta: 'திட்டமிட்ட அட்டவணையில் 23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள்',
@@ -883,7 +886,7 @@ const STRINGS = {
   rankBoosterIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
   // Dashboard discovery banner (Test Arena).
   rankBoosterDashBadge: { en: 'New', ta: 'புதியது' },
-  rankBoosterDashTitle: { en: 'Group II/ IIA- Rank Booster', ta: 'குரூப் II/ IIA - Rank Booster' },
+  rankBoosterDashTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterDashSub: {
     en: '23 full-length Group II/IIA prelims papers — Test 1 free',
     ta: '23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள் — தேர்வு 1 இலவசம்',
@@ -1328,8 +1331,8 @@ const STRINGS = {
   },
   // Rank Booster is a standalone ₹1,249/90-day plan; Premium includes it free.
   premiumPerk7: {
-    en: 'Group II/ IIA- Rank Booster series - all 23 papers',
-    ta: 'குரூப் II/ IIA - Rank Booster தொடர் - அனைத்து 23 தாள்களும்',
+    en: 'Group II/IIA Test Series - all 23 papers',
+    ta: 'குரூப் II/IIA தேர்வுத் தொடர் - அனைத்து 23 தாள்களும்',
   },
   // Bonus benefits, shown as a separate "extras" block on the premium banner.
   premiumBonusTitle: { en: 'Bonus with Premium', ta: 'பிரீமியத்துடன் போனஸ்' },
