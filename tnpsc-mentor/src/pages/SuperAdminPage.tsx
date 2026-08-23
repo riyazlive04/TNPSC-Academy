@@ -58,6 +58,7 @@ import {
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
 import ConfirmDialog from '../components/UI/ConfirmDialog'
+import ErrorState from '../components/UI/ErrorState'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
 import ReportResolvedMessageEditor from '../components/SuperAdmin/ReportResolvedMessageEditor'
 import {
@@ -258,20 +259,6 @@ export default function SuperAdminPage() {
         </div>
       )}
     </>
-  )
-}
-
-// ─── Shared: load states ───────────────────────────────────────────────────────
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  const { t } = useT()
-  return (
-    <div className="flex animate-fadeIn flex-col items-center gap-3 py-16 text-center">
-      <AlertTriangle size={30} className="text-coral" />
-      <p className="font-body text-ink2">{t('couldNotLoad')}</p>
-      <button onClick={onRetry} className="btn-soft press mt-1 px-4 py-2 text-sm">
-        <RefreshCw size={15} /> {t('retry')}
-      </button>
-    </div>
   )
 }
 
@@ -803,7 +790,7 @@ function UsersTab() {
             >
               <option value="all">All plans</option>
               <option value="premium">Premium</option>
-              <option value="vettri">Vettri Nichayam</option>
+              <option value="vettri">Group 1 Test Series</option>
               <option value="free">Free</option>
             </select>
           </Field>
@@ -1322,14 +1309,14 @@ function UserDetailModal({
       } else if (action === 'revoke-vettri') {
         await api.superadmin.revokeVettri(user.id)
         onChange({ vettri: false, vettri_until: null })
-        toast.success('Vettri Nichayam revoked.')
+        toast.success('Group 1 Test Series revoked.')
       } else if (action === 'grant-vettri') {
         await api.superadmin.grantPlan(user.id, 'vettri_nichayam')
         onChange({
           vettri: true,
           vettri_until: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(),
         })
-        toast.success('Vettri Nichayam granted for 60 days.')
+        toast.success('Group 1 Test Series granted for 60 days.')
       } else if (action === 'revoke-rank-booster') {
         await api.superadmin.revokeRankBooster(user.id)
         onChange({ rank_booster: false, rank_booster_until: null })
@@ -1499,7 +1486,7 @@ function UserDetailModal({
           {planRow({
             icon: <Trophy size={18} />,
             iconClass: 'bg-brand-soft text-brand',
-            name: 'Vettri Nichayam',
+            name: 'Group 1 Test Series',
             active: user.vettri,
             until: user.vettri_until,
             grant: 'grant-vettri',
@@ -2035,7 +2022,7 @@ function MockExamsTab() {
 // ─── Test Series ────────────────────────────────────────────────────────────────
 type AdminSeries = 'g1_marathon' | 'g2a_rankbooster'
 
-// Labeled to match the student-facing hub tabs exactly ("Vettri Nichayam" /
+// Labeled to match the student-facing hub tabs exactly ("Group 1 Test Series" /
 // "Rank Booster" inside the Test Marathon hub — see TestSeriesPage.tsx).
 const SERIES_TABS: { key: AdminSeries; labelKey: 'vettriTitle' | 'rankBoosterTab'; settingKey: 'test_series_enabled' | 'rank_booster_enabled' }[] = [
   { key: 'g1_marathon', labelKey: 'vettriTitle', settingKey: 'test_series_enabled' },

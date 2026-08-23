@@ -65,10 +65,10 @@ const T = {
   ctaMock: { ta: 'மாதிரி தேர்வுகள் பெறு', en: 'Get Mock Tests' },
 
   vettriRibbon: { ta: 'குரூப் 1 தேர்வுத் தொடர்', en: 'Group 1 Test Series' },
-  vettriBadge: { ta: 'வெற்றி நிச்சயம்', en: 'Vettri Nichayam' },
-  vettriBannerTitle: { ta: 'வெற்றி நிச்சயம் தேர்வுத் தொகுப்பு', en: 'Vettri Nichayam bundle' },
+  vettriBadge: { ta: 'குரூப் 1 தேர்வுத் தொடர்', en: 'Group 1 Test Series' },
+  vettriBannerTitle: { ta: 'குரூப் 1 தேர்வுத் தொடர் தொகுப்பு', en: 'Group 1 Test Series bundle' },
   scheduleInline: { ta: 'அட்டவணையை பதிவிறக்க (PDF)', en: 'download the schedule (PDF)' },
-  ctaVettri: { ta: 'வெற்றி நிச்சயம் பெறு', en: 'Get Vettri Nichayam' },
+  ctaVettri: { ta: 'குரூப் 1 தேர்வுத் தொடர் பெறு', en: 'Get Group 1 Test Series' },
 
   rankBoosterRibbon: { ta: 'பரிந்துரைக்கப்படுகிறது', en: 'Recommended' },
   rankBoosterSeriesLabel: { ta: 'குரூப் 2 தேர்வுத் தொடர்', en: 'Group 2 Test Series' },

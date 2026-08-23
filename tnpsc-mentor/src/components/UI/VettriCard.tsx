@@ -47,7 +47,7 @@ const PLANS: Record<
     labelKey: 'vettriPlanFull',
     validityKey: 'vettriValidity',
     suffixKey: 'vettriFullSuffix',
-    descr: 'Vettri Nichayam - full (two months)',
+    descr: 'Group 1 Test Series - full (two months)',
   },
   month: {
     id: 'vettri_month',
@@ -56,7 +56,7 @@ const PLANS: Record<
     labelKey: 'vettriPlanMonth',
     validityKey: 'vettriMonthValidity',
     suffixKey: 'vettriMonthSuffix',
-    descr: 'Vettri Nichayam - month 1 of 2 (pay again for month 2)',
+    descr: 'Group 1 Test Series - month 1 of 2 (pay again for month 2)',
   },
 }
 

@@ -123,8 +123,8 @@ const STRINGS = {
   downloadSchedule: { en: 'Download the schedule (PDF)', ta: 'தேர்வு அட்டவணையை பதிவிறக்கு (PDF)' },
   onbCreditsTitle: { en: 'Your test credits', ta: 'உங்கள் தேர்வு கிரெடிட்கள்' },
   onbCreditsBody: {
-    en: 'Each question uses 1 credit — a 20-question test costs 20 credits. You get +10 free credits every day you log in, but unused daily credits expire at the end of the day (midnight) — so practise every day! Premium / Vettri Nichayam plans are unlimited.',
-    ta: 'ஒவ்வொரு கேள்விக்கும் 1 கிரெடிட் செலவாகும் — 20 கேள்வித் தேர்வுக்கு 20 கிரெடிட்கள். உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்; ஆனால் பயன்படுத்தாத தினசரி கிரெடிட்கள் அன்றைய நாள் முடிவில் (நள்ளிரவில்) காலாவதியாகும் — எனவே தினமும் பயிற்சி செய்யுங்கள்! பிரீமியம் / வெற்றி நிச்சயம் திட்டங்களில் வரம்பே இல்லை.',
+    en: 'Each question uses 1 credit — a 20-question test costs 20 credits. You get +10 free credits every day you log in, but unused daily credits expire at the end of the day (midnight) — so practise every day! Premium / Group 1 Test Series plans are unlimited.',
+    ta: 'ஒவ்வொரு கேள்விக்கும் 1 கிரெடிட் செலவாகும் — 20 கேள்வித் தேர்வுக்கு 20 கிரெடிட்கள். உள்நுழையும் ஒவ்வொரு நாளும் +10 இலவச கிரெடிட்கள் கிடைக்கும்; ஆனால் பயன்படுத்தாத தினசரி கிரெடிட்கள் அன்றைய நாள் முடிவில் (நள்ளிரவில்) காலாவதியாகும் — எனவே தினமும் பயிற்சி செய்யுங்கள்! பிரீமியம் / குரூப் 1 தேர்வுத் தொடர் திட்டங்களில் வரம்பே இல்லை.',
   },
   onbLangTitle: { en: 'Tamil, English or both', ta: 'தமிழ், ஆங்கிலம் அல்லது இரண்டும்' },
   onbLangBody: {
@@ -219,16 +219,16 @@ const STRINGS = {
   },
   upsellBundleTitle: { en: 'Unlock with a plan', ta: 'திட்டத்துடன் திறக்கவும்' },
   upsellBundleBody: {
-    en: 'This section opens with any paid plan - Vettri Nichayam or Premium. Pick the one that fits you below.',
-    ta: 'இந்தப் பிரிவு எந்தக் கட்டணத் திட்டத்திலும் திறக்கும் - வெற்றி நிச்சயம் அல்லது பிரீமியம். உங்களுக்கு ஏற்றதைக் கீழே தேர்ந்தெடுங்கள்.',
+    en: 'This section opens with any paid plan - Group 1 Test Series or Premium. Pick the one that fits you below.',
+    ta: 'இந்தப் பிரிவு எந்தக் கட்டணத் திட்டத்திலும் திறக்கும் - குரூப் 1 தேர்வுத் தொடர் அல்லது பிரீமியம். உங்களுக்கு ஏற்றதைக் கீழே தேர்ந்தெடுங்கள்.',
   },
   upsellRankBoosterTitle: {
     en: 'Unlock Group II/IIA Test Series',
     ta: 'குரூப் II/IIA தேர்வுத் தொடரைத் திறக்கவும்',
   },
   upsellRankBoosterBody: {
-    en: 'The Group II/IIA Test Series opens with its own plan, or with Premium. Vettri Nichayam does not include it.',
-    ta: 'குரூப் II/IIA தேர்வுத் தொடர் அதன் சொந்தத் திட்டத்துடன் அல்லது பிரீமியத்துடன் திறக்கும். வெற்றி நிச்சயம் இதைச் சேர்க்காது.',
+    en: 'The Group II/IIA Test Series opens with its own plan, or with Premium. Group 1 Test Series does not include it.',
+    ta: 'குரூப் II/IIA தேர்வுத் தொடர் அதன் சொந்தத் திட்டத்துடன் அல்லது பிரீமியத்துடன் திறக்கும். குரூப் 1 தேர்வுத் தொடர் இதைச் சேர்க்காது.',
   },
   upsellLater: { en: 'Maybe later', ta: 'பிறகு பார்க்கலாம்' },
   howItWorks: { en: 'How it works', ta: 'இது எவ்வாறு செயல்படுகிறது' },
@@ -463,12 +463,12 @@ const STRINGS = {
     ta: 'இந்தத் தேர்வுக்கு உங்கள் இருப்பிலிருந்து {n} கிரெடிட்கள் கழிக்கப்படும் (ஒரு கேள்விக்கு 1 கிரெடிட்).',
   },
   outOfCredits: {
-    en: "You're out of credits. You'll get 10 more free credits tomorrow, or go Premium / Vettri Nichayam for unlimited tests.",
-    ta: 'உங்கள் கிரெடிட்கள் தீர்ந்துவிட்டன. நாளை மேலும் 10 இலவச கிரெடிட்கள் கிடைக்கும், அல்லது வரம்பற்ற தேர்வுகளுக்கு பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
+    en: "You're out of credits. You'll get 10 more free credits tomorrow, or go Premium / Group 1 Test Series for unlimited tests.",
+    ta: 'உங்கள் கிரெடிட்கள் தீர்ந்துவிட்டன. நாளை மேலும் 10 இலவச கிரெடிட்கள் கிடைக்கும், அல்லது வரம்பற்ற தேர்வுகளுக்கு பிரீமியம் / குரூப் 1 தேர்வுத் தொடர் பெறுங்கள்.',
   },
   mockFreeUsed: {
-    en: "You've used your one free mock exam. Go Premium / Vettri Nichayam for all mock exams.",
-    ta: 'உங்கள் ஒரு இலவச மாதிரித் தேர்வைப் பயன்படுத்திவிட்டீர்கள். அனைத்து மாதிரித் தேர்வுகளுக்கும் பிரீமியம் / வெற்றி நிச்சயம் பெறுங்கள்.',
+    en: "You've used your one free mock exam. Go Premium / Group 1 Test Series for all mock exams.",
+    ta: 'உங்கள் ஒரு இலவச மாதிரித் தேர்வைப் பயன்படுத்திவிட்டீர்கள். அனைத்து மாதிரித் தேர்வுகளுக்கும் பிரீமியம் / குரூப் 1 தேர்வுத் தொடர் பெறுங்கள்.',
   },
   // Dashboard credit wall - the payment banner shown ONLY once credits run out.
   // {b} is replaced with the live balance.
@@ -781,8 +781,8 @@ const STRINGS = {
     ta: 'இன்னும் எந்தத் தேர்வும் திட்டமிடப்படவில்லை.',
   },
   testSeriesLockedPremium: {
-    en: 'Unlock the full Test Series with Vettri Nichayam or Premium',
-    ta: 'முழுத் தேர்வுத் தொடரை வெற்றி நிச்சயம் அல்லது பிரீமியம் மூலம் திறக்கலாம்',
+    en: 'Unlock the full Test Series with Group 1 Test Series or Premium',
+    ta: 'முழுத் தேர்வுத் தொடரை குரூப் 1 தேர்வுத் தொடர் அல்லது பிரீமியம் மூலம் திறக்கலாம்',
   },
   unlocksOn: { en: 'Unlocks', ta: 'திறக்கும்' },
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
@@ -978,8 +978,8 @@ const STRINGS = {
 
   // ─── Vettri Nichayam bundle (₹999: 13 mock exams + unlimited PYQ & CA) ─────
   vettriNav: { en: 'Vettri', ta: 'வெற்றி' },
-  vettriBadge: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
-  vettriTitle: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
+  vettriBadge: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' },
+  vettriTitle: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' },
   vettriArenaSub: {
     en: '13 mock exams · unlimited PYQ & CA · 2 months',
     ta: '13 மாதிரித் தேர்வுகள் · வரம்பற்ற PYQ & CA · 2 மாதம்',
@@ -1026,20 +1026,20 @@ const STRINGS = {
     en: 'Subject-wise test questions (3000+), unlimited · 2-month access and much more',
     ta: 'பாட வாரியான தேர்வு வினாக்கள் (3000+), வரம்பற்றது · 2 மாத அணுகல் மற்றும் இன்னும் பல',
   },
-  vettriGet: { en: 'Get Vettri Nichayam', ta: 'வெற்றி நிச்சயம் பெறுங்கள்' },
+  vettriGet: { en: 'Get Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர் பெறுங்கள்' },
   // Vettri-first suggestion shown before a paid Premium checkout.
   vettriSuggestTitle: { en: 'Before you buy Premium…', ta: 'பிரீமியம் வாங்கும் முன்…' },
   vettriSuggestBody: {
-    en: 'Vettri Nichayam gives you the 13-exam marathon plus unlimited PYQ, Current Affairs and subject tests - much better value for money.',
-    ta: 'வெற்றி நிச்சயத்தில் 13 மாதிரித் தேர்வுகளுடன் வரம்பற்ற PYQ, நடப்பு நிகழ்வுகள் & பாடத் தேர்வுகளும் கிடைக்கும் - பணத்திற்கு மிகச் சிறந்த மதிப்பு.',
+    en: 'Group 1 Test Series gives you the 13-exam marathon plus unlimited PYQ, Current Affairs and subject tests - much better value for money.',
+    ta: 'குரூப் 1 தேர்வுத் தொடரில் 13 மாதிரித் தேர்வுகளுடன் வரம்பற்ற PYQ, நடப்பு நிகழ்வுகள் & பாடத் தேர்வுகளும் கிடைக்கும் - பணத்திற்கு மிகச் சிறந்த மதிப்பு.',
   },
   vettriSuggestMonths: { en: '2 months', ta: '2 மாதங்கள்' },
   vettriSuggestPremiumMonths: { en: '6 months', ta: '6 மாதங்கள்' },
-  vettriSuggestGo: { en: 'View Vettri Nichayam', ta: 'வெற்றி நிச்சயம் பார்க்க' },
+  vettriSuggestGo: { en: 'View Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர் பார்க்க' },
   vettriSuggestStay: { en: 'Continue with Premium', ta: 'பிரீமியத்துடன் தொடர' },
   vettriThanks: {
-    en: 'Welcome to Vettri Nichayam! Everything is unlocked.',
-    ta: 'வெற்றி நிச்சயத்திற்கு வரவேற்கிறோம்! அனைத்தும் திறக்கப்பட்டது.',
+    en: 'Welcome to Group 1 Test Series! Everything is unlocked.',
+    ta: 'குரூப் 1 தேர்வுத் தொடருக்கு வரவேற்கிறோம்! அனைத்தும் திறக்கப்பட்டது.',
   },
   vettriEmpty: { en: 'No exams are available yet.', ta: 'இன்னும் தேர்வுகள் எதுவும் கிடைக்கவில்லை.' },
   // Offer sheet — the paywall popup raised for non-paid learners (Test Marathon).
@@ -1051,20 +1051,20 @@ const STRINGS = {
   vettriOnly: { en: 'Vettri', ta: 'வெற்றி' },
   vettriUnlimited: { en: 'Unlimited attempts', ta: 'வரம்பற்ற முயற்சிகள்' },
   vettriLocked: {
-    en: 'Unlock Vettri Nichayam to take these exams',
-    ta: 'இந்தத் தேர்வுகளை எழுத வெற்றி நிச்சயத்தைத் திறங்கள்',
+    en: 'Unlock Group 1 Test Series to take these exams',
+    ta: 'இந்தத் தேர்வுகளை எழுத குரூப் 1 தேர்வுத் தொடரைத் திறங்கள்',
   },
   lockedLabel: { en: 'Locked', ta: 'பூட்டப்பட்டது' },
   topicFreeUsed: {
-    en: "You've used your free test for this topic. Get unlimited tests with Vettri Nichayam or Premium.",
-    ta: 'இந்தத் தலைப்பிற்கான உங்கள் இலவசத் தேர்வைப் பயன்படுத்திவிட்டீர்கள். வெற்றி நிச்சயம் அல்லது பிரீமியத்துடன் வரம்பற்ற தேர்வுகளைப் பெறுங்கள்.',
+    en: "You've used your free test for this topic. Get unlimited tests with Group 1 Test Series or Premium.",
+    ta: 'இந்தத் தலைப்பிற்கான உங்கள் இலவசத் தேர்வைப் பயன்படுத்திவிட்டீர்கள். குரூப் 1 தேர்வுத் தொடர் அல்லது பிரீமியத்துடன் வரம்பற்ற தேர்வுகளைப் பெறுங்கள்.',
   },
   // Superadmin — Vettri tab
   vettriTab: { en: 'Vettri', ta: 'வெற்றி' },
-  vettriShowTitle: { en: 'Vettri Nichayam visibility', ta: 'வெற்றி நிச்சயம் காட்சி' },
+  vettriShowTitle: { en: 'Group 1 Test Series visibility', ta: 'குரூப் 1 தேர்வுத் தொடர் காட்சி' },
   vettriShowSub: {
-    en: 'Show or hide the Vettri Nichayam tab and Test Arena tile for all students.',
-    ta: 'அனைத்து மாணவர்களுக்கும் வெற்றி நிச்சயம் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
+    en: 'Show or hide the Group 1 Test Series tab and Test Arena tile for all students.',
+    ta: 'அனைத்து மாணவர்களுக்கும் குரூப் 1 தேர்வுத் தொடர் தாவல் மற்றும் டைலைக் காட்டு அல்லது மறை.',
   },
 
   premiumOnly: { en: 'Premium', ta: 'பிரீமியம்' },
@@ -1322,8 +1322,8 @@ const STRINGS = {
   // Premium is a superset of Vettri Nichayam, so it includes the full Test
   // Series (all 13 scheduled papers) plus every future content update.
   premiumPerk5: {
-    en: 'Test Series (Vettri Nichayam) - all 13 papers',
-    ta: 'தேர்வுத் தொடர் (வெற்றி நிச்சயம்) - அனைத்து 13 தாள்களும்',
+    en: 'Test Series (Group 1 Test Series) - all 13 papers',
+    ta: 'தேர்வுத் தொடர் (குரூப் 1 தேர்வுத் தொடர்) - அனைத்து 13 தாள்களும்',
   },
   premiumPerk6: {
     en: 'All future updates included for your plan duration',
@@ -2134,6 +2134,20 @@ const STRINGS = {
     en: 'Something went wrong. Please try again.',
     ta: 'ஏதோ தவறாகிவிட்டது. மீண்டும் முயற்சிக்கவும்.',
   },
+  // components/UI/ErrorState.tsx — one of three classified fetch-failure
+  // variants (network / server / generic), shown in place of couldNotLoad
+  // wherever a page can tell which one it hit.
+  errorNetworkTitle: { en: 'No internet connection', ta: 'இணைய இணைப்பு இல்லை' },
+  errorNetworkMessage: {
+    en: 'Check your Wi-Fi or mobile data, then try again.',
+    ta: 'உங்கள் Wi-Fi அல்லது மொபைல் டேட்டாவைச் சரிபார்த்து, மீண்டும் முயற்சிக்கவும்.',
+  },
+  errorServerTitle: { en: 'Something went wrong on our end', ta: 'எங்கள் தரப்பில் ஒரு பிழை ஏற்பட்டது' },
+  errorServerMessage: {
+    en: 'Our servers hit a snag. Please try again in a moment.',
+    ta: 'எங்கள் சேவையகங்களில் சிக்கல் ஏற்பட்டது. சிறிது நேரம் கழித்து முயற்சிக்கவும்.',
+  },
+  errorGenericTitle: { en: "Couldn't load this", ta: 'இதை ஏற்ற முடியவில்லை' },
   // Setting a new password from the emailed reset link (ResetPasswordPage).
   newPasswordTitle: { en: 'Set a new password', ta: 'புதிய கடவுச்சொல்லை அமைக்கவும்' },
   newPasswordHint: {

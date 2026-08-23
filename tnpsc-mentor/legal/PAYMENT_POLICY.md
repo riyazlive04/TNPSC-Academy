@@ -23,8 +23,8 @@ This Payment Policy explains what we sell, what it costs, how long access lasts,
 ## 2. Paid plans
 
 - Premium — ₹1,699, valid for 90 days. Unlocks all paid content, including the Test Marathon papers.
-- Vettri Nichayam (full) — ₹899, valid for 60 days. The 13-paper scheduled mock-exam programme, plus unlimited previous-year questions and current affairs.
-- Vettri Nichayam (monthly) — ₹499, valid for 30 days. The first month of the same programme; pay again to continue into the second.
+- Group 1 Test Series (full) — ₹899, valid for 60 days. The 13-paper scheduled mock-exam programme, plus unlimited previous-year questions and current affairs.
+- Group 1 Test Series (monthly) — ₹499, valid for 30 days. The first month of the same programme; pay again to continue into the second.
 - Every plan is a one-time payment for a fixed period. Nothing auto-renews and no recurring mandate is created. When the period ends, access simply stops until you buy again.
 - Access begins as soon as the payment is verified, and ends at the stated expiry.
 

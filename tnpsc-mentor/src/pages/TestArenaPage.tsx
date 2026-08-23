@@ -685,7 +685,7 @@ export default function TestArenaPage() {
           <MarathonFreeAlert
             onTake={() => {
               consumeMarathonAlert()
-              navigate('/test-series')
+              navigate('/test-series', { state: { tab: 'vettri' } })
             }}
             onDismiss={consumeMarathonAlert}
           />

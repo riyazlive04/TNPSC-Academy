@@ -288,8 +288,8 @@ const T = {
   },
   stickyHint: { ta: 'TNPSC · Group 1', en: 'TNPSC · Group 1' },
   // Vettri Nichayam bundle banner (pricing section)
-  vettriBadge: { ta: 'வெற்றி நிச்சயம்', en: 'Vettri Nichayam' },
-  vettriBannerTitle: { ta: 'வெற்றி நிச்சயம் தேர்வுத் தொகுப்பு', en: 'Vettri Nichayam bundle' },
+  vettriBadge: { ta: 'குரூப் 1 தேர்வுத் தொடர்', en: 'Group 1 Test Series' },
+  vettriBannerTitle: { ta: 'குரூப் 1 தேர்வுத் தொடர் தொகுப்பு', en: 'Group 1 Test Series bundle' },
   vettriBannerSub: {
     ta: '13 முழு மாதிரித் தேர்வுகள் + வரம்பற்ற PYQ மற்றும் நடப்பு நிகழ்வுத் தேர்வுகள்.',
     en: '13 full mock exams + unlimited PYQ and Current Affairs tests.',

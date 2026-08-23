@@ -23,12 +23,12 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
   {
     plan: 'vettri_nichayam',
     productId: 'com.tnpscmentor.app.vettri60',
-    label: 'Vettri Nichayam - full programme',
+    label: 'Group 1 Test Series - full programme',
   },
   {
     plan: 'vettri_month',
     productId: 'com.tnpscmentor.app.vettri30',
-    label: 'Vettri Nichayam - 1 month',
+    label: 'Group 1 Test Series - 1 month',
   },
   {
     plan: 'rank_booster_g2',

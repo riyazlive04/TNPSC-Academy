@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Rocket, Trophy, Download, ListChecks } from 'lucide-react'
 import PremiumCard from '../components/UI/PremiumCard'
@@ -47,16 +47,47 @@ export default function TestSeriesPage() {
   const marathonOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
 
-  // A caller (e.g. the Rank Booster discovery banner on Test Arena) can request
-  // a starting tab via router state — otherwise default to Vettri Nichayam.
+  // A caller (e.g. the Group 1 Test Series discovery banner on Test Arena) can
+  // request a starting tab via router state — otherwise default to Group
+  // II/IIA (Rank Booster), which leads the hub.
   const requestedTab = (location.state as { tab?: HubTab } | null)?.tab
-  const [tab, setTab] = useState<HubTab>(requestedTab ?? 'vettri')
-  // Both flags default false until the settings fetch resolves. If Vettri
-  // Nichayam turns out to be off but Rank Booster is on, land there instead —
+  const [tab, setTab] = useState<HubTab>(requestedTab ?? 'rankbooster')
+  // Both flags default false until the settings fetch resolves. If whichever
+  // tab we're sitting on turns out to be off, land on the other one instead —
   // only fires on that one resolution, never overrides a manual tab click.
   useEffect(() => {
-    if (!marathonOn && rankBoosterOn) setTab('rankbooster')
+    if (!rankBoosterOn && marathonOn) setTab('vettri')
+    else if (!marathonOn && rankBoosterOn) setTab('rankbooster')
   }, [marathonOn, rankBoosterOn])
+
+  // Click-and-drag-to-scroll for the promo banner stack below: a mouse user can
+  // grab anywhere on a banner and drag to scroll the page, not just the edge
+  // scrollbar. Touch/pen are left alone (they already scroll natively). A tiny
+  // movement is still treated as a tap so the banners' own buttons keep working.
+  const bannerDrag = useRef({ down: false, startY: 0, startScroll: 0, dragged: false })
+  const onBannerPointerDown = (e: ReactPointerEvent) => {
+    if (e.pointerType !== 'mouse') return
+    bannerDrag.current = { down: true, startY: e.clientY, startScroll: window.scrollY, dragged: false }
+  }
+  const onBannerPointerMove = (e: ReactPointerEvent) => {
+    const s = bannerDrag.current
+    if (!s.down) return
+    const delta = e.clientY - s.startY
+    if (Math.abs(delta) > 4) s.dragged = true
+    if (s.dragged) window.scrollTo({ top: s.startScroll - delta })
+  }
+  const endBannerDrag = () => {
+    bannerDrag.current.down = false
+  }
+  // Capture-phase: swallow the click that would otherwise fire on a banner
+  // button right after a drag, so dragging never doubles as "buy this".
+  const onBannerClickCapture = (e: React.MouseEvent) => {
+    if (bannerDrag.current.dragged) {
+      e.preventDefault()
+      e.stopPropagation()
+      bannerDrag.current.dragged = false
+    }
+  }
 
   const unlimited = useEntitlementsStore((s) => s.unlimited)
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
@@ -73,8 +104,8 @@ export default function TestSeriesPage() {
   }, [tab, overall])
 
   const tabs: { key: HubTab; label: string }[] = [
-    ...(marathonOn ? [{ key: 'vettri' as const, label: t('testSeriesTabG1') }] : []),
     ...(rankBoosterOn ? [{ key: 'rankbooster' as const, label: t('testSeriesTabG2') }] : []),
+    ...(marathonOn ? [{ key: 'vettri' as const, label: t('testSeriesTabG1') }] : []),
     { key: 'overall' as const, label: t('tsOverallTab') },
   ]
 
@@ -112,14 +143,19 @@ export default function TestSeriesPage() {
         <p className="tamil mt-1 font-body text-base text-muted">{t('testSeriesHubSub')}</p>
       </header>
 
-      {/* Symmetric cross-promo: Vettri Nichayam/Test Marathon gets the same
-          banner treatment as Rank Booster below, just shown on every tab
-          EXCEPT its own. On the Overall tab both banners show together. */}
-      {marathonOn && tab !== 'vettri' && (
-        <button
-          onClick={() => setTab('vettri')}
-          className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
-        >
+      <div
+        onPointerDown={onBannerPointerDown}
+        onPointerMove={onBannerPointerMove}
+        onPointerUp={endBannerDrag}
+        onPointerLeave={endBannerDrag}
+        onClickCapture={onBannerClickCapture}
+        className="cursor-grab active:cursor-grabbing"
+      >
+      {/* Pinned to its own tab only — a plain info strip, not a cross-tab
+          switcher: the ₹899 price only ever appears while looking at the
+          Group 1 Test Series tab. */}
+      {marathonOn && tab === 'vettri' && (
+        <div className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-white">
           <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
             <Trophy size={20} />
           </span>
@@ -134,19 +170,17 @@ export default function TestSeriesPage() {
           <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
             <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
           </span>
-        </button>
+        </div>
       )}
 
-      {/* Announces the second product on the hub itself — visible on EVERY tab,
-          including Rank Booster's own (unlike the Vettri banner below, which
-          hides on its own tab): the 399 Mock Pack banner always shows here, and
-          this one should always sit alongside it rather than disappearing the
-          moment someone's already on the Rank Booster tab. */}
-      {rankBoosterOn && (
+      {/* Pinned to its own tab too — the ₹1249 price only ever appears on the
+          Group II/IIA tab. Stays a real button while locked (tap starts the
+          purchase flow); once unlocked it's a plain info strip like the
+          Group 1 banner above. */}
+      {rankBoosterOn && tab === 'rankbooster' && !rbPurchase.rankBoosterUnlocked && (
         <button
-          onClick={() =>
-            rbPurchase.rankBoosterUnlocked ? setTab('rankbooster') : rbPurchase.startEnroll()
-          }
+          type="button"
+          onClick={rbPurchase.startEnroll}
           disabled={rbPurchase.paying}
           className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
         >
@@ -161,17 +195,30 @@ export default function TestSeriesPage() {
               {t('rankBoosterBannerSub')}
             </span>
           </span>
-          {!rbPurchase.rankBoosterUnlocked && (
-            <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-              <span className="font-body text-2xs text-white/70 line-through">₹{RANK_BOOSTER_MRP_RUPEES}</span>
-              <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
-            </span>
-          )}
+          <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+            <span className="font-body text-2xs text-white/70 line-through">₹{RANK_BOOSTER_MRP_RUPEES}</span>
+            <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
+          </span>
         </button>
+      )}
+      {rankBoosterOn && tab === 'rankbooster' && rbPurchase.rankBoosterUnlocked && (
+        <div className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-white">
+          <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+            <Rocket size={20} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="tamil block font-display text-sm font-bold tracking-tight">
+              {t('rankBoosterBannerTitle')}
+            </span>
+            <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+              {t('rankBoosterBannerSub')}
+            </span>
+          </span>
+        </div>
       )}
 
       {/* Group 1 Mock Test Pack (6 mock exams) - a lighter, cheaper entry point
-          than the full Vettri bundle, now a real ₹399/80-day SKU of its own
+          than the full Group 1 Test Series bundle, now a real ₹399/80-day SKU of its own
           (see useMockPackPurchase). No tab of its own on this hub: an owner
           taps straight through to the exams (/mock); anyone else taps straight
           into the same confirm→Razorpay flow as every other paid-plan card.
@@ -201,6 +248,7 @@ export default function TestSeriesPage() {
           )}
         </button>
       )}
+      </div>
 
       {/* Tab capsule + schedule download sit in one row ("parallel") on wide
           screens; on mobile they wrap onto their own full-width rows instead
