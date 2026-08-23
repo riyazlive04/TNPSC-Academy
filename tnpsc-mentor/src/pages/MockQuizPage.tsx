@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Flag, Grid3x3, GripVertical, Loader2, Maximize2, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Flag, Grid3x3, GripVertical, Loader2, Maximize2, ServerCrash, WifiOff, X } from 'lucide-react'
 import QuestionStem from '../components/Quiz/QuestionStem'
 import QuestionFigures from '../components/Quiz/QuestionFigures'
 import OmrBubbles from '../components/Quiz/OmrBubbles'
@@ -10,6 +10,7 @@ import ReportQuestionModal from '../components/Quiz/ReportQuestionModal'
 import LogoLoader from '../components/UI/LogoLoader'
 import { formatTime } from '../components/UI/Timer'
 import { api, ApiError } from '../lib/api'
+import { classifyError, type ErrorKind } from '../components/UI/ErrorState'
 import { describeConfig } from '../lib/fetchQuestions'
 import { exitFullscreen } from '../lib/proctor'
 import { submitTest } from '../lib/submitTest'
@@ -83,6 +84,10 @@ export default function MockQuizPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  // Only meaningful when loadError is the generic transport-error branch below -
+  // the credit/free-test gates are deliberate server responses, not a network
+  // failure, so they always render the plain AlertTriangle icon.
+  const [loadErrorKind, setLoadErrorKind] = useState<ErrorKind>('generic')
   const [empty, setEmpty] = useState(false)
   // Bumped by the Retry button to re-run the load effect after a load failure.
   const [reloadKey, setReloadKey] = useState(0)
@@ -199,6 +204,7 @@ export default function MockQuizPage() {
               ? (err.data as { reason?: string; cost?: number })
               : undefined
           const outOfCredits = err?.status === 402 && err.message === 'insufficient_credits'
+          const isGate = outOfCredits || gate?.reason === 'mock_free_used'
           setLoadError(
             outOfCredits
               ? t('outOfCredits')
@@ -206,6 +212,7 @@ export default function MockQuizPage() {
                 ? t('mockFreeUsed')
                 : t('loadQuestionsError')
           )
+          setLoadErrorKind(isGate ? 'generic' : classifyError(e))
           // Force the buy decision: the inline error stays behind as context.
           if (outOfCredits) upsell.credits(gate?.cost)
           else if (gate?.reason === 'mock_free_used') upsell.premium()
@@ -515,9 +522,18 @@ export default function MockQuizPage() {
     )
   }
   if (loadError || empty) {
+    const LoadErrorIcon =
+      empty || loadErrorKind === 'generic'
+        ? AlertTriangle
+        : loadErrorKind === 'network'
+          ? WifiOff
+          : ServerCrash
     return (
       <CenteredScreen>
-        <AlertTriangle size={36} className="text-coral" />
+        <LoadErrorIcon
+          size={36}
+          className={!empty && loadErrorKind === 'network' ? 'text-sky' : 'text-coral'}
+        />
         <p className="mt-3 max-w-sm text-center font-body text-sm text-ink2">
           {empty ? t('noQuestionsLong') : loadError}
         </p>

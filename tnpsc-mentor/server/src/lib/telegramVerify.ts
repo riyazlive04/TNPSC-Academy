@@ -130,6 +130,10 @@ export async function handleTelegramUpdate(update: TgUpdate): Promise<void> {
   const msg = update?.message
   const chatId = msg?.chat?.id
   if (!msg || typeof chatId !== 'number') return
+  // getUpdates can't be polled while this webhook is active (Telegram rejects
+  // both at once), so this is the only visibility into an inbound chat_id —
+  // useful whenever someone needs to be looked up/added as an alert recipient.
+  console.log('[tg-webhook] update from chat_id', chatId, 'text:', msg.text ?? '(non-text)')
 
   try {
     // ── /start <token> ────────────────────────────────────────────────────────
@@ -218,6 +222,20 @@ export async function handleTelegramUpdate(update: TgUpdate): Promise<void> {
             '❌ இந்த Telegram கணக்கு நீங்கள் உள்ளிட்ட எண்ணுடன் இணைக்கப்படவில்லை. ' +
             'உங்கள் Telegram எண்ணுடன் பதிவு செய்யவும் அல்லது WhatsApp உள்ள எண்ணை உள்ளிடவும்.',
         reply_markup: { remove_keyboard: true },
+      })
+      return
+    }
+
+    // ── /adminid — self-serve chat id lookup ──────────────────────────────────
+    // Lets whoever should receive ops/security Telegram alerts (see
+    // lib/securityAlerts.ts) get their own numeric chat id without a second bot
+    // or touching this webhook (Telegram forbids polling getUpdates while a
+    // webhook is active). Harmless to leave live: it reveals nothing but the
+    // sender their own already-visible-to-them chat id.
+    if (text === '/adminid') {
+      await tg('sendMessage', {
+        chat_id: chatId,
+        text: `Your Telegram chat ID is: ${chatId}\n\nSet this as SECURITY_ALERT_CHAT_ID in server/.env to receive ops/security alerts here.`,
       })
       return
     }

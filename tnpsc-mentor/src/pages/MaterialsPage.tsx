@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Play, FileText, Image as ImageIcon, Download, Library, Newspaper, ListChecks } from 'lucide-react'
+import { Play, FileText, Image as ImageIcon, Download, Library, Newspaper, ListChecks } from 'lucide-react'
 import MaterialViewer from '../components/Materials/MaterialViewer'
 import MagazineReader from '../components/Materials/MagazineReader'
 import { SkeletonCards } from '../components/UI/Skeleton'
+import ErrorState from '../components/UI/ErrorState'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
 import { issueDateLabel, magazineName } from '../lib/caMagazine'
@@ -31,14 +32,14 @@ const FILTERS: { value: MaterialKind | 'all'; key: StringKey }[] = [
 export default function MaterialsPage() {
   const { t, lang } = useT()
   const [items, setItems] = useState<Material[] | null>(null)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<unknown>(null)
   const [filter, setFilter] = useState<MaterialKind | 'all'>('all')
   const [active, setActive] = useState<Material | null>(null)
   // Magazine covers, keyed by materials row id (one batch call, see below).
   const [covers, setCovers] = useState<Record<string, string>>({})
 
   const load = () => {
-    setError(false)
+    setError(null)
     api.materials
       // CA Questions are surfaced in their own dashboard section, not here.
       .list('materials')
@@ -55,7 +56,7 @@ export default function MaterialsPage() {
             .catch(() => undefined)
         }
       })
-      .catch(() => setError(true))
+      .catch(setError)
   }
   useEffect(load, [])
 
@@ -110,15 +111,7 @@ export default function MaterialsPage() {
           />
         )}
 
-        {error && (
-          <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <AlertTriangle size={30} className="text-coral" />
-            <p className="font-body text-ink2">{t('couldNotLoad')}</p>
-            <button onClick={load} className="btn-ghost btn-sm">
-              {t('retry')}
-            </button>
-          </div>
-        )}
+        {error != null && <ErrorState error={error} onRetry={load} />}
 
         {items && !error && filtered.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">

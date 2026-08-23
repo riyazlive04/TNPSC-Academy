@@ -16,6 +16,7 @@ import {
 import ProgressBar from '../components/UI/ProgressBar'
 import StatStrip from '../components/UI/StatStrip'
 import { SkeletonAnalytics } from '../components/UI/Skeleton'
+import ErrorState from '../components/UI/ErrorState'
 import { fetchUserAnalytics, weakAreas, type UserAnalytics } from '../lib/analytics'
 import { fetchHabit, fetchPercentile, type HabitState } from '../lib/habit'
 import { SHOW_STREAK } from '../lib/features'
@@ -46,12 +47,17 @@ export default function InsightsPage() {
   const [percentile, setPercentile] = useState<number | null>(null)
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<unknown>(null)
   const [subjectSort, setSubjectSort] = useState<'accuracy' | 'volume'>('accuracy')
   const [subjectPage, setSubjectPage] = useState(0)
+  // Bumped by ErrorState's retry button to re-run the load effect.
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     if (!user) return
     let cancelled = false
+    setLoading(true)
+    setError(null)
     Promise.all([
       fetchUserAnalytics(user.id),
       fetchPercentile(user.id),
@@ -63,12 +69,16 @@ export default function InsightsPage() {
         setPercentile(p)
         setHabit(h)
       })
-      .catch(() => !cancelled && setData(null))
+      .catch((e) => {
+        if (cancelled) return
+        setData(null)
+        setError(e)
+      })
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
-  }, [user, profile?.daily_goal, profile?.exam_date])
+  }, [user, profile?.daily_goal, profile?.exam_date, reloadKey])
 
   // Syllabus coverage: subjects practised vs the target group's subject list.
   const group = (profile?.target_group as GroupType) || 'Group1'
@@ -122,7 +132,11 @@ export default function InsightsPage() {
 
         {loading && <SkeletonAnalytics />}
 
-        {!loading && !hasData && (
+        {!loading && error != null && (
+          <ErrorState error={error} onRetry={() => setReloadKey((k) => k + 1)} />
+        )}
+
+        {!loading && error == null && !hasData && (
           <div className="flex flex-col items-center gap-5 py-16 text-center">
             <span className="grid h-16 w-16 place-items-center rounded-2xl bg-brand-soft text-brand">
               <Sparkles size={28} />

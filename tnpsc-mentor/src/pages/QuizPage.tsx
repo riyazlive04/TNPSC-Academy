@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Maximize2, X } from 'lucide-react'
+import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Maximize2, ServerCrash, WifiOff, X } from 'lucide-react'
 import type { Lang } from '../store/languageStore'
 import Timer from '../components/UI/Timer'
 import ScreenGuard from '../components/Quiz/ScreenGuard'
@@ -25,6 +25,7 @@ import { useCreditsStore } from '../store/creditsStore'
 import { upsell } from '../store/upsellStore'
 import { describeConfig, fetchQuestionsForConfig } from '../lib/fetchQuestions'
 import { api, ApiError } from '../lib/api'
+import { classifyError, type ErrorKind } from '../components/UI/ErrorState'
 import { submitTest } from '../lib/submitTest'
 import { abandonTest } from '../lib/abandonTest'
 import { useProctoring, MAX_VIOLATIONS, type Violation } from '../hooks/useProctoring'
@@ -91,6 +92,10 @@ export default function QuizPage() {
 
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  // Only meaningful when loadError is the generic transport-error branch below -
+  // the credit/free-test gates are deliberate server responses, not a network
+  // failure, so they always render the plain AlertTriangle icon.
+  const [loadErrorKind, setLoadErrorKind] = useState<ErrorKind>('generic')
   const [empty, setEmpty] = useState(false)
   // Bumped by the Retry button to re-run the load effect after a load failure.
   const [reloadKey, setReloadKey] = useState(0)
@@ -178,6 +183,7 @@ export default function QuizPage() {
               ? (err.data as { reason?: string; cost?: number })
               : undefined
           const outOfCredits = err?.status === 402 && err.message === 'insufficient_credits'
+          const isGate = outOfCredits || gate?.reason === 'mock_free_used'
           setLoadError(
             outOfCredits
               ? t('outOfCredits')
@@ -185,6 +191,7 @@ export default function QuizPage() {
                 ? t('mockFreeUsed')
                 : t('loadQuestionsError')
           )
+          setLoadErrorKind(isGate ? 'generic' : classifyError(e))
           // Force the buy decision: the inline error stays behind as context.
           if (outOfCredits) upsell.credits(gate?.cost)
           else if (gate?.reason === 'mock_free_used') upsell.premium()
@@ -486,9 +493,11 @@ export default function QuizPage() {
   }
 
   if (loadError) {
+    const LoadErrorIcon =
+      loadErrorKind === 'network' ? WifiOff : loadErrorKind === 'server' ? ServerCrash : AlertTriangle
     return (
       <CenteredMessage>
-        <AlertTriangle size={36} className="text-coral" />
+        <LoadErrorIcon size={36} className={loadErrorKind === 'network' ? 'text-sky' : 'text-coral'} />
         <p className="max-w-sm text-center font-body text-ink2">{loadError}</p>
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button onClick={() => setReloadKey((k) => k + 1)} className="btn-brand px-6 py-2.5">

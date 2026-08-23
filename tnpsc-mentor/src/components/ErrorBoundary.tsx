@@ -1,5 +1,7 @@
-import { Component, useState, type ErrorInfo, type ReactNode } from 'react'
-import { AlertTriangle, RotateCw, Home, Copy, Check } from 'lucide-react'
+import { Component, useEffect, useState, type ErrorInfo, type ReactNode } from 'react'
+import { AlertTriangle, RotateCw, Home, Copy, Check, WifiOff, Sparkles } from 'lucide-react'
+import { classifyError } from './UI/ErrorState'
+import { reportClientError } from '../lib/reportClientError'
 
 interface Props {
   children: ReactNode
@@ -38,9 +40,22 @@ export default class ErrorBoundary extends Component<Props, State> {
 }
 
 /**
+ * A route-chunk `import()` rejecting - stale asset hashes after a redeploy, or
+ * no connection when the chunk was never cached - throws during render exactly
+ * like a real bug and lands here too. It deserves its own copy: "reload for the
+ * latest version" reads very differently from "something broke".
+ */
+function isChunkLoadError(error: Error): boolean {
+  return /dynamically imported module|importing a module script failed|chunkloaderror/i.test(
+    `${error.name} ${error.message}`
+  )
+}
+
+/**
  * The recoverable error screen. Shown by ErrorBoundary on a crash; standalone so
- * it can be reused/previewed. Surfaces the real error message directly so the
- * user (and support) can see exactly what failed, with a one-tap copy.
+ * it can be reused/previewed. A chunk-load or offline failure gets its own
+ * actionable copy; anything else surfaces the real error message directly so
+ * the user (and support) can see exactly what failed, with a one-tap copy.
  */
 export function ErrorScreen({
   error,
@@ -50,6 +65,20 @@ export function ErrorScreen({
   componentStack?: string | null
 }) {
   const [copied, setCopied] = useState(false)
+
+  const kind = isChunkLoadError(error) ? 'chunk' : classifyError(error) === 'network' ? 'network' : 'generic'
+
+  // A genuine unhandled crash - the highest-value 'generic' case to page on.
+  // Chunk-load (a stale deploy, not a bug) and network (the user's own dropped
+  // connection) are deliberately never reported.
+  useEffect(() => {
+    if (kind !== 'generic') return
+    reportClientError({
+      kind: 'generic',
+      path: window.location.pathname,
+      message: error.name ? `${error.name}: ${error.message}` : error.message,
+    })
+  }, [error, kind])
 
   const details = [error.name ? `${error.name}: ${error.message}` : error.message, componentStack]
     .filter(Boolean)
@@ -63,6 +92,48 @@ export function ErrorScreen({
     } catch {
       /* clipboard unavailable - no-op */
     }
+  }
+
+  if (kind === 'chunk') {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-canvas px-5 py-10 text-center">
+        <span className="grid h-16 w-16 place-items-center rounded-hero bg-tint-violet">
+          <Sparkles size={30} className="text-primary" />
+        </span>
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
+            New version available
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm font-body text-sm leading-relaxed text-muted">
+            TNPSC Mentors was updated since this page loaded. Reload to get the latest version.
+          </p>
+        </div>
+        <button onClick={() => window.location.reload()} className="btn-brand px-6 py-3 text-sm">
+          <RotateCw size={16} /> Reload app
+        </button>
+      </div>
+    )
+  }
+
+  if (kind === 'network') {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-canvas px-5 py-10 text-center">
+        <span className="grid h-16 w-16 place-items-center rounded-hero bg-tint-blue">
+          <WifiOff size={30} className="text-sky" />
+        </span>
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
+            No internet connection
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm font-body text-sm leading-relaxed text-muted">
+            Check your Wi-Fi or mobile data, then try again.
+          </p>
+        </div>
+        <button onClick={() => window.location.reload()} className="btn-brand px-6 py-3 text-sm">
+          <RotateCw size={16} /> Retry
+        </button>
+      </div>
+    )
   }
 
   return (

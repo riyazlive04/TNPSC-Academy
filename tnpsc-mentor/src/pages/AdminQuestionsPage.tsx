@@ -22,6 +22,7 @@ import QuestionFigures from '../components/Quiz/QuestionFigures'
 import { optionLetters, displayOption, displayQuestion, displayExplanation } from '../types'
 import MathText from '../components/UI/MathText'
 import { SkeletonCards } from '../components/UI/Skeleton'
+import ErrorState from '../components/UI/ErrorState'
 import type { DisplayLang, Question, QuizConfig } from '../types'
 import { describeConfig, deleteAdminQuestion, fetchAdminQuestions, setAdminQuestionActive } from '../lib/fetchQuestions'
 import { OUTER_SUBJECTS, PYQ_SUBJECTS, subjectName, topicName } from '../lib/constants'
@@ -54,7 +55,7 @@ export default function AdminQuestionsPage() {
 
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<unknown>(null)
   const [search, setSearch] = useState('')
   // Debounced ~250ms after typing pauses, so `filtered` below (and the up-to-500
   // memoised rows it drives) don't re-filter on every keystroke — the input
@@ -157,12 +158,12 @@ export default function AdminQuestionsPage() {
     let cancelled = false
     const load = async () => {
       setLoading(true)
-      setError('')
+      setError(null)
       try {
         const data = await fetchAdminQuestions(activeConfig)
         if (!cancelled) setQuestions(data)
-      } catch {
-        if (!cancelled) setError(t('loadQuestionsError'))
+      } catch (e) {
+        if (!cancelled) setError(e)
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -407,12 +408,7 @@ export default function AdminQuestionsPage() {
 
         {loading && <SkeletonCards count={5} height="h-44" className="flex flex-col gap-4" />}
 
-        {!loading && error && (
-          <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <AlertTriangle size={32} className="text-coral" />
-            <p className="max-w-sm font-body text-ink2">{error}</p>
-          </div>
-        )}
+        {!loading && error != null && <ErrorState error={error} onRetry={reloadQuestions} />}
 
         {!loading && !error && questions.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-12 text-center">

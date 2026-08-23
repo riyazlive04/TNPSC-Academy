@@ -225,6 +225,33 @@ export function recordServerError(path: string, status: number): void {
 }
 
 /**
+ * Called when the CLIENT itself renders a 'server' or 'generic' error screen
+ * (components/UI/ErrorState.tsx, ErrorBoundary's crash screen) — i.e. a real
+ * person actually saw the failure, not just a status code in a log. Unlike
+ * recordServerError's 25-in-5-minutes spike threshold, this alerts on the
+ * FIRST occurrence of a given kind+path: a rare-but-real bug shouldn't need to
+ * hit 25 users before anyone hears about it. `raise`'s own 15-minute per-key
+ * cooldown is what keeps a recurring failure from paging on every retry.
+ * Deliberately excludes 'network' — a user's own dropped connection isn't
+ * something the team can act on.
+ */
+export function recordClientError(opts: {
+  kind: 'server' | 'generic'
+  path: string
+  message: string
+  status?: number
+  userId?: string | null
+}): void {
+  const { kind, path, message, status, userId } = opts
+  raise(
+    'client_error',
+    `${kind}:${path}`,
+    `A user hit a ${kind} error on ${path}${status ? ` (HTTP ${status})` : ''}: ${message}`,
+    { kind, path, status, user_id: userId }
+  )
+}
+
+/**
  * Called on a Postgres statement-timeout (57014) or an outbound Supabase call
  * that exhausted every retry — the two failure shapes behind "Failed to fetch"
  * / "can't reach server" reports. `reason` is a short machine tag ('db_timeout'

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bookmark, BookmarkX, Check, Loader2 } from 'lucide-react'
 import YouTubeEmbed from '../components/Quiz/YouTubeEmbed'
 import { SkeletonCards } from '../components/UI/Skeleton'
+import ErrorState from '../components/UI/ErrorState'
 import { fetchBookmarkedQuestions, removeBookmark } from '../lib/bookmarks'
 import { optionLetters, displayQuestion, displayOption, displayExplanation } from '../types'
 import type { Question } from '../types'
@@ -13,17 +14,21 @@ export default function BookmarksPage() {
   const { lang } = useT()
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<unknown>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  // Bumped by ErrorState's retry button to re-run the load effect.
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setError(null)
     ;(async () => {
       try {
         const data = await fetchBookmarkedQuestions()
         if (!cancelled) setQuestions(data)
-      } catch {
-        if (!cancelled) setError('Could not load your saved questions. Please try again.')
+      } catch (e) {
+        if (!cancelled) setError(e)
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -31,7 +36,7 @@ export default function BookmarksPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [reloadKey])
 
   const handleRemove = async (id: string) => {
     setRemovingId(id)
@@ -70,7 +75,9 @@ export default function BookmarksPage() {
           />
         )}
 
-        {!loading && error && <p className="py-12 text-center font-body text-muted">{error}</p>}
+        {!loading && error != null && (
+          <ErrorState error={error} onRetry={() => setReloadKey((k) => k + 1)} />
+        )}
 
         {!loading && !error && questions.length === 0 && (
           <div className="flex flex-col items-center gap-3 py-16 text-center">

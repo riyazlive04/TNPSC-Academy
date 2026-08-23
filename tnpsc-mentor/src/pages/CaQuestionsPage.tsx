@@ -4,6 +4,7 @@ import PickerPage from '../components/Layout/PickerPage'
 import IconTile from '../components/UI/IconTile'
 import { List, ListRow } from '../components/UI/ListRow'
 import { SkeletonList } from '../components/UI/Skeleton'
+import ErrorState from '../components/UI/ErrorState'
 import SectionHeader from '../components/UI/SectionHeader'
 import { api, type CaDailySet, type Material } from '../lib/api'
 import { issueDateLabel, setKeyOrder } from '../lib/caMagazine'
@@ -44,11 +45,11 @@ export default function CaQuestionsPage() {
   const [tab, setTab] = useState<Tab>('quiz')
   const [sets, setSets] = useState<Material[] | null>(cache)
   const [daily, setDaily] = useState<CaDailySet[] | null>(dailyCache)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<unknown>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
 
   const load = () => {
-    setError(false)
+    setError(null)
     api.materials
       .list('materials')
       .then((all) => {
@@ -60,7 +61,7 @@ export default function CaQuestionsPage() {
         cache = qs
         setSets(qs)
       })
-      .catch(() => setError(true))
+      .catch(setError)
     // The playable daily sets. Published-but-not-downloadable days still appear
     // here: `downloadable` gates the answer PDF, not the test.
     api.caQuestions
@@ -196,14 +197,7 @@ export default function CaQuestionsPage() {
 
       {loading && !error && <SkeletonList rows={6} />}
 
-      {error && (
-        <div className="flex flex-col items-center gap-3 py-16 text-center">
-          <p className="font-body text-ink2">{t('couldNotLoad')}</p>
-          <button onClick={load} className="btn-ghost btn-sm">
-            {t('retry')}
-          </button>
-        </div>
-      )}
+      {error != null && <ErrorState error={error} onRetry={load} />}
 
       {empty && !error && (
         <div className="flex flex-col items-center gap-3 py-16 text-center">

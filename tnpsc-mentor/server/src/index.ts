@@ -7,7 +7,7 @@ import { config, isAllowedOrigin } from './config.js'
 import { requestLog } from './middleware/requestLog.js'
 import { auditAdmin } from './middleware/auditAdmin.js'
 import { startAuditRetention } from './lib/audit.js'
-import { securityAlertsEnabled } from './lib/securityAlerts.js'
+import { securityAlertsEnabled, raise } from './lib/securityAlerts.js'
 
 import authRoutes from './routes/auth.js'
 import questionRoutes from './routes/questions.js'
@@ -34,6 +34,7 @@ import caTelegramRoutes from './routes/caTelegram.js'
 import creditRoutes from './routes/credits.js'
 import appRoutes from './routes/app.js'
 import telegramRoutes from './routes/telegram.js'
+import clientErrorRoutes from './routes/clientErrors.js'
 
 const app = express()
 
@@ -108,6 +109,7 @@ app.use('/api/ca-telegram', caTelegramRoutes)
 app.use('/api/credits', creditRoutes)
 app.use('/api/app', appRoutes)
 app.use('/api/telegram', telegramRoutes)
+app.use('/api/client-errors', clientErrorRoutes)
 
 // 404 for unknown API routes.
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }))
@@ -116,7 +118,7 @@ app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }))
 app.use(
   (
     err: Error,
-    _req: express.Request,
+    req: express.Request,
     res: express.Response,
     _next: express.NextFunction
   ) => {
@@ -129,6 +131,18 @@ app.use(
       (err as { statusCode?: unknown }).statusCode
     const status = typeof raw === 'number' && raw >= 400 && raw <= 599 ? raw : 500
     const message = status >= 500 ? 'Internal server error' : (err.message || 'Request error')
+    if (status >= 500) {
+      // Immediate ping on the FIRST crash of a given route+error, not just once
+      // recordServerError's 25-in-5-minutes spike threshold trips — a genuine
+      // unhandled exception is worth knowing about right away.
+      const path = req.originalUrl.split('?')[0]
+      raise(
+        'unhandled_exception',
+        `${path}:${err.name || 'Error'}`,
+        `Unhandled exception on ${req.method} ${path}: ${err.name || 'Error'}: ${err.message || '(no message)'}`,
+        { path, method: req.method }
+      )
+    }
     res.status(status).json({ error: message })
   }
 )
