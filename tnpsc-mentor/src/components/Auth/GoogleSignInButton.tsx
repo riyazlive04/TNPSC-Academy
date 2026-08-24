@@ -45,6 +45,13 @@ declare global {
   }
 }
 
+// Android's WebView appends "; wv)" to its user-agent's platform token — absent
+// from real Chrome. Google's own Sign-In SDK refuses to run inside a WebView
+// (an anti-phishing measure on Google's side, not something we can bypass), so
+// this is worth detecting to give affected users a message that actually
+// explains what happened instead of a generic "failed to load".
+const isAndroidWebView = /; ?wv\)/i.test(navigator.userAgent)
+
 // Load the Google Identity Services script exactly once, shared across mounts.
 let gsiPromise: Promise<void> | null = null
 function loadGsi(): Promise<void> {
@@ -271,7 +278,7 @@ export default function GoogleSignInButton({
       .catch((e) => {
         if (cancelled) return
         const msg = e instanceof Error ? e.message : 'Failed to load Google sign-in'
-        errorRef.current(msg)
+        errorRef.current(isAndroidWebView ? t('errGoogleWebView') : msg)
         // Server-side record (audit_log, via the same client-error telemetry
         // ErrorBoundary uses) so this is diagnosable from real traffic instead
         // of guessing — the server captures User-Agent/IP from the request
@@ -279,7 +286,7 @@ export default function GoogleSignInButton({
         reportClientError({
           kind: 'generic',
           path: window.location.pathname,
-          message: `${msg} | UA: ${navigator.userAgent}`,
+          message: `${msg}${isAndroidWebView ? ' [webview]' : ''} | UA: ${navigator.userAgent}`,
         })
       })
     return () => {
