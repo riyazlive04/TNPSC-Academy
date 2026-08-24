@@ -7,6 +7,7 @@ import { useT } from '../../lib/i18n'
 import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuthConfigStore } from '../../store/authConfigStore'
+import { reportClientError } from '../../lib/reportClientError'
 import DeviceLimitModal from './DeviceLimitModal'
 import TotpChallengeModal from './TotpChallengeModal'
 import type { DeviceSession } from '../../lib/api'
@@ -95,15 +96,6 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // The GSI script (accounts.google.com/gsi/client) is blocked outright by
-  // common ad-blocker/privacy lists (EasyPrivacy and similar flag it as a
-  // tracker) — Clarity showed this hitting ~11% of login-page sessions. That's
-  // not a bug we can fix by retrying; it's simply unavailable for those users.
-  // Failing quietly (hide the button) instead of surfacing it through the same
-  // banner as a real credential error keeps email/password — which still works
-  // fine — the obvious, uncluttered path, instead of making the whole page look
-  // broken before the user even tries their own password.
-  const [loadFailed, setLoadFailed] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
   // picking the Google account and the profile/onboarding screen appearing.
@@ -154,6 +146,8 @@ export default function GoogleSignInButton({
     // Leave the overlay up through navigation; it unmounts with this component.
     navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
   }
+  const errorRef = useRef(onError)
+  errorRef.current = onError
 
   // Sign out the chosen device, then finish signing in here. TOTP-triggered
   // blocks (already past the code check) use that fresh ticket; Google-
@@ -274,8 +268,19 @@ export default function GoogleSignInButton({
         ro = new ResizeObserver(() => renderButton())
         ro.observe(containerRef.current)
       })
-      .catch(() => {
-        if (!cancelled) setLoadFailed(true)
+      .catch((e) => {
+        if (cancelled) return
+        const msg = e instanceof Error ? e.message : 'Failed to load Google sign-in'
+        errorRef.current(msg)
+        // Server-side record (audit_log, via the same client-error telemetry
+        // ErrorBoundary uses) so this is diagnosable from real traffic instead
+        // of guessing — the server captures User-Agent/IP from the request
+        // itself, so browser/network patterns are queryable later.
+        reportClientError({
+          kind: 'generic',
+          path: window.location.pathname,
+          message: `${msg} | UA: ${navigator.userAgent}`,
+        })
       })
     return () => {
       cancelled = true
@@ -337,7 +342,7 @@ export default function GoogleSignInButton({
             {label}
           </button>
         </div>
-      ) : loadFailed ? null : (
+      ) : (
         // GIS renders its own fixed-width button; center it within the form column.
         <div ref={containerRef} className="flex justify-center" />
       )}

@@ -245,13 +245,18 @@ export function recordClientError(opts: {
    *  Telegram summary (too long to page on) but stored in audit_log.detail so a
    *  superadmin can actually find the component, not just the route. */
   componentStack?: string | null
+  /** Request IP/User-Agent, captured server-side (never trust a client-supplied
+   *  value) — the only way to see WHICH browsers/networks a given client-side
+   *  failure clusters on, since the browser console never reaches us otherwise. */
+  ip?: string
+  userAgent?: string
 }): void {
-  const { kind, path, message, status, userId, componentStack } = opts
+  const { kind, path, message, status, userId, componentStack, ip, userAgent } = opts
   raise(
     'client_error',
     `${kind}:${path}`,
     `A user hit a ${kind} error on ${path}${status ? ` (HTTP ${status})` : ''}: ${message}`,
-    { kind, path, status, user_id: userId, component_stack: componentStack ?? undefined }
+    { kind, path, status, user_id: userId, component_stack: componentStack ?? undefined, ip, user_agent: userAgent }
   )
 }
 

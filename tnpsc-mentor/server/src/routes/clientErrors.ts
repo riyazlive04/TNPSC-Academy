@@ -14,6 +14,7 @@ import { Router } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import { asyncH } from '../util.js'
 import { recordClientError } from '../lib/securityAlerts.js'
+import { clientIp } from '../lib/audit.js'
 
 const router = Router()
 
@@ -47,7 +48,16 @@ router.post(
         ? req.body.componentStack.slice(0, 2000)
         : null
 
-    recordClientError({ kind, path, message, status, userId, componentStack })
+    recordClientError({
+      kind,
+      path,
+      message,
+      status,
+      userId,
+      componentStack,
+      ip: clientIp(req),
+      userAgent: req.headers['user-agent'],
+    })
     res.json({ ok: true })
   })
 )
