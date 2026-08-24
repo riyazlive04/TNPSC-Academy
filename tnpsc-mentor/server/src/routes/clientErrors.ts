@@ -42,8 +42,12 @@ router.post(
         : undefined
     const userId =
       typeof req.body?.userId === 'string' ? req.body.userId.slice(0, 100) : null
+    const componentStack =
+      typeof req.body?.componentStack === 'string'
+        ? req.body.componentStack.slice(0, 2000)
+        : null
 
-    recordClientError({ kind, path, message, status, userId })
+    recordClientError({ kind, path, message, status, userId, componentStack })
     res.json({ ok: true })
   })
 )

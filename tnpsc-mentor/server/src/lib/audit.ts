@@ -82,24 +82,51 @@ export function clientUa(req: Request): string {
  * reported to stderr rather than propagated.
  */
 export function audit(entry: AuditEntry): void {
+  const row = {
+    category: entry.category,
+    action: entry.action,
+    actor_id: entry.actorId ?? null,
+    actor_role: entry.actorRole ?? null,
+    subject_id: entry.subjectId ?? null,
+    status: entry.status ?? null,
+    ip: entry.ip ?? null,
+    user_agent: entry.userAgent ?? null,
+    detail: (redact(entry.detail ?? {}) as Record<string, unknown>) ?? {},
+  }
+
   void supabaseAdmin
     .from('audit_log')
-    .insert({
-      category: entry.category,
-      action: entry.action,
-      actor_id: entry.actorId ?? null,
-      actor_role: entry.actorRole ?? null,
-      subject_id: entry.subjectId ?? null,
-      status: entry.status ?? null,
-      ip: entry.ip ?? null,
-      user_agent: entry.userAgent ?? null,
-      detail: (redact(entry.detail ?? {}) as Record<string, unknown>) ?? {},
-    })
+    .insert(row)
     .then(({ error }) => {
-      if (error) {
-        // eslint-disable-next-line no-console
-        console.error('[audit] write failed', entry.category, entry.action, error.message)
+      if (!error) return
+
+      // The write runs after the response (res.on('finish')), so an action that
+      // itself deletes its subject — e.g. superadmin user deletion — races the
+      // FK: subject_id no longer exists in auth.users by the time this fires.
+      // The schema already expects subjects to disappear (subject_id is
+      // `on delete set null` for existing rows); retry once with it nulled out
+      // rather than lose the whole entry — actor/action/detail (which still
+      // carries the subject's id, redacted or not) survive either way.
+      if (error.code === '23503' && row.subject_id !== null) {
+        void supabaseAdmin
+          .from('audit_log')
+          .insert({ ...row, subject_id: null })
+          .then(({ error: retryError }) => {
+            if (retryError) {
+              // eslint-disable-next-line no-console
+              console.error(
+                '[audit] write failed (retry w/o subject_id)',
+                entry.category,
+                entry.action,
+                retryError.message
+              )
+            }
+          })
+        return
       }
+
+      // eslint-disable-next-line no-console
+      console.error('[audit] write failed', entry.category, entry.action, error.message)
     })
 }
 

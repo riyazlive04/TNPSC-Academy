@@ -241,13 +241,17 @@ export function recordClientError(opts: {
   message: string
   status?: number
   userId?: string | null
+  /** React's component tree at crash time (ErrorBoundary only) — kept out of the
+   *  Telegram summary (too long to page on) but stored in audit_log.detail so a
+   *  superadmin can actually find the component, not just the route. */
+  componentStack?: string | null
 }): void {
-  const { kind, path, message, status, userId } = opts
+  const { kind, path, message, status, userId, componentStack } = opts
   raise(
     'client_error',
     `${kind}:${path}`,
     `A user hit a ${kind} error on ${path}${status ? ` (HTTP ${status})` : ''}: ${message}`,
-    { kind, path, status, user_id: userId }
+    { kind, path, status, user_id: userId, component_stack: componentStack ?? undefined }
   )
 }
 

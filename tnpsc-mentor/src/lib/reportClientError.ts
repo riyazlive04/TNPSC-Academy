@@ -19,6 +19,10 @@ export function reportClientError(opts: {
   path: string
   message: string
   status?: number
+  /** React's component tree at the point of a render crash (ErrorBoundary only) —
+   *  the difference between "something broke on /mock" and knowing which
+   *  component to look at. */
+  componentStack?: string | null
 }): void {
   if (opts.kind === 'network') return
   const userId = useAuthStore.getState().user?.id ?? null

@@ -77,6 +77,7 @@ export function ErrorScreen({
       kind: 'generic',
       path: window.location.pathname,
       message: error.name ? `${error.name}: ${error.message}` : error.message,
+      componentStack,
     })
   }, [error, kind])
 
