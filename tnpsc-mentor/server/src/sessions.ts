@@ -80,6 +80,19 @@ export function deviceLabel(ua?: string): string | null {
   return os ? `${browser} on ${os}` : browser
 }
 
+export type ClientPlatform = 'web' | 'android' | 'ios'
+
+/**
+ * The platform our own client sends on every request (Capacitor.getPlatform(),
+ * see src/lib/api.ts) — trustworthy since it's not user-agent guesswork. Null
+ * for a pre-upgrade client that doesn't send the header yet.
+ */
+export function clientPlatform(req: { headers: Record<string, unknown> }): ClientPlatform | null {
+  const raw = req.headers['x-client-platform']
+  const v = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw[0] : undefined
+  return v === 'web' || v === 'android' || v === 'ios' ? v : null
+}
+
 /** Active (not revoked, seen within TTL) session count, optionally excluding one device. */
 async function activeCount(userId: string, excludeDeviceId?: string): Promise<number> {
   let q = supabaseAdmin
@@ -133,7 +146,8 @@ export async function registerLoginSession(
   userId: string,
   sessionKey: string,
   clientDeviceId: string,
-  label: string | null
+  label: string | null,
+  platform: ClientPlatform | null = null
 ): Promise<{ blocked: boolean }> {
   if (!sessionKey) return { blocked: false }
 
@@ -143,16 +157,23 @@ export async function registerLoginSession(
 
   const { data: existing } = await supabaseAdmin
     .from('user_sessions')
-    .select('id, revoked_at')
+    .select('id, revoked_at, platform')
     .eq('user_id', userId)
     .eq('device_id', sessionKey)
     .maybeSingle()
 
-  // This session already holds an active slot → just heartbeat.
+  // This session already holds an active slot → just heartbeat. Coalesce onto
+  // the known platform so a stray call from a stale cached client (no header
+  // yet) can't null out a value an earlier call already established.
   if (existing && !existing.revoked_at) {
     await supabaseAdmin
       .from('user_sessions')
-      .update({ last_seen_at: now(), label, client_device_id: clientDeviceId || null })
+      .update({
+        last_seen_at: now(),
+        label,
+        client_device_id: clientDeviceId || null,
+        platform: platform ?? existing.platform,
+      })
       .eq('id', existing.id)
     return { blocked: false }
   }
@@ -175,6 +196,7 @@ export async function registerLoginSession(
       device_id: sessionKey,
       client_device_id: clientDeviceId || null,
       label,
+      platform: platform ?? existing?.platform ?? null,
       last_seen_at: now(),
       created_at: now(),
       revoked_at: null,
@@ -207,27 +229,43 @@ export async function touchSession(
   userId: string,
   sessionKey: string,
   clientDeviceId: string,
-  label: string | null
+  label: string | null,
+  platform: ClientPlatform | null = null
 ): Promise<{ revoked: boolean }> {
   if (!sessionKey) return { revoked: false }
   const { data: existing } = await supabaseAdmin
     .from('user_sessions')
-    .select('id, revoked_at')
+    .select('id, revoked_at, platform')
     .eq('user_id', userId)
     .eq('device_id', sessionKey)
     .maybeSingle()
   if (existing?.revoked_at) return { revoked: true }
-  // Persisting client_device_id here backfills it onto rows that predate the
-  // column, so a browser's stale duplicate slots can be deduped on the next login.
+  // Persisting client_device_id/platform here backfills them onto rows that
+  // predate the columns, so a browser's stale duplicate slots can be deduped
+  // and older sessions eventually pick up their platform on the next refresh.
+  // Coalesced onto the known value so a stale cached client (no header yet)
+  // can't null out a platform an earlier call already established.
   if (existing) {
     await supabaseAdmin
       .from('user_sessions')
-      .update({ last_seen_at: now(), label, client_device_id: clientDeviceId || null })
+      .update({
+        last_seen_at: now(),
+        label,
+        client_device_id: clientDeviceId || null,
+        platform: platform ?? existing.platform,
+      })
       .eq('id', existing.id)
   } else {
     await supabaseAdmin
       .from('user_sessions')
-      .insert({ user_id: userId, device_id: sessionKey, client_device_id: clientDeviceId || null, label, last_seen_at: now() })
+      .insert({
+        user_id: userId,
+        device_id: sessionKey,
+        client_device_id: clientDeviceId || null,
+        label,
+        platform,
+        last_seen_at: now(),
+      })
   }
   return { revoked: false }
 }
@@ -272,6 +310,7 @@ export interface DeviceSession {
   id: string
   device_id: string
   label: string | null
+  platform: ClientPlatform | null
   created_at: string
   last_seen_at: string
   /** True for the row matching the requester's own session (set by listSessions
@@ -291,7 +330,7 @@ export async function listSessions(
 ): Promise<DeviceSession[]> {
   const { data } = await supabaseAdmin
     .from('user_sessions')
-    .select('id, device_id, label, created_at, last_seen_at')
+    .select('id, device_id, label, platform, created_at, last_seen_at')
     .eq('user_id', userId)
     .is('revoked_at', null)
     .gte('last_seen_at', ttlSince())

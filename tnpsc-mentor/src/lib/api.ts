@@ -33,6 +33,10 @@ const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replac
 // can't read it; the native Android WebView can't rely on cross-site cookies, so
 // it keeps the refresh token in storage and sends it in the request body.
 const isNative = Capacitor.isNativePlatform()
+// Sent on every request so the server can persist which platform a session came
+// from (user_sessions.platform) — 'web' | 'android' | 'ios'. Read once at module
+// load like isNative above; the platform can't change mid-session.
+const CLIENT_PLATFORM = Capacitor.getPlatform()
 // Web must send credentials so the refresh cookie is set/sent cross-site; native
 // uses Bearer tokens only and never depends on the cookie.
 const CREDENTIALS: RequestCredentials = isNative ? 'same-origin' : 'include'
@@ -156,7 +160,7 @@ async function doRefresh(): Promise<boolean> {
   try {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Client-Platform': CLIENT_PLATFORM },
       credentials: CREDENTIALS,
       // Native sends its stored refresh token; web sends none - the HttpOnly
       // cookie carries it automatically with credentials: 'include'.
@@ -275,7 +279,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   }
 
   const send = async (): Promise<Response> => {
-    const headers: Record<string, string> = {}
+    const headers: Record<string, string> = { 'X-Client-Platform': CLIENT_PLATFORM }
     if (body !== undefined) headers['Content-Type'] = 'application/json'
     if (auth && tokens.access) headers.Authorization = `Bearer ${tokens.access}`
     return fetch(url, {
@@ -332,6 +336,8 @@ export interface TotpRequiredResponse {
 export interface DeviceSession {
   id: string
   label: string | null
+  /** 'web' | 'android' | 'ios' | null (pre-upgrade sessions predate this field). */
+  platform: 'web' | 'android' | 'ios' | null
   created_at: string
   last_seen_at: string
   current?: boolean

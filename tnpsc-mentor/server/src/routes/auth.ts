@@ -19,6 +19,7 @@ import {
   revokeSessionByDeviceId,
   listSessions,
   deviceLabel,
+  clientPlatform,
   sessionIdFromToken,
   type DeviceSession,
 } from '../sessions.js'
@@ -296,7 +297,8 @@ router.post(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       // Return the active devices so the browser can show them and let the user
@@ -309,7 +311,7 @@ router.post(
     auditAuth(req, 'login_success', {
       subjectId: data.session.user.id,
       status: 200,
-      detail: { device: deviceLabel(req.headers['user-agent']) },
+      detail: { device: deviceLabel(req.headers['user-agent']), platform: clientPlatform(req) },
     })
     setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
@@ -347,7 +349,8 @@ router.post(
       userId,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(userId))
@@ -507,7 +510,11 @@ router.post(
       console.error('[register] profile enrich failed', data.user.id, enrichError.message)
     }
 
-    auditAuth(req, 'register_success', { subjectId: data.user.id, status: 200 })
+    auditAuth(req, 'register_success', {
+      subjectId: data.user.id,
+      status: 200,
+      detail: { platform: clientPlatform(req) },
+    })
 
     // Email-confirmation projects return no session on signup — surface that.
     if (!data.session) {
@@ -518,7 +525,8 @@ router.post(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     setRtCookie(res, data.session.refresh_token)
     res.json(await sessionPayload(data.session))
@@ -561,7 +569,8 @@ router.post(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(data.session.user.id))
@@ -607,7 +616,7 @@ router.post(
     auditAuth(req, 'oauth_login_success', {
       subjectId: data.user.id,
       status: 200,
-      detail: { method: 'google', device: deviceLabel(req.headers['user-agent']) },
+      detail: { method: 'google', device: deviceLabel(req.headers['user-agent']), platform: clientPlatform(req) },
     })
 
     // Returning user: reuse the row we already have (merged with any enrichment).
@@ -661,7 +670,8 @@ router.post(
       userId,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(userId))
@@ -701,7 +711,8 @@ router.post(
       data.session.user.id,
       deviceKey(data.session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (revoked) {
       clearRtCookie(res)
@@ -1024,7 +1035,8 @@ router.post(
       session.user.id,
       deviceKey(session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(session.user.id))
@@ -1037,7 +1049,7 @@ router.post(
     auditAuth(req, 'login_success', {
       subjectId: session.user.id,
       status: 200,
-      detail: { method: 'phone_otp', device: deviceLabel(req.headers['user-agent']) },
+      detail: { method: 'phone_otp', device: deviceLabel(req.headers['user-agent']), platform: clientPlatform(req) },
     })
     setRtCookie(res, session.refresh_token)
     res.json(await sessionPayload(session))
@@ -1078,7 +1090,8 @@ router.post(
       session.user.id,
       deviceKey(session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(session.user.id))
@@ -1255,7 +1268,8 @@ router.post(
       session.user.id,
       deviceKey(session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(session.user.id))
@@ -1268,7 +1282,7 @@ router.post(
     auditAuth(req, 'login_success', {
       subjectId: session.user.id,
       status: 200,
-      detail: { method: usedBackup ? 'totp_backup' : 'totp', device: deviceLabel(req.headers['user-agent']) },
+      detail: { method: usedBackup ? 'totp_backup' : 'totp', device: deviceLabel(req.headers['user-agent']), platform: clientPlatform(req) },
     })
     setRtCookie(res, session.refresh_token)
     res.json(await sessionPayload(session))
@@ -1308,7 +1322,8 @@ router.post(
       session.user.id,
       deviceKey(session.access_token, req),
       deviceId(req),
-      deviceLabel(req.headers['user-agent'])
+      deviceLabel(req.headers['user-agent']),
+      clientPlatform(req)
     )
     if (blocked) {
       const devices = publicDevices(await listSessions(session.user.id))

@@ -13,6 +13,10 @@ create table if not exists public.user_sessions (
   -- accumulated login sessions. Nullable: legacy rows + private-mode clients.
   client_device_id text,
   label        text,
+  -- 'web' | 'android' | 'ios', from the client's X-Client-Platform header
+  -- (Capacitor.getPlatform()). Null for pre-upgrade clients that don't send it
+  -- yet. The earliest row per user_id is that user's signup platform.
+  platform     text,
   created_at   timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),
   revoked_at   timestamptz,
@@ -21,6 +25,7 @@ create table if not exists public.user_sessions (
 
 -- Re-runnable for existing databases (the table above only creates fresh).
 alter table public.user_sessions add column if not exists client_device_id text;
+alter table public.user_sessions add column if not exists platform text;
 
 -- Fast "active sessions for this user" count (the login-time limit check).
 create index if not exists user_sessions_user_active_idx
