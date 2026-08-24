@@ -40,18 +40,26 @@ must allow `connect.facebook.net` + `www.facebook.com` (it does).
 | App action    | Meta event        | Type     | Params                         |
 | ------------- | ----------------- | -------- | ------------------------------ |
 | route change  | `PageView`        | standard | — (first load fired by base code; SPA hook fires the rest) |
-| sign up       | `CompleteRegistration` | standard | `method`                  |
+| sign up       | —                 | —        | deliberately does not fire a Meta event (see below) |
 | login         | `Login`           | custom   | `method`                       |
 | start test    | `StartTest`       | custom   | `category`, `subject`          |
 | submit test   | `SubmitTest`      | custom   | `category`, `subject`, `score_percentage` |
 | view result   | `ViewResult`      | custom   | `category`, `score_percentage`, `passed` |
-| purchase      | `Purchase`        | standard | `value`, `currency`, `content_name` |
+| checkout confirmed (pre-payment, recap popup) | `CheckoutConfirmed` | custom | `value`, `currency`, `content_name` |
+| purchase (verified payment) | `Purchase` + `CompleteRegistration` | standard | `value`, `currency`, `content_name` |
 | APK download  | `APKDownload`     | custom   | `source`                       |
+
+`CompleteRegistration` fires **only** from a verified successful payment
+(`trackPurchase()` in `src/lib/tracking.ts`), never from account creation or
+from confirming checkout — this keeps the "Registration Complete" ad
+conversion meaning an actual paid user, not a free signup or an abandoned
+checkout.
 
 Verify in **Meta Events Manager → Test Events** (or the Meta Pixel Helper
 extension). Mark `Purchase` and `CompleteRegistration` as your conversion
-events for ad optimisation. Custom events (StartTest, etc.) can be turned into
-**Custom Conversions** in Events Manager if you want to optimise on them.
+events for ad optimisation. Custom events (StartTest, CheckoutConfirmed, etc.)
+can be turned into **Custom Conversions** in Events Manager if you want to
+optimise on them.
 
 ## GTM dashboard setup (one-time)
 

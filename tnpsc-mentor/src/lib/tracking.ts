@@ -150,11 +150,15 @@ export function trackLogin(method: string): void {
   metaTrackCustom('Login', { method })
 }
 
-/** A new account was created. `method` = password | google. */
+/**
+ * A new account was created. `method` = password | google.
+ *
+ * NOTE: deliberately does NOT fire Meta's CompleteRegistration — that standard
+ * conversion event is reserved for trackPurchase() below, so it only fires on a
+ * verified successful payment (see the doc comment there).
+ */
 export function trackSignUp(method: string): void {
   track('sign_up', { method })
-  // Meta standard conversion event for a completed signup.
-  metaTrack('CompleteRegistration', { method })
 }
 
 /** User kicked off a test from any of the test-arena flows. */
@@ -225,10 +229,10 @@ export function trackViewResult(params: {
  * Also fires Meta's CompleteRegistration on the verified payment itself — this
  * is the single choke point every web payment flow (Premium, Vettri, Rank
  * Booster, ...) resolves through in razorpay.ts, so it's guaranteed to reflect
- * an actual successful payment rather than checkout intent. This is on top of,
- * not instead of, the pre-payment CompleteRegistration in
- * trackCheckoutConfirmed() below — a real purchase now fires it twice
- * (confirm + success), by deliberate choice.
+ * an actual successful payment. This is the ONLY place CompleteRegistration
+ * fires (see trackSignUp() and trackCheckoutConfirmed()) — deliberately, so the
+ * ad platform's "Registration Complete" conversion always means a paid user,
+ * never a free signup or an abandoned checkout.
  */
 export function trackPurchase(params: {
   transactionId: string
@@ -260,8 +264,8 @@ export function trackPurchase(params: {
     currency,
     content_name: itemName,
   })
-  // Meta CompleteRegistration, fired again here on the verified payment itself
-  // (see doc comment above) so it reliably reflects a successful payment.
+  // Meta CompleteRegistration — the "Registration Complete" ad conversion.
+  // This is the ONLY place it fires (see doc comment above).
   metaTrack('CompleteRegistration', {
     value: params.value,
     currency,
@@ -289,21 +293,19 @@ export function trackInitiateCheckout(params: {
 }
 
 /**
- * Buyer confirmed the recap popup and the Razorpay sheet is opening. Fires Meta's
- * CompleteRegistration as a high-intent lead signal for the payment funnel.
- * Meta-only, no GA4 push.
- * NOTE: this is a deliberate reuse of CompleteRegistration — trackSignUp() fires
- * it at account creation, and trackPurchase() fires it again on the verified
- * payment itself, so this Meta standard event now counts new signups, buyers
- * proceeding to pay, and successful payments. Segment in Ads Manager if you need
- * them apart (e.g. by the presence of `value`, or a custom param).
+ * Buyer confirmed the recap popup and the Razorpay sheet is opening. Fires a
+ * Meta CUSTOM event (not the CompleteRegistration standard event) as a
+ * high-intent lead signal for the payment funnel — deliberately kept off the
+ * standard conversion so it can't be mistaken for a successful payment.
+ * CompleteRegistration itself only fires from trackPurchase() on a verified
+ * payment. Meta-only, no GA4 push.
  */
 export function trackCheckoutConfirmed(params: {
   value: number
   currency?: string
   description?: string
 }): void {
-  metaTrack('CompleteRegistration', {
+  metaTrackCustom('CheckoutConfirmed', {
     value: params.value,
     currency: params.currency ?? 'INR',
     content_name: params.description ?? 'TNPSC Mentors purchase',
