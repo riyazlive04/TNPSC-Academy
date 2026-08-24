@@ -444,12 +444,14 @@ router.post(
   asyncH(async (req, res) => {
     const { fullName, email, phone, gender, password, targetGroup } = req.body ?? {}
     if (!email || !password || !fullName) {
+      console.log('[register-400]', 'missing_fields', { hasEmail: !!email, hasPassword: !!password, hasFullName: !!fullName })
       return res.status(400).json({ error: 'Name, email and password are required' })
     }
     // Server-side floor — the client already enforces this, but that alone is
     // trivially bypassed with curl. Checked before any DB round-trip below.
     const pwCheck = await checkPassword(String(password))
     if (!pwCheck.ok) {
+      console.log('[register-400]', `password_${pwCheck.code}`)
       return res.status(400).json({ error: `password_${pwCheck.code}` })
     }
     // One mobile number = one account. Reject BEFORE creating the auth user so a
@@ -463,6 +465,7 @@ router.post(
     // Enforced server-side — the client flow alone would be trivial to curl past.
     if (whatsappOtpEnabled) {
       if (!normalizedPhone) {
+        console.log('[register-400]', 'invalid_phone', { rawPhone: phone })
         return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
       }
       const ticketPhone = verifyPhoneVerifyTicket(String(req.body?.phoneTicket ?? ''))

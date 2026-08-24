@@ -8,6 +8,16 @@
 // password (or even its full hash) is never sent anywhere, including to HIBP
 // itself. Fails OPEN on any network/API error — a third-party outage must never
 // block someone from registering or resetting their password.
+//
+// 2026-08-24: the breach check STOPPED being a hard block. It shipped 2026-08-21
+// and coincided with signups collapsing from ~30/day to ~2/day — students commonly
+// pick passwords ("Password123!", a phone number, etc.) that look fine by any
+// heuristic but ARE in HIBP's corpus, so a large fraction of real registration
+// attempts were rejected with no clear path forward (retried the same password,
+// kept failing, gave up). The client's strength meter (authValidation.ts) still
+// nudges toward a better password; this floor no longer blocks account creation
+// over it. Only the length minimum still blocks — that one's cheap, obvious, and
+// not what broke signups.
 
 import { createHash } from 'node:crypto'
 
@@ -39,11 +49,12 @@ async function isBreached(password: string): Promise<boolean | null> {
   }
 }
 
-/** Enforce the password floor: minimum length, then a best-effort known-breach
- * check. Never rejects solely because HIBP itself was unreachable. */
+/** Enforce the password floor: minimum length only. The breach check still runs
+ * (logged, not blocking) so it stays easy to reinstate as a hard block, or to
+ * surface as a non-blocking client-side warning, later. */
 export async function checkPassword(password: string): Promise<PasswordCheck> {
   if (password.length < MIN_LENGTH) return { ok: false, code: 'too_short' }
   const breached = await isBreached(password)
-  if (breached) return { ok: false, code: 'breached' }
+  if (breached) console.log('[password-policy] breached password accepted (non-blocking)')
   return { ok: true }
 }
