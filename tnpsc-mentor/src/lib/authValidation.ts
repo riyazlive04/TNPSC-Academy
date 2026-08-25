@@ -6,6 +6,26 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
+ * Classify WHY a rejected email failed isValidEmail — a coarse shape tag,
+ * never the value itself, so a real occurrence can be diagnosed (autofill
+ * cross-filling the phone number? a stray space from predictive text? an
+ * incomplete domain?) without logging anyone's actual input anywhere.
+ * Only meaningful to call when isValidEmail(raw) is already false.
+ */
+export function classifyInvalidEmail(raw: string): string {
+  const email = raw.trim()
+  if (!email) return 'empty_after_trim'
+  if (/^\d{10}$/.test(email.replace(/[\s\-()]/g, ''))) return 'looks_like_phone_number'
+  const atCount = (email.match(/@/g) ?? []).length
+  if (atCount === 0) return 'no_at_sign'
+  if (atCount > 1) return 'multiple_at_signs'
+  if (/\s/.test(email)) return 'contains_whitespace'
+  const domain = email.split('@')[1] ?? ''
+  if (!domain.includes('.')) return 'domain_missing_dot'
+  return 'other'
+}
+
+/**
  * Map a raw error from the API/network into a friendly, translatable key.
  * Never leak infrastructure text ("API is not configured", fetch failures,
  * stack traces) to end users. Recognised auth messages pass through verbatim;

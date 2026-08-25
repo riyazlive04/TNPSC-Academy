@@ -8,7 +8,8 @@ import GoogleSignInButton, { useIsGoogleConfigured } from '../components/Auth/Go
 import DeviceLimitModal from '../components/Auth/DeviceLimitModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
-import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
+import { friendlyAuthError, isValidEmail, classifyInvalidEmail } from '../lib/authValidation'
+import { reportClientError } from '../lib/reportClientError'
 import { postAuthDestination, postAuthState, type CredentialCarryoverState } from '../lib/authRouting'
 import { type DeviceSession } from '../lib/api'
 import { useAuthConfigStore } from '../store/authConfigStore'
@@ -84,7 +85,15 @@ export default function LoginPage() {
     setError('')
 
     if (!email.trim()) return setError(t('errEmailRequired'))
-    if (!isValidEmail(email)) return setError(t('errEmailInvalid'))
+    if (!isValidEmail(email)) {
+      // Never the actual value — a coarse shape tag only, see classifyInvalidEmail.
+      reportClientError({
+        kind: 'generic',
+        path: '/login',
+        message: `Email validation rejected on submit: ${classifyInvalidEmail(email)} (length ${email.trim().length})`,
+      })
+      return setError(t('errEmailInvalid'))
+    }
     if (!password) return setError(t('errPasswordRequired'))
 
     setLoading(true)

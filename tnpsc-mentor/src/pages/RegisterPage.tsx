@@ -19,7 +19,8 @@ import GoogleSignInButton, { useIsGoogleConfigured } from '../components/Auth/Go
 import TelegramHelpModal from '../components/Auth/TelegramHelpModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
-import { friendlyAuthError, isValidEmail, passwordStrength } from '../lib/authValidation'
+import { friendlyAuthError, isValidEmail, classifyInvalidEmail, passwordStrength } from '../lib/authValidation'
+import { reportClientError } from '../lib/reportClientError'
 import { trackViewContent } from '../lib/tracking'
 import { useT, type StringKey } from '../lib/i18n'
 
@@ -233,7 +234,17 @@ export default function RegisterPage() {
 
     if (!form.fullName.trim()) return setError(t('errNameRequired'))
     if (!form.email.trim()) return setError(t('errEmailRequired'))
-    if (!isValidEmail(form.email)) return setError(t('errEmailInvalid'))
+    if (!isValidEmail(form.email)) {
+      // Never the actual value — a coarse shape tag only (see
+      // classifyInvalidEmail) — so a real occurrence is diagnosable without
+      // logging anyone's typed input anywhere.
+      reportClientError({
+        kind: 'generic',
+        path: '/register',
+        message: `Email validation rejected on submit: ${classifyInvalidEmail(form.email)} (length ${form.email.trim().length})`,
+      })
+      return setError(t('errEmailInvalid'))
+    }
     if (!form.phone.trim()) return setError(t('errPhoneRequired'))
     if (!isValidIndianMobile(form.phone)) return setError(t('errMobileInvalid'))
     if (form.password.length < 8) return setError(t('errPasswordShort'))
