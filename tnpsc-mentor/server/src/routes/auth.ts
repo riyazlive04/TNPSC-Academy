@@ -279,12 +279,19 @@ router.post(
       password: String(password),
     })
     if (error || !data.session) {
-      // Constant, generic message: never echo GoTrue's text (which can distinguish
-      // "wrong password" from "no such user" → account enumeration). The audit
-      // entry follows the same rule — it records the attempt and its IP but NOT
-      // whether the address exists, so the trail can't be read as an oracle.
       auditAuth(req, 'login_failed', { status: 401 })
       recordAuthFailure(clientIp(req), { route: 'login' })
+      // Deliberately reveals account existence — a product decision (2026-08-25)
+      // to route a mistyped "login" straight to signup instead of a dead end.
+      // This was previously a constant, generic message specifically to avoid
+      // this: GoTrue's own text already distinguishes "wrong password" from "no
+      // such user", which is an enumeration oracle. The marginal exposure here
+      // is small — /register already reveals the same thing (email_already_
+      // registered) for the opposite direction — but it IS a real, intentional
+      // tradeoff, not an oversight.
+      if ((await emailStatus(String(email).trim())) === 'none') {
+        return res.status(404).json({ error: 'account_not_found' })
+      }
       return res.status(401).json({ error: 'Invalid email or password' })
     }
     // Privileged accounts with TOTP enrolled must clear a step-up challenge

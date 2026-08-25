@@ -54,3 +54,16 @@ export function postAuthState(
   if (dest === '/complete-profile' && fromPath) return { from: { pathname: fromPath } }
   return undefined
 }
+
+/**
+ * Router state used when bouncing between /login and /register because the
+ * email the user typed belongs on the OTHER page (no account found → signup;
+ * already registered → sign in) — carries over what they already typed so
+ * they don't retype it, and preserves any deep-link `from` so a bounce here
+ * doesn't lose it.
+ */
+export interface CredentialCarryoverState {
+  prefillEmail: string
+  prefillPassword: string
+  from?: { pathname: string }
+}

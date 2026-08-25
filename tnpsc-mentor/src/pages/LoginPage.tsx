@@ -9,7 +9,7 @@ import DeviceLimitModal from '../components/Auth/DeviceLimitModal'
 import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail } from '../lib/authValidation'
-import { postAuthDestination, postAuthState } from '../lib/authRouting'
+import { postAuthDestination, postAuthState, type CredentialCarryoverState } from '../lib/authRouting'
 import { type DeviceSession } from '../lib/api'
 import { useAuthConfigStore } from '../store/authConfigStore'
 import { useT } from '../lib/i18n'
@@ -34,8 +34,11 @@ export default function LoginPage() {
   // enabled for this build (server independently gates the endpoints).
   const [mode, setMode] = useState<Mode>('password')
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  // Bounced here from /register because the email typed there already has a
+  // password account — carry over what was typed instead of a blank form.
+  const carryover = location.state as CredentialCarryoverState | null
+  const [email, setEmail] = useState(carryover?.prefillEmail ?? '')
+  const [password, setPassword] = useState(carryover?.prefillPassword ?? '')
   const [error, setError] = useState('')
   const [touched, setTouched] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -96,6 +99,15 @@ export default function LoginPage() {
     }
     if (res.deviceLimit) {
       setDevices(res.devices ?? [])
+      return
+    }
+    if (res.accountNotFound) {
+      const state: CredentialCarryoverState = {
+        prefillEmail: email.trim(),
+        prefillPassword: password,
+        ...(fromPath ? { from: { pathname: fromPath } } : {}),
+      }
+      navigate('/register', { replace: true, state })
       return
     }
     if (res.error) {

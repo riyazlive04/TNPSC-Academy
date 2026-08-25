@@ -6,7 +6,12 @@ import { useAuthStore } from '../store/authStore'
 import { useLanguageStore, type Lang } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
 import { api } from '../lib/api'
-import { postAuthDestination, postAuthState, isAutoEnrollPath } from '../lib/authRouting'
+import {
+  postAuthDestination,
+  postAuthState,
+  isAutoEnrollPath,
+  type CredentialCarryoverState,
+} from '../lib/authRouting'
 import { useAuthConfigStore } from '../store/authConfigStore'
 import AuthShell from '../components/Auth/AuthShell'
 import AuthDivider from '../components/Auth/AuthDivider'
@@ -71,13 +76,16 @@ export default function RegisterPage() {
   const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
   const isGoogleConfigured = useIsGoogleConfigured()
 
+  // Bounced here from /login because no account exists for the email typed
+  // there — carry over what was typed instead of a blank form.
+  const carryover = location.state as CredentialCarryoverState | null
   const [form, setForm] = useState({
     fullName: '',
-    email: '',
+    email: carryover?.prefillEmail ?? '',
     phone: '',
     gender: '',
-    password: '',
-    confirm: '',
+    password: carryover?.prefillPassword ?? '',
+    confirm: carryover?.prefillPassword ?? '',
     targetGroup: 'Group1',
     language: 'en' as Lang,
   })
@@ -144,7 +152,7 @@ export default function RegisterPage() {
    * run the post-signup routine. On failure the user lands back on the form —
    * every fixable signup error (duplicate email etc.) lives there. */
   const doSignUp = async (phoneTicket?: string) => {
-    const { error: err } = await signUp({
+    const { error: err, emailTaken } = await signUp({
       fullName: form.fullName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
@@ -153,6 +161,16 @@ export default function RegisterPage() {
       targetGroup: form.targetGroup,
       phoneTicket,
     })
+
+    if (emailTaken) {
+      const state: CredentialCarryoverState = {
+        prefillEmail: form.email.trim(),
+        prefillPassword: form.password,
+        ...(fromPath ? { from: { pathname: fromPath } } : {}),
+      }
+      navigate('/login', { replace: true, state })
+      return
+    }
 
     if (err) {
       // Ticket went stale between verify and register (very slow submit) — the

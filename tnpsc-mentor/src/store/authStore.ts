@@ -41,6 +41,9 @@ export interface SignInResult {
   /** Password/Google succeeded but the account (admin/superadmin) has TOTP
    * enabled — `ticket` is the step-up ticket verifyTotp() needs. */
   totpRequired?: boolean
+  /** No account exists for the email that was tried — LoginPage sends the user
+   * to /register with what they typed carried over, instead of a dead end. */
+  accountNotFound?: boolean
 }
 
 /** Pull the device list off a `device_limit` 403, or null if it's a different error. */
@@ -111,7 +114,12 @@ export interface AuthState {
   totpEnroll: () => Promise<{ error: string | null; secret?: string; qr?: string }>
   totpConfirm: (code: string) => Promise<{ error: string | null; backupCodes?: string[] }>
   totpDisable: (params: { password?: string; backupCode?: string }) => Promise<{ error: string | null }>
-  signUp: (params: SignUpParams) => Promise<{ error: string | null }>
+  signUp: (params: SignUpParams) => Promise<{
+    error: string | null
+    /** The email already has a password account — RegisterPage sends the user
+     * to /login with what they typed carried over, instead of a dead end. */
+    emailTaken?: boolean
+  }>
   /** Signup WhatsApp-OTP: send a code to the number being registered. Flags let
    * the UI give a precise nudge without parsing error strings. */
   sendSignupOtp: (phone: string) => Promise<{
@@ -204,6 +212,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (e) {
       const devices = deviceLimitFrom(e)
       if (devices) return { error: null, deviceLimit: true, devices }
+      if (e instanceof Error && e.message === 'account_not_found') {
+        return { error: null, accountNotFound: true }
+      }
       return { error: e instanceof Error ? e.message : 'Sign in failed' }
     }
   },
@@ -379,7 +390,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { error: 'This email is registered with Google. Please use “Continue with Google” to sign in.' }
       }
       if (code === 'email_already_registered') {
-        return { error: 'This email is already registered to another account. Please sign in instead.' }
+        return {
+          error: 'This email is already registered to another account. Please sign in instead.',
+          emailTaken: true,
+        }
       }
       if (code === 'phone_not_verified') {
         return { error: 'Phone verification expired. Please verify your number again.' }
