@@ -124,6 +124,14 @@ export default function GoogleSignInButton({
   // visitors who never intended to use Google (most of them) see a normal,
   // undisturbed page.
   const [webViewBlocked, setWebViewBlocked] = useState(false)
+  // True once GSI rendered a button and it later vanished on its own — Google
+  // runs its own WebView/compatibility checks beyond the UA marker our
+  // isAndroidWebView regex looks for, and can pull a button that already
+  // rendered (2026-08-25: real reports of "shown, then vanishing" that
+  // isAndroidWebView alone didn't catch, since that check only ever ran
+  // once, up front, before GSI was even asked to load). Once this happens,
+  // render the same tap-to-reveal fallback the detected-upfront case uses.
+  const [buttonVanished, setButtonVanished] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
   // picking the Google account and the profile/onboarding screen appearing.
@@ -278,6 +286,13 @@ export default function GoogleSignInButton({
     }
     let cancelled = false
     let ro: ResizeObserver | undefined
+    let mo: MutationObserver | undefined
+    // Set around our OWN el.innerHTML='' + renderButton() calls so the
+    // MutationObserver below can tell "we're intentionally redrawing" apart
+    // from "Google emptied the container on its own" — both look identical
+    // as DOM mutations otherwise.
+    let weAreRedrawing = false
+    let everRendered = false
     // GIS only takes a fixed pixel width - a hardcoded one overflows narrow
     // phones. Size it to the container instead (clamped to GIS's 200-400 range)
     // and re-render on resize so it stays inside the card. The width guard stops
@@ -294,6 +309,7 @@ export default function GoogleSignInButton({
       if (Math.abs(width - lastWidth) < 2 && theme === lastTheme) return
       lastWidth = width
       lastTheme = theme
+      weAreRedrawing = true
       el.innerHTML = ''
       window.google.accounts.id.renderButton(el, {
         theme,
@@ -303,6 +319,17 @@ export default function GoogleSignInButton({
         shape: 'pill',
         logo_alignment: 'center',
       })
+      // GIS renders into the DOM effectively synchronously in practice, but a
+      // short buffer (rather than checking in the same tick) avoids a false
+      // "vanished" verdict if that's ever not strictly true — a wrong verdict
+      // here means dropping a perfectly working Google button into the
+      // fallback UI for a real browser, worse than the 50ms it costs to be sure.
+      setTimeout(() => {
+        weAreRedrawing = false
+        if (cancelled) return
+        if (el.childElementCount > 0) everRendered = true
+        else setButtonVanished(true)
+      }, 50)
     }
     renderRef.current = renderButton
     loadGsi()
@@ -315,6 +342,23 @@ export default function GoogleSignInButton({
         renderButton()
         ro = new ResizeObserver(() => renderButton())
         ro.observe(containerRef.current)
+        // Catches Google pulling an ALREADY-rendered button later on its own
+        // (not in response to any resize/theme change we triggered) — the
+        // "shown, then vanishing" reports the synchronous check above can't
+        // catch since it only looks right after OUR OWN render calls.
+        mo = new MutationObserver(() => {
+          if (weAreRedrawing || cancelled) return
+          const el = containerRef.current
+          if (everRendered && el && el.childElementCount === 0) {
+            setButtonVanished(true)
+            reportClientError({
+              kind: 'generic',
+              path: window.location.pathname,
+              message: `Google button vanished after rendering (self-removed by GSI) | UA: ${navigator.userAgent}`,
+            })
+          }
+        })
+        mo.observe(containerRef.current, { childList: true })
       })
       .catch((e) => {
         if (cancelled) return
@@ -336,6 +380,7 @@ export default function GoogleSignInButton({
     return () => {
       cancelled = true
       ro?.disconnect()
+      mo?.disconnect()
     }
     // Mount-once: deps are read via refs so the widget isn't re-created per render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -394,11 +439,13 @@ export default function GoogleSignInButton({
             {label}
           </button>
         </div>
-      ) : isAndroidWebView ? (
+      ) : isAndroidWebView || buttonVanished ? (
         // Looks and reads exactly like a normal Google button — nothing about
         // the page is disturbed for the visitor who never taps it. Only a tap
         // opens OpenInChromeModal, which explains why sign-in isn't happening
-        // here and offers the way out.
+        // here and offers the way out. Also shown after a real GSI button
+        // rendered and then vanished on its own (buttonVanished) — same fix
+        // applies either way once Google has decided not to cooperate here.
         <div className="flex justify-center">
           <button
             type="button"
