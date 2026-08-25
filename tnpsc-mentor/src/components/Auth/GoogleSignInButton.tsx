@@ -119,10 +119,10 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // True inside a detected Android WebView, where GSI never renders a button.
-  // Drives OpenInChromeModal — a popup (not a button competing for attention
-  // with the rest of the form) offering a way OUT to a real browser, where
-  // Google Sign-In works, on top of the email/password fallback already below.
+  // Opens OpenInChromeModal. Only ever set true by an explicit tap on the
+  // WebView-mode Google button below — never automatically on mount, so
+  // visitors who never intended to use Google (most of them) see a normal,
+  // undisturbed page.
   const [webViewBlocked, setWebViewBlocked] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
@@ -257,17 +257,22 @@ export default function GoogleSignInButton({
     if (isAndroidWebView) {
       // Google's SDK doesn't reject any promise we can catch inside a WebView
       // - the script tag loads fine, GSI just silently declines to render a
-      // button. Waiting on loadGsi() to fail here never fires, so the "Open
-      // in Chrome" escape hatch never appeared. Skip attempting to load it
-      // at all and go straight to the escape hatch instead. Unlike the
-      // ad-blocker case below, this swap is worth explaining - the button
-      // that appears isn't the one the user expects.
-      onError(t('errGoogleWebView'))
-      setWebViewBlocked(true)
+      // button. Skip attempting to load it at all; the render branch below
+      // shows our own Google-styled button instead, and ONLY on a tap does it
+      // explain what's happening and offer the Chrome escape hatch.
+      //
+      // 2026-08-25: this used to fire the popup + error banner right here, on
+      // mount — i.e. for every WebView pageview, whether or not the visitor
+      // ever intended to use Google. Real traffic showed why that's wrong: 81
+      // WebView pageviews on /register in one day, 2 completed signups total.
+      // Interrupting someone who only wanted email/password with a Google/
+      // Chrome popup before they'd even seen the form is a plausible reason
+      // conversion collapsed, not just Google specifically failing. Now
+      // nothing happens until they actually tap the button.
       reportClientError({
         kind: 'generic',
         path: window.location.pathname,
-        message: `Google sign-in skipped: Android WebView detected | UA: ${navigator.userAgent}`,
+        message: `Google sign-in unavailable: Android WebView detected (page view, not yet attempted) | UA: ${navigator.userAgent}`,
       })
       return
     }
@@ -357,38 +362,61 @@ export default function GoogleSignInButton({
         ? t('signInWithGoogle')
         : t('continueWithGoogle')
 
+  const googleGlyph = (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"
+      />
+      <path
+        fill="#34A853"
+        d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"
+      />
+      <path
+        fill="#EA4335"
+        d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"
+      />
+    </svg>
+  )
+  const googleButtonClass =
+    'flex w-full max-w-[400px] items-center justify-center gap-3 rounded-full border border-line bg-card px-5 py-3 font-heading text-sm font-semibold text-ink shadow-pill transition active:scale-[0.98] disabled:opacity-60'
+
   return (
     <>
       {isNativeApp() ? (
         <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={onNativeClick}
-            disabled={busy}
-            className="flex w-full max-w-[400px] items-center justify-center gap-3 rounded-full border border-line bg-card px-5 py-3 font-heading text-sm font-semibold text-ink shadow-pill transition active:scale-[0.98] disabled:opacity-60"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-              <path
-                fill="#4285F4"
-                d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"
-              />
-              <path
-                fill="#34A853"
-                d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"
-              />
-              <path
-                fill="#EA4335"
-                d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.47.89 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"
-              />
-            </svg>
+          <button type="button" onClick={onNativeClick} disabled={busy} className={googleButtonClass}>
+            {googleGlyph}
             {label}
           </button>
         </div>
-      ) : webViewBlocked ? null : (
+      ) : isAndroidWebView ? (
+        // Looks and reads exactly like a normal Google button — nothing about
+        // the page is disturbed for the visitor who never taps it. Only a tap
+        // opens OpenInChromeModal, which explains why sign-in isn't happening
+        // here and offers the way out.
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setWebViewBlocked(true)
+              reportClientError({
+                kind: 'generic',
+                path: window.location.pathname,
+                message: `Google sign-in tapped inside Android WebView | UA: ${navigator.userAgent}`,
+              })
+            }}
+            className={googleButtonClass}
+          >
+            {googleGlyph}
+            {label}
+          </button>
+        </div>
+      ) : (
         // GIS renders its own fixed-width button; center it within the form column.
         <div ref={containerRef} className="flex justify-center" />
       )}
