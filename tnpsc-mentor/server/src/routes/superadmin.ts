@@ -1,9 +1,16 @@
+import { createHash } from 'node:crypto'
 import express, { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { listSessions, revokeSessionById } from '../sessions.js'
 import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
+import {
+  BUNDLE_BUCKET,
+  BUILTIN,
+  bundlePublicUrl,
+  type WebBundleRow,
+} from '../lib/webBundles.js'
 import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
 import { notifyUser } from '../notify.js'
 import { KNOWN_PLANS } from '../pricing.js'
@@ -363,6 +370,177 @@ router.delete(
 
     await supabaseAdmin.storage.from(APK_BUCKET).remove([(row as ReleaseRow).storage_path])
     const { error } = await supabaseAdmin.from('app_releases').delete().eq('id', id)
+    if (error) return sendDbError(res, error)
+    res.json({ deleted: true })
+  })
+)
+
+// ─── Live web bundles (OTA) ──────────────────────────────────────────────────
+// Superadmins upload a zipped `dist` here; the newest ACTIVE row matching a
+// device's native version is what /api/app/web-bundle/check serves it. See
+// server/src/lib/webBundles.ts and docs/LIVE-UPDATES.md.
+
+const ZIP_MIME = 'application/zip'
+const MAX_BUNDLE_BYTES = 50 * 1024 * 1024 // 50 MB — a dist zip is ~2-4 MB.
+
+/** Shape a bundle row for the console, attaching the public download URL. */
+function withBundleUrl(b: WebBundleRow) {
+  return {
+    id: b.id,
+    version: b.version,
+    channel: b.channel,
+    min_version_build: b.min_version_build,
+    max_version_build: b.max_version_build,
+    rollout_percent: b.rollout_percent,
+    file_name: b.file_name,
+    file_size: b.file_size,
+    checksum: b.checksum,
+    notes: b.notes,
+    active: b.active,
+    created_at: b.created_at,
+    url: bundlePublicUrl(b.storage_path),
+  }
+}
+
+// ─── GET /api/superadmin/web-bundles ─────────────────────────────────────────
+router.get(
+  '/web-bundles',
+  asyncH(async (_req: AuthedRequest, res) => {
+    const { data, error } = await supabaseAdmin
+      .from('web_bundles')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) return sendDbError(res, error)
+    res.json({ bundles: (data as WebBundleRow[]).map(withBundleUrl) })
+  })
+)
+
+// ─── POST /api/superadmin/web-bundles?version=&min=&max=&rollout=&notes= ─────
+// The zip is the raw request body (same transport as the APK upload above).
+// The checksum is computed HERE, never taken from the client: the plugin
+// refuses a bundle whose sha256 doesn't match what we advertise, so a wrong
+// value would silently break every update.
+router.post(
+  '/web-bundles',
+  express.raw({ type: () => true, limit: '55mb' }),
+  asyncH(async (req: AuthedRequest, res) => {
+    const version = String(req.query.version ?? '').trim()
+    const minBuild = String(req.query.min ?? '').trim()
+    const maxBuild = String(req.query.max ?? '').trim() || null
+    const notes = String(req.query.notes ?? '').trim() || null
+    const rolloutRaw = Number(req.query.rollout)
+    const rollout = Number.isFinite(rolloutRaw) ? Math.min(100, Math.max(0, Math.trunc(rolloutRaw))) : 100
+
+    if (!version) return res.status(400).json({ error: 'A bundle version is required.' })
+    if (version === BUILTIN) {
+      return res.status(400).json({ error: `"${BUILTIN}" is reserved by the updater plugin.` })
+    }
+    if (!minBuild) {
+      return res.status(400).json({ error: 'A minimum app version (e.g. 2.0.5) is required.' })
+    }
+
+    const body = req.body
+    if (!Buffer.isBuffer(body) || body.length === 0) {
+      return res.status(400).json({ error: 'No file was uploaded.' })
+    }
+    if (body.length > MAX_BUNDLE_BYTES) {
+      return res.status(413).json({ error: 'That file is too large (max 50 MB).' })
+    }
+    // "PK\x03\x04" — a mis-picked folder or .aab here would install as a broken
+    // bundle on every device, so check the magic bytes rather than the name.
+    if (!(body[0] === 0x50 && body[1] === 0x4b && body[2] === 0x03 && body[3] === 0x04)) {
+      return res.status(400).json({ error: 'That file is not a .zip archive.' })
+    }
+
+    const checksum = createHash('sha256').update(body).digest('hex')
+    const safeVersion = version.replace(/[^a-zA-Z0-9.\-_+]/g, '-')
+    const fileName = `tnpsc-web-${safeVersion}.zip`
+    const storagePath = `bundles/${Date.now()}/${fileName}`
+
+    const { error: upErr } = await supabaseAdmin.storage
+      .from(BUNDLE_BUCKET)
+      .upload(storagePath, body, { contentType: ZIP_MIME, upsert: false })
+    if (upErr) {
+      console.error('[web-bundle upload]', upErr)
+      return res.status(502).json({ error: 'Upload to storage failed. Please try again.' })
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('web_bundles')
+      .insert({
+        version,
+        min_version_build: minBuild,
+        max_version_build: maxBuild,
+        rollout_percent: rollout,
+        file_name: fileName,
+        storage_path: storagePath,
+        file_size: body.length,
+        checksum,
+        notes,
+        created_by: req.userId ?? null,
+      })
+      .select('*')
+      .single()
+    if (error) {
+      // Roll back the orphaned object so a failed insert leaves no dangling file.
+      await supabaseAdmin.storage.from(BUNDLE_BUCKET).remove([storagePath])
+      return sendDbError(res, error)
+    }
+
+    res.status(201).json({ bundle: withBundleUrl(data as WebBundleRow) })
+  })
+)
+
+// ─── PATCH /api/superadmin/web-bundles/:id ───────────────────────────────────
+// Pause/resume a bundle or move its rollout percentage. Deactivating the only
+// matching bundle is the rollback: devices are told "builtin" on their next
+// foreground and revert to the store build's assets.
+router.patch(
+  '/web-bundles/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { active, rollout_percent, notes } = req.body ?? {}
+    const patch: Record<string, unknown> = {}
+    if (typeof active === 'boolean') patch.active = active
+    if (rollout_percent !== undefined) {
+      const n = Number(rollout_percent)
+      if (!Number.isFinite(n) || n < 0 || n > 100) {
+        return res.status(400).json({ error: 'rollout_percent must be between 0 and 100.' })
+      }
+      patch.rollout_percent = Math.trunc(n)
+    }
+    if (typeof notes === 'string') patch.notes = notes.trim() || null
+    if (!Object.keys(patch).length) return res.status(400).json({ error: 'Nothing to update.' })
+
+    const { data, error } = await supabaseAdmin
+      .from('web_bundles')
+      .update(patch)
+      .eq('id', String(req.params.id))
+      .select('*')
+      .maybeSingle()
+    if (error) return sendDbError(res, error)
+    if (!data) return res.status(404).json({ error: 'Bundle not found.' })
+    res.json({ bundle: withBundleUrl(data as WebBundleRow) })
+  })
+)
+
+// ─── DELETE /api/superadmin/web-bundles/:id ──────────────────────────────────
+// Removes the row + its stored zip. Prefer PATCH active:false for a rollback —
+// devices that already downloaded this version keep running it until they hear
+// otherwise, and deleting the object breaks any download still in flight.
+router.delete(
+  '/web-bundles/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = String(req.params.id)
+    const { data: row, error: lookupErr } = await supabaseAdmin
+      .from('web_bundles')
+      .select('storage_path')
+      .eq('id', id)
+      .maybeSingle()
+    if (lookupErr) return sendDbError(res, lookupErr)
+    if (!row) return res.status(404).json({ error: 'Bundle not found.' })
+
+    await supabaseAdmin.storage.from(BUNDLE_BUCKET).remove([(row as WebBundleRow).storage_path])
+    const { error } = await supabaseAdmin.from('web_bundles').delete().eq('id', id)
     if (error) return sendDbError(res, error)
     res.json({ deleted: true })
   })

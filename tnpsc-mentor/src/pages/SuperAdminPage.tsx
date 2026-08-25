@@ -77,6 +77,7 @@ import {
   type AlertKind,
   type DeviceSession,
   type AppRelease,
+  type WebBundle,
   type Material,
   type MaterialKind,
   type MaterialPlacement,
@@ -3923,6 +3924,285 @@ function AppReleasesTab() {
                   ? 'It is the live build — the previous version becomes live again.'
                   : 'This removes it from history.'
               }`
+            : ''
+        }
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        tone="danger"
+        busy={busyId === pendingDelete?.id}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+
+      <WebBundlesSection />
+    </div>
+  )
+}
+
+// ─── Live web bundles (OTA updates) ──────────────────────────────────────────
+// Ships a rebuilt `dist` to apps ALREADY installed, without a store review. The
+// newest active bundle whose minimum app version the device satisfies is what
+// it downloads and swaps in on next background. Pausing a bundle sends every
+// device back to the assets inside its store build — the rollback.
+// See docs/LIVE-UPDATES.md for how a bundle is cut.
+function WebBundlesSection() {
+  const [bundles, setBundles] = useState<WebBundle[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [version, setVersion] = useState('')
+  const [minBuild, setMinBuild] = useState('')
+  const [rollout, setRollout] = useState('100')
+  const [notes, setNotes] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<WebBundle | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const load = () => {
+    setLoading(true)
+    setError(false)
+    api.webBundles
+      .list()
+      .then(setBundles)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [])
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (uploading) return
+    const v = version.trim()
+    const min = minBuild.trim()
+    if (!v) return toast.error('Enter a bundle version (e.g. 2.0.5+w1).')
+    if (!min) return toast.error('Enter the minimum app version this bundle needs.')
+    if (!file) return toast.error('Choose the packed .zip to upload.')
+    if (!/\.zip$/i.test(file.name)) return toast.error('Only .zip bundles are accepted.')
+
+    setUploading(true)
+    try {
+      const b = await api.webBundles.upload(file, {
+        version: v,
+        minBuild: min,
+        rollout: Number(rollout) || 0,
+        notes: notes.trim(),
+      })
+      setBundles((prev) => [b, ...prev])
+      setVersion('')
+      setNotes('')
+      setFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+      toast.success(`Bundle ${b.version} published to ${b.rollout_percent}% of devices.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const patch = async (b: WebBundle, changes: { active?: boolean; rollout_percent?: number }) => {
+    setBusyId(b.id)
+    try {
+      const updated = await api.webBundles.update(b.id, changes)
+      setBundles((prev) => prev.map((x) => (x.id === updated.id ? updated : x)))
+      if (changes.active === false) toast.success(`${b.version} paused — devices revert on next open.`)
+      else if (changes.active === true) toast.success(`${b.version} resumed.`)
+      else toast.success(`${b.version} now at ${updated.rollout_percent}%.`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update the bundle.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    setBusyId(pendingDelete.id)
+    try {
+      await api.webBundles.remove(pendingDelete.id)
+      setBundles((prev) => prev.filter((b) => b.id !== pendingDelete.id))
+      toast.success('Bundle deleted.')
+      setPendingDelete(null)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not delete the bundle.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  return (
+    <div className="space-y-6 border-t border-line pt-6">
+      {/* Intro */}
+      <div className="card flex items-start gap-3 p-4">
+        <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+          <Rocket size={20} />
+        </span>
+        <div>
+          <h2 className="font-heading text-sm font-semibold text-ink">Live updates (no store review)</h2>
+          <p className="font-body text-xs text-ink2">
+            Upload a packed <code>dist</code> (<code>npm run build</code> then{' '}
+            <code>npm run bundle:pack 2.0.5+w1</code>) and installed apps pick it up the next time
+            they are backgrounded — screens, copy, subject lists, fixes. Anything <em>native</em> —
+            a new plugin, a permission, a versionCode — still needs a real Play/App Store release.
+            Pause a bundle to send every device back to the build it installed from the store.
+          </p>
+        </div>
+      </div>
+
+      {/* Upload form */}
+      <form onSubmit={submit} className="card space-y-4 p-5">
+        <h2 className="flex items-center gap-2 font-heading text-sm font-semibold text-ink">
+          <Plus size={16} className="text-brand" /> Publish a bundle
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Bundle version *">
+            <input
+              className={COUPON_INPUT}
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+              placeholder="e.g. 2.0.5+w1"
+              spellCheck={false}
+            />
+          </Field>
+          <Field label="Minimum app version *">
+            <input
+              className={COUPON_INPUT}
+              value={minBuild}
+              onChange={(e) => setMinBuild(e.target.value)}
+              placeholder="e.g. 2.0.6"
+              spellCheck={false}
+            />
+          </Field>
+          <Field label="Rollout %">
+            <input
+              className={COUPON_INPUT}
+              type="number"
+              min={0}
+              max={100}
+              value={rollout}
+              onChange={(e) => setRollout(e.target.value)}
+            />
+          </Field>
+          <Field label="Bundle zip *">
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".zip,application/zip"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="focus-ring w-full rounded-lg border border-line bg-card px-3 py-2 font-body text-sm text-ink outline-none transition file:mr-3 file:rounded-md file:border-0 file:bg-brand-soft file:px-3 file:py-1.5 file:font-heading file:text-xs file:font-semibold file:text-brand hover:border-brand/40"
+            />
+          </Field>
+        </div>
+        <Field label="What changed (optional)">
+          <textarea
+            className={COUPON_INPUT + ' min-h-[70px] resize-y'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Shown in this list only…"
+            maxLength={500}
+          />
+        </Field>
+        {file && (
+          <p className="font-body text-xs text-ink2">
+            Selected: <span className="font-heading text-ink">{file.name}</span> ·{' '}
+            {formatBytes(file.size)}
+          </p>
+        )}
+        <p className="font-body text-xs text-ink2">
+          Start at 10-20% and raise it once the crash/error feed stays quiet — a bad bundle reaches
+          only that slice, and pausing it pulls them back.
+        </p>
+        <button type="submit" disabled={uploading} className="btn-brand press disabled:opacity-60">
+          {uploading ? <Spinner size={16} /> : <UploadCloud size={16} />}
+          {uploading ? 'Uploading…' : 'Upload & publish'}
+        </button>
+      </form>
+
+      {/* History */}
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="skeleton h-20 w-full" />
+          ))}
+        </div>
+      ) : error ? (
+        <ErrorState onRetry={load} />
+      ) : bundles.length === 0 ? (
+        <p className="py-10 text-center font-body text-ink2">
+          No live bundles yet — every device is running the assets from its store build.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {bundles.map((b, i) => (
+            <div
+              key={b.id}
+              style={{ '--i': i } as React.CSSProperties}
+              className={`card stagger-item flex flex-wrap items-center gap-3 p-3.5 ${
+                b.active ? 'ring-1 ring-brand/30' : 'opacity-70'
+              }`}
+            >
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+                <Rocket size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate font-heading text-sm font-bold text-ink">{b.version}</p>
+                  {b.active ? (
+                    <span className="rounded-full bg-mintsoft px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
+                      Live · {b.rollout_percent}%
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-line px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-ink2">
+                      Paused
+                    </span>
+                  )}
+                </div>
+                <p className="truncate font-body text-xs text-ink2">
+                  app v{b.min_version_build}+ · {formatBytes(b.file_size)} ·{' '}
+                  {new Date(b.created_at).toLocaleString()}
+                  {b.notes ? ` · ${b.notes}` : ''}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => patch(b, { active: !b.active })}
+                disabled={busyId === b.id}
+                className="focus-ring inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink transition hover:border-brand/40 disabled:opacity-50"
+              >
+                {busyId === b.id ? <Spinner size={14} /> : b.active ? <EyeOff size={14} /> : <Eye size={14} />}
+                {b.active ? 'Pause' : 'Resume'}
+              </button>
+              {b.active && b.rollout_percent < 100 && (
+                <button
+                  type="button"
+                  onClick={() => patch(b, { rollout_percent: 100 })}
+                  disabled={busyId === b.id}
+                  className="focus-ring inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-line px-3 py-2 font-heading text-xs font-semibold text-ink transition hover:border-brand/40 disabled:opacity-50"
+                >
+                  <TrendingUp size={14} /> 100%
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setPendingDelete(b)}
+                disabled={busyId === b.id}
+                aria-label="Delete bundle"
+                className="focus-ring grid h-9 w-9 place-items-center rounded-lg border border-line text-coral transition hover:border-coral/40 disabled:opacity-50"
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete this bundle?"
+        message={
+          pendingDelete
+            ? `Delete ${pendingDelete.version}? Pausing is the safer rollback — deleting also removes the zip, so a device mid-download fails instead of finishing.`
             : ''
         }
         confirmLabel="Delete"

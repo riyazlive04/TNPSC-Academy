@@ -6,6 +6,9 @@ node_modules
 # Build output
 dist
 dist-ssr
+# Packed live-update bundles (scripts/pack-web-bundle.mjs) — uploaded to
+# Storage from the superadmin console, never committed.
+dist-bundles
 *.local
 *.zip
 

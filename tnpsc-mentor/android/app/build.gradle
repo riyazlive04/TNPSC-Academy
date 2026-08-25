@@ -18,8 +18,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         // Play rejects a versionCode it has already seen, even from a deleted
         // draft — always bump before re-uploading, never reuse.
-        versionCode 17
-        versionName "2.0.5"
+        versionCode 18
+        versionName "2.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     androidResources {

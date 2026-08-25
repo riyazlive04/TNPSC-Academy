@@ -35,6 +35,30 @@ const config: CapacitorConfig = {
         twitter: false,
       },
     },
+    // Live (OTA) web-bundle updates, served by our OWN server — see
+    // server/src/routes/app.ts (/api/app/web-bundle/check) and
+    // docs/LIVE-UPDATES.md. Web assets ship in minutes instead of waiting on a
+    // store review; anything native still needs a real release.
+    CapacitorUpdater: {
+      updateUrl: 'https://app.tnpscmentors.in/api/app/web-bundle/check',
+      // Capgo's cloud is not involved: no stats leave the device. (channelUrl
+      // is never reached because the app never calls setChannel.)
+      statsUrl: '',
+      // Check on every foreground, download in the background, and swap only
+      // when the app NEXT goes to background. Never mid-session: a reload
+      // during a proctored mock test would count as a violation and lose the
+      // attempt.
+      autoUpdate: 'atBackground',
+      // A Play/App Store update wipes downloaded bundles, so a build that
+      // predates a newly added native plugin can never be restored over it.
+      resetWhenUpdate: true,
+      autoDeleteFailed: true,
+      autoDeletePrevious: true,
+      // If a bundle fails to boot and call notifyAppReady() within this window,
+      // the plugin rolls back to the previous one by itself. Generous, because
+      // a cold start on a cheap Android device is genuinely slow.
+      appReadyTimeout: 15000,
+    },
     PushNotifications: {
       // Badge is never used; alert+sound only. Keeps the iOS permission prompt
       // scoped to what the app actually does.

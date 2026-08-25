@@ -7,6 +7,9 @@
 //                   so the bar must be made transparent and the web layer given
 //                   real safe-area insets, or the header sits under the clock.
 //  • splash       — hidden once React has actually painted, not on a timer.
+//  • live updates — tell the updater plugin this web bundle booted, so an OTA
+//                   bundle that white-screens rolls itself back instead of
+//                   needing a store release to fix.
 //  • purchases    — re-submit anything the store charged for but our server never
 //                   recorded (app killed mid-purchase, offline at the wrong
 //                   moment). Without this a user can be charged with no access.
@@ -20,6 +23,7 @@ import { useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { useNavigate } from 'react-router-dom'
 import { finishPendingPurchases } from '../lib/iap'
+import { initLiveUpdates } from '../lib/liveUpdate'
 import { refreshNativePushToken } from '../lib/nativePush'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useCreditsStore } from '../store/creditsStore'
@@ -53,6 +57,15 @@ export function useNativeBootstrap(): void {
         /* already hidden */
       }
     })()
+  }, [])
+
+  // ── Live updates: confirm THIS bundle boots ──
+  // Must run on every launch and must not wait on auth or the network: an
+  // OTA bundle that never calls notifyAppReady() is rolled back to the
+  // previous one. See src/lib/liveUpdate.ts.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return
+    void initLiveUpdates()
   }, [])
 
   // ── Recover interrupted purchases, once we know who is signed in ──

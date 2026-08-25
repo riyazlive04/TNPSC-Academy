@@ -357,6 +357,27 @@ export interface AppRelease {
 /** The current build the public landing page links to (no `id`). */
 export type LatestRelease = Omit<AppRelease, 'id'>
 
+/** A live (OTA) web bundle — a zipped `dist` the installed app can pick up
+ *  without a store release. See docs/LIVE-UPDATES.md. */
+export interface WebBundle {
+  id: string
+  /** Bundle name devices report as their running version, e.g. "2.0.5+w3". */
+  version: string
+  channel: string
+  /** Lowest native app version this bundle may run on (inclusive). */
+  min_version_build: string
+  max_version_build: string | null
+  /** Share of devices eligible, 0-100 (staged rollout). */
+  rollout_percent: number
+  file_name: string
+  file_size: number
+  checksum: string
+  notes: string | null
+  active: boolean
+  created_at: string
+  url: string
+}
+
 export const api = {
   auth: {
     /** Which optional auth methods are live right now — see AuthConfig. */
@@ -1246,6 +1267,61 @@ export const api = {
     /** Superadmin: delete a release (deleting the current one rolls back to the previous). */
     async remove(id: string): Promise<void> {
       await request(`/api/superadmin/apk/${id}`, { method: 'DELETE' })
+    },
+  },
+
+  // ─── Live web bundles (OTA) ──────────────────────────────────────────────
+  // Superadmin-only. Ships a new `dist` to installed apps without a store
+  // review; see docs/LIVE-UPDATES.md for how a bundle is cut.
+  webBundles: {
+    /** Every bundle, newest first. */
+    async list(): Promise<WebBundle[]> {
+      const data = await request<{ bundles: WebBundle[] }>('/api/superadmin/web-bundles')
+      return data.bundles
+    },
+    /**
+     * Upload a zipped `dist`. Raw body like the APK upload, so it bypasses the
+     * shared request() helper; metadata rides in the query string. The server
+     * computes the checksum — the device refuses a bundle that doesn't match.
+     */
+    async upload(
+      file: File,
+      opts: { version: string; minBuild: string; rollout?: number; notes?: string }
+    ): Promise<WebBundle> {
+      const qs = new URLSearchParams({ version: opts.version, min: opts.minBuild })
+      if (opts.rollout !== undefined) qs.set('rollout', String(opts.rollout))
+      if (opts.notes) qs.set('notes', opts.notes)
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/zip',
+        'x-file-name': file.name,
+      }
+      if (tokens.access) headers.Authorization = `Bearer ${tokens.access}`
+      const res = await fetch(`${API_URL}/api/superadmin/web-bundles?${qs.toString()}`, {
+        method: 'POST',
+        headers,
+        credentials: CREDENTIALS,
+        body: file,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
+      }
+      return (data as { bundle: WebBundle }).bundle
+    },
+    /** Pause/resume a bundle or move its rollout percentage. */
+    async update(
+      id: string,
+      patch: { active?: boolean; rollout_percent?: number; notes?: string }
+    ): Promise<WebBundle> {
+      const data = await request<{ bundle: WebBundle }>(`/api/superadmin/web-bundles/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      })
+      return data.bundle
+    },
+    /** Delete a bundle outright. Prefer `update(id, { active: false })` to roll back. */
+    async remove(id: string): Promise<void> {
+      await request(`/api/superadmin/web-bundles/${id}`, { method: 'DELETE' })
     },
   },
 

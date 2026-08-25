@@ -173,11 +173,22 @@ entity are exempt. Start this early — it is wall-clock time you cannot compres
 
 ### Build
 
+Bump `versionCode` (and usually `versionName`) in `android/app/build.gradle`
+first — Play rejects a versionCode it has already accepted.
+
 ```bash
 npm run sync:android
-cd android && ./gradlew bundleRelease
+cd android
+# Plugin toolchains now require JDK 21; the machine's JAVA_HOME is 17, so point
+# Gradle at Android Studio's bundled JBR for this command:
+JAVA_HOME="C:/Program Files/Android/Android Studio/jbr" ./gradlew bundleRelease
 # → android/app/build/outputs/bundle/release/app-release.aab
 ```
+
+Signing is automatic when `android/keystore.properties` is present. Confirm the
+output is signed —
+`unzip -l app-release.aab | grep META-INF/TNPSC` should list `TNPSC.RSA` — then
+rename it `TNPSCMentors-<versionName>-vc<versionCode>-play.aab` before uploading.
 
 ### Data safety form
 
