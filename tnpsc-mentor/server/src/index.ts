@@ -8,6 +8,7 @@ import { requestLog } from './middleware/requestLog.js'
 import { auditAdmin } from './middleware/auditAdmin.js'
 import { startAuditRetention } from './lib/audit.js'
 import { securityAlertsEnabled, raise } from './lib/securityAlerts.js'
+import { startCaMonthlyAutoPublish } from './lib/caMonthlyAutoPublish.js'
 
 import authRoutes from './routes/auth.js'
 import questionRoutes from './routes/questions.js'
@@ -153,6 +154,10 @@ app.listen(config.port, () => {
   // Enforces the retention the Privacy Policy states (90 days for technical and
   // security logs, 400 for the admin trail). Without this the table only grows.
   startAuditRetention()
+  // Recovers a monthly CA magazine that the VPS pipeline pushed to storage/
+  // questions but failed to insert into ca_magazine, and auto-publishes it —
+  // see lib/caMonthlyAutoPublish.ts for why this doesn't wait on a superadmin.
+  startCaMonthlyAutoPublish()
   if (!securityAlertsEnabled) {
     // eslint-disable-next-line no-console
     console.warn(
