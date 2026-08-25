@@ -171,8 +171,6 @@ export default function GoogleSignInButton({
     // Leave the overlay up through navigation; it unmounts with this component.
     navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
   }
-  const errorRef = useRef(onError)
-  errorRef.current = onError
 
   // Sign out the chosen device, then finish signing in here. TOTP-triggered
   // blocks (already past the code check) use that fresh ticket; Google-
@@ -253,6 +251,23 @@ export default function GoogleSignInButton({
 
   useEffect(() => {
     if (!CLIENT_ID || isNativeApp()) return
+    if (isAndroidWebView) {
+      // Google's SDK doesn't reject any promise we can catch inside a WebView
+      // - the script tag loads fine, GSI just silently declines to render a
+      // button. Waiting on loadGsi() to fail here never fires, so the "Open
+      // in Chrome" escape hatch never appeared. Skip attempting to load it
+      // at all and go straight to the escape hatch instead. Unlike the
+      // ad-blocker case below, this swap is worth explaining - the button
+      // that appears isn't the one the user expects.
+      onError(t('errGoogleWebView'))
+      setWebViewBlocked(true)
+      reportClientError({
+        kind: 'generic',
+        path: window.location.pathname,
+        message: `Google sign-in skipped: Android WebView detected | UA: ${navigator.userAgent}`,
+      })
+      return
+    }
     let cancelled = false
     let ro: ResizeObserver | undefined
     // GIS only takes a fixed pixel width - a hardcoded one overflows narrow
@@ -295,17 +310,19 @@ export default function GoogleSignInButton({
       })
       .catch((e) => {
         if (cancelled) return
+        // Reached only on a real (non-WebView) browser now - typically an
+        // ad-blocker/privacy list blocking the GSI script (Clarity showed
+        // ~11% of login-page sessions). Fail quietly instead of routing it
+        // through the same error banner as a real credential failure: that
+        // made the whole login page look broken, when email/password -
+        // still visible right below - works fine. Server-side record (via
+        // the same client-error telemetry ErrorBoundary uses) so this stays
+        // diagnosable from real traffic instead of guessing.
         const msg = e instanceof Error ? e.message : 'Failed to load Google sign-in'
-        errorRef.current(isAndroidWebView ? t('errGoogleWebView') : msg)
-        if (isAndroidWebView) setWebViewBlocked(true)
-        // Server-side record (audit_log, via the same client-error telemetry
-        // ErrorBoundary uses) so this is diagnosable from real traffic instead
-        // of guessing — the server captures User-Agent/IP from the request
-        // itself, so browser/network patterns are queryable later.
         reportClientError({
           kind: 'generic',
           path: window.location.pathname,
-          message: `${msg}${isAndroidWebView ? ' [webview]' : ''} | UA: ${navigator.userAgent}`,
+          message: `${msg} | UA: ${navigator.userAgent}`,
         })
       })
     return () => {
