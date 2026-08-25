@@ -1862,6 +1862,10 @@ const STRINGS = {
     en: "Google sign-in doesn't work inside this app's in-app browser. Please sign in with your email and password below, or open this page in Chrome.",
     ta: 'இந்தப் பயன்பாட்டின் உள்ளமைந்த உலாவியில் Google உள்நுழைவு வேலை செய்யாது. கீழே உள்ள மின்னஞ்சல் மற்றும் கடவுச்சொல்லைப் பயன்படுத்தி உள்நுழையவும், அல்லது இந்தப் பக்கத்தை Chrome-இல் திறக்கவும்.',
   },
+  openInChrome: {
+    en: 'Open in Chrome',
+    ta: 'Chrome-இல் திறக்கவும்',
+  },
   // ── Devices / sessions (manage-devices screen) ──
   devicesTitle: { en: 'Devices', ta: 'சாதனங்கள்' },
   devicesSub: {

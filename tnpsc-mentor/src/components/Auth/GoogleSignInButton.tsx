@@ -52,6 +52,19 @@ declare global {
 // explains what happened instead of a generic "failed to load".
 const isAndroidWebView = /; ?wv\)/i.test(navigator.userAgent)
 
+/**
+ * Hand the current page to Chrome via Android's `intent://` scheme — the
+ * standard way a web page escapes an embedding app's WebView. Most in-app
+ * browsers (Instagram, Facebook, Messenger, WhatsApp) honour it, either
+ * launching Chrome directly or offering a chooser; a handful deliberately
+ * swallow it to keep the user inside their app, in which case nothing
+ * visible happens and the user still has the email/password fallback.
+ */
+function openInChrome(): void {
+  const withoutScheme = window.location.href.replace(/^https?:\/\//, '')
+  window.location.href = `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;end`
+}
+
 // Load the Google Identity Services script exactly once, shared across mounts.
 let gsiPromise: Promise<void> | null = null
 function loadGsi(): Promise<void> {
@@ -103,6 +116,11 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
+  // Shown in place of the (unrenderable) Google button when GSI failed to load
+  // inside a detected Android WebView — gives the user a way OUT to a real
+  // browser, where Google Sign-In works, instead of only the email/password
+  // fallback the errGoogleWebView message points to.
+  const [webViewBlocked, setWebViewBlocked] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
   // picking the Google account and the profile/onboarding screen appearing.
@@ -279,6 +297,7 @@ export default function GoogleSignInButton({
         if (cancelled) return
         const msg = e instanceof Error ? e.message : 'Failed to load Google sign-in'
         errorRef.current(isAndroidWebView ? t('errGoogleWebView') : msg)
+        if (isAndroidWebView) setWebViewBlocked(true)
         // Server-side record (audit_log, via the same client-error telemetry
         // ErrorBoundary uses) so this is diagnosable from real traffic instead
         // of guessing — the server captures User-Agent/IP from the request
@@ -347,6 +366,16 @@ export default function GoogleSignInButton({
               />
             </svg>
             {label}
+          </button>
+        </div>
+      ) : webViewBlocked ? (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={openInChrome}
+            className="flex w-full max-w-[400px] items-center justify-center gap-3 rounded-full border border-line bg-card px-5 py-3 font-heading text-sm font-semibold text-ink shadow-pill transition active:scale-[0.98]"
+          >
+            {t('openInChrome')}
           </button>
         </div>
       ) : (

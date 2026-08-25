@@ -17,7 +17,7 @@ module.exports = {
   apps: [
     {
       name: 'tnpsc-api',
-      cwd: '/var/www/tnpsc-app/server',
+      cwd: '/var/www/tnpsc-app/tnpsc-mentor/server',
       script: 'dist/index.js',
       instances: 4,
       exec_mode: 'cluster',
