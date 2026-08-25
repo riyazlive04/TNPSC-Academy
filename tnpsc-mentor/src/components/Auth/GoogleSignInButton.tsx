@@ -10,6 +10,7 @@ import { useAuthConfigStore } from '../../store/authConfigStore'
 import { reportClientError } from '../../lib/reportClientError'
 import DeviceLimitModal from './DeviceLimitModal'
 import TotpChallengeModal from './TotpChallengeModal'
+import OpenInChromeModal from './OpenInChromeModal'
 import type { DeviceSession } from '../../lib/api'
 
 // Public OAuth Web Client ID (safe to ship to the browser) — still needed
@@ -53,12 +54,14 @@ declare global {
 const isAndroidWebView = /; ?wv\)/i.test(navigator.userAgent)
 
 /**
- * Hand the current page to Chrome via Android's `intent://` scheme — the
- * standard way a web page escapes an embedding app's WebView. Most in-app
- * browsers (Instagram, Facebook, Messenger, WhatsApp) honour it, either
- * launching Chrome directly or offering a chooser; a handful deliberately
- * swallow it to keep the user inside their app, in which case nothing
- * visible happens and the user still has the email/password fallback.
+ * Hand the current page to Chrome SPECIFICALLY — via Android's `intent://`
+ * scheme with an explicit `package=com.android.chrome`, which launches only
+ * that app (never a chooser with other browsers) when it's installed. This is
+ * the standard way a web page escapes an embedding app's WebView. Most in-app
+ * browsers (Instagram, Facebook, Messenger, WhatsApp) honour it and hand off
+ * to Chrome directly; a handful deliberately swallow it to keep the user
+ * inside their own app, in which case nothing visible happens and the user
+ * still has the email/password fallback in the popup underneath.
  */
 function openInChrome(): void {
   const withoutScheme = window.location.href.replace(/^https?:\/\//, '')
@@ -116,10 +119,10 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // Shown in place of the (unrenderable) Google button when GSI failed to load
-  // inside a detected Android WebView — gives the user a way OUT to a real
-  // browser, where Google Sign-In works, instead of only the email/password
-  // fallback the errGoogleWebView message points to.
+  // True inside a detected Android WebView, where GSI never renders a button.
+  // Drives OpenInChromeModal — a popup (not a button competing for attention
+  // with the rest of the form) offering a way OUT to a real browser, where
+  // Google Sign-In works, on top of the email/password fallback already below.
   const [webViewBlocked, setWebViewBlocked] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
@@ -385,17 +388,7 @@ export default function GoogleSignInButton({
             {label}
           </button>
         </div>
-      ) : webViewBlocked ? (
-        <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={openInChrome}
-            className="flex w-full max-w-[400px] items-center justify-center gap-3 rounded-full border border-line bg-card px-5 py-3 font-heading text-sm font-semibold text-ink shadow-pill transition active:scale-[0.98]"
-          >
-            {t('openInChrome')}
-          </button>
-        </div>
-      ) : (
+      ) : webViewBlocked ? null : (
         // GIS renders its own fixed-width button; center it within the form column.
         <div ref={containerRef} className="flex justify-center" />
       )}
@@ -411,6 +404,11 @@ export default function GoogleSignInButton({
           </div>
         </div>
       )}
+      <OpenInChromeModal
+        open={webViewBlocked}
+        onOpenChrome={openInChrome}
+        onClose={() => setWebViewBlocked(false)}
+      />
       <DeviceLimitModal
         open={!!deviceLimit}
         devices={deviceLimit?.devices ?? []}

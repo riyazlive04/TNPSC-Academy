@@ -1866,6 +1866,10 @@ const STRINGS = {
     en: 'Open in Chrome',
     ta: 'Chrome-இல் திறக்கவும்',
   },
+  openInChromeTitle: {
+    en: 'Continue in Chrome',
+    ta: 'Chrome-இல் தொடரவும்',
+  },
   // ── Devices / sessions (manage-devices screen) ──
   devicesTitle: { en: 'Devices', ta: 'சாதனங்கள்' },
   devicesSub: {
