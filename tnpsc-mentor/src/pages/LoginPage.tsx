@@ -78,7 +78,7 @@ export default function LoginPage() {
 
   // After login the destination (console / onboarding / deep link / arena) is
   // resolved by the shared post-auth router from the freshly-loaded profile.
-  // A ?from= query param is the fallback for a WebView-to-Chrome handoff
+  // A ?from= query param is the fallback for a WebView-to-browser handoff
   // (fresh page load, no router state survives it) — see goAuth in
   // RankBoosterLandingPage.tsx and sanitizeFromPath's own doc for why the
   // query-param source is validated and the state one isn't.

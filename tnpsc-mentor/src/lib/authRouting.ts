@@ -70,7 +70,7 @@ export interface CredentialCarryoverState {
 
 /**
  * Validate a `from` value that arrived via a URL query param (e.g.
- * `/register?from=/rank-booster`, used when a WebView handoff to Chrome loses
+ * `/register?from=/rank-booster`, used when a WebView handoff to the browser loses
  * router state — see RankBoosterLandingPage's goAuth) rather than router
  * state. Router state can only ever be set by our own navigate() calls, so
  * fromPath is trusted there; a query param is attacker-controllable, so it

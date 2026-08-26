@@ -121,7 +121,7 @@ export default function RegisterPage() {
 
   // A deep link the user was bounced from (e.g. a marketing landing page CTA) —
   // resolved the same way LoginPage does, via the shared postAuthDestination().
-  // A ?from= query param is the fallback for a WebView-to-Chrome handoff
+  // A ?from= query param is the fallback for a WebView-to-browser handoff
   // (fresh page load, no router state survives it) — see goAuth in
   // RankBoosterLandingPage.tsx and sanitizeFromPath's own doc for why the
   // query-param source is validated and the state one isn't.

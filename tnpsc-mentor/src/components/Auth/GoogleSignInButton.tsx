@@ -8,10 +8,10 @@ import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuthConfigStore } from '../../store/authConfigStore'
 import { reportClientError } from '../../lib/reportClientError'
-import { isAndroidWebView, openInChrome } from '../../lib/webview'
+import { isAndroidWebView, openInBrowser } from '../../lib/webview'
 import DeviceLimitModal from './DeviceLimitModal'
 import TotpChallengeModal from './TotpChallengeModal'
-import OpenInChromeModal from './OpenInChromeModal'
+import OpenInBrowserModal from './OpenInBrowserModal'
 import type { DeviceSession } from '../../lib/api'
 
 // Public OAuth Web Client ID (safe to ship to the browser) — still needed
@@ -47,7 +47,7 @@ declare global {
   }
 }
 
-// isAndroidWebView / openInChrome moved to lib/webview.ts — RankBoosterLandingPage
+// isAndroidWebView / openInBrowser moved to lib/webview.ts — RankBoosterLandingPage
 // also proactively escapes the WebView (at "Enroll now", before Google Sign-In
 // is even needed on /register) and shouldn't have to duplicate the UA regex.
 
@@ -102,7 +102,7 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // Opens OpenInChromeModal. Only ever set true by an explicit tap on the
+  // Opens OpenInBrowserModal. Only ever set true by an explicit tap on the
   // WebView-mode Google button below — never automatically on mount, so
   // visitors who never intended to use Google (most of them) see a normal,
   // undisturbed page.
@@ -250,14 +250,14 @@ export default function GoogleSignInButton({
       // - the script tag loads fine, GSI just silently declines to render a
       // button. Skip attempting to load it at all; the render branch below
       // shows our own Google-styled button instead, and ONLY on a tap does it
-      // explain what's happening and offer the Chrome escape hatch.
+      // explain what's happening and offer the default-browser escape hatch.
       //
       // 2026-08-25: this used to fire the popup + error banner right here, on
       // mount — i.e. for every WebView pageview, whether or not the visitor
       // ever intended to use Google. Real traffic showed why that's wrong: 81
       // WebView pageviews on /register in one day, 2 completed signups total.
       // Interrupting someone who only wanted email/password with a Google/
-      // Chrome popup before they'd even seen the form is a plausible reason
+      // browser popup before they'd even seen the form is a plausible reason
       // conversion collapsed, not just Google specifically failing. Now
       // nothing happens until they actually tap the button.
       reportClientError({
@@ -425,7 +425,7 @@ export default function GoogleSignInButton({
       ) : isAndroidWebView || buttonVanished ? (
         // Looks and reads exactly like a normal Google button — nothing about
         // the page is disturbed for the visitor who never taps it. Only a tap
-        // opens OpenInChromeModal, which explains why sign-in isn't happening
+        // opens OpenInBrowserModal, which explains why sign-in isn't happening
         // here and offers the way out. Also shown after a real GSI button
         // rendered and then vanished on its own (buttonVanished) — same fix
         // applies either way once Google has decided not to cooperate here.
@@ -462,9 +462,9 @@ export default function GoogleSignInButton({
           </div>
         </div>
       )}
-      <OpenInChromeModal
+      <OpenInBrowserModal
         open={webViewBlocked}
-        onOpenChrome={openInChrome}
+        onOpenBrowser={openInBrowser}
         onClose={() => setWebViewBlocked(false)}
       />
       <DeviceLimitModal

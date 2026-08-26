@@ -37,7 +37,7 @@ import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import PricingCards from '../components/Landing/PricingCards'
 import { translate, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
-import { isAndroidWebView, openInChrome } from '../lib/webview'
+import { isAndroidWebView, openInBrowser } from '../lib/webview'
 
 type Lang = 'ta' | 'en'
 
@@ -457,18 +457,19 @@ export default function RankBoosterLandingPage() {
   // This page is the Meta ad landing target — most guests here arrive via an
   // in-app browser (Instagram/Facebook), where Google Sign-In can't work at
   // all (Google blocks its own SDK inside any WebView). Rather than let them
-  // hit that wall on /login or /register and lose the moment, hand off to
-  // Chrome proactively right here, at the highest-intent tap on the page —
-  // GoogleSignInButton still has its own reactive fallback for every OTHER
-  // page, where most visitors never intend to use Google at all and
+  // hit that wall on /login or /register and lose the moment, hand off to the
+  // default browser proactively right here, at the highest-intent tap on the
+  // page — GoogleSignInButton still has its own reactive fallback for every
+  // OTHER page, where most visitors never intend to use Google at all and
   // shouldn't be interrupted by this before even seeing the form.
   const goAuth = (path: '/login' | '/register') => {
-    // Chrome is a fresh browser instance — React Router state can't survive
-    // the handoff, so the "resume checkout back on /rank-booster after
-    // signing in" behaviour (see the autoEnroll effect above and
-    // isAutoEnrollPath in authRouting.ts) rides in a query param instead;
-    // LoginPage/RegisterPage fall back to reading it when there's no state.
-    if (isAndroidWebView) return openInChrome(`${path}?from=/rank-booster`)
+    // The browser this opens in is a fresh instance — React Router state
+    // can't survive the handoff, so the "resume checkout back on
+    // /rank-booster after signing in" behaviour (see the autoEnroll effect
+    // above and isAutoEnrollPath in authRouting.ts) rides in a query param
+    // instead; LoginPage/RegisterPage fall back to reading it when there's
+    // no state.
+    if (isAndroidWebView) return openInBrowser(`${path}?from=/rank-booster`)
     navigate(path, { state: { from: { pathname: '/rank-booster' } } })
   }
 

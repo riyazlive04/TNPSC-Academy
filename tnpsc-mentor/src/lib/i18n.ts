@@ -1859,16 +1859,16 @@ const STRINGS = {
   // script simply won't load there. Email/password works fine in the same
   // context, so point straight at it instead of a generic "failed" message.
   errGoogleWebView: {
-    en: "Google sign-in doesn't work inside this app's in-app browser. Please sign in with your email and password below, or open this page in Chrome.",
-    ta: 'இந்தப் பயன்பாட்டின் உள்ளமைந்த உலாவியில் Google உள்நுழைவு வேலை செய்யாது. கீழே உள்ள மின்னஞ்சல் மற்றும் கடவுச்சொல்லைப் பயன்படுத்தி உள்நுழையவும், அல்லது இந்தப் பக்கத்தை Chrome-இல் திறக்கவும்.',
+    en: "Google sign-in doesn't work inside this app's in-app browser. Please sign in with your email and password below, or open this page in your browser.",
+    ta: 'இந்தப் பயன்பாட்டின் உள்ளமைந்த உலாவியில் Google உள்நுழைவு வேலை செய்யாது. கீழே உள்ள மின்னஞ்சல் மற்றும் கடவுச்சொல்லைப் பயன்படுத்தி உள்நுழையவும், அல்லது இந்தப் பக்கத்தை உங்கள் உலாவியில் திறக்கவும்.',
   },
-  openInChrome: {
-    en: 'Open in Chrome',
-    ta: 'Chrome-இல் திறக்கவும்',
+  openInBrowser: {
+    en: 'Open in browser',
+    ta: 'உலாவியில் திறக்கவும்',
   },
-  openInChromeTitle: {
-    en: 'Continue in Chrome',
-    ta: 'Chrome-இல் தொடரவும்',
+  openInBrowserTitle: {
+    en: 'Continue in your browser',
+    ta: 'உங்கள் உலாவியில் தொடரவும்',
   },
   // ── Devices / sessions (manage-devices screen) ──
   devicesTitle: { en: 'Devices', ta: 'சாதனங்கள்' },
