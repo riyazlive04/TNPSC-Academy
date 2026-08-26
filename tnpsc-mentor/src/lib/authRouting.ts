@@ -67,3 +67,19 @@ export interface CredentialCarryoverState {
   prefillPassword: string
   from?: { pathname: string }
 }
+
+/**
+ * Validate a `from` value that arrived via a URL query param (e.g.
+ * `/register?from=/rank-booster`, used when a WebView handoff to Chrome loses
+ * router state — see RankBoosterLandingPage's goAuth) rather than router
+ * state. Router state can only ever be set by our own navigate() calls, so
+ * fromPath is trusted there; a query param is attacker-controllable, so it
+ * must be a same-site relative path — never an absolute URL or a
+ * protocol-relative `//host` one — before it's used as a redirect target.
+ */
+export function sanitizeFromPath(raw: string | null | undefined): string | undefined {
+  if (!raw) return undefined
+  if (!raw.startsWith('/') || raw.startsWith('//')) return undefined
+  if (/^\/[a-z0-9/_-]*$/i.test(raw)) return raw
+  return undefined
+}

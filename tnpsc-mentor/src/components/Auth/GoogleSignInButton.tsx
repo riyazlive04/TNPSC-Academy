@@ -8,6 +8,7 @@ import { isNativeApp, nativeGoogleIdToken } from '../../lib/nativeAuth'
 import { useThemeStore } from '../../store/themeStore'
 import { useAuthConfigStore } from '../../store/authConfigStore'
 import { reportClientError } from '../../lib/reportClientError'
+import { isAndroidWebView, openInChrome } from '../../lib/webview'
 import DeviceLimitModal from './DeviceLimitModal'
 import TotpChallengeModal from './TotpChallengeModal'
 import OpenInChromeModal from './OpenInChromeModal'
@@ -46,27 +47,9 @@ declare global {
   }
 }
 
-// Android's WebView appends "; wv)" to its user-agent's platform token — absent
-// from real Chrome. Google's own Sign-In SDK refuses to run inside a WebView
-// (an anti-phishing measure on Google's side, not something we can bypass), so
-// this is worth detecting to give affected users a message that actually
-// explains what happened instead of a generic "failed to load".
-const isAndroidWebView = /; ?wv\)/i.test(navigator.userAgent)
-
-/**
- * Hand the current page to Chrome SPECIFICALLY — via Android's `intent://`
- * scheme with an explicit `package=com.android.chrome`, which launches only
- * that app (never a chooser with other browsers) when it's installed. This is
- * the standard way a web page escapes an embedding app's WebView. Most in-app
- * browsers (Instagram, Facebook, Messenger, WhatsApp) honour it and hand off
- * to Chrome directly; a handful deliberately swallow it to keep the user
- * inside their own app, in which case nothing visible happens and the user
- * still has the email/password fallback in the popup underneath.
- */
-function openInChrome(): void {
-  const withoutScheme = window.location.href.replace(/^https?:\/\//, '')
-  window.location.href = `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;end`
-}
+// isAndroidWebView / openInChrome moved to lib/webview.ts — RankBoosterLandingPage
+// also proactively escapes the WebView (at "Enroll now", before Google Sign-In
+// is even needed on /register) and shouldn't have to duplicate the UA regex.
 
 // Load the Google Identity Services script exactly once, shared across mounts.
 let gsiPromise: Promise<void> | null = null

@@ -10,6 +10,7 @@ import {
   postAuthDestination,
   postAuthState,
   isAutoEnrollPath,
+  sanitizeFromPath,
   type CredentialCarryoverState,
 } from '../lib/authRouting'
 import { useAuthConfigStore } from '../store/authConfigStore'
@@ -120,7 +121,13 @@ export default function RegisterPage() {
 
   // A deep link the user was bounced from (e.g. a marketing landing page CTA) —
   // resolved the same way LoginPage does, via the shared postAuthDestination().
-  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
+  // A ?from= query param is the fallback for a WebView-to-Chrome handoff
+  // (fresh page load, no router state survives it) — see goAuth in
+  // RankBoosterLandingPage.tsx and sanitizeFromPath's own doc for why the
+  // query-param source is validated and the state one isn't.
+  const fromPath =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ??
+    sanitizeFromPath(new URLSearchParams(location.search).get('from'))
 
   // Top of the signup funnel: fire Meta's ViewContent once when the register
   // page is reached (no-ops in the native apps / dev — see lib/tracking).

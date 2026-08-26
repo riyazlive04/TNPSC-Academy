@@ -10,7 +10,12 @@ import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, classifyInvalidEmail } from '../lib/authValidation'
 import { reportClientError } from '../lib/reportClientError'
-import { postAuthDestination, postAuthState, type CredentialCarryoverState } from '../lib/authRouting'
+import {
+  postAuthDestination,
+  postAuthState,
+  sanitizeFromPath,
+  type CredentialCarryoverState,
+} from '../lib/authRouting'
 import { type DeviceSession } from '../lib/api'
 import { useAuthConfigStore } from '../store/authConfigStore'
 import { useT } from '../lib/i18n'
@@ -73,7 +78,13 @@ export default function LoginPage() {
 
   // After login the destination (console / onboarding / deep link / arena) is
   // resolved by the shared post-auth router from the freshly-loaded profile.
-  const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
+  // A ?from= query param is the fallback for a WebView-to-Chrome handoff
+  // (fresh page load, no router state survives it) — see goAuth in
+  // RankBoosterLandingPage.tsx and sanitizeFromPath's own doc for why the
+  // query-param source is validated and the state one isn't.
+  const fromPath =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ??
+    sanitizeFromPath(new URLSearchParams(location.search).get('from'))
 
   const emailInvalid = touched && !isValidEmail(email)
   const passwordInvalid = touched && !password
