@@ -102,10 +102,10 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // Opens OpenInBrowserModal. Only ever set true by an explicit tap on the
-  // WebView-mode Google button below — never automatically on mount, so
-  // visitors who never intended to use Google (most of them) see a normal,
-  // undisturbed page.
+  // Opens OpenInBrowserModal. Set on mount for a detected WebView (see the
+  // effect below) and also by an explicit tap on the WebView-mode Google
+  // button further down, which re-opens it if the visitor dismissed it once
+  // and then goes looking for Google sign-in anyway.
   const [webViewBlocked, setWebViewBlocked] = useState(false)
   // True once GSI rendered a button and it later vanished on its own — Google
   // runs its own WebView/compatibility checks beyond the UA marker our
@@ -249,21 +249,26 @@ export default function GoogleSignInButton({
       // Google's SDK doesn't reject any promise we can catch inside a WebView
       // - the script tag loads fine, GSI just silently declines to render a
       // button. Skip attempting to load it at all; the render branch below
-      // shows our own Google-styled button instead, and ONLY on a tap does it
-      // explain what's happening and offer the default-browser escape hatch.
+      // shows our own Google-styled button as a fallback for anyone who
+      // dismisses this and goes looking for Google sign-in anyway.
       //
-      // 2026-08-25: this used to fire the popup + error banner right here, on
-      // mount — i.e. for every WebView pageview, whether or not the visitor
-      // ever intended to use Google. Real traffic showed why that's wrong: 81
-      // WebView pageviews on /register in one day, 2 completed signups total.
-      // Interrupting someone who only wanted email/password with a Google/
-      // browser popup before they'd even seen the form is a plausible reason
-      // conversion collapsed, not just Google specifically failing. Now
-      // nothing happens until they actually tap the button.
+      // 2026-08-25: this was made tap-only (silent on mount) because 81 WebView
+      // pageviews on /register in one day had produced only 2 signups, and an
+      // interrupting popup on every load looked like the cause. 2026-08-27:
+      // that comparison was confounded — a breached-password check bug was
+      // ALSO blocking legitimate signups that same day (fixed in a later
+      // commit). With the popup silent and that bug gone, nginx logs showed
+      // 146 real /register visits (109 from instagram.com, 22 facebook.com)
+      // and exactly 1 completed signup — worse, not better. Almost none of
+      // that traffic ever taps the Google button, so it never learns Google
+      // won't work here or that email/password is one scroll away. Showing
+      // this immediately costs a beat of attention from the few visitors who
+      // didn't need it, but it's dismissible and doesn't block the form.
+      setWebViewBlocked(true)
       reportClientError({
         kind: 'generic',
         path: window.location.pathname,
-        message: `Google sign-in unavailable: Android WebView detected (page view, not yet attempted) | UA: ${navigator.userAgent}`,
+        message: `Google sign-in unavailable: Android WebView detected (auto-prompted) | UA: ${navigator.userAgent}`,
       })
       return
     }
