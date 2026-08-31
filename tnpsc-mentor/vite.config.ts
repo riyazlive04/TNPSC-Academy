@@ -25,17 +25,30 @@ export default defineConfig({
     chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // jsPDF + html2canvas are only needed on the result page —
-          // split them out of the main bundle.
-          pdf: ['jspdf', 'html2canvas'],
-          vendor: ['react', 'react-dom', 'react-router-dom', 'zustand'],
+        // There is deliberately NO `pdf: ['jspdf', 'html2canvas']` entry here,
+        // and the hook is a function rather than the `{ name: [pkg] }` object
+        // form. Naming a pdf chunk cost every visitor ~200 kB gzip on every
+        // route: Vite's own preload helper (the `__vitePreload` that each
+        // `await import()` compiles to) got parked inside that chunk, which made
+        // the 590 kB jsPDF + html2canvas bundle a STATIC import of 26 other
+        // chunks — so index.html modulepreloaded it and the registration page
+        // downloaded a PDF engine before it could paint. Left unnamed, jsPDF and
+        // html2canvas land in an async chunk that loads only when someone
+        // actually saves a PDF (every call site already uses `await import()`).
+        //
+        // After touching this file, CHECK: `dist/index.html` must reference only
+        // the entry, vendor, motion and the stylesheet — nothing else.
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return
+          if (/node_modules[\/](react|react-dom|react-router-dom|zustand)[\/]/.test(id)) {
+            return 'vendor'
+          }
           // Shared across many lazy route chunks (quiz/mock/result/admin
           // pages, page-transition engine) — isolate so they get their own
           // long-lived cache entry instead of being duplicated/re-bundled
           // into whichever chunk happens to import them first.
-          motion: ['motion'],
-          katex: ['katex'],
+          if (/node_modules[\/]motion[\/]/.test(id)) return 'motion'
+          if (/node_modules[\/]katex[\/]/.test(id)) return 'katex'
         },
       },
     },
