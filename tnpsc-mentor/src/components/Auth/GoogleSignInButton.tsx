@@ -102,18 +102,16 @@ export default function GoogleSignInButton({
   resolvedRef.current = resolved
   const renderRef = useRef<() => void>(() => {})
   const containerRef = useRef<HTMLDivElement>(null)
-  // Opens OpenInBrowserModal. Set on mount for a detected WebView (see the
-  // effect below) and also by an explicit tap on the WebView-mode Google
-  // button further down, which re-opens it if the visitor dismissed it once
-  // and then goes looking for Google sign-in anyway.
+  // Opens OpenInBrowserModal, and only ever by a tap on the fallback button
+  // below — nothing here interrupts a page on load.
   const [webViewBlocked, setWebViewBlocked] = useState(false)
-  // True once GSI rendered a button and it later vanished on its own — Google
-  // runs its own WebView/compatibility checks beyond the UA marker our
-  // isAndroidWebView regex looks for, and can pull a button that already
-  // rendered (2026-08-25: real reports of "shown, then vanishing" that
-  // isAndroidWebView alone didn't catch, since that check only ever ran
-  // once, up front, before GSI was even asked to load). Once this happens,
-  // render the same tap-to-reveal fallback the detected-upfront case uses.
+  // Google has refused to render here. The single source of truth for that
+  // verdict, reached three ways: the GSI script failed to load inside a WebView
+  // (a 403 for the UA), a render call left the container empty, or a button
+  // that HAD rendered was later pulled by Google's own compatibility checks
+  // (2026-08-25: real "shown, then vanishing" reports). The UA marker alone
+  // never decides it — plenty of embedded browsers do allow Google, and
+  // guessing up front cost those visitors a working one-tap sign-in.
   const [buttonVanished, setButtonVanished] = useState(false)
   // Drives a full-screen overlay while the ID token is exchanged for a session
   // and the next page loads - without it the page looks frozen ("lag") between
@@ -245,33 +243,20 @@ export default function GoogleSignInButton({
 
   useEffect(() => {
     if (!CLIENT_ID || isNativeApp()) return
-    if (isAndroidWebView) {
-      // Google's SDK doesn't reject any promise we can catch inside a WebView
-      // - the script tag loads fine, GSI just silently declines to render a
-      // button. Skip attempting to load it at all; the render branch below
-      // shows our own Google-styled button as a fallback for anyone who
-      // dismisses this and goes looking for Google sign-in anyway.
-      //
-      // 2026-08-25: this was made tap-only (silent on mount) because 81 WebView
-      // pageviews on /register in one day had produced only 2 signups, and an
-      // interrupting popup on every load looked like the cause. 2026-08-27:
-      // that comparison was confounded — a breached-password check bug was
-      // ALSO blocking legitimate signups that same day (fixed in a later
-      // commit). With the popup silent and that bug gone, nginx logs showed
-      // 146 real /register visits (109 from instagram.com, 22 facebook.com)
-      // and exactly 1 completed signup — worse, not better. Almost none of
-      // that traffic ever taps the Google button, so it never learns Google
-      // won't work here or that email/password is one scroll away. Showing
-      // this immediately costs a beat of attention from the few visitors who
-      // didn't need it, but it's dismissible and doesn't block the form.
-      setWebViewBlocked(true)
-      reportClientError({
-        kind: 'generic',
-        path: window.location.pathname,
-        message: `Google sign-in unavailable: Android WebView detected (auto-prompted) | UA: ${navigator.userAgent}`,
-      })
-      return
-    }
+    // A detected WebView used to short-circuit here: no GSI load attempt at all,
+    // straight to the fallback. That threw away the cases where Google DOES work
+    // in an embedded browser — the UA marker says "this is a WebView", not
+    // "Google has refused". Which of those is true is knowable, but only by
+    // asking: load GSI, render, and look at whether a button actually appeared.
+    // The empty-container check inside renderButton() and the MutationObserver
+    // below already do exactly that (they were built for the "rendered, then
+    // vanished" reports), so a WebView now takes the same path as any other
+    // browser and only falls back when Google really has declined.
+    // No telemetry for the mere sighting any more: now that a WebView is
+    // attempted like anything else, "detected" says nothing actionable, and it
+    // would double-count against the page-level arrival ping RegisterPage
+    // fires. The two reports below — script load failed, button vanished — are
+    // the events that actually mean Google refused.
     let cancelled = false
     let ro: ResizeObserver | undefined
     let mo: MutationObserver | undefined
@@ -350,14 +335,22 @@ export default function GoogleSignInButton({
       })
       .catch((e) => {
         if (cancelled) return
-        // Reached only on a real (non-WebView) browser now - typically an
-        // ad-blocker/privacy list blocking the GSI script (Clarity showed
-        // ~11% of login-page sessions). Fail quietly instead of routing it
-        // through the same error banner as a real credential failure: that
-        // made the whole login page look broken, when email/password -
-        // still visible right below - works fine. Server-side record (via
-        // the same client-error telemetry ErrorBoundary uses) so this stays
-        // diagnosable from real traffic instead of guessing.
+        // Two very different causes land here, and they want opposite handling:
+        //
+        //  • A real browser — typically an ad-blocker/privacy list blocking the
+        //    GSI script (Clarity showed ~11% of login-page sessions). Fail
+        //    QUIETLY. Routing it through the same error banner as a real
+        //    credential failure made the whole login page look broken, when
+        //    email/password — still visible right below — works fine. And
+        //    "open this in your browser" is nonsense advice to someone who
+        //    already is in one.
+        //  • A WebView, where accounts.google.com/gsi/client answers 403 for the
+        //    UA. Here "open this in your browser" is precisely the fix, so show
+        //    the tap-to-explain fallback rather than an empty gap.
+        //
+        // Either way it is recorded server-side (the same client-error telemetry
+        // ErrorBoundary uses) so this stays diagnosable from real traffic.
+        if (isAndroidWebView) setButtonVanished(true)
         const msg = e instanceof Error ? e.message : 'Failed to load Google sign-in'
         reportClientError({
           kind: 'generic',
@@ -427,13 +420,12 @@ export default function GoogleSignInButton({
             {label}
           </button>
         </div>
-      ) : isAndroidWebView || buttonVanished ? (
-        // Looks and reads exactly like a normal Google button — nothing about
-        // the page is disturbed for the visitor who never taps it. Only a tap
-        // opens OpenInBrowserModal, which explains why sign-in isn't happening
-        // here and offers the way out. Also shown after a real GSI button
-        // rendered and then vanished on its own (buttonVanished) — same fix
-        // applies either way once Google has decided not to cooperate here.
+      ) : buttonVanished ? (
+        // Only once Google has actually declined — the script 403'd, or a button
+        // rendered and was then pulled. Looks and reads exactly like a normal
+        // Google button, so nothing about the page is disturbed for the visitor
+        // who never taps it; a tap opens OpenInBrowserModal, which explains why
+        // sign-in isn't happening here and offers the way out.
         <div className="flex justify-center">
           <button
             type="button"

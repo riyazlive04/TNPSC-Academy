@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { Info, Send } from 'lucide-react'
+import { Info, Send, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore, selectProfileNeedsOnboarding } from '../store/authStore'
 import { useOnboardingStore } from '../store/onboardingStore'
@@ -68,7 +68,6 @@ export default function CompleteProfilePage() {
   const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
 
   const [phone, setPhone] = useState(profile?.phone ?? '')
-  const [gender, setGender] = useState(profile?.gender ?? '')
   // Default group, submitted but not shown - keeps group-derived logic working.
   const group = profile?.target_group ?? 'Group1'
   const [error, setError] = useState('')
@@ -112,7 +111,6 @@ export default function CompleteProfilePage() {
     try {
       await api.updateProfile({
         phone: phone.trim(),
-        gender: gender || null,
         target_group: group,
         ...(phoneTicket ? { phoneTicket } : {}),
       })
@@ -478,7 +476,7 @@ export default function CompleteProfilePage() {
                 htmlFor="cp-phone"
                 className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
               >
-                {t('phone')}
+                {t('whatsappNumber')}
               </label>
               <input
                 id="cp-phone"
@@ -489,32 +487,23 @@ export default function CompleteProfilePage() {
                     ? 'animate-shake border-coral/60 focus:ring-coral/20'
                     : ''
                 }`}
-                placeholder="10-digit mobile"
+                inputMode="numeric"
+                placeholder="10-digit WhatsApp number"
                 value={phone}
                 aria-invalid={(touched && !isValidIndianMobile(phone)) || undefined}
                 onChange={(e) => updatePhone(e.target.value)}
               />
+              {isSignupWaOtpConfigured && (
+                <p className="tamil mt-1.5 flex items-start gap-1.5 font-body text-xs leading-relaxed text-ink2">
+                  <ShieldCheck size={13} className="mt-0.5 flex-shrink-0 text-mint" />
+                  {t('whatsappNumberHint')}
+                </p>
+              )}
             </div>
-
-            <div>
-              <label
-                htmlFor="cp-gender"
-                className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
-              >
-                {t('gender')}
-              </label>
-              <select
-                id="cp-gender"
-                className="input-soft appearance-none"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-              >
-                <option value="">{t('genderSelect')}</option>
-                <option value="male">{t('genderMale')}</option>
-                <option value="female">{t('genderFemale')}</option>
-                <option value="other">{t('genderOther')}</option>
-              </select>
-            </div>
+            {/* Gender used to be asked here too. It gates nothing, and this
+                screen is the ONLY thing standing between a Google sign-up and
+                the dashboard — so it moved to Profile, where it can be filled in
+                (or not) without costing a signup. */}
 
             {error && (
               <div

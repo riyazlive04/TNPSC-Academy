@@ -906,6 +906,36 @@ export const api = {
     return request('/api/reviews/grade', { method: 'POST', body: { itemId, selected } })
   },
 
+  // ─── Flashcards ("Instants") ───────────────────────────────────────────────
+  // Story-style subject decks. Outcomes land in the SAME review_items deck as
+  // the MCQ revision above, via grade_flashcard — see supabase/flashcards.sql.
+  flashcards: {
+    /** Every live deck + this user's due count. Feeds the dashboard tray. */
+    async decks(): Promise<FlashcardDeck[]> {
+      // Short SWR window: the tray is on the dashboard, which users bounce off
+      // constantly, but the due counts must still move after a study session.
+      const data = await request<{ decks: FlashcardDeck[] }>('/api/flashcards/decks', {
+        swr: 30_000,
+      })
+      return data.decks
+    },
+    /** The cards of one deck, each with its spaced-revision state. */
+    async deck(deckId: string): Promise<FlashcardCard[]> {
+      const data = await request<{ cards: FlashcardCard[] }>(`/api/flashcards/decks/${deckId}`)
+      return data.cards
+    },
+    /** One swipe. `knew` true = "Knew it", false = "Need to study". */
+    async grade(itemId: string, knew: boolean): Promise<FlashcardGrade> {
+      const res = await request<FlashcardGrade>('/api/flashcards/grade', {
+        method: 'POST',
+        body: { itemId, knew },
+      })
+      // The tray's due counts are now stale.
+      invalidateReads('/api/flashcards/decks')
+      return res
+    },
+  },
+
   // ─── Topic revision (study-gate + similar-question re-tests) ────────────────
   async revisions(): Promise<RevisionTopic[]> {
     const data = await request<{ items: RevisionTopic[] }>('/api/revisions', { swr: 60_000 })
@@ -1600,6 +1630,48 @@ export const api = {
     },
   },
 
+  // ─── CA → WhatsApp Channel (superadmin manual-post helper) ─────────────────
+  // WhatsApp Channels have no posting API (official or otherwise), so unlike
+  // caTelegram there is no upload/send — the console only holds the caption
+  // templates and a log of what was marked posted after the operator pasted
+  // it in by hand.
+  caWhatsapp: {
+    /** Saved caption templates for the dialog. */
+    async config(): Promise<CaWhatsappConfig> {
+      return request<CaWhatsappConfig>('/api/ca-whatsapp/admin/config')
+    },
+    /** Save the default caption templates. */
+    async saveConfig(patch: { caption_en?: string; caption_ta?: string }): Promise<CaWhatsappConfig> {
+      return request<CaWhatsappConfig>('/api/ca-whatsapp/admin/config', { method: 'PUT', body: patch })
+    },
+    /** What has been marked posted for one issue (newest first). */
+    async posts(caType: CaMagazineType, date: string): Promise<CaWhatsappPost[]> {
+      const qs = new URLSearchParams({ ca_type: caType, date })
+      const data = await request<{ posts: CaWhatsappPost[] }>(`/api/ca-whatsapp/admin/posts?${qs.toString()}`)
+      return data.posts
+    },
+    /** Latest mark per issue+language, keyed `${ca_type}|${date}` — list chips. */
+    async sent(): Promise<Record<string, { en?: string; ta?: string }>> {
+      const data = await request<{ sent: Record<string, { en?: string; ta?: string }> }>(
+        '/api/ca-whatsapp/admin/sent'
+      )
+      return data.sent
+    },
+    /** Log that one language of one issue was posted to the Channel by hand. */
+    async markSent(input: {
+      ca_type: CaMagazineType
+      date: string
+      lang: 'en' | 'ta'
+      caption: string
+    }): Promise<CaWhatsappPost> {
+      const data = await request<{ post: CaWhatsappPost }>('/api/ca-whatsapp/admin/mark-sent', {
+        method: 'POST',
+        body: input,
+      })
+      return data.post
+    },
+  },
+
   // ─── CA Questions (pipeline-generated daily sets + monthly banks) ──────────
   // Read-only superadmin viewer over the questions the VPS pipeline generates.
   caQuestions: {
@@ -1954,6 +2026,55 @@ export interface Material {
   thumb_url?: string | null
 }
 
+// ─── Flashcard shapes ───────────────────────────────────────────────────────
+/** The three tags the content source ships, in ascending order of difficulty. */
+export type FlashcardDifficulty = 'medium' | 'hard-medium' | 'hard'
+
+/** One deck as an avatar in the dashboard tray (get_flashcard_decks). */
+export interface FlashcardDeck {
+  id: string
+  slug: string
+  /** Canonical bank subject — resolves the avatar art via subjectIcons.ts. */
+  subject: string
+  title_en: string
+  title_ta: string | null
+  /** The one-line hook for the floating speech bubble. */
+  teaser_en: string | null
+  teaser_ta: string | null
+  /** Explicit icon slug; null falls back to resolving from `subject`. */
+  icon_slug: string | null
+  sort_order: number
+  card_count: number
+  /** Never-swiped cards + cards the SRS has brought back round. */
+  due_count: number
+  started_count: number
+}
+
+/** One card, with this user's spaced-revision state (get_flashcard_deck). */
+export interface FlashcardCard {
+  id: string
+  question_en: string
+  question_ta: string | null
+  answer_en: string
+  answer_ta: string | null
+  difficulty: FlashcardDifficulty
+  sort_order: number
+  reps: number
+  interval_days: number
+  /** null = never swiped. */
+  due_at: string | null
+  last_result: 'correct' | 'wrong' | null
+}
+
+/** What grade_flashcard returns after a swipe. */
+export interface FlashcardGrade {
+  ok: boolean
+  knew: boolean
+  reps: number
+  interval_days: number
+  due_at: string
+}
+
 // ─── CA Magazine shapes ─────────────────────────────────────────────────────────
 export type CaMagazineType = 'day_wise' | 'month_wise'
 
@@ -2020,6 +2141,21 @@ export interface CaTelegramPost {
 export interface CaTelegramSendResponse {
   chatId: string
   results: { lang: 'en' | 'ta'; ok: boolean; messageId?: number; error?: string }[]
+}
+
+// ─── CA → WhatsApp Channel shapes ───────────────────────────────────────────────
+/** The saved caption templates, with server defaults applied. No channel/bot
+ *  fields — WhatsApp Channels have no posting API, so nothing is sent from here. */
+export interface CaWhatsappConfig {
+  captions: { en: string; ta: string }
+}
+
+/** One language of one issue that was marked posted (logged by hand, not sent). */
+export interface CaWhatsappPost {
+  id: string
+  lang: 'en' | 'ta'
+  caption: string | null
+  sent_at: string
 }
 
 // ─── CA Questions shapes ────────────────────────────────────────────────────────

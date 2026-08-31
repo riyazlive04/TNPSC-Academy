@@ -40,7 +40,7 @@ alter table public.ca_telegram_posts enable row level security;
 -- Placeholders resolved at send time: {date} {items} {link} {name}
 -- Insert-only so re-running never clobbers edited copy.
 insert into public.app_settings (key, value) values
-  ('telegram_ca_channel', '"@tnpscmentors"'::jsonb),   -- t.me/tnpscmentors
+  ('telegram_ca_channel', '"-1004443543961"'::jsonb),  -- TNPSC Mentors (private: numeric id)
   (
     'telegram_ca_caption_en',
     to_jsonb(

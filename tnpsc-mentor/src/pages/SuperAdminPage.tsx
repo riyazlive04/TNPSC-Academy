@@ -54,6 +54,7 @@ import {
   FileDown,
   Presentation,
   Rocket,
+  MessageCircle,
 } from 'lucide-react'
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
@@ -94,6 +95,7 @@ import { issueDateLabel, magazineName } from '../lib/caMagazine'
 import { ALERT_KIND, ALERT_KINDS, alertKindOf } from '../lib/alertKinds'
 import MagazineEditor from '../components/Materials/MagazineEditor'
 import CaTelegramDialog from '../components/Materials/CaTelegramDialog'
+import CaWhatsappDialog from '../components/Materials/CaWhatsappDialog'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
@@ -5204,12 +5206,20 @@ function CaMagazineTab() {
   // and language (`${ca_type}|${date}` → { en, ta }) behind the row chips.
   const [telegramFor, setTelegramFor] = useState<CaMagazineIssue | null>(null)
   const [sent, setSent] = useState<Record<string, { en?: string; ta?: string }>>({})
+  // Same shape, but for the WhatsApp Channel manual-post helper (marked
+  // posted by hand — there's no send to log, WhatsApp Channels have no API).
+  const [whatsappFor, setWhatsappFor] = useState<CaMagazineIssue | null>(null)
+  const [sentWa, setSentWa] = useState<Record<string, { en?: string; ta?: string }>>({})
 
   // Non-blocking: the list still works if the send log can't be read.
   const loadSent = () => {
     api.caTelegram
       .sent()
       .then(setSent)
+      .catch(() => undefined)
+    api.caWhatsapp
+      .sent()
+      .then(setSentWa)
       .catch(() => undefined)
   }
 
@@ -5320,7 +5330,9 @@ function CaMagazineTab() {
             The pipeline pushes a daily issue every morning (and a monthly compilation on the 1st). Preview an
             issue, then approve it to publish it in the students' Materials tab. Hide or remove a published
             issue to take it down — the underlying data is never deleted. The send icon posts the issue to the
-            Telegram channel as an English and a Tamil PDF, with a caption you can edit before it goes out.
+            Telegram channel as an English and a Tamil PDF, with a caption you can edit before it goes out. The
+            chat-bubble icon gets the same issue ready for the WhatsApp Channel instead — WhatsApp has no
+            posting API, so that one hands you a caption to copy and a PDF to download for pasting in by hand.
           </p>
         </div>
       </div>
@@ -5391,6 +5403,16 @@ function CaMagazineTab() {
                         </span>
                       )
                     })()}
+                    {(() => {
+                      const wa = sentWa[keyOf(issue)]
+                      if (!wa) return null
+                      const langs = [wa.en && 'EN', wa.ta && 'TA'].filter(Boolean).join(' + ')
+                      return (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#25D366]/15 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-[#128C7E]">
+                          <MessageCircle size={10} /> {langs}
+                        </span>
+                      )
+                    })()}
                   </div>
                 </div>
                 <div className="flex flex-shrink-0 items-center gap-1">
@@ -5400,6 +5422,13 @@ function CaMagazineTab() {
                     title="Send to the Telegram channel (English + Tamil PDF)"
                   >
                     <Send size={15} />
+                  </button>
+                  <button
+                    onClick={() => setWhatsappFor(issue)}
+                    className="grid h-8 w-8 place-items-center rounded-lg text-ink2 transition hover:bg-tint hover:text-[#128C7E]"
+                    title="Get ready for the WhatsApp Channel (caption + PDF to post by hand)"
+                  >
+                    <MessageCircle size={15} />
                   </button>
                   <button
                     onClick={() => setPreview(issue)}
@@ -5487,6 +5516,14 @@ function CaMagazineTab() {
         <CaTelegramDialog
           issue={telegramFor}
           onClose={() => setTelegramFor(null)}
+          onSent={loadSent}
+        />
+      )}
+
+      {whatsappFor && (
+        <CaWhatsappDialog
+          issue={whatsappFor}
+          onClose={() => setWhatsappFor(null)}
           onSent={loadSent}
         />
       )}

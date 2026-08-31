@@ -1638,6 +1638,32 @@ const STRINGS = {
   newHere: { en: 'New here?', ta: 'புதியவரா?' },
   createAccount: { en: 'Create an account', ta: 'கணக்கை உருவாக்கு' },
   createYourAccount: { en: 'Create your account', ta: 'உங்கள் கணக்கை உருவாக்கவும்' },
+  // Signup headline + CTA. "Register for free" is deliberately the loudest line
+  // on the page — cold ad traffic lands here and needs to know, before reading
+  // anything else, that nothing is being charged.
+  registerForFree: { en: 'Register for free', ta: 'இலவசமாகப் பதிவு செய்யுங்கள்' },
+  registerFreeSub: {
+    en: 'No card needed. Free credits to start practising today.',
+    ta: 'கார்டு தேவையில்லை. இன்றே பயிற்சி தொடங்க இலவச கிரெடிட்கள்.',
+  },
+  registeringFree: { en: 'Registering…', ta: 'பதிவு செய்கிறது…' },
+  // The number MUST be on WhatsApp — that is where the verification code goes.
+  whatsappNumber: { en: 'WhatsApp number', ta: 'WhatsApp எண்' },
+  whatsappNumberHint: {
+    en: 'A 6-digit code will be sent to this number on WhatsApp.',
+    ta: 'இந்த எண்ணுக்கு WhatsApp-இல் 6-இலக்க குறியீடு அனுப்பப்படும்.',
+  },
+  errWhatsappRequired: {
+    en: 'Please enter the 10-digit mobile number that has WhatsApp.',
+    ta: 'WhatsApp உள்ள 10-இலக்க கைபேசி எண்ணை உள்ளிடவும்.',
+  },
+  // In-app browsers (Instagram / Facebook ads traffic) can't run Google sign-in.
+  // Shown inline under the form instead of as a modal that blocks the page.
+  webViewGoogleNote: {
+    en: 'One-tap Google sign-up needs a real browser.',
+    ta: 'ஒரு-தட்டு Google பதிவுக்கு உலாவி தேவை.',
+  },
+  openInChrome: { en: 'Open in Chrome', ta: 'Chrome-இல் திறக்கவும்' },
   startPreparing: { en: 'Start preparing today.', ta: 'இன்றே தயாராகத் தொடங்குங்கள்.' },
   creatingAccount: { en: 'Creating account…', ta: 'கணக்கை உருவாக்குகிறது…' },
   alreadyRegistered: { en: 'Already registered?', ta: 'ஏற்கனவே பதிவு செய்துள்ளீர்களா?' },
@@ -2182,6 +2208,40 @@ const STRINGS = {
     ta: 'இந்த இணைப்பு தவறானது அல்லது காலாவதியாகிவிட்டது. புதிய ஒன்றைக் கோரவும்.',
   },
   requestNewLink: { en: 'Request a new link', ta: 'புதிய இணைப்பைக் கோரவும்' },
+
+  // ─── Flashcards ("Instants") ──────────────────────────────────────────────
+  flashcardsTitle: { en: 'Flashcards', ta: 'நினைவு அட்டைகள்' },
+  cardsToStudy: { en: 'cards to study', ta: 'படிக்க வேண்டிய அட்டைகள்' },
+  /** Compact suffix for the tray bubble's count line — "12 due". */
+  dueShort: { en: 'due', ta: 'நிலுவை' },
+  answer: { en: 'Answer', ta: 'விடை' },
+  knewIt: { en: 'Knew it', ta: 'தெரியும்' },
+  needToStudy: { en: 'Need to study', ta: 'படிக்க வேண்டும்' },
+  tapToReveal: { en: 'Tap to flip', ta: 'திருப்ப தட்டவும்' },
+  showAnswer: { en: 'Show the answer', ta: 'விடையைக் காட்டு' },
+  showQuestion: { en: 'Show the question', ta: 'வினாவைக் காட்டு' },
+  flashcardHint: {
+    en: 'Swipe right if you knew it, left to study it again',
+    ta: 'தெரிந்திருந்தால் வலப்புறம், மீண்டும் படிக்க இடப்புறம் தட்டி இழுக்கவும்',
+  },
+  deckComplete: { en: 'Deck complete', ta: 'அட்டைத் தொகுப்பு முடிந்தது' },
+  deckCompleteSub: {
+    en: 'Anything you marked "Need to study" comes back in your revision deck.',
+    ta: '"படிக்க வேண்டும்" எனக் குறித்தவை உங்கள் மீள்பார்வைத் தொகுப்பில் திரும்பும்.',
+  },
+  studyAgain: { en: 'Study again', ta: 'மீண்டும் படி' },
+  flashcardSaveFailed: {
+    en: "Couldn't save that card. Check your connection.",
+    ta: 'அந்த அட்டையைச் சேமிக்க முடியவில்லை. இணைப்பைச் சரிபார்க்கவும்.',
+  },
+  flashcardLoadFailed: {
+    en: "Couldn't load this deck. Please try again.",
+    ta: 'இந்தத் தொகுப்பை ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+  },
+  flashcardDeckEmpty: {
+    en: 'There are no cards in this deck yet.',
+    ta: 'இந்தத் தொகுப்பில் இன்னும் அட்டைகள் இல்லை.',
+  },
 } as const
 
 export type StringKey = keyof typeof STRINGS

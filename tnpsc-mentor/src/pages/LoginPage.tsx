@@ -555,13 +555,15 @@ export default function LoginPage() {
           </>
         )}
 
-        <p className="mt-6 text-center font-body text-sm text-ink2">
+        {/* Signing up is the scarcer action, so the link says what it costs
+            ("free") rather than what it does ("create an account"). */}
+        <p className="tamil mt-6 text-center font-body text-sm text-ink2">
           {t('newHere')}{' '}
           <Link
             to="/register"
             className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
           >
-            {t('createAccount')}
+            {t('registerForFree')}
           </Link>
         </p>
         </>

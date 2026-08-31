@@ -82,6 +82,7 @@ const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
 const SetupPage = lazy(() => import('./pages/SetupPage'))
 const ThirukuralQuizPage = lazy(() => import('./pages/ThirukuralQuizPage'))
 const DailyPage = lazy(() => import('./pages/DailyPage'))
+const FlashcardDeck = lazy(() => import('./pages/FlashcardDeck'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
@@ -151,6 +152,9 @@ const BARE_ROUTES: RouteDef[] = [
   { path: '/language', element: <LanguageScreen /> },
   { path: '/quiz', element: <QuizPage /> },
   { path: '/mock/quiz', element: <MockQuizPage /> },
+  // The flashcard viewer hijacks the screen the way a test does — the swipe
+  // gesture needs the full viewport, and the tab bar would sit under the thumb.
+  { path: '/flashcards/:deckId', element: <FlashcardDeck /> },
   { path: '/payment-success', element: <PaymentSuccessPage /> },
 ]
 

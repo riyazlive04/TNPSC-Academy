@@ -29,10 +29,17 @@ router.get(
   '/count',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
+    // review_items also holds the flashcard deck (question_id NULL, see
+    // supabase/flashcards.sql). This badge counts MCQ revision only — the
+    // /due list already excludes them by INNER JOINing questions, so without
+    // this filter the badge would promise items that screen can't show.
+    // Keyed on question_id (not flashcard_item_id) so it is correct whether or
+    // not the flashcards migration has been applied yet.
     const { count, error } = await req.db!
       .from('review_items')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', req.userId)
+      .not('question_id', 'is', null)
       .lte('due_at', new Date().toISOString())
     if (error) return sendDbError(res, error)
     res.json({ count: count ?? 0 })

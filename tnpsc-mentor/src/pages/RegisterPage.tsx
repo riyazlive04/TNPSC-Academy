@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { CheckCircle2, Info, Send } from 'lucide-react'
+import { CheckCircle2, Info, Send, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthStore } from '../store/authStore'
-import { useLanguageStore, type Lang } from '../store/languageStore'
+import { useLanguageStore } from '../store/languageStore'
 import { useOnboardingStore } from '../store/onboardingStore'
 import { api } from '../lib/api'
 import {
@@ -22,7 +22,9 @@ import PasswordInput from '../components/UI/PasswordInput'
 import Spinner from '../components/UI/Spinner'
 import { friendlyAuthError, isValidEmail, classifyInvalidEmail, passwordStrength } from '../lib/authValidation'
 import { reportClientError } from '../lib/reportClientError'
-import { trackViewContent } from '../lib/tracking'
+import { isNativeApp } from '../lib/nativeAuth'
+import { isAndroidWebView, openInBrowser } from '../lib/webview'
+import { track, trackViewContent } from '../lib/tracking'
 import { useT, type StringKey } from '../lib/i18n'
 
 /**
@@ -47,17 +49,16 @@ function tenDigits(raw: string): string {
 /** Seconds the user must wait between WhatsApp-OTP sends (mirrors the server). */
 const RESEND_COOLDOWN_S = 45
 
-const GENDERS: { value: string; labelKey: StringKey }[] = [
-  { value: 'male', labelKey: 'genderMale' },
-  { value: 'female', labelKey: 'genderFemale' },
-  { value: 'other', labelKey: 'genderOther' },
-]
-
-const LANGUAGES: { id: Lang; labelKey: StringKey }[] = [
-  { id: 'en', labelKey: 'langEnglish' },
-  { id: 'ta', labelKey: 'langTamil' },
-  { id: 'both', labelKey: 'langBoth' },
-]
+/**
+ * Language is NOT asked for on this form any more — it is one of the fields that
+ * was cut to shorten signup. The AuthShell header already carries a live
+ * EN / தமிழ் / EN+த switcher, so whatever the visitor is reading the page in is
+ * the honest answer; when they never touched it we persist 'both', which is the
+ * only default that strands nobody (every question renders in English AND
+ * Tamil). Persisting it here is also what keeps the post-signup route going
+ * straight to the dashboard instead of detouring via the /language screen.
+ */
+const DEFAULT_SIGNUP_LANG = 'both' as const
 
 const STRENGTH_META: { key: StringKey; color: string }[] = [
   { key: 'pwStrengthWeak', color: 'bg-coral' },
@@ -81,15 +82,18 @@ export default function RegisterPage() {
   // Bounced here from /login because no account exists for the email typed
   // there — carry over what was typed instead of a blank form.
   const carryover = location.state as CredentialCarryoverState | null
+  // Four inputs, deliberately. Gender, confirm-password and the language picker
+  // were cut: none of them gate anything on the way in, and each one was another
+  // reason to abandon a form that most visitors reach from an ad. Gender is
+  // editable in Profile; language rides the AuthShell switcher (see
+  // DEFAULT_SIGNUP_LANG); a mistyped password is recoverable via the show/hide
+  // eye and, failing that, /forgot-password.
   const [form, setForm] = useState({
     fullName: '',
     email: carryover?.prefillEmail ?? '',
     phone: '',
-    gender: '',
     password: carryover?.prefillPassword ?? '',
-    confirm: carryover?.prefillPassword ?? '',
     targetGroup: 'Group1',
-    language: 'en' as Lang,
   })
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
@@ -114,8 +118,9 @@ export default function RegisterPage() {
   // UNAMBIGUOUS indication given by clear affirmative action — a passive "by
   // using this app you agree" does not qualify. It also defines a child as
   // anyone under 18, so an explicit age affirmation is what lets us apply the
-  // children's rules at all. One tick covers both, and the submit is blocked
-  // until it is given.
+  // children's rules at all. One tick covers both. The submit BUTTON stays
+  // enabled (a dead button teaches nothing); handleSubmit refuses and points at
+  // the tick instead.
   const [consented, setConsented] = useState(false)
   const [showTgHelp, setShowTgHelp] = useState(false)
 
@@ -133,6 +138,18 @@ export default function RegisterPage() {
   // page is reached (no-ops in the native apps / dev — see lib/tracking).
   useEffect(() => {
     trackViewContent({ contentName: 'Register', contentCategory: 'signup' })
+    // Arrival counter for in-app-browser traffic — the clearest signal we have
+    // about where this page's visitors come from (overwhelmingly Instagram /
+    // Facebook). Reported here, once per page load, rather than from
+    // GoogleSignInButton: that component now attempts Google in a WebView like
+    // anywhere else, so it can only tell us about REFUSALS, not arrivals.
+    if (isAndroidWebView) {
+      reportClientError({
+        kind: 'generic',
+        path: '/register',
+        message: `Register opened inside an Android WebView | UA: ${navigator.userAgent}`,
+      })
+    }
   }, [])
 
   // Tick the resend-cooldown counter down once per second while it's running.
@@ -154,7 +171,21 @@ export default function RegisterPage() {
   }
 
   const strength = useMemo(() => passwordStrength(form.password), [form.password])
-  const confirmMismatch = touched && form.confirm.length > 0 && form.password !== form.confirm
+
+  // WHERE the Google block goes, not whether it exists — it is always rendered.
+  // Google's SDK usually refuses to run inside an in-app browser (Instagram /
+  // Facebook / Messenger), which is where most of this page's ad traffic
+  // arrives, so leading with it there would spend the most valuable spot on the
+  // page on a button that probably won't appear; those visitors get the form
+  // first and the Google block underneath, where it still renders a real,
+  // working button in the WebViews that DO allow it.
+  //
+  // Our own Android app is also an Android WebView by user-agent (stock System
+  // WebView, no UA override in capacitor.config.ts) — but its Google sign-in
+  // goes through the native plugin and was never subject to the block, so it
+  // belongs firmly in the "Google first" branch.
+  const googleFirst = isGoogleConfigured && (isNativeApp() || !isAndroidWebView)
+  const googleBelowForm = isGoogleConfigured && !googleFirst
 
   /** Create the account (with the WhatsApp ticket when the feature is live) and
    * run the post-signup routine. On failure the user lands back on the form —
@@ -164,7 +195,6 @@ export default function RegisterPage() {
       fullName: form.fullName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      gender: form.gender || undefined,
       password: form.password,
       targetGroup: form.targetGroup,
       phoneTicket,
@@ -194,11 +224,14 @@ export default function RegisterPage() {
     // user first reaches the dashboard (now, or after email confirmation).
     useOnboardingStore.getState().arm()
 
-    // Apply the language chosen at signup right away (drives the UI), persist it
-    // to the profile when the account is live, and skip the language screen.
-    setLang(form.language)
+    // Settle the language WITHOUT asking: whatever the AuthShell switcher is on,
+    // else the bilingual default. Persisting it is what lets the next line land
+    // on the dashboard instead of the one-time /language screen — a brand-new
+    // account should never be stopped by another screen right after signing up.
+    const chosenLang = useLanguageStore.getState().lang ?? DEFAULT_SIGNUP_LANG
+    setLang(chosenLang)
     if (useAuthStore.getState().user) {
-      api.updateProfile({ language: form.language }).catch(() => {})
+      api.updateProfile({ language: chosenLang }).catch(() => {})
       navigate(postAuthDestination(fromPath), { replace: true, state: postAuthState(fromPath) })
     } else {
       setStep('form')
@@ -228,6 +261,7 @@ export default function RegisterPage() {
     // type it rather than block them.
     setStep('otp')
     setResendIn(RESEND_COOLDOWN_S)
+    track('signup_otp_sent')
     if (res.cooldown) setOtpInfo(t('waOtpCooldown'))
     return true
   }
@@ -252,12 +286,12 @@ export default function RegisterPage() {
       })
       return setError(t('errEmailInvalid'))
     }
-    if (!form.phone.trim()) return setError(t('errPhoneRequired'))
+    if (!form.phone.trim()) return setError(t('errWhatsappRequired'))
     if (!isValidIndianMobile(form.phone)) return setError(t('errMobileInvalid'))
     if (form.password.length < 8) return setError(t('errPasswordShort'))
-    if (form.password !== form.confirm) return setError(t('errPasswordMismatch'))
     if (!consented) return setError(t('errConsentRequired'))
 
+    track('signup_form_submit')
     setLoading(true)
     if (!isSignupWaOtpConfigured) {
       // Feature off: single-step signup, exactly as before.
@@ -273,8 +307,8 @@ export default function RegisterPage() {
     setLoading(false)
   }
 
-  const handleVerifyOtp = async (e: FormEvent) => {
-    e.preventDefault()
+  const handleVerifyOtp = async (e?: FormEvent) => {
+    e?.preventDefault()
     setError('')
     setOtpInfo('')
     if (otp.trim().length !== 6) return setError(t('errOtpRequired'))
@@ -283,11 +317,13 @@ export default function RegisterPage() {
     const res = await verifySignupOtp(form.phone.trim(), otp.trim())
     if (res.invalid) {
       setLoading(false)
+      track('signup_otp_failed', { reason: 'invalid' })
       return setError(t('waOtpInvalid'))
     }
     if (res.dead) {
       setLoading(false)
       setOtp('')
+      track('signup_otp_failed', { reason: 'expired' })
       return setError(t('waOtpDead'))
     }
     if (res.error || !res.ticket) {
@@ -296,10 +332,23 @@ export default function RegisterPage() {
       return setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
     }
     setVerified({ phone: tenDigits(form.phone), ticket: res.ticket })
+    track('signup_otp_verified')
     // Straight into account creation — the button reads "Verify & create account".
     await doSignUp(res.ticket)
     setLoading(false)
   }
+
+  // Six digits in → verify immediately. Guarded on `loading` and on the step so
+  // a re-render mid-request can't fire a second verification with the same code
+  // (which the server would count as a wrong guess against the 5-attempt budget).
+  useEffect(() => {
+    if (step !== 'otp' || loading || otp.length !== 6) return
+    void handleVerifyOtp()
+    // handleVerifyOtp is re-created every render and `loading` must stay OUT of
+    // the deps: re-running when it flips back to false would resubmit the same
+    // rejected code and burn another of the server's 5 attempts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp, step])
 
   const handleResendOtp = async () => {
     if (loading || resendIn > 0) return
@@ -381,22 +430,27 @@ export default function RegisterPage() {
   return (
     <AuthShell>
       <div className="rounded-3xl border border-line bg-card p-6 shadow-card sm:p-8">
-        <h2 className="mb-1 text-center font-heading text-xl font-semibold tracking-tight text-ink">
-          {t('createYourAccount')}
+        {/* "Register for free" is the headline, not "Create your account": the
+            page's whole job is to answer "what does this cost me?" before a
+            visitor decides whether to read on. */}
+        <h2 className="tamil mb-1 text-center font-heading text-2xl font-bold tracking-tight text-ink">
+          {t('registerForFree')}
         </h2>
-        <p className="mb-6 text-center font-body text-sm text-ink2">{t('startPreparing')}</p>
+        <p className="tamil mb-6 text-center font-body text-sm text-ink2">{t('registerFreeSub')}</p>
 
-        {/* Promoted fast path: arriving with purchase intent (e.g. Rank
-            Booster's "Enroll now") skips straight past the full form —
-            Google is one tap, and fromPath (threaded through
-            GoogleSignInButton → postAuthState) brings them right back to
-            resume checkout, detouring through /complete-profile only for the
-            still-mandatory phone number. */}
-        {isGoogleConfigured && step === 'form' && isAutoEnrollPath(fromPath) && (
+        {/* Google first — one tap, nothing to type. Only where it can actually
+            work: inside an in-app browser Google's SDK refuses to run, so those
+            visitors get the form first and the escape hatch below it instead of
+            a dead button occupying the most valuable spot on the page.
+            fromPath (threaded through GoogleSignInButton → postAuthState) brings
+            purchase-intent arrivals right back to resume checkout. */}
+        {googleFirst && step === 'form' && (
           <div className="mb-6">
-            <p className="tamil mb-3 text-center font-heading text-xs font-bold uppercase tracking-wide text-gold">
-              {t('fastestWayToEnroll')}
-            </p>
+            {isAutoEnrollPath(fromPath) && (
+              <p className="tamil mb-3 text-center font-heading text-xs font-bold uppercase tracking-wide text-gold">
+                {t('fastestWayToEnroll')}
+              </p>
+            )}
             <GoogleSignInButton onError={setError} fromPath={fromPath} text="signup_with" />
             <AuthDivider label={t('orSignUpWithEmail')} />
           </div>
@@ -423,10 +477,11 @@ export default function RegisterPage() {
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 maxLength={6}
+                autoFocus
                 className="input-soft text-center text-lg tracking-[0.5em]"
                 placeholder="••••••"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
               />
             </div>
 
@@ -570,16 +625,28 @@ export default function RegisterPage() {
             autoComplete="email"
             invalid={touched && !!form.email && !isValidEmail(form.email)}
           />
-          <Field
-            id="reg-phone"
-            label={t('phone')}
-            type="tel"
-            value={form.phone}
-            onChange={(v) => update('phone', v)}
-            placeholder="10-digit mobile"
-            autoComplete="tel"
-            invalid={touched && !!form.phone && !isValidIndianMobile(form.phone)}
-          />
+          {/* The number must be ON WhatsApp — that is where the verification
+              code is delivered — so the label says so rather than leaving the
+              user to discover it at the OTP step. */}
+          <div>
+            <Field
+              id="reg-phone"
+              label={t('whatsappNumber')}
+              type="tel"
+              value={form.phone}
+              onChange={(v) => update('phone', v)}
+              placeholder="10-digit WhatsApp number"
+              autoComplete="tel"
+              inputMode="numeric"
+              invalid={touched && !!form.phone && !isValidIndianMobile(form.phone)}
+            />
+            {isSignupWaOtpConfigured && (
+              <p className="tamil mt-1.5 flex items-start gap-1.5 font-body text-xs leading-relaxed text-ink2">
+                <ShieldCheck size={13} className="mt-0.5 flex-shrink-0 text-mint" />
+                {t('whatsappNumberHint')}
+              </p>
+            )}
+          </div>
 
           <div>
             <label
@@ -614,78 +681,6 @@ export default function RegisterPage() {
                 </span>
               </div>
             )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="reg-confirm"
-              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
-            >
-              {t('confirmPassword')}
-            </label>
-            <PasswordInput
-              id="reg-confirm"
-              value={form.confirm}
-              onChange={(v) => update('confirm', v)}
-              placeholder="Re-enter password"
-              autoComplete="new-password"
-              invalid={confirmMismatch}
-            />
-            {confirmMismatch && (
-              <p className="mt-1.5 animate-slideDown font-body text-xs font-medium text-coral">
-                {t('errPasswordMismatch')}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="reg-gender"
-              className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2"
-            >
-              {t('gender')}
-            </label>
-            <select
-              id="reg-gender"
-              className="input-soft appearance-none"
-              value={form.gender}
-              onChange={(e) => update('gender', e.target.value)}
-            >
-              <option value="">{t('genderSelect')}</option>
-              {GENDERS.map((g) => (
-                <option key={g.value} value={g.value}>
-                  {t(g.labelKey)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Preferred language - chosen at signup so the language screen is skipped */}
-          <div>
-            <label className="mb-1.5 block font-heading text-xs font-bold uppercase tracking-wide text-ink2">
-              {t('language')}
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {LANGUAGES.map((o) => {
-                const active = form.language === o.id
-                return (
-                  <button
-                    key={o.id}
-                    type="button"
-                    onClick={() => setForm((f) => ({ ...f, language: o.id }))}
-                    aria-pressed={active}
-                    className={[
-                      'tamil rounded-xl border px-3 py-2.5 font-heading text-sm font-semibold transition-all',
-                      active
-                        ? 'border-transparent bg-brand-gradient text-white shadow-brand'
-                        : 'border-line bg-card text-ink2 hover:border-brand/30',
-                    ].join(' ')}
-                  >
-                    {t(o.labelKey)}
-                  </button>
-                )
-              })}
-            </div>
           </div>
 
           {error && (
@@ -753,23 +748,41 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            disabled={loading || !consented}
+            disabled={loading}
             className="btn-brand press mt-2 px-6 py-3.5 text-base"
           >
             {loading && <Spinner size={18} />}
             {loading
               ? isSignupWaOtpConfigured
                 ? t('sendingOtp')
-                : t('creatingAccount')
-              : t('createAccount')}
+                : t('registeringFree')
+              : t('registerForFree')}
           </button>
         </form>
         )}
 
-        {isGoogleConfigured && step === 'form' && !isAutoEnrollPath(fromPath) && (
+        {/* In-app browser (Instagram / Facebook / Messenger). Google still gets
+            its chance here — the button below renders for real wherever the
+            embedded browser permits it, and only degrades to tap-to-explain
+            where Google actually refuses. The "open in Chrome" line sits under
+            it as a quiet offer rather than the modal that used to interrupt the
+            page before the visitor had read a word of it; tapping hands the URL
+            to Android's intent resolver, which opens their real browser (or this
+            app, if installed). */}
+        {googleBelowForm && step === 'form' && (
           <>
             <AuthDivider label={t('orDivider')} />
             <GoogleSignInButton onError={setError} fromPath={fromPath} text="signup_with" />
+            <p className="tamil mt-3 text-center font-body text-xs leading-relaxed text-ink2">
+              {t('webViewGoogleNote')}{' '}
+              <button
+                type="button"
+                onClick={() => openInBrowser('/register')}
+                className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
+              >
+                {t('openInChrome')}
+              </button>
+            </p>
           </>
         )}
 
@@ -797,6 +810,7 @@ interface FieldProps {
   type?: string
   placeholder?: string
   autoComplete?: string
+  inputMode?: 'numeric' | 'tel' | 'email' | 'text'
   invalid?: boolean
 }
 
@@ -808,6 +822,7 @@ function Field({
   type = 'text',
   placeholder,
   autoComplete,
+  inputMode,
   invalid = false,
 }: FieldProps) {
   return (
@@ -824,6 +839,7 @@ function Field({
         className={`input-soft ${invalid ? 'animate-shake border-coral/60 focus:ring-coral/20' : ''}`}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        inputMode={inputMode}
         value={value}
         aria-invalid={invalid || undefined}
         onChange={(e) => onChange(e.target.value)}

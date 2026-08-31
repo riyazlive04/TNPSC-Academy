@@ -120,6 +120,9 @@ const T = {
   // Primary CTA while we promote the hosted web app (APK download paused). The
   // Platforms section still offers the APK; everywhere else routes here.
   webCta: { ta: 'Web app-ல try பண்ணுங்க', en: 'Try the web app' },
+  // What a LOGGED-OUT tap on that CTA actually leads to. Naming the price (none)
+  // at the click, not one page later, is the whole point.
+  registerForFree: { ta: 'இலவசமாகப் பதிவு செய்யுங்க', en: 'Register for free' },
 
   // Hero
   heroTitle: {
@@ -686,7 +689,7 @@ export default function LandingPage() {
                 {t('heroSub')}
               </motion.p>
               <motion.div variants={heroItem} className="mt-8 flex justify-center lg:justify-start">
-                <WebAppButton label={t('webCta')} size="lg" />
+                <WebAppButton label={t('webCta')} guestLabel={t('registerForFree')} size="lg" />
               </motion.div>
               {/* Trust row - concrete, no hype */}
               <motion.div
@@ -778,7 +781,7 @@ export default function LandingPage() {
               </span>
             </div>
             <div className="mt-8 flex justify-center">
-              <WebAppButton label={t('webCta')} size="lg" />
+              <WebAppButton label={t('webCta')} guestLabel={t('registerForFree')} size="lg" />
             </div>
           </div>
         </section>
@@ -992,7 +995,7 @@ export default function LandingPage() {
               </h2>
               <p className="mx-auto mt-3 max-w-xl font-body text-base text-white/75">{t('s8Sub')}</p>
               <div className="mt-8 flex justify-center">
-                <WebAppButton label={t('webCta')} size="lg" tone="onDark" />
+                <WebAppButton label={t('webCta')} guestLabel={t('registerForFree')} size="lg" tone="onDark" />
               </div>
               <p className="mt-4 font-body text-sm text-white/70">{t('heroTrust')}</p>
             </div>
@@ -1098,7 +1101,7 @@ export default function LandingPage() {
           onClick={() => trackEvent('webapp_click')}
           className="btn-brand group w-full justify-center whitespace-nowrap px-4 py-3 text-sm"
         >
-          <Globe size={16} /> {t('webCta')}
+          <Globe size={16} /> {isAuthed ? t('webCta') : t('registerForFree')}
         </a>
       </div>
 
@@ -1169,17 +1172,23 @@ function DownloadButton({
  * DownloadButton's sizing/tone props so swapping it in leaves the layout intact. */
 function WebAppButton({
   label,
+  guestLabel,
   size,
   compact,
   tone,
 }: {
   label: string
+  /** Shown to logged-out visitors, who this button sends to the signup form. */
+  guestLabel: string
   size?: 'lg'
   compact?: boolean
   tone?: 'onDark'
 }) {
   const isAuthed = useAuthStore((s) => Boolean(s.user))
   const href = isAuthed ? APP_URL : APP_REGISTER_URL
+  // A guest tapping this lands on the signup form, so promise the thing that
+  // form promises. Only a signed-in visitor is really just "opening the app".
+  const cta = isAuthed ? label : guestLabel
   // On violet hero panels the gradient button vanishes, so use a solid white pill.
   const base =
     tone === 'onDark'
@@ -1193,7 +1202,7 @@ function WebAppButton({
   return (
     <a href={href} onClick={() => trackEvent('webapp_click')} className={cls}>
       <Globe size={compact ? 16 : 18} />
-      {label}
+      {cta}
       {!compact && (
         <ArrowRight
           size={18}

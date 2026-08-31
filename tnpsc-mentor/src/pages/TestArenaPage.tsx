@@ -29,6 +29,7 @@ import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
 import MomentumPanel from '../components/Home/MomentumPanel'
 import CaMagazineCarousel from '../components/Home/CaMagazineCarousel'
+import FlashcardPeek from '../components/Home/FlashcardPeek'
 import DailyCaSheet from '../components/Home/DailyCaSheet'
 import CurrentAffairsHubSheet from '../components/Home/CurrentAffairsHubSheet'
 import { List, ListRow } from '../components/UI/ListRow'
@@ -615,6 +616,10 @@ export default function TestArenaPage() {
           </CardGrid>
         </section>
       </div>
+
+      {/* Flashcard decks, as a card peeking in from the right edge. Portals to
+          document.body and positions itself — nothing to lay out here. */}
+      <FlashcardPeek />
 
       {/* The Daily CA day picker - today's paper + every earlier published day. */}
       <DailyCaSheet open={dailyCaOpen} onClose={() => setDailyCaOpen(false)} />
