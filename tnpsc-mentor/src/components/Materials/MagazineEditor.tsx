@@ -613,21 +613,18 @@ function DocItem({
       </div>
 
       {/* English */}
-      <AutoTextarea
-        value={title}
-        onChange={setTitle}
+      <ItemEditor
+        title={title}
+        content={content}
+        onChange={(v) => {
+          setTitle(v.title)
+          setContent(v.content)
+        }}
         onBlur={commit}
-        placeholder="Title"
-        className="font-heading text-lg font-semibold leading-snug text-ink"
-      />
-      <RichTextEditor
-        value={content}
-        onChange={setContent}
-        onBlur={commit}
-        placeholder="Write the item…"
-        ariaLabel="Item content"
+        titlePlaceholder="Title"
+        bodyPlaceholder="Write the item…"
+        ariaLabel="Item heading and content"
         toolbar={toolbar}
-        className="mt-1.5"
       />
 
       {/* Tamil twin */}
@@ -635,23 +632,19 @@ function DocItem({
         <span className="tamil mb-0.5 block font-heading text-2xs font-bold uppercase tracking-wider text-ink2/50">
           தமிழ் / Tamil
         </span>
-        <AutoTextarea
-          value={titleTa}
-          onChange={setTitleTa}
+        <ItemEditor
+          title={titleTa}
+          content={contentTa}
+          onChange={(v) => {
+            setTitleTa(v.title)
+            setContentTa(v.content)
+          }}
           onBlur={commit}
-          placeholder="தலைப்பு (Tamil title)"
-          tamil
-          className="font-heading text-base font-semibold leading-snug text-ink"
-        />
-        <RichTextEditor
-          value={contentTa}
-          onChange={setContentTa}
-          onBlur={commit}
-          placeholder="தமிழ் உள்ளடக்கம்"
-          ariaLabel="Tamil content"
+          titlePlaceholder="தலைப்பு (Tamil title)"
+          bodyPlaceholder="தமிழ் உள்ளடக்கம்"
+          ariaLabel="Tamil heading and content"
           toolbar={toolbar}
           tamil
-          className="mt-1.5"
         />
       </div>
     </div>
@@ -712,39 +705,34 @@ function AddItemComposer({
           <RteToolbar toolbar={toolbar} />
         </div>
       </div>
-      <AutoTextarea
-        value={title}
-        onChange={setTitle}
-        placeholder="Title"
-        className="font-heading text-lg font-semibold leading-snug text-ink"
-      />
-      <RichTextEditor
-        value={content}
-        onChange={setContent}
-        placeholder="Write the item…"
-        ariaLabel="New item content"
+      <ItemEditor
+        title={title}
+        content={content}
+        onChange={(v) => {
+          setTitle(v.title)
+          setContent(v.content)
+        }}
+        titlePlaceholder="Title"
+        bodyPlaceholder="Write the item…"
+        ariaLabel="New item heading and content"
         toolbar={toolbar}
-        className="mt-1.5"
       />
       <div className="mt-3 border-l-2 border-line pl-3">
         <span className="tamil mb-0.5 block font-heading text-2xs font-bold uppercase tracking-wider text-ink2/50">
           தமிழ் / Tamil (optional)
         </span>
-        <AutoTextarea
-          value={titleTa}
-          onChange={setTitleTa}
-          placeholder="தலைப்பு"
-          tamil
-          className="font-heading text-base font-semibold leading-snug text-ink"
-        />
-        <RichTextEditor
-          value={contentTa}
-          onChange={setContentTa}
-          placeholder="தமிழ் உள்ளடக்கம்"
-          ariaLabel="New Tamil content"
+        <ItemEditor
+          title={titleTa}
+          content={contentTa}
+          onChange={(v) => {
+            setTitleTa(v.title)
+            setContentTa(v.content)
+          }}
+          titlePlaceholder="தலைப்பு"
+          bodyPlaceholder="தமிழ் உள்ளடக்கம்"
+          ariaLabel="New Tamil heading and content"
           toolbar={toolbar}
           tamil
-          className="mt-1.5"
         />
       </div>
       <div className="mt-3 flex justify-end gap-2">
@@ -799,20 +787,38 @@ function useRteToolbar(): RteToolbarController {
   }
 }
 
-function RichTextEditor({
-  value,
+/**
+ * Heading AND body in ONE editable root, because that is the only way a text
+ * selection can run from the heading down into the bullets: the heading used to
+ * be a <textarea>, and a browser selection can never leave a form control, so a
+ * drag that started in the title stopped dead at its edge and Ctrl+C took the
+ * heading alone. Two sibling contentEditable divs would not have fixed it
+ * either — a selection is clamped to a single editing host.
+ *
+ * The split is positional and needs no bookkeeping: the FIRST block is the
+ * title, everything after it is the content. The same rule drives the styling
+ * (first-child), so what looks like the heading is always exactly what is saved
+ * as one. Pressing Enter at the end of the title therefore starts the body,
+ * which is what that keystroke should do anyway.
+ */
+function ItemEditor({
+  title,
+  content,
   onChange,
   onBlur,
-  placeholder,
+  titlePlaceholder,
+  bodyPlaceholder,
   ariaLabel,
   toolbar,
   tamil = false,
   className = '',
 }: {
-  value: string
-  onChange: (md: string) => void
+  title: string
+  content: string
+  onChange: (next: { title: string; content: string }) => void
   onBlur?: () => void
-  placeholder?: string
+  titlePlaceholder?: string
+  bodyPlaceholder?: string
   ariaLabel?: string
   /** The item's shared toolbar; this editor claims it while focused. */
   toolbar: RteToolbarController
@@ -820,28 +826,34 @@ function RichTextEditor({
   className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  // Last markdown we rendered/serialized — guards against re-setting innerHTML
-  // (which would reset the caret) while the user is typing. Sentinel forces the
-  // first sync.
-  const lastMd = useRef<string>('\u0000')
+  // Last title+markdown we rendered/serialized — guards against re-setting
+  // innerHTML (which would reset the caret) while the user is typing. The
+  // sentinel forces the first sync.
+  const last = useRef({ title: '\u0000', content: '\u0000' })
   const focused = useRef(false)
-  const [empty, setEmpty] = useState(!value.trim())
+  const [empty, setEmpty] = useState(!title.trim() && !content.trim())
 
   // Sync external value → HTML, but never while focused (would jump the caret).
   useEffect(() => {
     if (focused.current || !ref.current) return
-    if (value === lastMd.current) return
-    ref.current.innerHTML = markdownToHtml(value)
-    lastMd.current = value
-    setEmpty(!value.trim())
-  }, [value])
+    if (title === last.current.title && content === last.current.content) return
+    ref.current.innerHTML = `<div>${escapeText(title) || '<br>'}</div>${markdownToHtml(content)}`
+    last.current = { title, content }
+    setEmpty(!title.trim() && !content.trim())
+  }, [title, content])
 
   const serialize = () => {
-    if (!ref.current) return
-    const md = htmlToMarkdown(ref.current)
-    lastMd.current = md
-    setEmpty(!ref.current.textContent?.trim())
-    onChange(md)
+    const root = ref.current
+    if (!root) return
+    // First node is the heading, everything after it the body. Cloning lets the
+    // body be read without touching the live DOM the caret is sitting in.
+    const nextTitle = (root.firstChild?.textContent ?? '').trim()
+    const rest = root.cloneNode(true) as HTMLElement
+    if (rest.firstChild) rest.removeChild(rest.firstChild)
+    const nextContent = htmlToMarkdown(rest)
+    last.current = { title: nextTitle, content: nextContent }
+    setEmpty(!root.textContent?.trim())
+    onChange({ title: nextTitle, content: nextContent })
   }
 
   const exec = (command: string) => {
@@ -851,16 +863,33 @@ function RichTextEditor({
     serialize()
   }
 
+  // The heading's look comes from the same first-child rule that decides what
+  // IS the heading, so the two can never disagree.
+  const headingStyle = tamil
+    ? '[&>*:first-child]:font-heading [&>*:first-child]:text-base [&>*:first-child]:font-semibold [&>*:first-child]:leading-snug [&>*:first-child]:text-ink'
+    : '[&>*:first-child]:font-heading [&>*:first-child]:text-lg [&>*:first-child]:font-semibold [&>*:first-child]:leading-snug [&>*:first-child]:text-ink'
+
   return (
     <div className={className}>
       <div className="relative">
-        {empty && placeholder && (
+        {empty && (titlePlaceholder || bodyPlaceholder) && (
           <div
-            className={`pointer-events-none absolute left-0 top-0 font-body text-base leading-relaxed text-ink2/35 ${
-              tamil ? 'tamil' : ''
-            }`}
+            className={`pointer-events-none absolute left-0 top-0 ${tamil ? 'tamil' : ''}`}
           >
-            {placeholder}
+            {titlePlaceholder && (
+              <div
+                className={`font-heading font-semibold leading-snug text-ink2/35 ${
+                  tamil ? 'text-base' : 'text-lg'
+                }`}
+              >
+                {titlePlaceholder}
+              </div>
+            )}
+            {bodyPlaceholder && (
+              <div className="font-body text-base leading-relaxed text-ink2/35">
+                {bodyPlaceholder}
+              </div>
+            )}
           </div>
         )}
         <div
@@ -883,7 +912,7 @@ function RichTextEditor({
             toolbar.attach(null)
             onBlur?.()
           }}
-          className={`min-h-[1.6em] w-full font-body text-base leading-relaxed text-ink2 outline-none [&_b]:font-semibold [&_b]:text-ink [&_li]:my-0.5 [&_p]:my-1 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_ul_ul]:list-[circle] ${
+          className={`min-h-[3.2em] w-full font-body text-base leading-relaxed text-ink2 outline-none [&_b]:font-semibold [&_b]:text-ink [&_li]:my-0.5 [&_p]:my-1 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_ul_ul]:list-[circle] ${headingStyle} ${
             tamil ? 'tamil' : ''
           }`}
         />
@@ -937,44 +966,12 @@ function ToolbarBtn({
 }
 
 // ─── Shared bits ───────────────────────────────────────────────────────────────
-/** Borderless, auto-growing textarea — the doc-editor writing surface. */
-function AutoTextarea({
-  value,
-  onChange,
-  onBlur,
-  placeholder,
-  className = '',
-  tamil = false,
-}: {
-  value: string
-  onChange: (v: string) => void
-  onBlur?: () => void
-  placeholder?: string
-  className?: string
-  tamil?: boolean
-}) {
-  const ref = useRef<HTMLTextAreaElement>(null)
-  useEffect(() => {
-    const el = ref.current
-    if (el) {
-      el.style.height = '0px'
-      el.style.height = `${el.scrollHeight}px`
-    }
-  }, [value])
-  return (
-    <textarea
-      ref={ref}
-      rows={1}
-      value={value}
-      placeholder={placeholder}
-      onChange={(e) => onChange(e.target.value)}
-      onBlur={onBlur}
-      className={`w-full resize-none border-0 bg-transparent p-0 outline-none placeholder:text-ink2/35 ${
-        tamil ? 'tamil ' : ''
-      }${className}`}
-    />
-  )
+/** Plain text → HTML text. The title is stored as plain text (no markdown), so
+ *  it is escaped rather than parsed on the way into the editable root. */
+function escapeText(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
+
 
 /**
  * Compact know-level picker, styled to match SectionSelect but tinted by the
