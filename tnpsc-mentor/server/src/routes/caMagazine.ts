@@ -14,9 +14,27 @@ const router = Router()
 // that row being present AND active, so hide/delete in the Materials tab
 // unpublishes instantly while the ca_magazine rows stay untouched.
 
-const ITEM_COLS = 'id, external_id, ca_type, date, ca_month, topic, title, title_ta, content, content_ta'
+const ITEM_COLS =
+  'id, external_id, ca_type, date, ca_month, topic, title, title_ta, content, content_ta, know_level'
 
 const CA_TYPES = new Set(['day_wise', 'month_wise'])
+// Superadmin triage levels. NULL (unset) is always allowed — the pipeline
+// pushes items with no level and they must stay that way until reviewed.
+const KNOW_LEVELS = new Set(['must', 'should', 'good'])
+
+/**
+ * Read a know_level off a request body. Returns the key, `null` for an explicit
+ * clear, or `undefined` when the caller didn't mention it (leave alone).
+ * Rejects anything else by returning `false` so the route can 400 rather than
+ * silently dropping a typo'd level on the floor.
+ */
+function readKnowLevel(b: Record<string, unknown>): string | null | undefined | false {
+  if (!('know_level' in b)) return undefined
+  const v = b.know_level
+  if (v === null || v === '') return null
+  if (typeof v === 'string' && KNOW_LEVELS.has(v)) return v
+  return false
+}
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -316,6 +334,8 @@ router.post(
     if (!topic || !title || !content) {
       return res.status(400).json({ error: 'Section, title and content are all required.' })
     }
+    const knowLevel = readKnowLevel(b)
+    if (knowLevel === false) return res.status(400).json({ error: 'Unknown know level.' })
 
     // Keep ca_month/ca_year consistent with the rest of the issue.
     const { data: sample } = await supabaseAdmin
@@ -342,6 +362,7 @@ router.post(
         title_ta: b.title_ta ? String(b.title_ta).trim() : null,
         content,
         content_ta: b.content_ta ? String(b.content_ta).trim() : null,
+        know_level: knowLevel ?? null,
         source_url: 'admin-added',
       })
       .select(ITEM_COLS)
@@ -367,6 +388,9 @@ router.patch(
     if ('title_ta' in b) patch.title_ta = b.title_ta ? String(b.title_ta).trim() : null
     if (typeof b.content === 'string') patch.content = b.content.trim()
     if ('content_ta' in b) patch.content_ta = b.content_ta ? String(b.content_ta).trim() : null
+    const knowLevel = readKnowLevel(b)
+    if (knowLevel === false) return res.status(400).json({ error: 'Unknown know level.' })
+    if (knowLevel !== undefined) patch.know_level = knowLevel
     if (patch.topic === '') return res.status(400).json({ error: 'Section cannot be empty.' })
     if (patch.title === '') return res.status(400).json({ error: 'A title is required.' })
     if (patch.content === '') return res.status(400).json({ error: 'Content is required.' })

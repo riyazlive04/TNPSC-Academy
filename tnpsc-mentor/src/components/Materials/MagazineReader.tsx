@@ -4,7 +4,14 @@ import { useFocusTrap } from '../UI/useFocusTrap'
 import { Skeleton, SkeletonText } from '../UI/Skeleton'
 import type { CaMagazineItem, CaMagazineType } from '../../lib/api'
 import MagazineSections from './MagazineContent'
-import { issueDateLabel, magazineName } from '../../lib/caMagazine'
+import {
+  KNOW_LEVELS,
+  KNOW_LEVEL_TONE,
+  issueDateLabel,
+  knowLevelShort,
+  magazineName,
+  type KnowLevel,
+} from '../../lib/caMagazine'
 import { pdfWatermark } from '../../lib/pdfWatermark'
 import { useAuth } from '../../hooks/useAuth'
 import { useT } from '../../lib/i18n'
@@ -57,26 +64,41 @@ export default function MagazineReader({
   const [newsImage, setNewsImage] = useState<string | null>(null)
   // The reading language — seeded from the app toggle, then owned by the reader.
   const [readLang, setReadLang] = useState<'en' | 'ta' | 'both'>(lang)
+  // Revision filter: narrow the issue to one know level. null = show everything.
+  const [levelFilter, setLevelFilter] = useState<KnowLevel | null>(null)
 
   // The Tamil edition is only offered when the issue carries Tamil twins.
   const hasTamil = !!items?.some((i) => i.content_ta && i.content_ta.trim())
+  // Only offer the levels this issue actually uses — a chip that filters to an
+  // empty screen is worse than no chip, and older issues predate the feature
+  // entirely. Kept in KNOW_LEVELS order (most essential first), not in the
+  // order the items happen to appear.
+  const levelsPresent = KNOW_LEVELS.filter((level) => items?.some((i) => i.know_level === level))
+  const shownItems =
+    levelFilter && items ? items.filter((i) => i.know_level === levelFilter) : items
   const viewLang = hasTamil ? readLang : 'en'
 
   const title = magazineName(viewLang)
   const dateLine = issueDateLabel(caType, date, viewLang)
 
   const downloadPdf = async () => {
-    if (downloading || !items?.length) return
+    if (downloading || !shownItems?.length) return
     setDownloading(true)
     try {
       // Lazy-load the generator so jspdf/html2canvas stay out of the reader chunk.
       const { generateMagazinePdf } = await import('../../lib/magazinePdf')
+      // Exports exactly what is on screen — the level filter behaves like the
+      // language toggle above it, which already drives both. Filtering to
+      // "Must Know" and hitting download is the revision sheet, so the subtitle
+      // and the filename have to say which cut this is.
       await generateMagazinePdf({
-        items,
+        items: shownItems,
         title,
-        subtitle: dateLine,
+        subtitle: levelFilter ? `${dateLine} · ${knowLevelShort(levelFilter, viewLang)}` : dateLine,
         lang: viewLang,
-        fileLabel: issueDateLabel(caType, date, 'en'),
+        fileLabel: levelFilter
+          ? `${issueDateLabel(caType, date, 'en')} ${knowLevelShort(levelFilter, 'en')}`
+          : issueDateLabel(caType, date, 'en'),
         watermark: pdfWatermark(profile),
       })
     } catch {
@@ -145,7 +167,7 @@ export default function MagazineReader({
             <h2 className="tamil truncate font-heading text-base font-semibold text-ink">{title}</h2>
             <p className="tamil mt-0.5 truncate font-body text-xs text-ink2">{dateLine}</p>
           </div>
-          {downloadable && items && items.length > 0 && (
+          {downloadable && shownItems && shownItems.length > 0 && (
             <button
               onClick={downloadPdf}
               disabled={downloading}
@@ -156,7 +178,7 @@ export default function MagazineReader({
               {t('downloadMagazinePdf')}
             </button>
           )}
-          {downloadable && items && items.length > 0 && (
+          {downloadable && shownItems && shownItems.length > 0 && (
             <button
               onClick={downloadPdf}
               disabled={downloading}
@@ -201,6 +223,40 @@ export default function MagazineReader({
           </div>
         )}
 
+        {/* Know-level filter — only for issues a superadmin has actually triaged,
+            so nothing new appears on an untouched issue. "All" is always first
+            and is the default, so the filter can never silently hide items a
+            student never asked to hide. */}
+        {levelsPresent.length > 0 && (
+          <div className="flex flex-shrink-0 flex-wrap items-center gap-1.5 border-b border-line bg-card/60 px-4 py-2 sm:px-6">
+            <button
+              onClick={() => setLevelFilter(null)}
+              aria-pressed={levelFilter === null}
+              className={`tamil press rounded-full border px-3 py-1 font-heading text-2xs font-semibold transition ${
+                levelFilter === null
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-line bg-card text-ink2 hover:border-brand-ring hover:text-ink'
+              }`}
+            >
+              {t('caLevelAll')}
+            </button>
+            {levelsPresent.map((level) => (
+              <button
+                key={level}
+                onClick={() => setLevelFilter(levelFilter === level ? null : level)}
+                aria-pressed={levelFilter === level}
+                className={`tamil press rounded-full border px-3 py-1 font-heading text-2xs font-semibold transition ${
+                  levelFilter === level
+                    ? `border-transparent ${KNOW_LEVEL_TONE[level]}`
+                    : 'border-line bg-card text-ink2 hover:border-brand-ring hover:text-ink'
+                }`}
+              >
+                {knowLevelShort(level, viewLang)}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Body */}
         <div className="min-h-0 flex-1 overflow-y-auto bg-canvas">
           {items === null && !failed && (
@@ -236,7 +292,7 @@ export default function MagazineReader({
             </figure>
           )}
 
-          {items !== null && <MagazineSections items={items} lang={viewLang} />}
+          {shownItems !== null && <MagazineSections items={shownItems} lang={viewLang} />}
         </div>
       </div>
     </div>

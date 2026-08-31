@@ -1,5 +1,13 @@
 import type { CaMagazineItem } from '../../lib/api'
-import { groupBySection, isSectionEcho, parseBullets, sectionLabel } from '../../lib/caMagazine'
+import {
+  KNOW_LEVEL_TONE,
+  groupBySection,
+  isKnowLevel,
+  isSectionEcho,
+  knowLevelShort,
+  parseBullets,
+  sectionLabel,
+} from '../../lib/caMagazine'
 import { useT } from '../../lib/i18n'
 
 /**
@@ -34,6 +42,30 @@ export default function MagazineSections({
   )
 }
 
+/**
+ * The superadmin's triage badge. Renders nothing at all for an unmarked item —
+ * an issue the pipeline pushed and nobody has reviewed must look exactly as it
+ * always did, not as if every item were equally optional.
+ */
+export function KnowLevelBadge({
+  level,
+  lang,
+  className = '',
+}: {
+  level: unknown
+  lang: 'en' | 'ta' | 'both'
+  className?: string
+}) {
+  if (!isKnowLevel(level)) return null
+  return (
+    <span
+      className={`tamil inline-block rounded-full px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${KNOW_LEVEL_TONE[level]} ${className}`}
+    >
+      {knowLevelShort(level, lang)}
+    </span>
+  )
+}
+
 function MagazineItemView({
   item,
   topic,
@@ -51,8 +83,11 @@ function MagazineItemView({
 
   return (
     <article className="rounded-2xl border border-line bg-card p-4">
+      {/* Standalone when the item is a section echo (no title to sit above). */}
+      {!showTitle && <KnowLevelBadge level={item.know_level} lang={lang} className="mb-2" />}
       {showTitle && (
         <header className="mb-2">
+          <KnowLevelBadge level={item.know_level} lang={lang} className="mb-1.5" />
           {(lang === 'en' || lang === 'both' || !ta) && (
             <h4 className="font-heading text-sm font-semibold leading-snug text-ink">{item.title}</h4>
           )}

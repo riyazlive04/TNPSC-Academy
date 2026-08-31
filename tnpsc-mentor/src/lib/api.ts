@@ -1539,6 +1539,7 @@ export const api = {
       content: string
       title_ta?: string | null
       content_ta?: string | null
+      know_level?: string | null
     }): Promise<CaMagazineItem> {
       const data = await request<{ item: CaMagazineItem }>('/api/ca-magazine/admin/items', {
         method: 'POST',
@@ -1549,7 +1550,9 @@ export const api = {
     /** Superadmin: edit an item's section/title/content (either language). */
     async adminUpdateItem(
       id: string,
-      patch: Partial<Pick<CaMagazineItem, 'topic' | 'title' | 'title_ta' | 'content' | 'content_ta'>>
+      patch: Partial<
+        Pick<CaMagazineItem, 'topic' | 'title' | 'title_ta' | 'content' | 'content_ta' | 'know_level'>
+      >
     ): Promise<CaMagazineItem> {
       const data = await request<{ item: CaMagazineItem }>(`/api/ca-magazine/admin/items/${id}`, {
         method: 'PATCH',
@@ -2111,6 +2114,9 @@ export interface CaMagazineItem {
   title_ta: string | null
   content: string
   content_ta: string | null
+  /** Superadmin triage: 'must' | 'should' | 'good'. null = not reviewed yet, and
+   *  renders with no badge at all. See KnowLevel in lib/caMagazine.ts. */
+  know_level: string | null
 }
 
 // ─── CA → Telegram shapes ───────────────────────────────────────────────────────

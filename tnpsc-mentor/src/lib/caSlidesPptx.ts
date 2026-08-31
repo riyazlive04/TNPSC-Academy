@@ -18,6 +18,10 @@ import {
   EN_LEFT,
   EN_WIDTH,
   LATIN_FONT,
+  LEVEL_HEIGHT,
+  LEVEL_PT,
+  LEVEL_TOP,
+  LEVEL_WIDTH,
   SLIDE_H,
   SLIDE_W,
   TA_LEFT,
@@ -28,6 +32,7 @@ import {
   type ContentSlide,
   type SlideColumn,
 } from './caSlides'
+import { KNOW_LEVEL_HEX, knowLevelShort } from './caMagazine'
 
 const LAYOUT = 'CA_16x9'
 const MASTER = 'CA_BACKGROUND'
@@ -140,6 +145,23 @@ export async function buildCaSlidesPptx(slides: CaSlide[]): Promise<Blob> {
       fontFace: LATIN_FONT,
       color: '000000',
     })
+
+    // Know-level tag, opposite the date in the same header strip. The deck's
+    // chrome (date, section dividers) is English regardless of the bilingual
+    // body, so this follows suit. Nothing is drawn for an unmarked item.
+    if (s.kind === 'content' && s.level) {
+      slide.addText(knowLevelShort(s.level, 'en').toUpperCase(), {
+        x: EN_LEFT,
+        y: LEVEL_TOP,
+        w: LEVEL_WIDTH,
+        h: LEVEL_HEIGHT,
+        align: 'left',
+        bold: true,
+        fontSize: LEVEL_PT,
+        fontFace: LATIN_FONT,
+        color: KNOW_LEVEL_HEX[s.level].fg.replace('#', ''),
+      })
+    }
 
     if (s.kind === 'divider') {
       slide.addText(s.label, {

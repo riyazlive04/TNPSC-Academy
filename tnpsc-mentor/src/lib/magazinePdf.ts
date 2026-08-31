@@ -2,7 +2,14 @@ import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 import { savePdfDoc } from './savePdf'
 import { SITE_URL, stampWatermark, makeWatermarkLayer } from './pdfWatermark'
-import { groupBySection, isSectionEcho, sectionLabel } from './caMagazine'
+import {
+  KNOW_LEVEL_HEX,
+  groupBySection,
+  isKnowLevel,
+  isSectionEcho,
+  knowLevelShort,
+  sectionLabel,
+} from './caMagazine'
 import { markdownToHtml } from './caMagazineMarkdown'
 import type { CaMagazineItem } from './api'
 
@@ -48,6 +55,14 @@ function itemHtml(item: CaMagazineItem, topic: string, lang: Lang): string {
   const showEn = lang !== 'ta' || !item.content_ta
   const showTa = (lang === 'ta' || lang === 'both') && !!item.content_ta
 
+  // The superadmin's triage, printed above the heading exactly as the reader
+  // shows it. Absent for an unmarked item, so an untriaged issue prints as it
+  // always did.
+  const level = isKnowLevel(item.know_level) ? item.know_level : null
+  const levelHtml = level
+    ? `<div style="display:inline-block;background:${KNOW_LEVEL_HEX[level].bg};color:${KNOW_LEVEL_HEX[level].fg};font-weight:800;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:5px">${esc(knowLevelShort(level, lang))}</div>`
+    : ''
+
   let titleHtml = ''
   if (showTitle) {
     const parts: string[] = []
@@ -65,7 +80,7 @@ function itemHtml(item: CaMagazineItem, topic: string, lang: Lang): string {
   const taHtml = showTa ? markdownToHtml(item.content_ta as string) : ''
   const divider = showEn && showTa ? `<div style="height:1px;background:${LINE};margin:8px 0"></div>` : ''
 
-  return `<div style="padding:9px 4px 11px;border-bottom:1px solid ${LINE}">${titleHtml}${enHtml}${divider}${taHtml}</div>`
+  return `<div style="padding:9px 4px 11px;border-bottom:1px solid ${LINE}">${levelHtml}${titleHtml}${enHtml}${divider}${taHtml}</div>`
 }
 
 function sectionHeaderHtml(label: string): string {

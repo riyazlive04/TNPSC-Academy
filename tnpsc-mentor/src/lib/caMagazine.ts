@@ -106,6 +106,68 @@ export function groupBySection(items: CaMagazineItem[]): { topic: string; items:
     .map(([topic, list]) => ({ topic, items: list }))
 }
 
+// ─── Know levels (superadmin triage) ─────────────────────────────────────────
+// A superadmin marks each item by how essential it is. Set in the issue editor;
+// students see it as a badge and can filter a whole issue down to one level.
+//
+// The keys are what lives in ca_magazine.know_level and must not change — the
+// labels below are display-only, so re-wording them never touches a row. NULL
+// (unmarked) is a first-class state: the pipeline pushes items with no level,
+// and an unreviewed item renders exactly as it always has.
+
+export type KnowLevel = 'must' | 'should' | 'good'
+
+/** Most-essential first — the order used by pickers, filters and any sorting. */
+export const KNOW_LEVELS: KnowLevel[] = ['must', 'should', 'good']
+
+export function isKnowLevel(v: unknown): v is KnowLevel {
+  return v === 'must' || v === 'should' || v === 'good'
+}
+
+const KNOW_LEVEL_EN: Record<KnowLevel, string> = {
+  must: 'Must Know',
+  should: 'Should Know',
+  good: 'Good to Know',
+}
+const KNOW_LEVEL_TA: Record<KnowLevel, string> = {
+  must: 'கட்டாயம் அறிய வேண்டியவை',
+  should: 'அறிந்திருக்க வேண்டியவை',
+  good: 'அறிந்தால் நல்லது',
+}
+
+/** Display label for a level. `both` stacks EN / TA the way sectionLabel does. */
+export function knowLevelLabel(level: KnowLevel, lang: 'en' | 'ta' | 'both'): string {
+  if (lang === 'ta') return KNOW_LEVEL_TA[level]
+  if (lang === 'both') return `${KNOW_LEVEL_EN[level]} / ${KNOW_LEVEL_TA[level]}`
+  return KNOW_LEVEL_EN[level]
+}
+
+/** Short label — for the badge on a card and for chips, where the bilingual
+ *  form would wrap onto three lines. Tamil-only stays Tamil; `both` shrinks to
+ *  English rather than truncating a Tamil phrase mid-word. */
+export function knowLevelShort(level: KnowLevel, lang: 'en' | 'ta' | 'both'): string {
+  return lang === 'ta' ? KNOW_LEVEL_TA[level] : KNOW_LEVEL_EN[level]
+}
+
+/** Tailwind classes for the badge/chip, warmest for the most essential. */
+export const KNOW_LEVEL_TONE: Record<KnowLevel, string> = {
+  must: 'bg-coralsoft text-coral',
+  should: 'bg-goldsoft text-gold',
+  good: 'bg-mintsoft text-mint',
+}
+
+/**
+ * Hex twins of KNOW_LEVEL_TONE, for the renderers that never see a stylesheet:
+ * the magazine PDF (html2canvas snapshots inline styles) and the slide decks
+ * (PptxGenJS/jsPDF want raw hex). One definition so a colour change can't drift
+ * between what a student reads on screen and what they download.
+ */
+export const KNOW_LEVEL_HEX: Record<KnowLevel, { bg: string; fg: string }> = {
+  must: { bg: '#FDE7E7', fg: '#C0392B' },
+  should: { bg: '#FDF3DC', fg: '#9A6B00' },
+  good: { bg: '#E4F6EC', fg: '#1E7B4D' },
+}
+
 // ─── Issue identity ──────────────────────────────────────────────────────────
 // Every issue — daily or monthly — carries the same name on one line and its
 // date on the next. No source/publication credit is ever shown to students.

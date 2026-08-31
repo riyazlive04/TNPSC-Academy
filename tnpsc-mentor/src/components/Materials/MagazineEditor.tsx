@@ -19,11 +19,16 @@ import MagazineSections, { MagazineEmpty } from './MagazineContent'
 import type { CaMagazineIssue, CaMagazineItem } from '../../lib/api'
 import { api } from '../../lib/api'
 import {
+  KNOW_LEVELS,
+  KNOW_LEVEL_TONE,
   MAGAZINE_SECTION_ORDER,
   displayItemTitle,
   groupBySection,
+  isKnowLevel,
   issueDateLabel,
+  knowLevelShort,
   sectionLabel,
+  type KnowLevel,
 } from '../../lib/caMagazine'
 import { htmlToMarkdown, markdownToHtml } from '../../lib/caMagazineMarkdown'
 import { useT } from '../../lib/i18n'
@@ -456,6 +461,9 @@ function DocItem({
   const shownTitleTa = displayItemTitle(item.title_ta ?? '', item.topic)
 
   const [topic, setTopic] = useState(item.topic)
+  const [knowLevel, setKnowLevel] = useState<KnowLevel | null>(
+    isKnowLevel(item.know_level) ? item.know_level : null
+  )
   const [title, setTitle] = useState(shownTitle)
   const [titleTa, setTitleTa] = useState(shownTitleTa)
   const [content, setContent] = useState(item.content)
@@ -465,6 +473,7 @@ function DocItem({
   // Last-saved snapshot — drives dirty detection so blurs don't re-save no-ops.
   const base = useRef({
     topic: item.topic,
+    knowLevel: isKnowLevel(item.know_level) ? item.know_level : null,
     title: shownTitle,
     titleTa: shownTitleTa,
     content: item.content,
@@ -522,6 +531,25 @@ function DocItem({
     }
   }
 
+  // Saved on pick, like the section chip — a triage pass over a whole issue is
+  // a run of single taps, and making each one wait on a blur elsewhere would
+  // lose changes the moment the reviewer scrolled on.
+  const changeKnowLevel = async (next: KnowLevel | null) => {
+    if (next === base.current.knowLevel) return
+    setKnowLevel(next)
+    reportSave('saving')
+    try {
+      const updated = await api.caMagazine.adminUpdateItem(item.id, { know_level: next })
+      base.current.knowLevel = isKnowLevel(updated.know_level) ? updated.know_level : null
+      onUpdated(updated)
+      reportSave('saved')
+    } catch (e) {
+      setKnowLevel(base.current.knowLevel)
+      reportSave('error')
+      toast.error(e instanceof Error ? e.message : 'Could not set the level.')
+    }
+  }
+
   const del = async () => {
     setDeleting(true)
     try {
@@ -536,9 +564,16 @@ function DocItem({
 
   return (
     <div className="group relative rounded-xl px-3 py-3.5 transition hover:bg-tint/25 focus-within:bg-tint/30">
-      {/* Meta row: section chip + delete */}
-      <div className="mb-1.5 flex items-center justify-between gap-2">
-        <SectionSelect value={topic} onChange={changeSection} />
+      {/* Meta row above the heading: section + know level on the left, delete on
+          the right. Delete used to be hover-only on desktop, which left the row
+          looking like it held nothing but the section chip and made the action
+          undiscoverable on touch; it is always visible now, and still guarded by
+          the inline Delete?/Yes/No confirm. */}
+      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <SectionSelect value={topic} onChange={changeSection} />
+          <KnowLevelSelect value={knowLevel} onChange={changeKnowLevel} />
+        </div>
         {confirmDel ? (
           <div className="flex items-center gap-1.5">
             <span className="font-body text-xs text-ink2">Delete?</span>
@@ -559,7 +594,7 @@ function DocItem({
         ) : (
           <button
             onClick={() => setConfirmDel(true)}
-            className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg text-ink2/60 transition hover:bg-coralsoft hover:text-coral sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+            className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg text-ink2/60 transition hover:bg-coralsoft hover:text-coral"
             title="Delete item"
           >
             <Trash2 size={14} />
@@ -622,6 +657,7 @@ function AddItemComposer({
   onCancel: () => void
 }) {
   const [topic, setTopic] = useState(MAGAZINE_SECTION_ORDER[1]) // TAMIL NADU
+  const [knowLevel, setKnowLevel] = useState<KnowLevel | null>(null)
   const [title, setTitle] = useState('')
   const [titleTa, setTitleTa] = useState('')
   const [content, setContent] = useState('')
@@ -641,6 +677,7 @@ function AddItemComposer({
         content: content.trim(),
         title_ta: titleTa.trim() || null,
         content_ta: contentTa.trim() || null,
+        know_level: knowLevel,
       })
       toast.success('Item added.')
       onAdded(item)
@@ -656,8 +693,9 @@ function AddItemComposer({
       <div className="mb-2 flex items-center gap-2">
         <Plus size={15} className="text-brand" />
         <h4 className="font-heading text-sm font-semibold text-ink">New item</h4>
-        <div className="ml-auto">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
           <SectionSelect value={topic} onChange={setTopic} />
+          <KnowLevelSelect value={knowLevel} onChange={setKnowLevel} />
         </div>
       </div>
       <AutoTextarea
@@ -734,7 +772,7 @@ function RichTextEditor({
   // Last markdown we rendered/serialized — guards against re-setting innerHTML
   // (which would reset the caret) while the user is typing. Sentinel forces the
   // first sync.
-  const lastMd = useRef<string>(' ')
+  const lastMd = useRef<string>('\u0000')
   const focused = useRef(false)
   const [empty, setEmpty] = useState(!value.trim())
 
@@ -870,6 +908,39 @@ function AutoTextarea({
         tamil ? 'tamil ' : ''
       }${className}`}
     />
+  )
+}
+
+/**
+ * Compact know-level picker, styled to match SectionSelect but tinted by the
+ * level so a scan down a long issue shows the triage at a glance. The empty
+ * option is real and must stay: an item the superadmin has not judged yet is a
+ * distinct state from one judged "good to know", and clearing back to it is the
+ * only way to undo a mis-click.
+ */
+function KnowLevelSelect({
+  value,
+  onChange,
+}: {
+  value: KnowLevel | null
+  onChange: (v: KnowLevel | null) => void
+}) {
+  const { lang } = useT()
+  const tone = value ? KNOW_LEVEL_TONE[value] : 'bg-card text-ink2/70'
+  return (
+    <select
+      value={value ?? ''}
+      onChange={(e) => onChange(isKnowLevel(e.target.value) ? e.target.value : null)}
+      title="How essential is this item?"
+      className={`tamil max-w-[45vw] truncate rounded-full border border-line px-2.5 py-1 font-heading text-2xs font-semibold uppercase tracking-wide outline-none transition hover:border-brand-ring focus:border-brand-ring sm:max-w-xs ${tone}`}
+    >
+      <option value="">Set level…</option>
+      {KNOW_LEVELS.map((level) => (
+        <option key={level} value={level}>
+          {knowLevelShort(level, lang)}
+        </option>
+      ))}
+    </select>
   )
 }
 

@@ -1642,6 +1642,9 @@ const STRINGS = {
   // on the page — cold ad traffic lands here and needs to know, before reading
   // anything else, that nothing is being charged.
   registerForFree: { en: 'Register for free', ta: 'இலவசமாகப் பதிவு செய்யுங்கள்' },
+  // CA magazine know-level filter (the level names themselves live in
+  // lib/caMagazine.ts, next to the keys they render).
+  caLevelAll: { en: 'All', ta: 'அனைத்தும்' },
   registerFreeSub: {
     en: 'No card needed. Free credits to start practising today.',
     ta: 'கார்டு தேவையில்லை. இன்றே பயிற்சி தொடங்க இலவச கிரெடிட்கள்.',

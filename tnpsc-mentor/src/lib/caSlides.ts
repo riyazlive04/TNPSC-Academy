@@ -9,7 +9,15 @@
 // renders the same model to a PDF, so the two exports can never drift apart.
 
 import type { CaMagazineItem, CaMagazineType } from './api'
-import { groupBySection, isSectionEcho, issueDateLabel, parseBullets, type MagazineLine } from './caMagazine'
+import {
+  groupBySection,
+  isKnowLevel,
+  isSectionEcho,
+  issueDateLabel,
+  parseBullets,
+  type KnowLevel,
+  type MagazineLine,
+} from './caMagazine'
 
 // ─── Geometry (inches, 16:9) ─────────────────────────────────────────────────
 // The background art carries the header band (ends ~0.67") and the social
@@ -23,6 +31,15 @@ export const DATE_TOP = 0.72
 export const DATE_WIDTH = 4.53
 export const DATE_HEIGHT = 0.34
 export const DATE_PT = 12
+
+// The know-level tag mirrors the date box on the opposite side of the same
+// band: the template's purple header ends at ~0.66", the date sits at 0.72"
+// on the right, and the left half of that strip is empty white space. Body
+// columns don't start until BODY_TOP (1.18"), so nothing collides.
+export const LEVEL_TOP = DATE_TOP
+export const LEVEL_HEIGHT = DATE_HEIGHT
+export const LEVEL_WIDTH = 4.0
+export const LEVEL_PT = 11
 
 export const DIVIDER_TOP = 3.14
 export const DIVIDER_PT = 18
@@ -169,6 +186,9 @@ export interface DividerSlide {
 export interface ContentSlide {
   kind: 'content'
   date: string
+  /** Superadmin triage, repeated on every slide an item spills across so a
+   *  "(contd.)" slide is never stripped of its context. null = unmarked. */
+  level: KnowLevel | null
   /** Top of both columns, in inches. */
   top: number
   lineSpacing: number
@@ -264,6 +284,7 @@ export function buildCaSlides(items: CaMagazineItem[], caType: CaMagazineType, d
         slides.push({
           kind: 'content',
           date: dateText,
+          level: isKnowLevel(item.know_level) ? item.know_level : null,
           top: BODY_TOP + Math.min(Math.max(slack, 0) / 3, 1),
           lineSpacing: ls,
           numbered,

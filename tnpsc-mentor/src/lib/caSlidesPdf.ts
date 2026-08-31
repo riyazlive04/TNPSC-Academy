@@ -16,6 +16,9 @@ import {
   BODY_BOTTOM,
   BULLET_INDENT,
   DATE_LEFT,
+  LEVEL_PT,
+  LEVEL_TOP,
+  LEVEL_WIDTH,
   DATE_PT,
   DATE_TOP,
   DATE_WIDTH,
@@ -31,6 +34,7 @@ import {
   type CaSlide,
   type SlideColumn,
 } from './caSlides'
+import { KNOW_LEVEL_HEX, knowLevelShort } from './caMagazine'
 
 /** CSS px per inch — the slide renders at 1280 × 720 before the 2× capture. */
 const PX = 96
@@ -85,6 +89,19 @@ function slideHtml(slide: CaSlide, bgUrl: string): string {
   const box = (x: number, y: number, w: number, extra: string, inner: string) =>
     `<div style="position:absolute;left:${(x + INSET_L) * PX}px;top:${(y + INSET_T) * PX}px;width:${(w - 2 * INSET_L) * PX}px;${extra}">${inner}</div>`
 
+  // Know-level tag, mirroring the date across the same header strip — see
+  // LEVEL_TOP in caSlides. Content slides only, and only when marked.
+  const levelTag =
+    slide.kind === 'content' && slide.level
+      ? box(
+          EN_LEFT,
+          LEVEL_TOP,
+          LEVEL_WIDTH,
+          `text-align:left;font-weight:700;font-size:${LEVEL_PT}pt;color:${KNOW_LEVEL_HEX[slide.level].fg}`,
+          esc(knowLevelShort(slide.level, 'en').toUpperCase())
+        )
+      : ''
+
   const chrome =
     `<img src="${bgUrl}" style="position:absolute;left:0;top:0;width:${SLIDE_W * PX}px;height:${SLIDE_H * PX}px" />` +
     box(
@@ -93,7 +110,8 @@ function slideHtml(slide: CaSlide, bgUrl: string): string {
       DATE_WIDTH,
       `text-align:right;font-weight:700;font-size:${DATE_PT}pt`,
       esc(slide.date)
-    )
+    ) +
+    levelTag
 
   if (slide.kind === 'divider') {
     return (
