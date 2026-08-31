@@ -470,6 +470,8 @@ function DocItem({
   const [contentTa, setContentTa] = useState(item.content_ta ?? '')
   const [confirmDel, setConfirmDel] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  // One toolbar for both writing surfaces below — see useRteToolbar.
+  const toolbar = useRteToolbar()
   // Last-saved snapshot — drives dirty detection so blurs don't re-save no-ops.
   const base = useRef({
     topic: item.topic,
@@ -564,42 +566,50 @@ function DocItem({
 
   return (
     <div className="group relative rounded-xl px-3 py-3.5 transition hover:bg-tint/25 focus-within:bg-tint/30">
-      {/* Meta row above the heading: section + know level on the left, delete on
-          the right. Delete used to be hover-only on desktop, which left the row
-          looking like it held nothing but the section chip and made the action
-          undiscoverable on touch; it is always visible now, and still guarded by
-          the inline Delete?/Yes/No confirm. */}
+      {/* Everything that acts ON this item lives above its heading, in one row:
+          section and know level on the left, formatting and delete on the right.
+          The bold/list buttons used to sit under the title, directly above the
+          English surface — which read as belonging to that surface alone, even
+          though the Tamil twin below needed them just as much. Delete was
+          hover-only on desktop, so the row looked like it held nothing but the
+          section chip and the action was invisible on touch; both are now
+          always here. */}
       <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           <SectionSelect value={topic} onChange={changeSection} />
           <KnowLevelSelect value={knowLevel} onChange={changeKnowLevel} />
         </div>
-        {confirmDel ? (
-          <div className="flex items-center gap-1.5">
-            <span className="font-body text-xs text-ink2">Delete?</span>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          {/* Hidden while the delete confirm is open — that row is already
+              three controls wide and would wrap on a phone. */}
+          {!confirmDel && <RteToolbar toolbar={toolbar} />}
+          {confirmDel ? (
+            <div className="flex items-center gap-1.5">
+              <span className="font-body text-xs text-ink2">Delete?</span>
+              <button
+                onClick={del}
+                disabled={deleting}
+                className="press inline-flex items-center gap-1 rounded-full bg-coral px-2.5 py-1 font-heading text-2xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+              >
+                {deleting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Yes
+              </button>
+              <button
+                onClick={() => setConfirmDel(false)}
+                className="rounded-full px-2 py-1 font-heading text-2xs font-semibold text-ink2 hover:text-ink"
+              >
+                No
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={del}
-              disabled={deleting}
-              className="press inline-flex items-center gap-1 rounded-full bg-coral px-2.5 py-1 font-heading text-2xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+              onClick={() => setConfirmDel(true)}
+              className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg text-ink2/60 transition hover:bg-coralsoft hover:text-coral"
+              title="Delete item"
             >
-              {deleting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />} Yes
+              <Trash2 size={14} />
             </button>
-            <button
-              onClick={() => setConfirmDel(false)}
-              className="rounded-full px-2 py-1 font-heading text-2xs font-semibold text-ink2 hover:text-ink"
-            >
-              No
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setConfirmDel(true)}
-            className="grid h-7 w-7 flex-shrink-0 place-items-center rounded-lg text-ink2/60 transition hover:bg-coralsoft hover:text-coral"
-            title="Delete item"
-          >
-            <Trash2 size={14} />
-          </button>
-        )}
+          )}
+        </div>
       </div>
 
       {/* English */}
@@ -616,6 +626,7 @@ function DocItem({
         onBlur={commit}
         placeholder="Write the item…"
         ariaLabel="Item content"
+        toolbar={toolbar}
         className="mt-1.5"
       />
 
@@ -638,6 +649,7 @@ function DocItem({
           onBlur={commit}
           placeholder="தமிழ் உள்ளடக்கம்"
           ariaLabel="Tamil content"
+          toolbar={toolbar}
           tamil
           className="mt-1.5"
         />
@@ -663,6 +675,7 @@ function AddItemComposer({
   const [content, setContent] = useState('')
   const [contentTa, setContentTa] = useState('')
   const [saving, setSaving] = useState(false)
+  const toolbar = useRteToolbar()
 
   const submit = async () => {
     if (saving) return
@@ -696,6 +709,7 @@ function AddItemComposer({
         <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
           <SectionSelect value={topic} onChange={setTopic} />
           <KnowLevelSelect value={knowLevel} onChange={setKnowLevel} />
+          <RteToolbar toolbar={toolbar} />
         </div>
       </div>
       <AutoTextarea
@@ -709,6 +723,7 @@ function AddItemComposer({
         onChange={setContent}
         placeholder="Write the item…"
         ariaLabel="New item content"
+        toolbar={toolbar}
         className="mt-1.5"
       />
       <div className="mt-3 border-l-2 border-line pl-3">
@@ -727,6 +742,7 @@ function AddItemComposer({
           onChange={setContentTa}
           placeholder="தமிழ் உள்ளடக்கம்"
           ariaLabel="New Tamil content"
+          toolbar={toolbar}
           tamil
           className="mt-1.5"
         />
@@ -751,12 +767,45 @@ function AddItemComposer({
  * so the student reader and the pipeline are unaffected. Bold via the toolbar or
  * Ctrl/Cmd+B (native in contentEditable); bullets via the list button.
  */
+/**
+ * A formatting command applied to whichever editor currently holds the caret.
+ * An item has TWO writing surfaces (English and its Tamil twin) but only ONE
+ * toolbar, up in the meta row — so the toolbar can't own an editor, it has to
+ * follow the focus between them.
+ */
+interface RteHandle {
+  exec: (command: string) => void
+}
+
+export interface RteToolbarController {
+  /** Called by an editor on focus (itself) and on blur (null). */
+  attach: (handle: RteHandle | null) => void
+  exec: (command: string) => void
+  /** True while some editor holds the caret — the toolbar is inert otherwise. */
+  active: boolean
+}
+
+/** Wires one meta-row toolbar to an item's writing surfaces. */
+function useRteToolbar(): RteToolbarController {
+  const handle = useRef<RteHandle | null>(null)
+  const [active, setActive] = useState(false)
+  return {
+    attach: (h) => {
+      handle.current = h
+      setActive(!!h)
+    },
+    exec: (command) => handle.current?.exec(command),
+    active,
+  }
+}
+
 function RichTextEditor({
   value,
   onChange,
   onBlur,
   placeholder,
   ariaLabel,
+  toolbar,
   tamil = false,
   className = '',
 }: {
@@ -765,6 +814,8 @@ function RichTextEditor({
   onBlur?: () => void
   placeholder?: string
   ariaLabel?: string
+  /** The item's shared toolbar; this editor claims it while focused. */
+  toolbar: RteToolbarController
   tamil?: boolean
   className?: string
 }) {
@@ -801,16 +852,7 @@ function RichTextEditor({
   }
 
   return (
-    <div className={`group/rte ${className}`}>
-      {/* Toolbar — subtle until the field is focused */}
-      <div className="mb-1 flex gap-1 opacity-50 transition group-focus-within/rte:opacity-100">
-        <ToolbarBtn title="Bold (Ctrl+B)" onPress={() => exec('bold')}>
-          <Bold size={13} />
-        </ToolbarBtn>
-        <ToolbarBtn title="Bullet list" onPress={() => exec('insertUnorderedList')}>
-          <List size={13} />
-        </ToolbarBtn>
-      </div>
+    <div className={className}>
       <div className="relative">
         {empty && placeholder && (
           <div
@@ -831,9 +873,14 @@ function RichTextEditor({
           onInput={serialize}
           onFocus={() => {
             focused.current = true
+            toolbar.attach({ exec })
           }}
           onBlur={() => {
             focused.current = false
+            // A toolbar press can't reach here — the buttons preventDefault on
+            // mousedown, so the caret never leaves. Any blur that DOES land is
+            // the user genuinely going elsewhere, and the toolbar goes inert.
+            toolbar.attach(null)
             onBlur?.()
           }}
           className={`min-h-[1.6em] w-full font-body text-base leading-relaxed text-ink2 outline-none [&_b]:font-semibold [&_b]:text-ink [&_li]:my-0.5 [&_p]:my-1 [&_strong]:font-semibold [&_strong]:text-ink [&_ul]:list-disc [&_ul]:pl-5 [&_ul_ul]:list-[circle] ${
@@ -841,6 +888,24 @@ function RichTextEditor({
           }`}
         />
       </div>
+    </div>
+  )
+}
+
+/** The item's one formatting toolbar, rendered up in the meta row beside the
+ *  delete button. Dimmed until a writing surface actually has the caret, so it
+ *  never looks like it would do something when it wouldn't. */
+function RteToolbar({ toolbar }: { toolbar: RteToolbarController }) {
+  return (
+    <div
+      className={`flex items-center gap-1 transition ${toolbar.active ? 'opacity-100' : 'opacity-40'}`}
+    >
+      <ToolbarBtn title="Bold (Ctrl+B)" onPress={() => toolbar.exec('bold')}>
+        <Bold size={13} />
+      </ToolbarBtn>
+      <ToolbarBtn title="Bullet list" onPress={() => toolbar.exec('insertUnorderedList')}>
+        <List size={13} />
+      </ToolbarBtn>
     </div>
   )
 }
