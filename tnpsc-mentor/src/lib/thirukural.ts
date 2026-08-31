@@ -46,18 +46,47 @@ export function getCachedKural(no: number): Kural | undefined {
   return cache?.find((k) => k.kural_no === no)
 }
 
+/** The Thirukkural is exactly 1330 couplets, numbered 1..1330 — a fixed fact of
+ *  the text, not a row count that can drift. Knowing it up front is what lets
+ *  kuralNoOfDay() name today's couplet without downloading the bank first. */
+export const TOTAL_KURALS = 1330
+
 /**
- * The "Kural of the day" - a deterministic pick that's stable for a whole
- * calendar day and advances by one each day, cycling through all 1330. Keyed on
- * the local date (not the clock), so it doesn't change as the day goes on.
+ * The number (1..1330) of the "Kural of the day" - a deterministic pick that's
+ * stable for a whole calendar day and advances by one each day, cycling through
+ * all 1330. Keyed on the local date (not the clock), so it doesn't change as the
+ * day goes on.
  */
-export function kuralOfDay(kurals: Kural[], date: Date = new Date()): Kural | undefined {
-  if (!kurals.length) return undefined
+export function kuralNoOfDay(date: Date = new Date(), total: number = TOTAL_KURALS): number {
   const dayNum = Math.floor(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000
   )
-  const idx = ((dayNum % kurals.length) + kurals.length) % kurals.length
-  return kurals[idx]
+  return (((dayNum % total) + total) % total) + 1
+}
+
+/**
+ * The "Kural of the day" from an already-loaded bank. Same pick as
+ * kuralNoOfDay() — the list is ordered by kural_no, so index n holds kural n+1.
+ */
+export function kuralOfDay(kurals: Kural[], date: Date = new Date()): Kural | undefined {
+  if (!kurals.length) return undefined
+  return kurals[kuralNoOfDay(date, kurals.length) - 1]
+}
+
+/**
+ * Today's kural, fetched on its own.
+ *
+ * The dashboard shows ONE couplet, and used to call loadKurals() to get it —
+ * downloading all 1330 (~2 MB) on every visit. This asks for just that couplet
+ * instead. When the full bank is already cached (the browse modal has been
+ * opened) it's answered from memory with no request at all.
+ */
+export async function loadKuralOfDay(date: Date = new Date()): Promise<Kural | undefined> {
+  if (cache) return kuralOfDay(cache, date)
+  const no = kuralNoOfDay(date)
+  const hit = getCachedKural(no)
+  if (hit) return hit
+  return api.thirukuralOne(no)
 }
 
 /**

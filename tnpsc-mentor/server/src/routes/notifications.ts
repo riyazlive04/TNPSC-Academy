@@ -193,7 +193,11 @@ router.get(
         // (req.userId is a verified-JWT UUID, safe to interpolate.)
         .or(`target_user_id.is.null,target_user_id.eq.${req.userId}`)
         .order('created_at', { ascending: false })
-        .limit(100),
+        // Over-fetch a little, because the audience filter below drops rows this
+        // user can't see — but not by much. The bell shows a short list; pulling
+        // 100 bilingual rows on every poll was ~50 KB of egress per user, per
+        // poll, most of it never rendered.
+        .limit(60),
       supabaseAdmin.from('notification_reads').select('notification_id').eq('user_id', req.userId),
     ])
 
@@ -212,7 +216,7 @@ router.get(
         if (target) return target === req.userId
         return matchesAudience(n.audience as string, (n.audience_value as string | null) ?? null, ctx)
       })
-      .slice(0, 50)
+      .slice(0, 30)
       .map((n) => ({
         id: n.id as string,
         kind: n.kind as 'push' | 'system',
@@ -237,7 +241,7 @@ router.post(
   '/read',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    // Cap the batch: the feed never returns more than ~50 items, so a larger
+    // Cap the batch: the feed never returns more than ~30 items, so a larger
     // array is abuse — bound it so one request can't write unbounded rows.
     const ids: string[] = Array.isArray(req.body?.ids)
       ? req.body.ids.filter((x: unknown) => typeof x === 'string').slice(0, 100)

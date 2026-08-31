@@ -66,6 +66,58 @@ function storagePath(caType: string, date: string, lang: string): string {
   return `${date.slice(0, 7)}/telegram/CA_${kind}_${date}_${lang}.pdf`
 }
 
+// ─── Upload → send hand-off ──────────────────────────────────────────────────
+// The console uploads a PDF and then, seconds later, asks us to send it. We were
+// archiving those bytes to Storage and immediately downloading the very same
+// bytes back out again to hand to Telegram — around 6 MB of Supabase egress per
+// broadcast, for a file this process had just held in memory.
+//
+// Keep the uploaded buffer around for the short window between the two calls.
+// A miss (a re-send of an older issue, or a server restart in between) still
+// falls back to the archive, so this is a shortcut, never the source of truth.
+const HANDOFF_TTL_MS = 30 * 60_000
+/** Anything larger stays out of memory and is re-read from the archive — the
+ *  daily issues are 2–6 MB, so this covers the normal case without letting a
+ *  one-off 45 MB upload sit in the heap. */
+const HANDOFF_MAX_ENTRY_BYTES = 16 * 1024 * 1024
+/** Total ceiling across all held buffers (one broadcast = EN + TA). */
+const HANDOFF_MAX_TOTAL_BYTES = 48 * 1024 * 1024
+
+const handoff = new Map<string, { pdf: Buffer; until: number }>()
+let handoffBytes = 0
+
+function handoffDrop(path: string): void {
+  const hit = handoff.get(path)
+  if (!hit) return
+  handoffBytes -= hit.pdf.length
+  handoff.delete(path)
+}
+
+/** Remember an issue's PDF for the imminent /send. Oldest entries go first when
+ *  the ceiling is reached (Map preserves insertion order). */
+function handoffPut(path: string, pdf: Buffer): void {
+  if (pdf.length > HANDOFF_MAX_ENTRY_BYTES) return
+  handoffDrop(path)
+  while (handoffBytes + pdf.length > HANDOFF_MAX_TOTAL_BYTES && handoff.size > 0) {
+    const oldest = handoff.keys().next().value
+    if (oldest === undefined) break
+    handoffDrop(oldest)
+  }
+  handoff.set(path, { pdf, until: Date.now() + HANDOFF_TTL_MS })
+  handoffBytes += pdf.length
+}
+
+/** The held PDF for a path, or null when it has expired or was never held. */
+function handoffTake(path: string): Buffer | null {
+  const hit = handoff.get(path)
+  if (!hit) return null
+  if (hit.until <= Date.now()) {
+    handoffDrop(path)
+    return null
+  }
+  return hit.pdf
+}
+
 /** Reject anything that isn't a real issue reference up front. */
 function badIssue(caType: string, date: string): boolean {
   return !CA_TYPES.has(caType) || !DATE_RE.test(date)
@@ -211,6 +263,9 @@ router.post(
       console.error('[ca-telegram upload]', error)
       return res.status(502).json({ error: 'Could not store the PDF. Please try again.' })
     }
+    // The send is the next call — keep the bytes so it doesn't pull them back
+    // out of Storage.
+    handoffPut(path, body)
     res.status(201).json({ path, size: body.length })
   })
 )
@@ -258,12 +313,18 @@ router.post(
     const results: { lang: string; ok: boolean; messageId?: number; error?: string }[] = []
     for (const lang of langs) {
       const path = storagePath(caType, date, lang)
-      const { data: file, error: dlErr } = await supabaseAdmin.storage.from(BUCKET).download(path)
-      if (dlErr || !file) {
-        results.push({ lang, ok: false, error: 'The generated PDF was not found. Please try sending again.' })
-        continue
+      let pdf = handoffTake(path)
+      if (!pdf) {
+        // Not the freshly uploaded file (a re-send, or a restart in between) —
+        // read it back out of the archive, and hold it in case of a retry.
+        const { data: file, error: dlErr } = await supabaseAdmin.storage.from(BUCKET).download(path)
+        if (dlErr || !file) {
+          results.push({ lang, ok: false, error: 'The generated PDF was not found. Please try sending again.' })
+          continue
+        }
+        pdf = Buffer.from(await file.arrayBuffer())
+        handoffPut(path, pdf)
       }
-      const pdf = Buffer.from(await file.arrayBuffer())
       const kind = caType === 'day_wise' ? '' : '_Monthly'
       const fileName = `TNPSC_Mentors_Current_Affairs${kind}_${date}_${lang.toUpperCase()}.pdf`
       const caption = String(captions[lang])

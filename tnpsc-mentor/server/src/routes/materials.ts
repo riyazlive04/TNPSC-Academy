@@ -2,6 +2,7 @@ import express, { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
+import { createSignedUrlCache } from '../lib/signedUrls.js'
 
 const router = Router()
 
@@ -12,6 +13,7 @@ const MATERIALS_BUCKET = 'materials'
 const MAX_FILE_BYTES = 50 * 1024 * 1024 // 50 MB, matches the bucket limit
 /** Lifetime of the card thumbnails minted with the list (see below). */
 const THUMB_TTL_SECONDS = 3600
+const thumbUrls = createSignedUrlCache(MATERIALS_BUCKET, THUMB_TTL_SECONDS)
 
 // Metadata returned to clients. No file URLs — those are minted on demand by
 // GET /:id/file so the per-item download gate can't be bypassed. Shared with
@@ -84,15 +86,9 @@ router.get(
     const imagePaths = rows
       .filter((r) => r.kind === 'image' && r.storage_path)
       .map((r) => r.storage_path as string)
-    const signedByPath = new Map<string, string>()
-    if (imagePaths.length > 0) {
-      const { data: signed } = await supabaseAdmin.storage
-        .from(MATERIALS_BUCKET)
-        .createSignedUrls(imagePaths, THUMB_TTL_SECONDS)
-      for (const s of signed ?? []) {
-        if (s.path && s.signedUrl) signedByPath.set(s.path, s.signedUrl)
-      }
-    }
+    // Memoised: a fresh URL per request is a fresh download per request, because
+    // the browser can't match it to the copy it already has. See lib/signedUrls.
+    const signedByPath = await thumbUrls.signMany(imagePaths)
 
     const materials = rows.map(({ storage_path, ...rest }) => ({
       ...rest,
@@ -255,6 +251,7 @@ router.post(
     if (error) {
       // Roll back the orphaned object so a failed insert leaves no dangling file.
       await supabaseAdmin.storage.from(MATERIALS_BUCKET).remove([storagePath])
+      thumbUrls.invalidate(storagePath)
       return sendDbError(res, error)
     }
     res.status(201).json({ material: data })
@@ -311,6 +308,9 @@ router.delete(
     if (lookupErr) return sendDbError(res, lookupErr)
     if (row?.storage_path) {
       await supabaseAdmin.storage.from(MATERIALS_BUCKET).remove([row.storage_path as string])
+      // Drop the memoised URL with it — a cached link to a deleted object would
+      // render as a broken image until it aged out.
+      thumbUrls.invalidate(row.storage_path as string)
     }
     const { error } = await supabaseAdmin.from('materials').delete().eq('id', req.params.id)
     if (error) return sendDbError(res, error)

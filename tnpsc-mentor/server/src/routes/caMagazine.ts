@@ -3,6 +3,7 @@ import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { MATERIAL_COLS } from './materials.js'
+import { createSignedUrlCache } from '../lib/signedUrls.js'
 
 const router = Router()
 
@@ -76,8 +77,12 @@ function issueDateLabel(caType: string, date: string, caMonth: string): string {
 // custom one falls straight back to the pipeline's image.
 const CA_DELIVERABLES_BUCKET = 'ca-deliverables'
 const NEWS_IMAGE_TTL_SECONDS = 3600
-/** A thumbnail is displayed a few hundred pixels wide — this is already generous. */
-const MAX_THUMB_MB = 8
+/** A thumbnail is displayed a few hundred pixels wide, and the editor downscales
+ *  to THUMB_MAX_PX/THUMB_QUALITY (see MagazineEditor) before it uploads — so a
+ *  well-formed upload is tens of KB. The cap is what stops a full-resolution
+ *  original (the old ones averaged 2.3 MB and were re-downloaded by every
+ *  reader on every visit) from reaching Storage if the resize is ever skipped. */
+const MAX_THUMB_MB = 1
 const ALLOWED_THUMB_MIME = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
 
 /** '2026-07-09' → '2026-07/daily/newsimage_2026-07-09.jpg' (pipeline). */
@@ -93,38 +98,19 @@ function customThumbPath(caType: string, date: string): string {
   return `${date.slice(0, 7)}/${kind}/custom-thumb_${date}`
 }
 
-/** Sign one object, or null when it isn't there. */
-async function signObject(path: string): Promise<string | null> {
-  const { data, error } = await supabaseAdmin.storage
-    .from(CA_DELIVERABLES_BUCKET)
-    .createSignedUrl(path, NEWS_IMAGE_TTL_SECONDS)
-  if (error || !data?.signedUrl) return null
-  return data.signedUrl
-}
+// Thumbnails are memoised (see lib/signedUrls) — re-signing on every request
+// handed every reader a URL their browser had never seen, so a cached image was
+// never reused and the carousel re-downloaded itself on every visit.
+const thumbUrls = createSignedUrlCache(CA_DELIVERABLES_BUCKET, NEWS_IMAGE_TTL_SECONDS)
 
 /** A 1-hour signed URL for an issue's thumbnail: the custom one if a superadmin
  * uploaded it, else the pipeline's daily image, else null. */
 async function signNewsImage(caType: string, date: string): Promise<string | null> {
   if (!CA_TYPES.has(caType) || !DATE_RE.test(date)) return null
-  const custom = await signObject(customThumbPath(caType, date))
+  const custom = await thumbUrls.sign(customThumbPath(caType, date))
   if (custom) return custom
   if (caType !== 'day_wise') return null
-  return signObject(newsImagePath(date))
-}
-
-/** Batch-sign a path list in ONE Storage round trip; missing objects simply
- * don't land in the map. Shared by /recent and /thumbnails so neither calls
- * signObject/signNewsImage per-row (one Storage round trip per card). */
-async function signMany(paths: string[]): Promise<Map<string, string>> {
-  const out = new Map<string, string>()
-  if (paths.length === 0) return out
-  const { data: signed } = await supabaseAdmin.storage
-    .from(CA_DELIVERABLES_BUCKET)
-    .createSignedUrls(paths, NEWS_IMAGE_TTL_SECONDS)
-  for (const s of signed ?? []) {
-    if (s.path && s.signedUrl) out.set(s.path, s.signedUrl)
-  }
-  return out
+  return thumbUrls.sign(newsImagePath(date))
 }
 
 const admin = [requireAuth, requireSuperadmin] as const
@@ -232,14 +218,19 @@ router.post(
       .upload(customThumbPath(caType, date), body, {
         contentType: mime,
         upsert: true,
-        // Short: a replacement should reach students in about a minute, not an
-        // hour — these are small files and read through signed URLs anyway.
-        cacheControl: '60',
+        // Matches the signed URL's own lifetime. It used to be 60s, which meant
+        // every reader re-fetched the image roughly every minute; a thumbnail is
+        // worth caching for as long as the URL that points at it. A replacement
+        // still lands immediately for the uploader (the memo is dropped below)
+        // and reaches other readers as their signed URL rolls over.
+        cacheControl: String(NEWS_IMAGE_TTL_SECONDS),
       })
     if (error) {
       console.error('[ca-magazine thumb upload]', error)
       return res.status(502).json({ error: 'Could not store the image. Please try again.' })
     }
+    // The path now holds a different image — never hand out the old URL again.
+    thumbUrls.invalidate(customThumbPath(caType, date))
     res.status(201).json({ url: await signNewsImage(caType, date) })
   })
 )
@@ -261,6 +252,9 @@ router.delete(
       .remove([customThumbPath(caType, date)])
     // Removing something that was never there is not a failure.
     if (error) console.error('[ca-magazine thumb remove]', error)
+    // Forget the removed thumbnail so the next read falls back to the pipeline's
+    // image instead of serving a URL for an object that no longer exists.
+    thumbUrls.invalidate(customThumbPath(caType, date))
     res.json({ url: await signNewsImage(caType, date) })
   })
 )
@@ -447,8 +441,8 @@ router.get(
     // total (not one signNewsImage call per row, up to ~28 for a 14-item list).
     // Same custom → pipeline priority as signNewsImage.
     const [customs, pipeline] = await Promise.all([
-      signMany(rows.map((r) => customThumbPath('day_wise', r.magazine_date))),
-      signMany(rows.map((r) => newsImagePath(r.magazine_date))),
+      thumbUrls.signMany(rows.map((r) => customThumbPath('day_wise', r.magazine_date))),
+      thumbUrls.signMany(rows.map((r) => newsImagePath(r.magazine_date))),
     ])
 
     const issues = rows.map((r) => ({
@@ -492,8 +486,8 @@ router.get(
     ) as { id: string; magazine_ca_type: string; magazine_date: string }[]
 
     const [customs, pipeline] = await Promise.all([
-      signMany(rows.map((r) => customThumbPath(r.magazine_ca_type, r.magazine_date))),
-      signMany(
+      thumbUrls.signMany(rows.map((r) => customThumbPath(r.magazine_ca_type, r.magazine_date))),
+      thumbUrls.signMany(
         rows
           .filter((r) => r.magazine_ca_type === 'day_wise')
           .map((r) => newsImagePath(r.magazine_date))

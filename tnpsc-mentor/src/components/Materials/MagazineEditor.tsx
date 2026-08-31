@@ -31,6 +31,7 @@ import {
   type KnowLevel,
 } from '../../lib/caMagazine'
 import { htmlToMarkdown, markdownToHtml } from '../../lib/caMagazineMarkdown'
+import { downscaleImage, THUMB_MAX_PX } from '../../lib/imageResize'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
 
@@ -302,7 +303,13 @@ export default function MagazineEditor({
 // original" deletes the override, which falls the issue back to the pipeline's
 // image — so a bad pick is never destructive.
 const THUMB_MIME = ['image/jpeg', 'image/png', 'image/webp']
+/** Cap on the file a superadmin PICKS. What actually gets uploaded is the
+ *  downscaled copy (see downscaleImage), which is tens of KB — the server's own
+ *  cap is far tighter than this one. */
 const THUMB_MAX_MB = 8
+/** What the server accepts AFTER the downscale — keep in step with MAX_THUMB_MB
+ *  in server/src/routes/caMagazine.ts. */
+const UPLOAD_MAX_MB = 1
 
 function ThumbnailEditor({
   issue,
@@ -332,7 +339,18 @@ function ThumbnailEditor({
     }
     setBusy('upload')
     try {
-      const next = await api.caMagazine.uploadNewsImage(issue.ca_type, issue.date, file)
+      // Shrink before uploading. A 2 MB original in a 160px card costs every
+      // reader 2 MB of Storage egress on every visit; 800px of WebP looks the
+      // same and costs ~50 KB. Falls back to the original file if the browser
+      // can't re-encode it, and the server rejects anything still oversized.
+      const sized = await downscaleImage(file)
+      if (sized.size > UPLOAD_MAX_MB * 1024 * 1024) {
+        // Only reachable if the browser refused to re-encode: say so plainly
+        // rather than letting the server answer with a bare 413.
+        toast.error('That image could not be compressed — please pick a smaller one.')
+        return
+      }
+      const next = await api.caMagazine.uploadNewsImage(issue.ca_type, issue.date, sized)
       onChange(next)
       setCustom(true)
       toast.success('Thumbnail updated.')
@@ -403,7 +421,9 @@ function ThumbnailEditor({
                 {issue.ca_type === 'day_wise' ? 'Use the original' : 'Remove'}
               </button>
             )}
-            <span className="font-body text-2xs text-ink2">JPG, PNG or WebP · max {THUMB_MAX_MB} MB</span>
+            <span className="font-body text-2xs text-ink2">
+              JPG, PNG or WebP · max {THUMB_MAX_MB} MB · resized to {THUMB_MAX_PX}px before upload
+            </span>
           </div>
         </div>
       </div>

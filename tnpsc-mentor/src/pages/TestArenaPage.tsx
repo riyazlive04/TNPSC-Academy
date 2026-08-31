@@ -23,7 +23,7 @@ import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import StarterTestPrompt from '../components/Onboarding/StarterTestPrompt'
 import MarathonFreeAlert from '../components/Onboarding/MarathonFreeAlert'
-import { loadKurals, kuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
+import { loadKuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import CreditWall from '../components/UI/CreditWall'
 import IconTile, { type Tint } from '../components/UI/IconTile'
 import SectionHeader from '../components/UI/SectionHeader'
@@ -176,13 +176,15 @@ export default function TestArenaPage() {
     if (!isAdmin && onboardingPending && !testPromptPending) startOnboarding()
   }, [isAdmin, onboardingPending, testPromptPending, startOnboarding])
 
-  // Load the kural bank once and pick today's couplet for the header. The modal
-  // shares the same module-level cache, so opening it makes no extra request.
+  // Fetch today's couplet for the header — just that one row. Pulling the whole
+  // 1330-kural bank here (which is what this used to do) meant every dashboard
+  // visit downloaded ~2 MB to render four lines of text. The modal still loads
+  // the full bank when it opens, and this reads from that cache when it's there.
   useEffect(() => {
     if (isAdmin) return
     let cancelled = false
-    loadKurals()
-      .then((all) => !cancelled && setDailyKural(kuralOfDay(all) ?? null))
+    loadKuralOfDay()
+      .then((k) => !cancelled && setDailyKural(k ?? null))
       .catch(() => {
         // Decorative header content; leave it absent (safe fallback) rather than
         // crash, but keep a console trail for diagnosis.

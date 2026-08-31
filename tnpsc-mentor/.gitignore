@@ -102,3 +102,6 @@ ios/capacitor-cordova-ios-plugins/
 # Server scratch - image cache + ad-hoc data-script backups
 server/_imgcache/
 server/_*_backup.json
+# Originals of the CA thumbnails that _thumb_reencode.mjs shrank in Storage —
+# 57 MB of full-resolution images, kept locally as the only copy, not in git.
+server/_thumb_backup/

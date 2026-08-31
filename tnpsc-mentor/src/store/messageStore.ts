@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api, isApiConfigured } from '../lib/api'
+import { BADGE_POLL_MS, startPolling } from '../lib/poll'
 
 /**
  * Unread badge for the header Messages icon. Deliberately separate from
@@ -27,20 +28,17 @@ export const useMessageStore = create<MessageState>((set) => ({
   clear: () => set({ unread: 0 }),
 }))
 
-let pollTimer: ReturnType<typeof setInterval> | null = null
+let stopPoll: (() => void) | null = null
 
 /** Begin periodic unread-count refreshes (idempotent). Call after sign-in. */
 export function startMessagePolling(): void {
-  if (pollTimer) return
-  useMessageStore.getState().refresh()
-  pollTimer = setInterval(() => useMessageStore.getState().refresh(), 60_000)
+  if (stopPoll) return
+  stopPoll = startPolling(() => void useMessageStore.getState().refresh(), BADGE_POLL_MS)
 }
 
 /** Stop polling and clear the badge (call on sign-out). */
 export function stopMessagePolling(): void {
-  if (pollTimer) {
-    clearInterval(pollTimer)
-    pollTimer = null
-  }
+  stopPoll?.()
+  stopPoll = null
   useMessageStore.getState().clear()
 }

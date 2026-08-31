@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api, isApiConfigured, type NotificationItem } from '../lib/api'
+import { BADGE_POLL_MS, startPolling } from '../lib/poll'
 
 /**
  * In-app notification feed shared by the header bell. Fetched on demand and on a
@@ -52,20 +53,17 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 }))
 
 // ─── Background polling (module-level, started once) ─────────────────────────
-let pollTimer: ReturnType<typeof setInterval> | null = null
+let stopPoll: (() => void) | null = null
 
 /** Begin periodic feed refreshes (idempotent). Call after sign-in. */
 export function startNotificationPolling(): void {
-  if (pollTimer) return
-  useNotificationStore.getState().refresh()
-  pollTimer = setInterval(() => useNotificationStore.getState().refresh(), 60_000)
+  if (stopPoll) return
+  stopPoll = startPolling(() => void useNotificationStore.getState().refresh(), BADGE_POLL_MS)
 }
 
 /** Stop polling and clear the feed (call on sign-out). */
 export function stopNotificationPolling(): void {
-  if (pollTimer) {
-    clearInterval(pollTimer)
-    pollTimer = null
-  }
+  stopPoll?.()
+  stopPoll = null
   useNotificationStore.setState({ items: [], unread: 0, loaded: false })
 }

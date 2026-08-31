@@ -748,10 +748,17 @@ export const api = {
   },
 
   // ─── Thirukural ─────────────────────────────────────────────────────────────
-  /** All 1330 kurals (public reference content). */
+  /** All 1330 kurals (public reference content). ~2 MB — only the browse modal
+   *  needs it; anything after a single couplet should use thirukuralOne(). */
   async thirukural(): Promise<Kural[]> {
     const data = await request<{ kurals: Kural[] }>('/api/thirukural', { auth: false })
     return data.kurals
+  },
+
+  /** One kural by number, for the dashboard's kural of the day. */
+  async thirukuralOne(no: number): Promise<Kural> {
+    const data = await request<{ kural: Kural }>(`/api/thirukural/${no}`, { auth: false })
+    return data.kural
   },
 
   // ─── Mock tests ─────────────────────────────────────────────────────────────
