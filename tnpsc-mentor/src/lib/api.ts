@@ -2370,6 +2370,8 @@ export interface AppSettings {
   vettri_enabled: boolean
   /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
   rank_booster_enabled: boolean
+  /** Show the flashcard ("Instants") peek on the dashboard. Off = admins only. */
+  flashcards_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

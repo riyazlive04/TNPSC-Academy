@@ -38,6 +38,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
+import { useFlashcardsEnabled } from '../hooks/useFlashcardsEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import {
   useRankBoosterPurchase,
@@ -144,6 +145,7 @@ export default function TestArenaPage() {
   const testSeriesOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
   const vettriOn = useVettriEnabled()
+  const flashcardsOn = useFlashcardsEnabled()
   const rbPurchase = useRankBoosterPurchase()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
@@ -618,8 +620,12 @@ export default function TestArenaPage() {
       </div>
 
       {/* Flashcard decks, as a card peeking in from the right edge. Portals to
-          document.body and positions itself — nothing to lay out here. */}
-      <FlashcardPeek />
+          document.body and positions itself — nothing to lay out here.
+          Dark until `flashcards_enabled` is switched on in the superadmin
+          console; admins see it meanwhile so it can be tested on production.
+          `isAdmin` already respects the student-preview toggle, so previewing
+          as a student hides it exactly as a student would see it. */}
+      {(flashcardsOn || isAdmin) && <FlashcardPeek />}
 
       {/* The Daily CA day picker - today's paper + every earlier published day. */}
       <DailyCaSheet open={dailyCaOpen} onClose={() => setDailyCaOpen(false)} />

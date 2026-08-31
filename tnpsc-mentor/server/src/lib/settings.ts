@@ -18,6 +18,10 @@ export interface PublicSettings {
   vettri_enabled: boolean
   /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
   rank_booster_enabled: boolean
+  /** Show the flashcard ("Instants") peek on the dashboard. While this is off
+   *  the decks are still served to admins, so the feature can be tested on
+   *  production before students ever see it. */
+  flashcards_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
@@ -26,6 +30,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   test_series_enabled: false,
   vettri_enabled: false,
   rank_booster_enabled: false,
+  flashcards_enabled: false,
 }
 
 // ─── Admin-only settings ─────────────────────────────────────────────────────
@@ -93,6 +98,9 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     vettri_enabled: Boolean(raw.vettri_enabled ?? PUBLIC_SETTING_DEFAULTS.vettri_enabled),
     rank_booster_enabled: Boolean(
       raw.rank_booster_enabled ?? PUBLIC_SETTING_DEFAULTS.rank_booster_enabled
+    ),
+    flashcards_enabled: Boolean(
+      raw.flashcards_enabled ?? PUBLIC_SETTING_DEFAULTS.flashcards_enabled
     ),
   }
 }

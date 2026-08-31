@@ -2036,6 +2036,12 @@ const STRINGS = {
     en: 'Show or hide the Group Exam and Subject/Topic tabs for all students.',
     ta: 'அனைத்து மாணவர்களுக்கும் குரூப் தேர்வு மற்றும் பாடம்/தலைப்பு தாவல்களைக் காட்டு அல்லது மறை.',
   },
+  flashcardsSectionTitle: { en: 'Flashcards', ta: 'ஃபிளாஷ்கார்டுகள்' },
+  flashcardsSectionSub: {
+    en: 'While this is off only admins see the flashcard decks, so the feature can be tested here on the live app.',
+    ta: 'இது அணைந்திருக்கும் வரை நிர்வாகிகள் மட்டுமே ஃபிளாஷ்கார்டுகளைப் பார்ப்பார்கள்; நேரடிச் செயலியிலேயே சோதிக்கலாம்.',
+  },
+  flashcardsShowToStudents: { en: 'Show to students', ta: 'மாணவர்களுக்குக் காட்டு' },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },

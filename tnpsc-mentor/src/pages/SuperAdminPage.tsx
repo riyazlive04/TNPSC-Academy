@@ -55,6 +55,7 @@ import {
   Presentation,
   Rocket,
   MessageCircle,
+  Layers,
 } from 'lucide-react'
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
@@ -344,6 +345,73 @@ function OverviewTab() {
       <div className="grid gap-5 md:grid-cols-2">
         <BreakdownCard title={t('roleBreakdown')} data={metrics.roleBreakdown} />
         <BreakdownCard title={t('questionBank')} data={metrics.questionsByCategory} />
+      </div>
+
+      <FlashcardsVisibilityCard />
+    </div>
+  )
+}
+
+/**
+ * The one switch that launches flashcards. Off (the default) the decks are
+ * served to admins only, so the feature can be exercised against real
+ * production data while every student sees an app without it; on, the peek
+ * appears on everyone's dashboard. Enforced server-side too — see
+ * server/src/routes/flashcards.ts.
+ */
+function FlashcardsVisibilityCard() {
+  const { t } = useT()
+  const [on, setOn] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    api.superadmin
+      .settings()
+      .then((s) => setOn(Boolean(s.flashcards_enabled)))
+      .catch(() => undefined)
+      .finally(() => setReady(true))
+  }, [])
+
+  const toggle = async (next: boolean) => {
+    setSaving(true)
+    setOn(next) // optimistic
+    try {
+      await api.superadmin.setSetting('flashcards_enabled', next)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setOn(!next)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="card p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <Layers size={16} className="text-brand" />
+        <h2 className="font-heading text-sm font-semibold text-ink">
+          {t('flashcardsSectionTitle')}
+        </h2>
+      </div>
+      <p className="mb-3 font-body text-xs text-ink2">{t('flashcardsSectionSub')}</p>
+      <div className="flex items-center justify-between gap-3">
+        <span className="tamil font-body text-sm text-ink">{t('flashcardsShowToStudents')}</span>
+        <button
+          disabled={!ready || saving}
+          onClick={() => toggle(!on)}
+          aria-pressed={on}
+          aria-label={t('flashcardsShowToStudents')}
+          className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+            on ? 'bg-correct' : 'bg-ink2/30'
+          } disabled:opacity-50`}
+        >
+          <span
+            className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              on ? 'left-6' : 'left-1'
+            }`}
+          />
+        </button>
       </div>
     </div>
   )
