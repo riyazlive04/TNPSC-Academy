@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   BellOff,
   BellRing,
+  GraduationCap,
   Clock,
   Inbox,
   LogOut,
@@ -160,6 +161,17 @@ export default function CrmPage() {
               {supervisor && ' · supervisor view'}
             </p>
           </div>
+          {/* The desk is not a cage: a telecaller can open the student app to
+              learn the product or walk a lead through it, and come back via
+              the Lead desk button in that header. */}
+          <button
+            onClick={() => navigate('/test-arena')}
+            className="icon-btn h-9 w-9"
+            aria-label="Open the student app"
+            title="Open the student app"
+          >
+            <GraduationCap size={17} />
+          </button>
           <button
             onClick={() => setSound(!sound)}
             className="icon-btn h-9 w-9"

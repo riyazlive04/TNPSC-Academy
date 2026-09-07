@@ -79,12 +79,10 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
     return <Navigate to="/test-arena" replace />
   }
 
-  // A telecaller's whole app IS the lead desk: they have no tests, no credits
-  // and no dashboard, so every other authenticated route sends them there
-  // rather than to an arena full of tiles they can't use.
-  if (role !== 'crm' && isTelecaller) {
-    return <Navigate to="/crm" replace />
-  }
+  // A telecaller may use the student app as well as the desk. Someone selling
+  // the product has to be able to open it — to learn it, and to walk a lead
+  // through what they're being sold. They still land on /crm at sign-in (see
+  // authRouting); this just stops the rest of the app being walled off.
 
   return <>{children}</>
 }

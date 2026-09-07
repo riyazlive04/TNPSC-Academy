@@ -3,6 +3,7 @@ import {
   selectIsAdmin,
   selectIsSuperAdmin,
   selectIsAuthenticated,
+  selectIsCrmStaff,
 } from '../store/authStore'
 import { useAdminViewStore } from '../store/adminViewStore'
 
@@ -16,6 +17,10 @@ export function useAuth() {
   const isAuthenticated = useAuthStore(selectIsAuthenticated)
   const realIsAdmin = useAuthStore(selectIsAdmin)
   const realIsSuperAdmin = useAuthStore(selectIsSuperAdmin)
+  // Who may open the lead desk. Not masked by "preview as student": that toggle
+  // exists so an admin can see the LEARNER experience, and hiding their own way
+  // back to the desk would strand them in it.
+  const isCrmStaff = useAuthStore(selectIsCrmStaff)
 
   // "Preview as student" (admins only): mask the effective role so every UI
   // consumer renders the learner experience. Non-admins can never be in preview.
@@ -51,6 +56,8 @@ export function useAuth() {
     isAuthenticated,
     isAdmin,
     isSuperAdmin,
+    /** Telecallers plus the admins who supervise them — may open /crm. */
+    isCrmStaff,
     /** The user's real role, ignoring student-preview (drives the preview toggle). */
     realIsAdmin,
     realIsSuperAdmin,

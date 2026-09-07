@@ -2075,6 +2075,7 @@ const STRINGS = {
   // The telecaller lead desk's console tab. The desk itself (/crm) is a staff
   // tool and ships in English only; this label sits in the bilingual console.
   crmTab: { en: 'CRM / Leads', ta: 'CRM / லீட்கள்' },
+  leadDesk: { en: 'Lead desk', ta: 'லீட் டெஸ்க்' },
   caMagazineNoItems: {
     en: 'No items in this issue yet.',
     ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',

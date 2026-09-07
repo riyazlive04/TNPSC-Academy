@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins } from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins, Headphones } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useCreditsStore } from '../../store/creditsStore'
 import { useHasMaterials } from '../../hooks/useHasMaterials'
@@ -88,7 +88,7 @@ const ADMIN_NAV = [
 export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   const navigate = useNavigate()
   const location = useLocation()
-  const { profile, isAdmin, isSuperAdmin, user, realIsAdmin, previewAsStudent, setPreviewAsStudent } =
+  const { profile, isAdmin, isSuperAdmin, isCrmStaff, user, realIsAdmin, previewAsStudent, setPreviewAsStudent } =
     useAuth()
 
   // Admins can preview the learner experience. Entering/leaving preview homes to
@@ -290,6 +290,21 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   <span className="tamil hidden sm:inline">
                     {previewAsStudent ? t('adminView') : t('studentView')}
                   </span>
+                </button>
+              )}
+              {/* A telecaller works the desk but may also use the student app,
+                  so the way back has to be visible from inside it. Shown to
+                  every CRM-staff account; a superadmin already has the console
+                  button beside this one. */}
+              {isCrmStaff && (
+                <button
+                  onClick={() => navigate('/crm')}
+                  title={t('leadDesk')}
+                  aria-label={t('leadDesk')}
+                  className="press inline-flex items-center gap-1 rounded-lg bg-tint-violet px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-primary focus-ring"
+                >
+                  <Headphones size={13} />
+                  <span className="hidden sm:inline">{t('leadDesk')}</span>
                 </button>
               )}
               {isSuperAdmin ? (
