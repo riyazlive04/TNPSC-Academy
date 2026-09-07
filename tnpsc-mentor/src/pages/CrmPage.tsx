@@ -338,6 +338,12 @@ export default function CrmPage() {
           />
         ) : (
           <>
+            {/* Where you are, stated BEFORE the cards. The pager sits below 25
+                lead cards, which on a phone is a long scroll — an agent looking
+                at 679 leads had no way to tell there was a second page without
+                reaching the bottom first. */}
+            <QueueCount page={current.page} total={current.total} />
+
             <div className="space-y-3">
               {current.leads.map((lead: Lead) => (
                 <LeadCard
@@ -442,6 +448,46 @@ function EmptyQueue({
   )
 }
 
+/** Which slice of the queue is on screen, and how many pages it spans. */
+function pageRange(page: number, total: number) {
+  return {
+    pages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+    from: total === 0 ? 0 : page * PAGE_SIZE + 1,
+    to: Math.min(total, (page + 1) * PAGE_SIZE),
+  }
+}
+
+/**
+ * The queue's size and your position in it, shown above the cards.
+ *
+ * Unlike the pager this renders even for a single page: "12 leads" is the
+ * answer to a question an agent asks constantly, and its absence was being read
+ * as "pagination is missing" whenever a queue happened to be small.
+ */
+function QueueCount({ page, total }: { page: number; total: number }) {
+  if (total === 0) return null
+  const { pages, from, to } = pageRange(page, total)
+
+  return (
+    <p className="mb-3 font-body text-2xs tabular-nums text-ink2" aria-live="polite">
+      {pages === 1 ? (
+        <>
+          <span className="font-heading font-semibold text-ink">{total}</span>{' '}
+          {total === 1 ? 'lead' : 'leads'}
+        </>
+      ) : (
+        <>
+          Showing{' '}
+          <span className="font-heading font-semibold text-ink">
+            {from}–{to}
+          </span>{' '}
+          of {total} · page {page + 1} of {pages}
+        </>
+      )}
+    </p>
+  )
+}
+
 /**
  * Page navigation for a queue. "Load more" was wrong here: it grows one endless
  * list, gives no sense of position in 682 leads, and offers no way back to
@@ -459,11 +505,8 @@ function Pager({
   loading: boolean
   onGo: (page: number) => void
 }) {
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   if (total <= PAGE_SIZE) return null
-
-  const from = page * PAGE_SIZE + 1
-  const to = Math.min(total, (page + 1) * PAGE_SIZE)
+  const { pages, from, to } = pageRange(page, total)
 
   return (
     <nav className="mt-4 flex items-center justify-between gap-3" aria-label="Lead pages">

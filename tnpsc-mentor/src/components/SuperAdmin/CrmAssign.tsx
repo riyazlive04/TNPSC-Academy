@@ -1,9 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Check, Download, Loader2, UserPlus, Users } from 'lucide-react'
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Loader2,
+  UserPlus,
+  Users,
+} from 'lucide-react'
 import Spinner from '../UI/Spinner'
 import { api, type CrmAgentRow } from '../../lib/api'
 import { toast } from '../../store/toastStore'
 import { STATUS_CLASS, STATUS_LABEL, formatPhone, type Lead } from '../../lib/crm'
+
+/** Leads per page. Larger than the agent desk's 25: this is a desktop
+ *  tick-list being worked in bulk, not cards being read one at a time. */
+const PAGE_SIZE = 50
 
 /**
  * Hand leads to an agent, in bulk.
@@ -20,6 +32,8 @@ import { STATUS_CLASS, STATUS_LABEL, formatPhone, type Lead } from '../../lib/cr
 export default function CrmAssign() {
   const [agents, setAgents] = useState<CrmAgentRow[]>([])
   const [leads, setLeads] = useState<Lead[]>([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [agentId, setAgentId] = useState('')
   const [queue, setQueue] = useState<'pool' | 'all'>('pool')
@@ -28,11 +42,17 @@ export default function CrmAssign() {
 
   const load = () => {
     setLoading(true)
-    Promise.all([api.crm.agents(), api.crm.leads({ queue, limit: 100 })])
+    Promise.all([
+      api.crm.agents(),
+      api.crm.leads({ queue, limit: PAGE_SIZE, offset: page * PAGE_SIZE }),
+    ])
       .then(([a, l]) => {
         setAgents(a)
         setLeads(l.leads)
-        setPicked(new Set())
+        setTotal(l.total)
+        // Selection deliberately SURVIVES a page turn — assigning 200 leads
+        // means ticking across several pages — but not a queue change, where
+        // the ticked rows are no longer on the board being worked.
       })
       .catch((e: unknown) =>
         toast.error(e instanceof Error ? e.message : 'Could not load leads to assign.')
@@ -40,9 +60,21 @@ export default function CrmAssign() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(load, [queue])
+  useEffect(load, [queue, page])
 
-  const allPicked = leads.length > 0 && picked.size === leads.length
+  // A queue change is a different board: reset both the position and the ticks.
+  const pickQueue = (q: 'pool' | 'all') => {
+    setQueue(q)
+    setPage(0)
+    setPicked(new Set())
+  }
+
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+
+  // "All" means every lead ON THIS PAGE. Comparing sizes was fine when the list
+  // was one page; now that ticks carry across pages, 50 selected on page 1
+  // would have made page 2 claim to be fully selected too.
+  const allPicked = leads.length > 0 && leads.every((l) => picked.has(l.id))
   const toggle = (id: string) =>
     setPicked((prev) => {
       const next = new Set(prev)
@@ -61,6 +93,10 @@ export default function CrmAssign() {
           ? `${assigned} lead${assigned === 1 ? '' : 's'} assigned.`
           : `${assigned} lead${assigned === 1 ? '' : 's'} returned to the shared queue.`
       )
+      // These rows have been dealt with; `load` no longer clears the ticks for
+      // us (they now survive a page turn), so clear them at the point the work
+      // actually completed.
+      setPicked(new Set())
       load()
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Could not assign those leads.')
@@ -98,7 +134,7 @@ export default function CrmAssign() {
           {(['pool', 'all'] as const).map((q) => (
             <button
               key={q}
-              onClick={() => setQueue(q)}
+              onClick={() => pickQueue(q)}
               className={`seg text-xs ${queue === q ? 'seg-active' : ''}`}
             >
               {q === 'pool' ? 'Unclaimed' : 'Every lead'}
@@ -156,7 +192,19 @@ export default function CrmAssign() {
       ) : (
         <>
           <button
-            onClick={() => setPicked(allPicked ? new Set() : new Set(leads.map((l) => l.id)))}
+            // Adds/removes only this page's rows, leaving ticks made on other
+            // pages alone — replacing the whole set here would silently discard
+            // them the moment you selected all on a second page.
+            onClick={() =>
+              setPicked((prev) => {
+                const next = new Set(prev)
+                for (const l of leads) {
+                  if (allPicked) next.delete(l.id)
+                  else next.add(l.id)
+                }
+                return next
+              })
+            }
             className="btn btn-sm btn-ghost px-3 py-1.5 text-2xs"
           >
             <Check size={13} /> {allPicked ? 'Clear selection' : `Select all ${leads.length}`}
@@ -199,11 +247,35 @@ export default function CrmAssign() {
             })}
           </ul>
 
-          {leads.length >= 100 && (
-            <p className="flex items-center gap-1.5 font-body text-2xs text-ink2">
-              <Users size={12} /> Showing the first 100. Assign these, then reload for more.
+          {/* Was "showing the first 100, assign these then reload" — which made
+              the other 580 leads unreachable unless you emptied the queue from
+              the front. */}
+          <nav className="flex items-center justify-between gap-3" aria-label="Lead pages">
+            <button
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0 || loading}
+              className="btn btn-sm btn-ghost px-3"
+            >
+              <ChevronLeft size={15} /> Previous
+            </button>
+
+            <p className="flex items-center gap-1.5 font-body text-2xs tabular-nums text-ink2">
+              <Users size={12} />
+              <span className="font-heading font-semibold text-ink">
+                {page * PAGE_SIZE + 1}–{Math.min(total, (page + 1) * PAGE_SIZE)}
+              </span>
+              of {total}
+              {pages > 1 && ` · page ${page + 1} of ${pages}`}
             </p>
-          )}
+
+            <button
+              onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
+              disabled={page >= pages - 1 || loading}
+              className="btn btn-sm btn-ghost px-3"
+            >
+              Next <ChevronRight size={15} />
+            </button>
+          </nav>
         </>
       )}
     </section>
