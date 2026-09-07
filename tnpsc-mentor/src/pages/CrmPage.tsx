@@ -22,6 +22,7 @@ import LeadCard from '../components/Crm/LeadCard'
 import LeadSheet from '../components/Crm/LeadSheet'
 import NewLeadPopup from '../components/Crm/NewLeadPopup'
 import QueueFilters from '../components/Crm/QueueFilters'
+import MyStats from '../components/Crm/MyStats'
 import WorkspaceSwitch from '../components/Layout/WorkspaceSwitch'
 import Spinner from '../components/UI/Spinner'
 import ErrorState from '../components/UI/ErrorState'
@@ -310,6 +311,8 @@ export default function CrmPage() {
             </div>
           </div>
         )}
+
+        {queue === 'mine' && <MyStats />}
 
         <QueueFilters queue={queue} />
 

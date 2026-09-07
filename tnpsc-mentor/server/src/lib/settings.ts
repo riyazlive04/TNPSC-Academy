@@ -70,8 +70,41 @@ export const REPORT_RESOLVED_MESSAGE_DEFAULT: ReportResolvedMessage = {
 /** Placeholders the superadmin may use in the message copy. */
 export const REPORT_MESSAGE_TOKENS = ['subject', 'note'] as const
 
+/**
+ * How long a fresh inbound lead may wait before the desk's response timer turns
+ * amber, orange and red. Minutes. Editable because a two-agent shift and a
+ * ten-agent shift do not have the same idea of "late", and everything else in
+ * the CRM taxonomy is already the superadmin's to set.
+ */
+export interface CrmSla {
+  target_mins: number
+  warn_mins: number
+  breach_mins: number
+}
+
+export const CRM_SLA_DEFAULT: CrmSla = { target_mins: 5, warn_mins: 15, breach_mins: 60 }
+
 export const ADMIN_SETTING_DEFAULTS: Record<string, unknown> = {
   report_resolved_message: REPORT_RESOLVED_MESSAGE_DEFAULT,
+  crm_sla: CRM_SLA_DEFAULT,
+}
+
+/** The SLA thresholds with defaults applied, and ordering repaired: a warn
+ *  below target (or a breach below warn) would make the timer skip a band. */
+export async function readCrmSla(): Promise<CrmSla> {
+  let raw: Record<string, unknown> = {}
+  try {
+    raw = await readAllSettings()
+  } catch {
+    return CRM_SLA_DEFAULT
+  }
+  const v = (raw.crm_sla ?? {}) as Partial<CrmSla>
+  const num = (x: unknown, fallback: number) =>
+    Number.isFinite(Number(x)) && Number(x) > 0 ? Math.round(Number(x)) : fallback
+  const target = num(v.target_mins, CRM_SLA_DEFAULT.target_mins)
+  const warn = Math.max(target + 1, num(v.warn_mins, CRM_SLA_DEFAULT.warn_mins))
+  const breach = Math.max(warn + 1, num(v.breach_mins, CRM_SLA_DEFAULT.breach_mins))
+  return { target_mins: target, warn_mins: warn, breach_mins: breach }
 }
 
 /** Keys the superadmin console is allowed to write (allow-list). */

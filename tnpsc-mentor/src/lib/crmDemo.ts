@@ -79,6 +79,9 @@ function lead(p: Partial<Lead> & { full_name: string; phone: string }): Lead {
     premium_until: null,
     vettri: false,
     vettri_until: null,
+    do_not_call: false,
+    dnc_reason: null,
+    dnc_at: null,
     ...p,
     // Imported/backfilled rows signed up long ago but reached the DESK just
     // now — the same split the real backfill writes.
@@ -500,6 +503,7 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       supervisor: true,
       intents: intents.filter((i) => i.active),
       metrics: metrics(),
+      sla: { target_mins: 5, warn_mins: 15, breach_mins: 60 },
       today,
       now,
     })
@@ -640,6 +644,7 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       if (q.source) filtered = filtered.filter((l) => l.source === q.source)
       if (q.intent === 'none') filtered = filtered.filter((l) => !l.intent_id)
       else if (q.intent) filtered = filtered.filter((l) => l.intent_id === q.intent)
+      if (String(q.queue ?? 'pool') !== 'all') filtered = filtered.filter((l) => !l.do_not_call)
       if (q.age === 'fresh') filtered = filtered.filter((l) => l.source === 'signup')
       else if (q.age === 'backlog') filtered = filtered.filter((l) => l.source !== 'signup')
       if (q.plan === 'free') filtered = filtered.filter((l) => !l.premium && !l.vettri)
@@ -675,6 +680,24 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       target.status = 'in_progress'
       touch(target)
       log(target.id, { kind: 'system', channel: 'system', notes: 'Claimed from the pool' })
+      return out({ lead: target })
+    }
+
+    if (seg[2] === 'dnc') {
+      const on = body.on !== false
+      target.do_not_call = on
+      target.dnc_reason = on ? ((body.reason as string) || null) : null
+      target.dnc_at = on ? now : null
+      if (on) {
+        target.status = 'invalid'
+        target.next_follow_up_at = null
+      }
+      touch(target)
+      log(target.id, {
+        kind: 'system',
+        channel: 'system',
+        notes: on ? 'Marked do-not-call' : 'Do-not-call lifted',
+      })
       return out({ lead: target })
     }
 
@@ -714,7 +737,12 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       target.intent_id = intent?.id ?? target.intent_id
       target.intent_label = intent?.label ?? target.intent_label
       target.intent_color = intent?.color ?? target.intent_color
-      target.notes = (body.notes as string) || target.notes
+      if (body.notes) {
+        const stamp = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        const line = `[${stamp}] ${body.notes as string}`
+        target.notes = target.notes ? `${target.notes}
+${line}` : line
+      }
       target.next_follow_up_at = (body.nextFollowUpAt as string) ?? null
       target.last_contacted_at = now
       if (!target.assigned_to) {

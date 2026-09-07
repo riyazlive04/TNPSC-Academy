@@ -73,6 +73,11 @@ export interface Lead {
    *  yet in front of them. */
   entered_at: string
   updated_at: string
+  /** They asked not to be contacted. Suppressed from every working queue and
+   *  deliberately independent of `status`, which a later agent may change. */
+  do_not_call?: boolean
+  dnc_reason?: string | null
+  dnc_at?: string | null
   // Joined on the way out by the server.
   assigned_name?: string | null
   intent_label?: string | null
@@ -230,9 +235,41 @@ export function whatsappOpener(lead: Pick<Lead, 'full_name'>): string {
 // warmest in the first few minutes, so the desk shows a live clock and escalates
 // its colour as it runs. Thresholds are in seconds.
 
+// Defaults only. The live values are superadmin-editable (app_settings.crm_sla)
+// and arrive with the bootstrap — see crmStore.sla. These remain the fallback
+// for a server that has never had them set, and the basis of the unit tests.
 export const SLA_TARGET_SECS = 5 * 60 // green below this — the goal
 export const SLA_WARN_SECS = 15 * 60 // amber up to here
 export const SLA_BREACH_SECS = 60 * 60 // red past here
+
+/** Thresholds in seconds, as the timer uses them. */
+export interface SlaThresholds {
+  target: number
+  warn: number
+  breach: number
+}
+
+export const DEFAULT_SLA: SlaThresholds = {
+  target: SLA_TARGET_SECS,
+  warn: SLA_WARN_SECS,
+  breach: SLA_BREACH_SECS,
+}
+
+/** Server shape (minutes) → the seconds the timer works in. */
+export function slaFromMinutes(v?: {
+  target_mins?: number
+  warn_mins?: number
+  breach_mins?: number
+} | null): SlaThresholds {
+  if (!v) return DEFAULT_SLA
+  const s = (m: unknown, fallback: number) =>
+    Number.isFinite(Number(m)) && Number(m) > 0 ? Math.round(Number(m)) * 60 : fallback
+  return {
+    target: s(v.target_mins, SLA_TARGET_SECS),
+    warn: s(v.warn_mins, SLA_WARN_SECS),
+    breach: s(v.breach_mins, SLA_BREACH_SECS),
+  }
+}
 
 export type SlaLevel = 'fresh' | 'warn' | 'late' | 'breached' | 'done' | 'backlog'
 
@@ -257,7 +294,11 @@ export function isFreshInbound(lead: Pick<Lead, 'source'>): boolean {
   return lead.source === 'signup'
 }
 
-export function slaState(lead: Lead, nowMs: number): SlaState {
+export function slaState(
+  lead: Lead,
+  nowMs: number,
+  thresholds: SlaThresholds = DEFAULT_SLA
+): SlaState {
   // Measured from when the lead reached the DESK. Older rows predate the
   // column and fall back to created_at.
   const entered = Date.parse(lead.entered_at ?? lead.created_at)
@@ -273,11 +314,11 @@ export function slaState(lead: Lead, nowMs: number): SlaState {
   // colour of meaning for the handful that genuinely are late.
   if (!isFreshInbound(lead)) return { level: 'backlog', seconds, running: true }
   const level: SlaLevel =
-    seconds < SLA_TARGET_SECS
+    seconds < thresholds.target
       ? 'fresh'
-      : seconds < SLA_WARN_SECS
+      : seconds < thresholds.warn
         ? 'warn'
-        : seconds < SLA_BREACH_SECS
+        : seconds < thresholds.breach
           ? 'late'
           : 'breached'
   return { level, seconds, running: true }

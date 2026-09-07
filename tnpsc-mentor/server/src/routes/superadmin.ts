@@ -13,6 +13,7 @@ import {
 } from '../lib/webBundles.js'
 import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
 import { notifyUser } from '../notify.js'
+import { invalidateTelecallerRoster } from '../lib/crmAlerts.js'
 import { KNOWN_PLANS } from '../pricing.js'
 import { TEST_SERIES_CONFIG, resolveSeries } from '../lib/testSeriesCatalog.js'
 
@@ -88,6 +89,9 @@ router.post(
       p_role: role,
     })
     if (error) return sendDbError(res, error)
+    // A newly appointed telecaller should start getting lead alerts at once,
+    // not after the roster cache expires.
+    invalidateTelecallerRoster()
     res.json({ user: data })
   })
 )

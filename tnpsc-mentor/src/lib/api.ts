@@ -423,6 +423,8 @@ export interface CrmBootstrap {
   intents: CrmIntent[]
   metrics: CrmPipelineMetrics
   today: CrmTodayStats | null
+  /** Superadmin-configured response thresholds, in minutes. */
+  sla?: { target_mins: number; warn_mins: number; breach_mins: number } | null
   /** Server clock, so response timers can't be shifted by a wrong device clock. */
   now: string
 }
@@ -2119,6 +2121,19 @@ export const api = {
       }
     ): Promise<{ lead: Lead }> {
       return request(`/api/crm/leads/${id}/log`, { method: 'POST', body: input })
+    },
+    /** Mark (or lift) do-not-call. Suppresses the lead from working queues. */
+    async setDnc(id: string, on: boolean, reason?: string): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}/dnc`, { method: 'POST', body: { on, reason } })
+    },
+    /** Supervisor-only CSV of the whole book. Returns the raw text. */
+    async exportCsv(): Promise<string> {
+      const res = await fetch(`${API_URL}/api/crm/export`, {
+        headers: { Authorization: `Bearer ${tokens.access ?? ''}` },
+        credentials: CREDENTIALS,
+      })
+      if (!res.ok) throw new Error('Could not export the leads.')
+      return res.text()
     },
     /** Correct the contact details read out on the call. */
     async updateLead(id: string, patch: Partial<CrmLeadPatch>): Promise<{ lead: Lead }> {

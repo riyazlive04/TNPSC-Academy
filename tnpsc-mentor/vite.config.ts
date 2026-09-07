@@ -7,6 +7,11 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'node',
+    // The API server is a separate package with its own vitest, tsconfig and
+    // NodeNext module resolution ('./x.js' specifiers that this config cannot
+    // resolve). Run it with `npm test` inside /server; collecting it here just
+    // fails to load.
+    exclude: ['node_modules/**', 'dist/**', 'server/**', 'android/**', 'ios/**'],
     // Point the API client at a dummy base URL (unit tests never hit the network).
     env: {
       VITE_API_URL: 'http://localhost:4000',

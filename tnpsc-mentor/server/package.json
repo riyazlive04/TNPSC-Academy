@@ -2,7 +2,7 @@
   "name": "tnpsc-mentor-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Express API layer for TNPSC Mentors — the single trusted client in front of the Supabase Postgres backend.",
+  "description": "Express API layer for TNPSC Mentors \u2014 the single trusted client in front of the Supabase Postgres backend.",
   "type": "module",
   "main": "dist/index.js",
   "engines": {
@@ -12,7 +12,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
@@ -39,6 +40,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/web-push": "^3.6.4",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.1"
   }
 }

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  ArrowDown,
+  ArrowUp,
   Check,
   ChevronDown,
   Clock,
@@ -17,12 +19,14 @@ import {
   Trash2,
   TrendingUp,
   UploadCloud,
+  UserPlus,
   Users,
   X,
 } from 'lucide-react'
 import Spinner from '../UI/Spinner'
 import ConfirmDialog from '../UI/ConfirmDialog'
 import CrmLiveAnswers from './CrmLiveAnswers'
+import CrmAssign from './CrmAssign'
 import { api, type CrmAgentRow, type CrmIntentInput } from '../../lib/api'
 import { toast } from '../../store/toastStore'
 import {
@@ -50,12 +54,15 @@ import {
  * ~5.8k lines — a new console section should not make that worse.
  */
 export default function CrmPanel() {
-  const [section, setSection] = useState<'pipeline' | 'intents' | 'agents' | 'import'>('pipeline')
+  const [section, setSection] = useState<
+    'pipeline' | 'intents' | 'agents' | 'assign' | 'import'
+  >('pipeline')
 
   const SECTIONS = [
     { id: 'pipeline' as const, label: 'Pipeline', icon: TrendingUp },
     { id: 'intents' as const, label: 'Intent categories', icon: Tags },
     { id: 'agents' as const, label: 'Telecallers', icon: Headphones },
+    { id: 'assign' as const, label: 'Assign leads', icon: UserPlus },
     { id: 'import' as const, label: 'Import leads', icon: UploadCloud },
   ]
 
@@ -83,6 +90,7 @@ export default function CrmPanel() {
       {section === 'pipeline' && <PipelineSection />}
       {section === 'intents' && <IntentsSection />}
       {section === 'agents' && <AgentsSection />}
+      {section === 'assign' && <CrmAssign />}
       {section === 'import' && <ImportSection />}
     </div>
   )
@@ -352,6 +360,31 @@ function IntentsSection() {
     }
   }
 
+  /** Swap this category's position with its neighbour. The desk renders the
+   *  chips in sort_order, so this is what decides which answers an agent
+   *  reaches for first. */
+  const move = async (intent: CrmIntent, delta: number) => {
+    const i = intents.indexOf(intent)
+    const other = intents[i + delta]
+    if (!other) return
+    // Optimistic swap so the list does not jump twice.
+    setIntents((s) => {
+      const next = [...s]
+      next[i] = other
+      next[i + delta] = intent
+      return next
+    })
+    try {
+      await Promise.all([
+        api.crm.updateIntent(intent.id, { sortOrder: other.sort_order }),
+        api.crm.updateIntent(other.id, { sortOrder: intent.sort_order }),
+      ])
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not reorder.')
+      load()
+    }
+  }
+
   const toggleActive = async (intent: CrmIntent) => {
     try {
       const updated = await api.crm.updateIntent(intent.id, { active: !intent.active })
@@ -460,7 +493,7 @@ function IntentsSection() {
         <Spinner className="mx-auto my-8" />
       ) : (
         <ul className="space-y-2">
-          {intents.map((intent) => (
+          {intents.map((intent, i) => (
             <li
               key={intent.id}
               className={`card flex flex-wrap items-center gap-3 p-3 ${intent.active ? '' : 'opacity-60'}`}
@@ -491,6 +524,22 @@ function IntentsSection() {
                   {intent.active ? 'Retire' : 'Restore'}
                 </button>
                 <button
+                  onClick={() => void move(intent, -1)}
+                  disabled={i === 0}
+                  className="icon-btn h-8 w-8 disabled:opacity-30"
+                  aria-label={`Move ${intent.label} up`}
+                >
+                  <ArrowUp size={14} />
+                </button>
+                <button
+                  onClick={() => void move(intent, 1)}
+                  disabled={i === intents.length - 1}
+                  className="icon-btn h-8 w-8 disabled:opacity-30"
+                  aria-label={`Move ${intent.label} down`}
+                >
+                  <ArrowDown size={14} />
+                </button>
+                <button
                   onClick={() => {
                     setEditingId(intent.id)
                     setDraft({
@@ -518,6 +567,8 @@ function IntentsSection() {
           ))}
         </ul>
       )}
+
+      <SlaEditor />
 
       <ConfirmDialog
         open={Boolean(confirmId)}
@@ -752,5 +803,102 @@ function ImportSection() {
         </div>
       </div>
     </section>
+  )
+}
+
+// ─── Response targets ────────────────────────────────────────────────────────
+
+/**
+ * How long a fresh inbound lead may wait before the desk's timer turns amber,
+ * orange and red. Hardcoded until now, which sat oddly beside a taxonomy the
+ * superadmin owns entirely — a two-agent shift and a ten-agent shift do not
+ * share an idea of "late".
+ *
+ * Applies to inbound signups only; imported and backfilled leads carry no
+ * deadline by design.
+ */
+function SlaEditor() {
+  const [sla, setSla] = useState({ target_mins: 5, warn_mins: 15, breach_mins: 60 })
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    api.superadmin
+      .settings()
+      .then((all) => {
+        const v = all.crm_sla as Partial<typeof sla> | undefined
+        if (v) setSla((s) => ({ ...s, ...v }))
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const save = async () => {
+    setBusy(true)
+    try {
+      await api.superadmin.setSetting('crm_sla', sla)
+      toast.success('Response targets saved. Agents pick them up on their next refresh.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not save.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const fields = [
+    { key: 'target_mins' as const, label: 'Green until', hint: 'answered on time' },
+    { key: 'warn_mins' as const, label: 'Amber until', hint: 'getting late' },
+    { key: 'breach_mins' as const, label: 'Red after', hint: 'missed' },
+  ]
+
+  const ordered = sla.target_mins < sla.warn_mins && sla.warn_mins < sla.breach_mins
+
+  return (
+    <div className="card space-y-3 p-4">
+      <div>
+        <h3 className="font-heading text-sm font-semibold text-ink">Response targets</h3>
+        <p className="mt-0.5 font-body text-xs text-ink2">
+          Minutes a new signup may wait before the desk timer escalates. Imported and backfilled
+          leads carry no deadline.
+        </p>
+      </div>
+
+      {loading ? (
+        <Spinner className="mx-auto my-4" />
+      ) : (
+        <>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {fields.map((f) => (
+              <label key={f.key} className="block">
+                <span className="font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
+                  {f.label}
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={10080}
+                  value={sla[f.key]}
+                  onChange={(e) => setSla((s) => ({ ...s, [f.key]: Number(e.target.value) }))}
+                  className="input-soft mt-1 py-2 text-sm"
+                />
+                <span className="font-body text-2xs text-ink2">{f.hint}</span>
+              </label>
+            ))}
+          </div>
+
+          {!ordered && (
+            <p className="font-body text-xs text-error">
+              Each threshold has to be larger than the one before it, or the timer skips a band.
+              The server will correct this on save.
+            </p>
+          )}
+
+          <button onClick={() => void save()} disabled={busy} className="btn btn-sm btn-brand">
+            {busy ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+            Save targets
+          </button>
+        </>
+      )}
+    </div>
   )
 }

@@ -7,7 +7,22 @@ import {
   type AuthedRequest,
 } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
-import { normalizeMobile } from '../lib/msg91.js'
+import { readCrmSla } from '../lib/settings.js'
+import {
+  CHANNELS,
+  LEAD_STATUSES,
+  LEAD_SOURCES,
+  OUTCOME_TO_STATUS,
+  appendNote,
+  cleanText,
+  csvCell,
+  firstResponseSecs,
+  istDate,
+  safeFilterTerm,
+  tenDigit,
+  type Channel,
+  type LeadStatus,
+} from '../lib/crmLogic.js'
 
 // ─── Telecaller CRM ──────────────────────────────────────────────────────────
 // The lead desk behind /crm. Every route here is staff-only (telecaller, admin
@@ -26,39 +41,8 @@ function isSupervisor(req: AuthedRequest): boolean {
 const LEAD_COLUMNS =
   'id, user_id, full_name, phone, whatsapp, email, city, target_group, source, source_detail, ' +
   'status, intent_id, assigned_to, assigned_at, first_response_at, first_response_secs, ' +
-  'last_contacted_at, next_follow_up_at, attempts, notes, created_at, entered_at, updated_at'
-
-const LEAD_STATUSES = [
-  'new',
-  'in_progress',
-  'follow_up',
-  'converted',
-  'not_interested',
-  'unreachable',
-  'invalid',
-] as const
-type LeadStatus = (typeof LEAD_STATUSES)[number]
-
-const CHANNELS = ['call', 'whatsapp', 'email', 'sms', 'note'] as const
-type Channel = (typeof CHANNELS)[number]
-
-/** Bare 10-digit Indian mobile, or '' when the input isn't one. Shared with the
- *  DB trigger's own normalisation so signup leads and imports dedupe together. */
-function tenDigit(raw: unknown): string {
-  return normalizeMobile(String(raw ?? ''))
-}
-
-/** A UTC epoch as its IST (UTC+5:30, no DST) calendar date, 'YYYY-MM-DD' —
- *  the shape crm_interactions.day_ist is stored in. */
-function istDate(epochMs: number): string {
-  return new Date(epochMs + 330 * 60_000).toISOString().slice(0, 10)
-}
-
-function cleanText(raw: unknown, max = 500): string | null {
-  const s = String(raw ?? '').trim()
-  if (!s) return null
-  return s.slice(0, max)
-}
+  'last_contacted_at, next_follow_up_at, attempts, notes, created_at, entered_at, updated_at, ' +
+  'do_not_call, dnc_reason, dnc_at'
 
 /**
  * PostgREST rows come back untyped here (this project has no generated DB
@@ -126,7 +110,7 @@ async function decorate(rows: Row[]): Promise<Row[]> {
 router.get(
   '/bootstrap',
   asyncH(async (req: AuthedRequest, res) => {
-    const [profile, intents, metrics, mine] = await Promise.all([
+    const [profile, intents, metrics, mine, sla] = await Promise.all([
       supabaseAdmin
         .from('profiles')
         .select('id, full_name, email, role, avatar_url')
@@ -139,6 +123,7 @@ router.get(
         .order('sort_order', { ascending: true }),
       req.db!.rpc('crm_pipeline_metrics'),
       req.db!.rpc('crm_agent_stats', { p_agent: req.userId }),
+      readCrmSla(),
     ])
 
     if (intents.error) return sendDbError(res, intents.error)
@@ -150,6 +135,7 @@ router.get(
       supervisor: isSupervisor(req),
       intents: intents.data ?? [],
       metrics: metrics.data ?? {},
+      sla,
       today: today && {
         calls: Number(today.calls ?? 0),
         whatsapps: Number(today.whatsapps ?? 0),
@@ -180,6 +166,11 @@ router.get(
 
     let q = supabaseAdmin.from('crm_leads').select(LEAD_COLUMNS, { count: 'exact' })
 
+    // A do-not-call lead is suppressed from every WORKING queue. It stays
+    // findable in 'all' so a supervisor can audit or reverse it — hiding it
+    // completely would make an accidental DNC unrecoverable.
+    if (queue !== 'all') q = q.eq('do_not_call', false)
+
     if (queue === 'pool') {
       q = q.is('assigned_to', null).eq('status', 'new').order('entered_at', { ascending: false })
     } else if (queue === 'mine') {
@@ -206,7 +197,7 @@ router.get(
     else if (intent) q = q.eq('intent_id', intent)
 
     const source = String(req.query.source ?? '')
-    if (['signup', 'import', 'manual', 'backfill'].includes(source)) q = q.eq('source', source)
+    if ((LEAD_SOURCES as readonly string[]).includes(source)) q = q.eq('source', source)
 
     // Fresh inbound vs backlog. `source` is the honest discriminator: a lead
     // filed by the signup trigger came through the app just now and is what the
@@ -217,44 +208,21 @@ router.get(
     if (age === 'fresh') q = q.eq('source', 'signup')
     else if (age === 'backlog') q = q.in('source', ['import', 'manual', 'backfill'])
 
-    // Plan filtering can't be a column predicate — entitlement is derived from
-    // the payments table (see crm_lead_plans), not stored on the lead. Resolve
-    // the matching user ids first and constrain the query to them. 'free' is
-    // the one an agent actually works: everyone with nothing to lose by being
-    // pitched.
+    // Plan filtering is resolved in Postgres (crm_leads_by_plan): entitlement
+    // is derived from payments, and resolving it here meant embedding every
+    // paying user's uuid in the query URL — fine at three payers, a broken
+    // request at a few thousand.
     const plan = String(req.query.plan ?? '')
     if (['premium', 'vettri', 'paid', 'free'].includes(plan)) {
-      const { data: paidRows } = await supabaseAdmin
-        .from('payments')
-        .select('user_id, notes, created_at')
-        .eq('status', 'paid')
-        .gte('created_at', new Date(Date.now() - 90 * 86_400_000).toISOString())
-      const premiumIds = new Set<string>()
-      const vettriIds = new Set<string>()
-      for (const row of asRows(paidRows)) {
-        const planName = (row.notes as { plan?: string } | null)?.plan
-        const age = Date.now() - Date.parse(String(row.created_at))
-        const days = age / 86_400_000
-        const id = String(row.user_id)
-        if (planName === 'premium_annual' && days <= 90) premiumIds.add(id)
-        if (planName === 'vettri_nichayam' && days <= 60) vettriIds.add(id)
-        if (planName === 'vettri_month' && days <= 30) vettriIds.add(id)
-      }
-      const match =
-        plan === 'premium' ? premiumIds
-        : plan === 'vettri' ? vettriIds
-        : new Set([...premiumIds, ...vettriIds])
-
-      if (plan === 'free') {
-        // Everyone who is NOT in the paid set. Expressed as "no user_id at all
-        // (a cold-list row) OR a user id outside the paid set".
-        const ids = [...match]
-        if (ids.length) q = q.or(`user_id.is.null,user_id.not.in.(${ids.join(',')})`)
-      } else if (match.size === 0) {
+      const { data: planIds, error: planErr } = await req.db!.rpc('crm_leads_by_plan', {
+        p_plan: plan,
+      })
+      if (planErr) return sendDbError(res, planErr)
+      const ids = asRows(planIds).map((r) => String(r.id))
+      if (ids.length === 0) {
         return res.json({ leads: [], total: 0, now: new Date().toISOString() })
-      } else {
-        q = q.in('user_id', [...match])
       }
+      q = q.in('id', ids)
     }
     if (search) {
       // `.or()` takes a PostgREST filter STRING, so the term is interpolated
@@ -264,7 +232,7 @@ router.get(
       // rewrite the filter. Strip exactly those. Dots stay: they are only
       // structural BEFORE the operator, so an email searches correctly, and %
       // stays because it is just an ilike wildcard.
-      const safe = search.replace(/[,()"\\]/g, '').trim()
+      const safe = safeFilterTerm(search)
       const digits = search.replace(/[^0-9]/g, '')
       const terms: string[] = []
       if (safe) terms.push(`full_name.ilike.%${safe}%`, `email.ilike.%${safe}%`)
@@ -441,7 +409,7 @@ router.post(
 
     const { data: lead, error } = await supabaseAdmin
       .from('crm_leads')
-      .select('id, created_at, first_response_at, attempts, assigned_to, status')
+      .select('id, created_at, entered_at, first_response_at, attempts, assigned_to, status')
       .eq('id', req.params.id)
       .maybeSingle()
     if (error) return sendDbError(res, error)
@@ -456,9 +424,9 @@ router.post(
     // Stop the clock on the first contact attempt, whatever the channel.
     if (!lead.first_response_at) {
       patch.first_response_at = now.toISOString()
-      patch.first_response_secs = Math.max(
-        0,
-        Math.round((now.getTime() - new Date(lead.created_at as string).getTime()) / 1000)
+      patch.first_response_secs = firstResponseSecs(
+        lead as { created_at?: string | null; entered_at?: string | null },
+        now.getTime()
       )
     }
     // Dialling an unclaimed lead claims it — the agent is plainly working it,
@@ -493,15 +461,6 @@ router.post(
 // The agent's outcome: which intent the lead expressed, free notes, an optional
 // call duration and a follow-up time. The intent's own `outcome` drives the new
 // lead status unless the agent picked one explicitly.
-const OUTCOME_TO_STATUS: Record<string, LeadStatus> = {
-  interested: 'in_progress',
-  callback: 'follow_up',
-  converted: 'converted',
-  not_interested: 'not_interested',
-  unreachable: 'unreachable',
-  neutral: 'in_progress',
-}
-
 router.post(
   '/leads/:id/log',
   asyncH(async (req: AuthedRequest, res) => {
@@ -522,7 +481,7 @@ router.post(
 
     const { data: lead, error } = await supabaseAdmin
       .from('crm_leads')
-      .select('id, created_at, first_response_at, assigned_to')
+      .select('id, created_at, entered_at, first_response_at, assigned_to, notes')
       .eq('id', req.params.id)
       .maybeSingle()
     if (error) return sendDbError(res, error)
@@ -555,14 +514,18 @@ router.post(
     }
     if (status) patch.status = status
     if (intent) patch.intent_id = intent.id
-    if (notes) patch.notes = notes
+    // APPEND, never overwrite: the lead note is a running summary several
+    // agents contribute to (the per-call text is also kept verbatim on the
+    // interaction row).
+    if (notes) patch.notes = appendNote(cleanText(lead.notes, 4000), notes)
+
     // Logging an outcome is a contact too — if the agent dialled from their own
     // handset rather than the link, this still stops the clock.
     if (!lead.first_response_at) {
       patch.first_response_at = now.toISOString()
-      patch.first_response_secs = Math.max(
-        0,
-        Math.round((now.getTime() - new Date(lead.created_at as string).getTime()) / 1000)
+      patch.first_response_secs = firstResponseSecs(
+        lead as { created_at?: string | null; entered_at?: string | null },
+        now.getTime()
       )
     }
     if (!lead.assigned_to) {
@@ -592,6 +555,79 @@ router.post(
 
     const [decorated] = await decorate([asRow(updated)])
     res.json({ lead: decorated })
+  })
+)
+
+// ─── POST /api/crm/leads/:id/dnc ─────────────────────────────────────────────
+// Mark (or clear) do-not-call. Separate from status on purpose: a status is
+// pipeline state the next agent may legitimately change, whereas "they asked us
+// to stop" has to outlive every later edit.
+router.post(
+  '/leads/:id/dnc',
+  asyncH(async (req: AuthedRequest, res) => {
+    const on = req.body?.on !== false
+    const reason = cleanText(req.body?.reason, 200)
+
+    const { data, error } = await supabaseAdmin
+      .from('crm_leads')
+      .update({
+        do_not_call: on,
+        dnc_reason: on ? reason : null,
+        dnc_at: on ? new Date().toISOString() : null,
+        ...(on ? { status: 'invalid', next_follow_up_at: null } : {}),
+      })
+      .eq('id', req.params.id)
+      .select(LEAD_COLUMNS)
+      .maybeSingle()
+    if (error) return sendDbError(res, error)
+    if (!data) return res.status(404).json({ error: 'Lead not found.' })
+
+    await supabaseAdmin.from('crm_interactions').insert({
+      lead_id: req.params.id,
+      agent_id: req.userId,
+      kind: 'system',
+      channel: 'system',
+      notes: on ? `Marked do-not-call${reason ? `: ${reason}` : ''}` : 'Do-not-call lifted',
+    })
+
+    const [decorated] = await decorate([asRow(data)])
+    res.json({ lead: decorated })
+  })
+)
+
+// ─── GET /api/crm/leads/export ───────────────────────────────────────────────
+// The whole (filtered) book as CSV, for a supervisor who needs it outside the
+// app. Supervisors only — this hands over every contact detail at once, which
+// is a different act from an agent opening one lead to call it.
+router.get(
+  '/export',
+  asyncH(async (req: AuthedRequest, res) => {
+    if (!isSupervisor(req)) return res.status(403).json({ error: 'Supervisor access required.' })
+
+    const { data, error } = await supabaseAdmin
+      .from('crm_leads')
+      .select(LEAD_COLUMNS)
+      .order('entered_at', { ascending: false })
+      .limit(5000)
+    if (error) return sendDbError(res, error)
+
+    const rows = await decorate(asRows(data))
+    const cols = [
+      'full_name', 'phone', 'whatsapp', 'email', 'city', 'target_group',
+      'source', 'source_detail', 'status', 'intent_label', 'assigned_name',
+      'attempts', 'do_not_call', 'first_response_secs', 'next_follow_up_at',
+      'created_at', 'entered_at', 'last_contacted_at',
+    ]
+    // Quote every field: names contain commas, notes contain quotes, and a
+    // phone number must not be re-interpreted by a spreadsheet.
+    const csv = [
+      cols.join(','),
+      ...rows.map((r) => cols.map((c) => csvCell(r[c])).join(',')),
+    ].join('\n')
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', `attachment; filename="crm-leads-${istDate(Date.now())}.csv"`)
+    res.send(csv)
   })
 )
 
@@ -835,17 +871,31 @@ admin.post(
       return res.json({ inserted: 0, updated: 0, invalid, duplicateInFile })
     }
 
-    // Which of these numbers we already hold, so the response can say how many
-    // were genuinely new rather than refreshed.
-    const { data: existing } = await supabaseAdmin
-      .from('crm_leads')
-      .select('phone')
-      .in('phone', [...seen])
-    const already = new Set((existing ?? []).map((r) => r.phone as string))
+    // Which of these we already hold. Phone is the primary key of a person here,
+    // but a bought list routinely carries the same person on a second number —
+    // so an email match counts as a duplicate too, otherwise the same student
+    // ends up in the queue twice and gets called by two agents.
+    const emails = [...new Set(valid.map((v) => v.email).filter(Boolean))] as string[]
+    const [byPhone, byEmail] = await Promise.all([
+      supabaseAdmin.from('crm_leads').select('phone').in('phone', [...seen]),
+      emails.length
+        ? supabaseAdmin.from('crm_leads').select('email').in('email', emails)
+        : Promise.resolve({ data: null }),
+    ])
+    const already = new Set(asRows(byPhone.data).map((r) => String(r.phone)))
+    const knownEmails = new Set(
+      asRows(byEmail.data)
+        .map((r) => String(r.email ?? '').toLowerCase())
+        .filter(Boolean)
+    )
 
     // Never overwrite the identity of a lead that is an app account: an import
     // may only fill gaps there. Split the batch accordingly.
-    const fresh = valid.filter((v) => !already.has(v.phone as string))
+    const fresh = valid.filter(
+      (v) =>
+        !already.has(v.phone as string) &&
+        !(v.email && knownEmails.has(String(v.email).toLowerCase()))
+    )
     const { error } = fresh.length
       ? await supabaseAdmin.from('crm_leads').insert(fresh)
       : { error: null }
@@ -863,7 +913,9 @@ admin.post(
 
     res.json({
       inserted: fresh.length,
-      updated: already.size,
+      // Everything recognised as somebody we already hold — by number or by
+      // email — so the console can report it honestly rather than as "new".
+      updated: valid.length - fresh.length,
       invalid,
       duplicateInFile,
     })

@@ -7,6 +7,8 @@ import {
   MapPin,
   Pencil,
   Phone,
+  PhoneOff,
+  Timer,
   Undo2,
   UserPlus,
   X,
@@ -81,6 +83,8 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
   const [status, setStatus] = useState<LeadStatus | ''>('')
   const [notes, setNotes] = useState('')
   const [followUp, setFollowUp] = useState('')
+  // Call length, in whole minutes — nobody types seconds off a call timer.
+  const [durationMin, setDurationMin] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -139,16 +143,29 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
       return
     }
     setSaving(true)
+    const mins = Number(durationMin)
     const updated = await logOutcome(lead.id, {
       intentId,
       status: status || undefined,
       notes: notes.trim() || undefined,
+      durationSecs: Number.isFinite(mins) && mins > 0 ? Math.round(mins * 60) : null,
       nextFollowUpAt: followUp ? new Date(followUp).toISOString() : null,
     })
     setSaving(false)
     if (!updated) return
     toast.success('Call logged.')
     onClose()
+  }
+
+  const setDnc = async (on: boolean, reason?: string) => {
+    if (!lead) return
+    try {
+      const { lead: updated } = await api.crm.setDnc(lead.id, on, reason || undefined)
+      setLead(updated)
+      toast.success(on ? 'Marked do-not-call.' : 'Do-not-call lifted.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not update this lead.')
+    }
   }
 
   const mine = lead?.assigned_to === agentId
@@ -288,6 +305,40 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
                 )}
               </div>
 
+              {/* Do-not-call. Kept apart from the status dropdown on purpose: a
+                  status is pipeline state the next agent may legitimately
+                  change, whereas "they asked us to stop" has to outlive every
+                  later edit. */}
+              <div className="mt-3">
+                {lead.do_not_call ? (
+                  <div className="card flex flex-wrap items-center gap-2 border-error/30 bg-errorsoft/40 p-3">
+                    <PhoneOff size={15} className="text-error" />
+                    <p className="min-w-0 flex-1 font-body text-xs text-ink">
+                      <span className="font-heading font-semibold text-error">Do not call.</span>{' '}
+                      {lead.dnc_reason || 'They asked not to be contacted.'}
+                    </p>
+                    <button
+                      onClick={() => void setDnc(false)}
+                      className="btn btn-sm btn-ghost px-3 py-1.5 text-2xs"
+                    >
+                      Lift
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      const reason = window.prompt(
+                        'Mark this lead do-not-call. What did they say? (optional)'
+                      )
+                      if (reason !== null) void setDnc(true, reason)
+                    }}
+                    className="btn btn-sm btn-ghost text-error"
+                  >
+                    <PhoneOff size={14} /> Do not call
+                  </button>
+                )}
+              </div>
+
               {/* ─── Log the call ──────────────────────────────────────── */}
               <section className="mt-5">
                 <h3 className="font-heading text-xs font-semibold uppercase tracking-[0.14em] text-ink2">
@@ -332,6 +383,23 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
                     maxLength={2000}
                     placeholder="Anything the next call should know — budget, exam target, when they're free…"
                     className="input-soft mt-1.5 resize-y text-sm"
+                  />
+                </label>
+
+                <label className="mt-4 block">
+                  <span className="font-heading text-xs font-semibold text-ink2">
+                    <Timer size={12} className="mr-1 inline" />
+                    How long was the call? (minutes, optional)
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={240}
+                    inputMode="numeric"
+                    value={durationMin}
+                    onChange={(e) => setDurationMin(e.target.value)}
+                    placeholder="e.g. 4"
+                    className="input-soft mt-1.5 text-sm"
                   />
                 </label>
 

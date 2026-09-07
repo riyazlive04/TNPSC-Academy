@@ -8,7 +8,9 @@ import type {
   CrmTodayStats,
   Lead,
   LeadStatus,
+  SlaThresholds,
 } from '../lib/crm'
+import { DEFAULT_SLA, slaFromMinutes } from '../lib/crm'
 import { track } from '../lib/tracking'
 import { toast } from './toastStore'
 
@@ -76,6 +78,8 @@ interface CrmState {
   intents: CrmIntent[]
   metrics: CrmPipelineMetrics
   today: CrmTodayStats | null
+  /** Response-time thresholds, superadmin-configured. */
+  sla: SlaThresholds
 
   /** serverNow − clientNow at the last response. See nowMs(). */
   skewMs: number
@@ -144,7 +148,16 @@ function applyLead(queues: Record<CrmQueue, QueueState>, lead: Lead, agentId: st
     if (key === 'followups' && !lead.next_follow_up_at) {
       leads = leads.filter((l) => l.id !== lead.id)
     }
-    next[key] = leads === q.leads ? q : { ...q, leads, total: q.total + (leads.length - q.leads.length) }
+    if (leads === q.leads) {
+      next[key] = q
+      continue
+    }
+    // The queue's `total` is the server's count of the WHOLE queue, not of the
+    // page on screen — so a lead leaving this page has to decrement it, or the
+    // pager keeps offering a page that no longer exists. Never let it fall
+    // below what is actually rendered.
+    const delta = leads.length - q.leads.length
+    next[key] = { ...q, leads, total: Math.max(leads.length, q.total + delta) }
   }
   return next
 }
@@ -158,6 +171,7 @@ export const useCrmStore = create<CrmState>((set, get) => ({
   intents: [],
   metrics: {},
   today: null,
+  sla: DEFAULT_SLA,
   skewMs: 0,
   queues: { pool: EMPTY_QUEUE, mine: EMPTY_QUEUE, followups: EMPTY_QUEUE, all: EMPTY_QUEUE },
   search: '',
@@ -187,6 +201,7 @@ export const useCrmStore = create<CrmState>((set, get) => ({
         intents: data.intents,
         metrics: data.metrics,
         today: data.today,
+        sla: slaFromMinutes(data.sla),
         skewMs: Date.parse(data.now) - Date.now(),
         cursor: data.now,
       })
@@ -262,6 +277,7 @@ export const useCrmStore = create<CrmState>((set, get) => ({
         metrics: data.metrics,
         today: data.today,
         intents: data.intents,
+        sla: slaFromMinutes(data.sla),
         skewMs: Date.parse(data.now) - Date.now(),
       })
     } catch {

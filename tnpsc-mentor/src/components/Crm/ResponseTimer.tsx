@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Clock, CheckCircle2, Hourglass } from 'lucide-react'
-import { nowMs } from '../../store/crmStore'
+import { nowMs, useCrmStore } from '../../store/crmStore'
 import { SLA_CLASS, formatDuration, slaState, type Lead } from '../../lib/crm'
 
 /**
@@ -53,10 +53,11 @@ interface ResponseTimerProps {
  * Call/WhatsApp/Email click lands (see crmStore.logClick).
  */
 export default function ResponseTimer({ lead, variant = 'chip' }: ResponseTimerProps) {
-  const sla = slaState(lead, nowMs())
+  const thresholds = useCrmStore((s) => s.sla)
+  const sla = slaState(lead, nowMs(), thresholds)
   // Only leads still on the clock need to re-render every second.
   const now = useNow(sla.running)
-  const live = slaState(lead, now)
+  const live = slaState(lead, now, thresholds)
 
   const backlog = live.level === 'backlog'
   const Icon = !live.running ? CheckCircle2 : backlog ? Hourglass : Clock

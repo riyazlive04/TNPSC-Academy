@@ -213,8 +213,17 @@ update public.crm_leads
  where entered_at > created_at + interval '1 second'
    and entered_at >= now() - interval '10 minutes';
 
+-- Do-not-call. A person who asks not to be contacted must be suppressed from
+-- every working queue permanently — a status can be changed back by the next
+-- agent who touches the row, which is not what a DNC request means. Kept as its
+-- own column so it survives any pipeline movement.
+alter table public.crm_leads
+  add column if not exists do_not_call boolean not null default false;
+alter table public.crm_leads add column if not exists dnc_reason text;
+alter table public.crm_leads add column if not exists dnc_at timestamptz;
+
 create index if not exists idx_crm_leads_pool
-  on public.crm_leads (entered_at desc) where assigned_to is null;
+  on public.crm_leads (entered_at desc) where assigned_to is null and not do_not_call;
 create index if not exists idx_crm_leads_agent
   on public.crm_leads (assigned_to, status, created_at desc);
 create index if not exists idx_crm_leads_followup
@@ -586,6 +595,47 @@ as $$
 $$;
 
 grant execute on function public.crm_lead_plans(uuid[]) to authenticated;
+
+-- ─── 8c. Plan-filtered lead ids ─────────────────────────────────────────────
+-- The route used to resolve "who has paid" in Node and then embed every one of
+-- those uuids in a PostgREST `not.in.(...)` URL. Correct at three payers, and a
+-- broken query at a few thousand once the URL outgrows its limit. Doing the set
+-- work in Postgres keeps the request a constant size whatever the customer base.
+--
+-- Returns the lead ids matching p_plan: 'free' | 'paid' | 'premium' | 'vettri'.
+create or replace function public.crm_leads_by_plan(p_plan text)
+returns table (id uuid)
+language sql
+security definer
+set search_path = public
+as $$
+  with paid as (
+    select p.user_id,
+           bool_or(p.notes->>'plan' = 'premium_annual'
+                   and p.created_at >= now() - interval '90 days') as premium,
+           bool_or((p.notes->>'plan' = 'vettri_nichayam'
+                    and p.created_at >= now() - interval '60 days')
+                or (p.notes->>'plan' = 'vettri_month'
+                    and p.created_at >= now() - interval '30 days')) as vettri
+      from public.payments p
+     where p.status = 'paid'
+       and p.created_at >= now() - interval '90 days'
+     group by p.user_id
+  )
+  select l.id
+    from public.crm_leads l
+    left join paid on paid.user_id = l.user_id
+   where public.is_crm_staff()
+     and case p_plan
+           when 'premium' then coalesce(paid.premium, false)
+           when 'vettri'  then coalesce(paid.vettri, false)
+           when 'paid'    then coalesce(paid.premium, false) or coalesce(paid.vettri, false)
+           when 'free'    then not (coalesce(paid.premium, false) or coalesce(paid.vettri, false))
+           else true
+         end;
+$$;
+
+grant execute on function public.crm_leads_by_plan(text) to authenticated;
 
 -- ─── 9. Take back the stack's blanket grants ────────────────────────────────
 -- Defence in depth behind RLS, not instead of it. The Express server reaches

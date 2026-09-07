@@ -1,4 +1,5 @@
 import { Router, type Request, type Response } from 'express'
+import { notifyNewLead } from '../lib/crmAlerts.js'
 import { rateLimit } from 'express-rate-limit'
 import { supabaseAuthClient, supabaseAdmin } from '../supabase.js'
 import { asyncH } from '../util.js'
@@ -525,6 +526,11 @@ router.post(
       status: 200,
       detail: { platform: clientPlatform(req) },
     })
+
+    // Tell the telecallers a lead is waiting. Deliberately not awaited: the
+    // desk's own popup only fires on an open tab, and this must never be able
+    // to slow down or fail a registration.
+    notifyNewLead(fullName ?? null, targetGroup ?? null)
 
     // Email-confirmation projects return no session on signup — surface that.
     if (!data.session) {
