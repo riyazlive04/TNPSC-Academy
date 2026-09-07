@@ -3,6 +3,7 @@ import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
 import { useCrmStore } from '../../store/crmStore'
 import {
   INTENT_CLASS,
+  PLAN_CLASS,
   SOURCE_LABEL,
   STATUS_CLASS,
   STATUS_LABEL,
@@ -24,6 +25,14 @@ const STATUSES: LeadStatus[] = [
 ]
 
 const SOURCES: LeadSource[] = ['signup', 'import', 'manual', 'backfill']
+
+/** Entitlement filters. Derived from payments server-side, not a lead column. */
+const PLAN_FILTERS = [
+  { id: 'free', label: 'Not paid yet', tone: 'bg-tint text-ink2' },
+  { id: 'paid', label: 'Any paid plan', tone: 'bg-goldsoft text-gold' },
+  { id: 'premium', label: 'Premium', tone: 'bg-goldsoft text-gold' },
+  { id: 'vettri', label: 'Vettri', tone: 'bg-tint-violet text-primary' },
+]
 
 interface QueueFiltersProps {
   queue: CrmQueue
@@ -48,9 +57,10 @@ export default function QueueFilters({ queue }: QueueFiltersProps) {
   const clearFilters = useCrmStore((s) => s.clearFilters)
   const [open, setOpen] = useState(false)
 
-  const active = [filters.status, filters.intent, filters.source].filter(Boolean).length
+  const active = [filters.status, filters.intent, filters.source, filters.plan].filter(Boolean)
+    .length
 
-  const toggle = (key: 'status' | 'intent' | 'source', value: string) =>
+  const toggle = (key: 'status' | 'intent' | 'source' | 'plan', value: string) =>
     setFilter({ [key]: filters[key] === value ? null : value }, queue)
 
   return (
@@ -103,6 +113,13 @@ export default function QueueFilters({ queue }: QueueFiltersProps) {
                 onClear={() => setFilter({ intent: null }, queue)}
               />
             )}
+            {filters.plan && (
+              <Pill
+                label={PLAN_FILTERS.find((p) => p.id === filters.plan)?.label ?? 'Plan'}
+                className={PLAN_CLASS[filters.plan === 'free' ? 'free' : 'premium']}
+                onClear={() => setFilter({ plan: null }, queue)}
+              />
+            )}
             {filters.source && (
               <Pill
                 label={SOURCE_LABEL[filters.source as LeadSource]}
@@ -137,6 +154,20 @@ export default function QueueFilters({ queue }: QueueFiltersProps) {
                 on={filters.intent === i.id}
                 tone={INTENT_CLASS[i.color]}
                 onClick={() => toggle('intent', i.id)}
+              />
+            ))}
+          </Group>
+
+          {/* Already paid? An agent working a sales list wants the free ones;
+              a renewal push wants the opposite. */}
+          <Group title="Plan">
+            {PLAN_FILTERS.map((p) => (
+              <Chip
+                key={p.id}
+                label={p.label}
+                on={filters.plan === p.id}
+                tone={p.tone}
+                onClick={() => toggle('plan', p.id)}
               />
             ))}
           </Group>

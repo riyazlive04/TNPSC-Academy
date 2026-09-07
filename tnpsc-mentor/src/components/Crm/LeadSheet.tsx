@@ -21,6 +21,9 @@ import { toast } from '../../store/toastStore'
 import {
   CHANNEL_ICON,
   INTENT_CLASS,
+  PLAN_CLASS,
+  PLAN_LABEL,
+  leadPlan,
   SOURCE_LABEL,
   STATUS_CLASS,
   STATUS_LABEL,
@@ -192,6 +195,14 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
                     <span className="rounded-pill bg-tint px-2 py-0.5 font-heading text-2xs font-medium text-ink2">
                       {SOURCE_LABEL[lead.source]}
                       {lead.source_detail ? ` · ${lead.source_detail}` : ''}
+                    </span>
+                    {/* What they have already bought, with the expiry — the
+                        difference between a renewal call and a sales pitch. */}
+                    <span
+                      className={`rounded-pill px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${PLAN_CLASS[leadPlan(lead)]}`}
+                    >
+                      {PLAN_LABEL[leadPlan(lead)]}
+                      {planExpiry(lead) ? ` · till ${planExpiry(lead)}` : ''}
                     </span>
                     <span className="font-body text-2xs text-ink2">
                       Arrived {relativeTime(lead.created_at, nowMs())}
@@ -410,6 +421,19 @@ export default function LeadSheet({ leadId, onClose }: LeadSheetProps) {
       </div>
     </div>
   )
+}
+
+/** The later of the two plan expiries, as a short date. Null when free. */
+function planExpiry(lead: Lead): string | null {
+  const dates = [lead.premium_until, lead.vettri_until]
+    .filter(Boolean)
+    .map((d) => Date.parse(d as string))
+    .filter((n) => Number.isFinite(n))
+  if (dates.length === 0) return null
+  return new Date(Math.max(...dates)).toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+  })
 }
 
 function ContactLine({

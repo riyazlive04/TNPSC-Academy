@@ -4,6 +4,9 @@ import ResponseTimer from './ResponseTimer'
 import { nowMs, useCrmStore } from '../../store/crmStore'
 import {
   INTENT_CLASS,
+  PLAN_CLASS,
+  PLAN_LABEL,
+  leadPlan,
   SOURCE_LABEL,
   STATUS_CLASS,
   STATUS_LABEL,
@@ -34,6 +37,7 @@ export default function LeadCard({ lead, claimable, showDue, onOpen }: LeadCardP
 
   const name = lead.full_name?.trim() || formatPhone(lead.phone) || 'Unnamed lead'
   const mine = lead.assigned_to === agentId
+  const plan = leadPlan(lead)
 
   return (
     <article className="card interactive p-4">
@@ -45,6 +49,16 @@ export default function LeadCard({ lead, claimable, showDue, onOpen }: LeadCardP
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="truncate font-display text-base font-semibold text-ink">{name}</h3>
+            {/* Already a customer? The single most important thing to know
+                before dialling — pitching premium to somebody who bought it
+                last week is the fastest way to lose them. */}
+            {plan !== 'free' && (
+              <span
+                className={`rounded-pill px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${PLAN_CLASS[plan]}`}
+              >
+                {PLAN_LABEL[plan]}
+              </span>
+            )}
             <ResponseTimer lead={lead} />
           </div>
 

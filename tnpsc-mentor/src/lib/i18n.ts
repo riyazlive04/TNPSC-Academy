@@ -2076,6 +2076,8 @@ const STRINGS = {
   // tool and ships in English only; this label sits in the bilingual console.
   crmTab: { en: 'CRM / Leads', ta: 'CRM / லீட்கள்' },
   leadDesk: { en: 'Lead desk', ta: 'லீட் டெஸ்க்' },
+  studentApp: { en: 'Student', ta: 'மாணவர்' },
+  workspace: { en: 'Workspace', ta: 'பணியிடம்' },
   caMagazineNoItems: {
     en: 'No items in this issue yet.',
     ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',

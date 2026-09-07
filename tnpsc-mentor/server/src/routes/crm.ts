@@ -92,13 +92,28 @@ async function decorate(rows: Row[]): Promise<Row[]> {
   const agentById = new Map(agents.map((a) => [String(a.id), a]))
   const intentById = new Map(intents.map((i) => [String(i.id), i]))
 
+  // What each lead has already paid for. Only leads that ARE accounts can have
+  // a plan; a cold-list row has no user_id and stays 'free'. One RPC for the
+  // whole page rather than a query per lead.
+  const userIds = [...new Set(rows.map((r) => r.user_id).filter(Boolean))] as string[]
+  const planByUser = new Map<string, Row>()
+  if (userIds.length) {
+    const { data } = await supabaseAdmin.rpc('crm_lead_plans', { p_ids: userIds })
+    for (const row of asRows(data)) planByUser.set(String(row.user_id), row)
+  }
+
   return rows.map((r) => {
     const intent = intentById.get(String(r.intent_id))
+    const plan = r.user_id ? planByUser.get(String(r.user_id)) : undefined
     return {
       ...r,
       assigned_name: (agentById.get(String(r.assigned_to))?.full_name as string | null) ?? null,
       intent_label: (intent?.label as string | null) ?? null,
       intent_color: (intent?.color as string | null) ?? null,
+      premium: Boolean(plan?.premium),
+      premium_until: (plan?.premium_until as string | null) ?? null,
+      vettri: Boolean(plan?.vettri),
+      vettri_until: (plan?.vettri_until as string | null) ?? null,
     }
   })
 }
@@ -192,6 +207,46 @@ router.get(
 
     const source = String(req.query.source ?? '')
     if (['signup', 'import', 'manual', 'backfill'].includes(source)) q = q.eq('source', source)
+
+    // Plan filtering can't be a column predicate — entitlement is derived from
+    // the payments table (see crm_lead_plans), not stored on the lead. Resolve
+    // the matching user ids first and constrain the query to them. 'free' is
+    // the one an agent actually works: everyone with nothing to lose by being
+    // pitched.
+    const plan = String(req.query.plan ?? '')
+    if (['premium', 'vettri', 'paid', 'free'].includes(plan)) {
+      const { data: paidRows } = await supabaseAdmin
+        .from('payments')
+        .select('user_id, notes, created_at')
+        .eq('status', 'paid')
+        .gte('created_at', new Date(Date.now() - 90 * 86_400_000).toISOString())
+      const premiumIds = new Set<string>()
+      const vettriIds = new Set<string>()
+      for (const row of asRows(paidRows)) {
+        const planName = (row.notes as { plan?: string } | null)?.plan
+        const age = Date.now() - Date.parse(String(row.created_at))
+        const days = age / 86_400_000
+        const id = String(row.user_id)
+        if (planName === 'premium_annual' && days <= 90) premiumIds.add(id)
+        if (planName === 'vettri_nichayam' && days <= 60) vettriIds.add(id)
+        if (planName === 'vettri_month' && days <= 30) vettriIds.add(id)
+      }
+      const match =
+        plan === 'premium' ? premiumIds
+        : plan === 'vettri' ? vettriIds
+        : new Set([...premiumIds, ...vettriIds])
+
+      if (plan === 'free') {
+        // Everyone who is NOT in the paid set. Expressed as "no user_id at all
+        // (a cold-list row) OR a user id outside the paid set".
+        const ids = [...match]
+        if (ids.length) q = q.or(`user_id.is.null,user_id.not.in.(${ids.join(',')})`)
+      } else if (match.size === 0) {
+        return res.json({ leads: [], total: 0, now: new Date().toISOString() })
+      } else {
+        q = q.in('user_id', [...match])
+      }
+    }
     if (search) {
       // `.or()` takes a PostgREST filter STRING, so the term is interpolated
       // into query syntax rather than bound as a parameter. A comma would end

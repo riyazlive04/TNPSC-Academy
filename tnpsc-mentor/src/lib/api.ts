@@ -2064,6 +2064,8 @@ export const api = {
       /** An intent id, or 'none' for leads with no answer recorded yet. */
       intent?: string
       source?: string
+      /** 'free' | 'paid' | 'premium' | 'vettri' — derived from payments. */
+      plan?: string
       limit?: number
       offset?: number
     } = {}): Promise<{ leads: Lead[]; total: number; now: string }> {
@@ -2074,6 +2076,7 @@ export const api = {
           status: params.status || undefined,
           intent: params.intent || undefined,
           source: params.source || undefined,
+          plan: params.plan || undefined,
           limit: params.limit,
           offset: params.offset,
         },

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   BellOff,
   BellRing,
-  GraduationCap,
   Clock,
   Inbox,
   LogOut,
@@ -18,6 +17,7 @@ import LeadCard from '../components/Crm/LeadCard'
 import LeadSheet from '../components/Crm/LeadSheet'
 import NewLeadPopup from '../components/Crm/NewLeadPopup'
 import QueueFilters from '../components/Crm/QueueFilters'
+import WorkspaceSwitch from '../components/Layout/WorkspaceSwitch'
 import Spinner from '../components/UI/Spinner'
 import ErrorState from '../components/UI/ErrorState'
 import { Skeleton } from '../components/UI/Skeleton'
@@ -161,17 +161,8 @@ export default function CrmPage() {
               {supervisor && ' · supervisor view'}
             </p>
           </div>
-          {/* The desk is not a cage: a telecaller can open the student app to
-              learn the product or walk a lead through it, and come back via
-              the Lead desk button in that header. */}
-          <button
-            onClick={() => navigate('/test-arena')}
-            className="icon-btn h-9 w-9"
-            aria-label="Open the student app"
-            title="Open the student app"
-          >
-            <GraduationCap size={17} />
-          </button>
+          {/* Same control, same place, as the student shell's header. */}
+          <WorkspaceSwitch active="crm" />
           <button
             onClick={() => setSound(!sound)}
             className="icon-btn h-9 w-9"

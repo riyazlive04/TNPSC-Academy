@@ -513,6 +513,61 @@ $$;
 
 grant execute on function public.crm_pipeline_metrics() to authenticated;
 
+-- ─── 9. What a lead has already paid for ────────────────────────────────────
+-- A telecaller must never pitch premium to somebody who already bought it.
+-- 682 backfilled leads include existing paying customers, so the desk shows
+-- each lead's plan beside their name.
+--
+-- The plan windows below are a DELIBERATE MIRROR of superadmin_list_users
+-- (supabase/superadmin_users_v2.sql) and bundleAccess (server/src/lib/premium.ts):
+-- premium_annual = 90 days, vettri_nichayam = 60, vettri_month = 30. If those
+-- windows ever change, this function has to change with them — there is no
+-- shared definition to inherit from, which is exactly why this note is here.
+create or replace function public.crm_lead_plans(p_ids uuid[])
+returns table (
+  user_id       uuid,
+  premium       boolean,
+  premium_until timestamptz,
+  vettri        boolean,
+  vettri_until  timestamptz
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    u.id,
+    pay.latest_paid is not null,
+    (pay.latest_paid + interval '90 days'),
+    (vet.vettri_end is not null),
+    vet.vettri_end
+  from unnest(p_ids) as u(id)
+  left join lateral (
+    select max(pm.created_at) as latest_paid
+    from public.payments pm
+    where pm.user_id = u.id
+      and pm.status = 'paid'
+      and pm.notes->>'plan' = 'premium_annual'
+      and pm.created_at >= now() - interval '90 days'
+  ) pay on true
+  left join lateral (
+    select max(pm.created_at + case pm.notes->>'plan'
+             when 'vettri_nichayam' then interval '60 days'
+             else interval '30 days'
+           end) as vettri_end
+    from public.payments pm
+    where pm.user_id = u.id
+      and pm.status = 'paid'
+      and (
+        (pm.notes->>'plan' = 'vettri_nichayam' and pm.created_at >= now() - interval '60 days')
+        or (pm.notes->>'plan' = 'vettri_month' and pm.created_at >= now() - interval '30 days')
+      )
+  ) vet on true
+  where public.is_crm_staff();
+$$;
+
+grant execute on function public.crm_lead_plans(uuid[]) to authenticated;
+
 -- ─── 9. Take back the stack's blanket grants ────────────────────────────────
 -- Defence in depth behind RLS, not instead of it. The Express server reaches
 -- these tables as `service_role` (which both keeps its grants and bypasses RLS),

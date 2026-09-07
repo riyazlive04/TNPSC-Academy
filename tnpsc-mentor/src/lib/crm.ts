@@ -71,6 +71,36 @@ export interface Lead {
   assigned_name?: string | null
   intent_label?: string | null
   intent_color?: IntentColor | null
+  /** What this lead has ALREADY paid for. Only leads that are app accounts can
+   *  carry a plan; a cold-list row has no account and reads as free. */
+  premium?: boolean
+  premium_until?: string | null
+  vettri?: boolean
+  vettri_until?: string | null
+}
+
+/** The one-word answer to "have they already bought something?" */
+export type LeadPlan = 'premium' | 'vettri' | 'both' | 'free'
+
+export function leadPlan(lead: Pick<Lead, 'premium' | 'vettri'>): LeadPlan {
+  if (lead.premium && lead.vettri) return 'both'
+  if (lead.premium) return 'premium'
+  if (lead.vettri) return 'vettri'
+  return 'free'
+}
+
+export const PLAN_LABEL: Record<LeadPlan, string> = {
+  premium: 'Premium',
+  vettri: 'Vettri',
+  both: 'Premium + Vettri',
+  free: 'Free',
+}
+
+export const PLAN_CLASS: Record<LeadPlan, string> = {
+  premium: 'bg-goldsoft text-gold',
+  vettri: 'bg-tint-violet text-primary',
+  both: 'bg-goldsoft text-gold',
+  free: 'bg-tint text-ink2',
 }
 
 export interface LeadInteraction {

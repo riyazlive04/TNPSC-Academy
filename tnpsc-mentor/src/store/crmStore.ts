@@ -44,9 +44,11 @@ export interface CrmFilters {
   status: LeadStatus | null
   intent: string | null
   source: string | null
+  /** What they have already bought. 'free' is the working calling list. */
+  plan: string | null
 }
 
-const NO_FILTERS: CrmFilters = { status: null, intent: null, source: null }
+const NO_FILTERS: CrmFilters = { status: null, intent: null, source: null, plan: null }
 
 interface QueueState {
   leads: Lead[]
@@ -192,13 +194,14 @@ export const useCrmStore = create<CrmState>((set, get) => ({
     const offset = opts.append ? current.leads.length : 0
     set((s) => ({ queues: { ...s.queues, [queue]: { ...current, loading: true } } }))
     try {
-      const { status, intent, source } = get().filters
+      const { status, intent, source, plan } = get().filters
       const { leads, total, now } = await api.crm.leads({
         queue,
         search: queue === 'all' ? get().search : undefined,
         status: status ?? undefined,
         intent: intent ?? undefined,
         source: source ?? undefined,
+        plan: plan ?? undefined,
         offset,
         limit: 50,
       })

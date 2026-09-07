@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins, Headphones } from 'lucide-react'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
+import WorkspaceSwitch from './WorkspaceSwitch'
 import { useCreditsStore } from '../../store/creditsStore'
 import { useHasMaterials } from '../../hooks/useHasMaterials'
 import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
@@ -292,21 +293,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   </span>
                 </button>
               )}
-              {/* A telecaller works the desk but may also use the student app,
-                  so the way back has to be visible from inside it. Shown to
-                  every CRM-staff account; a superadmin already has the console
-                  button beside this one. */}
-              {isCrmStaff && (
-                <button
-                  onClick={() => navigate('/crm')}
-                  title={t('leadDesk')}
-                  aria-label={t('leadDesk')}
-                  className="press inline-flex items-center gap-1 rounded-lg bg-tint-violet px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-primary focus-ring"
-                >
-                  <Headphones size={13} />
-                  <span className="hidden sm:inline">{t('leadDesk')}</span>
-                </button>
-              )}
+              {/* CRM staff hold one account with two jobs; the switch shows
+                  both and which one they're in. Students never see it. */}
+              {isCrmStaff && <WorkspaceSwitch active="student" />}
               {isSuperAdmin ? (
                 <button
                   onClick={() => navigate('/superadmin')}

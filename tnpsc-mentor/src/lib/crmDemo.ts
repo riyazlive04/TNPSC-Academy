@@ -75,6 +75,10 @@ function lead(p: Partial<Lead> & { full_name: string; phone: string }): Lead {
     assigned_name: null,
     intent_label: null,
     intent_color: null,
+    premium: false,
+    premium_until: null,
+    vettri: false,
+    vettri_until: null,
     ...p,
   } as Lead
 }
@@ -101,6 +105,9 @@ const leads: Lead[] = [
     created_at: ago(mins(9)),
   }),
   lead({
+    // Already paying — the badge exists so nobody pitches her premium.
+    premium: true,
+    premium_until: soon(mins(60 * 24 * 62)),
     full_name: 'Priya Dharshini',
     phone: '9600778899',
     email: 'priya.d@example.com',
@@ -128,6 +135,8 @@ const leads: Lead[] = [
 
   // Already being worked by the preview agent — these show the frozen timer.
   lead({
+    vettri: true,
+    vettri_until: soon(mins(60 * 24 * 26)),
     full_name: 'Suresh Babu',
     phone: '9498221100',
     email: 'suresh.b@example.com',
@@ -183,6 +192,10 @@ const leads: Lead[] = [
     created_at: ago(mins(2000)),
   }),
   lead({
+    premium: true,
+    premium_until: soon(mins(60 * 24 * 40)),
+    vettri: true,
+    vettri_until: soon(mins(60 * 24 * 15)),
     full_name: 'Anitha Selvi',
     phone: '9791003322',
     email: 'anitha@example.com',
@@ -622,6 +635,10 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       if (q.source) filtered = filtered.filter((l) => l.source === q.source)
       if (q.intent === 'none') filtered = filtered.filter((l) => !l.intent_id)
       else if (q.intent) filtered = filtered.filter((l) => l.intent_id === q.intent)
+      if (q.plan === 'free') filtered = filtered.filter((l) => !l.premium && !l.vettri)
+      else if (q.plan === 'paid') filtered = filtered.filter((l) => l.premium || l.vettri)
+      else if (q.plan === 'premium') filtered = filtered.filter((l) => l.premium)
+      else if (q.plan === 'vettri') filtered = filtered.filter((l) => l.vettri)
       const offset = Number(q.offset) || 0
       const limit = Number(q.limit) || 50
       return out({ leads: filtered.slice(offset, offset + limit), total: filtered.length, now })
