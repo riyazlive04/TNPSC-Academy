@@ -282,7 +282,7 @@ export default function QuizInstructionsPage() {
         <button
           onClick={begin}
           disabled={!agreed || noQuestions || loadingCount}
-          className="btn-brand btn-lg w-full"
+          className="btn-wrap btn-brand btn-lg w-full"
         >
           <Maximize2 size={18} /> {t('enterFullscreen')}
         </button>

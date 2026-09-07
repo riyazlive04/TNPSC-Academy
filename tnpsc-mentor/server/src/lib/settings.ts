@@ -22,6 +22,10 @@ export interface PublicSettings {
    *  the decks are still served to admins, so the feature can be tested on
    *  production before students ever see it. */
   flashcards_enabled: boolean
+  /** When true, the app is closed to everyone except admins/superadmins —
+   *  every non-exempt API route 503s (see middleware/maintenance.ts) and the
+   *  frontend shows a full-screen maintenance page instead of the router. */
+  maintenance_mode: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
@@ -31,6 +35,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   vettri_enabled: false,
   rank_booster_enabled: false,
   flashcards_enabled: false,
+  maintenance_mode: false,
 }
 
 // ─── Admin-only settings ─────────────────────────────────────────────────────
@@ -102,7 +107,27 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     flashcards_enabled: Boolean(
       raw.flashcards_enabled ?? PUBLIC_SETTING_DEFAULTS.flashcards_enabled
     ),
+    maintenance_mode: Boolean(
+      raw.maintenance_mode ?? PUBLIC_SETTING_DEFAULTS.maintenance_mode
+    ),
   }
+}
+
+/**
+ * Just the maintenance flag, without the round-trip cost of resolving every
+ * other public setting. Used by the request-hot `maintenanceGate` middleware
+ * (see middleware/maintenance.ts), which calls this behind its own short-TTL
+ * cache rather than on every request.
+ */
+export async function readMaintenanceMode(): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'maintenance_mode')
+    .maybeSingle()
+  if (error) throw error
+  const value = (data as { value?: unknown } | null)?.value
+  return Boolean(value ?? PUBLIC_SETTING_DEFAULTS.maintenance_mode)
 }
 
 /**

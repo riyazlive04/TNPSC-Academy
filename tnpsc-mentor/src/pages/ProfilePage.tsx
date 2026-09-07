@@ -26,6 +26,7 @@ import {
   BellOff,
   Library,
   Shield,
+  Sparkles,
 } from 'lucide-react'
 import Avatar from '../components/UI/Avatar'
 import PasswordInput from '../components/UI/PasswordInput'
@@ -536,6 +537,16 @@ export default function ProfilePage() {
                         sub={t('howItWorksSub')}
                       />
                     )}
+                    {/* Replay the first-run intro slides - the feature
+                        walkthrough, as opposed to the tour's "where to tap". */}
+                    {!isAdmin && (
+                      <NavRow
+                        onClick={() => navigate('/welcome')}
+                        icon={<Sparkles size={16} />}
+                        label={t('introReplay')}
+                        sub={t('introReplaySub')}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -565,7 +576,7 @@ export default function ProfilePage() {
                 <AccountSection />
 
                 {/* Sign out */}
-                <button onClick={handleSignOut} className="btn-ghost w-full">
+                <button onClick={handleSignOut} className="btn-wrap btn-ghost w-full">
                   <LogOut size={16} /> {t('signOut')}
                 </button>
               </div>
@@ -1048,13 +1059,13 @@ function SecuritySection() {
           />
           {error && <p className="text-center font-body text-xs font-medium text-coral">{error}</p>}
           <div className="flex gap-2">
-            <button type="button" onClick={resetToIdle} className="btn-ghost btn-sm flex-1">
+            <button type="button" onClick={resetToIdle} className="btn-wrap btn-ghost btn-sm flex-1">
               {t('cancel')}
             </button>
             <button
               type="submit"
               disabled={busy || !code.trim()}
-              className="btn-brand btn-sm flex-1"
+              className="btn-wrap btn-brand btn-sm flex-1"
             >
               {busy && <Loader2 size={14} className="animate-spin" />}
               {t('totpActivate')}
@@ -1116,10 +1127,10 @@ function SecuritySection() {
             {useBackupToDisable ? t('totpUseAppCodeInstead') : t('totpUseBackupCode')}
           </button>
           <div className="flex gap-2">
-            <button type="button" onClick={resetToIdle} className="btn-ghost btn-sm flex-1">
+            <button type="button" onClick={resetToIdle} className="btn-wrap btn-ghost btn-sm flex-1">
               {t('cancel')}
             </button>
-            <button type="submit" disabled={busy} className="btn-brand btn-sm flex-1">
+            <button type="submit" disabled={busy} className="btn-wrap btn-brand btn-sm flex-1">
               {busy && <Loader2 size={14} className="animate-spin" />}
               {t('totpTurnOff')}
             </button>

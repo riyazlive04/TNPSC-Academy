@@ -355,6 +355,15 @@ h4,
   .btn-ghost {
     @apply btn border border-line bg-card text-ink hover:border-brand/40 hover:bg-tint/40 hover:text-brand-dark;
   }
+  /* Wrapping modifier. `.btn` is deliberately whitespace-nowrap - right for
+   * pills sitting in a row, wrong for a full-width CTA whose label can be long:
+   * the Tamil copy is routinely 1.5-2x the English, and a nowrap label simply
+   * spilled out of the pill (the onboarding CTAs overflowed by 12-125px on
+   * every phone width). Add this to any w-full / flex-1 button. `leading-none`
+   * from `.btn` would collide a second line, so relax it too. */
+  .btn-wrap {
+    @apply h-auto whitespace-normal text-center leading-snug;
+  }
 
   /* ─── Segmented tabs ─────────────────────────────────────────────────── */
   .seg-wrap {

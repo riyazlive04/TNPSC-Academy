@@ -96,7 +96,7 @@ export function AttendanceGateModal({
         >
           {t('submitAnywayScore')}
         </button>
-        <button onClick={onContinue} className="btn-brand flex-1 px-5 py-3 text-sm">
+        <button onClick={onContinue} className="btn-wrap btn-brand flex-1 px-5 py-3 text-sm">
           {t('continueTest')}
         </button>
       </div>
@@ -121,7 +121,7 @@ export function ExitTestModal({ onEvaluate, onDiscard, onCancel }: ExitTestModal
       <div className="flex flex-col gap-2">
         <button
           onClick={onEvaluate}
-          className="btn-brand w-full px-5 py-3 text-sm"
+          className="btn-wrap btn-brand w-full px-5 py-3 text-sm"
         >
           {t('submitSeeResults')}
         </button>
@@ -155,7 +155,7 @@ export function SubmitErrorModal({ message, onRetry, onSignIn }: SubmitErrorModa
     <ModalShell title={t('submitFailed')}>
       <p className="mb-5 font-body text-sm leading-relaxed text-navytext/80">{message}</p>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <button onClick={onRetry} className="btn-brand flex-1 px-5 py-3 text-sm">
+        <button onClick={onRetry} className="btn-wrap btn-brand flex-1 px-5 py-3 text-sm">
           {t('retrySubmit')}
         </button>
         <button

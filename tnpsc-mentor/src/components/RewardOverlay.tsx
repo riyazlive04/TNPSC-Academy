@@ -129,7 +129,7 @@ export default function RewardOverlay({
           <p className="mb-4 font-heading text-xl font-semibold text-ink">Nice work</p>
         )}
 
-        <button onClick={onClose} className="btn-brand w-full px-6 py-3 text-sm">
+        <button onClick={onClose} className="btn-wrap btn-brand w-full px-6 py-3 text-sm">
           Continue
         </button>
       </div>

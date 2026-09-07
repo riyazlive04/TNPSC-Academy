@@ -127,7 +127,7 @@ export default function TestSeriesGrid({
               <button
                 onClick={() => (premiumLocked ? onLockedTap() : !disabled && onLaunch(tst))}
                 disabled={exhausted || dateLocked}
-                className="btn-brand w-full whitespace-normal px-2 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-40 sm:px-5 sm:py-2.5 sm:text-sm"
+                className="btn-wrap btn-brand w-full whitespace-normal px-2 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-40 sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 {exhausted ? t('examCompleted') : t('startExam')}
               </button>

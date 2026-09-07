@@ -191,7 +191,7 @@ function GroupExamTab() {
           ))}
         </div>
 
-        <button onClick={launch} className="btn-brand btn-lg mt-6 w-full">
+        <button onClick={launch} className="btn-wrap btn-brand btn-lg mt-6 w-full">
           {t('startExam')}
         </button>
       </div>

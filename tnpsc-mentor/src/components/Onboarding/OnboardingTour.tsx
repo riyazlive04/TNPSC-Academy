@@ -203,7 +203,7 @@ export default function OnboardingTour({
                 onFinish()
                 onStartTest()
               }}
-              className="btn-brand w-full py-2.5 text-sm"
+              className="btn-wrap btn-brand w-full py-2.5 text-sm"
             >
               {t('onbFirstTestCta')} <ArrowRight size={16} />
             </button>
@@ -211,7 +211,7 @@ export default function OnboardingTour({
               <button onClick={back} className="btn-ghost flex-shrink-0 px-3.5 py-2 text-sm" aria-label={t('back')}>
                 <ArrowLeft size={16} />
               </button>
-              <button onClick={onFinish} className="btn-ghost flex-1 py-2 text-sm">
+              <button onClick={onFinish} className="btn-wrap btn-ghost flex-1 py-2 text-sm">
                 {t('onbStartExploring')}
               </button>
             </div>
@@ -223,7 +223,7 @@ export default function OnboardingTour({
                 <ArrowLeft size={16} />
               </button>
             )}
-            <button onClick={next} className="btn-brand flex-1 py-2.5 text-sm">
+            <button onClick={next} className="btn-wrap btn-brand flex-1 py-2.5 text-sm">
               {isLast ? t('onbStartExploring') : t('onbNext')} <ArrowRight size={16} />
             </button>
           </div>
@@ -281,13 +281,14 @@ function TourCard({
       style={style}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="mb-2.5 flex items-center justify-between">
+      <div className="mb-2.5 flex items-center justify-between gap-2">
         {header}
         <button
           onClick={onClose}
-          className="focus-ring -mr-1 inline-flex items-center gap-1 rounded-full px-2 py-1 font-heading text-xs font-semibold text-muted hover:bg-tint-coral hover:text-accent"
+          className="focus-ring -mr-1 inline-flex min-w-0 items-center gap-1 rounded-full px-2 py-1 font-heading text-xs font-semibold text-muted hover:bg-tint-coral hover:text-accent"
         >
-          {skipLabel} <X size={14} />
+          <span className="truncate">{skipLabel}</span>
+          <X size={14} className="flex-shrink-0" />
         </button>
       </div>
 

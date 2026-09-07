@@ -300,7 +300,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+              className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
             >
               {loading && <Spinner size={18} />}
               {loading ? t('verifyingOtp') : t('verifyAndSignIn')}
@@ -421,7 +421,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+              className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
             >
               {loading && <Spinner size={18} />}
               {loading ? t('signingIn') : t('signIn')}
@@ -464,7 +464,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+                  className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
                 >
                   {loading && <Spinner size={18} />}
                   {loading ? t('sendingOtp') : t('sendOtp')}
@@ -515,7 +515,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+                  className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
                 >
                   {loading && <Spinner size={18} />}
                   {loading ? t('verifyingOtp') : t('verifyAndSignIn')}

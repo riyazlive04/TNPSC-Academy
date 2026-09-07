@@ -132,7 +132,7 @@ export default function RevisionPage() {
             />
 
             {selected !== null && (
-              <button onClick={next} className="btn-brand mt-4 w-full px-6 py-3.5 text-base">
+              <button onClick={next} className="btn-wrap btn-brand mt-4 w-full px-6 py-3.5 text-base">
                 {idx + 1 < items.length ? t('next') : t('allCaughtUp')}
               </button>
             )}

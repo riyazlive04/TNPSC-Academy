@@ -75,11 +75,11 @@ export default function UpdatePrompt() {
         </div>
         <button
           onClick={() => void openDownload(release.url)}
-          className="btn-brand press flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
+          className="btn-wrap btn-brand press flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
         >
           <Download size={16} /> Update now
         </button>
-        <button onClick={later} className="btn-ghost press mt-2 w-full px-4 py-2.5 text-sm">
+        <button onClick={later} className="btn-wrap btn-ghost press mt-2 w-full px-4 py-2.5 text-sm">
           Later
         </button>
       </div>

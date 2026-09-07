@@ -80,7 +80,7 @@ router.post(
     }
     // Allow-list the role before it reaches the RPC (the RPC also validates,
     // but reject obviously-bad input early with a clear message).
-    if (!['user', 'admin', 'superadmin'].includes(role)) {
+    if (!['user', 'admin', 'superadmin', 'telecaller'].includes(role)) {
       return res.status(400).json({ error: `Invalid role: ${role}` })
     }
     const { data, error } = await req.db!.rpc('superadmin_set_role', {

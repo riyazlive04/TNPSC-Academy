@@ -649,7 +649,7 @@ export default function RankBoosterLandingPage() {
                     <AlertCircle size={12} className="shrink-0" /> {t('validTill')}
                   </p>
 
-                  <button onClick={handleEnrollClick} className="btn-brand group mt-4 w-full justify-center px-6 py-3 text-sm">
+                  <button onClick={handleEnrollClick} className="btn-wrap btn-brand group mt-4 w-full justify-center px-6 py-3 text-sm">
                     <Rocket size={16} /> {t('ctaEnroll')}
                     <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
                   </button>

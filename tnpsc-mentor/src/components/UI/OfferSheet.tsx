@@ -150,7 +150,7 @@ export default function OfferSheet({
               className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 pb-6 pt-1 sm:px-5"
             >
               {children}
-              <button type="button" onClick={onClose} className="btn-ghost w-full py-2.5 text-sm">
+              <button type="button" onClick={onClose} className="btn-wrap btn-ghost w-full py-2.5 text-sm">
                 <span className="tamil">{t('offerSheetSkip')}</span>
               </button>
             </div>

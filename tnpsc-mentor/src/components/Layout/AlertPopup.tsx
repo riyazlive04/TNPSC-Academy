@@ -122,7 +122,7 @@ export default function AlertPopup() {
         </div>
         <div className="flex gap-3">
           {current.url && (
-            <button onClick={openLink} className="btn-ghost press tamil flex-1 px-4 py-2.5 text-sm">
+            <button onClick={openLink} className="btn-wrap btn-ghost press tamil flex-1 px-4 py-2.5 text-sm">
               {t('alertViewLink')}
             </button>
           )}

@@ -462,7 +462,7 @@ function Summary({
         <Stat value={study} label={t('needToStudy')} tone="wrong" />
       </div>
       <div className="flex w-full flex-col gap-2">
-        <button onClick={onRestart} className="btn-brand w-full px-6 py-3 text-sm">
+        <button onClick={onRestart} className="btn-wrap btn-brand w-full px-6 py-3 text-sm">
           <RotateCcw size={16} /> {t('studyAgain')}
         </button>
         <button

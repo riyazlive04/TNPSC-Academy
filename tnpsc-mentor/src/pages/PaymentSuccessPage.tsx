@@ -208,13 +208,13 @@ export default function PaymentSuccessPage() {
         <div className="mt-6 flex flex-col gap-2.5">
           <button
             onClick={() => navigate('/test-arena', { replace: true })}
-            className="btn-brand w-full px-6 py-3 text-sm"
+            className="btn-wrap btn-brand w-full px-6 py-3 text-sm"
           >
             {t('paySuccessStart')} <ArrowRight size={16} />
           </button>
           <button
             onClick={() => navigate('/profile', { replace: true })}
-            className="btn-ghost w-full px-6 py-3 text-sm"
+            className="btn-wrap btn-ghost w-full px-6 py-3 text-sm"
           >
             {t('paySuccessProfile')}
           </button>

@@ -132,7 +132,7 @@ export default function DeviceLimitModal({
         <button
           onClick={onClose}
           disabled={!!busyId}
-          className="btn-ghost press mt-5 w-full px-4 py-2.5 text-sm disabled:opacity-50"
+          className="btn-wrap btn-ghost press mt-5 w-full px-4 py-2.5 text-sm disabled:opacity-50"
         >
           {t('cancel')}
         </button>

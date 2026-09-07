@@ -56,6 +56,8 @@ import {
   Rocket,
   MessageCircle,
   Layers,
+  Wrench,
+  Headphones,
 } from 'lucide-react'
 import Avatar from '../components/UI/Avatar'
 import Spinner from '../components/UI/Spinner'
@@ -63,6 +65,7 @@ import ConfirmDialog from '../components/UI/ConfirmDialog'
 import ErrorState from '../components/UI/ErrorState'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
 import ReportResolvedMessageEditor from '../components/SuperAdmin/ReportResolvedMessageEditor'
+import CrmPanel from '../components/SuperAdmin/CrmPanel'
 import {
   api,
   type PlatformMetrics,
@@ -100,7 +103,7 @@ import CaWhatsappDialog from '../components/Materials/CaWhatsappDialog'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions'
+type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions' | 'crm'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -116,6 +119,7 @@ export default function SuperAdminPage() {
     { id: 'notifications', label: 'notificationsTab', icon: Bell },
     { id: 'feedback', label: 'feedbackTab', icon: MessageSquare },
     { id: 'reports', label: 'reportsTab', icon: Flag },
+    { id: 'crm', label: 'crmTab', icon: Headphones },
     { id: 'notes', label: 'notesTab', icon: BookOpen },
     { id: 'mockexams', label: 'mockExamsTab', icon: ClipboardList },
     { id: 'testseries', label: 'testSeriesTab', icon: CalendarDays },
@@ -216,6 +220,7 @@ export default function SuperAdminPage() {
                 <ReportedQuestions />
               </>
             )}
+            {tab === 'crm' && <CrmPanel />}
             {tab === 'notes' && <StudyNotesTab />}
             {tab === 'mockexams' && <MockExamsTab />}
             {tab === 'testseries' && <TestSeriesTab />}
@@ -348,6 +353,7 @@ function OverviewTab() {
       </div>
 
       <FlashcardsVisibilityCard />
+      <MaintenanceModeCard />
     </div>
   )
 }
@@ -402,6 +408,73 @@ function FlashcardsVisibilityCard() {
           onClick={() => toggle(!on)}
           aria-pressed={on}
           aria-label={t('flashcardsShowToStudents')}
+          className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+            on ? 'bg-correct' : 'bg-ink2/30'
+          } disabled:opacity-50`}
+        >
+          <span
+            className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              on ? 'left-6' : 'left-1'
+            }`}
+          />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Closes the app to everyone except admins/superadmins — every gated API
+ * route 503s (server/src/middleware/maintenance.ts) and non-admins see a
+ * full-screen maintenance page (App.tsx). Used for the self-hosted Supabase
+ * cutover and any future maintenance window. Same shape as
+ * FlashcardsVisibilityCard above.
+ */
+function MaintenanceModeCard() {
+  const { t } = useT()
+  const [on, setOn] = useState(false)
+  const [ready, setReady] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    api.superadmin
+      .settings()
+      .then((s) => setOn(Boolean(s.maintenance_mode)))
+      .catch(() => undefined)
+      .finally(() => setReady(true))
+  }, [])
+
+  const toggle = async (next: boolean) => {
+    setSaving(true)
+    setOn(next) // optimistic
+    try {
+      await api.superadmin.setSetting('maintenance_mode', next)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setOn(!next)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="card p-5">
+      <div className="mb-1 flex items-center gap-2">
+        <Wrench size={16} className="text-brand" />
+        <h2 className="font-heading text-sm font-semibold text-ink">
+          {t('maintenanceSectionTitle')}
+        </h2>
+      </div>
+      <p className="mb-3 font-body text-xs text-ink2">{t('maintenanceSectionSub')}</p>
+      <div className="flex items-center justify-between gap-3">
+        <span className="tamil font-body text-sm text-ink">
+          {t('maintenanceCloseAppToStudents')}
+        </span>
+        <button
+          disabled={!ready || saving}
+          onClick={() => toggle(!on)}
+          aria-pressed={on}
+          aria-label={t('maintenanceCloseAppToStudents')}
           className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
             on ? 'bg-correct' : 'bg-ink2/30'
           } disabled:opacity-50`}
@@ -654,6 +727,8 @@ const ROLE_LABELS: Record<UserRole, StringKey> = {
   user: 'roleUser',
   admin: 'roleAdmin',
   superadmin: 'roleSuperadmin',
+  // Staff role for the lead desk at /crm. NOT an admin — see supabase/crm.sql.
+  telecaller: 'roleTelecaller',
 }
 
 // User-list filters (client-side, over the loaded page of users). Console
@@ -849,6 +924,7 @@ function UsersTab() {
             >
               <option value="all">All roles</option>
               <option value="user">Student</option>
+              <option value="telecaller">Telecaller</option>
               <option value="admin">Admin</option>
               <option value="superadmin">Superadmin</option>
             </select>
@@ -981,7 +1057,7 @@ function UsersTab() {
                 aria-label={`${t('role')} - ${u.email}`}
                 className="focus-ring rounded-lg border border-line bg-card px-2.5 py-1.5 font-heading text-xs font-semibold text-ink transition hover:border-brand/40"
               >
-                {(['user', 'admin', 'superadmin'] as UserRole[]).map((r) => (
+                {(['user', 'telecaller', 'admin', 'superadmin'] as UserRole[]).map((r) => (
                   <option key={r} value={r}>
                     {t(ROLE_LABELS[r])}
                   </option>

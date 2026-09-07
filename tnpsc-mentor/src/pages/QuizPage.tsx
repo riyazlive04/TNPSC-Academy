@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ChevronLeft, ChevronRight, Clock, Flag, Languages, Maximize2, ServerCrash, WifiOff, X } from 'lucide-react'
 import type { Lang } from '../store/languageStore'
@@ -33,19 +33,7 @@ import { useScreenSecure } from '../hooks/useScreenSecure'
 import { exitFullscreen } from '../lib/proctor'
 import { useT, translate } from '../lib/i18n'
 import { hapticSelect } from '../lib/haptics'
-import type { AnswerLetter, Question, QuizConfig } from '../types'
-
-/** The check_answer response shape - see api.checkAnswer / supabase/check_answer.sql. */
-type AnswerReveal = Pick<
-  Question,
-  'correct_answer' | 'explanation' | 'explanation_ta' | 'explanation_video_url' | 'why_wrong' | 'why_wrong_ta'
->
-
-// Categories that stay exam-style (no per-question reveal, matching Mock Test):
-// PYQ practice mirrors a real past exam, and config.mock covers any mock-flagged
-// pull through this page. Everything else (Subject Practice, Samacheer, Current
-// Affairs, Aptitude) is a study loop, where instant feedback is the point.
-const EXAM_STYLE_CATEGORIES = new Set(['pyq', 'pyq2', 'pyq4'])
+import type { AnswerLetter, QuizConfig } from '../types'
 
 /** Loose structural match so resuming a refreshed test reuses the same pool. */
 function sameConfig(a: QuizConfig, b: QuizConfig): boolean {
@@ -254,12 +242,6 @@ export default function QuizPage() {
     ? (answers[currentQuestion.id]?.selected_answer ?? null)
     : null
 
-  // Practice-mode instant feedback: keyed by question id so it survives
-  // Prev/Next navigation once fetched. Never populated for PYQ/mock - those
-  // stay exam-style (see EXAM_STYLE_CATEGORIES).
-  const instantFeedback = !config?.mock && !EXAM_STYLE_CATEGORIES.has(config?.category ?? '')
-  const [revealed, setRevealed] = useState<Record<string, AnswerReveal>>({})
-
   // Memoised: QuestionCard is wrapped in React.memo, and this page re-renders
   // every second (global countdown + per-question timer below) — an inline
   // arrow function here would get a fresh identity every render and defeat
@@ -277,30 +259,9 @@ export default function QuizPage() {
       // is easy to miss mid-scroll on a phone.
       hapticSelect()
       store.selectAnswer(currentQuestion.id, letter)
-      if (instantFeedback && !revealed[currentQuestion.id]) {
-        const id = currentQuestion.id
-        api
-          .checkAnswer(id)
-          .then((data) => setRevealed((r) => ({ ...r, [id]: data })))
-          .catch(() => {
-            /* best-effort — the reveal just doesn't show for this question */
-          })
-      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentQuestion, instantFeedback, revealed, store.selectAnswer]
-  )
-
-  // Merges in the revealed-answer fields once fetched, memoised so this object
-  // keeps a stable identity across the once-a-second re-renders driven by the
-  // countdown timers below — otherwise QuestionCard's React.memo would see a
-  // "changed" prop every second and re-render anyway.
-  const questionForCard = useMemo(
-    () =>
-      currentQuestion && revealed[currentQuestion.id]
-        ? { ...currentQuestion, ...revealed[currentQuestion.id] }
-        : currentQuestion,
-    [currentQuestion, revealed]
+    [currentQuestion, store.selectAnswer]
   )
 
   const canAdvance = secondsOnQuestion >= MIN_SECONDS_PER_QUESTION
@@ -536,10 +497,7 @@ export default function QuizPage() {
     )
   }
 
-  // `questionForCard` is derived from `currentQuestion` in the memo above, so
-  // whenever `currentQuestion` is non-null in this same render it is too — the
-  // extra check here just gives TypeScript that narrowing for the JSX below.
-  if (!currentQuestion || !questionForCard) return null
+  if (!currentQuestion) return null
 
   const isFlagged = flags[currentQuestion.id] ?? false
   const isLast = currentIndex + 1 >= total
@@ -662,14 +620,17 @@ export default function QuizPage() {
           </aside>
         </div>
 
+        {/* No `reveal` here: the quiz screen never shows the correct answer or
+            the explanation mid-test - both belong to the Result page, and a
+            revealed answer on a live, credit-charged test let an aspirant
+            switch to it before submitting. */}
         <QuestionCard
-          question={questionForCard}
+          question={currentQuestion}
           index={currentIndex}
           total={total}
           selected={selectedLetter}
           onSelect={handleSelect}
           displayLang={quizLang}
-          reveal={!!(currentQuestion && revealed[currentQuestion.id])}
           bare
         />
 
@@ -713,23 +674,31 @@ export default function QuizPage() {
         </div>
       </div>
 
-      {/* Bottom nav bar - icon + label always visible on every action, matching
-          Next/Submit's existing always-labelled pattern. */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-3 py-3">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-2">
+      {/* Bottom nav bar. Next/Submit is the ONLY flex-shrink-0 item and comes
+          last, so a wide label elsewhere can never push it off the right edge -
+          it used to, badly: every item was flex-shrink-0 + whitespace-nowrap in
+          a row that neither wraps nor scrolls, so on the Tamil UI (longer words)
+          Next ran off-screen on every phone up to ~410px, and once a question
+          was flagged it was 100-190px off-screen at ANY phone width. Prev and
+          Flag now give up their labels below 400px instead. */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-20 border-t border-line bg-card px-3 pt-3"
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      >
+        <div className="mx-auto flex max-w-2xl items-center gap-2">
           {/* Previous */}
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
             aria-label={t('prev')}
-            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-pill border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink2 transition-colors hover:border-primary/40 hover:text-ink disabled:opacity-40 sm:px-4"
+            className="inline-flex min-w-0 items-center gap-1.5 rounded-pill border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink2 transition-colors hover:border-primary/40 hover:text-ink disabled:opacity-40 sm:px-4"
           >
             <ChevronLeft size={18} className="flex-shrink-0" />
-            <span className="whitespace-nowrap">{t('prev')}</span>
+            <span className="hidden whitespace-nowrap min-[400px]:inline">{t('prev')}</span>
           </button>
 
           {/* Centre: close (exit) sits to the LEFT of flag */}
-          <div className="flex flex-shrink-0 items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
             {!config.mock && (
               <button
                 onClick={() => setShowExitModal(true)}
@@ -745,15 +714,17 @@ export default function QuizPage() {
               aria-pressed={isFlagged}
               aria-label={isFlagged ? t('unflagQuestion') : t('flagForReview')}
               className={[
-                'press inline-flex flex-shrink-0 items-center gap-1.5 rounded-pill px-3 py-2.5 font-heading text-sm font-semibold transition-colors sm:px-4',
+                'press inline-flex min-w-0 items-center gap-1.5 rounded-pill px-3 py-2.5 font-heading text-sm font-semibold transition-colors sm:px-4',
                 isFlagged
                   ? 'bg-accent text-white'
                   : 'border border-line bg-card text-ink2 hover:border-accent/40 hover:text-accent',
               ].join(' ')}
             >
               <Flag size={16} className={`flex-shrink-0 ${isFlagged ? 'animate-popStar' : ''}`} />
-              <span className="whitespace-nowrap">
-                {isFlagged ? t('flagged') : t('flag')}
+              {/* `flaggedShort`, not `flagged`: the summary noun reads
+                  "குறிக்கப்பட்டவை" in Tamil, far too wide for a nav pill. */}
+              <span className="hidden whitespace-nowrap min-[400px]:inline">
+                {isFlagged ? t('flaggedShort') : t('flag')}
               </span>
             </button>
           </div>
@@ -765,14 +736,14 @@ export default function QuizPage() {
           {isLast ? (
             <button
               onClick={requestSubmit}
-              className="inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-pill bg-brand-gradient px-5 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
+              className="inline-flex flex-shrink-0 items-center justify-center whitespace-nowrap rounded-pill bg-brand-gradient px-4 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
             >
               {t('submitTest')}
             </button>
           ) : (
             <button
               onClick={goNext}
-              className="inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-pill bg-brand-gradient px-5 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
+              className="inline-flex flex-shrink-0 items-center gap-1 whitespace-nowrap rounded-pill bg-brand-gradient px-4 py-2.5 font-display text-sm font-semibold text-white transition-all hover:brightness-105 active:scale-[0.98] sm:px-6"
             >
               {t('next')} <ChevronRight size={18} className="flex-shrink-0" />
             </button>

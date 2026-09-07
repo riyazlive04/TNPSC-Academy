@@ -175,7 +175,7 @@ export default function MockInstructionsPage() {
           <span className="tamil font-body text-sm text-ink">{t('instrConfirm')}</span>
         </label>
 
-        <button onClick={begin} disabled={!agreed} className="btn-brand btn-lg w-full">
+        <button onClick={begin} disabled={!agreed} className="btn-wrap btn-brand btn-lg w-full">
           <Maximize2 size={18} /> {t('enterFullscreen')}
         </button>
       </div>

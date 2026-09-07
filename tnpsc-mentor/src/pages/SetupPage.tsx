@@ -82,7 +82,7 @@ export default function SetupPage() {
             </>
           )}
 
-          <button type="submit" disabled={saving} className="btn-brand w-full px-6 py-3.5 text-base">
+          <button type="submit" disabled={saving} className="btn-wrap btn-brand w-full px-6 py-3.5 text-base">
             {saving ? '…' : t('saveContinue')}
           </button>
           <button

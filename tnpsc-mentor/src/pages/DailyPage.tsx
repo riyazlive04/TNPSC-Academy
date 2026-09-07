@@ -171,7 +171,7 @@ export default function DailyPage() {
             )}
           </div>
 
-          <button onClick={start} className="btn-brand w-full px-6 py-3 text-sm">
+          <button onClick={start} className="btn-wrap btn-brand w-full px-6 py-3 text-sm">
             {t('startMock')}
           </button>
         </div>

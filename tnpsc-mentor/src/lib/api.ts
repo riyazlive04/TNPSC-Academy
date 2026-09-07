@@ -22,10 +22,24 @@ import type {
   VettriExamAdmin,
 } from '../types'
 
+import type {
+  Channel,
+  CrmAgentDay,
+  CrmIntent,
+  CrmPipelineMetrics,
+  CrmTodayStats,
+  ImportRow,
+  IntentColor,
+  IntentOutcome,
+  Lead,
+  LeadInteraction,
+} from './crm'
+
 import { getDeviceId } from './device'
 import { Capacitor } from '@capacitor/core'
 import { translate } from './i18n'
 import { useLanguageStore } from '../store/languageStore'
+import { useAuthConfigStore } from '../store/authConfigStore'
 
 const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
 
@@ -233,6 +247,17 @@ export function invalidateReads(...prefixes: string[]): void {
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, auth = true, query, swr } = opts
 
+  // UI-preview mode (DEV with no VITE_API_URL — see ProtectedRoute) has no
+  // backend to answer to. Most screens degrade honestly to an empty state, but
+  // the lead desk can't be judged from one: its timers have to be running and a
+  // lead has to actually arrive. Serve /api/crm from an in-memory fixture
+  // instead. The dynamic import keeps that module in its own chunk, which a
+  // configured build never fetches.
+  if (!isApiConfigured && import.meta.env.DEV && path.startsWith('/api/crm')) {
+    const { handleCrmDemo } = await import('./crmDemo')
+    return handleCrmDemo<T>(path, { method, body, query })
+  }
+
   let url = `${API_URL}${path}`
   if (query) {
     const qs = Object.entries(query)
@@ -309,6 +334,13 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   if (res.status === 204) return undefined as T
   const data = await res.json().catch(() => ({}))
   if (!res.ok) {
+    // maintenanceGate's signature (server/src/middleware/maintenance.ts) — flip
+    // the shared flag so an already-open tab reacts without a manual reload.
+    // Checked on status AND body shape: a 503 alone isn't unique to this (e.g.
+    // "Payments are not configured" also returns 503).
+    if (res.status === 503 && (data as { error?: string }).error === 'maintenance') {
+      useAuthConfigStore.setState({ maintenanceMode: true })
+    }
     throw new ApiError((data as { error?: string }).error ?? res.statusText, res.status, data)
   }
   return data as T
@@ -376,6 +408,69 @@ export interface WebBundle {
   active: boolean
   created_at: string
   url: string
+}
+
+// ─── CRM wire shapes ─────────────────────────────────────────────────────────
+// The row/domain types themselves live in lib/crm.ts (shared with the UI); these
+// are just the envelopes this client sends and receives.
+
+export type CrmQueue = 'pool' | 'mine' | 'followups' | 'all'
+
+export interface CrmBootstrap {
+  agent: { id: string; full_name: string | null; email: string | null; role: string; avatar_url: string | null } | null
+  /** True for the admins/superadmins supervising, who see every agent's board. */
+  supervisor: boolean
+  intents: CrmIntent[]
+  metrics: CrmPipelineMetrics
+  today: CrmTodayStats | null
+  /** Server clock, so response timers can't be shifted by a wrong device clock. */
+  now: string
+}
+
+export interface CrmLeadPatch {
+  fullName: string | null
+  phone: string | null
+  whatsapp: string | null
+  email: string | null
+  city: string | null
+  notes: string | null
+}
+
+export interface CrmIntentInput {
+  label: string
+  labelTa?: string | null
+  outcome: IntentOutcome
+  color: IntentColor
+  sortOrder?: number
+  active?: boolean
+}
+
+/** One answer a lead gave, as the console's live feed renders it. */
+export interface CrmActivityItem {
+  id: string
+  created_at: string
+  lead_id: string
+  lead_name: string | null
+  lead_phone: string | null
+  agent_name: string | null
+  intent_label: string | null
+  intent_color: IntentColor | null
+  status_after: string | null
+  notes: string | null
+}
+
+export interface CrmAgentRow {
+  id: string
+  full_name: string | null
+  email: string | null
+  phone: string | null
+  role: string
+  created_at: string
+  calls_today: number
+  whatsapps_today: number
+  outcomes_today: number
+  conversions_today: number
+  open_leads: number
 }
 
 export const api = {
@@ -607,22 +702,6 @@ export const api = {
       body: { config },
     })
     return data.questions
-  },
-  /** Practice-mode instant reveal for ONE already-served question (see
-   *  supabase/check_answer.sql - server-gated on seen_questions, not a bare
-   *  answer-key lookup). Never call this for Mock/PYQ; they stay exam-style. */
-  async checkAnswer(
-    questionId: string
-  ): Promise<
-    Pick<
-      Question,
-      'correct_answer' | 'explanation' | 'explanation_ta' | 'explanation_video_url' | 'why_wrong' | 'why_wrong_ta'
-    >
-  > {
-    return request('/api/questions/check-answer', {
-      method: 'POST',
-      body: { questionId },
-    })
   },
   /** The new-user Starter Challenge paper (fixed hard mixed set, ≤18 questions). */
   async starterQuestions(count: number): Promise<Question[]> {
@@ -1969,6 +2048,138 @@ export const api = {
     },
   },
 
+  // ─── Telecaller CRM (/crm) ────────────────────────────────────────────────
+  // Staff-only. Every call 403s for a student account; the server gates on the
+  // `telecaller` role plus admin/superadmin (see middleware requireCrmStaff).
+  crm: {
+    /** Everything the desk needs on open: agent, intents, pipeline, my day. */
+    async bootstrap(): Promise<CrmBootstrap> {
+      return request<CrmBootstrap>('/api/crm/bootstrap')
+    },
+    /** One page of a queue: 'pool' | 'mine' | 'followups' | 'all'. */
+    async leads(params: {
+      queue?: CrmQueue
+      search?: string
+      status?: string
+      /** An intent id, or 'none' for leads with no answer recorded yet. */
+      intent?: string
+      source?: string
+      limit?: number
+      offset?: number
+    } = {}): Promise<{ leads: Lead[]; total: number; now: string }> {
+      return request('/api/crm/leads', {
+        query: {
+          queue: params.queue ?? 'pool',
+          search: params.search || undefined,
+          status: params.status || undefined,
+          intent: params.intent || undefined,
+          source: params.source || undefined,
+          limit: params.limit,
+          offset: params.offset,
+        },
+      })
+    },
+    /** The "has anything arrived?" poll — unclaimed leads created since `since`. */
+    async incoming(since: string): Promise<{ leads: Lead[]; now: string }> {
+      return request('/api/crm/leads/incoming', { query: { since } })
+    },
+    async lead(id: string): Promise<{ lead: Lead; history: LeadInteraction[]; now: string }> {
+      return request(`/api/crm/leads/${id}`)
+    },
+    /** Take a lead out of the shared pool. Throws ApiError 409 if someone won it first. */
+    async claim(id: string): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}/claim`, { method: 'POST' })
+    },
+    async release(id: string): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}/release`, { method: 'POST' })
+    },
+    /**
+     * Record that a contact link was tapped. Fired by the Call / WhatsApp /
+     * Email buttons themselves — this is what makes per-agent daily call volume
+     * countable, and the first one stops the lead's response timer.
+     */
+    async logClick(id: string, channel: Channel): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}/click`, { method: 'POST', body: { channel } })
+    },
+    /** The agent's outcome: intent category, notes, duration, next follow-up. */
+    async logOutcome(
+      id: string,
+      input: {
+        intentId?: string | null
+        notes?: string
+        status?: string
+        durationSecs?: number | null
+        nextFollowUpAt?: string | null
+      }
+    ): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}/log`, { method: 'POST', body: input })
+    },
+    /** Correct the contact details read out on the call. */
+    async updateLead(id: string, patch: Partial<CrmLeadPatch>): Promise<{ lead: Lead }> {
+      return request(`/api/crm/leads/${id}`, { method: 'PATCH', body: patch })
+    },
+    /** Daily volume. A telecaller only ever gets their own rows back. */
+    async stats(params: { days?: number; agent?: string } = {}): Promise<CrmAgentDay[]> {
+      const data = await request<{ stats: CrmAgentDay[] }>('/api/crm/stats', {
+        query: { days: params.days, agent: params.agent },
+      })
+      return data.stats
+    },
+
+    // ── Superadmin half: taxonomy, import, assignment, roster ──────────────
+    async allIntents(): Promise<CrmIntent[]> {
+      const data = await request<{ intents: CrmIntent[] }>('/api/crm/intents/all')
+      return data.intents
+    },
+    async createIntent(input: CrmIntentInput): Promise<CrmIntent> {
+      const data = await request<{ intent: CrmIntent }>('/api/crm/admin/intents', {
+        method: 'POST',
+        body: input,
+      })
+      return data.intent
+    },
+    async updateIntent(id: string, input: Partial<CrmIntentInput>): Promise<CrmIntent> {
+      const data = await request<{ intent: CrmIntent }>(`/api/crm/admin/intents/${id}`, {
+        method: 'PATCH',
+        body: input,
+      })
+      return data.intent
+    },
+    /** Deletes an unused category; retires (active=false) one that has history. */
+    async removeIntent(id: string): Promise<{ retired: boolean }> {
+      return request(`/api/crm/admin/intents/${id}`, { method: 'DELETE' })
+    },
+    async importLeads(
+      rows: ImportRow[],
+      batch: string
+    ): Promise<{ inserted: number; updated: number; invalid: number; duplicateInFile: number }> {
+      return request('/api/crm/admin/import', { method: 'POST', body: { rows, batch } })
+    },
+    async assign(leadIds: string[], agentId: string | null): Promise<{ assigned: number }> {
+      return request('/api/crm/admin/assign', { method: 'POST', body: { leadIds, agentId } })
+    },
+    async agents(): Promise<CrmAgentRow[]> {
+      const data = await request<{ agents: CrmAgentRow[] }>('/api/crm/admin/agents')
+      return data.agents
+    },
+    /**
+     * The console's live feed of answers. Pass the newest `created_at` already
+     * held as `since` and only newer rows come back, so a dashboard left open
+     * stays cheap.
+     */
+    async activity(
+      params: { since?: string; limit?: number } = {}
+    ): Promise<{ activity: CrmActivityItem[]; now: string }> {
+      return request('/api/crm/admin/activity', {
+        query: { since: params.since || undefined, limit: params.limit },
+      })
+    },
+    /** File leads for accounts that signed up before the CRM existed. */
+    async backfill(days: number): Promise<{ created: number }> {
+      return request('/api/crm/admin/backfill', { method: 'POST', body: { days } })
+    },
+  },
+
   // ─── Popup alerts (superadmin-authored modal announcements) ───────────────
   alerts: {
     /** Pending popup alerts for the signed-in user (active, audience-matched, undismissed). */
@@ -2385,6 +2596,8 @@ export interface AppSettings {
   rank_booster_enabled: boolean
   /** Show the flashcard ("Instants") peek on the dashboard. Off = admins only. */
   flashcards_enabled: boolean
+  /** App-wide: non-admins get MaintenancePage + every gated API 503s. */
+  maintenance_mode: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

@@ -158,7 +158,7 @@ export default function TelegramHelpModal({ open, onClose }: TelegramHelpModalPr
           {t('tgHelpNote')}
         </p>
 
-        <button onClick={onClose} className="btn-brand press mt-5 w-full px-4 py-3 text-sm">
+        <button onClick={onClose} className="btn-wrap btn-brand press mt-5 w-full px-4 py-3 text-sm">
           <span className="tamil">{t('gotIt')}</span>
         </button>
       </div>

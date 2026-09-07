@@ -151,7 +151,7 @@ export default function PurchaseConfirmModal({
           <button
             onClick={onCancel}
             disabled={busy}
-            className="btn-ghost press flex-1 px-4 py-2.5 text-sm"
+            className="btn-wrap btn-ghost press flex-1 px-4 py-2.5 text-sm"
           >
             {t('cancel')}
           </button>

@@ -107,7 +107,7 @@ export default function TotpChallengeModal({
           <button
             type="submit"
             disabled={busy || !code.trim()}
-            className="btn-brand press w-full px-6 py-3.5 text-base disabled:opacity-50"
+            className="btn-wrap btn-brand press w-full px-6 py-3.5 text-base disabled:opacity-50"
           >
             {busy && <Spinner size={18} />}
             {busy ? t('verifyingOtp') : t('verifyAndSignIn')}
@@ -129,7 +129,7 @@ export default function TotpChallengeModal({
         <button
           onClick={onClose}
           disabled={busy}
-          className="btn-ghost press mt-5 w-full px-4 py-2.5 text-sm disabled:opacity-50"
+          className="btn-wrap btn-ghost press mt-5 w-full px-4 py-2.5 text-sm disabled:opacity-50"
         >
           {t('cancel')}
         </button>

@@ -86,10 +86,10 @@ export default function ReportQuestionModal({
         />
 
         <div className="mt-4 flex items-stretch gap-2">
-          <button onClick={onCancel} className="btn-soft flex-1">
+          <button onClick={onCancel} className="btn-wrap btn-soft flex-1">
             {t('cancel')}
           </button>
-          <button onClick={() => onSubmit(reason.trim())} className="btn-brand flex-1">
+          <button onClick={() => onSubmit(reason.trim())} className="btn-wrap btn-brand flex-1">
             {t('submitReport')}
           </button>
         </div>

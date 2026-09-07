@@ -48,6 +48,14 @@ export function auditAdmin(req: AuthedRequest, res: Response, next: NextFunction
   const subjectId = subjectOf(req)
 
   res.on('finish', () => {
+    // A handler may declare that this particular response exposed nothing worth
+    // a trail — used by the CRM's few-second "any new leads?" poll, which would
+    // otherwise write thousands of empty rows a day and bury the reads that
+    // actually surfaced someone's phone number. Only ever set on a response
+    // that returned no personal data; the same route audits normally when it
+    // does return a lead.
+    if (res.locals.auditSkip) return
+
     const path = req.originalUrl.split('?')[0]
     const action = `${req.method} ${path}`
     const status = res.statusCode

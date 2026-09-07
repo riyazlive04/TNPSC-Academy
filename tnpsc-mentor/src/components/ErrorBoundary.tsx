@@ -175,13 +175,13 @@ export function ErrorScreen({
       <div className="flex w-full max-w-md flex-col gap-2 sm:flex-row">
         <button
           onClick={() => window.location.reload()}
-          className="btn-brand flex-1 px-6 py-3 text-sm"
+          className="btn-wrap btn-brand flex-1 px-6 py-3 text-sm"
         >
           <RotateCw size={16} /> Reload app
         </button>
         <button
           onClick={() => window.location.assign('/test-arena')}
-          className="btn-ghost flex-1 px-6 py-3 text-sm"
+          className="btn-wrap btn-ghost flex-1 px-6 py-3 text-sm"
         >
           <Home size={16} /> Go to Home
         </button>

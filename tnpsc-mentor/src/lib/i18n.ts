@@ -138,6 +138,112 @@ const STRINGS = {
   },
   onbFirstTestCta: { en: 'Experience the free test now!', ta: 'இப்போதே இலவசத் தேர்வை அனுபவியுங்கள்!' },
 
+  // ─── Intro screens (first-run "what's in the app" slides, /welcome) ───────
+  // A swipeable Next/Back walkthrough shown once, right after signup (and
+  // replayable from the profile). Deliberately feature-led: it answers "what
+  // do I get here?" before the dashboard's guided tour answers "where do I tap?".
+  //
+  // Every number below is checked against the live bank (2026-09-01) - keep it
+  // that way: a slide that overstates what is in the app is worse than no slide.
+  // 20,537 active student-facing questions; PYQ 5,075 across 2011-2025; subject
+  // bank 12 subjects / 109 topics / 5 question types; aptitude 1,066; CA 1,709
+  // monthly + a daily issue; mocks are 200 Q / 180 min with NO negative marking;
+  // revision triggers at <= 40% (REVISION_PASS_MARK). Flashcards are deliberately
+  // absent - they are still dark behind `flashcards_enabled`.
+  introSkip: { en: 'Skip', ta: 'தவிர்' },
+  introReplay: { en: "What's inside the app", ta: 'செயலியில் என்ன இருக்கிறது' },
+  introReplaySub: { en: 'A quick look at every feature', ta: 'ஒவ்வொரு வசதியையும் விரைவாகப் பாருங்கள்' },
+
+  introWelcomeTitle: {
+    en: 'Everything for TNPSC, in one app',
+    ta: 'TNPSC-க்குத் தேவையான அனைத்தும் ஒரே செயலியில்',
+  },
+  introWelcomeBody: {
+    en: 'Real exam questions, timed papers and honest progress tracking — built for Group 1, 2, 2A and 4 aspirants.',
+    ta: 'உண்மையான தேர்வு வினாக்கள், நேரக் கட்டுப்பாட்டுத் தேர்வுகள், தெளிவான முன்னேற்றக் கண்காணிப்பு — குரூப் 1, 2, 2A, 4 விரும்பிகளுக்காக.',
+  },
+  introWelcomeP1: {
+    en: '20,000+ questions, each with a written explanation',
+    ta: '20,000+ வினாக்கள், ஒவ்வொன்றுக்கும் எழுத்து விளக்கம்',
+  },
+  introWelcomeP2: {
+    en: 'Read the whole app in Tamil, English or both',
+    ta: 'செயலி முழுவதையும் தமிழ், ஆங்கிலம் அல்லது இரண்டிலும் படிக்கலாம்',
+  },
+
+  introPyqTitle: { en: 'Previous year question papers', ta: 'முந்தைய ஆண்டு வினாத்தாள்கள்' },
+  introPyqBody: {
+    en: 'The real TNPSC papers for Group 1, Group 2/2A and Group 4 — 2011 to 2025, year by year and section by section.',
+    ta: 'குரூப் 1, குரூப் 2/2A, குரூப் 4-க்கான உண்மையான TNPSC வினாத்தாள்கள் — 2011 முதல் 2025 வரை, ஆண்டு வாரியாகவும் பிரிவு வாரியாகவும்.',
+  },
+  introPyqP1: {
+    en: '5,000+ past questions, filtered by year or section',
+    ta: '5,000+ முந்தைய வினாக்கள், ஆண்டு அல்லது பிரிவு வாரியாக',
+  },
+  introPyqP2: {
+    en: 'A worked explanation for every single answer',
+    ta: 'ஒவ்வொரு விடைக்கும் விரிவான விளக்கம்',
+  },
+
+  introPracticeTitle: { en: 'Practise subject by subject', ta: 'பாடம் வாரியாகப் பயிற்சி செய்யுங்கள்' },
+  introPracticeBody: {
+    en: 'Choose a subject, then a topic, then the question type you want to drill — 12 subjects and 109 topics, plus 1,000+ aptitude and reasoning questions.',
+    ta: 'பாடம், பிறகு தலைப்பு, பிறகு பயிற்சி செய்ய வேண்டிய வினா வகை — 12 பாடங்கள், 109 தலைப்புகள், உடன் 1,000+ திறனாய்வு & பகுத்தறிவு வினாக்கள்.',
+  },
+  introPracticeP1: {
+    en: '12 subjects · 109 topics · 5 question types',
+    ta: '12 பாடங்கள் · 109 தலைப்புகள் · 5 வினா வகைகள்',
+  },
+  introPracticeP2: {
+    en: "Questions you've already answered are served last",
+    ta: 'ஏற்கனவே பதிலளித்த வினாக்கள் கடைசியாகவே வரும்',
+  },
+
+  introMockTitle: { en: 'Sit a full-length mock test', ta: 'முழு நீள மாதிரித் தேர்வு எழுதுங்கள்' },
+  introMockBody: {
+    en: '200-question papers with a 3-hour timer and an OMR answer sheet, written in fullscreen — the closest thing to the real exam hall.',
+    ta: '200 வினாக்கள், 3 மணி நேரம், OMR விடைத்தாள் — முழுத்திரையில் எழுதும் தேர்வு, உண்மையான தேர்வரங்கத்திற்கு மிக அருகில்.',
+  },
+  introMockP1: {
+    en: 'Full 200-question papers, timed to 3 hours',
+    ta: 'முழு 200 வினாத் தாள்கள், 3 மணி நேர வரம்பு',
+  },
+  introMockP2: {
+    en: 'A subject-wise breakdown after every attempt',
+    ta: 'ஒவ்வொரு முயற்சிக்குப் பிறகும் பாட வாரியான பகுப்பாய்வு',
+  },
+
+  introCaTitle: { en: 'Current affairs, every single day', ta: 'நடப்பு நிகழ்வுகள், தினமும்' },
+  introCaBody: {
+    en: "A bilingual daily digest to read, and a short test on the same day's news to check what actually stayed with you.",
+    ta: 'படிக்க இருமொழி தினசரித் தொகுப்பு, அன்றைய செய்திகளிலேயே ஒரு குறுந்தேர்வு — எவை நினைவில் நிற்கின்றன என்று பார்க்க.',
+  },
+  introCaP1: {
+    en: 'A new issue every day, in Tamil and English',
+    ta: 'தினமும் புதிய இதழ், தமிழிலும் ஆங்கிலத்திலும்',
+  },
+  introCaP2: {
+    en: '1,700+ monthly current-affairs questions for revision',
+    ta: 'மீள்பார்வைக்கு 1,700+ மாதாந்திர நடப்பு நிகழ்வு வினாக்கள்',
+  },
+
+  introProgressTitle: {
+    en: 'Revise smart, track everything',
+    ta: 'திறமையாக மீள்பார்வை, அனைத்தையும் கண்காணிப்பு',
+  },
+  introProgressBody: {
+    en: 'Score 40% or less on a topic and it comes back as a revision on its own — while Insights show your accuracy, your weak subjects and your daily streak.',
+    ta: 'ஒரு தலைப்பில் 40% அல்லது அதற்குக் குறைவாகப் பெற்றால், அது தானாகவே மீள்பார்வையாகத் திரும்பும் — பகுப்பாய்வு உங்கள் துல்லியம், பலவீனமான பாடங்கள், தினசரித் தொடர்ச்சியைக் காட்டும்.',
+  },
+  introProgressP1: {
+    en: 'Weak topics return automatically for revision',
+    ta: 'பலவீனமான தலைப்புகள் தானாகவே மீள்பார்வைக்குத் திரும்பும்',
+  },
+  introProgressP2: {
+    en: 'Streaks, daily goals and subject-wise insights',
+    ta: 'தொடர்ச்சி, தினசரி இலக்குகள், பாட வாரியான பகுப்பாய்வு',
+  },
+
   // ─── Push notification primer (native app, shown once before the OS asks) ──
   pushPrimerTitle: { en: "Don't miss your streak", ta: 'உங்கள் தொடர்ச்சியை தவறவிடாதீர்கள்' },
   pushPrimerBody: {
@@ -398,6 +504,9 @@ const STRINGS = {
   prev: { en: 'Prev', ta: 'முந்தைய' },
   next: { en: 'Next', ta: 'அடுத்து' },
   flag: { en: 'Flag', ta: 'குறி' },
+  /** Short form for the quiz nav pill - `flagged` is a summary noun and its
+   *  Tamil (குறிக்கப்பட்டவை) is far too wide for a button. */
+  flaggedShort: { en: 'Flagged', ta: 'குறித்தது' },
   submitTest: { en: 'Submit Test', ta: 'தேர்வைச் சமர்ப்பி' },
   quit: { en: 'Quit', ta: 'வெளியேறு' },
   leaveAppTitle: { en: 'Leave the app?', ta: 'ஆப்-ஐ விட்டு வெளியேறவா?' },
@@ -1963,6 +2072,9 @@ const STRINGS = {
   caMagazineTab: { en: 'CA Magazine', ta: 'CA இதழ்' },
   caSlidesTab: { en: 'CA Slides', ta: 'CA ஸ்லைடுகள்' },
   caQuestionsTab: { en: 'CA Questions', ta: 'CA வினாக்கள்' },
+  // The telecaller lead desk's console tab. The desk itself (/crm) is a staff
+  // tool and ships in English only; this label sits in the bilingual console.
+  crmTab: { en: 'CRM / Leads', ta: 'CRM / லீட்கள்' },
   caMagazineNoItems: {
     en: 'No items in this issue yet.',
     ta: 'இந்த இதழில் இதுவரை உள்ளடக்கம் எதுவும் இல்லை.',
@@ -2045,6 +2157,12 @@ const STRINGS = {
     ta: 'இது அணைந்திருக்கும் வரை நிர்வாகிகள் மட்டுமே ஃபிளாஷ்கார்டுகளைப் பார்ப்பார்கள்; நேரடிச் செயலியிலேயே சோதிக்கலாம்.',
   },
   flashcardsShowToStudents: { en: 'Show to students', ta: 'மாணவர்களுக்குக் காட்டு' },
+  maintenanceSectionTitle: { en: 'Maintenance mode', ta: 'பராமரிப்பு பயன்முறை' },
+  maintenanceSectionSub: {
+    en: 'While this is on, students see a maintenance page and every API call 503s. Admins and superadmins can still sign in and work normally.',
+    ta: 'இது இயக்கத்தில் இருக்கும்போது மாணவர்கள் பராமரிப்புப் பக்கத்தைப் பார்ப்பார்கள். நிர்வாகிகள் மற்றும் மேல்நிர்வாகிகள் வழக்கம் போல் உள்நுழையலாம்.',
+  },
+  maintenanceCloseAppToStudents: { en: 'Close app to students', ta: 'மாணவர்களுக்கு செயலியை மூடு' },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },
@@ -2060,6 +2178,7 @@ const STRINGS = {
   roleUser: { en: 'Student', ta: 'மாணவர்' },
   roleAdmin: { en: 'Admin', ta: 'நிர்வாகி' },
   roleSuperadmin: { en: 'Super Admin', ta: 'மேலாண்மை நிர்வாகி' },
+  roleTelecaller: { en: 'Telecaller', ta: 'தொலைபேசி அழைப்பாளர்' },
   roleUpdated: { en: 'Role updated.', ta: 'பங்கு புதுப்பிக்கப்பட்டது.' },
   roleUpdateFailed: { en: "Couldn't update role.", ta: 'பங்கை புதுப்பிக்க முடியவில்லை.' },
   changeRoleTitle: { en: 'Change user role?', ta: 'பயனர் பங்கை மாற்றவா?' },
@@ -2179,6 +2298,14 @@ const STRINGS = {
   noFeedback: { en: 'No feedback yet.', ta: 'இன்னும் கருத்துகள் இல்லை.' },
   couldNotLoad: { en: "Couldn't load this data. Try again.", ta: 'இந்தத் தரவை ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' },
   retry: { en: 'Retry', ta: 'மீண்டும் முயற்சி' },
+  // Full-screen page shown to non-admins while superadmin-controlled
+  // maintenance mode is on (App.tsx's AnimatedRoutes, MaintenanceModeCard).
+  maintenanceTitle: { en: "We'll be right back", ta: 'விரைவில் திரும்புவோம்' },
+  maintenanceBody: {
+    en: 'TNPSC Mentor is under maintenance. Please check back shortly.',
+    ta: 'TNPSC Mentor பராமரிப்பில் உள்ளது. சிறிது நேரத்தில் மீண்டும் பாருங்கள்.',
+  },
+  maintenanceAdminSignIn: { en: 'Admin sign in', ta: 'நிர்வாகி உள்நுழைவு' },
   // Shown in place of a server message that turned out to be a database
   // internal rather than copy meant for a user — see ApiError in lib/api.ts.
   unexpectedError: {

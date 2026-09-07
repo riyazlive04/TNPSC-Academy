@@ -64,7 +64,7 @@ export default function CreditConfirmPopup({ open, cost, onConfirm, onCancel }: 
           </p>
         </div>
         <div className="flex gap-3">
-          <button onClick={onCancel} className="btn-ghost press flex-1 px-4 py-2.5 text-sm">
+          <button onClick={onCancel} className="btn-wrap btn-ghost press flex-1 px-4 py-2.5 text-sm">
             {t('cancel')}
           </button>
           <button

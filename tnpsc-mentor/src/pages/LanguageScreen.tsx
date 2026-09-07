@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, Globe } from 'lucide-react'
 import { useLanguageStore, type Lang } from '../store/languageStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 import { api } from '../lib/api'
 import { useT } from '../lib/i18n'
 import type { Tint } from '../components/UI/IconTile'
@@ -42,7 +43,9 @@ export default function LanguageScreen() {
     // this screen is never shown again. Best-effort: the local store already
     // drives the UI, and the column may not exist until the migration is run.
     api.updateProfile({ language: selected }).catch(() => {})
-    navigate('/test-arena', { replace: true })
+    // A new account sees the intro slides next - in the language just picked.
+    const dest = useOnboardingStore.getState().intro ? '/welcome' : '/test-arena'
+    navigate(dest, { replace: true })
   }
 
   return (
@@ -91,7 +94,7 @@ export default function LanguageScreen() {
           })}
         </div>
 
-        <button onClick={proceed} disabled={!selected} className="btn-brand w-full px-6 py-3.5 text-base">
+        <button onClick={proceed} disabled={!selected} className="btn-wrap btn-brand w-full px-6 py-3.5 text-base">
           {t('continueBtn')} →
         </button>
       </div>

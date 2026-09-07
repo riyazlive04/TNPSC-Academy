@@ -9,6 +9,11 @@ import { api, type AuthConfig } from '../lib/api'
  */
 export interface AuthConfigState extends AuthConfig {
   loaded: boolean
+  /** Superadmin-controlled app-wide maintenance flag (GET /api/app/settings,
+   *  fetched alongside auth config since both are needed at boot). See
+   *  App.tsx's AnimatedRoutes for the full-screen gate, and lib/api.ts's
+   *  request() for the reactive 503 → true flip on an already-open tab. */
+  maintenanceMode: boolean
   init: () => Promise<void>
 }
 
@@ -18,17 +23,23 @@ export const useAuthConfigStore = create<AuthConfigState>((set, get) => ({
   telegramVerify: false,
   phoneOtp: false,
   loaded: false,
+  maintenanceMode: false,
 
   init: async () => {
     if (get().loaded) return
-    try {
-      const cfg = await api.auth.config()
-      set({ ...cfg, loaded: true })
-    } catch {
-      // Boot-time network hiccup — leave every optional method hidden rather
-      // than guess. Core email/password + Google-by-CLIENT_ID auth still work;
-      // a reload retries this fetch.
-      set({ loaded: true })
-    }
+    // allSettled, not all: these two calls are unrelated (auth-method config
+    // vs. public app settings) and must fail independently — one endpoint
+    // being down (e.g. a Supabase-REST outage affecting only /api/app/settings)
+    // shouldn't also blank out the other's already-succeeded result.
+    const [cfgResult, settingsResult] = await Promise.allSettled([
+      api.auth.config(),
+      api.appSettings(),
+    ])
+    set({
+      ...(cfgResult.status === 'fulfilled' ? cfgResult.value : {}),
+      maintenanceMode:
+        settingsResult.status === 'fulfilled' ? settingsResult.value.maintenance_mode : false,
+      loaded: true,
+    })
   },
 }))

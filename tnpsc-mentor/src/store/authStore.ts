@@ -502,13 +502,27 @@ export function selectIsSuperAdmin(s: AuthState): boolean {
   return s.profile?.role === 'superadmin'
 }
 
+/** A telecaller and nothing else — the staff role whose whole app is /crm. */
+export function selectIsTelecaller(s: AuthState): boolean {
+  return s.profile?.role === 'telecaller'
+}
+
+/** Anyone allowed into the lead desk: telecallers plus the admins who
+ *  supervise them. Deliberately separate from selectIsAdmin — a telecaller
+ *  must not pass any admin gate. */
+export function selectIsCrmStaff(s: AuthState): boolean {
+  const role = s.profile?.role
+  return role === 'telecaller' || role === 'admin' || role === 'superadmin'
+}
+
 // A Google signup arrives with only name/email - no phone. Such aspirants are
 // routed through /complete-profile until phone is filled. (Target group is no
-// longer collected; a default is applied server-side.) Admins and superadmins
-// are seeded directly and skip this onboarding gate.
+// longer collected; a default is applied server-side.) Staff accounts (admin,
+// superadmin, telecaller) are seeded directly and skip this onboarding gate —
+// a telecaller has no reason to hand over a personal mobile to sign in.
 export function selectProfileNeedsOnboarding(s: AuthState): boolean {
   const p = s.profile
   if (!p) return false
-  if (p.role === 'admin' || p.role === 'superadmin') return false
+  if (p.role === 'admin' || p.role === 'superadmin' || p.role === 'telecaller') return false
   return !p.phone
 }

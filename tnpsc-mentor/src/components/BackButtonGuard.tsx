@@ -8,6 +8,7 @@ import { useQuizStore } from '../store/quizStore'
 import { useMockQuizStore } from '../store/mockQuizStore'
 import { abandonTest } from '../lib/abandonTest'
 import { exitFullscreen } from '../lib/proctor'
+import { runBackInterceptor } from '../lib/backInterceptor'
 
 // Screens that hold a live, unfinished test - a back press here must confirm
 // before throwing the attempt away, instead of silently navigating off.
@@ -18,6 +19,8 @@ type Prompt = 'leave-app' | 'abandon'
 /**
  * Global back-navigation guard for both the installed app and the web build.
  *
+ *  - A screen that registered a back interceptor (see lib/backInterceptor -
+ *    currently the intro slides) unwinds its own steps first.
  *  - During a live test (practice or mock), back asks "Leave this test?" and
  *    only abandons + navigates away on confirm - never loses progress silently.
  *  - On the native app's root screen, back asks "Leave the app?" and only exits
@@ -56,6 +59,9 @@ export default function BackButtonGuard() {
       setPrompt(null)
       return
     }
+    // A screen with internal steps (the intro slides) gets first refusal: back
+    // walks it one step instead of leaving it. Falls through when it's done.
+    if (runBackInterceptor()) return
     if (liveTestKind()) {
       setPrompt('abandon')
       return
@@ -168,14 +174,14 @@ export default function BackButtonGuard() {
         <div className="mt-6 flex gap-3">
           <button
             onClick={() => setPrompt(null)}
-            className="btn-ghost flex-1 justify-center py-2.5 text-sm"
+            className="btn-wrap btn-ghost flex-1 justify-center py-2.5 text-sm"
             autoFocus
           >
             {t('stay')}
           </button>
           <button
             onClick={isAbandon ? confirmAbandon : confirmExitApp}
-            className="btn-brand flex-1 justify-center py-2.5 text-sm"
+            className="btn-wrap btn-brand flex-1 justify-center py-2.5 text-sm"
           >
             {isAbandon ? t('abandonTestConfirm') : t('leaveAppConfirm')}
           </button>

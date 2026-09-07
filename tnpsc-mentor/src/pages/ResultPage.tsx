@@ -543,7 +543,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                     )
                   })}
                 </div>
-                <button onClick={() => navigate('/revision')} className="btn-soft mt-4 w-full px-5 py-3 text-sm">
+                <button onClick={() => navigate('/revision')} className="btn-wrap btn-soft mt-4 w-full px-5 py-3 text-sm">
                   {t('practiceMistakes')} →
                 </button>
               </section>
@@ -570,7 +570,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
               ) : outOfDownloads ? (
                 <button
                   onClick={promptUpgrade}
-                  className="btn-brand press flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
+                  className="btn-wrap btn-brand press flex w-full items-center justify-center gap-2 px-5 py-3 text-sm"
                 >
                   <Crown size={16} /> {t('pdfUpgradeForMore')}
                 </button>
@@ -579,7 +579,7 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                   <button
                     onClick={downloadExplanationPdf}
                     disabled={downloadingPdf}
-                    className="btn-soft flex w-full items-center justify-center gap-2 px-5 py-3 text-sm disabled:opacity-60"
+                    className="btn-wrap btn-soft flex w-full items-center justify-center gap-2 px-5 py-3 text-sm disabled:opacity-60"
                   >
                     {downloadingPdf ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
                     {downloadingPdf ? t('preparingPdf') : t('downloadExplanations')}
@@ -648,10 +648,10 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
 
         {/* Actions - the single primary pill + a quiet retry, full width below. */}
         <div className="mx-auto mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row">
-          <button onClick={handleRetry} className="btn-ghost flex-1 px-6 py-3.5">
+          <button onClick={handleRetry} className="btn-wrap btn-ghost flex-1 px-6 py-3.5">
             <RefreshCw size={18} /> {t('retryTest')}
           </button>
-          <button onClick={() => navigate('/test-arena')} className="btn-brand flex-1 px-6 py-3.5">
+          <button onClick={() => navigate('/test-arena')} className="btn-wrap btn-brand flex-1 px-6 py-3.5">
             <Home size={18} /> {t('testArena')}
           </button>
         </div>

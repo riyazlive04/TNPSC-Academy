@@ -90,12 +90,12 @@ export default function PushNudge({ holdBack = false }: { holdBack?: boolean }) 
             <button
               onClick={handleEnable}
               disabled={enabling}
-              className="btn-brand inline-flex w-full items-center justify-center gap-1.5 py-2.5 text-sm disabled:opacity-60"
+              className="btn-wrap btn-brand inline-flex w-full items-center justify-center gap-1.5 py-2.5 text-sm disabled:opacity-60"
             >
               {enabling ? <Loader2 size={16} className="animate-spin" /> : <BellRing size={16} />}
               {t('enableDeviceNotifications')}
             </button>
-            <button onClick={settle} className="btn-ghost w-full py-2 text-sm">
+            <button onClick={settle} className="btn-wrap btn-ghost w-full py-2 text-sm">
               {t('notNow')}
             </button>
           </div>

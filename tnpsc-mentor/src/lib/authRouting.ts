@@ -1,28 +1,37 @@
 import {
   useAuthStore,
   selectIsSuperAdmin,
+  selectIsTelecaller,
   selectProfileNeedsOnboarding,
 } from '../store/authStore'
 import { useLanguageStore } from '../store/languageStore'
+import { useOnboardingStore } from '../store/onboardingStore'
 
 /**
  * Resolve where to send a user immediately after a successful sign-in. Shared by
  * the email/password login and the Google button so both honour the same rules:
  *
  *  1. Profile missing target group / phone (a fresh Google signup) → onboarding.
- *  2. Superadmins → their console.
- *  3. A deep link the user was bounced from (unless it's the arena default).
- *  4. Otherwise the arena, or the one-time language screen if not chosen yet.
+ *  2. Telecallers → the lead desk, which is the only screen they have.
+ *  3. Superadmins → their console.
+ *  4. A deep link the user was bounced from (unless it's the arena default).
+ *  5. Otherwise the arena - via the one-time language screen if a language has
+ *     not been chosen yet, then the one-time intro slides for a new account.
  *
  * Reads the live store state, so call it AFTER the sign-in action has resolved.
  */
 export function postAuthDestination(fromPath?: string): string {
   const state = useAuthStore.getState()
   if (selectProfileNeedsOnboarding(state)) return '/complete-profile'
+  if (selectIsTelecaller(state)) return '/crm'
   if (selectIsSuperAdmin(state)) return '/superadmin'
   if (fromPath && fromPath !== '/test-arena') return fromPath
   const langAlreadySet = useLanguageStore.getState().lang !== null
-  return langAlreadySet ? '/test-arena' : '/language'
+  if (!langAlreadySet) return '/language'
+  // A brand-new account still owes the intro slides ("what's in the app").
+  // Only signup arms this, so existing users go straight to the arena.
+  if (useOnboardingStore.getState().intro) return '/welcome'
+  return '/test-arena'
 }
 
 /** Landing pages where a successful auth should resume checkout immediately

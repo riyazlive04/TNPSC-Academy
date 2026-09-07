@@ -1099,7 +1099,7 @@ export default function LandingPage() {
         <a
           href={isAuthed ? APP_URL : APP_REGISTER_URL}
           onClick={() => trackEvent('webapp_click')}
-          className="btn-brand group w-full justify-center whitespace-nowrap px-4 py-3 text-sm"
+          className="btn-wrap btn-brand group w-full justify-center whitespace-nowrap px-4 py-3 text-sm"
         >
           <Globe size={16} /> {isAuthed ? t('webCta') : t('registerForFree')}
         </a>
@@ -1311,7 +1311,7 @@ function InstallNoticeModal({
                 trackEvent('download_click')
                 onClose()
               }}
-              className="btn-brand group mt-5 w-full justify-center px-6 py-3.5 text-base"
+              className="btn-wrap btn-brand group mt-5 w-full justify-center px-6 py-3.5 text-base"
             >
               <Download
                 size={18}

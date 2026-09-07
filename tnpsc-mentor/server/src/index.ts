@@ -35,9 +35,11 @@ import caQuestionsRoutes from './routes/caQuestions.js'
 import caTelegramRoutes from './routes/caTelegram.js'
 import caWhatsappRoutes from './routes/caWhatsapp.js'
 import creditRoutes from './routes/credits.js'
+import crmRoutes from './routes/crm.js'
 import appRoutes from './routes/app.js'
 import telegramRoutes from './routes/telegram.js'
 import clientErrorRoutes from './routes/clientErrors.js'
+import { maintenanceGate } from './middleware/maintenance.js'
 
 const app = express()
 
@@ -83,6 +85,18 @@ app.use(
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
 
 app.use('/api/auth', authRoutes)
+// Self-authenticating (webhook secret) / the Telegram fallback for signup
+// phone-verification — mounted alongside /api/auth, ahead of the maintenance
+// gate below, so that OTP channel isn't blocked while WhatsApp's (inside
+// /api/auth) isn't either.
+app.use('/api/telegram', telegramRoutes)
+
+// Closes the app to everyone except admins/superadmins when maintenance mode
+// is on (superadmin console → toggle). Everything mounted above this line
+// (auth, telegram) stays reachable regardless — an admin has to be able to
+// log in to prove their role. Everything below is gated.
+app.use('/api', maintenanceGate)
+
 app.use('/api/questions', questionRoutes)
 app.use('/api/tests', testRoutes)
 app.use('/api/reviews', reviewRoutes)
@@ -112,8 +126,10 @@ app.use('/api/ca-questions', caQuestionsRoutes)
 app.use('/api/ca-telegram', caTelegramRoutes)
 app.use('/api/ca-whatsapp', caWhatsappRoutes)
 app.use('/api/credits', creditRoutes)
+// Telecaller lead desk (/crm). Audited like the admin consoles: every lead read
+// exposes a student's phone/email, so the trail has to exist.
+app.use('/api/crm', auditAdmin, crmRoutes)
 app.use('/api/app', appRoutes)
-app.use('/api/telegram', telegramRoutes)
 app.use('/api/client-errors', clientErrorRoutes)
 
 // 404 for unknown API routes.

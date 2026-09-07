@@ -1,17 +1,23 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
-import { Navigate, Route, Routes, useNavigate, useLocation, useOutlet } from 'react-router-dom'
+import { Link, Navigate, Route, Routes, useNavigate, useLocation, useOutlet } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Compass, Home } from 'lucide-react'
-import { useAuthStore } from './store/authStore'
+import { Compass, Home, Loader2, Wrench } from 'lucide-react'
+import {
+  useAuthStore,
+  selectIsAdmin,
+  selectIsSuperAdmin,
+  selectIsTelecaller,
+} from './store/authStore'
 import { useAuthConfigStore } from './store/authConfigStore'
 import { useThemeStore } from './store/themeStore'
 import { useUpsellStore } from './store/upsellStore'
-import { warmApi } from './lib/api'
+import { api, warmApi } from './lib/api'
 import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
 import { trackPageView } from './lib/tracking'
 import { pageVariants } from './lib/motion'
+import { useT } from './lib/i18n'
 import AppLayout from './components/Layout/AppLayout'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import { prefetchRoutes, PREFETCH_ON_BOOT } from './lib/routePrefetch'
@@ -52,6 +58,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'))
 const LanguageScreen = lazy(() => import('./pages/LanguageScreen'))
+const WelcomeIntroPage = lazy(() => import('./pages/WelcomeIntroPage'))
 const TestArenaPage = lazy(() => import('./pages/TestArenaPage'))
 const PyqGroupChooserPage = lazy(() => import('./pages/PyqGroupChooserPage'))
 const PreviousYearPage = lazy(() => import('./pages/PreviousYearPage'))
@@ -86,6 +93,7 @@ const FlashcardDeck = lazy(() => import('./pages/FlashcardDeck'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
+const CrmPage = lazy(() => import('./pages/CrmPage'))
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
@@ -93,7 +101,7 @@ const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 interface RouteDef {
   path: string
   element: ReactElement
-  role?: 'admin' | 'superadmin'
+  role?: 'admin' | 'superadmin' | 'crm'
 }
 
 /**
@@ -150,12 +158,19 @@ const SHELL_ROUTES: RouteDef[] = [
 const BARE_ROUTES: RouteDef[] = [
   { path: '/complete-profile', element: <CompleteProfilePage /> },
   { path: '/language', element: <LanguageScreen /> },
+  // The first-run intro slides ("what's in the app"): own the whole viewport so
+  // nothing of the app is visible behind them until the walkthrough is done.
+  { path: '/welcome', element: <WelcomeIntroPage /> },
   { path: '/quiz', element: <QuizPage /> },
   { path: '/mock/quiz', element: <MockQuizPage /> },
   // The flashcard viewer hijacks the screen the way a test does — the swipe
   // gesture needs the full viewport, and the tab bar would sit under the thumb.
   { path: '/flashcards/:deckId', element: <FlashcardDeck /> },
   { path: '/payment-success', element: <PaymentSuccessPage /> },
+  // The telecaller lead desk owns the whole viewport: its users are staff, not
+  // aspirants, so the student header and tab bar would be dead weight (and a
+  // pile of tiles they have no access to). Its own chrome ships inside the page.
+  { path: '/crm', element: <CrmPage />, role: 'crm' },
 ]
 
 export default function App() {
@@ -259,10 +274,21 @@ function AnimatedOutlet() {
   )
 }
 
+// Always reachable even while maintenance mode is on — an admin has to be
+// able to get to /login to prove their role (see MaintenancePage's own link
+// there too). Kept deliberately narrow: /register stays gated, since new
+// signups shouldn't land mid-maintenance.
+const MAINTENANCE_EXEMPT_PATHS = new Set(['/login', '/forgot-password', '/reset-password'])
+
 /** The route table. Chrome routes are nested under the shell (which owns the
  * transition); immersive screens render straight, with no animation at all. */
 function AnimatedRoutes() {
   const location = useLocation()
+  const maintenanceMode = useAuthConfigStore((s) => s.maintenanceMode)
+  const authLoading = useAuthStore((s) => s.loading)
+  const realIsAdmin = useAuthStore(selectIsAdmin)
+  const realIsSuperAdmin = useAuthStore(selectIsSuperAdmin)
+  const realIsTelecaller = useAuthStore(selectIsTelecaller)
 
   // SPA page-view tracking: GTM/GA4/Meta only fire a pageview on the initial
   // HTML load, so every client-side route change here must be reported by hand.
@@ -270,6 +296,24 @@ function AnimatedRoutes() {
   useEffect(() => {
     trackPageView(location.pathname + location.search)
   }, [location.pathname, location.search])
+
+  // Real (unmasked) role — "preview as student" must never lock an admin out
+  // of their own maintenance window. !authLoading guards the moment right
+  // after a real admin's session bootstraps, so they don't flash this page.
+  // Telecallers are exempt too, but only ON the desk: maintenance closes the
+  // student app, and the lead desk is a separate internal tool whose leads keep
+  // arriving throughout a deploy (the API gate mirrors this — see
+  // middleware/maintenance.ts).
+  if (
+    maintenanceMode &&
+    !authLoading &&
+    !realIsAdmin &&
+    !realIsSuperAdmin &&
+    !(realIsTelecaller && location.pathname === '/crm') &&
+    !MAINTENANCE_EXEMPT_PATHS.has(location.pathname)
+  ) {
+    return <MaintenancePage />
+  }
 
   return (
     <Routes location={location}>
@@ -333,8 +377,11 @@ function AnimatedRoutes() {
 function RootRedirect() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
+  const isTelecaller = useAuthStore(selectIsTelecaller)
   if (loading) return <PageLoader />
-  if (user) return <Navigate to="/test-arena" replace />
+  // Telecallers have no arena — send them straight to the desk rather than
+  // through a redirect the ProtectedRoute would have to undo.
+  if (user) return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
   if (isNativeApp()) return <Navigate to="/login" replace />
   return <LandingPage />
 }
@@ -356,6 +403,52 @@ function ContentLoader() {
   return (
     <div className="grid min-h-[60vh] place-items-center">
       <LogoLoader size={56} />
+    </div>
+  )
+}
+
+/** Full-screen page shown to non-admins while superadmin-controlled
+ * maintenance mode is on (see AnimatedRoutes' gate above). */
+function MaintenancePage() {
+  const { t } = useT()
+  const [retrying, setRetrying] = useState(false)
+
+  const retry = async () => {
+    setRetrying(true)
+    try {
+      const settings = await api.appSettings()
+      useAuthConfigStore.setState({ maintenanceMode: settings.maintenance_mode })
+    } catch {
+      // Stay on this screen either way — the button just stops spinning.
+    } finally {
+      setRetrying(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-canvas px-5 text-center">
+      <span className="grid h-16 w-16 place-items-center rounded-hero bg-tint-violet">
+        <Wrench size={30} className="text-primary" />
+      </span>
+      <div>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
+          {t('maintenanceTitle')}
+        </h1>
+        <p className="mx-auto mt-2 max-w-xs font-body text-sm leading-relaxed text-muted">
+          {t('maintenanceBody')}
+        </p>
+      </div>
+      <button
+        onClick={retry}
+        disabled={retrying}
+        className="btn-brand flex items-center gap-2 px-6 py-3 text-sm disabled:opacity-60"
+      >
+        {retrying && <Loader2 size={16} className="animate-spin" />}
+        {t('retry')}
+      </button>
+      <Link to="/login" className="font-body text-xs text-muted underline underline-offset-2">
+        {t('maintenanceAdminSignIn')}
+      </Link>
     </div>
   )
 }

@@ -505,7 +505,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+              className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
             >
               {loading && <Spinner size={18} />}
               {loading ? t('verifyingOtp') : t('verifyAndCreate')}
@@ -699,7 +699,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={handleStartTelegram}
                 disabled={loading}
-                className="btn-brand press flex flex-1 items-center justify-center gap-2 px-6 py-3 text-sm"
+                className="btn-wrap btn-brand press flex flex-1 items-center justify-center gap-2 px-6 py-3 text-sm"
               >
                 <Send size={16} />
                 {t('tgOfferBtn')}

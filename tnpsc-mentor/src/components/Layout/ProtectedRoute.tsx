@@ -4,6 +4,8 @@ import {
   useAuthStore,
   selectIsAdmin,
   selectIsSuperAdmin,
+  selectIsCrmStaff,
+  selectIsTelecaller,
   selectProfileNeedsOnboarding,
 } from '../../store/authStore'
 import { isApiConfigured } from '../../lib/api'
@@ -14,9 +16,10 @@ interface ProtectedRouteProps {
   children: ReactNode
   /**
    * Optional role gate. 'admin' allows admins + superadmins; 'superadmin'
-   * allows only superadmins. Users lacking the role are bounced to the arena.
+   * allows only superadmins; 'crm' allows telecallers plus the admins who
+   * supervise them. Users lacking the role are bounced to the arena.
    */
-  role?: 'admin' | 'superadmin'
+  role?: 'admin' | 'superadmin' | 'crm'
 }
 
 /**
@@ -35,6 +38,8 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
   const loading = useAuthStore((s) => s.loading)
   const isAdmin = useAuthStore(selectIsAdmin)
   const isSuperAdmin = useAuthStore(selectIsSuperAdmin)
+  const isCrmStaff = useAuthStore(selectIsCrmStaff)
+  const isTelecaller = useAuthStore(selectIsTelecaller)
   const needsOnboarding = useAuthStore(selectProfileNeedsOnboarding)
   const location = useLocation()
   const { t } = useT()
@@ -65,10 +70,20 @@ export default function ProtectedRoute({ children, role }: ProtectedRouteProps) 
   }
 
   if (role === 'superadmin' && !isSuperAdmin) {
-    return <Navigate to="/test-arena" replace />
+    return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
   }
   if (role === 'admin' && !isAdmin) {
+    return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
+  }
+  if (role === 'crm' && !isCrmStaff) {
     return <Navigate to="/test-arena" replace />
+  }
+
+  // A telecaller's whole app IS the lead desk: they have no tests, no credits
+  // and no dashboard, so every other authenticated route sends them there
+  // rather than to an arena full of tiles they can't use.
+  if (role !== 'crm' && isTelecaller) {
+    return <Navigate to="/crm" replace />
   }
 
   return <>{children}</>

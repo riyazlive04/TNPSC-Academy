@@ -133,7 +133,7 @@ export default function FeedbackModal({ open, onClose, onSubmitted }: FeedbackMo
           className="input-soft mb-4 resize-none"
         />
 
-        <button onClick={submit} disabled={saving} className="btn-brand press w-full px-6 py-3 text-base">
+        <button onClick={submit} disabled={saving} className="btn-wrap btn-brand press w-full px-6 py-3 text-base">
           {saving && <Spinner size={18} />}
           {saving ? t('submitting') : t('submit')}
         </button>

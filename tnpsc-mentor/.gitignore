@@ -105,3 +105,6 @@ server/_*_backup.json
 # Originals of the CA thumbnails that _thumb_reencode.mjs shrank in Storage —
 # 57 MB of full-resolution images, kept locally as the only copy, not in git.
 server/_thumb_backup/
+# Full-table exports taken during the 2026-09-04 Supabase egress-quota lockout
+# (contains PII: profiles, payments, credit_transactions) — local-only, never git.
+server/_db_backup_20260904/

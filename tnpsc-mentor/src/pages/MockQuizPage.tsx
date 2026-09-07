@@ -678,20 +678,24 @@ export default function MockQuizPage() {
               aria-pressed={showFlaggedOnly}
               aria-label={t('flagged')}
               className={[
-                'btn btn-lg flex-shrink-0 border',
+                'btn btn-lg min-w-0 border',
                 showFlaggedOnly
                   ? 'border-primary bg-primary text-white'
                   : 'border-line bg-card text-ink2 hover:border-brand-ring',
               ].join(' ')}
             >
               <Flag size={16} className={showFlaggedOnly ? 'fill-current' : ''} />
-              {t('flagged')}
+              {/* Label drops below 400px: at `btn-lg` the Tamil "flagged" made
+                  this pill 265px wide and pushed Submit clean off the screen on
+                  any phone <=360px. The icon + count still say what it is, and
+                  the aria-label carries the full name. */}
+              <span className="hidden min-[400px]:inline">{t('flagged')}</span>
               <span className="tabular-nums opacity-90">{flaggedIndices.length}</span>
             </button>
             <button
               onClick={() => doSubmit(false)}
               disabled={submitting}
-              className="btn-brand btn-lg flex-1"
+              className="btn-wrap btn-brand btn-lg flex-1"
             >
               {submitting ? <Loader2 size={18} className="animate-spin" /> : t('submitTest')}
             </button>
@@ -1028,7 +1032,7 @@ function Palette({
           <Flag size={15} className={showFlaggedOnly ? 'fill-current' : ''} />
           <span className="tabular-nums">{flaggedCount}</span>
         </button>
-        <button onClick={onSubmit} disabled={submitting} className="btn-brand flex-1">
+        <button onClick={onSubmit} disabled={submitting} className="btn-wrap btn-brand flex-1">
           {submitting ? <Loader2 size={16} className="animate-spin" /> : t('submitTest')}
         </button>
       </div>

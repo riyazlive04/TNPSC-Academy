@@ -130,7 +130,7 @@ export default function VettriSuggestModal({
             <Trophy size={15} />
             <span className="tamil">{t('vettriSuggestGo')}</span>
           </button>
-          <button onClick={onPremium} className="btn-ghost press w-full px-4 py-2.5 text-sm">
+          <button onClick={onPremium} className="btn-wrap btn-ghost press w-full px-4 py-2.5 text-sm">
             <span className="tamil">{t('vettriSuggestStay')}</span>
           </button>
         </div>

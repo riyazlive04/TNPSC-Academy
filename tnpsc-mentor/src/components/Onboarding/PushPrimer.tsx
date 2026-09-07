@@ -27,6 +27,7 @@ const EXCLUDED_ROUTES = [
   '/test-arena',
   '/complete-profile',
   '/language',
+  '/welcome',
   '/quiz',
   '/mock/quiz',
   '/payment-success',
@@ -105,11 +106,11 @@ export default function PushPrimer() {
           <button
             onClick={handleEnable}
             disabled={enabling}
-            className="btn-brand w-full py-2.5 text-sm disabled:opacity-70"
+            className="btn-wrap btn-brand w-full py-2.5 text-sm disabled:opacity-70"
           >
             {t('pushPrimerEnable')}
           </button>
-          <button onClick={dismiss} className="btn-ghost w-full py-2 text-sm">
+          <button onClick={dismiss} className="btn-wrap btn-ghost w-full py-2 text-sm">
             {t('pushPrimerDismiss')}
           </button>
         </div>

@@ -54,10 +54,10 @@ export default function StarterTestPrompt({
         </div>
 
         <div className="mt-5 space-y-2">
-          <button onClick={onStart} className="btn-brand w-full py-2.5 text-sm">
+          <button onClick={onStart} className="btn-wrap btn-brand w-full py-2.5 text-sm">
             {t('onbFirstTestCta')} <ArrowRight size={16} />
           </button>
-          <button onClick={onSkip} className="btn-ghost w-full py-2 text-sm">
+          <button onClick={onSkip} className="btn-wrap btn-ghost w-full py-2 text-sm">
             {t('startPromptSkip')}
           </button>
         </div>

@@ -50,7 +50,7 @@ export default function RevisionCard({ item, onStart, onDismiss, busy }: Props) 
           <button
             onClick={() => onStart(item)}
             disabled={item.status === 'locked' || busy}
-            className="btn-brand flex-1 px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-wrap btn-brand flex-1 px-4 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy ? (
               <Loader2 size={16} className="animate-spin" />

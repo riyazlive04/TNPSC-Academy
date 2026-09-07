@@ -280,7 +280,7 @@ export default function PricingCards({
           <a
             href={webAppHref}
             onClick={() => track('free-card')}
-            className="btn-ghost w-full justify-center px-6 py-2.5 text-sm font-bold"
+            className="btn-wrap btn-ghost w-full justify-center px-6 py-2.5 text-sm font-bold"
           >
             {t('ctaFree')} <ArrowRight size={16} />
           </a>

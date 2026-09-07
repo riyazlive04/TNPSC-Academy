@@ -52,10 +52,10 @@ export default function MarathonFreeAlert({
           </div>
 
           <div className="mt-5 space-y-2">
-            <button onClick={onTake} className="btn-brand w-full py-2.5 text-sm">
+            <button onClick={onTake} className="btn-wrap btn-brand w-full py-2.5 text-sm">
               {t('marathonFreeCta')} <ArrowRight size={16} />
             </button>
-            <button onClick={onDismiss} className="btn-ghost w-full py-2 text-sm">
+            <button onClick={onDismiss} className="btn-wrap btn-ghost w-full py-2 text-sm">
               {t('marathonFreeLater')}
             </button>
           </div>

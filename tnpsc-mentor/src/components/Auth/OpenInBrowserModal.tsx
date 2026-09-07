@@ -50,11 +50,11 @@ export default function OpenInBrowserModal({ open, onOpenBrowser, onClose }: Ope
           </p>
         </div>
 
-        <button type="button" onClick={onOpenBrowser} className="btn-brand press w-full px-6 py-3.5 text-base">
+        <button type="button" onClick={onOpenBrowser} className="btn-wrap btn-brand press w-full px-6 py-3.5 text-base">
           {t('openInBrowser')}
         </button>
 
-        <button onClick={onClose} className="btn-ghost press mt-3 w-full px-4 py-2.5 text-sm">
+        <button onClick={onClose} className="btn-wrap btn-ghost press mt-3 w-full px-4 py-2.5 text-sm">
           {t('cancel')}
         </button>
       </div>

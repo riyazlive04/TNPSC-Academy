@@ -64,7 +64,11 @@ export type Difficulty = 'easy' | 'medium' | 'hard'
 // Role hierarchy: superadmin ⊃ admin ⊃ user. A superadmin inherits every admin
 // ability (the DB `is_admin()` check is widened to include it) and additionally
 // owns the platform console (metrics, user management, feedback inbox).
-export type UserRole = 'user' | 'admin' | 'superadmin'
+//
+// `telecaller` sits OUTSIDE that chain: it is a staff role that grants the lead
+// desk at /crm and nothing else. It is NOT an admin, does not see the question
+// bank, and takes no tests — see supabase/crm.sql.
+export type UserRole = 'user' | 'admin' | 'superadmin' | 'telecaller'
 
 export interface Question {
   id: string

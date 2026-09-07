@@ -8,9 +8,16 @@ export interface AuthedRequest extends Request {
   accessToken?: string
   /** A DB client scoped to the authenticated user (RLS + auth.uid() apply). */
   db?: SupabaseClient
+  /** The caller's profile role, populated by the role gates that resolve it
+   *  (currently requireCrmStaff, whose routes branch on telecaller vs admin). */
+  role?: string | null
 }
 
-function bearer(req: Request): string | null {
+/** Exported so `middleware/maintenance.ts` can resolve a caller's role without
+ *  duplicating the token-parse logic (it can't reuse `requireAuth` directly —
+ *  that always 401s on a missing/invalid token, where the gate needs to fall
+ *  through to a 503 instead). */
+export function bearer(req: Request): string | null {
   const h = req.headers.authorization
   if (!h || !h.startsWith('Bearer ')) return null
   return h.slice(7).trim() || null
@@ -78,6 +85,28 @@ export async function requireAdmin(
   if (role !== 'admin' && role !== 'superadmin') {
     return res.status(403).json({ error: 'Admin access required' })
   }
+  next()
+}
+
+/**
+ * Require the authenticated user to be CRM staff: a telecaller, or an
+ * admin/superadmin supervising them.
+ *
+ * `telecaller` sits OUTSIDE the superadmin ⊃ admin ⊃ user hierarchy — it is a
+ * staff role that grants the lead desk and nothing else, so requireAdmin above
+ * deliberately still rejects it. This is the only gate that lets it through.
+ */
+export async function requireCrmStaff(
+  req: AuthedRequest,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.userId) return res.status(401).json({ error: 'Not authenticated' })
+  const role = await roleOf(req.userId)
+  if (role !== 'telecaller' && role !== 'admin' && role !== 'superadmin') {
+    return res.status(403).json({ error: 'CRM access required' })
+  }
+  req.role = role
   next()
 }
 

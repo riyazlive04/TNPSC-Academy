@@ -370,7 +370,7 @@ export default function CompleteProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="btn-brand press mt-2 w-full px-6 py-3.5 text-base"
+              className="btn-wrap btn-brand press mt-2 w-full px-6 py-3.5 text-base"
             >
               {saving && <Spinner size={18} />}
               {saving ? t('verifyingOtp') : t('verifyAndContinue')}
@@ -521,7 +521,7 @@ export default function CompleteProfilePage() {
                   type="button"
                   onClick={handleStartTelegram}
                   disabled={saving}
-                  className="btn-brand press flex flex-1 items-center justify-center gap-2 px-6 py-3 text-sm"
+                  className="btn-wrap btn-brand press flex flex-1 items-center justify-center gap-2 px-6 py-3 text-sm"
                 >
                   <Send size={16} />
                   {t('tgOfferBtn')}
