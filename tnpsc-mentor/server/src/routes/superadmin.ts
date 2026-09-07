@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import express, { Router } from 'express'
 import { asyncH, sendDbError } from '../util.js'
-import { requireAuth, requireSuperadmin, type AuthedRequest } from '../middleware/auth.js'
+import { requireAuth, requireSuperadmin, forgetRole, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { listSessions, revokeSessionById } from '../sessions.js'
 import { APK_BUCKET, apkPublicUrl, type ReleaseRow } from '../lib/appReleases.js'
@@ -89,8 +89,10 @@ router.post(
       p_role: role,
     })
     if (error) return sendDbError(res, error)
-    // A newly appointed telecaller should start getting lead alerts at once,
-    // not after the roster cache expires.
+    // Both caches have to forget this user now: the role cache, or their very
+    // next request is still judged on the old role, and the telecaller roster,
+    // or a new agent waits a minute for their first lead alert.
+    forgetRole(String(userId))
     invalidateTelecallerRoster()
     res.json({ user: data })
   })

@@ -54,6 +54,19 @@ export async function requireAuth(
 const ROLE_TTL_MS = 30_000
 const roleCache = new Map<string, { role: string | null; expires: number }>()
 
+/**
+ * Forget a cached role, so a role change takes effect on the very next request
+ * instead of up to ROLE_TTL_MS later.
+ *
+ * Without this, promoting someone to telecaller left them locked out of /crm
+ * for half a minute — the desk polls every 10s, so they got a burst of 403s at
+ * exactly the moment they were told to try it, and it tripped the authz-probe
+ * detector into paging the operator about their own new hire.
+ */
+export function forgetRole(userId: string): void {
+  roleCache.delete(userId)
+}
+
 /** Look up the authenticated user's role (null if missing/unknown), cached ~30s. */
 export async function roleOf(userId: string): Promise<string | null> {
   const cached = roleCache.get(userId)
