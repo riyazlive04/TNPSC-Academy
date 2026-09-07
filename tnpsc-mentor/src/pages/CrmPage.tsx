@@ -100,9 +100,16 @@ export default function CrmPage() {
   }, [init, reset])
 
   // Each queue loads the first time it's opened; switching back is instant.
+  //
+  // Depends on the LOADED FLAG, never on `queues` itself. Depending on the
+  // object meant every store write re-ran this effect, and `loaded` stays false
+  // for the whole round-trip — so it re-fired on its own `loading: true` write
+  // and hit the API 42 times in one second. Selecting the boolean means the
+  // effect only re-runs when the answer actually changes.
+  const queueLoaded = useCrmStore((s) => s.queues[queue].loaded)
   useEffect(() => {
-    if (ready && !queues[queue].loaded) void loadQueue(queue)
-  }, [ready, queue, queues, loadQueue])
+    if (ready && !queueLoaded) void loadQueue(queue)
+  }, [ready, queue, queueLoaded, loadQueue])
 
   const filters = useCrmStore((s) => s.filters)
   const current = queues[queue]
@@ -121,11 +128,11 @@ export default function CrmPage() {
 
   const runSearch = () => {
     setSearch(searchDraft.trim())
-    void loadQueue('all')
+    void loadQueue('all', { force: true })
   }
 
   const refresh = () => {
-    void loadQueue(queue)
+    void loadQueue(queue, { force: true })
     void refreshCounts()
   }
 

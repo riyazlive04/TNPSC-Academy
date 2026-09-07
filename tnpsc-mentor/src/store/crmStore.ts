@@ -100,7 +100,9 @@ interface CrmState {
   sound: boolean
 
   init: () => Promise<void>
-  loadQueue: (queue: CrmQueue, opts?: { page?: number }) => Promise<void>
+  /** `force` marks a load the USER asked for (filter change, page, refresh);
+   *  those must never be dropped by the duplicate-load guard. */
+  loadQueue: (queue: CrmQueue, opts?: { page?: number; force?: boolean }) => Promise<void>
   /** Jump to a page of the current queue (clamped to what exists). */
   goToPage: (queue: CrmQueue, page: number) => void
   setSearch: (q: string) => void
@@ -216,6 +218,15 @@ export const useCrmStore = create<CrmState>((set, get) => ({
 
   loadQueue: async (queue, opts = {}) => {
     const current = get().queues[queue]
+    // Belt and braces behind the caller's own guard: whatever re-render storm
+    // arrives, the AUTOMATIC path never has two loads in flight for one queue.
+    // This is the layer that would have contained the 42-requests-per-second
+    // loop regardless of which component triggered it.
+    //
+    // A user-initiated load (`force`) is always honoured — dropping someone's
+    // filter change because a poll happened to be in flight would be a worse
+    // bug than the one this prevents.
+    if (current.loading && !opts.force) return
     const page = Math.max(0, opts.page ?? 0)
     set((s) => ({ queues: { ...s.queues, [queue]: { ...current, loading: true } } }))
     try {
@@ -234,8 +245,12 @@ export const useCrmStore = create<CrmState>((set, get) => ({
       // A page that comes back empty because the queue shrank under us (a lead
       // claimed elsewhere) would strand the agent on a blank screen — step back.
       if (leads.length === 0 && page > 0 && total > 0) {
+        // Clear `loading` FIRST or the guard above rejects our own retry.
         set((s) => ({ queues: { ...s.queues, [queue]: { ...current, loading: false } } }))
-        return get().loadQueue(queue, { page: Math.min(page - 1, Math.ceil(total / PAGE_SIZE) - 1) })
+        return get().loadQueue(queue, {
+          page: Math.min(page - 1, Math.ceil(total / PAGE_SIZE) - 1),
+          force: true,
+        })
       }
       set((s) => ({
         skewMs: Date.parse(now) - Date.now(),
@@ -250,7 +265,7 @@ export const useCrmStore = create<CrmState>((set, get) => ({
   },
 
   goToPage: (queue, page) => {
-    void get().loadQueue(queue, { page })
+    void get().loadQueue(queue, { page, force: true })
     // A page change is a new screenful; start it at the top rather than leaving
     // the agent mid-list on unrelated leads.
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -262,12 +277,12 @@ export const useCrmStore = create<CrmState>((set, get) => ({
     set((s) => ({ filters: { ...s.filters, ...patch } }))
     // Filtering server-side means the loaded page is now the wrong set, and
     // `total` with it — refetch from the top rather than filtering in place.
-    void get().loadQueue(queue)
+    void get().loadQueue(queue, { force: true })
   },
 
   clearFilters: (queue) => {
     set({ filters: NO_FILTERS })
-    void get().loadQueue(queue)
+    void get().loadQueue(queue, { force: true })
   },
 
   refreshCounts: async () => {
