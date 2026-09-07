@@ -80,6 +80,11 @@ function lead(p: Partial<Lead> & { full_name: string; phone: string }): Lead {
     vettri: false,
     vettri_until: null,
     ...p,
+    // Imported/backfilled rows signed up long ago but reached the DESK just
+    // now — the same split the real backfill writes.
+    entered_at:
+      p.entered_at ??
+      (p.source && p.source !== 'signup' ? ago(mins(45)) : (p.created_at ?? ago(mins(3)))),
   } as Lead
 }
 
@@ -407,7 +412,7 @@ function queueOf(queue: string): Lead[] {
   if (queue === 'pool') {
     return leads
       .filter((l) => !l.assigned_to && l.status === 'new')
-      .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
+      .sort((a, b) => Date.parse(b.entered_at) - Date.parse(a.entered_at))
   }
   if (queue === 'mine') {
     return leads
@@ -635,6 +640,8 @@ export async function handleCrmDemo<T>(path: string, opts: DemoOpts = {}): Promi
       if (q.source) filtered = filtered.filter((l) => l.source === q.source)
       if (q.intent === 'none') filtered = filtered.filter((l) => !l.intent_id)
       else if (q.intent) filtered = filtered.filter((l) => l.intent_id === q.intent)
+      if (q.age === 'fresh') filtered = filtered.filter((l) => l.source === 'signup')
+      else if (q.age === 'backlog') filtered = filtered.filter((l) => l.source !== 'signup')
       if (q.plan === 'free') filtered = filtered.filter((l) => !l.premium && !l.vettri)
       else if (q.plan === 'paid') filtered = filtered.filter((l) => l.premium || l.vettri)
       else if (q.plan === 'premium') filtered = filtered.filter((l) => l.premium)

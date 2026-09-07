@@ -89,18 +89,47 @@ describe('click-to-action links', () => {
 })
 
 describe('response timer', () => {
-  const at = (created: string, extra: Partial<Lead> = {}): Lead =>
-    ({ created_at: created, first_response_at: null, first_response_secs: null, ...extra }) as Lead
+  /** An inbound signup — the only kind the response promise applies to. */
+  const at = (entered: string, extra: Partial<Lead> = {}): Lead =>
+    ({
+      source: 'signup',
+      created_at: entered,
+      entered_at: entered,
+      first_response_at: null,
+      first_response_secs: null,
+      ...extra,
+    }) as Lead
 
   const T0 = Date.parse('2026-09-07T10:00:00Z')
 
-  it('escalates as the lead waits', () => {
+  it('escalates as an inbound lead waits', () => {
     expect(slaState(at('2026-09-07T10:00:00Z'), T0).level).toBe('fresh')
     expect(slaState(at('2026-09-07T10:00:00Z'), T0 + (SLA_TARGET_SECS + 1) * 1000).level).toBe('warn')
     expect(slaState(at('2026-09-07T10:00:00Z'), T0 + (SLA_WARN_SECS + 1) * 1000).level).toBe('late')
     expect(slaState(at('2026-09-07T10:00:00Z'), T0 + (SLA_BREACH_SECS + 1) * 1000).level).toBe(
       'breached'
     )
+  })
+
+  it('never escalates a backfilled or imported lead', () => {
+    // The regression this guards: 682 backfilled rows all rendered as
+    // months-overdue breaches, which drained the colour of meaning for the
+    // handful of inbound leads that genuinely were late.
+    for (const source of ['backfill', 'import', 'manual'] as const) {
+      const old = at('2026-09-07T10:00:00Z', { source })
+      expect(slaState(old, T0 + 40 * 24 * 3600_000).level).toBe('backlog')
+    }
+  })
+
+  it('times from when the lead reached the desk, not when the person signed up', () => {
+    // A backfilled account signed up in June but landed on the desk today; the
+    // team cannot be late answering something that was not in front of them.
+    const lead = at('2026-09-07T10:00:00Z', {
+      source: 'signup',
+      created_at: '2026-06-01T00:00:00Z',
+      entered_at: '2026-09-07T09:58:00Z',
+    })
+    expect(slaState(lead, T0).seconds).toBe(120)
   })
 
   it('freezes once the lead has been contacted', () => {

@@ -65,7 +65,13 @@ export interface Lead {
   next_follow_up_at: string | null
   attempts: number
   notes: string | null
+  /** When the PERSON signed up. Context for the call, not a deadline. */
   created_at: string
+  /** When this lead landed on the DESK. Equal to created_at for an inbound
+   *  signup; the import/backfill moment for a cold row. The response timer
+   *  runs off this — the team cannot be late answering something that was not
+   *  yet in front of them. */
+  entered_at: string
   updated_at: string
   // Joined on the way out by the server.
   assigned_name?: string | null
@@ -228,7 +234,7 @@ export const SLA_TARGET_SECS = 5 * 60 // green below this — the goal
 export const SLA_WARN_SECS = 15 * 60 // amber up to here
 export const SLA_BREACH_SECS = 60 * 60 // red past here
 
-export type SlaLevel = 'fresh' | 'warn' | 'late' | 'breached' | 'done'
+export type SlaLevel = 'fresh' | 'warn' | 'late' | 'breached' | 'done' | 'backlog'
 
 export interface SlaState {
   level: SlaLevel
@@ -244,15 +250,28 @@ export interface SlaState {
  * so the page can run off SERVER time, which a telecaller's device clock being
  * minutes out must not be able to fake.
  */
+/** True for a lead that came through the app just now — the kind the response
+ *  promise is actually about. Imported and backfilled rows are a list to work
+ *  through, not a clock to beat. */
+export function isFreshInbound(lead: Pick<Lead, 'source'>): boolean {
+  return lead.source === 'signup'
+}
+
 export function slaState(lead: Lead, nowMs: number): SlaState {
-  const created = Date.parse(lead.created_at)
+  // Measured from when the lead reached the DESK. Older rows predate the
+  // column and fall back to created_at.
+  const entered = Date.parse(lead.entered_at ?? lead.created_at)
   if (lead.first_response_at || lead.first_response_secs != null) {
     const seconds =
       lead.first_response_secs ??
-      Math.max(0, Math.round((Date.parse(lead.first_response_at!) - created) / 1000))
+      Math.max(0, Math.round((Date.parse(lead.first_response_at!) - entered) / 1000))
     return { level: 'done', seconds, running: false }
   }
-  const seconds = Math.max(0, Math.round((nowMs - created) / 1000))
+  const seconds = Math.max(0, Math.round((nowMs - entered) / 1000))
+
+  // A backlog lead has no SLA to breach. Showing 682 of them in red drains the
+  // colour of meaning for the handful that genuinely are late.
+  if (!isFreshInbound(lead)) return { level: 'backlog', seconds, running: true }
   const level: SlaLevel =
     seconds < SLA_TARGET_SECS
       ? 'fresh'
@@ -285,6 +304,8 @@ export const SLA_CLASS: Record<SlaLevel, string> = {
   late: 'bg-accentwarmsoft text-accentwarm',
   breached: 'bg-errorsoft text-error',
   done: 'bg-tint text-ink2',
+  // Neutral by design — it is an age, not a deadline.
+  backlog: 'bg-tint text-ink2',
 }
 
 // ─── Presentation tables ─────────────────────────────────────────────────────

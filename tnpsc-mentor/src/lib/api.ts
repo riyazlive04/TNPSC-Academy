@@ -2066,6 +2066,8 @@ export const api = {
       source?: string
       /** 'free' | 'paid' | 'premium' | 'vettri' — derived from payments. */
       plan?: string
+      /** 'fresh' (inbound signups) | 'backlog' (imported/backfilled). */
+      age?: string
       limit?: number
       offset?: number
     } = {}): Promise<{ leads: Lead[]; total: number; now: string }> {
@@ -2077,6 +2079,7 @@ export const api = {
           intent: params.intent || undefined,
           source: params.source || undefined,
           plan: params.plan || undefined,
+          age: params.age || undefined,
           limit: params.limit,
           offset: params.offset,
         },

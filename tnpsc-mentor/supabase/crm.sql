@@ -196,8 +196,25 @@ create unique index if not exists idx_crm_leads_phone
 
 -- The three queue reads: the unclaimed pool (newest first), an agent's own
 -- desk, and follow-ups coming due.
+-- When this lead landed on the DESK, as distinct from when the person signed
+-- up. For an inbound signup the two are the same instant. For a cold import or
+-- a backfill they are months apart, and conflating them is what made every
+-- backfilled lead read as a months-overdue SLA breach: the team cannot be late
+-- answering something that was not in front of them yet.
+alter table public.crm_leads
+  add column if not exists entered_at timestamptz not null default now();
+
+-- Existing rows: an imported/backfilled lead entered when its row was written
+-- (updated_at, untouched since the insert); a signup lead entered when it was
+-- created. Idempotent — only fills rows still sitting on the column default.
+update public.crm_leads
+   set entered_at = case when source in ('backfill', 'import', 'manual')
+                         then updated_at else created_at end
+ where entered_at > created_at + interval '1 second'
+   and entered_at >= now() - interval '10 minutes';
+
 create index if not exists idx_crm_leads_pool
-  on public.crm_leads (created_at desc) where assigned_to is null;
+  on public.crm_leads (entered_at desc) where assigned_to is null;
 create index if not exists idx_crm_leads_agent
   on public.crm_leads (assigned_to, status, created_at desc);
 create index if not exists idx_crm_leads_followup
@@ -394,8 +411,10 @@ begin
       and not exists (select 1 from public.crm_leads l where l.user_id = p.id)
   )
   insert into public.crm_leads
-    (user_id, full_name, phone, whatsapp, email, target_group, source, created_at)
-  select id, full_name, phone, phone, email, target_group, 'backfill', created_at
+    (user_id, full_name, phone, whatsapp, email, target_group, source, created_at, entered_at)
+  -- created_at keeps the SIGNUP date (useful context on the call); entered_at
+  -- is now, because that is when the desk actually became responsible for it.
+  select id, full_name, phone, phone, email, target_group, 'backfill', created_at, now()
   from candidates
   -- A cold import may already hold this number; leave that row alone.
   on conflict do nothing;

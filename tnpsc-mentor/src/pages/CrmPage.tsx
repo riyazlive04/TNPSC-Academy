@@ -7,7 +7,12 @@ import {
   LogOut,
   Phone,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
+  Hourglass,
+  Layers,
   Search,
+  Sparkles,
   TrendingUp,
   UserCheck,
   Users,
@@ -26,6 +31,7 @@ import { useAuthStore } from '../store/authStore'
 import { toast } from '../store/toastStore'
 import type { CrmQueue } from '../lib/api'
 import { formatDuration, type Lead } from '../lib/crm'
+import { PAGE_SIZE } from '../store/crmStore'
 
 /**
  * The telecaller lead desk (/crm).
@@ -50,6 +56,13 @@ const QUEUES: { id: CrmQueue; label: string; icon: typeof Inbox }[] = [
   { id: 'all', label: 'Search', icon: Search },
 ]
 
+/** New vs old, in the words an agent uses. */
+const AGE_TABS = [
+  { id: '', label: 'All', icon: Layers },
+  { id: 'fresh', label: 'New', icon: Sparkles },
+  { id: 'backlog', label: 'Backlog', icon: Hourglass },
+]
+
 export default function CrmPage() {
   const navigate = useNavigate()
   const signOut = useAuthStore((s) => s.signOut)
@@ -70,6 +83,8 @@ export default function CrmPage() {
     sound,
     setSound,
     clearFilters,
+    setFilter,
+    goToPage,
   } = useCrmStore()
 
   const [queue, setQueue] = useState<CrmQueue>('pool')
@@ -272,6 +287,30 @@ export default function CrmPage() {
           </form>
         )}
 
+        {/* New vs old. The pool is where it matters: 682 backfilled rows would
+            otherwise sit indistinguishably among the signups that came in
+            this morning. */}
+        {(queue === 'pool' || queue === 'all') && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <div className="seg-wrap">
+              {AGE_TABS.map((tab) => {
+                const on = (filters.age ?? '') === tab.id
+                return (
+                  <button
+                    key={tab.id || 'all'}
+                    onClick={() => setFilter({ age: tab.id || null }, queue)}
+                    aria-current={on ? 'page' : undefined}
+                    className={`seg flex items-center gap-1.5 text-xs ${on ? 'seg-active' : ''}`}
+                  >
+                    <tab.icon size={13} />
+                    {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         <QueueFilters queue={queue} />
 
         {current.loading && current.leads.length === 0 ? (
@@ -301,16 +340,12 @@ export default function CrmPage() {
               ))}
             </div>
 
-            {current.leads.length < current.total && (
-              <button
-                onClick={() => void loadQueue(queue, { append: true })}
-                disabled={current.loading}
-                className="btn btn-ghost mt-4 w-full py-3"
-              >
-                {current.loading ? <Spinner size={16} /> : null}
-                Load more ({current.total - current.leads.length} left)
-              </button>
-            )}
+            <Pager
+              page={current.page}
+              total={current.total}
+              loading={current.loading}
+              onGo={(p) => goToPage(queue, p)}
+            />
           </>
         )}
       </main>
@@ -394,5 +429,63 @@ function EmptyQueue({
       <h2 className="mt-4 font-display text-lg font-semibold text-ink">{title}</h2>
       <p className="mt-1 max-w-xs font-body text-sm leading-relaxed text-ink2">{body}</p>
     </div>
+  )
+}
+
+/**
+ * Page navigation for a queue. "Load more" was wrong here: it grows one endless
+ * list, gives no sense of position in 682 leads, and offers no way back to
+ * where you were. A pager states how big the queue is and lets an agent move
+ * through it deliberately.
+ */
+function Pager({
+  page,
+  total,
+  loading,
+  onGo,
+}: {
+  page: number
+  total: number
+  loading: boolean
+  onGo: (page: number) => void
+}) {
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  if (total <= PAGE_SIZE) return null
+
+  const from = page * PAGE_SIZE + 1
+  const to = Math.min(total, (page + 1) * PAGE_SIZE)
+
+  return (
+    <nav className="mt-4 flex items-center justify-between gap-3" aria-label="Lead pages">
+      <button
+        onClick={() => onGo(page - 1)}
+        disabled={page === 0 || loading}
+        className="btn btn-sm btn-ghost px-3"
+        aria-label="Previous page"
+      >
+        <ChevronLeft size={15} />
+        <span className="hidden sm:inline">Previous</span>
+      </button>
+
+      <p className="font-body text-2xs tabular-nums text-ink2">
+        <span className="font-heading font-semibold text-ink">
+          {from}–{to}
+        </span>{' '}
+        of {total}
+        <span className="hidden sm:inline">
+          {' '}· page {page + 1} of {pages}
+        </span>
+      </p>
+
+      <button
+        onClick={() => onGo(page + 1)}
+        disabled={page >= pages - 1 || loading}
+        className="btn btn-sm btn-ghost px-3"
+        aria-label="Next page"
+      >
+        <span className="hidden sm:inline">Next</span>
+        <ChevronRight size={15} />
+      </button>
+    </nav>
   )
 }

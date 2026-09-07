@@ -46,18 +46,26 @@ export interface CrmFilters {
   source: string | null
   /** What they have already bought. 'free' is the working calling list. */
   plan: string | null
+  /** 'fresh' = inbound signups, 'backlog' = imported/backfilled rows. */
+  age: string | null
 }
 
-const NO_FILTERS: CrmFilters = { status: null, intent: null, source: null, plan: null }
+const NO_FILTERS: CrmFilters = { status: null, intent: null, source: null, plan: null, age: null }
+
+/** How many leads a page holds. Small enough to scan on a phone without the
+ *  list becoming a scroll marathon. */
+export const PAGE_SIZE = 25
 
 interface QueueState {
   leads: Lead[]
   total: number
+  /** Zero-based page currently on screen. */
+  page: number
   loading: boolean
   loaded: boolean
 }
 
-const EMPTY_QUEUE: QueueState = { leads: [], total: 0, loading: false, loaded: false }
+const EMPTY_QUEUE: QueueState = { leads: [], total: 0, page: 0, loading: false, loaded: false }
 
 interface CrmState {
   ready: boolean
@@ -88,7 +96,9 @@ interface CrmState {
   sound: boolean
 
   init: () => Promise<void>
-  loadQueue: (queue: CrmQueue, opts?: { append?: boolean }) => Promise<void>
+  loadQueue: (queue: CrmQueue, opts?: { page?: number }) => Promise<void>
+  /** Jump to a page of the current queue (clamped to what exists). */
+  goToPage: (queue: CrmQueue, page: number) => void
   setSearch: (q: string) => void
   /** Narrow the current queue by status / answer category / source. Merges into
    *  the existing filters; pass null to clear one. */
@@ -191,10 +201,10 @@ export const useCrmStore = create<CrmState>((set, get) => ({
 
   loadQueue: async (queue, opts = {}) => {
     const current = get().queues[queue]
-    const offset = opts.append ? current.leads.length : 0
+    const page = Math.max(0, opts.page ?? 0)
     set((s) => ({ queues: { ...s.queues, [queue]: { ...current, loading: true } } }))
     try {
-      const { status, intent, source, plan } = get().filters
+      const { status, intent, source, plan, age } = get().filters
       const { leads, total, now } = await api.crm.leads({
         queue,
         search: queue === 'all' ? get().search : undefined,
@@ -202,20 +212,19 @@ export const useCrmStore = create<CrmState>((set, get) => ({
         intent: intent ?? undefined,
         source: source ?? undefined,
         plan: plan ?? undefined,
-        offset,
-        limit: 50,
+        age: age ?? undefined,
+        offset: page * PAGE_SIZE,
+        limit: PAGE_SIZE,
       })
+      // A page that comes back empty because the queue shrank under us (a lead
+      // claimed elsewhere) would strand the agent on a blank screen — step back.
+      if (leads.length === 0 && page > 0 && total > 0) {
+        set((s) => ({ queues: { ...s.queues, [queue]: { ...current, loading: false } } }))
+        return get().loadQueue(queue, { page: Math.min(page - 1, Math.ceil(total / PAGE_SIZE) - 1) })
+      }
       set((s) => ({
         skewMs: Date.parse(now) - Date.now(),
-        queues: {
-          ...s.queues,
-          [queue]: {
-            leads: opts.append ? [...current.leads, ...leads] : leads,
-            total,
-            loading: false,
-            loaded: true,
-          },
-        },
+        queues: { ...s.queues, [queue]: { leads, total, page, loading: false, loaded: true } },
       }))
     } catch (e) {
       set((s) => ({
@@ -223,6 +232,13 @@ export const useCrmStore = create<CrmState>((set, get) => ({
         error: e instanceof Error ? e.message : 'Could not load leads.',
       }))
     }
+  },
+
+  goToPage: (queue, page) => {
+    void get().loadQueue(queue, { page })
+    // A page change is a new screenful; start it at the top rather than leaving
+    // the agent mid-list on unrelated leads.
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   },
 
   setSearch: (q) => set({ search: q }),

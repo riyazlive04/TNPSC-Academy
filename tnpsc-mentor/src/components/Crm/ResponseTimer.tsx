@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Clock, CheckCircle2 } from 'lucide-react'
+import { Clock, CheckCircle2, Hourglass } from 'lucide-react'
 import { nowMs } from '../../store/crmStore'
 import { SLA_CLASS, formatDuration, slaState, type Lead } from '../../lib/crm'
 
@@ -58,22 +58,30 @@ export default function ResponseTimer({ lead, variant = 'chip' }: ResponseTimerP
   const now = useNow(sla.running)
   const live = slaState(lead, now)
 
-  const Icon = live.running ? Clock : CheckCircle2
-  const label = live.running
-    ? formatDuration(live.seconds)
-    : `${formatDuration(live.seconds)} to first call`
+  const backlog = live.level === 'backlog'
+  const Icon = !live.running ? CheckCircle2 : backlog ? Hourglass : Clock
+
+  // A backlog lead shows an AGE, an inbound lead shows a countdown against the
+  // response promise, and a contacted lead shows what the response actually was.
+  const label = !live.running
+    ? `${formatDuration(live.seconds)} to first call`
+    : backlog
+      ? `in queue ${formatDuration(live.seconds)}`
+      : formatDuration(live.seconds)
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 font-heading text-2xs font-semibold tabular-nums ${SLA_CLASS[live.level]}`}
       title={
-        live.running
-          ? 'Waiting for the first call, WhatsApp or email'
-          : 'Time from arrival to the first contact attempt'
+        !live.running
+          ? 'Time from reaching the desk to the first contact attempt'
+          : backlog
+            ? 'How long this lead has been waiting on the desk. Imported and backfilled leads carry no response deadline.'
+            : 'Waiting for the first call, WhatsApp or email'
       }
     >
       <Icon size={12} className={live.level === 'breached' ? 'animate-pulse' : undefined} />
-      {variant === 'full' ? label : formatDuration(live.seconds)}
+      {variant === 'full' || backlog ? label : formatDuration(live.seconds)}
     </span>
   )
 }

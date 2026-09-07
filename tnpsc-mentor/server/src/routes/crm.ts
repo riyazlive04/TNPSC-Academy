@@ -26,7 +26,7 @@ function isSupervisor(req: AuthedRequest): boolean {
 const LEAD_COLUMNS =
   'id, user_id, full_name, phone, whatsapp, email, city, target_group, source, source_detail, ' +
   'status, intent_id, assigned_to, assigned_at, first_response_at, first_response_secs, ' +
-  'last_contacted_at, next_follow_up_at, attempts, notes, created_at, updated_at'
+  'last_contacted_at, next_follow_up_at, attempts, notes, created_at, entered_at, updated_at'
 
 const LEAD_STATUSES = [
   'new',
@@ -181,7 +181,7 @@ router.get(
     let q = supabaseAdmin.from('crm_leads').select(LEAD_COLUMNS, { count: 'exact' })
 
     if (queue === 'pool') {
-      q = q.is('assigned_to', null).eq('status', 'new').order('created_at', { ascending: false })
+      q = q.is('assigned_to', null).eq('status', 'new').order('entered_at', { ascending: false })
     } else if (queue === 'mine') {
       q = q.eq('assigned_to', req.userId!).order('updated_at', { ascending: false })
     } else if (queue === 'followups') {
@@ -207,6 +207,15 @@ router.get(
 
     const source = String(req.query.source ?? '')
     if (['signup', 'import', 'manual', 'backfill'].includes(source)) q = q.eq('source', source)
+
+    // Fresh inbound vs backlog. `source` is the honest discriminator: a lead
+    // filed by the signup trigger came through the app just now and is what the
+    // response promise is about; an imported or backfilled row is a list to
+    // work through. Kept separate from the `source` filter above because an
+    // agent thinks in "new vs old", not in provenance.
+    const age = String(req.query.age ?? '')
+    if (age === 'fresh') q = q.eq('source', 'signup')
+    else if (age === 'backlog') q = q.in('source', ['import', 'manual', 'backfill'])
 
     // Plan filtering can't be a column predicate — entitlement is derived from
     // the payments table (see crm_lead_plans), not stored on the lead. Resolve
