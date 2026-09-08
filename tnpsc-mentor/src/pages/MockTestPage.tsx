@@ -6,6 +6,7 @@ import PillSection from '../components/UI/PillSection'
 import PremiumCard from '../components/UI/PremiumCard'
 import { SkeletonCards, SkeletonPills } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
+import { useAuth } from '../hooks/useAuth'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
 import { upsell } from '../store/upsellStore'
 import { useT, type StringKey } from '../lib/i18n'
@@ -412,6 +413,12 @@ function SubjectExamTab() {
 function FullMockExamTab() {
   const navigate = useNavigate()
   const { t, lang } = useT()
+  // "Preview as student": the server resolves `locked` from the REAL role and
+  // staff bypass the tier gate, so every exam comes back unlocked for an admin
+  // and the picker looks nothing like a learner's. Re-derive the lock here from
+  // the exam's own tier, which the API returns regardless. Presentation only —
+  // the same approach TestSeriesProductPanel takes with `previewLocked`.
+  const { previewAsStudent } = useAuth()
 
   const [exams, setExams] = useState<MockExam[]>([])
   const [loading, setLoading] = useState(true)
@@ -444,7 +451,14 @@ function FullMockExamTab() {
     navigate('/mock/instructions', { state: config })
   }
 
-  const anyLocked = exams.some((e) => e.locked)
+  /**
+   * What a learner would see for this exam. In preview the free tier is the
+   * honest default: an admin has no student entitlement to reflect, and showing
+   * the paywall is the whole point of the toggle.
+   */
+  const lockedFor = (e: MockExam) => (previewAsStudent ? e.tier === 'paid' : e.locked)
+
+  const anyLocked = exams.some(lockedFor)
 
   return (
     <div className="animate-fadeIn">
@@ -464,7 +478,8 @@ function FullMockExamTab() {
             const title = lang === 'ta' && e.title_ta ? e.title_ta : e.title
             const minutes = Math.round(e.duration_seconds / 60)
             const exhausted = e.attemptsUsed >= e.attemptsMax
-            const disabled = e.locked || exhausted
+            const locked = lockedFor(e)
+            const disabled = locked || exhausted
             return (
               <div
                 key={e.id}
@@ -479,7 +494,7 @@ function FullMockExamTab() {
                       <h3 className="tamil truncate font-heading text-base font-semibold text-ink">
                         {title}
                       </h3>
-                      {e.locked && (
+                      {locked && (
                         <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-accentwarmsoft px-2 py-0.5 font-heading text-2xs font-semibold text-accentwarm">
                           <Lock size={11} /> {t('premiumOnly')}
                         </span>
@@ -507,14 +522,14 @@ function FullMockExamTab() {
                       the forced upsell instead of silently doing nothing. Only
                       the attempt-cap state is a true dead end. */}
                   <button
-                    onClick={() => (e.locked ? upsell.premium() : !disabled && launch(e))}
+                    onClick={() => (locked ? upsell.premium() : !disabled && launch(e))}
                     disabled={exhausted}
                     className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {exhausted ? t('examCompleted') : t('startExam')}
                   </button>
                 </div>
-                {e.locked && (
+                {locked && (
                   <p className="tamil mt-3 border-t border-line pt-3 font-body text-xs text-ink2">
                     {t('examLocked')}
                   </p>
