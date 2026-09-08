@@ -284,7 +284,14 @@ export default function TestSeriesPage() {
             <button
               key={key}
               type="button"
-              onClick={() => setTab(key)}
+              onClick={() => {
+                setTab(key)
+                // The Group 1 tab is the way back out of the mock papers: the
+                // button below is one-way into them by design, so re-selecting
+                // this tab has to return to the scheduled series rather than
+                // land on whatever was last open.
+                setG1View('series')
+              }}
               aria-pressed={tab === key}
               className={`flex-1 rounded-[10px] px-3 py-1.5 text-center font-heading text-xs font-semibold leading-tight transition-colors sm:flex-none ${
                 tab === key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
@@ -310,40 +317,34 @@ export default function TestSeriesPage() {
 
       {tab === 'vettri' && marathonOn && (
         <>
-          {/* Group 1 holds two products, so the tab opens onto a choice rather
-              than straight into one of them: the scheduled series (13 dated
-              papers) or the mock papers (6 full-length). Kept as a sub-toggle
-              instead of a fourth top-level tab — that row is already three
-              items and the Tamil labels are roughly twice the width of the
-              English, which does not survive a 320px phone.
+          {/* One centred button into the Group 1 mock papers, replacing the
+              two-sided toggle that used to sit here. It always opens the mock
+              papers — never a dead tap — and for anyone who has not bought them
+              it opens the ₹399 confirm sheet on top, so the papers are visible
+              behind the ask rather than hidden until payment.
 
-              Only rendered when the mock papers are worth offering at all
-              (owned, or on sale), so a learner with neither never sees a
-              toggle with one meaningful side. */}
-          {showMockEntry && (
-            <div className="mb-5 flex w-full rounded-field bg-tint p-0.5 sm:w-auto sm:inline-flex">
-              {(
-                [
-                  { key: 'series' as const, label: t('testSeriesTitle') },
-                  { key: 'mock' as const, label: t('mockTest') },
-                ]
-              ).map(({ key, label }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setG1View(key)}
-                  aria-pressed={g1View === key}
-                  className={`tamil flex-1 rounded-[10px] px-4 py-1.5 text-center font-heading text-xs font-semibold leading-tight transition-colors sm:flex-none ${
-                    g1View === key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
+              The prompt is deliberately skipped for an owner (mockAction is
+              'open' once the pack, Vettri or Premium is active): asking someone
+              to pay for what they already bought reads as a double charge.
 
-          {g1View === 'mock' && showMockEntry ? (
+              Way back to the scheduled papers is the "Group 1 Test Series" tab
+              above, which resets this view. */}
+          <div className="mb-5 flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                setG1View('mock')
+                if (mockAction === 'buy') mockPurchase.startEnroll()
+              }}
+              disabled={mockPurchase.paying}
+              className="tamil btn-wrap inline-flex items-center gap-2 rounded-pill bg-sky px-5 py-2.5 text-center font-heading text-sm font-bold text-white shadow-card transition hover:brightness-105 disabled:opacity-60"
+            >
+              <ListChecks size={16} className="flex-shrink-0" />
+              {t('g1MockTestTitle')}
+            </button>
+          </div>
+
+          {g1View === 'mock' ? (
             <FullMockExamList />
           ) : (
             <TestSeriesProductPanel
