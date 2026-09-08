@@ -81,7 +81,6 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MaterialsPage = lazy(() => import('./pages/MaterialsPage'))
 const RevisionPage = lazy(() => import('./pages/RevisionPage'))
 const MockTestPage = lazy(() => import('./pages/MockTestPage'))
-const MockPackBuyPage = lazy(() => import('./pages/MockPackBuyPage'))
 const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
 const MockQuizPage = lazy(() => import('./pages/MockQuizPage'))
 const TestSeriesPage = lazy(() => import('./pages/TestSeriesPage'))
@@ -331,16 +330,16 @@ function AnimatedRoutes() {
           once signed in, or via sign-up-then-return for a brand-new visitor. */}
       <Route path="/rank-booster" element={<RankBoosterLandingPage />} />
 
-      {/* Direct pay link for the ₹399 Group 1 Mock Test Pack — handed to a
-          buyer as a URL (ad, WhatsApp, a telecaller on a call). Opens the
-          confirm sheet on arrival; a signed-out visitor registers and is
-          returned here with checkout resuming (AUTO_ENROLL_PATHS). */}
-      <Route path="/mock-test-pack" element={<MockPackBuyPage />} />
-      {/* Same page under the /rank-booster prefix: the link is handed out in
-          that longer shape too. A real second route, not a redirect — the
-          buyer must return to the exact URL they were given if signing up
-          interrupts checkout (see MOCK_PACK_BUY_PATHS in lib/authRouting). */}
-      <Route path="/rank-booster/mock-test-pack" element={<MockPackBuyPage />} />
+      {/* The shareable pay link for the ₹399 Group 1 Mock Test Pack. Renders
+          THIS page with the confirm sheet already open over it, rather than a
+          page of its own: a buyer handed a bare payment card has nothing to
+          judge the offer against, where the landing page behind the sheet is
+          the pitch. Two paths because the link is handed out in both shapes;
+          both are real routes, not redirects, so a buyer who has to sign up
+          mid-checkout returns to the exact URL they were sent
+          (MOCK_PACK_BUY_PATHS in lib/authRouting). */}
+      <Route path="/mock-test-pack" element={<RankBoosterLandingPage />} />
+      <Route path="/rank-booster/mock-test-pack" element={<RankBoosterLandingPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   Check,
   Trophy,
@@ -15,7 +16,6 @@ import {
   Gift,
   Calculator,
   CalendarDays,
-  Share2,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { translate, type StringKey } from '../../lib/i18n'
@@ -27,8 +27,6 @@ import {
 } from '../../hooks/useRankBoosterPurchase'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../../hooks/useMockPackPurchase'
 import { VETTRI_PRICE_RUPEES } from '../UI/VettriCard'
-import { MOCK_PACK_BUY_PATHS } from '../../lib/authRouting'
-import { toast } from '../../store/toastStore'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useAuth } from '../../hooks/useAuth'
 import { usePlanSales } from '../../hooks/usePlanSales'
@@ -234,12 +232,17 @@ export default function PricingCards({
   lang,
   webAppHref,
   onTrack,
+  autoOpenMockPack = false,
 }: {
   lang: Lang
   /** Where Free/Vettri/Premium CTAs go - typically isAuthed ? APP_URL : APP_REGISTER_URL. */
   webAppHref: string
   /** Optional click-tracking hook (source label per card). */
   onTrack?: (source: string) => void
+  /** Open the ₹399 Mock Pack confirm sheet as soon as this mounts. Set by the
+   *  shareable pay route (/mock-test-pack), which is this page with that one
+   *  purchase already in front of the buyer. */
+  autoOpenMockPack?: boolean
 }) {
   const t = (key: keyof typeof T) => T[key][lang]
   const gt = (key: StringKey) => translate(key, lang)
@@ -260,36 +263,25 @@ export default function PricingCards({
   const navigate = useNavigate()
   const mockPurchase = useMockPackPurchase()
 
-  // Pinned to the public site rather than window.location.origin: this URL is
-  // shared OUTWARD, and the app subdomain is noindex and not the address a
-  // customer should be handed.
-  const payLink = `https://tnpscmentors.in${MOCK_PACK_BUY_PATHS[0]}`
-
-  /** Hand the ₹399 purchase over as a link — share sheet, else clipboard. */
-  const sharePayLink = async () => {
-    track('mock-pay-link')
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: t('mockTitle'), url: payLink })
-        return
-      } catch (e) {
-        // Dismissing the share sheet is not a failure — don't then silently
-        // copy something they chose not to send.
-        if ((e as Error)?.name === 'AbortError') return
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(payLink)
-      toast.success(gt('payLinkCopied'))
-    } catch {
-      toast.error(gt('payLinkCopyFailed'))
-    }
-  }
   // Which paid tiers the superadmin is currently selling. A withdrawn plan is
   // dropped from the grid entirely (see `cards.filter` below) rather than shown
   // in a disabled state - an unbuyable price on a marketing page is worse than
   // no price. "Starter" is free, so it is never filtered.
   const sales = usePlanSales()
+
+  // Pay-link arrivals open straight on the ₹399 sheet, with this page behind
+  // it. Declared after `sales` because it reads it. Waits for the entitlement
+  // to load so an existing owner is never asked to pay for what they have, and
+  // stays shut when the plan is off sale — the server would refuse that order.
+  useEffect(() => {
+    if (!autoOpenMockPack || !isAuthenticated) return
+    if (!mockPurchase.loaded || mockPurchase.mockPackUnlocked || !sales.mockPack) return
+    mockPurchase.startEnroll()
+    // Once per arrival: startEnroll is rebuilt each render, so depending on it
+    // would reopen the sheet every time the buyer closed it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenMockPack, isAuthenticated, mockPurchase.loaded, mockPurchase.mockPackUnlocked, sales.mockPack])
+
   const PLAN_ON_SALE: Record<string, boolean> = {
     mock: sales.mockPack,
     vettri: sales.vettri,
@@ -298,7 +290,13 @@ export default function PricingCards({
   }
   const handleMockCta = () => {
     if (!isAuthenticated) {
-      window.location.href = webAppHref
+      // On the pay link, carry the way back: a buyer who signs up here must
+      // land on the payment sheet again, not be dropped into the app having
+      // forgotten what they came to buy. sanitizeFromPath validates this at
+      // the receiving end, so only our own routes can be returned to.
+      window.location.href = autoOpenMockPack
+        ? `/register?from=${window.location.pathname}`
+        : webAppHref
       return
     }
     if (mockPurchase.mockPackUnlocked) {
@@ -373,18 +371,6 @@ export default function PricingCards({
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-sky px-5 py-2.5 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
           >
             {t('ctaMock')} <ArrowRight size={16} />
-          </button>
-
-          {/* The same purchase as a URL you can hand someone. A telecaller on a
-              call, or a WhatsApp reply, needs to send the buyer somewhere that
-              opens ON the payment sheet — not to this grid with instructions to
-              find the right card. Native share sheet where the device has one,
-              clipboard everywhere else. */}
-          <button
-            onClick={sharePayLink}
-            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-pill px-4 py-2 font-heading text-xs font-semibold text-sky transition hover:bg-tint-blue"
-          >
-            <Share2 size={13} /> {gt('sharePayLink')}
           </button>
         </div>
       </div>,

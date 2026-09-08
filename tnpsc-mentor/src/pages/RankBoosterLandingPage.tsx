@@ -38,6 +38,7 @@ import PricingCards from '../components/Landing/PricingCards'
 import { usePlanSales } from '../hooks/usePlanSales'
 import { translate, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
+import { MOCK_PACK_BUY_PATHS } from '../lib/authRouting'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 
 type Lang = 'ta' | 'en'
@@ -441,6 +442,11 @@ export default function RankBoosterLandingPage() {
         : 'TNPSC Group II/IIA Test Series - Enroll now'
   }, [lang])
 
+  // This page doubles as the shareable ₹399 pay link (see MOCK_PACK_BUY_PATHS).
+  // On those paths the Mock Pack sheet opens over the page instead of the Rank
+  // Booster one — same page, different product in front of the buyer.
+  const isMockPayLink = (MOCK_PACK_BUY_PATHS as readonly string[]).includes(location.pathname)
+
   useEffect(() => {
     if (isAuthenticated && !loaded) refresh()
   }, [isAuthenticated, loaded, refresh])
@@ -456,9 +462,14 @@ export default function RankBoosterLandingPage() {
     if (!isAuthenticated || !loaded) return
     if (!(location.state as { autoEnroll?: boolean } | null)?.autoEnroll) return
     navigate(location.pathname, { replace: true, state: null })
+    // On the ₹399 pay route the resume belongs to the Mock Pack, which
+    // PricingCards opens itself — firing Rank Booster's checkout here would
+    // put the wrong product's payment sheet in front of someone who signed up
+    // specifically to buy the other one.
+    if (isMockPayLink) return
     if (!sales.rankBooster) return
     if (!((isAdmin || isSuperAdmin) || rankBoosterUnlocked)) purchase.startEnroll()
-  }, [isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked, sales.rankBooster])
+  }, [isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked, sales.rankBooster, isMockPayLink])
 
   // This page is the Meta ad landing target — most guests here arrive via an
   // in-app browser (Instagram/Facebook), where Google Sign-In can't work at
@@ -475,8 +486,11 @@ export default function RankBoosterLandingPage() {
     // above and isAutoEnrollPath in authRouting.ts) rides in a query param
     // instead; LoginPage/RegisterPage fall back to reading it when there's
     // no state.
-    if (isAndroidWebView) return openInBrowser(`${path}?from=/rank-booster`)
-    navigate(path, { state: { from: { pathname: '/rank-booster' } } })
+    // The pay-link paths return to themselves, not to /rank-booster — a buyer
+    // sent a payment link has to come back to it after signing up.
+    const back = isMockPayLink ? location.pathname : '/rank-booster'
+    if (isAndroidWebView) return openInBrowser(`${path}?from=${back}`)
+    navigate(path, { state: { from: { pathname: back } } })
   }
 
   /** The one "Enroll now" handler behind every CTA on this page (hero, price
@@ -811,7 +825,11 @@ export default function RankBoosterLandingPage() {
             </div>
           </Reveal>
           <div className="mt-10">
-            <PricingCards lang={lang} webAppHref={isAuthenticated ? '/test-arena' : '/register'} />
+            <PricingCards
+              lang={lang}
+              webAppHref={isAuthenticated ? '/test-arena' : '/register'}
+              autoOpenMockPack={isMockPayLink}
+            />
           </div>
         </div>
       </section>
