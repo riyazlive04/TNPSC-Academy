@@ -136,13 +136,16 @@ const MOCK_ITEMS: { ta: string; en: string }[] = [
     en: '50 free credits on signup + 50 daily while this plan is active (instead of the usual 10)',
   },
   FREE_ITEMS[1],
-  FREE_ITEMS[2],
+  // FREE_ITEMS[2] ("1 full mock exam") is deliberately NOT reused here: it is
+  // the FREE tier's single-mock allowance, and listing it under a plan whose
+  // headline perk is six full mocks reads as a smaller number contradicting
+  // the bigger one two lines above.
   FREE_ITEMS[3],
 ]
 // Positionally paired with MOCK_ITEMS above — add an icon whenever you add an
 // item, or every line after the new one silently inherits the wrong one.
 // CalendarDays sits at index 1 for the previous-year-questions perk.
-const MOCK_ICONS = [ListChecks, CalendarDays, Download, Gift, FileText, Trophy, ShieldCheck]
+const MOCK_ICONS = [ListChecks, CalendarDays, Download, Gift, FileText, ShieldCheck]
 
 // What the Vettri Nichayam bundle unlocks — mirrors the in-app VettriCard.
 // The first item gets an inline "download the schedule" link at render time.
