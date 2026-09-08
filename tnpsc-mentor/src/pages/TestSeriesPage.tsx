@@ -16,6 +16,7 @@ import {
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import { seriesTap, mockTap, mockEntryVisible, showsPrice } from '../lib/g1Access'
 import TestSeriesProductPanel from '../components/TestSeries/TestSeriesProductPanel'
+import FullMockExamList from '../components/TestSeries/FullMockExamList'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { SkeletonAnalytics } from '../components/UI/Skeleton'
 import { fetchTestSeriesAnalyticsOverall, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
@@ -29,6 +30,8 @@ import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
 
 type HubTab = 'vettri' | 'rankbooster' | 'overall'
+/** Within the Group 1 tab: the scheduled series, or the full mock papers. */
+type G1View = 'series' | 'mock'
 
 /**
  * The "Test Marathon" hub: one Test Arena tile fanning out into every
@@ -57,6 +60,7 @@ export default function TestSeriesPage() {
   // II/IIA (Rank Booster), which leads the hub.
   const requestedTab = (location.state as { tab?: HubTab } | null)?.tab
   const [tab, setTab] = useState<HubTab>(requestedTab ?? 'rankbooster')
+  const [g1View, setG1View] = useState<G1View>('series')
   // Both flags default false until the settings fetch resolves. If whichever
   // tab we're sitting on turns out to be off, land on the other one instead —
   // only fires on that one resolution, never overrides a manual tab click.
@@ -126,8 +130,11 @@ export default function TestSeriesPage() {
   // The schedule download sits IN THE SAME ROW as the tab capsule (not
   // stacked inside whichever panel is open), so it stays put across tab
   // switches instead of jumping around — swaps target per the active tab.
+  // Hidden on the Group 1 MOCK view: this is the scheduled series' calendar,
+  // and the mock papers have no schedule — offering that download beside them
+  // would be handing over a timetable for a different product.
   const schedule: { href: string; filename: string; buttonClassName: string } | null =
-    tab === 'vettri'
+    tab === 'vettri' && g1View === 'series'
       ? {
           href: '/test-marathon-2026-schedule.pdf',
           filename: 'TNPSC-Mentors-Test-Marathon-2026-Schedule.pdf',
@@ -152,7 +159,11 @@ export default function TestSeriesPage() {
 
       <header className="mb-6 mt-4">
         <h1 className="tamil font-display text-2xl font-bold tracking-tight text-ink">
-          {tab === 'vettri' ? t('testSeriesTitle') : t('testSeriesHubTitle')}
+          {tab === 'vettri'
+            ? g1View === 'mock'
+              ? t('mockTest')
+              : t('testSeriesTitle')
+            : t('testSeriesHubTitle')}
         </h1>
         <p className="tamil mt-1 font-body text-base text-muted">{t('testSeriesHubSub')}</p>
       </header>
@@ -230,7 +241,11 @@ export default function TestSeriesPage() {
               className="bg-gradient-to-r from-brand to-brand-dark"
               // A ₹1,899 (or Premium) owner lands on the papers; anyone who can
               // still buy gets the same upsell the locked panel opens.
-              onClick={() => (seriesAction === 'buy' ? upsell.bundle() : setTab('vettri'))}
+              onClick={() => {
+                if (seriesAction === 'buy') return upsell.bundle()
+                setTab('vettri')
+                setG1View('series')
+              }}
             />
           )}
           {showMockEntry && (
@@ -244,7 +259,14 @@ export default function TestSeriesPage() {
               // whose plan already includes them (server-side mockUnlocked is
               // premium || mockPack || vettri) — and so does a learner while
               // the pack is off sale, since /mock carries its own paywall.
-              onClick={() => (mockAction === 'buy' ? mockPurchase.startEnroll() : navigate('/mock'))}
+              onClick={() => {
+                if (mockAction === 'buy') return mockPurchase.startEnroll()
+                // Stays on this page: the mock papers now live under the Group
+                // 1 tab, so sending the tap to /mock would walk the learner out
+                // of the hub they just chose a product in.
+                setTab('vettri')
+                setG1View('mock')
+              }}
               busy={mockPurchase.paying}
             />
           )}
@@ -287,20 +309,59 @@ export default function TestSeriesPage() {
       </div>
 
       {tab === 'vettri' && marathonOn && (
-        <TestSeriesProductPanel
-          series="g1_marathon"
-          offerTitleKey="testSeriesTitle"
-          entitlementUnlocked={unlimited}
-          onLockedTap={() => upsell.bundle()}
-          previewLocked={previewAsStudent}
-          offerEnabled={sales.vettri || sales.premium}
-          paywallCards={
-            <>
-              <VettriCard />
-              <PremiumCard />
-            </>
-          }
-        />
+        <>
+          {/* Group 1 holds two products, so the tab opens onto a choice rather
+              than straight into one of them: the scheduled series (13 dated
+              papers) or the mock papers (6 full-length). Kept as a sub-toggle
+              instead of a fourth top-level tab — that row is already three
+              items and the Tamil labels are roughly twice the width of the
+              English, which does not survive a 320px phone.
+
+              Only rendered when the mock papers are worth offering at all
+              (owned, or on sale), so a learner with neither never sees a
+              toggle with one meaningful side. */}
+          {showMockEntry && (
+            <div className="mb-5 flex w-full rounded-field bg-tint p-0.5 sm:w-auto sm:inline-flex">
+              {(
+                [
+                  { key: 'series' as const, label: t('testSeriesTitle') },
+                  { key: 'mock' as const, label: t('mockTest') },
+                ]
+              ).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setG1View(key)}
+                  aria-pressed={g1View === key}
+                  className={`tamil flex-1 rounded-[10px] px-4 py-1.5 text-center font-heading text-xs font-semibold leading-tight transition-colors sm:flex-none ${
+                    g1View === key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {g1View === 'mock' && showMockEntry ? (
+            <FullMockExamList />
+          ) : (
+            <TestSeriesProductPanel
+              series="g1_marathon"
+              offerTitleKey="testSeriesTitle"
+              entitlementUnlocked={unlimited}
+              onLockedTap={() => upsell.bundle()}
+              previewLocked={previewAsStudent}
+              offerEnabled={sales.vettri || sales.premium}
+              paywallCards={
+                <>
+                  <VettriCard />
+                  <PremiumCard />
+                </>
+              }
+            />
+          )}
+        </>
       )}
 
       {tab === 'rankbooster' && rankBoosterOn && (
