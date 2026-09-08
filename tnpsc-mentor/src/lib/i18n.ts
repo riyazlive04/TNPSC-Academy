@@ -874,6 +874,11 @@ const STRINGS = {
   // pill wants a shorter, product-agnostic "Group N Test Series" label
   // without touching those other surfaces.
   testSeriesTabG1: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' },
+  // The Group 1 hub's second entry point, beside the scheduled series: the
+  // standalone mock papers sold by the ₹399 pack. Deliberately shorter than
+  // mockPackBannerTitle ("Group 1 Mock Test Pack") — this labels a destination
+  // the learner is going to, not the product they are being sold.
+  g1MockTestTitle: { en: 'Group 1 Mock Test', ta: 'குரூப் 1 மாதிரித் தேர்வு' },
   testSeriesTabG2: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   testSeriesArenaSub: { en: 'Scheduled test series', ta: 'திட்டமிடப்பட்ட தேர்வுத் தொடர்கள்' },
   testSeriesSub: {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ArrowLeft, Rocket, Trophy, Download } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Rocket, Trophy, Download, ListChecks } from 'lucide-react'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard, { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
 import RankBoosterCard, {
@@ -13,6 +13,8 @@ import {
   RANK_BOOSTER_PERK_KEYS,
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
+import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
+import { seriesTap, mockTap, mockEntryVisible, showsPrice } from '../lib/g1Access'
 import TestSeriesProductPanel from '../components/TestSeries/TestSeriesProductPanel'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { SkeletonAnalytics } from '../components/UI/Skeleton'
@@ -94,10 +96,18 @@ export default function TestSeriesPage() {
 
   const unlimited = useEntitlementsStore((s) => s.unlimited)
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
+  const mockPack = useEntitlementsStore((s) => s.mockPack)
   const rbPurchase = useRankBoosterPurchase()
-  // The Group 1 (Vettri) marathon is only a pitch while the account can still
-  // buy it and one of the plans granting it is actually on sale.
-  const marathonBuyable = !unlimited && (sales.vettri || sales.premium)
+  const mockPurchase = useMockPackPurchase()
+
+  // ─── The two Group 1 entry points ──────────────────────────────────────────
+  // Which product each button opens and which it sells lives in lib/g1Access,
+  // pinned by tests: the failure modes here are silent (a paying customer sent
+  // to buy what they own, or a free learner walked into paid content).
+  const entitlement = { unlimited, mockPack }
+  const seriesAction = seriesTap(entitlement, sales)
+  const mockAction = mockTap(entitlement, sales)
+  const showMockEntry = mockEntryVisible(entitlement, sales)
 
   const [overall, setOverall] = useState<TestSeriesAnalytics | null>(null)
   useEffect(() => {
@@ -199,34 +209,46 @@ export default function TestSeriesPage() {
         </div>
       )}
 
-      {/* Sits in the banner list on every tab (it took the Mock Pack strip's
-          slot), so it doubles as the cross-tab entry to the Group 1 papers.
-          For a buyer it carries the ₹1,899 price and opens the same upsell the
-          locked panel does; for an owner — or while the plan is off sale — it
-          drops the price and just jumps to the Group 1 Test Series tab. */}
-      {marathonOn && (
-        <button
-          type="button"
-          onClick={() => (marathonBuyable ? upsell.bundle() : setTab('vettri'))}
-          className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
-        >
-          <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-            <Trophy size={20} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="tamil block font-display text-sm font-bold tracking-tight">
-              {t('marathonBannerTitle')}
-            </span>
-            <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-              {t('marathonBannerSub')}
-            </span>
-          </span>
-          {marathonBuyable && (
-            <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-              <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
-            </span>
+      {/* The two Group 1 products, side by side, because they are two different
+          purchases that lead to two different places: the ₹1,899 scheduled
+          series (13 dated papers, on this page) and the ₹399 mock pack (6
+          full-length papers, on /mock). One combined banner could only ever
+          point at one of them, which left the pack with no entry point here at
+          all.
+
+          Each button is an owner's shortcut OR a pitch, never both: it shows a
+          price only while the account can still buy that plan, and otherwise
+          just opens the thing. Stacks on mobile. */}
+      {(marathonOn || showMockEntry) && (
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          {marathonOn && (
+            <G1Entry
+              icon={<Trophy size={20} />}
+              title={t('testSeriesTabG1')}
+              sub={t('marathonBannerSub')}
+              price={showsPrice(seriesAction) ? `₹${VETTRI_PRICE_RUPEES}` : null}
+              className="bg-gradient-to-r from-brand to-brand-dark"
+              // A ₹1,899 (or Premium) owner lands on the papers; anyone who can
+              // still buy gets the same upsell the locked panel opens.
+              onClick={() => (seriesAction === 'buy' ? upsell.bundle() : setTab('vettri'))}
+            />
           )}
-        </button>
+          {showMockEntry && (
+            <G1Entry
+              icon={<ListChecks size={20} />}
+              title={t('g1MockTestTitle')}
+              sub={t('mockPackBannerSub')}
+              price={showsPrice(mockAction) ? `₹${MOCK_PACK_PRICE_RUPEES}` : null}
+              className="bg-gradient-to-r from-sky to-brand"
+              // A ₹399 owner goes straight to the mock papers. So does anyone
+              // whose plan already includes them (server-side mockUnlocked is
+              // premium || mockPack || vettri) — and so does a learner while
+              // the pack is off sale, since /mock carries its own paywall.
+              onClick={() => (mockAction === 'buy' ? mockPurchase.startEnroll() : navigate('/mock'))}
+              busy={mockPurchase.paying}
+            />
+          )}
+        </div>
       )}
 
       </div>
@@ -301,6 +323,27 @@ export default function TestSeriesPage() {
       {tab === 'overall' &&
         (overall ? <TestSeriesAnalyticsView analytics={overall} /> : <SkeletonAnalytics />)}
 
+      {/* Pre-payment recap for the Group 1 Mock Test button above. Required for
+          that button to do anything at all: startEnroll() only opens this
+          modal, so without it the tap would silently no-op. */}
+      <PurchaseConfirmModal
+        open={mockPurchase.confirmOpen}
+        planName={t('mockPackBannerTitle')}
+        validity={t('mockPackValidity')}
+        perks={[
+          t('mockPackBannerSub'),
+          t('mockPackPerkPyq'),
+          t('mockPackPerk2'),
+          t('mockPackPerk3'),
+        ]}
+        priceLabel={mockPurchase.isFree ? t('premiumFree') : mockPurchase.displayPrice}
+        isFree={mockPurchase.isFree}
+        accent="sky"
+        busy={mockPurchase.paying}
+        onConfirm={mockPurchase.handleBuy}
+        onCancel={() => mockPurchase.setConfirmOpen(false)}
+      />
+
       {/* Pre-payment recap for the Rank Booster discovery banner above — same
           confirm→Razorpay flow as RankBoosterCard's own CTA, so tapping the
           banner buys the series directly instead of just switching tabs. */}
@@ -319,5 +362,56 @@ export default function TestSeriesPage() {
         onCancel={() => rbPurchase.setConfirmOpen(false)}
       />
     </div>
+  )
+}
+
+/**
+ * One of the two Group 1 entry buttons.
+ *
+ * Extracted rather than written twice: the strip is ~25 lines of markup, and
+ * the pair only reads as a pair if they stay identical apart from icon, copy
+ * and colour. A price is shown only when `price` is given — the caller passes
+ * null once the account owns the plan, and the chevron takes its place so the
+ * button still reads as somewhere to go.
+ */
+function G1Entry({
+  icon,
+  title,
+  sub,
+  price,
+  className,
+  onClick,
+  busy = false,
+}: {
+  icon: React.ReactNode
+  title: string
+  sub: string
+  price: string | null
+  className: string
+  onClick: () => void
+  busy?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className={`flex w-full items-center gap-3 rounded-card px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60 ${className}`}
+    >
+      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="tamil block font-display text-sm font-bold tracking-tight">{title}</span>
+        <span className="tamil mt-0.5 block font-body text-xs text-white/85">{sub}</span>
+      </span>
+      {price ? (
+        <span className="flex flex-shrink-0 items-center rounded-pill bg-white/15 px-3 py-1.5">
+          <span className="font-heading text-sm font-bold">{price}</span>
+        </span>
+      ) : (
+        <ChevronRight size={18} className="flex-shrink-0 text-white/70" />
+      )}
+    </button>
   )
 }
