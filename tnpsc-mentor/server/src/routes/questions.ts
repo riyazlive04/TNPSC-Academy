@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
-import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
+import { bundleAccess } from '../lib/premium.js'
 import { chargeTestStart, FREE_MOCK_LIMIT } from '../lib/credits.js'
 import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 import { TEST_SERIES_CONFIG, DEFAULT_SERIES, resolveSeries } from '../lib/testSeriesCatalog.js'
@@ -864,7 +864,7 @@ router.get(
     // Independent reads (none consumes another's result) fired together instead
     // of sequentially — the exam list, staff status, ledger entitlement, and this
     // user's attempt counts were four separate round trips one after another.
-    const [{ data, error }, staff, entitlementPremium, counts] = await Promise.all([
+    const [{ data, error }, staff, entitlementUnlocked, counts] = await Promise.all([
       req.db!
         .from('mock_exams')
         .select(
@@ -873,15 +873,17 @@ router.get(
         .eq('enabled', true)
         .order('sort_order'),
       isStaff(req),
-      premiumEntitlement(req.db!)
-        .then((r) => r.premium)
+      // Same union the start gate enforces (premium || mockPack || vettri), so
+      // the picker can never disagree with what POST /mock-exam will allow.
+      bundleAccess(req.db!)
+        .then((r) => r.mockUnlocked)
         .catch(() => false), // fail closed: treat as free if the ledger is unreachable
       attemptCounts(req),
     ])
     if (error) return sendDbError(res, error)
 
     // Staff (admin/superadmin) preview every exam as unlocked and uncapped.
-    const premium = staff || entitlementPremium
+    const premium = staff || entitlementUnlocked
 
     const exams = ((data ?? []) as MockExamRow[]).map((e) => {
       const locked = e.tier === 'paid' && !premium
@@ -927,14 +929,16 @@ router.post(
     // Staff (admin/superadmin) bypass premium + attempt gates to preview exams.
     const staff = await isStaff(req)
 
+    // Premium, the Group 1 Mock Pack (these papers are the product it sells)
+    // or Vettri all unlock a paid mock. Fails CLOSED on a ledger read error.
     if (!staff && (exam as MockExamRow).tier === 'paid') {
-      let premium = false
+      let unlocked = false
       try {
-        premium = (await premiumEntitlement(req.db!)).premium
+        unlocked = (await bundleAccess(req.db!)).mockUnlocked
       } catch {
-        premium = false
+        unlocked = false
       }
-      if (!premium) return res.status(403).json({ error: 'premium_required' })
+      if (!unlocked) return res.status(403).json({ error: 'premium_required' })
     }
 
     // Free learners: at most ONE mock exam ever (locks even with credits), and a

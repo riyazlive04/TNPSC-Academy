@@ -40,6 +40,18 @@ export interface BundleEntitlement {
    *  (that stays on `unlimited` alone) — the two gates are intentionally
    *  different unions of the same three plans. */
   creditsUnlimited: boolean
+  /** premium || mockPack || vettri — unlocks the paid full mock exams.
+   *
+   *  The Mock Pack belongs here because those six papers ARE the product it
+   *  sells ("6 full-length Group 1 mock tests"); for a long time it granted
+   *  only the boosted credit allowance and left the exams themselves locked,
+   *  so it was billing for something it did not deliver.
+   *
+   *  Deliberately does NOT include rankBooster: that plan is Group II/IIA and
+   *  its copy never promises Group 1 mocks. Yet another union of the same
+   *  plans — see `unlimited`, `rankBoosterUnlocked` and `creditsUnlimited`,
+   *  each of which answers a different product question. */
+  mockUnlocked: boolean
   /** The standalone ₹399/80-day "Group 1 Mock Test Pack". Deliberately NOT
    *  folded into `creditsUnlimited` — it grants a bigger DAILY credit
    *  allowance (see credits.ts DAILY_CREDIT_GRANT_BOOSTED), not unlimited
@@ -142,6 +154,7 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
     rankBoosterUntil: rankBoosterActive ? untilFor(rankBoosterRow, RANK_BOOSTER_VALIDITY_MS) : null,
     rankBoosterUnlocked: premiumActive || rankBoosterActive,
     creditsUnlimited: premiumActive || vettriActive || rankBoosterActive,
+    mockUnlocked: premiumActive || mockPackActive || vettriActive,
     mockPack: mockPackActive,
     mockPackUntil: mockPackActive ? untilFor(mockPackRow, MOCK_PACK_VALIDITY_MS) : null,
   }

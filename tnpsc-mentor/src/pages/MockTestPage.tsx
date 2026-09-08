@@ -7,6 +7,9 @@ import PremiumCard from '../components/UI/PremiumCard'
 import { SkeletonCards, SkeletonPills } from '../components/UI/Skeleton'
 import { api } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
+import { usePlanSales } from '../hooks/usePlanSales'
+import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
+import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { MOCK_BLUEPRINTS } from '../lib/constants'
 import { upsell } from '../store/upsellStore'
 import { useT, type StringKey } from '../lib/i18n'
@@ -419,6 +422,13 @@ function FullMockExamTab() {
   // the exam's own tier, which the API returns regardless. Presentation only —
   // the same approach TestSeriesProductPanel takes with `previewLocked`.
   const { previewAsStudent } = useAuth()
+  // Tapping a locked exam has to lead somewhere buyable. The ₹399 Group 1 Mock
+  // Test Pack IS these papers, so the tap opens its confirm → Razorpay flow
+  // directly — the same machinery the Test Marathon banner uses. If the pack is
+  // off sale, fall back to the generic paywall, which pitches whatever plan
+  // still is (Vettri and Premium also unlock mocks).
+  const sales = usePlanSales()
+  const mockPurchase = useMockPackPurchase()
 
   const [exams, setExams] = useState<MockExam[]>([])
   const [loading, setLoading] = useState(true)
@@ -459,6 +469,12 @@ function FullMockExamTab() {
   const lockedFor = (e: MockExam) => (previewAsStudent ? e.tier === 'paid' : e.locked)
 
   const anyLocked = exams.some(lockedFor)
+
+  /** What a tap on a locked exam should do — never nothing. */
+  const offerAccess = () => {
+    if (sales.mockPack && !mockPurchase.mockPackUnlocked) return mockPurchase.startEnroll()
+    upsell.bundle()
+  }
 
   return (
     <div className="animate-fadeIn">
@@ -522,7 +538,7 @@ function FullMockExamTab() {
                       the forced upsell instead of silently doing nothing. Only
                       the attempt-cap state is a true dead end. */}
                   <button
-                    onClick={() => (locked ? upsell.premium() : !disabled && launch(e))}
+                    onClick={() => (locked ? offerAccess() : !disabled && launch(e))}
                     disabled={exhausted}
                     className="btn-brand shrink-0 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -540,12 +556,52 @@ function FullMockExamTab() {
         </div>
       )}
 
-      {/* When at least one exam is paywalled, surface the upgrade card. */}
+      {/* When at least one exam is paywalled, surface the way to unlock it. The
+          ₹399 pack leads because it is the plan that sells these exact papers;
+          the Premium card sits under it and hides itself when Premium is off
+          sale or already owned. */}
       {!loading && anyLocked && (
-        <div className="mt-6">
+        <div className="mt-6 space-y-4">
+          {sales.mockPack && !mockPurchase.mockPackUnlocked && (
+            <button
+              onClick={() => mockPurchase.startEnroll()}
+              disabled={mockPurchase.paying}
+              className="flex w-full items-center gap-3 rounded-card bg-sky px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
+            >
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                <ListChecks size={20} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="tamil block font-display text-sm font-bold tracking-tight">
+                  {t('mockPackBannerTitle')}
+                </span>
+                <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+                  {t('mockPackBannerSub')}
+                </span>
+              </span>
+              <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+                <span className="font-heading text-sm font-bold">₹{MOCK_PACK_PRICE_RUPEES}</span>
+              </span>
+            </button>
+          )}
           <PremiumCard />
         </div>
       )}
+
+      {/* Pre-payment recap for both entry points above (the banner and a tap on
+          a locked exam). Opens Razorpay only once the buyer confirms. */}
+      <PurchaseConfirmModal
+        open={mockPurchase.confirmOpen}
+        planName={t('mockPackBannerTitle')}
+        validity={t('mockPackValidity')}
+        perks={[t('mockPackBannerSub'), t('mockPackPerk2'), t('mockPackPerk3')]}
+        priceLabel={mockPurchase.isFree ? t('premiumFree') : mockPurchase.displayPrice}
+        isFree={mockPurchase.isFree}
+        accent="sky"
+        busy={mockPurchase.paying}
+        onConfirm={mockPurchase.handleBuy}
+        onCancel={() => mockPurchase.setConfirmOpen(false)}
+      />
     </div>
   )
 }
