@@ -25,7 +25,11 @@ import {
   validateRow,
 } from './lib-group1-mocks.mjs'
 
-const SRC = 'c:/Users/mas20/Desktop/work/parser/Group1/mock'
+// Where the authored papers live. Overridable because the machine that can
+// reach the database is not the machine the papers were written on: production
+// Postgres is only reachable from the VPS itself, so the JSON is copied there
+// and MOCK_SRC points at it.
+const SRC = process.env.MOCK_SRC || 'c:/Users/mas20/Desktop/work/parser/Group1/mock'
 const dryRun = process.argv.includes('--dry-run')
 
 // ─── 1. Transform ────────────────────────────────────────────────────────────
@@ -107,13 +111,17 @@ if (dryRun) {
 
 // ─── 4. Load ─────────────────────────────────────────────────────────────────
 const { Client } = await import('pg')
+// The self-hosted Postgres on the VPS speaks plain TCP on 127.0.0.1 and rejects
+// a TLS handshake outright ("the server does not support SSL connections"), so
+// SSL is opt-out. Set PGSSL=off when running on the box; leave it unset for a
+// managed host that requires TLS.
 const client = new Client({
-  host: process.env.SUPABASE_DB_HOST,
-  port: Number(process.env.SUPABASE_DB_PORT),
-  user: process.env.SUPABASE_DB_USER,
+  host: process.env.SUPABASE_DB_HOST || '127.0.0.1',
+  port: Number(process.env.SUPABASE_DB_PORT || 5432),
+  user: process.env.SUPABASE_DB_USER || 'postgres',
   password: process.env.SUPABASE_DB_PASSWORD,
-  database: process.env.SUPABASE_DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  database: process.env.SUPABASE_DB_NAME || 'postgres',
+  ssl: process.env.PGSSL === 'off' ? false : { rejectUnauthorized: false },
   statement_timeout: 180000,
 })
 await client.connect()
