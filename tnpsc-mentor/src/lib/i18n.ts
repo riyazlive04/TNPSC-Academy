@@ -1005,6 +1005,13 @@ const STRINGS = {
     ta: 'இந்த திட்டம் செயலில் இருக்கும் வரை தினமும் 50 கிரெடிட்கள் (வழக்கமான 10 க்கு பதிலாக)',
   },
   mockPackGet: { en: 'Get Mock Tests', ta: 'மாதிரி தேர்வுகள் பெறு' },
+  // Strings for the standalone /mock-test-pack pay link (MockPackBuyPage).
+  oneTimePaymentShort: { en: 'one-time payment', ta: 'ஒரே முறை கட்டணம்' },
+  mockPackAlreadyOwned: {
+    en: 'This plan is already active on your account — no need to pay again.',
+    ta: 'இந்தத் திட்டம் ஏற்கெனவே உங்கள் கணக்கில் செயலில் உள்ளது — மீண்டும் பணம் செலுத்த வேண்டாம்.',
+  },
+  mockPackOpenTests: { en: 'Open the mock tests', ta: 'மாதிரித் தேர்வுகளைத் திற' },
   rankBoosterIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
   // Dashboard discovery banner (Test Arena).
   rankBoosterDashBadge: { en: 'New', ta: 'புதியது' },

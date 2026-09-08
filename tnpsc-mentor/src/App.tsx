@@ -81,6 +81,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MaterialsPage = lazy(() => import('./pages/MaterialsPage'))
 const RevisionPage = lazy(() => import('./pages/RevisionPage'))
 const MockTestPage = lazy(() => import('./pages/MockTestPage'))
+const MockPackBuyPage = lazy(() => import('./pages/MockPackBuyPage'))
 const MockInstructionsPage = lazy(() => import('./pages/MockInstructionsPage'))
 const MockQuizPage = lazy(() => import('./pages/MockQuizPage'))
 const TestSeriesPage = lazy(() => import('./pages/TestSeriesPage'))
@@ -329,6 +330,12 @@ function AnimatedRoutes() {
           test series (marketing/ad landing target) — purchasable directly
           once signed in, or via sign-up-then-return for a brand-new visitor. */}
       <Route path="/rank-booster" element={<RankBoosterLandingPage />} />
+
+      {/* Direct pay link for the ₹399 Group 1 Mock Test Pack — handed to a
+          buyer as a URL (ad, WhatsApp, a telecaller on a call). Opens the
+          confirm sheet on arrival; a signed-out visitor registers and is
+          returned here with checkout resuming (AUTO_ENROLL_PATHS). */}
+      <Route path="/mock-test-pack" element={<MockPackBuyPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />

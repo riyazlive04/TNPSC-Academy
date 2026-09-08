@@ -36,7 +36,7 @@ export function postAuthDestination(fromPath?: string): string {
 
 /** Landing pages where a successful auth should resume checkout immediately
  *  rather than dropping the user back on the page cold. */
-const AUTO_ENROLL_PATHS = new Set(['/rank-booster'])
+const AUTO_ENROLL_PATHS = new Set(['/rank-booster', '/mock-test-pack'])
 
 export function isAutoEnrollPath(fromPath?: string): boolean {
   return !!fromPath && AUTO_ENROLL_PATHS.has(fromPath)
