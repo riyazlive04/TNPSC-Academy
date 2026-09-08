@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, Rocket, Trophy, Download, ListChecks } from 'lucide-react'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard, { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
@@ -59,14 +59,61 @@ export default function TestSeriesPage() {
   // request a starting tab via router state — otherwise default to Group
   // II/IIA (Rank Booster), which leads the hub.
   const requestedTab = (location.state as { tab?: HubTab } | null)?.tab
-  const [tab, setTab] = useState<HubTab>(requestedTab ?? 'rankbooster')
-  const [g1View, setG1View] = useState<G1View>('series')
+
+  // Where you were lives in the URL, so a reload (or a shared link, or the
+  // browser restoring the tab) comes back to the same place instead of
+  // silently resetting to the hub's default. Router state still wins when a
+  // caller asked for a specific tab, since that is a deliberate hand-off from
+  // another page.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlG1View: G1View = searchParams.get('g1') === 'mock' ? 'mock' : 'series'
+  const urlTab = searchParams.get('tab')
+  const initialTab: HubTab =
+    requestedTab ??
+    (urlTab === 'vettri' || urlTab === 'rankbooster' || urlTab === 'overall'
+      ? urlTab
+      : // A ?g1=mock link implies the Group 1 tab even without ?tab, so the
+        // mock papers are not restored behind a tab that is not showing them.
+        urlG1View === 'mock'
+        ? 'vettri'
+        : 'rankbooster')
+
+  const [tab, setTabState] = useState<HubTab>(initialTab)
+  const [g1View, setG1ViewState] = useState<G1View>(urlG1View)
+
+  /** Write the current position into the URL (replace: no history spam from a
+   *  view switch), mirroring how the PYQ pages carry their own filters. */
+  const syncUrl = (nextTab: HubTab, nextView: G1View) => {
+    const next = new URLSearchParams(searchParams)
+    next.set('tab', nextTab)
+    if (nextTab === 'vettri' && nextView === 'mock') next.set('g1', 'mock')
+    else next.delete('g1')
+    setSearchParams(next, { replace: true })
+  }
+
+  /**
+   * Move to a tab AND a Group 1 view in one step.
+   *
+   * Everything goes through here rather than calling the two setters in
+   * sequence: React batches the state updates, so a second setter would still
+   * read the PRE-update `tab`/`g1View` from this render's closure and write a
+   * stale pair into the URL — leaving the address bar pointing at the place you
+   * just left, which is precisely what a reload would then restore.
+   */
+  const goTo = (nextTab: HubTab, nextView: G1View) => {
+    setTabState(nextTab)
+    setG1ViewState(nextView)
+    syncUrl(nextTab, nextView)
+  }
+  const setG1View = (next: G1View) => goTo(next === 'mock' ? 'vettri' : tab, next)
   // Both flags default false until the settings fetch resolves. If whichever
   // tab we're sitting on turns out to be off, land on the other one instead —
   // only fires on that one resolution, never overrides a manual tab click.
   useEffect(() => {
-    if (!rankBoosterOn && marathonOn) setTab('vettri')
-    else if (!marathonOn && rankBoosterOn) setTab('rankbooster')
+    // setTabState, not setTab: this is a correction for a product being off,
+    // not a place the user chose, so it must not rewrite their URL.
+    if (!rankBoosterOn && marathonOn) setTabState('vettri')
+    else if (!marathonOn && rankBoosterOn) setTabState('rankbooster')
   }, [marathonOn, rankBoosterOn])
 
   // Click-and-drag-to-scroll for the promo banner stack below: a mouse user can
@@ -243,8 +290,7 @@ export default function TestSeriesPage() {
               // still buy gets the same upsell the locked panel opens.
               onClick={() => {
                 if (seriesAction === 'buy') return upsell.bundle()
-                setTab('vettri')
-                setG1View('series')
+                goTo('vettri', 'series')
               }}
             />
           )}
@@ -264,8 +310,7 @@ export default function TestSeriesPage() {
                 // Stays on this page: the mock papers now live under the Group
                 // 1 tab, so sending the tap to /mock would walk the learner out
                 // of the hub they just chose a product in.
-                setTab('vettri')
-                setG1View('mock')
+                goTo('vettri', 'mock')
               }}
               busy={mockPurchase.paying}
             />
@@ -284,14 +329,7 @@ export default function TestSeriesPage() {
             <button
               key={key}
               type="button"
-              onClick={() => {
-                setTab(key)
-                // The Group 1 tab is the way back out of the mock papers: the
-                // button below is one-way into them by design, so re-selecting
-                // this tab has to return to the scheduled series rather than
-                // land on whatever was last open.
-                setG1View('series')
-              }}
+              onClick={() => goTo(key, 'series')}
               aria-pressed={tab === key}
               className={`flex-1 rounded-[10px] px-3 py-1.5 text-center font-heading text-xs font-semibold leading-tight transition-colors sm:flex-none ${
                 tab === key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
@@ -322,44 +360,46 @@ export default function TestSeriesPage() {
               always one tap away — the earlier single flipping button made the
               destination visible but hid the fact that a choice existed at all.
 
-              The view you are on is the solid one; the other sits in its own
-              soft tint. Same colours the products use elsewhere (sky = mock
-              pack, brand = scheduled series) so the buttons read as those two
-              products rather than as a generic on/off pair.
+              Joined into one control on a shared track, so they read as two
+              halves of a single choice rather than two unrelated actions. The
+              view you are on is the solid half, in that product's own colour
+              (sky = mock pack, brand = scheduled series).
 
               Opening the mock papers also raises the ₹399 confirm sheet for
               anyone who has not bought them, leaving the papers visible behind
               the ask. Skipped for an owner — mockAction is already 'open' once
               the pack, Vettri or Premium is active, and asking someone to pay
               for what they bought reads as a double charge. */}
-          <div className="mb-5 flex flex-wrap items-stretch justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setG1View('mock')
-                if (mockAction === 'buy') mockPurchase.startEnroll()
-              }}
-              disabled={mockPurchase.paying}
-              aria-pressed={g1View === 'mock'}
-              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold transition hover:brightness-105 disabled:opacity-60 ${
-                g1View === 'mock' ? 'bg-sky text-white shadow-card' : 'bg-skysoft text-sky'
-              }`}
-            >
-              <ListChecks size={16} className="flex-shrink-0" />
-              {t('g1MockTestTitle')}
-            </button>
+          <div className="mb-5 flex justify-center">
+            <div className="inline-flex items-stretch rounded-pill bg-tint p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setG1View('mock')
+                  if (mockAction === 'buy') mockPurchase.startEnroll()
+                }}
+                disabled={mockPurchase.paying}
+                aria-pressed={g1View === 'mock'}
+                className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-4 py-2 text-center font-heading text-sm font-bold transition disabled:opacity-60 ${
+                  g1View === 'mock' ? 'bg-sky text-white shadow-sm' : 'text-ink2 hover:text-ink'
+                }`}
+              >
+                <ListChecks size={16} className="flex-shrink-0" />
+                {t('g1MockTestTitle')}
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setG1View('series')}
-              aria-pressed={g1View === 'series'}
-              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold transition hover:brightness-105 ${
-                g1View === 'series' ? 'bg-brand text-white shadow-card' : 'bg-tint-violet text-brand'
-              }`}
-            >
-              <Trophy size={16} className="flex-shrink-0" />
-              {t('testSeriesTabG1')}
-            </button>
+              <button
+                type="button"
+                onClick={() => setG1View('series')}
+                aria-pressed={g1View === 'series'}
+                className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-4 py-2 text-center font-heading text-sm font-bold transition ${
+                  g1View === 'series' ? 'bg-brand text-white shadow-sm' : 'text-ink2 hover:text-ink'
+                }`}
+              >
+                <Trophy size={16} className="flex-shrink-0" />
+                {t('testSeriesTabG1')}
+              </button>
+            </div>
           </div>
 
           {g1View === 'mock' ? (
