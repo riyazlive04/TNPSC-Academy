@@ -15,6 +15,7 @@ import {
   Gift,
   Calculator,
   CalendarDays,
+  Share2,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { translate, type StringKey } from '../../lib/i18n'
@@ -26,6 +27,8 @@ import {
 } from '../../hooks/useRankBoosterPurchase'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../../hooks/useMockPackPurchase'
 import { VETTRI_PRICE_RUPEES } from '../UI/VettriCard'
+import { MOCK_PACK_BUY_PATHS } from '../../lib/authRouting'
+import { toast } from '../../store/toastStore'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useAuth } from '../../hooks/useAuth'
 import { usePlanSales } from '../../hooks/usePlanSales'
@@ -256,6 +259,32 @@ export default function PricingCards({
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const mockPurchase = useMockPackPurchase()
+
+  // Pinned to the public site rather than window.location.origin: this URL is
+  // shared OUTWARD, and the app subdomain is noindex and not the address a
+  // customer should be handed.
+  const payLink = `https://tnpscmentors.in${MOCK_PACK_BUY_PATHS[0]}`
+
+  /** Hand the ₹399 purchase over as a link — share sheet, else clipboard. */
+  const sharePayLink = async () => {
+    track('mock-pay-link')
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: t('mockTitle'), url: payLink })
+        return
+      } catch (e) {
+        // Dismissing the share sheet is not a failure — don't then silently
+        // copy something they chose not to send.
+        if ((e as Error)?.name === 'AbortError') return
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(payLink)
+      toast.success(gt('payLinkCopied'))
+    } catch {
+      toast.error(gt('payLinkCopyFailed'))
+    }
+  }
   // Which paid tiers the superadmin is currently selling. A withdrawn plan is
   // dropped from the grid entirely (see `cards.filter` below) rather than shown
   // in a disabled state - an unbuyable price on a marketing page is worse than
@@ -344,6 +373,18 @@ export default function PricingCards({
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-sky px-5 py-2.5 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
           >
             {t('ctaMock')} <ArrowRight size={16} />
+          </button>
+
+          {/* The same purchase as a URL you can hand someone. A telecaller on a
+              call, or a WhatsApp reply, needs to send the buyer somewhere that
+              opens ON the payment sheet — not to this grid with instructions to
+              find the right card. Native share sheet where the device has one,
+              clipboard everywhere else. */}
+          <button
+            onClick={sharePayLink}
+            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-pill px-4 py-2 font-heading text-xs font-semibold text-sky transition hover:bg-tint-blue"
+          >
+            <Share2 size={13} /> {gt('sharePayLink')}
           </button>
         </div>
       </div>,

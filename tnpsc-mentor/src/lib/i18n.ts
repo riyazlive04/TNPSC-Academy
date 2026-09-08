@@ -1012,6 +1012,14 @@ const STRINGS = {
     ta: 'இந்தத் திட்டம் ஏற்கெனவே உங்கள் கணக்கில் செயலில் உள்ளது — மீண்டும் பணம் செலுத்த வேண்டாம்.',
   },
   mockPackOpenTests: { en: 'Open the mock tests', ta: 'மாதிரித் தேர்வுகளைத் திற' },
+  // The shareable pay link on the ₹399 card — lets a telecaller or the team
+  // hand a buyer a URL that opens straight on the payment sheet.
+  sharePayLink: { en: 'Share payment link', ta: 'கட்டண இணைப்பைப் பகிர்' },
+  payLinkCopied: { en: 'Payment link copied', ta: 'கட்டண இணைப்பு நகலெடுக்கப்பட்டது' },
+  payLinkCopyFailed: {
+    en: 'Could not copy — select the link and copy it manually.',
+    ta: 'நகலெடுக்க முடியவில்லை — இணைப்பைத் தேர்ந்தெடுத்து கைமுறையாக நகலெடுக்கவும்.',
+  },
   rankBoosterIncluded: { en: 'Included in this plan', ta: 'இந்தத் திட்டத்தில் அடங்கும்' },
   // Dashboard discovery banner (Test Arena).
   rankBoosterDashBadge: { en: 'New', ta: 'புதியது' },
