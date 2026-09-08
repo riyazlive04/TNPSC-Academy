@@ -317,30 +317,47 @@ export default function TestSeriesPage() {
 
       {tab === 'vettri' && marathonOn && (
         <>
-          {/* One centred button into the Group 1 mock papers, replacing the
-              two-sided toggle that used to sit here. It always opens the mock
-              papers — never a dead tap — and for anyone who has not bought them
-              it opens the ₹399 confirm sheet on top, so the papers are visible
-              behind the ask rather than hidden until payment.
+          {/* One centred button that switches between the two Group 1
+              products, labelled with the one it takes you TO.
 
-              The prompt is deliberately skipped for an owner (mockAction is
-              'open' once the pack, Vettri or Premium is active): asking someone
-              to pay for what they already bought reads as a double charge.
+              From the series it opens the mock papers, and for anyone who has
+              not bought them it opens the ₹399 confirm sheet on top — the
+              papers stay visible behind the ask rather than hidden until
+              payment. The prompt is skipped for an owner (mockAction is
+              already 'open' once the pack, Vettri or Premium is active):
+              asking someone to pay for what they bought reads as a double
+              charge.
 
-              Way back to the scheduled papers is the "Group 1 Test Series" tab
-              above, which resets this view. */}
+              From the mock papers it goes back. An earlier version relied on
+              re-tapping the "Group 1 Test Series" tab to return, but that tab
+              is already highlighted while you are in here, so there was
+              nothing that looked clickable and the mock view was a one-way
+              door. The label and colour both flip so the way out is the same
+              control that got you in. */}
           <div className="mb-5 flex justify-center">
             <button
               type="button"
               onClick={() => {
+                if (g1View === 'mock') return setG1View('series')
                 setG1View('mock')
                 if (mockAction === 'buy') mockPurchase.startEnroll()
               }}
               disabled={mockPurchase.paying}
-              className="tamil btn-wrap inline-flex items-center gap-2 rounded-pill bg-sky px-5 py-2.5 text-center font-heading text-sm font-bold text-white shadow-card transition hover:brightness-105 disabled:opacity-60"
+              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold text-white shadow-card transition hover:brightness-105 disabled:opacity-60 ${
+                g1View === 'mock' ? 'bg-brand' : 'bg-sky'
+              }`}
             >
-              <ListChecks size={16} className="flex-shrink-0" />
-              {t('g1MockTestTitle')}
+              {g1View === 'mock' ? (
+                <>
+                  <Trophy size={16} className="flex-shrink-0" />
+                  {t('testSeriesTabG1')}
+                </>
+              ) : (
+                <>
+                  <ListChecks size={16} className="flex-shrink-0" />
+                  {t('g1MockTestTitle')}
+                </>
+              )}
             </button>
           </div>
 
