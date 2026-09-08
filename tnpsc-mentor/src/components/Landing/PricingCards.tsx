@@ -497,7 +497,14 @@ export default function PricingCards({
       {isMobile ? (
         <StackedCards>{visible}</StackedCards>
       ) : (
-        <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">{visible}</div>
+        // Track count follows how many cards actually survived the sale filter
+        // (auto-fit collapses the spares), and `justify-center` centres the row
+        // - a fixed 5-column grid left-aligned a 4-card row against an empty
+        // trailing column. The minmax cap keeps each card at its designed width
+        // instead of ballooning when fewer tiers are on sale.
+        <div className="grid items-stretch justify-center gap-5 grid-cols-[repeat(auto-fit,minmax(15rem,18.25rem))]">
+          {visible}
+        </div>
       )}
 
       {/* Pre-payment recap for the Mock Pack CTA above - opens Razorpay only
