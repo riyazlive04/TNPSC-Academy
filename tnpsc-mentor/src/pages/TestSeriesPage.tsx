@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ArrowLeft, Rocket, Trophy, Download, ListChecks } from 'lucide-react'
+import { ArrowLeft, Rocket, Trophy, Download } from 'lucide-react'
 import PremiumCard from '../components/UI/PremiumCard'
 import VettriCard, { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
 import RankBoosterCard, {
@@ -21,7 +21,7 @@ import { useEntitlementsStore } from '../store/entitlementsStore'
 import { upsell } from '../store/upsellStore'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
-import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
+import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
@@ -46,6 +46,9 @@ export default function TestSeriesPage() {
   const { previewAsStudent } = useAuth()
   const marathonOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
+  // Which plans are on sale - decides whether each product's paywall popup
+  // has anything in it. The cards themselves hide on the same flags.
+  const sales = usePlanSales()
 
   // A caller (e.g. the Group 1 Test Series discovery banner on Test Arena) can
   // request a starting tab via router state — otherwise default to Group
@@ -91,9 +94,10 @@ export default function TestSeriesPage() {
 
   const unlimited = useEntitlementsStore((s) => s.unlimited)
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
-  const mockPackOwned = useEntitlementsStore((s) => s.mockPack)
-  const mockPurchase = useMockPackPurchase()
   const rbPurchase = useRankBoosterPurchase()
+  // The Group 1 (Vettri) marathon is only a pitch while the account can still
+  // buy it and one of the plans granting it is actually on sale.
+  const marathonBuyable = !unlimited && (sales.vettri || sales.premium)
 
   const [overall, setOverall] = useState<TestSeriesAnalytics | null>(null)
   useEffect(() => {
@@ -151,32 +155,10 @@ export default function TestSeriesPage() {
         onClickCapture={onBannerClickCapture}
         className="cursor-grab active:cursor-grabbing"
       >
-      {/* Pinned to its own tab only — a plain info strip, not a cross-tab
-          switcher: the ₹899 price only ever appears while looking at the
-          Group 1 Test Series tab. */}
-      {marathonOn && tab === 'vettri' && (
-        <div className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-white">
-          <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-            <Trophy size={20} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="tamil block font-display text-sm font-bold tracking-tight">
-              {t('marathonBannerTitle')}
-            </span>
-            <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-              {t('marathonBannerSub')}
-            </span>
-          </span>
-          <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-            <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
-          </span>
-        </div>
-      )}
-
-      {/* Pinned to its own tab too — the ₹1249 price only ever appears on the
+      {/* Pinned to its own tab — the ₹1249 price only ever appears on the
           Group II/IIA tab. Stays a real button while locked (tap starts the
           purchase flow); once unlocked it's a plain info strip like the
-          Group 1 banner above. */}
+          Group 1 banner below. */}
       {rankBoosterOn && tab === 'rankbooster' && !rbPurchase.rankBoosterUnlocked && (
         <button
           type="button"
@@ -217,37 +199,36 @@ export default function TestSeriesPage() {
         </div>
       )}
 
-      {/* Group 1 Mock Test Pack (6 mock exams) - a lighter, cheaper entry point
-          than the full Group 1 Test Series bundle, now a real ₹399/80-day SKU of its own
-          (see useMockPackPurchase). No tab of its own on this hub: an owner
-          taps straight through to the exams (/mock); anyone else taps straight
-          into the same confirm→Razorpay flow as every other paid-plan card.
-          Hides once the account already has Premium (which includes the pack
-          for free) - `unlimited` covers Premium/Vettri, not mockPack itself. */}
-      {!unlimited && (
+      {/* Sits in the banner list on every tab (it took the Mock Pack strip's
+          slot), so it doubles as the cross-tab entry to the Group 1 papers.
+          For a buyer it carries the ₹899 price and opens the same upsell the
+          locked panel does; for an owner — or while the plan is off sale — it
+          drops the price and just jumps to the Group 1 Test Series tab. */}
+      {marathonOn && (
         <button
-          onClick={() => (mockPackOwned ? navigate('/mock') : mockPurchase.startEnroll())}
-          disabled={mockPurchase.paying}
-          className="mb-6 flex w-full items-center gap-3 rounded-card bg-sky px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
+          type="button"
+          onClick={() => (marathonBuyable ? upsell.bundle() : setTab('vettri'))}
+          className="mb-6 flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
         >
           <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-            <ListChecks size={20} />
+            <Trophy size={20} />
           </span>
           <span className="min-w-0 flex-1">
             <span className="tamil block font-display text-sm font-bold tracking-tight">
-              {t('mockPackBannerTitle')}
+              {t('marathonBannerTitle')}
             </span>
             <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-              {t('mockPackBannerSub')}
+              {t('marathonBannerSub')}
             </span>
           </span>
-          {!mockPackOwned && (
+          {marathonBuyable && (
             <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-              <span className="font-heading text-sm font-bold">₹{MOCK_PACK_PRICE_RUPEES}</span>
+              <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
             </span>
           )}
         </button>
       )}
+
       </div>
 
       {/* Tab capsule + schedule download sit in one row ("parallel") on wide
@@ -290,6 +271,7 @@ export default function TestSeriesPage() {
           entitlementUnlocked={unlimited}
           onLockedTap={() => upsell.bundle()}
           previewLocked={previewAsStudent}
+          offerEnabled={sales.vettri || sales.premium}
           paywallCards={
             <>
               <VettriCard />
@@ -306,6 +288,7 @@ export default function TestSeriesPage() {
           entitlementUnlocked={rankBoosterUnlocked}
           onLockedTap={() => upsell.rankBooster()}
           previewLocked={previewAsStudent}
+          offerEnabled={sales.rankBooster || sales.premium}
           paywallCards={
             <>
               <RankBoosterCard />
@@ -317,20 +300,6 @@ export default function TestSeriesPage() {
 
       {tab === 'overall' &&
         (overall ? <TestSeriesAnalyticsView analytics={overall} /> : <SkeletonAnalytics />)}
-
-      {/* Pre-payment recap for the Mock Pack banner above. */}
-      <PurchaseConfirmModal
-        open={mockPurchase.confirmOpen}
-        planName={t('mockPackBannerTitle')}
-        validity={t('mockPackValidity')}
-        perks={[t('mockPackBannerSub'), t('mockPackPerk2'), t('mockPackPerk3')]}
-        priceLabel={mockPurchase.isFree ? t('premiumFree') : mockPurchase.displayPrice}
-        isFree={mockPurchase.isFree}
-        accent="sky"
-        busy={mockPurchase.paying}
-        onConfirm={mockPurchase.handleBuy}
-        onCancel={() => mockPurchase.setConfirmOpen(false)}
-      />
 
       {/* Pre-payment recap for the Rank Booster discovery banner above — same
           confirm→Razorpay flow as RankBoosterCard's own CTA, so tapping the

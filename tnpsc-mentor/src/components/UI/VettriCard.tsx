@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Trophy, Check, Download, Loader2, Tag, X, AlertCircle, CalendarDays, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTestSeriesEnabled } from '../../hooks/useTestSeriesEnabled'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import { startPurchase, couponMode, PURCHASE_ERR_KEY } from '../../lib/purchase'
 import { useStorePrice } from '../../hooks/useStorePrice'
 import type { PlanId } from '../../lib/iapCatalog'
@@ -94,6 +95,8 @@ export default function VettriCard({
   const { t } = useT()
   const navigate = useNavigate()
   const seriesOn = useTestSeriesEnabled()
+  // Whether this bundle is currently on sale (superadmin Payments tab).
+  const sales = usePlanSales()
   const [paying, setPaying] = useState(false)
   // Pre-payment recap popup: the CTA opens it; checkout runs only on OK.
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -195,6 +198,11 @@ export default function VettriCard({
   // Staff never buy — hide the upsell for admins/superadmins. (useAuth returns the
   // EFFECTIVE role, so an admin using the student-preview toggle still sees it.)
   if (isAdmin || isSuperAdmin) return null
+  // Withdrawn from sale (or payments switched off entirely) -> this card and
+  // the promo banner it carries disappear from every surface that mounts it.
+  // Reads false until the flags resolve, so a plan meant to be hidden never
+  // flashes on screen first.
+  if (!sales.vettri) return null
   if (!loaded || unlimited || (dismissible && dismissed)) return null
 
   const finalPaise = applied ? applied.finalAmount : sel.paise

@@ -19,6 +19,7 @@ import {
   ShieldOff,
   Crown,
   IndianRupee,
+  CreditCard,
   TrendingUp,
   Wallet,
   Bell,
@@ -100,10 +101,11 @@ import { ALERT_KIND, ALERT_KINDS, alertKindOf } from '../lib/alertKinds'
 import MagazineEditor from '../components/Materials/MagazineEditor'
 import CaTelegramDialog from '../components/Materials/CaTelegramDialog'
 import CaWhatsappDialog from '../components/Materials/CaWhatsappDialog'
+import { invalidatePlanSales } from '../hooks/usePlanSales'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions' | 'crm'
+type Tab = 'overview' | 'revenue' | 'payments' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions' | 'crm'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -114,6 +116,7 @@ export default function SuperAdminPage() {
   const TABS: { id: Tab; label: StringKey; icon: typeof Activity }[] = [
     { id: 'overview', label: 'overview', icon: Activity },
     { id: 'revenue', label: 'revenueTab', icon: IndianRupee },
+    { id: 'payments', label: 'paymentsTab', icon: CreditCard },
     { id: 'users', label: 'users', icon: UsersIcon },
     { id: 'coupons', label: 'couponsTab', icon: Ticket },
     { id: 'notifications', label: 'notificationsTab', icon: Bell },
@@ -209,6 +212,7 @@ export default function SuperAdminPage() {
           <div key={tab} className="min-w-0 flex-1 animate-fadeIn">
             {tab === 'overview' && <OverviewTab />}
             {tab === 'revenue' && <RevenueTab />}
+            {tab === 'payments' && <PaymentsTab />}
             {tab === 'users' && <UsersTab />}
             {tab === 'coupons' && <CouponsTab />}
             {tab === 'notifications' && <NotificationsTab />}
@@ -487,6 +491,237 @@ function MaintenanceModeCard() {
         </button>
       </div>
     </div>
+  )
+}
+
+// ─── Payments (what is on sale) ─────────────────────────────────────────────
+/**
+ * The monetisation switches. Each one governs whether a plan is OFFERED — its
+ * purchase card, the promo banners that card carries, its slot in the website's
+ * pricing grid, and its pitch inside the forced paywall popup — and, because
+ * POST /api/payments/order checks the same flags, whether the server will take
+ * money for it at all. Turning a plan off is therefore a real withdrawal from
+ * sale, not a cosmetic hide of a still-buyable product.
+ *
+ * What these switches never touch is ACCESS: a student who already paid keeps
+ * every entitlement they bought, and the product area itself (nav tab, Test
+ * Arena tile) is governed separately by `vettri_enabled` / `test_series_enabled`
+ * / `rank_booster_enabled`. So a plan can be closed to new buyers while the
+ * people who own it carry on using it.
+ */
+interface PaymentSwitch {
+  key: string
+  titleKey: StringKey
+  whereKey: StringKey
+  icon: typeof Crown
+  tone: string
+}
+
+const PAYMENT_SWITCHES: PaymentSwitch[] = [
+  {
+    key: 'premium_sale_enabled',
+    titleKey: 'paymentsPlanPremium',
+    whereKey: 'paymentsPlanPremiumWhere',
+    icon: Crown,
+    tone: 'bg-goldsoft text-gold',
+  },
+  {
+    key: 'vettri_sale_enabled',
+    titleKey: 'paymentsPlanVettri',
+    whereKey: 'paymentsPlanVettriWhere',
+    icon: Trophy,
+    tone: 'bg-brand-soft text-brand',
+  },
+  {
+    key: 'rank_booster_sale_enabled',
+    titleKey: 'paymentsPlanRankBooster',
+    whereKey: 'paymentsPlanRankBoosterWhere',
+    icon: Rocket,
+    tone: 'bg-accentwarmsoft text-accentwarm',
+  },
+  {
+    key: 'mock_pack_sale_enabled',
+    titleKey: 'paymentsPlanMockPack',
+    whereKey: 'paymentsPlanMockPackWhere',
+    icon: ListChecks,
+    tone: 'bg-skysoft text-sky',
+  },
+]
+
+/** Defaults mirrored from server/src/lib/settings.ts, applied when a settings
+ *  row has never been written. Premium is the one plan that starts OFF sale. */
+const PAYMENT_DEFAULTS: Record<string, boolean> = {
+  payments_enabled: true,
+  premium_sale_enabled: false,
+  vettri_sale_enabled: true,
+  rank_booster_sale_enabled: true,
+  mock_pack_sale_enabled: true,
+}
+
+function PaymentsTab() {
+  const { t } = useT()
+  const [values, setValues] = useState<Record<string, boolean>>(PAYMENT_DEFAULTS)
+  const [ready, setReady] = useState(false)
+  const [saving, setSaving] = useState<string | null>(null)
+  const [justSaved, setJustSaved] = useState<string | null>(null)
+
+  useEffect(() => {
+    api.superadmin
+      .settings()
+      .then((raw) => {
+        // A key with no row yet keeps its default rather than reading as false —
+        // otherwise this console would show every plan as withdrawn on a fresh
+        // environment while the app was happily still selling them.
+        const next: Record<string, boolean> = { ...PAYMENT_DEFAULTS }
+        for (const k of Object.keys(PAYMENT_DEFAULTS)) {
+          if (raw[k] !== undefined && raw[k] !== null) next[k] = Boolean(raw[k])
+        }
+        setValues(next)
+      })
+      .catch(() => undefined)
+      .finally(() => setReady(true))
+  }, [])
+
+  const toggle = async (key: string, next: boolean) => {
+    setSaving(key)
+    setValues((v) => ({ ...v, [key]: next })) // optimistic
+    try {
+      await api.superadmin.setSetting(key, next)
+      // Drop this session's cached flags so the operator's own app reflects the
+      // change without a reload. Other sessions pick it up on their next load.
+      invalidatePlanSales()
+      setJustSaved(key)
+      window.setTimeout(() => setJustSaved((k) => (k === key ? null : k)), 2000)
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setValues((v) => ({ ...v, [key]: !next }))
+    } finally {
+      setSaving(null)
+    }
+  }
+
+  const master = values.payments_enabled
+
+  return (
+    <div className="space-y-5">
+      {/* Master switch — deliberately its own card, above the per-plan list, so
+          it never reads as just another plan. */}
+      <div className="card p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <CreditCard size={16} className="text-brand" />
+          <h2 className="font-heading text-sm font-semibold text-ink">
+            {t('paymentsMasterTitle')}
+          </h2>
+        </div>
+        <p className="mb-3 font-body text-xs text-ink2">{t('paymentsMasterSub')}</p>
+        <div className="flex items-center justify-between gap-3">
+          <span className="tamil font-body text-sm text-ink">{t('paymentsMasterTitle')}</span>
+          <SaleToggle
+            on={master}
+            disabled={!ready || saving === 'payments_enabled'}
+            label={t('paymentsMasterTitle')}
+            onToggle={() => toggle('payments_enabled', !master)}
+          />
+        </div>
+        {ready && !master && (
+          <p className="tamil mt-3 rounded-field bg-coralsoft/60 px-3 py-2 font-body text-xs leading-snug text-coral">
+            {t('paymentsMasterOffWarning')}
+          </p>
+        )}
+      </div>
+
+      {/* Per-plan switches. Greyed while the master switch is off — they keep
+          their own stored value (so turning payments back on restores exactly
+          the previous mix) but nothing is on sale in the meantime. */}
+      <div className="card p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <IndianRupee size={16} className="text-brand" />
+          <h2 className="font-heading text-sm font-semibold text-ink">
+            {t('paymentsSectionTitle')}
+          </h2>
+        </div>
+        <p className="mb-4 font-body text-xs leading-relaxed text-ink2">
+          {t('paymentsSectionSub')}
+        </p>
+
+        <div className="divide-y divide-line">
+          {PAYMENT_SWITCHES.map(({ key, titleKey, whereKey, icon: Icon, tone }) => {
+            const on = Boolean(values[key])
+            const live = on && master
+            return (
+              <div key={key} className="flex items-start gap-3 py-3.5 first:pt-0 last:pb-0">
+                <span
+                  className={`mt-0.5 grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg ${tone} ${
+                    master ? '' : 'opacity-50'
+                  }`}
+                >
+                  <Icon size={17} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="tamil font-heading text-sm font-semibold text-ink">
+                      {t(titleKey)}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide ${
+                        live ? 'bg-mintsoft text-mint' : 'bg-tint text-ink2'
+                      }`}
+                    >
+                      {live ? t('paymentsOnSale') : t('paymentsOffSale')}
+                    </span>
+                    {justSaved === key && (
+                      <span className="inline-flex items-center gap-1 font-body text-2xs text-correct">
+                        <CheckCircle2 size={12} /> {t('paymentsSaved')}
+                      </span>
+                    )}
+                  </div>
+                  <p className="tamil mt-0.5 font-body text-xs leading-snug text-ink2">
+                    {t(whereKey)}
+                  </p>
+                </div>
+                <SaleToggle
+                  on={on}
+                  disabled={!ready || !master || saving === key}
+                  label={t(titleKey)}
+                  onToggle={() => toggle(key, !on)}
+                />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** The switch used by every row above — same treatment as the Overview toggles. */
+function SaleToggle({
+  on,
+  disabled,
+  label,
+  onToggle,
+}: {
+  on: boolean
+  disabled: boolean
+  label: string
+  onToggle: () => void
+}) {
+  return (
+    <button
+      disabled={disabled}
+      onClick={onToggle}
+      aria-pressed={on}
+      aria-label={label}
+      className={`relative mt-0.5 h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+        on ? 'bg-correct' : 'bg-ink2/30'
+      } disabled:opacity-50`}
+    >
+      <span
+        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+          on ? 'left-6' : 'left-1'
+        }`}
+      />
+    </button>
   )
 }
 

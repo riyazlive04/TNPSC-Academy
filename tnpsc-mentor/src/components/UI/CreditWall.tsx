@@ -1,6 +1,7 @@
 import { Coins, ChevronRight } from 'lucide-react'
 import PremiumCard from './PremiumCard'
 import VettriCard from './VettriCard'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import { useCreditsStore } from '../../store/creditsStore'
 import { upsell } from '../../store/upsellStore'
 import { useT } from '../../lib/i18n'
@@ -30,12 +31,20 @@ export default function CreditWall({ className = '' }: { className?: string }) {
   const loaded = useCreditsStore((s) => s.loaded)
   const unlimited = useCreditsStore((s) => s.unlimited)
   const balance = useCreditsStore((s) => s.balance)
+  // Nothing is pitched here that isn't currently on sale (superadmin Payments
+  // tab). With every plan withdrawn the cards below vanish on their own; what
+  // this flag decides is the surrounding banner - see both branches.
+  const sales = usePlanSales()
+  const selling = sales.vettri || sales.premium
 
   if (!loaded || unlimited || balance >= LOW_CREDITS) return null
 
   // ── Running low: one quiet strip, not a wall of pricing. Tapping it opens the
   // forced-upsell modal, which carries the same two purchase cards.
+  // With nothing on sale this strip has no destination - the modal it opens
+  // would have no cards in it - so the low-balance nudge simply doesn't appear.
   if (balance > 0) {
+    if (!selling) return null
     return (
       <button
         type="button"
@@ -80,7 +89,9 @@ export default function CreditWall({ className = '' }: { className?: string }) {
       </div>
 
       {/* The real purchase machinery - Vettri (cheaper entry) leads. Each card
-          hides itself once that plan is owned. */}
+          hides itself once that plan is owned, and again when the superadmin
+          takes that plan off sale. When none is selling only the notice above
+          remains, which still answers "why can't I start a test?". */}
       <VettriCard />
       <PremiumCard />
     </section>

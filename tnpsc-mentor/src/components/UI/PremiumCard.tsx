@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Crown, Check, Loader2, Tag, X, Gift, ShieldCheck, Download, Rocket } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useVettriEnabled } from '../../hooks/useVettriEnabled'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import { useRankBoosterEnabled } from '../../hooks/useRankBoosterEnabled'
 import { startPurchase, couponMode, PURCHASE_ERR_KEY } from '../../lib/purchase'
 import { useStorePrice } from '../../hooks/useStorePrice'
@@ -89,6 +90,8 @@ export default function PremiumCard({
   const [suggestOpen, setSuggestOpen] = useState(false)
   const [suggestSeen, setSuggestSeen] = useState(false)
   const vettriOn = useVettriEnabled()
+  // Whether Premium is currently on sale at all (superadmin Payments tab).
+  const sales = usePlanSales()
   const rankBoosterOn = useRankBoosterEnabled()
   const hasVettri = useEntitlementsStore((s) => s.vettri)
   const entitlementsLoaded = useEntitlementsStore((s) => s.loaded)
@@ -199,6 +202,12 @@ export default function PremiumCard({
   // Staff never buy — hide the upsell for admins/superadmins. (useAuth returns the
   // EFFECTIVE role, so an admin using the student-preview toggle still sees it.)
   if (isAdmin || isSuperAdmin) return null
+  // Withdrawn from sale (or payments switched off entirely) → this card and
+  // every banner it carries disappear everywhere it is mounted: the credit
+  // wall, Profile, the mock/subject/test-series paywalls and the forced-upsell
+  // modal. `sales` reads false until the flags resolve, so a plan that is meant
+  // to be hidden never flashes on screen first.
+  if (!sales.premium) return null
   if (!loaded || !entitlementsLoaded || premium || (dismissible && dismissed)) return null
   // Vettri owners see this card only where showForVettri opts in (Profile /
   // the paywall modal) - no ambient Premium nagging after they've paid.
@@ -223,7 +232,7 @@ export default function PremiumCard({
     }
     // Meta: buyer initiated checkout (opened the Vettri suggest / recap popup).
     trackInitiateCheckout({ value: finalPaise / 100, description: 'TNPSC Mentors Premium - 6 months' })
-    if (vettriOn && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
+    if (vettriOn && sales.vettri && !hasVettri && !isFree && !suggestSeen) setSuggestOpen(true)
     else setConfirmOpen(true)
   }
 

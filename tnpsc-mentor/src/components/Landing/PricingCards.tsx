@@ -27,6 +27,7 @@ import {
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../../hooks/useMockPackPurchase'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useAuth } from '../../hooks/useAuth'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import StackedCards from '../UI/StackedCards'
 import PurchaseConfirmModal from '../UI/PurchaseConfirmModal'
 
@@ -243,6 +244,17 @@ export default function PricingCards({
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const mockPurchase = useMockPackPurchase()
+  // Which paid tiers the superadmin is currently selling. A withdrawn plan is
+  // dropped from the grid entirely (see `cards.filter` below) rather than shown
+  // in a disabled state - an unbuyable price on a marketing page is worse than
+  // no price. "Starter" is free, so it is never filtered.
+  const sales = usePlanSales()
+  const PLAN_ON_SALE: Record<string, boolean> = {
+    mock: sales.mockPack,
+    vettri: sales.vettri,
+    rankbooster: sales.rankBooster,
+    premium: sales.premium,
+  }
   const handleMockCta = () => {
     if (!isAuthenticated) {
       window.location.href = webAppHref
@@ -475,12 +487,17 @@ export default function PricingCards({
       </div>,
   ]
 
+  // Keep only the tiers on sale, in the order authored above. Each element's
+  // `key` is its plan id, which is what PLAN_ON_SALE is keyed by; anything not
+  // listed there (the free "Starter" card) always stays.
+  const visible = cards.filter((c) => PLAN_ON_SALE[String(c.key)] ?? true)
+
   return (
     <>
       {isMobile ? (
-        <StackedCards>{cards}</StackedCards>
+        <StackedCards>{visible}</StackedCards>
       ) : (
-        <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">{cards}</div>
+        <div className="grid items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">{visible}</div>
       )}
 
       {/* Pre-payment recap for the Mock Pack CTA above - opens Razorpay only

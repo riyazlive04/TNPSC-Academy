@@ -2166,6 +2166,52 @@ const STRINGS = {
     ta: 'இது இயக்கத்தில் இருக்கும்போது மாணவர்கள் பராமரிப்புப் பக்கத்தைப் பார்ப்பார்கள். நிர்வாகிகள் மற்றும் மேல்நிர்வாகிகள் வழக்கம் போல் உள்நுழையலாம்.',
   },
   maintenanceCloseAppToStudents: { en: 'Close app to students', ta: 'மாணவர்களுக்கு செயலியை மூடு' },
+
+  // ─── Superadmin > Payments tab ────────────────────────────────────────────
+  // The monetisation switches. "On sale" here means the plan's purchase card,
+  // its promo banners, its slot in the landing pricing grid and its paywall
+  // pitch are shown AND the server will accept an order for it; off means all
+  // of that goes away and POST /api/payments/order refuses the plan. Existing
+  // buyers keep what they paid for either way — these switches govern selling,
+  // never access.
+  paymentsTab: { en: 'Payments', ta: 'கட்டணங்கள்' },
+  paymentsSectionTitle: { en: 'Plans on sale', ta: 'விற்பனையில் உள்ள திட்டங்கள்' },
+  paymentsSectionSub: {
+    en: 'Choose which plans are offered. Turning one off removes its card, banners and pricing everywhere in the app and on the website, and the server stops accepting payments for it. Students who already bought it keep their access.',
+    ta: 'எந்தெந்த திட்டங்கள் வழங்கப்படும் என்பதைத் தேர்வு செய்யவும். ஒன்றை அணைத்தால் அதன் கார்டு, பேனர்கள் மற்றும் விலை செயலி மற்றும் இணையதளம் முழுவதும் மறையும்; சேவையகமும் அதற்குக் கட்டணம் ஏற்காது. ஏற்கெனவே வாங்கியவர்களின் அணுகல் தொடரும்.',
+  },
+  paymentsMasterTitle: { en: 'Accept payments', ta: 'கட்டணங்களை ஏற்க' },
+  paymentsMasterSub: {
+    en: 'Master switch. Off = no plan is sold anywhere and every payment is refused, whatever the switches below say.',
+    ta: 'முதன்மை சுவிட்ச். அணைத்தால் எந்தத் திட்டமும் விற்கப்படாது; கீழுள்ள சுவிட்சுகள் எதுவாக இருந்தாலும் அனைத்துக் கட்டணங்களும் மறுக்கப்படும்.',
+  },
+  paymentsMasterOffWarning: {
+    en: 'Payments are switched off. Nothing is on sale and every plan switch below is inactive until you turn this back on.',
+    ta: 'கட்டணங்கள் அணைக்கப்பட்டுள்ளன. எதுவும் விற்பனையில் இல்லை; இதை மீண்டும் இயக்கும் வரை கீழுள்ள சுவிட்சுகள் செயல்படாது.',
+  },
+  paymentsPlanPremium: { en: 'Premium Prelims Kit', ta: 'பிரீமியம் ப்ரிலிம்ஸ் கிட்' },
+  paymentsPlanPremiumWhere: {
+    en: '₹1,699 · 6 months — Profile, credit wall, paywalls, upsell popup, website pricing',
+    ta: '₹1,699 · 6 மாதம் — சுயவிவரம், கிரெடிட் சுவர், கட்டணச் சுவர்கள், அப்செல் பாப்அப், இணையதள விலை',
+  },
+  paymentsPlanVettri: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
+  paymentsPlanVettriWhere: {
+    en: '₹899 / ₹499 monthly — PYQ, Current Affairs, Test Marathon, credit wall, website pricing',
+    ta: '₹899 / மாதம் ₹499 — PYQ, நடப்பு நிகழ்வுகள், டெஸ்ட் மாரத்தான், கிரெடிட் சுவர், இணையதள விலை',
+  },
+  paymentsPlanRankBooster: { en: 'Group II/IIA Rank Booster', ta: 'குரூப் II/IIA ரேங்க் பூஸ்டர்' },
+  paymentsPlanRankBoosterWhere: {
+    en: '₹1,249 · 90 days — Profile, Test Marathon, upsell popup, website pricing',
+    ta: '₹1,249 · 90 நாள் — சுயவிவரம், டெஸ்ட் மாரத்தான், அப்செல் பாப்அப், இணையதள விலை',
+  },
+  paymentsPlanMockPack: { en: 'Group 1 Mock Test Pack', ta: 'குரூப் 1 மாதிரித் தேர்வு தொகுப்பு' },
+  paymentsPlanMockPackWhere: {
+    en: '₹399 · 80 days — Test Marathon banner, website pricing',
+    ta: '₹399 · 80 நாள் — டெஸ்ட் மாரத்தான் பேனர், இணையதள விலை',
+  },
+  paymentsOnSale: { en: 'On sale', ta: 'விற்பனையில்' },
+  paymentsOffSale: { en: 'Off sale', ta: 'விற்பனையில் இல்லை' },
+  paymentsSaved: { en: 'Saved', ta: 'சேமிக்கப்பட்டது' },
   totalUsers: { en: 'Total Users', ta: 'மொத்த பயனர்கள்' },
   activeToday: { en: 'Active Today', ta: 'இன்று செயலில்' },
   active7d: { en: 'Active (7 days)', ta: 'செயலில் (7 நாட்கள்)' },

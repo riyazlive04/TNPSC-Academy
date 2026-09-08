@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Rocket, Check, Loader2, Tag, X, Download, AlertCircle, Gift } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import { useT } from '../../lib/i18n'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import {
   useRankBoosterPurchase,
   rupees,
@@ -43,6 +44,8 @@ export default function RankBoosterCard({
   const { t } = useT()
   const navigate = useNavigate()
   const purchase = useRankBoosterPurchase()
+  // Whether this plan is currently on sale (superadmin Payments tab).
+  const sales = usePlanSales()
   const {
     paying,
     confirmOpen,
@@ -71,6 +74,11 @@ export default function RankBoosterCard({
   // Already unlocked (Rank Booster or Premium) or still checking → render nothing.
   // Staff never buy — hide the upsell for admins/superadmins.
   if (isAdmin || isSuperAdmin) return null
+  // Withdrawn from sale (or payments switched off entirely) -> this card and
+  // the promo banner it carries disappear from every surface that mounts it.
+  // Reads false until the flags resolve, so a plan meant to be hidden never
+  // flashes on screen first.
+  if (!sales.rankBooster) return null
   if (!loaded || rankBoosterUnlocked || (dismissible && dismissed)) return null
 
   return (

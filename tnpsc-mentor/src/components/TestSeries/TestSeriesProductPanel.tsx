@@ -22,6 +22,7 @@ export default function TestSeriesProductPanel({
   series,
   offerTitleKey,
   paywallCards,
+  offerEnabled,
   entitlementUnlocked,
   onLockedTap,
   previewLocked = false,
@@ -29,6 +30,11 @@ export default function TestSeriesProductPanel({
   series: 'g1_marathon' | 'g2a_rankbooster'
   offerTitleKey: StringKey
   paywallCards: ReactNode
+  /** Whether any of `paywallCards` is still on sale (superadmin Payments tab).
+   *  False = the offer popup never opens and is not rendered, because it would
+   *  be an empty sheet. Passed in rather than derived here so it can't drift
+   *  from whatever cards the caller actually handed us. */
+  offerEnabled: boolean
   /** Whichever entitlement flag unlocks THIS series (unlimited vs rankBoosterUnlocked). */
   entitlementUnlocked: boolean
   onLockedTap: () => void
@@ -98,10 +104,11 @@ export default function TestSeriesProductPanel({
 
   useEffect(() => {
     if (loading || error || !seriesLocked || tests.length === 0) return
+    if (!offerEnabled) return
     if (sessionStorage.getItem(offerDismissedKey)) return
     setOfferOpen(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, error, seriesLocked, tests.length])
+  }, [loading, error, seriesLocked, tests.length, offerEnabled])
 
   useEffect(() => {
     if (!seriesLocked) setOfferOpen(false)
@@ -171,7 +178,7 @@ export default function TestSeriesProductPanel({
         <TestSeriesGrid tests={tests} onLaunch={launch} onLockedTap={onLockedTap} />
       )}
 
-      <OfferSheet open={offerOpen} onClose={closeOffer} title={t(offerTitleKey)}>
+      <OfferSheet open={offerOpen && offerEnabled} onClose={closeOffer} title={t(offerTitleKey)}>
         {paywallCards}
       </OfferSheet>
     </>

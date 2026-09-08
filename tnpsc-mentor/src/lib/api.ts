@@ -2619,6 +2619,24 @@ export interface AppSettings {
   flashcards_enabled: boolean
   /** App-wide: non-admins get MaintenancePage + every gated API 503s. */
   maintenance_mode: boolean
+
+  // ─── Monetisation switches (superadmin "Payments" tab) ─────────────────────
+  // Whether a plan is SOLD (its purchase card, promo banner, landing pricing
+  // slot and forced-paywall pitch), as distinct from vettri_enabled /
+  // rank_booster_enabled above, which control whether the product AREA exists.
+  // Enforced server-side too — POST /api/payments/order refuses a plan that is
+  // not on sale, so these are a real withdrawal, not just a cosmetic hide.
+
+  /** Master switch. Off = no plan is sold or purchasable anywhere. */
+  payments_enabled: boolean
+  /** Sell the ₹1,699 / 6-month Premium Prelims Kit. */
+  premium_sale_enabled: boolean
+  /** Sell the ₹899 / ₹499 Vettri Nichayam bundle. */
+  vettri_sale_enabled: boolean
+  /** Sell the ₹1,249 / 90-day Group II/IIA Rank Booster. */
+  rank_booster_sale_enabled: boolean
+  /** Sell the ₹399 / 80-day Group 1 Mock Test Pack. */
+  mock_pack_sale_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining

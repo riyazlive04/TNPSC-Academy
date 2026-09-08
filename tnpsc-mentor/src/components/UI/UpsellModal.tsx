@@ -5,6 +5,7 @@ import PremiumCard from './PremiumCard'
 import VettriCard from './VettriCard'
 import RankBoosterCard from './RankBoosterCard'
 import { useFocusTrap } from './useFocusTrap'
+import { usePlanSales } from '../../hooks/usePlanSales'
 import { useUpsellStore } from '../../store/upsellStore'
 import { useCreditsStore } from '../../store/creditsStore'
 import { useEntitlementsStore } from '../../store/entitlementsStore'
@@ -35,6 +36,10 @@ export default function UpsellModal() {
   // is true for a Vettri owner — Vettri deliberately does not unlock Rank
   // Booster), so that variant watches its own flag instead.
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
+  // Which plans are actually on sale. This modal is nothing but a frame around
+  // the purchase cards, so if the ones this variant would pitch have been
+  // withdrawn there is no paywall to show - see `nothingToSell` below.
+  const sales = usePlanSales()
 
   const dialogRef = useRef<HTMLDivElement>(null)
   useFocusTrap(open, dialogRef)
@@ -66,7 +71,20 @@ export default function UpsellModal() {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, close])
 
-  if (!open) return null
+  // What this variant would actually pitch, given the sale switches:
+  //   'rankbooster' -> RankBoosterCard alone (Vettri does not unlock it)
+  //   'premium'     -> PremiumCard alone (Vettri does not unlock it either)
+  //   otherwise     -> VettriCard, then PremiumCard
+  // With none of them on sale the modal would be a header, a "Later" button and
+  // nothing to buy - so it never opens. The caller's own gate (an out-of-credits
+  // test start, a locked feature) has already stopped the action; this only
+  // suppresses the sales pitch for it.
+  const showRankBooster = variant === 'rankbooster' && sales.rankBooster
+  const showVettri = variant !== 'rankbooster' && variant !== 'premium' && sales.vettri
+  const showPremium = variant !== 'rankbooster' && sales.premium
+  const nothingToSell = !showRankBooster && !showVettri && !showPremium
+
+  if (!open || nothingToSell) return null
 
   const head: Record<
     typeof variant,
@@ -151,12 +169,9 @@ export default function UpsellModal() {
             these locks must still get an answer here, so the Premium card
             opts in via showForVettri. */}
         <div className="space-y-4">
-          {variant === 'rankbooster' ? (
-            <RankBoosterCard />
-          ) : (
-            variant !== 'premium' && <VettriCard />
-          )}
-          <PremiumCard showForVettri />
+          {showRankBooster && <RankBoosterCard />}
+          {showVettri && <VettriCard />}
+          {showPremium && <PremiumCard showForVettri />}
         </div>
 
         {/* Soft escape - the credits variant reminds them tomorrow is free. */}

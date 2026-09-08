@@ -26,6 +26,29 @@ export interface PublicSettings {
    *  every non-exempt API route 503s (see middleware/maintenance.ts) and the
    *  frontend shows a full-screen maintenance page instead of the router. */
   maintenance_mode: boolean
+
+  // ─── Monetisation switches (superadmin "Payments" tab) ─────────────────────
+  // These control whether a plan is SOLD — its purchase card, its promo banner,
+  // its slot in the landing pricing grid and its forced-paywall pitch — as
+  // distinct from `vettri_enabled` / `rank_booster_enabled` above, which control
+  // whether the product AREA (nav tab, Test Arena tile) exists at all. A plan
+  // can be live for the people who already bought it while no longer being
+  // offered to anyone new. Every one of these is enforced server-side too:
+  // POST /api/payments/order refuses a plan that is not on sale, so hiding a
+  // card is a real withdrawal and not just a cosmetic one.
+
+  /** Master switch. Off = NO plan is sold anywhere: every purchase card, promo
+   *  banner, landing pricing grid and forced-upsell modal disappears, and the
+   *  order route refuses every plan. Defaults ON — "off" is the exception. */
+  payments_enabled: boolean
+  /** Sell the ₹1,699 / 6-month Premium Prelims Kit. Defaults OFF. */
+  premium_sale_enabled: boolean
+  /** Sell the ₹899 / ₹499 Vettri Nichayam bundle. */
+  vettri_sale_enabled: boolean
+  /** Sell the ₹1,249 / 90-day Group II/IIA Rank Booster. */
+  rank_booster_sale_enabled: boolean
+  /** Sell the ₹399 / 80-day Group 1 Mock Test Pack. */
+  mock_pack_sale_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
@@ -36,6 +59,15 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   rank_booster_enabled: false,
   flashcards_enabled: false,
   maintenance_mode: false,
+  // Selling is the normal state, so these default ON and a superadmin turns
+  // them OFF — the inverse of the dark-feature flags above. The one exception
+  // is Premium, which is withdrawn from sale by default until it is switched
+  // back on from the Payments tab.
+  payments_enabled: true,
+  premium_sale_enabled: false,
+  vettri_sale_enabled: true,
+  rank_booster_sale_enabled: true,
+  mock_pack_sale_enabled: true,
 }
 
 // ─── Admin-only settings ─────────────────────────────────────────────────────
@@ -143,7 +175,55 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     maintenance_mode: Boolean(
       raw.maintenance_mode ?? PUBLIC_SETTING_DEFAULTS.maintenance_mode
     ),
+    payments_enabled: Boolean(raw.payments_enabled ?? PUBLIC_SETTING_DEFAULTS.payments_enabled),
+    premium_sale_enabled: Boolean(
+      raw.premium_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.premium_sale_enabled
+    ),
+    vettri_sale_enabled: Boolean(
+      raw.vettri_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.vettri_sale_enabled
+    ),
+    rank_booster_sale_enabled: Boolean(
+      raw.rank_booster_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.rank_booster_sale_enabled
+    ),
+    mock_pack_sale_enabled: Boolean(
+      raw.mock_pack_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.mock_pack_sale_enabled
+    ),
   }
+}
+
+/**
+ * Which sale flag governs each ledger plan id. Shared by the order route (to
+ * refuse a withdrawn plan) and the superadmin console (to label the switches),
+ * so the mapping can never drift from `KNOWN_PLANS` in pricing.ts.
+ */
+export const PLAN_SALE_FLAG: Record<string, keyof PublicSettings> = {
+  premium_annual: 'premium_sale_enabled',
+  vettri_nichayam: 'vettri_sale_enabled',
+  vettri_month: 'vettri_sale_enabled',
+  rank_booster_g2: 'rank_booster_sale_enabled',
+  group1_mock_pack: 'mock_pack_sale_enabled',
+}
+
+/**
+ * Whether `plan` may be bought under these settings. The master switch vetoes
+ * everything; a plan with no flag of its own — including `null`, the generic
+ * contribution path — is governed by the master switch alone. Pure, so the rule
+ * can be tested without a database.
+ */
+export function planOnSale(settings: PublicSettings, plan: string | null | undefined): boolean {
+  if (!settings.payments_enabled) return false
+  if (!plan) return true
+  const flag = PLAN_SALE_FLAG[plan]
+  return flag ? Boolean(settings[flag]) : true
+}
+
+/**
+ * `planOnSale` against the live settings. Called by POST /api/payments/order
+ * BEFORE an order is created, so a plan whose card has been hidden cannot be
+ * bought anyway by replaying a captured request.
+ */
+export async function isPlanOnSale(plan: string | null | undefined): Promise<boolean> {
+  return planOnSale(await readPublicSettings(), plan)
 }
 
 /**

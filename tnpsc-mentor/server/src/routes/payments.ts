@@ -7,6 +7,7 @@ import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
 import { baseAmountForPlan, KNOWN_PLANS } from '../pricing.js'
 import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
+import { isPlanOnSale } from '../lib/settings.js'
 import { evaluateCoupon, couponLimiter } from './coupons.js'
 import { notifyAdmins } from '../notify.js'
 
@@ -57,6 +58,16 @@ router.post(
       typeof requestedPlan === 'string' && KNOWN_PLANS.has(requestedPlan) ? requestedPlan : null
     if (plan) notes.plan = plan
     else delete notes.plan
+
+    // A plan the superadmin has withdrawn from sale (Payments tab) must not be
+    // purchasable, not merely invisible: the card is gone from the UI, but a
+    // replayed/crafted request would otherwise still open a real Razorpay order
+    // and mint an entitlement. Checked before the order is created so nothing
+    // is charged. The master `payments_enabled` switch closes the generic
+    // contribution path too (plan === null).
+    if (!(await isPlanOnSale(plan))) {
+      return res.status(403).json({ error: 'This plan is not available for purchase right now.' })
+    }
 
     // Base price is the SERVER's responsibility: for a known plan we use the
     // server price and ignore the client amount; otherwise the clamped client

@@ -49,6 +49,7 @@ import {
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
 import { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
+import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { starterTestConfig } from '../lib/starterTest'
 import { fetchHabit, type HabitState } from '../lib/habit'
@@ -144,6 +145,8 @@ export default function TestArenaPage() {
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const testSeriesOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
+  // Which plans are on sale - gates the two priced discovery banners below.
+  const sales = usePlanSales()
   const vettriOn = useVettriEnabled()
   const flashcardsOn = useFlashcardsEnabled()
   const rbPurchase = useRankBoosterPurchase()
@@ -415,8 +418,12 @@ export default function TestArenaPage() {
             above the CA carousel: pricing/enrollment is the highest-intent
             content on the page. Rank Booster's tap opens the buy popup
             directly (via useRankBoosterPurchase) rather than just navigating,
-            mirroring the hub's own banner. */}
-        {testSeriesOn && (
+            mirroring the hub's own banner. Each strip quotes a price, so it is
+            a payment banner and disappears with its plan when the superadmin
+            takes that plan off sale (Payments tab) - except for an owner, for
+            whom Rank Booster's strip is a shortcut into what they already
+            bought rather than a pitch. */}
+        {testSeriesOn && sales.vettri && (
           <button
             onClick={() => navigate('/test-series', { state: { tab: 'vettri' } })}
             className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
@@ -438,7 +445,7 @@ export default function TestArenaPage() {
           </button>
         )}
 
-        {rankBoosterOn && (
+        {rankBoosterOn && (sales.rankBooster || rbPurchase.rankBoosterUnlocked) && (
           <button
             onClick={() =>
               rbPurchase.rankBoosterUnlocked
@@ -694,7 +701,11 @@ export default function TestArenaPage() {
         !testPromptPending &&
         !onboardingPending &&
         !onboardingOpen &&
-        testSeriesOn && (
+        // Promo overlay for a paid product ("first paper free, then enroll"),
+        // so it goes when the Marathon is no longer being sold - there is
+        // nothing to try before any more.
+        testSeriesOn &&
+        sales.vettri && (
           <MarathonFreeAlert
             onTake={() => {
               consumeMarathonAlert()

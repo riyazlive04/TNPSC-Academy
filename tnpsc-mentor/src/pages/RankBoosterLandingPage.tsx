@@ -35,6 +35,7 @@ import {
 } from '../hooks/useRankBoosterPurchase'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import PricingCards from '../components/Landing/PricingCards'
+import { usePlanSales } from '../hooks/usePlanSales'
 import { translate, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
@@ -415,6 +416,10 @@ export default function RankBoosterLandingPage() {
   const toggleTheme = useThemeStore((s) => s.toggle)
   const { rankBoosterUnlocked, loaded, refresh } = useEntitlementsStore()
   const purchase = useRankBoosterPurchase()
+  // Whether this plan is still being sold (superadmin Payments tab). Off, the
+  // enroll CTAs must not open a checkout the server would refuse with a 403 —
+  // see handleEnrollClick.
+  const sales = usePlanSales()
 
   const [lang, setLang] = useState<Lang>('ta')
   const t = (key: keyof typeof T) => T[key][lang]
@@ -451,8 +456,9 @@ export default function RankBoosterLandingPage() {
     if (!isAuthenticated || !loaded) return
     if (!(location.state as { autoEnroll?: boolean } | null)?.autoEnroll) return
     navigate(location.pathname, { replace: true, state: null })
+    if (!sales.rankBooster) return
     if (!((isAdmin || isSuperAdmin) || rankBoosterUnlocked)) purchase.startEnroll()
-  }, [isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked])
+  }, [isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked, sales.rankBooster])
 
   // This page is the Meta ad landing target — most guests here arrive via an
   // in-app browser (Instagram/Facebook), where Google Sign-In can't work at
@@ -484,6 +490,10 @@ export default function RankBoosterLandingPage() {
     if ((isAdmin || isSuperAdmin) || (loaded && rankBoosterUnlocked)) {
       return navigate('/test-series', { state: { tab: 'rankbooster' } })
     }
+    // Taken off sale: the server would refuse the order anyway, so send them
+    // into the app rather than into a checkout that cannot complete. The
+    // pricing grid further down drops the card on the same flag.
+    if (!sales.rankBooster) return navigate('/test-arena')
     purchase.startEnroll()
   }
 
