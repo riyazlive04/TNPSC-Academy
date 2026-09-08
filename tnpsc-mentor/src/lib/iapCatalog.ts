@@ -44,7 +44,10 @@ export const IAP_CATALOG: readonly CatalogEntry[] = [
   {
     plan: 'vettri_nichayam',
     productId: 'com.tnpscmentor.app.vettri60',
-    webPricePaise: 89900,
+    // Mirrors VETTRI_PRICE_PAISE in server/src/pricing.ts. The Play/App Store
+    // price for this product id is configured in the store consoles and does
+    // not follow this number — raise it there as well.
+    webPricePaise: 189900,
     label: 'Group 1 Test Series - full programme',
   },
   {

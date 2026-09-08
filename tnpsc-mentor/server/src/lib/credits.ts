@@ -17,6 +17,18 @@ export const DAILY_CREDIT_GRANT = 10
  * lose-it rule (grant_daily_credit expires the unused remainder at the next
  * IST day boundary), just a bigger number while the plan is active. */
 export const DAILY_CREDIT_GRANT_BOOSTED = 50
+/**
+ * Question categories an active ₹399 Group 1 Mock Test Pack owner draws WITHOUT
+ * spending credits, on top of the boosted daily grant above.
+ *
+ * Group 1 previous-year questions only — category 'pyq'. Group 2 ('pyq2') and
+ * Group 4 ('pyq4') are separate banks this plan does not sell and stay
+ * credit-charged, which is why this is a category list rather than folding
+ * mockPack into `creditsUnlimited` (that flag would hand over Current Affairs,
+ * subject practice and every other bank as well).
+ */
+export const MOCK_PACK_FREE_CATEGORIES: readonly string[] = ['pyq']
+
 /** A free user may take at most this many mock exams total, ever. */
 export const FREE_MOCK_LIMIT = 1
 /** One-time credits awarded when the user's FIRST completed test is graded. */

@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
             {/* Plans nudge - stacked on scroll (StackedCards), shown up front
                 (not tucked behind a tab) so it still surfaces the upgrade path.
-                Vettri (₹899 / ₹499 monthly) leads as the cheaper entry and
+                Vettri (₹1,899 / ₹499 monthly) leads as the cheaper entry and
                 hides itself once any paid plan is owned; Group II/IIA - Rank
                 Booster (₹1,249 Independence Day offer/90 days) is its own
                 standalone plan - NOT included by Vettri, so it stays visible

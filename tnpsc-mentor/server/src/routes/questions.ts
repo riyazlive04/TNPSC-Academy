@@ -4,7 +4,7 @@ import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
 import { bundleAccess } from '../lib/premium.js'
-import { chargeTestStart, FREE_MOCK_LIMIT } from '../lib/credits.js'
+import { chargeTestStart, FREE_MOCK_LIMIT, MOCK_PACK_FREE_CATEGORIES } from '../lib/credits.js'
 import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 import { TEST_SERIES_CONFIG, DEFAULT_SERIES, resolveSeries } from '../lib/testSeriesCatalog.js'
 
@@ -167,13 +167,26 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
 
 // ─── Unlimited-access check ──────────────────────────────────────────────────
 // premium OR vettri OR rankBooster OR staff → unlimited tests: they never spend
-// credits and skip the free-mock cap. Everyone else is a credit-gated free learner.
+// credits and skip the free-mock cap. Everyone else is a credit-gated free
+// learner — except for the specific banks their plan already includes, which is
+// what the optional `category` argument below resolves.
 
-/** premium OR vettri OR rankBooster OR staff → unlimited. Fails closed (treat as free on error). */
-async function isUnlimited(req: AuthedRequest): Promise<boolean> {
+/**
+ * premium OR vettri OR rankBooster OR staff → unlimited. Fails closed (treat as
+ * free on error).
+ *
+ * `category`, when given, additionally clears the gate for a bank the caller's
+ * plan includes outright: an active ₹399 Mock Pack owner draws Group 1 PYQs
+ * (MOCK_PACK_FREE_CATEGORIES) without spending credits, because that bank is
+ * part of what the pack sells. Callers that aren't drawing from a category
+ * (mock exams, the starter challenge) simply omit it and get the old behaviour.
+ */
+async function isUnlimited(req: AuthedRequest, category?: string): Promise<boolean> {
   if (await isStaff(req)) return true
   try {
-    return (await bundleAccess(req.db!)).creditsUnlimited
+    const b = await bundleAccess(req.db!)
+    if (b.creditsUnlimited) return true
+    return !!category && b.mockPack && MOCK_PACK_FREE_CATEGORIES.includes(category)
   } catch {
     return false // fail closed on entitlement: treat as free (gate may apply)
   }
@@ -221,7 +234,12 @@ router.post(
     if (typeof config.category === 'string' && QUIZ_BLOCKED_CATEGORIES.has(config.category)) {
       return res.status(403).json({ error: 'This content is not available here.' })
     }
-    const unlimited = await isUnlimited(req)
+    // The category is passed so a plan that includes this particular bank
+    // outright (Mock Pack → Group 1 PYQ) clears the credit gate for it.
+    const unlimited = await isUnlimited(
+      req,
+      typeof config.category === 'string' ? config.category : undefined
+    )
     const { data, error } = await req.db!.rpc('get_quiz_questions', { p_config: config })
     if (error) return sendDbError(res, error)
     const questions = (data ?? []) as { id?: string }[]

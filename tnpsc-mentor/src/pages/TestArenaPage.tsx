@@ -17,6 +17,7 @@ import {
   BarChart3,
   Trophy,
   Rocket,
+  ListChecks,
 } from 'lucide-react'
 import ThirukuralModal from '../components/Thirukural/ThirukuralModal'
 import Couplet from '../components/Thirukural/Couplet'
@@ -48,7 +49,7 @@ import {
   RANK_BOOSTER_PERK_KEYS,
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
-import { VETTRI_PRICE_RUPEES } from '../components/UI/VettriCard'
+import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { starterTestConfig } from '../lib/starterTest'
@@ -150,6 +151,7 @@ export default function TestArenaPage() {
   const vettriOn = useVettriEnabled()
   const flashcardsOn = useFlashcardsEnabled()
   const rbPurchase = useRankBoosterPurchase()
+  const mockPurchase = useMockPackPurchase()
   const { t, lang } = useT()
   const [habit, setHabit] = useState<HabitState | null>(null)
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null)
@@ -412,35 +414,39 @@ export default function TestArenaPage() {
           )}
         </header>
 
-        {/* Test Marathon (Vettri Nichayam) + Rank Booster discovery banners -
-            same cross-promo strips shown on the Test Series hub, surfaced here
-            too so a learner sees the offer before ever opening that hub. Sit
-            above the CA carousel: pricing/enrollment is the highest-intent
-            content on the page. Rank Booster's tap opens the buy popup
-            directly (via useRankBoosterPurchase) rather than just navigating,
-            mirroring the hub's own banner. Each strip quotes a price, so it is
-            a payment banner and disappears with its plan when the superadmin
-            takes that plan off sale (Payments tab) - except for an owner, for
-            whom Rank Booster's strip is a shortcut into what they already
-            bought rather than a pitch. */}
-        {testSeriesOn && sales.vettri && (
+        {/* Group 1 Mock Test Pack + Rank Booster discovery banners. Sit above
+            the CA carousel: pricing/enrollment is the highest-intent content on
+            the page. Each strip quotes a price, so it is a payment banner and
+            disappears with its plan when the superadmin takes that plan off
+            sale (Payments tab) - except for an owner, for whom Rank Booster's
+            strip is a shortcut into what they already bought rather than a
+            pitch.
+
+            The lead strip used to be the ₹899 Test Series; it now leads with
+            the ₹399 pack, which is the cheaper way in and the plan whose copy
+            this page's traffic responds to. Both taps open their buy popup
+            directly (useMockPackPurchase / useRankBoosterPurchase) rather than
+            navigating, so the price shown is one tap from checkout. The Test
+            Series keeps its own banner on the /test-series hub. */}
+        {sales.mockPack && !mockPurchase.mockPackUnlocked && (
           <button
-            onClick={() => navigate('/test-series', { state: { tab: 'vettri' } })}
-            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105"
+            onClick={() => mockPurchase.startEnroll()}
+            disabled={mockPurchase.paying}
+            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
           >
             <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-              <Trophy size={20} />
+              <ListChecks size={20} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="tamil block font-display text-sm font-bold tracking-tight">
-                {t('marathonBannerTitle')}
+                {t('mockPackBannerTitle')}
               </span>
               <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-                {t('marathonBannerSub')}
+                {t('mockPackBannerSub')}
               </span>
             </span>
             <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-              <span className="font-heading text-sm font-bold">₹{VETTRI_PRICE_RUPEES}</span>
+              <span className="font-heading text-sm font-bold">₹{MOCK_PACK_PRICE_RUPEES}</span>
             </span>
           </button>
         )}
@@ -655,6 +661,27 @@ export default function TestArenaPage() {
       />
 
       {/* Pre-payment recap for the Rank Booster discovery banner above. */}
+      {/* Pre-payment recap for the Mock Pack banner above. Without this the
+          banner's startEnroll() would set confirmOpen on a modal nothing
+          renders, and the tap would appear to do nothing. */}
+      <PurchaseConfirmModal
+        open={mockPurchase.confirmOpen}
+        planName={t('mockPackBannerTitle')}
+        validity={t('mockPackValidity')}
+        perks={[
+          t('mockPackBannerSub'),
+          t('mockPackPerkPyq'),
+          t('mockPackPerk2'),
+          t('mockPackPerk3'),
+        ]}
+        priceLabel={mockPurchase.isFree ? t('premiumFree') : mockPurchase.displayPrice}
+        isFree={mockPurchase.isFree}
+        accent="sky"
+        busy={mockPurchase.paying}
+        onConfirm={mockPurchase.handleBuy}
+        onCancel={() => mockPurchase.setConfirmOpen(false)}
+      />
+
       <PurchaseConfirmModal
         open={rbPurchase.confirmOpen}
         planName={t('rankBoosterTitle')}

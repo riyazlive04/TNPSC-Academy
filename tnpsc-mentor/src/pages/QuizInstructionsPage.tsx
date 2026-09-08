@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, AlertTriangle, ArrowLeft, Clock, Copy, ListChecks, Loader2, Maximize2 } from 'lucide-react'
 import YellowBadge from '../components/UI/YellowBadge'
 import CreditConfirmPopup from '../components/UI/CreditConfirmPopup'
-import { useCreditsStore } from '../store/creditsStore'
+import { useCreditsStore, useChargesCredits } from '../store/creditsStore'
 import { upsell } from '../store/upsellStore'
 import { enterFullscreen } from '../lib/proctor'
 import { api } from '../lib/api'
@@ -95,17 +95,25 @@ export default function QuizInstructionsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Free (credit-gated) learners confirm the per-question credit fee in a popup.
+  // Category-aware: a plan that includes this bank outright (the ₹399 Mock Pack
+  // covers Group 1 PYQ) is not charged by the server, so it must not be shown a
+  // fee here either.
+  //
+  // These sit ABOVE the `!config` early return: they are hooks, and running them
+  // only on the renders where a config exists changes the hook order between
+  // renders. That was already true of the credit reads before this screen became
+  // category-aware; it just had fewer hooks to get wrong.
+  const creditGated = useChargesCredits(config?.category)
+  const balance = useCreditsStore((s) => s.balance)
+  const [creditPopup, setCreditPopup] = useState(false)
+
   if (!config) return null
 
   const loadingCount = available === null
   const maxCount = available ?? DEFAULT_QUESTIONS
   const minCount = Math.min(MIN_QUESTIONS, maxCount)
   const noQuestions = available === 0
-
-  // Free (credit-gated) learners confirm the per-question credit fee in a popup.
-  const creditGated = useCreditsStore((s) => s.loaded && !s.unlimited)
-  const balance = useCreditsStore((s) => s.balance)
-  const [creditPopup, setCreditPopup] = useState(false)
 
   const startQuiz = () => {
     // Regular practice tests are NOT proctored - no fullscreen, no violation

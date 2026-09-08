@@ -897,7 +897,7 @@ const STRINGS = {
   availableNow: { en: 'Available now', ta: 'இப்போது கிடைக்கிறது' },
   scheduledOn: { en: 'Scheduled', ta: 'திட்டமிடப்பட்டது' },
   // Test Series promo strip — rendered as the VettriCard's header. The price
-  // sits right below in the card, so it carries an "included" pill, not ₹899.
+  // sits right below in the card, so it carries an "included" pill, not ₹1,899.
   marathonBannerTitle: { en: 'Test Series 2026', ta: 'தேர்வுத் தொடர் 2026' },
   marathonBannerSub: {
     en: '13 Group 1 papers on a fixed schedule: 10 sectional + 3 full mocks',
@@ -975,8 +975,16 @@ const STRINGS = {
   // Landing-page copy for the same pack (mockTitle/MOCK_ITEMS[0]).
   mockPackBannerTitle: { en: 'Group 1 Mock Test Pack', ta: 'குரூப் 1 மாதிரித் தேர்வு தொகுப்பு' },
   mockPackBannerSub: {
-    en: '6 full-length Group 1 mock tests, server-graded',
-    ta: '6 முழு நீள குரூப் 1 மாதிரித் தேர்வுகள் (Server-graded)',
+    en: '6 full-length Group 1 mock tests + unlimited Group 1 PYQs',
+    ta: '6 முழு நீள குரூப் 1 மாதிரித் தேர்வுகள் + வரம்பற்ற குரூப் 1 PYQ',
+  },
+  // The PYQ entitlement stated on its own, for the perk lists. Backed by
+  // MOCK_PACK_FREE_CATEGORIES in server/src/lib/credits.ts — this plan draws
+  // category 'pyq' without spending credits. Group 2/Group 4 PYQ banks are NOT
+  // included, so the copy says Group 1 rather than just "PYQ".
+  mockPackPerkPyq: {
+    en: 'Unlimited Group 1 previous-year questions — no credits deducted',
+    ta: 'வரம்பற்ற குரூப் 1 முந்தைய ஆண்டு வினாக்கள் (PYQ) — கிரெடிட் கழிக்கப்படாது',
   },
   mockPackValidity: { en: '80-day access', ta: '80 நாள் அணுகல்' },
   mockPackPerk2: {
@@ -2196,8 +2204,8 @@ const STRINGS = {
   },
   paymentsPlanVettri: { en: 'Vettri Nichayam', ta: 'வெற்றி நிச்சயம்' },
   paymentsPlanVettriWhere: {
-    en: '₹899 / ₹499 monthly — PYQ, Current Affairs, Test Marathon, credit wall, website pricing',
-    ta: '₹899 / மாதம் ₹499 — PYQ, நடப்பு நிகழ்வுகள், டெஸ்ட் மாரத்தான், கிரெடிட் சுவர், இணையதள விலை',
+    en: '₹1,899 / ₹499 monthly — PYQ, Current Affairs, Test Marathon, credit wall, website pricing',
+    ta: '₹1,899 / மாதம் ₹499 — PYQ, நடப்பு நிகழ்வுகள், டெஸ்ட் மாரத்தான், கிரெடிட் சுவர், இணையதள விலை',
   },
   paymentsPlanRankBooster: { en: 'Group II/IIA Rank Booster', ta: 'குரூப் II/IIA ரேங்க் பூஸ்டர்' },
   paymentsPlanRankBoosterWhere: {

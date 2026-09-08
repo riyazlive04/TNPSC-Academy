@@ -594,7 +594,7 @@ function FullMockExamTab() {
         open={mockPurchase.confirmOpen}
         planName={t('mockPackBannerTitle')}
         validity={t('mockPackValidity')}
-        perks={[t('mockPackBannerSub'), t('mockPackPerk2'), t('mockPackPerk3')]}
+        perks={[t('mockPackBannerSub'), t('mockPackPerkPyq'), t('mockPackPerk2'), t('mockPackPerk3')]}
         priceLabel={mockPurchase.isFree ? t('premiumFree') : mockPurchase.displayPrice}
         isFree={mockPurchase.isFree}
         accent="sky"

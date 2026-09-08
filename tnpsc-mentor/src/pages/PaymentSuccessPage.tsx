@@ -70,7 +70,7 @@ const PLAN_META: Record<
   group1_mock_pack: {
     nameKey: 'mockPackBannerTitle',
     validityKey: 'mockPackValidity',
-    perkKeys: ['mockPackBannerSub', 'mockPackPerk2', 'mockPackPerk3'],
+    perkKeys: ['mockPackBannerSub', 'mockPackPerkPyq', 'mockPackPerk2', 'mockPackPerk3'],
     accent: 'sky',
     flag: 'mockPack',
   },

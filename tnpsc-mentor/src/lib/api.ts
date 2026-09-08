@@ -475,6 +475,14 @@ export interface CrmAgentRow {
   open_leads: number
 }
 
+/** What both credit endpoints return. `freeCategories` is optional because a
+ *  client can be newer than the server it is talking to during a rollout. */
+export interface CreditStatus {
+  balance: number
+  unlimited: boolean
+  freeCategories?: string[]
+}
+
 export const api = {
   auth: {
     /** Which optional auth methods are live right now — see AuthConfig. */
@@ -1941,12 +1949,14 @@ export const api = {
 
   // ─── Credits (free-tier test balance) ────────────────────────────────────
   credits: {
-    /** Current balance + whether the caller is unlimited (paid/staff). */
-    async balance(): Promise<{ balance: number; unlimited: boolean }> {
-      return request<{ balance: number; unlimited: boolean }>('/api/credits')
+    /** Current balance + whether the caller is unlimited (paid/staff), plus any
+     *  categories they draw free without being unlimited (the ₹399 Mock Pack's
+     *  Group 1 PYQs). Optional so an older server response still parses. */
+    async balance(): Promise<CreditStatus> {
+      return request<CreditStatus>('/api/credits')
     },
     /** Grant the +10 daily bonus if due, then return the balance. Call on app load. */
-    async checkin(): Promise<{ balance: number; granted: boolean; unlimited: boolean }> {
+    async checkin(): Promise<CreditStatus & { granted: boolean }> {
       return request('/api/credits/checkin', { method: 'POST' })
     },
   },
@@ -2631,7 +2641,7 @@ export interface AppSettings {
   payments_enabled: boolean
   /** Sell the ₹1,699 / 6-month Premium Prelims Kit. */
   premium_sale_enabled: boolean
-  /** Sell the ₹899 / ₹499 Vettri Nichayam bundle. */
+  /** Sell the ₹1,899 / ₹499 Vettri Nichayam bundle. */
   vettri_sale_enabled: boolean
   /** Sell the ₹1,249 / 90-day Group II/IIA Rank Booster. */
   rank_booster_sale_enabled: boolean

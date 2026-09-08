@@ -6,8 +6,14 @@
 /** Premium plan price in paise (₹1 = 100). Mirrors PremiumCard.tsx (₹1,699). */
 export const PREMIUM_PRICE_PAISE = 169900 // ₹1,699
 
-/** Vettri Nichayam FULL price in paise (single payment, two months). Mirrors ₹899. */
-export const VETTRI_PRICE_PAISE = 89900 // ₹899
+/** Vettri Nichayam FULL price in paise (single payment, two months). Mirrors ₹1,899.
+ *
+ *  This is the amount Razorpay actually charges: the order route recomputes it
+ *  here via baseAmountForPlan and ignores whatever the client sent, so changing
+ *  this constant IS the price change for web checkout. The Play Store price for
+ *  com.tnpscmentor.app.vettri60 is set in Play Console and does NOT follow this
+ *  — update it there too or Android IAP keeps charging the old price. */
+export const VETTRI_PRICE_PAISE = 189900 // ₹1,899
 
 /** Vettri Nichayam MONTHLY price in paise (30-day; pay again to renew). ₹499. */
 export const VETTRI_MONTH_PRICE_PAISE = 49900 // ₹499
@@ -36,7 +42,7 @@ export const MIN_CHARGE_PAISE = 100
 export const PREMIUM_VALIDITY_MS = 180 * 24 * 60 * 60 * 1000 // 6 months
 
 /**
- * Vettri Nichayam FULL entitlement window — the ₹899 plan is a TWO-MONTH program.
+ * Vettri Nichayam FULL entitlement window — the ₹1,899 plan is a TWO-MONTH program.
  * This diverges from PREMIUM_VALIDITY_MS (180d), which is fine: bundleAccess queries
  * on max(the two) and then bounds each plan against its OWN window, so a shorter
  * Vettri validity lapses correctly.

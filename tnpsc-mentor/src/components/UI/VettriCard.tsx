@@ -19,9 +19,14 @@ import StoreCodeRow from './StoreCodeRow'
 
 // ─── Vettri Nichayam pricing (mirrors server pricing.ts) ─────────────────────
 // Display only — the server always recomputes the price from the plan + coupon.
-// A TWO-MONTH program: pay FULL ₹899 once for both months, OR MONTHLY ₹499 per
-// month (₹499 = the first month/half; pay ₹499 again for the second month/half).
-export const VETTRI_PRICE_RUPEES = 899
+// A TWO-MONTH program: pay FULL ₹1,899 once for both months, OR MONTHLY ₹499
+// per month (₹499 = the first month/half; pay ₹499 again for the second half).
+//
+// NOTE: two monthly payments (₹998) now cost less than the full plan (₹1,899),
+// so the full plan is no longer the cheaper route through the same programme.
+// That is a deliberate pricing decision, not an oversight — if the monthly tier
+// should rise with it, change VETTRI_MONTH_RUPEES and its server twin together.
+export const VETTRI_PRICE_RUPEES = 1899
 export const VETTRI_PRICE_PAISE = VETTRI_PRICE_RUPEES * 100
 export const VETTRI_MONTH_RUPEES = 499
 export const VETTRI_MONTH_PAISE = VETTRI_MONTH_RUPEES * 100
@@ -76,7 +81,7 @@ function rupees(paise: number): string {
 }
 
 /**
- * Vettri Nichayam upsell card. A two-month program: FULL ₹899 (both months) or
+ * Vettri Nichayam upsell card. A two-month program: FULL ₹1,899 (both months) or
  * MONTHLY ₹499 (one month/half; pay again for the second). Unlocks the 13-exam
  * Vettri bank + unlimited PYQ +
  * unlimited Current Affairs. Hidden for anyone who already has the bundle OR
@@ -113,7 +118,7 @@ export default function VettriCard({
   const [applied, setApplied] = useState<AppliedCoupon | null>(null)
   const [couponError, setCouponError] = useState<string | null>(null)
 
-  // Chosen plan (full ₹899 / monthly ₹499). Switching plans clears any applied
+  // Chosen plan (full ₹1,899 / monthly ₹499). Switching plans clears any applied
   // coupon, since its discount was computed against the other plan's base price.
   const [plan, setPlan] = useState<VettriPlan>('full')
   const sel = PLANS[plan]
@@ -304,7 +309,7 @@ export default function VettriCard({
 
         {/* Right: plan toggle + price + coupon + CTA */}
         <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
-          {/* Full ₹899 / Monthly ₹499 selector */}
+          {/* Full ₹1,899 / Monthly ₹499 selector */}
           <div className="flex w-full rounded-field bg-tint p-0.5 sm:w-auto">
             {(['full', 'month'] as VettriPlan[]).map((p) => (
               <button

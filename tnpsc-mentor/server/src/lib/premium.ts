@@ -119,7 +119,7 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
   const premiumRow = latestFor('premium_annual')
   const premiumActive = !!premiumRow && now - new Date(premiumRow.created_at).getTime() < PREMIUM_VALIDITY_MS
 
-  // Vettri access comes from EITHER the full ₹899 plan (90-day) OR the monthly
+  // Vettri access comes from EITHER the full ₹1,899 plan (90-day) OR the monthly
   // ₹499 plan (30-day). Take whichever expiry is later so a user who bought both
   // (or renewed monthly) keeps the longest access. Each plan's latest paid order
   // is checked against its own window.

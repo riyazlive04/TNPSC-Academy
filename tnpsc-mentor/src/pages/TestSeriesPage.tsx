@@ -201,7 +201,7 @@ export default function TestSeriesPage() {
 
       {/* Sits in the banner list on every tab (it took the Mock Pack strip's
           slot), so it doubles as the cross-tab entry to the Group 1 papers.
-          For a buyer it carries the ₹899 price and opens the same upsell the
+          For a buyer it carries the ₹1,899 price and opens the same upsell the
           locked panel does; for an owner — or while the plan is off sale — it
           drops the price and just jumps to the Group 1 Test Series tab. */}
       {marathonOn && (

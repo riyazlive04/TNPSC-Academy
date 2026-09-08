@@ -43,7 +43,7 @@ export interface PublicSettings {
   payments_enabled: boolean
   /** Sell the ₹1,699 / 6-month Premium Prelims Kit. Defaults OFF. */
   premium_sale_enabled: boolean
-  /** Sell the ₹899 / ₹499 Vettri Nichayam bundle. */
+  /** Sell the ₹1,899 / ₹499 Vettri Nichayam bundle. */
   vettri_sale_enabled: boolean
   /** Sell the ₹1,249 / 90-day Group II/IIA Rank Booster. */
   rank_booster_sale_enabled: boolean

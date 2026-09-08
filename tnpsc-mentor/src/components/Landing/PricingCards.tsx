@@ -25,6 +25,7 @@ import {
   RANK_BOOSTER_BONUS_KEYS,
 } from '../../hooks/useRankBoosterPurchase'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../../hooks/useMockPackPurchase'
+import { VETTRI_PRICE_RUPEES } from '../UI/VettriCard'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useAuth } from '../../hooks/useAuth'
 import { usePlanSales } from '../../hooks/usePlanSales'
@@ -47,7 +48,11 @@ const TINTS = [
 // (no standing discount exists) and Vettri has no MRP at all (VettriCard.tsx)
 // - so only Rank Booster gets a strikethrough. Faking one for the others
 // would be showing a discount that doesn't exist.
-const VETTRI_PRICE_RUPEES = 899
+//
+// Vettri's price is IMPORTED from VettriCard rather than re-declared here: this
+// file used to keep its own copy, so a price change meant editing two files and
+// the landing page would sooner or later advertise a price checkout no longer
+// charged.
 const PREMIUM_PRICE_RUPEES = 1699
 
 const T = {
@@ -118,6 +123,10 @@ const FREE_ITEMS: { ta: string; en: string }[] = [
 const MOCK_ITEMS: { ta: string; en: string }[] = [
   { ta: '6 முழு நீள குரூப் 1 மாதிரித் தேர்வுகள் (Server-graded)', en: '6 full-length Group 1 mock tests (server-graded)' },
   {
+    ta: 'வரம்பற்ற குரூப் 1 முந்தைய ஆண்டு வினாக்கள் (PYQ) — கிரெடிட் கழிக்கப்படாது',
+    en: 'Unlimited Group 1 previous-year questions — no credits deducted',
+  },
+  {
     ta: '6 மாதிரித் தேர்வுகளுக்கான விளக்கங்கள் PDF ஆக பதிவிறக்கம் செய்யலாம் (திரையில் காட்டப்படாது)',
     en: 'Explanation PDF to download for the 6 mock tests (not shown on-screen)',
   },
@@ -129,7 +138,10 @@ const MOCK_ITEMS: { ta: string; en: string }[] = [
   FREE_ITEMS[2],
   FREE_ITEMS[3],
 ]
-const MOCK_ICONS = [ListChecks, Download, Gift, FileText, Trophy, ShieldCheck]
+// Positionally paired with MOCK_ITEMS above — add an icon whenever you add an
+// item, or every line after the new one silently inherits the wrong one.
+// CalendarDays sits at index 1 for the previous-year-questions perk.
+const MOCK_ICONS = [ListChecks, CalendarDays, Download, Gift, FileText, Trophy, ShieldCheck]
 
 // What the Vettri Nichayam bundle unlocks — mirrors the in-app VettriCard.
 // The first item gets an inline "download the schedule" link at render time.
