@@ -317,47 +317,48 @@ export default function TestSeriesPage() {
 
       {tab === 'vettri' && marathonOn && (
         <>
-          {/* One centred button that switches between the two Group 1
-              products, labelled with the one it takes you TO.
+          {/* The two Group 1 products as a centred pair, mock papers first.
+              Both are always on screen, so whichever you are not looking at is
+              always one tap away — the earlier single flipping button made the
+              destination visible but hid the fact that a choice existed at all.
 
-              From the series it opens the mock papers, and for anyone who has
-              not bought them it opens the ₹399 confirm sheet on top — the
-              papers stay visible behind the ask rather than hidden until
-              payment. The prompt is skipped for an owner (mockAction is
-              already 'open' once the pack, Vettri or Premium is active):
-              asking someone to pay for what they bought reads as a double
-              charge.
+              The view you are on is the solid one; the other sits in its own
+              soft tint. Same colours the products use elsewhere (sky = mock
+              pack, brand = scheduled series) so the buttons read as those two
+              products rather than as a generic on/off pair.
 
-              From the mock papers it goes back. An earlier version relied on
-              re-tapping the "Group 1 Test Series" tab to return, but that tab
-              is already highlighted while you are in here, so there was
-              nothing that looked clickable and the mock view was a one-way
-              door. The label and colour both flip so the way out is the same
-              control that got you in. */}
-          <div className="mb-5 flex justify-center">
+              Opening the mock papers also raises the ₹399 confirm sheet for
+              anyone who has not bought them, leaving the papers visible behind
+              the ask. Skipped for an owner — mockAction is already 'open' once
+              the pack, Vettri or Premium is active, and asking someone to pay
+              for what they bought reads as a double charge. */}
+          <div className="mb-5 flex flex-wrap items-stretch justify-center gap-3">
             <button
               type="button"
               onClick={() => {
-                if (g1View === 'mock') return setG1View('series')
                 setG1View('mock')
                 if (mockAction === 'buy') mockPurchase.startEnroll()
               }}
               disabled={mockPurchase.paying}
-              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold text-white shadow-card transition hover:brightness-105 disabled:opacity-60 ${
-                g1View === 'mock' ? 'bg-brand' : 'bg-sky'
+              aria-pressed={g1View === 'mock'}
+              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold transition hover:brightness-105 disabled:opacity-60 ${
+                g1View === 'mock' ? 'bg-sky text-white shadow-card' : 'bg-skysoft text-sky'
               }`}
             >
-              {g1View === 'mock' ? (
-                <>
-                  <Trophy size={16} className="flex-shrink-0" />
-                  {t('testSeriesTabG1')}
-                </>
-              ) : (
-                <>
-                  <ListChecks size={16} className="flex-shrink-0" />
-                  {t('g1MockTestTitle')}
-                </>
-              )}
+              <ListChecks size={16} className="flex-shrink-0" />
+              {t('g1MockTestTitle')}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setG1View('series')}
+              aria-pressed={g1View === 'series'}
+              className={`tamil btn-wrap inline-flex items-center gap-2 rounded-pill px-5 py-2.5 text-center font-heading text-sm font-bold transition hover:brightness-105 ${
+                g1View === 'series' ? 'bg-brand text-white shadow-card' : 'bg-tint-violet text-brand'
+              }`}
+            >
+              <Trophy size={16} className="flex-shrink-0" />
+              {t('testSeriesTabG1')}
             </button>
           </div>
 
