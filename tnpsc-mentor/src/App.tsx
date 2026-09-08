@@ -336,6 +336,11 @@ function AnimatedRoutes() {
           confirm sheet on arrival; a signed-out visitor registers and is
           returned here with checkout resuming (AUTO_ENROLL_PATHS). */}
       <Route path="/mock-test-pack" element={<MockPackBuyPage />} />
+      {/* Same page under the /rank-booster prefix: the link is handed out in
+          that longer shape too. A real second route, not a redirect — the
+          buyer must return to the exact URL they were given if signing up
+          interrupts checkout (see MOCK_PACK_BUY_PATHS in lib/authRouting). */}
+      <Route path="/rank-booster/mock-test-pack" element={<MockPackBuyPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />

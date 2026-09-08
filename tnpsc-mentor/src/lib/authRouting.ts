@@ -34,9 +34,19 @@ export function postAuthDestination(fromPath?: string): string {
   return '/test-arena'
 }
 
+/**
+ * Every URL the Group 1 Mock Test Pack pay page answers on.
+ *
+ * The canonical one is first; the nested alias exists because the link is
+ * handed out in that longer shape too. Both must be listed rather than one
+ * redirecting to the other, so a buyer who signs up mid-checkout returns to the
+ * exact URL they were sent — a redirect would drop the `?from=` round-trip.
+ */
+export const MOCK_PACK_BUY_PATHS = ['/mock-test-pack', '/rank-booster/mock-test-pack'] as const
+
 /** Landing pages where a successful auth should resume checkout immediately
  *  rather than dropping the user back on the page cold. */
-const AUTO_ENROLL_PATHS = new Set(['/rank-booster', '/mock-test-pack'])
+const AUTO_ENROLL_PATHS = new Set<string>(['/rank-booster', ...MOCK_PACK_BUY_PATHS])
 
 export function isAutoEnrollPath(fromPath?: string): boolean {
   return !!fromPath && AUTO_ENROLL_PATHS.has(fromPath)

@@ -5,13 +5,10 @@ import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { useAuth } from '../hooks/useAuth'
 import { usePlanSales } from '../hooks/usePlanSales'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
+import { MOCK_PACK_BUY_PATHS } from '../lib/authRouting'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 import { useT } from '../lib/i18n'
 
-/** The path this page is served at. Kept as a constant because it is also the
- *  `?from=` value handed to login/register and the AUTO_ENROLL_PATHS entry that
- *  resumes checkout afterwards — three places that must agree exactly. */
-export const MOCK_PACK_BUY_PATH = '/mock-test-pack'
 
 const PERK_KEYS = [
   'mockPackBannerSub',
@@ -68,13 +65,22 @@ export default function MockPackBuyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Return to the URL they actually arrived on, not a hardcoded one: this page
+  // answers on more than one address, and sending a buyer back to a different
+  // one than the link they were given is a confusing way to resume a payment.
+  // Checked against the known list so only our own routes can ever be the
+  // return target.
+  const returnPath: string = (MOCK_PACK_BUY_PATHS as readonly string[]).includes(location.pathname)
+    ? location.pathname
+    : MOCK_PACK_BUY_PATHS[0]
+
   /** Send a signed-out visitor to auth, carrying the way back. */
   const goAuth = (path: '/login' | '/register') => {
     // An in-app browser (Instagram/Facebook) hands off to a fresh browser
     // instance, where React Router state cannot survive — so the return path
     // rides in a query param that LoginPage/RegisterPage fall back to.
-    if (isAndroidWebView) return openInBrowser(`${path}?from=${MOCK_PACK_BUY_PATH}`)
-    navigate(path, { state: { from: { pathname: MOCK_PACK_BUY_PATH } } })
+    if (isAndroidWebView) return openInBrowser(`${path}?from=${returnPath}`)
+    navigate(path, { state: { from: { pathname: returnPath } } })
   }
 
   const cta = () => {
