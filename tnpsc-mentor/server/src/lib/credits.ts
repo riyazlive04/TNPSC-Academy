@@ -29,6 +29,22 @@ export const DAILY_CREDIT_GRANT_BOOSTED = 50
  */
 export const MOCK_PACK_FREE_CATEGORIES: readonly string[] = ['pyq']
 
+/**
+ * Question categories an active ₹1,249 Group II/IIA Rank Booster ("Group 2 Test
+ * Series") owner draws WITHOUT spending credits.
+ *
+ * Today this is redundant: Rank Booster is part of `creditsUnlimited` (see
+ * bundleAccess), so its owners already draw every bank free. It is written down
+ * anyway because the Mock Pack shows exactly how that changes — that plan was
+ * narrowed from a blanket flag to a category list, and anything relying on the
+ * blanket flag silently started charging. Pinning Group 2's own bank to the
+ * Group 2 plan means the banner promise ("unlimited Group 2 PYQs, no credits
+ * deducted") survives the same narrowing here.
+ *
+ * Group 2 / 2A previous-year questions only — category 'pyq2'.
+ */
+export const RANK_BOOSTER_FREE_CATEGORIES: readonly string[] = ['pyq2']
+
 /** A free user may take at most this many mock exams total, ever. */
 export const FREE_MOCK_LIMIT = 1
 /** One-time credits awarded when the user's FIRST completed test is graded. */

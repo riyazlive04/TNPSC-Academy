@@ -8,6 +8,7 @@ import {
   DAILY_CREDIT_GRANT,
   DAILY_CREDIT_GRANT_BOOSTED,
   MOCK_PACK_FREE_CATEGORIES,
+  RANK_BOOSTER_FREE_CATEGORIES,
 } from '../lib/credits.js'
 import { maybeSendFirstTestNudge } from '../lib/firstTestNudge.js'
 
@@ -15,7 +16,8 @@ const router = Router()
 
 /** premium/vettri/rankBooster/staff → unlimited (never spends credits); an
  *  active Mock Pack owner isn't unlimited but does get the bigger daily
- *  grant. One bundleAccess() read serves both, reused by GET / and /checkin. */
+ *  grant, plus its own free bank. One bundleAccess() read serves all of it,
+ *  reused by GET / and /checkin. */
 async function resolveCreditPlan(
   req: AuthedRequest
 ): Promise<{ unlimited: boolean; dailyGrant: number; freeCategories: string[] }> {
@@ -29,10 +31,17 @@ async function resolveCreditPlan(
       unlimited: b.creditsUnlimited,
       dailyGrant: b.mockPack ? DAILY_CREDIT_GRANT_BOOSTED : DAILY_CREDIT_GRANT,
       // Banks this caller draws free without being unlimited overall — the
-      // Mock Pack's Group 1 PYQs. Served from here so the client's "this test
-      // costs N credits" prompt matches what the quiz route will actually
-      // charge, instead of re-deriving the rule and drifting from it.
-      freeCategories: b.mockPack ? [...MOCK_PACK_FREE_CATEGORIES] : [],
+      // Mock Pack's Group 1 PYQs, the Group 2 Test Series' Group 2 PYQs.
+      // Served from here so the client's "this test costs N credits" prompt
+      // matches what the quiz route will actually charge, instead of
+      // re-deriving the rule and drifting from it. Kept in step with
+      // isUnlimited() in routes/questions.ts, which is what actually charges.
+      freeCategories: [
+        ...new Set([
+          ...(b.mockPack ? MOCK_PACK_FREE_CATEGORIES : []),
+          ...(b.rankBooster ? RANK_BOOSTER_FREE_CATEGORIES : []),
+        ]),
+      ],
     }
   } catch {
     return { unlimited: false, dailyGrant: DAILY_CREDIT_GRANT, freeCategories: [] }

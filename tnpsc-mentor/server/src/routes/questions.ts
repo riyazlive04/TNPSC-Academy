@@ -4,7 +4,12 @@ import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
 import { recordSeen } from '../lib/seen.js'
 import { bundleAccess } from '../lib/premium.js'
-import { chargeTestStart, FREE_MOCK_LIMIT, MOCK_PACK_FREE_CATEGORIES } from '../lib/credits.js'
+import {
+  chargeTestStart,
+  FREE_MOCK_LIMIT,
+  MOCK_PACK_FREE_CATEGORIES,
+  RANK_BOOSTER_FREE_CATEGORIES,
+} from '../lib/credits.js'
 import { MAX_MOCK_EXAM_ATTEMPTS, MAX_TEST_SERIES_ATTEMPTS } from '../pricing.js'
 import { TEST_SERIES_CONFIG, DEFAULT_SERIES, resolveSeries } from '../lib/testSeriesCatalog.js'
 
@@ -178,15 +183,23 @@ const GROUP_SLOTS: Record<string, MockSlotDef[]> = {
  * `category`, when given, additionally clears the gate for a bank the caller's
  * plan includes outright: an active ₹399 Mock Pack owner draws Group 1 PYQs
  * (MOCK_PACK_FREE_CATEGORIES) without spending credits, because that bank is
- * part of what the pack sells. Callers that aren't drawing from a category
- * (mock exams, the starter challenge) simply omit it and get the old behaviour.
+ * part of what the pack sells, and a ₹1,249 Group 2 Test Series (Rank Booster)
+ * owner draws Group 2 / 2A PYQs (RANK_BOOSTER_FREE_CATEGORIES) on the same
+ * footing. The Rank Booster clause is redundant while that plan is inside
+ * `creditsUnlimited` above — it is here so the banner promise is tied to the
+ * plan that sells it rather than to a blanket flag someone may later narrow,
+ * which is precisely how the Mock Pack's own PYQs came to need a list.
+ * Callers that aren't drawing from a category (mock exams, the starter
+ * challenge) simply omit it and get the old behaviour.
  */
 async function isUnlimited(req: AuthedRequest, category?: string): Promise<boolean> {
   if (await isStaff(req)) return true
   try {
     const b = await bundleAccess(req.db!)
     if (b.creditsUnlimited) return true
-    return !!category && b.mockPack && MOCK_PACK_FREE_CATEGORIES.includes(category)
+    if (!category) return false
+    if (b.mockPack && MOCK_PACK_FREE_CATEGORIES.includes(category)) return true
+    return b.rankBooster && RANK_BOOSTER_FREE_CATEGORIES.includes(category)
   } catch {
     return false // fail closed on entitlement: treat as free (gate may apply)
   }

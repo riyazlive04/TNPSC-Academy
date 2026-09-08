@@ -944,9 +944,14 @@ const STRINGS = {
   // Same bonus mechanism as VettriCard's vettriBonus1-3 (the credit gate's
   // creditsUnlimited flag covers Rank Booster too) — reworded to this plan's
   // own 90-day window instead of Vettri's 2-month one.
+  // The PYQ entitlement, named by group. Backed by RANK_BOOSTER_FREE_CATEGORIES
+  // in server/src/lib/credits.ts (category 'pyq2') on top of this plan's place
+  // in creditsUnlimited. It said only "Unlimited PYQ tests" for a long time,
+  // which left the one bank a Group 2 aspirant is actually shopping for
+  // unnamed; mirrors mockPackPerkPyq's phrasing for the Group 1 plan.
   rankBoosterBonus1: {
-    en: 'Unlimited PYQ tests (Premium feature · 90-day access)',
-    ta: 'வரம்பற்ற முந்தைய ஆண்டு (PYQ) தேர்வுகள் (பிரீமியம் அம்சம் · 90 நாள் அணுகல்)',
+    en: 'Unlimited Group 2 / 2A previous-year questions (PYQ) — no credits deducted · 90-day access',
+    ta: 'வரம்பற்ற குரூப் 2 / 2A முந்தைய ஆண்டு வினாக்கள் (PYQ) — கிரெடிட் கழிக்கப்படாது · 90 நாள் அணுகல்',
   },
   rankBoosterBonus2: {
     en: 'Unlimited Current Affairs tests (Premium feature · 90-day access)',
@@ -973,8 +978,8 @@ const STRINGS = {
   // discovery banner, plus the dashboard discovery banner (Test Arena).
   rankBoosterBannerTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterBannerSub: {
-    en: '23 full-length Group II/IIA prelims papers on a fixed schedule',
-    ta: 'திட்டமிட்ட அட்டவணையில் 23 முழு நீள குரூப் II/IIA முதல்நிலைத் தேர்வுத் தாள்கள்',
+    en: '23 full-length Group II/IIA prelims papers + unlimited Group 2 PYQs',
+    ta: '23 முழு நீள குரூப் II/IIA முதல்நிலைத் தாள்கள் + வரம்பற்ற குரூப் 2 PYQ',
   },
   // Group 1 Mock Test Pack banner (Test Marathon hub) - mirrors PricingCards'
   // Landing-page copy for the same pack (mockTitle/MOCK_ITEMS[0]).

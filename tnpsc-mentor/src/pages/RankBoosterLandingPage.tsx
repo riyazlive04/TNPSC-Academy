@@ -158,8 +158,14 @@ const FEATURES: {
   },
   {
     icon: FileText,
-    ta: { t: 'PYQ அணுகல்', d: 'Topic-wise & year-wise முந்தைய ஆண்டு கேள்விகள் - strong practice-க்கு.' },
-    en: { t: 'PYQs Access', d: 'Topic-wise and year-wise previous year questions for strong practice.' },
+    ta: {
+      t: 'வரம்பற்ற குரூப் 2 PYQ',
+      d: 'குரூப் 2 / 2A முந்தைய ஆண்டு கேள்விகள் - topic-wise & year-wise, கிரெடிட் கழிக்கப்படாது.',
+    },
+    en: {
+      t: 'Unlimited Group 2 PYQs',
+      d: 'Every Group 2 / 2A previous-year paper, topic-wise and year-wise - no credits deducted.',
+    },
   },
   {
     icon: Newspaper,
