@@ -19,10 +19,11 @@ export const VETTRI_PRICE_PAISE = 189900 // ₹1,899
 export const VETTRI_MONTH_PRICE_PAISE = 49900 // ₹499
 
 /** Group II/ IIA- Rank Booster — standalone plan (90-day; pay again to renew).
- *  Mirrors Vettri, single tier only. ₹1,800 MRP, ₹1,249 Independence Day
- *  offer price (valid till 31 Aug 2026 per the marketing flyer — the price
- *  itself is not auto-reverting; update this constant by hand when the offer
- *  window ends). This is the amount actually charged. */
+ *  Mirrors Vettri, single tier only. ₹1,800 MRP, ₹1,249 offer price. The
+ *  advertised deadline lives in ONE place on the client
+ *  (RANK_BOOSTER_OFFER_END in src/lib/i18n.ts, currently 30 Sep 2026); the
+ *  price itself is not auto-reverting, so update this constant by hand when
+ *  that date passes. This is the amount actually charged. */
 export const RANK_BOOSTER_MRP_PAISE = 180000 // ₹1,800
 export const RANK_BOOSTER_PRICE_PAISE = 124900 // ₹1,249
 

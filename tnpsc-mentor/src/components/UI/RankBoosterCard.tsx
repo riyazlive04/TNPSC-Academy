@@ -99,8 +99,8 @@ export default function RankBoosterCard({
 
       {/* Offer banner - mirrors VettriCard's/PremiumCard's Test Marathon strip
           (icon + title + subtitle + pill), gold-themed to match this card
-          instead of copying their violet. Leads with the Independence Day
-          offer since that's the single biggest new fact for this card. */}
+          instead of copying their violet. Leads with the offer deadline since
+          that's the single biggest new fact for this card. */}
       <div className="relative -ml-7 -mr-6 -mt-6 mb-5 bg-gradient-to-r from-accentwarm to-gold py-4 pl-7 pr-6 text-white">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="flex min-w-0 items-center gap-3">
@@ -168,8 +168,8 @@ export default function RankBoosterCard({
         <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
           <div className="flex flex-col items-start gap-1 sm:items-end">
             <div className="flex items-baseline gap-2">
-              {/* MRP always struck through — a standing Independence Day offer,
-                  not a coupon-only discount (mirrors PremiumCard's MRP/SAVINGS
+              {/* MRP always struck through — a standing offer price, not a
+                  coupon-only discount (mirrors PremiumCard's MRP/SAVINGS
                   split, just always-on here instead of coupon-gated). */}
               <span className="font-body text-base text-ink2 line-through">
                 ₹{RANK_BOOSTER_MRP_RUPEES}

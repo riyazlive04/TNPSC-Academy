@@ -13,8 +13,8 @@ import { hapticSuccess } from '../lib/haptics'
 
 // ─── Group II/ IIA- Rank Booster pricing (mirrors server pricing.ts) ─────────
 // Display only — the server always recomputes the price from the plan + coupon.
-// Single tier: ₹1,800 MRP, ₹1,249 Independence Day offer price (valid till 31
-// Aug 2026 per the marketing flyer), 90 days, pay again to renew. Single source
+// Single tier: ₹1,800 MRP, ₹1,249 offer price (advertised until
+// RANK_BOOSTER_OFFER_END in lib/i18n.ts), 90 days, pay again to renew. Single source
 // of truth for both the in-app RankBoosterCard and the public /rank-booster
 // landing page, so the two surfaces can never drift apart on price or copy.
 export const RANK_BOOSTER_MRP_RUPEES = 1800

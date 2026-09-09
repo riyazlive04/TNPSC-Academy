@@ -101,7 +101,7 @@ const FREE_ITEMS: { ta: string; en: string }[] = [
     en: '50 free credits on signup + 10 daily (1 credit per question)',
   },
   {
-    ta: 'கிரெடிட்களில் எந்தத் தேர்வும்: பாடங்கள், PYQ, நடப்பு நிகழ்வுகள், அப்டிட்யூட்',
+    ta: 'உங்கள் கிரெடிட்களைப் பயன்படுத்தி பாடங்கள், முந்தைய ஆண்டு வினாத்தாள்கள் (PYQ), நடப்பு நிகழ்வுகள் மற்றும் திறனறி ஆகிய எந்தத் தேர்வுகளையும் நீங்கள் அணுகலாம்',
     en: 'Use credits on any test: subjects, PYQ, Current Affairs, aptitude',
   },
   {

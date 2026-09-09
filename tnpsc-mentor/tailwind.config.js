@@ -9,8 +9,10 @@ export default {
       // needs to tighten on short phones rather than on narrow ones - a width
       // breakpoint cannot see the axis that actually runs out. 720px is the
       // line below which the ₹399/₹1,249 recaps stopped fitting in Tamil.
+      // Raised 720 -> 760 once the credits perk was reworded longer: 360x740
+      // (a very common Android size) then sat 6px over on the wrong side of it.
       screens: {
-        short: { raw: '(max-height: 720px)' },
+        short: { raw: '(max-height: 760px)' },
       },
       colors: {
         // ─── Violet design system (light + dark) ───────────────────────────

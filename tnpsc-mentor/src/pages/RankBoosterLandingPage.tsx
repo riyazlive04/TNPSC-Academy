@@ -37,7 +37,7 @@ import {
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import PricingCards from '../components/Landing/PricingCards'
 import { usePlanSales } from '../hooks/usePlanSales'
-import { translate, type StringKey } from '../lib/i18n'
+import { translate, RANK_BOOSTER_OFFER_END, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
 import { MOCK_PACK_BUY_PATHS, RANK_BOOSTER_BUY_PATHS } from '../lib/authRouting'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
@@ -64,7 +64,6 @@ const T = {
   signUp: { ta: 'பதிவு செய்', en: 'Sign up' },
   dashboard: { ta: 'Dashboard', en: 'Dashboard' },
 
-  offerBadge: { ta: 'சுதந்திர தின மாத சலுகை', en: 'Independence Day Month Offer' },
   vacancies: { ta: '821 காலியிடங்கள்', en: '821 Vacancies' },
   examDate: {
     ta: 'தேர்வு தேதி: 01 நவம்பர் 2026 (ஞாயிறு)',
@@ -78,7 +77,12 @@ const T = {
     ta: '23 முழுமையான தேர்வுகள், real exam pattern-ல். GS + Aptitude, Language, மற்றும் 3 Grand Mock தேர்வுகள் அடங்கிய systematic schedule.',
     en: '23 complete tests in the real exam pattern - GS + Aptitude, Language, and 3 Grand Mock tests on a systematic schedule.',
   },
-  validTill: { ta: 'ஆகஸ்ட் 31, 2026 வரை மட்டும் இந்த சலுகை', en: 'Offer valid till 31 August 2026 only' },
+  // Urgency line under both price blocks. Says what the buyer LOSES by waiting,
+  // not merely that a window exists. Date from the single RANK_BOOSTER_OFFER_END.
+  validTill: {
+    ta: `${RANK_BOOSTER_OFFER_END.ta}-க்குப் பிறகு விலை ₹1,800 ஆகும்`,
+    en: `Price goes back to ₹1,800 after ${RANK_BOOSTER_OFFER_END.en}`,
+  },
 
   ctaEnroll: { ta: 'இப்போதே Enroll ஆகுங்க', en: 'Enroll now' },
   ctaSchedulePdf: { ta: 'முழு அட்டவணை (PDF)', en: 'Full schedule (PDF)' },
@@ -215,8 +219,14 @@ const FAQS: { ta: { q: string; a: string }; en: { q: string; a: string } }[] = [
     en: { q: 'How long do I get access?', a: '90 days from the date of purchase.' },
   },
   {
-    ta: { q: 'இந்த offer எப்போ முடியும்?', a: 'ஆகஸ்ட் 31, 2026 வரை மட்டும் ₹1,249 விலை இருக்கும் - அதன் பிறகு ₹1,800 MRP-க்கே கிடைக்கும்.' },
-    en: { q: 'When does this offer end?', a: 'The ₹1,249 price is valid only until 31 August 2026 - after that it reverts to the ₹1,800 MRP.' },
+    ta: {
+      q: 'இந்த offer எப்போ முடியும்?',
+      a: `${RANK_BOOSTER_OFFER_END.ta} வரை மட்டும் ₹1,249 விலை இருக்கும் - அதன் பிறகு ₹1,800 MRP-க்கே கிடைக்கும்.`,
+    },
+    en: {
+      q: 'When does this offer end?',
+      a: `The ₹1,249 price is valid only until ${RANK_BOOSTER_OFFER_END.en} - after that it reverts to the ₹1,800 MRP.`,
+    },
   },
   {
     ta: { q: 'Refund கிடைக்குமா?', a: 'எங்க return & cancellation கொள்கையை கீழே பாருங்க.' },

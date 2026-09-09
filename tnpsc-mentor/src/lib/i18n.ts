@@ -7,6 +7,23 @@ import { useLanguageStore, type Lang } from '../store/languageStore'
 
 type Entry = { en: string; ta: string }
 
+/**
+ * When the ₹1,249 Group II/IIA (Rank Booster) offer price stops, in both
+ * languages. Declared ONCE and interpolated into every string that states it -
+ * the badge and the price note here, plus the landing page's urgency line and
+ * its FAQ answer, which import this. The deadline used to be typed out in
+ * eight separate places, which is why the app was still advertising
+ * "31 August" on 9 September.
+ *
+ * The price does NOT auto-revert when this date passes: it is display copy.
+ * Changing what is actually charged means editing RANK_BOOSTER_PRICE_PAISE in
+ * server/src/pricing.ts (and its mirror in hooks/useRankBoosterPurchase.ts).
+ */
+export const RANK_BOOSTER_OFFER_END = {
+  en: '30 September 2026',
+  ta: '30 செப்டம்பர் 2026',
+} as const
+
 const STRINGS = {
   // Brand / common
   appName: { en: 'TNPSC MENTOR', ta: 'TNPSC வழிகாட்டி' },
@@ -928,14 +945,16 @@ const STRINGS = {
   rankBoosterBadge: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterTitle: { en: 'Group II/IIA Test Series', ta: 'குரூப் II/IIA தேர்வுத் தொடர்' },
   rankBoosterValidity: { en: '90-day access', ta: '90 நாள் அணுகல்' },
-  // Independence Day Month Offer — orange badge, matches the marketing flyer.
+  // Orange deadline badge. Was "Independence Day Offer" - a festival name says
+  // nothing about when the price goes away, and went stale the moment the
+  // festival did. It now states the deadline itself.
   rankBoosterOfferBadge: {
-    en: 'Independence Day Offer',
-    ta: 'சுதந்திர தின சலுகை',
+    en: `Only till ${RANK_BOOSTER_OFFER_END.en}`,
+    ta: `${RANK_BOOSTER_OFFER_END.ta} வரை மட்டும்`,
   },
   rankBoosterOfferNote: {
-    en: 'Independence Day Month Offer price of ₹1,249 (MRP ₹1,800) is valid till 31 August 2026 only.',
-    ta: 'சுதந்திர தின மாத சலுகை விலை ₹1,249 (MRP ₹1,800) 31 ஆகஸ்ட் 2026 வரை மட்டுமே செல்லுபடியாகும்.',
+    en: `₹1,249 (MRP ₹1,800) only until ${RANK_BOOSTER_OFFER_END.en} — after that the price goes back to ₹1,800.`,
+    ta: `₹1,249 (MRP ₹1,800) ${RANK_BOOSTER_OFFER_END.ta} வரை மட்டுமே — அதன் பிறகு விலை ₹1,800 ஆக மாறும்.`,
   },
   rankBoosterPerk1: {
     en: '23 full-length Group II/IIA prelims papers, each attempted up to twice',
