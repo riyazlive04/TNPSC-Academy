@@ -233,11 +233,16 @@ function PriceBlock({
  */
 export default function PricingCards({
   lang,
+  onLangChange,
   webAppHref,
   onTrack,
   autoOpenMockPack = false,
 }: {
   lang: Lang
+  /** Lets the Mock Pack confirm sheet carry its own EN/TA switch and push the
+   *  choice back up to the owning page, so flipping language at the payment
+   *  step re-renders the page behind it too rather than only the sheet. */
+  onLangChange?: (lang: Lang) => void
   /** Where Free/Vettri/Premium CTAs go - typically isAuthed ? APP_URL : APP_REGISTER_URL. */
   webAppHref: string
   /** Optional click-tracking hook (source label per card). */
@@ -558,6 +563,8 @@ export default function PricingCards({
         perks={MOCK_ITEMS.map((it) => it[lang])}
         priceLabel={mockPurchase.isFree ? gt('premiumFree') : mockPurchase.displayPrice}
         isFree={mockPurchase.isFree}
+        lang={lang}
+        onLangChange={onLangChange}
         accent="sky"
         busy={mockPurchase.paying}
         onConfirm={mockPurchase.handleBuy}

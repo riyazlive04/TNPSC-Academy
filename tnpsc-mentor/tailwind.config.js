@@ -4,6 +4,14 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // Height-based variant. Tamil copy runs ~1.5-2x the English, so a layout
+      // that must fit the viewport without scrolling (the pre-payment sheet)
+      // needs to tighten on short phones rather than on narrow ones - a width
+      // breakpoint cannot see the axis that actually runs out. 720px is the
+      // line below which the ₹399/₹1,249 recaps stopped fitting in Tamil.
+      screens: {
+        short: { raw: '(max-height: 720px)' },
+      },
       colors: {
         // ─── Violet design system (light + dark) ───────────────────────────
         // Every colour is a CSS variable defined in index.css (:root for light,

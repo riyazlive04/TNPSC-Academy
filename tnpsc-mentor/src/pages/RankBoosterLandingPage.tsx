@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react'
 import {
@@ -30,6 +30,7 @@ import {
   rupees,
   RANK_BOOSTER_MRP_RUPEES,
   RANK_BOOSTER_PRICE_RUPEES,
+  RANK_BOOSTER_SAVINGS,
   RANK_BOOSTER_PERK_KEYS,
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
@@ -38,7 +39,7 @@ import PricingCards from '../components/Landing/PricingCards'
 import { usePlanSales } from '../hooks/usePlanSales'
 import { translate, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
-import { MOCK_PACK_BUY_PATHS } from '../lib/authRouting'
+import { MOCK_PACK_BUY_PATHS, RANK_BOOSTER_BUY_PATHS } from '../lib/authRouting'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 
 type Lang = 'ta' | 'en'
@@ -143,6 +144,31 @@ const T = {
   footerDisclaimer: {
     ta: 'Tamil Nadu Public Service Commission-உடன் தொடர்பில்லை.',
     en: 'Not affiliated with the Tamil Nadu Public Service Commission.',
+  },
+
+  // ₹1,249 price banner, shown at the top of the dedicated Group 2 / 2A pay
+  // link (/group-2-test-series). It is the first thing a buyer arriving from an
+  // ad or a WhatsApp forward sees, so it carries the whole offer at once: what
+  // it is, what it costs, what it used to cost, and the way to buy it.
+  bannerEyebrow: {
+    ta: 'குரூப் 2 / 2A தேர்வுத் தொடர் 2026',
+    en: 'Group 2 / 2A Test Series 2026',
+  },
+  bannerTitle: {
+    ta: '23 தேர்வுகளும் ஒரே ஒரு கட்டணத்தில்',
+    en: 'All 23 tests for one single payment',
+  },
+  bannerValidity: {
+    ta: '90 நாள் அணுகல் · ஒரே முறை கட்டணம்',
+    en: '90-day access · one-time payment',
+  },
+  bannerOwned: {
+    ta: 'நீங்கள் ஏற்கனவே சேர்ந்துவிட்டீர்கள்',
+    en: "You're already enrolled",
+  },
+  bannerOwnedCta: {
+    ta: 'தேர்வுகளைப் பார்க்க',
+    en: 'Open the test series',
   },
 } as const
 
@@ -437,21 +463,31 @@ export default function RankBoosterLandingPage() {
   // never shows a different language than the rest of this page.
   const tGlobal = (key: StringKey) => translate(key, lang)
 
-  useEffect(() => {
-    trackViewContent({ contentName: 'RankBoosterLanding', contentCategory: 'landing' })
-  }, [])
+  // This page doubles as two shareable pay links. On the ₹399 Mock Pack paths
+  // (MOCK_PACK_BUY_PATHS) the Mock Pack sheet opens over it; on the ₹1,249
+  // Group 2 / 2A paths (RANK_BOOSTER_BUY_PATHS) it is this page's own product
+  // in front of the buyer, under a price banner — same page, different offer
+  // pushed to the front.
+  const isMockPayLink = (MOCK_PACK_BUY_PATHS as readonly string[]).includes(location.pathname)
+  const isG2PayLink = (RANK_BOOSTER_BUY_PATHS as readonly string[]).includes(location.pathname)
+  const isPayLink = isMockPayLink || isG2PayLink
 
   useEffect(() => {
-    document.title =
-      lang === 'ta'
+    trackViewContent({
+      contentName: isG2PayLink ? 'Group2TestSeriesPayLink' : 'RankBoosterLanding',
+      contentCategory: 'landing',
+    })
+  }, [isG2PayLink])
+
+  useEffect(() => {
+    document.title = isG2PayLink
+      ? lang === 'ta'
+        ? `TNPSC Group 2 / 2A தேர்வுத் தொடர் 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
+        : `TNPSC Group 2 / 2A Test Series 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
+      : lang === 'ta'
         ? 'TNPSC Group II/IIA Test Series - இப்போதே Enroll ஆகுங்க'
         : 'TNPSC Group II/IIA Test Series - Enroll now'
-  }, [lang])
-
-  // This page doubles as the shareable ₹399 pay link (see MOCK_PACK_BUY_PATHS).
-  // On those paths the Mock Pack sheet opens over the page instead of the Rank
-  // Booster one — same page, different product in front of the buyer.
-  const isMockPayLink = (MOCK_PACK_BUY_PATHS as readonly string[]).includes(location.pathname)
+  }, [lang, isG2PayLink])
 
   useEffect(() => {
     if (isAuthenticated && !loaded) refresh()
@@ -477,6 +513,26 @@ export default function RankBoosterLandingPage() {
     if (!((isAdmin || isSuperAdmin) || rankBoosterUnlocked)) purchase.startEnroll()
   }, [isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked, sales.rankBooster, isMockPayLink])
 
+  // Arriving cold on the ₹1,249 pay link opens its confirm sheet straight away,
+  // the way the ₹399 link already does from inside PricingCards: someone handed
+  // a payment link has already decided what they came for, and making them hunt
+  // for an Enroll button on a long landing page loses that. Fires once per
+  // arrival (the ref latch), and only when the purchase is actually available —
+  // an owner, a staff account or a withdrawn plan gets the page with its banner
+  // and no sheet. Guests get the page too: the banner CTA sends them to signup,
+  // which routes them back here with autoEnroll set (the effect above).
+  const g2SheetOpened = useRef(false)
+  useEffect(() => {
+    if (!isG2PayLink || !isAuthenticated || !loaded) return
+    if (g2SheetOpened.current) return
+    if (isAdmin || isSuperAdmin || rankBoosterUnlocked || !sales.rankBooster) return
+    g2SheetOpened.current = true
+    purchase.startEnroll()
+    // startEnroll is rebuilt every render, so it is deliberately not a dep —
+    // depending on it would reopen the sheet each time the buyer closed it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isG2PayLink, isAuthenticated, loaded, isAdmin, isSuperAdmin, rankBoosterUnlocked, sales.rankBooster])
+
   // This page is the Meta ad landing target — most guests here arrive via an
   // in-app browser (Instagram/Facebook), where Google Sign-In can't work at
   // all (Google blocks its own SDK inside any WebView). Rather than let them
@@ -494,10 +550,16 @@ export default function RankBoosterLandingPage() {
     // no state.
     // The pay-link paths return to themselves, not to /rank-booster — a buyer
     // sent a payment link has to come back to it after signing up.
-    const back = isMockPayLink ? location.pathname : '/rank-booster'
+    const back = isPayLink ? location.pathname : '/rank-booster'
     if (isAndroidWebView) return openInBrowser(`${path}?from=${back}`)
     navigate(path, { state: { from: { pathname: back } } })
   }
+
+  /** Staff and already-enrolled visitors, for whom every CTA on this page is a
+   *  way INTO the series rather than a purchase. The ₹1,249 banner reads it to
+   *  swap its CTA, and handleEnrollClick below to route instead of sell — one
+   *  definition, so the button and what it does can never disagree. */
+  const ownsRankBooster = isAdmin || isSuperAdmin || (loaded && rankBoosterUnlocked)
 
   /** The one "Enroll now" handler behind every CTA on this page (hero, price
    *  card, sticky bar). For an eligible signed-in visitor this opens the
@@ -507,7 +569,7 @@ export default function RankBoosterLandingPage() {
    *  section instead of a purchase flow. */
   const handleEnrollClick = () => {
     if (!isAuthenticated) return goAuth('/register')
-    if ((isAdmin || isSuperAdmin) || (loaded && rankBoosterUnlocked)) {
+    if (ownsRankBooster) {
       return navigate('/test-series', { state: { tab: 'rankbooster' } })
     }
     // Taken off sale: the server would refuse the order anyway, so send them
@@ -578,6 +640,54 @@ export default function RankBoosterLandingPage() {
           </div>
         </div>
       </header>
+
+      {/* ─── ₹1,249 price banner (dedicated Group 2 / 2A pay link only) ────
+          The whole offer in one band directly under the header, so a buyer who
+          arrived from an ad sees the price before anything else and can pay
+          from it without scrolling. On /rank-booster the hero's own buy-box
+          already does this job, so the band would only be a second copy of it
+          — hence pay-link only. */}
+      {isG2PayLink && (
+        <section className="border-b border-gold/25 bg-gradient-to-r from-accentwarm to-gold">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
+            <div className="min-w-0">
+              <span className="tamil inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-white">
+                <Rocket size={12} /> {tGlobal('rankBoosterOfferBadge')}
+              </span>
+              <h2 className="tamil mt-2 font-heading text-lg font-bold leading-tight text-white sm:text-xl">
+                {t('bannerEyebrow')}
+              </h2>
+              <p className="tamil mt-0.5 font-body text-sm leading-snug text-white/85">
+                {t('bannerTitle')} · {t('bannerValidity')}
+              </p>
+            </div>
+
+            <div className="flex shrink-0 flex-col gap-3 sm:items-end">
+              <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                <span className="font-body text-base text-white/70 line-through">
+                  ₹{RANK_BOOSTER_MRP_RUPEES}
+                </span>
+                <span className="font-display text-4xl font-bold tracking-tight text-white">
+                  ₹{RANK_BOOSTER_PRICE_RUPEES}
+                </span>
+                <span className="rounded-full bg-white/20 px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide text-white">
+                  −₹{RANK_BOOSTER_SAVINGS}
+                </span>
+              </div>
+              <button
+                onClick={handleEnrollClick}
+                className="btn-wrap press w-full min-w-0 rounded-pill bg-white px-6 py-2.5 font-heading text-sm font-bold text-accentwarm shadow-sm transition hover:brightness-95 sm:w-auto"
+              >
+                {!ownsRankBooster && <Rocket size={15} className="mr-1.5 inline-block align-[-2px]" />}
+                {ownsRankBooster ? t('bannerOwnedCta') : t('ctaEnroll')}
+              </button>
+              <p className="tamil font-body text-2xs font-semibold text-white/80">
+                {ownsRankBooster ? t('bannerOwned') : t('validTill')}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ─── Hero (banner on the right, kept above the fold) ──────────────── */}
       <section className="relative overflow-hidden">
@@ -833,6 +943,7 @@ export default function RankBoosterLandingPage() {
           <div className="mt-10">
             <PricingCards
               lang={lang}
+              onLangChange={setLang}
               webAppHref={isAuthenticated ? '/test-arena' : '/register'}
               autoOpenMockPack={isMockPayLink}
             />
@@ -933,6 +1044,8 @@ export default function RankBoosterLandingPage() {
         isFree={purchase.isFree}
         accent="gold"
         busy={purchase.paying}
+        lang={lang}
+        onLangChange={setLang}
         onConfirm={purchase.handleBuy}
         onCancel={() => purchase.setConfirmOpen(false)}
       />

@@ -44,9 +44,29 @@ export function postAuthDestination(fromPath?: string): string {
  */
 export const MOCK_PACK_BUY_PATHS = ['/mock-test-pack', '/rank-booster/mock-test-pack'] as const
 
+/**
+ * Every URL the Group II/IIA (₹1,249) Rank Booster pay page answers on.
+ *
+ * Same two-shape rule as MOCK_PACK_BUY_PATHS above: the canonical, self-
+ * describing link is first (it is what goes out in ads and WhatsApp, where
+ * "rank-booster" means nothing to a buyer but "group-2-test-series" does),
+ * with the nested alias alongside it so the link works under the /rank-booster
+ * prefix people already share. Both are real routes rather than one
+ * redirecting to the other, so a buyer who signs up mid-checkout returns to
+ * the exact URL they were sent.
+ */
+export const RANK_BOOSTER_BUY_PATHS = [
+  '/group-2-test-series',
+  '/rank-booster/group-2-test-series',
+] as const
+
 /** Landing pages where a successful auth should resume checkout immediately
  *  rather than dropping the user back on the page cold. */
-const AUTO_ENROLL_PATHS = new Set<string>(['/rank-booster', ...MOCK_PACK_BUY_PATHS])
+const AUTO_ENROLL_PATHS = new Set<string>([
+  '/rank-booster',
+  ...MOCK_PACK_BUY_PATHS,
+  ...RANK_BOOSTER_BUY_PATHS,
+])
 
 export function isAutoEnrollPath(fromPath?: string): boolean {
   return !!fromPath && AUTO_ENROLL_PATHS.has(fromPath)

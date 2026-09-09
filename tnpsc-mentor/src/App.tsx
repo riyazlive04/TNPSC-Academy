@@ -341,6 +341,15 @@ function AnimatedRoutes() {
       <Route path="/mock-test-pack" element={<RankBoosterLandingPage />} />
       <Route path="/rank-booster/mock-test-pack" element={<RankBoosterLandingPage />} />
 
+      {/* The dedicated, self-describing link for the ₹1,249 Group II/IIA test
+          series — the same page as /rank-booster, but named for the exam it
+          sells rather than the internal product name, opened on its ₹1,249
+          price banner with the confirm sheet already up. Two paths for the
+          same reason the mock-pack link has two (RANK_BOOSTER_BUY_PATHS in
+          lib/authRouting). */}
+      <Route path="/group-2-test-series" element={<RankBoosterLandingPage />} />
+      <Route path="/rank-booster/group-2-test-series" element={<RankBoosterLandingPage />} />
+
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />
       <Route path="/guidelines" element={<PolicyPage slug="guidelines" />} />
