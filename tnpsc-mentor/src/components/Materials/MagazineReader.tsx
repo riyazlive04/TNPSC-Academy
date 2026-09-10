@@ -13,6 +13,8 @@ import {
   type KnowLevel,
 } from '../../lib/caMagazine'
 import { pdfWatermark } from '../../lib/pdfWatermark'
+import { caMagazineLink } from '../../lib/shareLinks'
+import ShareLinkButton from '../UI/ShareLinkButton'
 import { useAuth } from '../../hooks/useAuth'
 import { useT } from '../../lib/i18n'
 import { toast } from '../../store/toastStore'
@@ -187,6 +189,19 @@ export default function MagazineReader({
             >
               {downloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
             </button>
+          )}
+          {/* Share this exact issue. Daily issues only: the deep link addresses
+              an issue by its DATE via /ca/magazine/:date, and that resolver
+              looks the date up among the recent DAY-WISE issues — a monthly
+              consolidation would not be found by it, so offering the button
+              there would hand out a link that lands on "not available". */}
+          {caType === 'day_wise' && (
+            <ShareLinkButton
+              url={caMagazineLink(date)}
+              title={title}
+              text={t('shareCaMagazineText')}
+              label={t('shareCaMagazine')}
+            />
           )}
           <button
             onClick={onClose}

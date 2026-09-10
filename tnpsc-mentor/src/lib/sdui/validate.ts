@@ -129,6 +129,8 @@ const URL_HOSTS = [
  *  unexpected mid-session). */
 const NAV_PREFIXES = [
   '/test-arena',
+  '/ca/magazine',
+  '/ca/test',
   '/quiz/instructions',
   '/mock',
   '/test-series',

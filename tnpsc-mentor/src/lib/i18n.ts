@@ -2130,6 +2130,52 @@ const STRINGS = {
     en: "Today's test isn't out yet. It arrives each morning with the magazine.",
     ta: 'இன்றைய தேர்வு இன்னும் வெளியாகவில்லை. ஒவ்வொரு காலையிலும் இதழுடன் வரும்.',
   },
+  // ─── Shareable deep links (lib/shareLinks.ts) ────────────────────────────
+  // One URL that opens ONE issue or ONE day's paper, for pasting into a class
+  // WhatsApp group. shareLink labels the control; the copied/shared toasts say
+  // which of the two actually happened, because the OS decides that, not us.
+  shareLink: { en: 'Share', ta: 'பகிர்' },
+  shareLinkCopied: { en: 'Link copied', ta: 'இணைப்பு நகலெடுக்கப்பட்டது' },
+  shareLinkFailed: { en: "Couldn't copy the link", ta: 'இணைப்பை நகலெடுக்க முடியவில்லை' },
+  shareCaMagazine: { en: "Share this issue", ta: 'இந்த இதழைப் பகிர' },
+  shareCaTest: { en: "Share this test", ta: 'இந்தத் தேர்வைப் பகிர' },
+  // Message that rides with the link in the OS share sheet.
+  shareCaMagazineText: {
+    en: "Today's Current Affairs magazine on TNPSC Mentors",
+    ta: 'TNPSC Mentors-ல் இன்றைய நடப்பு நிகழ்வுகள் இதழ்',
+  },
+  shareCaTestText: {
+    en: 'Take this Daily Current Affairs test on TNPSC Mentors',
+    ta: 'TNPSC Mentors-ல் இந்த தினசரி நடப்பு நிகழ்வுத் தேர்வை எடுங்கள்',
+  },
+  // Deep-link resolver states.
+  caLinkOpening: { en: 'Opening…', ta: 'திறக்கிறது…' },
+  caLinkMagazineMissing: {
+    en: "That issue isn't available — it may have been taken down. Browse every published issue below.",
+    ta: 'அந்த இதழ் கிடைக்கவில்லை. அது நீக்கப்பட்டிருக்கலாம், அல்லது கடந்த இரு வாரங்களுக்கும் முந்தையதாக இருக்கலாம் — அனைத்து இதழ்களையும் Materials-ல் பார்க்கவும்.',
+  },
+  caLinkTestMissing: {
+    en: "That day's test isn't available. It may not have been published, or be older than the last 30 days.",
+    ta: 'அந்த நாளின் தேர்வு கிடைக்கவில்லை. அது வெளியிடப்படாமல் இருக்கலாம், அல்லது கடந்த 30 நாட்களுக்கும் முந்தையதாக இருக்கலாம்.',
+  },
+  // — The whole-magazine archive at /ca/magazine —
+  caArchiveSub: {
+    en: 'Every issue, newest first — a new one each morning.',
+    ta: 'அனைத்த இதழ்களும், புதியது முதல் — தினமும் ஒரு புதிய இதழ்.',
+  },
+  caArchiveDaily: { en: 'Daily issues', ta: 'தினசரி இதழ்கள்' },
+  caArchiveMonthly: { en: 'Monthly issues', ta: 'மாதாந்திர இதழ்கள்' },
+  caArchiveEmpty: {
+    en: 'No issues have been published yet.',
+    ta: 'இதுவரை எந்த இதழும் வெளியிடப்படவில்லை.',
+  },
+  shareCaMagazineAll: { en: 'Share the magazine', ta: 'இதழைப் பகிர' },
+  shareCaMagazineAllText: {
+    en: 'Current Affairs magazine on TNPSC Mentors — a new issue every morning',
+    ta: 'TNPSC Mentors-ல் நடப்பு நிகழ்வுகள் இதழ் — தினமும் காலையில் புதிய இதழ்',
+  },
+  caLinkBackToDashboard: { en: 'Back to dashboard', ta: 'முகப்புக்குத் திரும்ப' },
+
   // ─── Student CA-Questions section (own dashboard row + page) ─────────────
   caQuestionsTitle: { en: 'CA Questions', ta: 'நடப்பு நிகழ்வு வினாக்கள்' },
   caQuestionsArenaSub: { en: 'Take as a test · or get the PDF', ta: 'தேர்வாக எழுது · அல்லது PDF பெறு' },

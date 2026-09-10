@@ -9,6 +9,8 @@ import SectionHeader from '../components/UI/SectionHeader'
 import { api, type CaDailySet, type Material } from '../lib/api'
 import { issueDateLabel, setKeyOrder } from '../lib/caMagazine'
 import { dailyCaConfig } from '../lib/caDaily'
+import { caTestLink } from '../lib/shareLinks'
+import ShareLinkButton from '../components/UI/ShareLinkButton'
 import { pdfWatermark } from '../lib/pdfWatermark'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
@@ -155,21 +157,41 @@ export default function CaQuestionsPage() {
     title: string,
     subtitle: string | undefined,
     monthlySet: boolean,
-    onClick: () => void
-  ) => (
-    <ListRow
-      key={key}
-      leading={
-        <IconTile tint={monthlySet ? 'violet' : 'green'} size={40}>
-          {monthlySet ? <CalendarDays size={19} /> : <ListChecks size={19} />}
-        </IconTile>
-      }
-      title={title}
-      subtitle={subtitle}
-      onClick={onClick}
-      trailing={<Play size={17} className="flex-shrink-0 text-brand" />}
-    />
-  )
+    onClick: () => void,
+    /** Set for daily papers, which have a shareable /ca/test/:date link.
+     *  Monthly banks are addressed by month, not date, and have none. */
+    shareUrl?: string
+  ) => {
+    const row = (
+      <ListRow
+        key={key}
+        leading={
+          <IconTile tint={monthlySet ? 'violet' : 'green'} size={40}>
+            {monthlySet ? <CalendarDays size={19} /> : <ListChecks size={19} />}
+          </IconTile>
+        }
+        title={title}
+        subtitle={subtitle}
+        onClick={onClick}
+        trailing={<Play size={17} className="flex-shrink-0 text-brand" />}
+      />
+    )
+    if (!shareUrl) return row
+    // Beside the row, not inside it: ListRow IS a <button> and renders its
+    // `trailing` slot within that button, so a share control passed there
+    // would be a button nested in a button.
+    return (
+      <div key={key} className="flex items-center gap-1 pr-2">
+        <div className="min-w-0 flex-1">{row}</div>
+        <ShareLinkButton
+          url={shareUrl}
+          title={title}
+          text={t('shareCaTestText')}
+          label={t('shareCaTest')}
+        />
+      </div>
+    )
+  }
 
   return (
     <PickerPage badge={t('caQuestionsTitle')}>
@@ -220,7 +242,8 @@ export default function CaQuestionsPage() {
                         issueDateLabel('day_wise', s.date, lang),
                         `${s.total} ${t('questionsCount')}`,
                         false,
-                        () => startTest(dailyCaConfig(s, lang))
+                        () => startTest(dailyCaConfig(s, lang)),
+                        caTestLink(s.date)
                       )
                     )}
                   </List>

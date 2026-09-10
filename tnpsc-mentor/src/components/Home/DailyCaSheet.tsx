@@ -7,6 +7,8 @@ import { dailyCaConfig } from '../../lib/caDaily'
 import { todayIso } from '../../lib/habit'
 import { useStartTest } from '../../hooks/useStartTest'
 import { tapScaleSubtle } from '../../lib/motion'
+import { caTestLink } from '../../lib/shareLinks'
+import ShareLinkButton from '../UI/ShareLinkButton'
 import { Skeleton } from '../UI/Skeleton'
 import BottomSheet from './BottomSheet'
 import { useT } from '../../lib/i18n'
@@ -78,10 +80,15 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
       {latest && (
         <div className="space-y-3">
           {/* The newest published day — the single obvious action in here. */}
+          {/* The card's frame lives on this wrapper, not on the button, so the
+              share control can sit inside the card visually while staying a
+              SIBLING of the launch button — a <button> inside a <button> is
+              invalid, and would make the whole row ambiguous to tap. */}
+          <div className="group flex w-full items-center rounded-card border border-primary/25 bg-tint-green/50 pr-2 transition-colors hover:border-primary/45">
           <motion.button
             type="button"
             onClick={() => start(latest)}
-            className="focus-ring group flex w-full items-center gap-3.5 rounded-card border border-primary/25 bg-tint-green/50 p-4 text-left transition-colors hover:border-primary/45"
+            className="focus-ring flex min-w-0 flex-1 items-center gap-3.5 rounded-card p-4 text-left"
             whileTap={tapScaleSubtle}
           >
             <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-gradient-to-br from-mint to-sky text-white shadow-sm">
@@ -105,16 +112,26 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
             </span>
             <ChevronRight size={19} className="flex-shrink-0 text-primary/60 sm:hidden" />
           </motion.button>
+            <ShareLinkButton
+              url={caTestLink(latest.date)}
+              title={t('caDailyTitle')}
+              text={t('shareCaTestText')}
+              label={t('shareCaTest')}
+            />
+          </div>
 
           {/* Every earlier day, so a missed one is still a single tap. */}
           {earlier.length > 0 && (
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
               {earlier.map((s) => (
-                <motion.button
+                <div
                   key={s.id}
+                  className="relative rounded-card border border-line bg-card transition-colors hover:border-brand/40"
+                >
+                <motion.button
                   type="button"
                   onClick={() => start(s)}
-                  className="focus-ring flex flex-col gap-1 rounded-card border border-line bg-card p-3 text-left transition-colors hover:border-brand/40"
+                  className="focus-ring flex w-full flex-col gap-1 rounded-card p-3 pr-8 text-left"
                   whileTap={tapScaleSubtle}
                 >
                   <span className="inline-flex items-center gap-1 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
@@ -128,6 +145,14 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
                     {t('questionsCount')}
                   </span>
                 </motion.button>
+                  <ShareLinkButton
+                    url={caTestLink(s.date)}
+                    title={t('caDailyTitle')}
+                    text={t('shareCaTestText')}
+                    label={t('shareCaTest')}
+                    className="absolute right-0.5 top-0.5 h-7 w-7"
+                  />
+                </div>
               ))}
             </div>
           )}

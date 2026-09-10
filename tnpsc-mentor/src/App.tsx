@@ -69,6 +69,10 @@ const SamacheerPage = lazy(() => import('./pages/SamacheerPage'))
 const SubjectPracticePage = lazy(() => import('./pages/SubjectPracticePage'))
 const CurrentAffairsPage = lazy(() => import('./pages/CurrentAffairsPage'))
 const CaQuestionsPage = lazy(() => import('./pages/CaQuestionsPage'))
+// Resolvers behind the shareable CA deep links (lib/shareLinks.ts). Their own
+// chunks: reached only by someone following a link, never on a normal session.
+const CaMagazineLinkPage = lazy(() => import('./pages/CaMagazineLinkPage'))
+const CaTestLinkPage = lazy(() => import('./pages/CaTestLinkPage'))
 const AptitudePage = lazy(() => import('./pages/AptitudePage'))
 const QuizInstructionsPage = lazy(() => import('./pages/QuizInstructionsPage'))
 const QuizPage = lazy(() => import('./pages/QuizPage'))
@@ -129,6 +133,14 @@ const SHELL_ROUTES: RouteDef[] = [
   { path: '/test-arena/samacheer', element: <SamacheerPage /> },
   { path: '/test-arena/current-affairs', element: <CurrentAffairsPage /> },
   { path: '/test-arena/ca-questions', element: <CaQuestionsPage /> },
+  // Shareable deep links into ONE Current-Affairs issue / ONE day's paper.
+  // Inside the shell (not bare) so a recipient who follows a link keeps the
+  // nav and can carry on into the rest of the app instead of dead-ending on a
+  // lone reader. The dateless forms open the newest published one.
+  { path: '/ca/magazine', element: <CaMagazineLinkPage /> },
+  { path: '/ca/magazine/:date', element: <CaMagazineLinkPage /> },
+  { path: '/ca/test', element: <CaTestLinkPage /> },
+  { path: '/ca/test/:date', element: <CaTestLinkPage /> },
   { path: '/test-arena/aptitude', element: <AptitudePage /> },
   { path: '/test-arena/thirukural', element: <ThirukuralQuizPage /> },
   { path: '/quiz/instructions', element: <QuizInstructionsPage /> },
