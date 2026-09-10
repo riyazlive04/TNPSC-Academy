@@ -94,6 +94,8 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const CrmPage = lazy(() => import('./pages/CrmPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
+const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
+const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
 interface RouteDef {
@@ -347,6 +349,34 @@ function AnimatedRoutes() {
           lib/authRouting). */}
       <Route path="/group-2-test-series" element={<RankBoosterLandingPage />} />
       <Route path="/rank-booster/group-2-test-series" element={<RankBoosterLandingPage />} />
+
+      {/* Standalone public enrollment page for the two Group 1 products - the
+          13-paper Test Series (Test Marathon 2026) and the 6-paper Mock Test
+          Pack - side by side, since an aspirant choosing between them is
+          choosing between exactly these two. Same shape as /rank-booster:
+          purchasable directly once signed in, or via sign-up-then-return for a
+          brand-new visitor. */}
+      <Route path="/group-1" element={<Group1LandingPage />} />
+
+      {/* The two shareable pay links for that page, each opening it on one
+          offer's price banner with that offer's confirm sheet already up. Two
+          paths apiece so a link handed out in either shape works, and both are
+          real routes rather than redirects, so a buyer who has to sign up
+          mid-checkout returns to the exact URL they were sent
+          (GROUP1_SERIES_BUY_PATHS / GROUP1_MOCK_BUY_PATHS in lib/authRouting). */}
+      <Route path="/group-1-test-series" element={<Group1LandingPage />} />
+      <Route path="/group-1/test-series" element={<Group1LandingPage />} />
+      <Route path="/group-1-mock-test" element={<Group1LandingPage />} />
+      <Route path="/group-1/mock-test" element={<Group1LandingPage />} />
+
+      {/* The ₹399 Mock Test Pack on a page of its own, sized to one screen:
+          the offer, the price and the pay button with no scrolling. Unlike the
+          routes above it sells nothing else, so it is the link to hand someone
+          who has already decided. Product-named canonical path plus two short
+          price-named aliases for ads (MOCK_PACK_399_PATHS in lib/authRouting). */}
+      <Route path="/group-1-mock-pack" element={<MockPackLandingPage />} />
+      <Route path="/mock-399" element={<MockPackLandingPage />} />
+      <Route path="/399" element={<MockPackLandingPage />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />

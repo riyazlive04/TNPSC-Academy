@@ -60,12 +60,61 @@ export const RANK_BOOSTER_BUY_PATHS = [
   '/rank-booster/group-2-test-series',
 ] as const
 
+/** The Group 1 landing page itself — the pitch for both Group 1 products
+ *  (the 13-paper Test Series and the 6-paper Mock Test Pack) with neither
+ *  payment sheet pushed to the front. The two pay links below are this same
+ *  page opened on one specific offer. */
+export const GROUP1_LANDING_PATH = '/group-1' as const
+
+/**
+ * Every URL the Group 1 Test Series (Vettri Nichayam) pay page answers on.
+ *
+ * Same two-shape rule as the Group II/IIA links: the canonical, self-
+ * describing link is first — it is what goes out in ads and WhatsApp, where
+ * the exam name is what a buyer recognises — with a nested alias under the
+ * /group-1 prefix alongside it. Both are real routes rather than one
+ * redirecting to the other, so a buyer who signs up mid-checkout returns to
+ * the exact URL they were sent (a redirect would drop the `?from=`
+ * round-trip).
+ */
+export const GROUP1_SERIES_BUY_PATHS = [
+  '/group-1-test-series',
+  '/group-1/test-series',
+] as const
+
+/** Every URL the ₹399 Group 1 Mock Test Pack pay page answers on, for the same
+ *  reasons as above. Distinct from MOCK_PACK_BUY_PATHS, which opens the same
+ *  purchase over the Group II/IIA landing page — that link is already in
+ *  circulation and keeps working unchanged. */
+export const GROUP1_MOCK_BUY_PATHS = ['/group-1-mock-test', '/group-1/mock-test'] as const
+
+/**
+ * Every URL the standalone, single-screen ₹399 page answers on
+ * (MockPackLandingPage) — a page that sells this one plan and nothing else.
+ *
+ * The canonical path is product-named rather than price-named, so it survives
+ * a price change; the two short aliases exist because the campaign for this
+ * offer is spoken about by its price ("the 399 plan") and a short link is what
+ * fits in an ad or a WhatsApp forward. All three are real routes, for the same
+ * mid-checkout-signup reason as the pay links above.
+ *
+ * Note this is a THIRD way to reach the same purchase, alongside
+ * MOCK_PACK_BUY_PATHS (over the Group II/IIA page) and GROUP1_MOCK_BUY_PATHS
+ * (over the Group 1 page). They differ in what a buyer sees behind the offer,
+ * not in what they buy — every one of them charges plan `group1_mock_pack`.
+ */
+export const MOCK_PACK_399_PATHS = ['/group-1-mock-pack', '/mock-399', '/399'] as const
+
 /** Landing pages where a successful auth should resume checkout immediately
  *  rather than dropping the user back on the page cold. */
 const AUTO_ENROLL_PATHS = new Set<string>([
   '/rank-booster',
+  GROUP1_LANDING_PATH,
   ...MOCK_PACK_BUY_PATHS,
   ...RANK_BOOSTER_BUY_PATHS,
+  ...GROUP1_SERIES_BUY_PATHS,
+  ...GROUP1_MOCK_BUY_PATHS,
+  ...MOCK_PACK_399_PATHS,
 ])
 
 export function isAutoEnrollPath(fromPath?: string): boolean {

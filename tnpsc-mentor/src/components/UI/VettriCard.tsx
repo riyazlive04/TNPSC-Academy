@@ -31,9 +31,9 @@ export const VETTRI_PRICE_PAISE = VETTRI_PRICE_RUPEES * 100
 export const VETTRI_MONTH_RUPEES = 499
 export const VETTRI_MONTH_PAISE = VETTRI_MONTH_RUPEES * 100
 
-type VettriPlan = 'full' | 'month'
+export type VettriPlan = 'full' | 'month'
 /** Per-plan checkout config. `id` is the server-validated plan tag in notes.plan. */
-const PLANS: Record<
+export const VETTRI_PLANS: Record<
   VettriPlan,
   {
     /** Ledger plan id; also the key into the store product catalog. */
@@ -68,8 +68,8 @@ const PLANS: Record<
 
 // Core perk (the 13-exam marathon) up top; everything else rides in the
 // "Bonus" extras box beneath it (mirrors the PremiumCard bonus block).
-const PERK_KEYS = ['vettriPerk1'] as const
-const BONUS_KEYS = ['vettriBonus1', 'vettriBonus2', 'vettriBonus3'] as const
+export const VETTRI_PERK_KEYS = ['vettriPerk1'] as const
+export const VETTRI_BONUS_KEYS = ['vettriBonus1', 'vettriBonus2', 'vettriBonus3'] as const
 
 /** A valid, applied coupon (the success branch of CouponValidation). */
 type AppliedCoupon = Extract<CouponValidation, { valid: true }>
@@ -121,7 +121,7 @@ export default function VettriCard({
   // Chosen plan (full ₹1,899 / monthly ₹499). Switching plans clears any applied
   // coupon, since its discount was computed against the other plan's base price.
   const [plan, setPlan] = useState<VettriPlan>('full')
-  const sel = PLANS[plan]
+  const sel = VETTRI_PLANS[plan]
   // Native charges the STORE price for the selected plan, not the rupee constant.
   const { priceString: storePriceString } = useStorePrice(sel.id)
   const showCoupon = couponMode() === 'input'
@@ -297,7 +297,7 @@ export default function VettriCard({
               <Gift size={13} /> {t('vettriBonusTitle')}
             </p>
             <ul className="mt-2 space-y-1">
-              {BONUS_KEYS.map((b) => (
+              {VETTRI_BONUS_KEYS.map((b) => (
                 <li key={b} className="flex items-start gap-1.5 font-body text-xs text-ink">
                   <Check size={12} className="mt-0.5 flex-shrink-0 text-brand" />
                   <span className="tamil">{t(b)}</span>
@@ -321,7 +321,7 @@ export default function VettriCard({
                   plan === p ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
                 }`}
               >
-                {t(PLANS[p].labelKey)} · ₹{PLANS[p].rupees}
+                {t(VETTRI_PLANS[p].labelKey)} · ₹{VETTRI_PLANS[p].rupees}
               </button>
             ))}
           </div>
@@ -429,7 +429,7 @@ export default function VettriCard({
         open={confirmOpen}
         planName={`${t('vettriTitle')} · ${t(sel.labelKey)}`}
         validity={t(sel.validityKey)}
-        perks={[...PERK_KEYS, ...BONUS_KEYS].map((k) => t(k))}
+        perks={[...VETTRI_PERK_KEYS, ...VETTRI_BONUS_KEYS].map((k) => t(k))}
         priceLabel={isFree ? t('premiumFree') : `₹${rupees(finalPaise)}`}
         strikePrice={applied ? `₹${sel.rupees}` : undefined}
         note={t(plan === 'month' ? 'vettriMonthNote' : 'vettriFullNote')}

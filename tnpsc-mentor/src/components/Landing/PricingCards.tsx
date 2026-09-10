@@ -121,7 +121,7 @@ const FREE_ITEMS: { ta: string; en: string }[] = [
 // this plan's real, bigger daily grant (DAILY_CREDIT_GRANT_BOOSTED = 50 in
 // server/src/lib/credits.ts, applied server-side whenever bundleAccess()
 // reports mockPack active), so that one line is replaced rather than reused.
-const MOCK_ITEMS: { ta: string; en: string }[] = [
+export const MOCK_ITEMS: { ta: string; en: string }[] = [
   { ta: '6 முழு நீள குரூப் 1 மாதிரித் தேர்வுகள் (Server-graded)', en: '6 full-length Group 1 mock tests (server-graded)' },
   {
     ta: 'வரம்பற்ற குரூப் 1 முந்தைய ஆண்டு வினாக்கள் (PYQ) — கிரெடிட் கழிக்கப்படாது',
@@ -149,6 +149,17 @@ const MOCK_ICONS = [ListChecks, CalendarDays, Download, Gift, FileText, ShieldCh
 
 // What the Vettri Nichayam bundle unlocks — mirrors the in-app VettriCard.
 // The first item gets an inline "download the schedule" link at render time.
+/** The Mock Pack's plan name and terms, exported alongside MOCK_ITEMS so the
+ *  Group 1 landing page's own card and confirm sheet read from this one copy
+ *  instead of restating it. */
+export const MOCK_PACK_LABELS = {
+  title: T.mockTitle,
+  badge: T.mockBadge,
+  cta: T.ctaMock,
+  duration: T.duration80,
+  oneTimePayment: T.oneTimePayment,
+} as const
+
 const VETTRI_ITEMS: { ta: string; en: string }[] = [
   {
     ta: '13 மாதிரித் தேர்வுகள் (10 பிரிவு வாரியான / 3 முழு மாதிரி)',
@@ -426,8 +437,12 @@ export default function PricingCards({
           })}
         </ul>
         <div className="mt-auto pt-4">
+          {/* Its own landing page, the way the Rank Booster card points at
+              /rank-booster: this card is a summary, and a buyer who taps it
+              wants the schedule, the FAQ and the installment option before
+              paying - not to be dropped into the app to find them. */}
           <a
-            href={webAppHref}
+            href="/group-1"
             onClick={() => track('vettri-card')}
             className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 active:scale-[0.99]"
           >
