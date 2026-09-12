@@ -11,6 +11,7 @@ import {
   bundlePublicUrl,
   type WebBundleRow,
 } from '../lib/webBundles.js'
+import { validateLayout } from '../lib/sdui.js'
 import { readAllSettings, writeSetting, WRITABLE_SETTING_KEYS } from '../lib/settings.js'
 import { notifyUser } from '../notify.js'
 import { invalidateTelecallerRoster } from '../lib/crmAlerts.js'
@@ -551,6 +552,150 @@ router.delete(
     res.json({ deleted: true })
   })
 )
+
+// ─── Server-driven UI layouts ────────────────────────────────────────────────
+// Authoring side of GET /api/app/sdui. A layout is refused unless it validates
+// against the component registry the apps actually ship (lib/sdui.ts), so the
+// failure lands on the author's screen with a list of problems rather than on a
+// student's phone. See docs/SDUI.md.
+
+// ─── GET /api/superadmin/sdui ────────────────────────────────────────────────
+router.get(
+  '/sdui',
+  asyncH(async (_req: AuthedRequest, res) => {
+    const { data, error } = await supabaseAdmin
+      .from('sdui_screens')
+      .select('*')
+      .order('updated_at', { ascending: false })
+    if (error) return sendDbError(res, error)
+    res.json({ layouts: data ?? [] })
+  })
+)
+
+// ─── POST /api/superadmin/sdui ───────────────────────────────────────────────
+// Creates a layout. Always lands inactive: publishing is the separate PATCH, so
+// nothing reaches a device between "saved" and "reviewed".
+router.post(
+  '/sdui',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { key, title, platform, min_app_version, max_app_version, rollout_percent, layout, notes } =
+      req.body ?? {}
+
+    const slot = String(key ?? '').trim()
+    if (!/^[a-z0-9]+(\.[a-z0-9_]+)+$/.test(slot)) {
+      return res.status(400).json({
+        error: 'Key must be a dotted lowercase name, e.g. "home.banners" or "screen.offer".',
+      })
+    }
+
+    const problems = validateLayout(layout)
+    if (problems.length) return res.status(400).json({ error: problems.join('\n'), problems })
+
+    const { data, error } = await supabaseAdmin
+      .from('sdui_screens')
+      .insert({
+        key: slot,
+        title: typeof title === 'string' ? title.trim().slice(0, 120) || null : null,
+        platform: ['all', 'android', 'ios', 'web'].includes(String(platform))
+          ? String(platform)
+          : 'all',
+        min_app_version: typeof min_app_version === 'string' && min_app_version.trim()
+          ? min_app_version.trim()
+          : null,
+        max_app_version: typeof max_app_version === 'string' && max_app_version.trim()
+          ? max_app_version.trim()
+          : null,
+        rollout_percent: clampPercent(rollout_percent),
+        layout,
+        active: false,
+        notes: typeof notes === 'string' ? notes.trim().slice(0, 500) || null : null,
+        updated_by: req.userId ?? null,
+      })
+      .select('*')
+      .single()
+    if (error) return sendDbError(res, error)
+    res.json({ layout: data })
+  })
+)
+
+// ─── PATCH /api/superadmin/sdui/:id ──────────────────────────────────────────
+// Edit, publish (active:true) or roll back (active:false). Editing the tree
+// bumps `revision`, which is what makes the newest edit win on the device and
+// what lets a cached copy know it is stale.
+router.patch(
+  '/sdui/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { title, platform, min_app_version, max_app_version, rollout_percent, layout, active, notes } =
+      req.body ?? {}
+
+    const patch: Record<string, unknown> = { updated_by: req.userId ?? null }
+
+    if (layout !== undefined) {
+      const problems = validateLayout(layout)
+      if (problems.length) return res.status(400).json({ error: problems.join('\n'), problems })
+      patch.layout = layout
+    }
+    if (typeof title === 'string') patch.title = title.trim().slice(0, 120) || null
+    if (platform !== undefined && ['all', 'android', 'ios', 'web'].includes(String(platform))) {
+      patch.platform = String(platform)
+    }
+    if (min_app_version !== undefined) {
+      patch.min_app_version = String(min_app_version).trim() || null
+    }
+    if (max_app_version !== undefined) {
+      patch.max_app_version = String(max_app_version).trim() || null
+    }
+    if (rollout_percent !== undefined) patch.rollout_percent = clampPercent(rollout_percent)
+    if (typeof active === 'boolean') patch.active = active
+    if (typeof notes === 'string') patch.notes = notes.trim().slice(0, 500) || null
+
+    const id = String(req.params.id)
+
+    // A tree edit is a new revision. Read-then-write rather than a SQL
+    // expression because PostgREST has no `revision = revision + 1` form; the
+    // console is single-operator, so the race this leaves is theoretical.
+    if (patch.layout !== undefined) {
+      const { data: current, error: readErr } = await supabaseAdmin
+        .from('sdui_screens')
+        .select('revision')
+        .eq('id', id)
+        .maybeSingle()
+      if (readErr) return sendDbError(res, readErr)
+      if (!current) return res.status(404).json({ error: 'Layout not found.' })
+      patch.revision = ((current as { revision: number }).revision ?? 0) + 1
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('sdui_screens')
+      .update(patch)
+      .eq('id', id)
+      .select('*')
+      .maybeSingle()
+    if (error) return sendDbError(res, error)
+    if (!data) return res.status(404).json({ error: 'Layout not found.' })
+    res.json({ layout: data })
+  })
+)
+
+// ─── DELETE /api/superadmin/sdui/:id ─────────────────────────────────────────
+// Prefer PATCH active:false — that is the rollback and it keeps the record of
+// what was live. Deleting is for drafts that were never published.
+router.delete(
+  '/sdui/:id',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { error } = await supabaseAdmin
+      .from('sdui_screens')
+      .delete()
+      .eq('id', String(req.params.id))
+    if (error) return sendDbError(res, error)
+    res.json({ deleted: true })
+  })
+)
+
+function clampPercent(v: unknown): number {
+  const n = Number(v)
+  return Number.isFinite(n) ? Math.min(100, Math.max(0, Math.trunc(n))) : 100
+}
 
 // ─── GET /api/superadmin/feedback?limit= ─────────────────────────────────────
 router.get(

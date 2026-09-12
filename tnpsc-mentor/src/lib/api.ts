@@ -410,6 +410,33 @@ export interface WebBundle {
   url: string
 }
 
+/** A server-driven UI layout row, as the console sees it. The app itself never
+ *  sees this shape — it gets only the tree, through GET /api/app/sdui. */
+export interface SduiLayoutRow {
+  id: string
+  /** Slot the app asks for: 'home.banners', or 'screen.<name>' for /s/<name>. */
+  key: string
+  title: string | null
+  platform: 'all' | 'android' | 'ios' | 'web'
+  /** Native versionName window — the guard that keeps a layout naming a new
+   *  component away from installs that don't ship it. */
+  min_app_version: string | null
+  max_app_version: string | null
+  rollout_percent: number
+  /** Bumped on every tree edit; highest active revision per key wins. */
+  revision: number
+  layout: { nodes: unknown[] }
+  active: boolean
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type SduiLayoutInput = Pick<
+  SduiLayoutRow,
+  'key' | 'title' | 'platform' | 'min_app_version' | 'max_app_version' | 'rollout_percent' | 'layout' | 'notes'
+>
+
 // ─── CRM wire shapes ─────────────────────────────────────────────────────────
 // The row/domain types themselves live in lib/crm.ts (shared with the UI); these
 // are just the envelopes this client sends and receives.
@@ -962,6 +989,25 @@ export const api = {
     return data.settings
   },
 
+  /**
+   * Every published server-driven layout for this device, keyed by slot (see
+   * docs/SDUI.md). Unauthenticated — layouts are the same for everyone in a
+   * platform/version/rollout group, and audience targeting happens on the
+   * device. A build whose server predates this endpoint simply 404s, which the
+   * SDUI store reads as "nothing published" and every slot keeps its built-in
+   * UI; that is the expected state until the server deploy lands.
+   */
+  async sdui(params: {
+    platform: string
+    version: string
+    deviceId: string
+  }): Promise<{ layouts: Record<string, unknown>; fetched_at: string }> {
+    return request('/api/app/sdui', {
+      auth: false,
+      query: { platform: params.platform, v: params.version, device: params.deviceId },
+    })
+  },
+
   // ─── Analytics ─────────────────────────────────────────────────────────────
   // The dashboard AND the Insights tab both derive everything from this one
   // read, so it is the single most re-fetched call in the app. Cached briefly:
@@ -1448,6 +1494,38 @@ export const api = {
     /** Delete a bundle outright. Prefer `update(id, { active: false })` to roll back. */
     async remove(id: string): Promise<void> {
       await request(`/api/superadmin/web-bundles/${id}`, { method: 'DELETE' })
+    },
+  },
+
+  // ─── Server-driven UI layouts ────────────────────────────────────────────
+  // Superadmin-only authoring for the slots the app renders from the server.
+  // Sibling to webBundles above: that ships new COMPONENTS (a whole `dist`),
+  // this arranges the components a build already has. See docs/SDUI.md.
+  sduiLayouts: {
+    /** Every layout, most recently changed first (drafts included). */
+    async list(): Promise<SduiLayoutRow[]> {
+      const data = await request<{ layouts: SduiLayoutRow[] }>('/api/superadmin/sdui')
+      return data.layouts
+    },
+    /** Create a DRAFT. Publishing is a separate `update(id, { active: true })`. */
+    async create(body: SduiLayoutInput): Promise<SduiLayoutRow> {
+      const data = await request<{ layout: SduiLayoutRow }>('/api/superadmin/sdui', {
+        method: 'POST',
+        body,
+      })
+      return data.layout
+    },
+    /** Edit, publish (`active: true`) or roll back (`active: false`). */
+    async update(id: string, patch: Partial<SduiLayoutInput> & { active?: boolean }): Promise<SduiLayoutRow> {
+      const data = await request<{ layout: SduiLayoutRow }>(`/api/superadmin/sdui/${id}`, {
+        method: 'PATCH',
+        body: patch,
+      })
+      return data.layout
+    },
+    /** Delete outright — for drafts. Use `active: false` to roll back a live one. */
+    async remove(id: string): Promise<void> {
+      await request(`/api/superadmin/sdui/${id}`, { method: 'DELETE' })
     },
   },
 

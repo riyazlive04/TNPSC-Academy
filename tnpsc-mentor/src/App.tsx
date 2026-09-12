@@ -21,6 +21,7 @@ import AppLayout from './components/Layout/AppLayout'
 import ProtectedRoute from './components/Layout/ProtectedRoute'
 import { prefetchRoutes, PREFETCH_ON_BOOT } from './lib/routePrefetch'
 import { useNativeBootstrap } from './hooks/useNativeBootstrap'
+import { useSduiStore } from './lib/sdui/client'
 import ScrollToTop from './components/ScrollToTop'
 import SmoothScroll from './components/SmoothScroll'
 import UpdatePrompt from './components/UpdatePrompt'
@@ -96,6 +97,7 @@ const FlashcardDeck = lazy(() => import('./pages/FlashcardDeck'))
 const BookmarksPage = lazy(() => import('./pages/BookmarksPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
+const SduiScreenPage = lazy(() => import('./pages/SduiScreenPage'))
 const CrmPage = lazy(() => import('./pages/CrmPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
@@ -160,6 +162,10 @@ const SHELL_ROUTES: RouteDef[] = [
   { path: '/bookmarks', element: <BookmarksPage /> },
   { path: '/messages', element: <MessagesPage /> },
   { path: '/superadmin', element: <SuperAdminPage />, role: 'superadmin' },
+  // Screens that exist only as a published layout — no page component, no
+  // release. See docs/SDUI.md; a key with nothing published renders a 404-ish
+  // empty state, which is the normal end of a campaign rather than a fault.
+  { path: '/s/:key', element: <SduiScreenPage /> },
 ]
 
 /**
@@ -201,6 +207,11 @@ export default function App() {
     warmApi()
     init()
     void useAuthConfigStore.getState().init()
+    // Server-driven layouts: one small read that every SDUI slot on every
+    // screen shares. Paints from the device's cached copy first and refreshes
+    // behind it, and a failure (or a server that predates the endpoint) simply
+    // leaves every slot showing the UI baked into this build.
+    void useSduiStore.getState().load()
     // Block copy/cut/paste/long-press selection app-wide in the installed app.
     installCopyGuard()
     // Cookie/tracker consent is auto-accepted (no banner) — this both reads

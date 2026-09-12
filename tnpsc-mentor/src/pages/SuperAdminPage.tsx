@@ -30,6 +30,7 @@ import {
   Download,
   UploadCloud,
   MonitorSmartphone,
+  LayoutTemplate,
   Smartphone,
   Tablet,
   Monitor,
@@ -67,6 +68,7 @@ import ErrorState from '../components/UI/ErrorState'
 import ReportedQuestions from '../components/Admin/ReportedQuestions'
 import ReportResolvedMessageEditor from '../components/SuperAdmin/ReportResolvedMessageEditor'
 import CrmPanel from '../components/SuperAdmin/CrmPanel'
+import SduiSection from '../components/SuperAdmin/SduiSection'
 import {
   api,
   type PlatformMetrics,
@@ -105,7 +107,7 @@ import { invalidatePlanSales } from '../hooks/usePlanSales'
 import { toast } from '../store/toastStore'
 import type { MockExamAdmin, TestSeriesAdmin, VettriExamAdmin, UserRole } from '../types'
 
-type Tab = 'overview' | 'revenue' | 'payments' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions' | 'crm'
+type Tab = 'overview' | 'revenue' | 'payments' | 'users' | 'coupons' | 'notifications' | 'feedback' | 'reports' | 'notes' | 'app' | 'mockexams' | 'testseries' | 'vettri' | 'materials' | 'camagazine' | 'caslides' | 'caquestions' | 'crm' | 'sdui'
 
 export default function SuperAdminPage() {
   const { t } = useT()
@@ -131,6 +133,7 @@ export default function SuperAdminPage() {
     { id: 'camagazine', label: 'caMagazineTab', icon: Newspaper },
     { id: 'caslides', label: 'caSlidesTab', icon: Presentation },
     { id: 'caquestions', label: 'caQuestionsTab', icon: ListChecks },
+    { id: 'sdui', label: 'sduiTab', icon: LayoutTemplate },
     { id: 'app', label: 'appTab', icon: Smartphone },
   ]
 
@@ -233,6 +236,7 @@ export default function SuperAdminPage() {
             {tab === 'camagazine' && <CaMagazineTab />}
             {tab === 'caslides' && <CaSlidesTab />}
             {tab === 'caquestions' && <CaQuestionsTab />}
+            {tab === 'sdui' && <SduiSection />}
             {tab === 'app' && <AppReleasesTab />}
           </div>
         </div>

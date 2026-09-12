@@ -34,6 +34,8 @@ import FlashcardPeek from '../components/Home/FlashcardPeek'
 import DailyCaSheet from '../components/Home/DailyCaSheet'
 import CurrentAffairsHubSheet from '../components/Home/CurrentAffairsHubSheet'
 import { List, ListRow } from '../components/UI/ListRow'
+import SduiSlot from '../components/Sdui/SduiSlot'
+import { useSduiSheetStore } from '../lib/sdui/actions'
 import { CardGrid, GridCard } from '../components/UI/CardRow'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
@@ -328,6 +330,20 @@ export default function TestArenaPage() {
     if (SHOW_MOMENTUM && showMomentum && habit && stats && !isAdmin) consumeMomentum()
   }, [showMomentum, habit, stats, isAdmin, consumeMomentum])
 
+  // A server-driven node can ask for one of this page's sheets (a layout has no
+  // way to reach local state, so it posts a request and the owner opens it).
+  // An id this page doesn't own is cleared and ignored rather than left
+  // pending, so it can't fire later on some other screen.
+  const sheetRequest = useSduiSheetStore((st) => st.requested)
+  const clearSheetRequest = useSduiSheetStore((st) => st.clear)
+  useEffect(() => {
+    if (!sheetRequest) return
+    if (sheetRequest === 'daily_ca') setDailyCaOpen(true)
+    else if (sheetRequest === 'ca_hub') setCaHubOpen(true)
+    else if (sheetRequest === 'thirukural') setThirukuralOpen(true)
+    clearSheetRequest()
+  }, [sheetRequest, clearSheetRequest])
+
   // ─── Admin / superadmin: a focused content-management home (no aspirant
   // gamification - no level, streak, daily goal or achievements). ──────────────
   if (isAdmin) {
@@ -349,6 +365,14 @@ export default function TestArenaPage() {
   // completed test — from the dashboard hero card below.
   const launchStarterTest = () => startTest(starterTestConfig())
   const showFirstTestHero = analytics !== null && analytics.overview.testsTaken === 0
+
+  // Facts the server-driven slots on this page may target on (see SduiSignals).
+  // Passed from what the dashboard has ALREADY fetched for its own strips, so a
+  // targeted banner costs no extra round trip.
+  const sduiSignals = {
+    tests_taken: analytics?.overview.testsTaken ?? 0,
+    streak: habit?.currentStreak ?? 0,
+  }
 
   return (
     <>
@@ -414,6 +438,13 @@ export default function TestArenaPage() {
           )}
         </header>
 
+        {/* A free region under the greeting, owned entirely by the console:
+            an exam-date notice, a results announcement, a one-week campaign.
+            Renders nothing at all until something is published, so it costs an
+            empty slot on a screen that otherwise cannot gain one without a
+            release. */}
+        <SduiSlot name="home.top" signals={sduiSignals} className="space-y-3" />
+
         {/* Group 1 Mock Test Pack + Rank Booster discovery banners. Sit above
             the CA carousel: pricing/enrollment is the highest-intent content on
             the page. Each strip quotes a price, so it is a payment banner and
@@ -428,60 +459,80 @@ export default function TestArenaPage() {
             directly (useMockPackPurchase / useRankBoosterPurchase) rather than
             navigating, so the price shown is one tap from checkout. The Test
             Series keeps its own banner on the /test-series hub. */}
-        {sales.mockPack && !mockPurchase.mockPackUnlocked && (
-          <button
-            onClick={() => mockPurchase.startEnroll()}
-            disabled={mockPurchase.paying}
-            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
-          >
-            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-              <ListChecks size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="tamil block font-display text-sm font-bold tracking-tight">
-                {t('mockPackBannerTitle')}
-              </span>
-              <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-                {t('mockPackBannerSub')}
-              </span>
-            </span>
-            <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-              <span className="font-heading text-sm font-bold">₹{MOCK_PACK_PRICE_RUPEES}</span>
-            </span>
-          </button>
-        )}
+        {/* ── Server-driven region ──────────────────────────────────────
+            Publishing a layout for "home.banners" REPLACES the two strips
+            below; with nothing published (the state every install ships in)
+            they render exactly as before. This is the highest-churn surface on
+            the dashboard — the last month of releases was almost entirely
+            re-pricing and re-ordering these — so it is the first region worth
+            editing from the console instead of through a store review.
 
-        {rankBoosterOn && (sales.rankBooster || rbPurchase.rankBoosterUnlocked) && (
-          <button
-            onClick={() =>
-              rbPurchase.rankBoosterUnlocked
-                ? navigate('/test-series', { state: { tab: 'rankbooster' } })
-                : rbPurchase.startEnroll()
-            }
-            disabled={rbPurchase.paying}
-            className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
-          >
-            <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
-              <Rocket size={20} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="tamil block font-display text-sm font-bold tracking-tight">
-                {t('rankBoosterBannerTitle')}
-              </span>
-              <span className="tamil mt-0.5 block font-body text-xs text-white/85">
-                {t('rankBoosterBannerSub')}
-              </span>
-            </span>
-            {!rbPurchase.rankBoosterUnlocked && (
-              <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
-                <span className="font-body text-2xs text-white/70 line-through">
-                  ₹{RANK_BOOSTER_MRP_RUPEES}
+            A server-driven strip reaches checkout by navigating to
+            /mock-test-pack or /rank-booster, which open the same confirm sheet
+            these buttons do, so nothing about the purchase flow moves. */}
+        <SduiSlot
+          name="home.banners"
+          signals={sduiSignals}
+          className="space-y-3"
+          fallback={
+            <>
+            {sales.mockPack && !mockPurchase.mockPackUnlocked && (
+              <button
+                onClick={() => mockPurchase.startEnroll()}
+                disabled={mockPurchase.paying}
+                className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-brand to-brand-dark px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
+              >
+                <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                  <ListChecks size={20} />
                 </span>
-                <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
-              </span>
+                <span className="min-w-0 flex-1">
+                  <span className="tamil block font-display text-sm font-bold tracking-tight">
+                    {t('mockPackBannerTitle')}
+                  </span>
+                  <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+                    {t('mockPackBannerSub')}
+                  </span>
+                </span>
+                <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+                  <span className="font-heading text-sm font-bold">₹{MOCK_PACK_PRICE_RUPEES}</span>
+                </span>
+              </button>
             )}
-          </button>
-        )}
+
+            {rankBoosterOn && (sales.rankBooster || rbPurchase.rankBoosterUnlocked) && (
+              <button
+                onClick={() =>
+                  rbPurchase.rankBoosterUnlocked
+                    ? navigate('/test-series', { state: { tab: 'rankbooster' } })
+                    : rbPurchase.startEnroll()
+                }
+                disabled={rbPurchase.paying}
+                className="flex w-full items-center gap-3 rounded-card bg-gradient-to-r from-accentwarm to-gold px-4 py-3 text-left text-white transition hover:brightness-105 disabled:opacity-60"
+              >
+                <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-2xl bg-white/15">
+                  <Rocket size={20} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="tamil block font-display text-sm font-bold tracking-tight">
+                    {t('rankBoosterBannerTitle')}
+                  </span>
+                  <span className="tamil mt-0.5 block font-body text-xs text-white/85">
+                    {t('rankBoosterBannerSub')}
+                  </span>
+                </span>
+                {!rbPurchase.rankBoosterUnlocked && (
+                  <span className="flex flex-shrink-0 flex-col items-end rounded-pill bg-white/15 px-3 py-1.5">
+                    <span className="font-body text-2xs text-white/70 line-through">
+                      ₹{RANK_BOOSTER_MRP_RUPEES}
+                    </span>
+                    <span className="font-heading text-sm font-bold">₹{RANK_BOOSTER_PRICE_RUPEES}</span>
+                  </span>
+                )}
+              </button>
+            )}
+            </>
+          }
+        />
 
         {/* Daily Current-Affairs magazines - the last 7 published issues, swiped
             horizontally. Sits directly under the kural: the day's reading is the
@@ -632,6 +683,11 @@ export default function TestArenaPage() {
             />
           </CardGrid>
         </section>
+
+        {/* The tail of the dashboard: the natural home for a survey prompt, a
+            seasonal notice or a link into a /s/<key> screen that exists only as
+            a published layout. Empty until used. */}
+        <SduiSlot name="home.footer" signals={sduiSignals} className="space-y-3" />
       </div>
 
       {/* Flashcard decks, as a card peeking in from the right edge. Portals to

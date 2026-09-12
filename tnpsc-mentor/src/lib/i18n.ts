@@ -2104,6 +2104,7 @@ const STRINGS = {
     ta: 'மாணவர்கள் திருத்தத்திற்காகக் குறித்த வினாக்கள்',
   },
   couponsTab: { en: 'Coupons', ta: 'கூப்பன்கள்' },
+  sduiTab: { en: 'Screen layouts', ta: 'திரை அமைப்புகள்' },
   appTab: { en: 'App', ta: 'ஆப்' },
   materialsTab: { en: 'Materials', ta: 'பொருட்கள்' },
   caMagazineTab: { en: 'CA Magazine', ta: 'CA இதழ்' },

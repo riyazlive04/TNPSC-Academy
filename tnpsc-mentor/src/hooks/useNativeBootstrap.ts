@@ -10,6 +10,9 @@
 //  • live updates — tell the updater plugin this web bundle booted, so an OTA
 //                   bundle that white-screens rolls itself back instead of
 //                   needing a store release to fix.
+//  • SDUI version — record the installed versionName, which is how a published
+//                   layout is kept away from builds that lack the components it
+//                   names (docs/SDUI.md).
 //  • purchases    — re-submit anything the store charged for but our server never
 //                   recorded (app killed mid-purchase, offline at the wrong
 //                   moment). Without this a user can be charged with no access.
@@ -24,6 +27,9 @@ import { Capacitor } from '@capacitor/core'
 import { useNavigate } from 'react-router-dom'
 import { finishPendingPurchases } from '../lib/iap'
 import { initLiveUpdates } from '../lib/liveUpdate'
+import { installedVersion } from '../lib/appUpdate'
+import { setSduiAppVersion } from '../lib/sdui/context'
+import { useSduiStore } from '../lib/sdui/client'
 import { refreshNativePushToken } from '../lib/nativePush'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useCreditsStore } from '../store/creditsStore'
@@ -66,6 +72,18 @@ export function useNativeBootstrap(): void {
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return
     void initLiveUpdates()
+  }, [])
+
+  // ── SDUI: publish this install's native version, then (re)load layouts ──
+  // The version gates which published layouts this build may render, so the
+  // reload is sequenced AFTER it is known — a first launch would otherwise ask
+  // for layouts as if it were the web build and cache a version-blind answer.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return
+    void (async () => {
+      setSduiAppVersion(await installedVersion())
+      await useSduiStore.getState().load({ force: true })
+    })()
   }, [])
 
   // ── Recover interrupted purchases, once we know who is signed in ──

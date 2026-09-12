@@ -3,6 +3,7 @@ import { rateLimit } from 'express-rate-limit'
 import { asyncH } from '../util.js'
 import { apkPublicUrl, currentRelease } from '../lib/appReleases.js'
 import { BUILTIN, bundlePublicUrl, pickBundle } from '../lib/webBundles.js'
+import { pickLayouts, toWireLayout } from '../lib/sdui.js'
 import { readPublicSettings } from '../lib/settings.js'
 
 // Public (unauthenticated) app-distribution routes. The landing page — served on
@@ -101,6 +102,56 @@ router.post(
       checksum: bundle.checksum,
       message: bundle.notes ?? '',
     })
+  })
+)
+
+// ─── GET /api/app/sdui ───────────────────────────────────────────────────────
+// Every published server-driven layout this device should render, keyed by slot
+// (see src/lib/sdui/ and docs/SDUI.md). The client fetches this once per launch
+// and caches it, so a screen with several server-driven regions costs one small
+// request rather than one per region.
+//
+// Unauthenticated on purpose: layouts are the same for everyone in a given
+// platform/version/rollout group, and audience targeting (paid vs. free, Tamil
+// vs. English) happens on the DEVICE against state it already holds. That keeps
+// this endpoint cacheable and means the login and landing screens can carry a
+// server-driven slot too. Nothing user-specific is ever in a response.
+//
+// A failure answers an empty set rather than an error: every slot falls back to
+// the UI baked into the build, which is exactly what shipped before any layout
+// existed.
+const sduiLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 240,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'too_many_requests', message: 'Too many layout checks.' },
+})
+
+router.get(
+  '/sdui',
+  sduiLimiter,
+  asyncH(async (req, res) => {
+    const platform = String(req.query.platform ?? 'web').slice(0, 16)
+    const version = String(req.query.v ?? '').slice(0, 24)
+    const deviceId = String(req.query.device ?? '').slice(0, 64)
+
+    let layouts: Record<string, ReturnType<typeof toWireLayout>> = {}
+    try {
+      const rows = await pickLayouts({ platform, version, deviceId })
+      layouts = Object.fromEntries(
+        Object.entries(rows).map(([key, row]) => [key, toWireLayout(row)])
+      )
+    } catch (e) {
+      // A DB blip must not blank a dashboard — answer "nothing published".
+      console.error('[sdui]', e)
+    }
+
+    // Short shared cache: a publish should reach devices in about a minute,
+    // and this endpoint is hit on every launch by every install.
+    res.set('Cache-Control', 'public, max-age=60')
+    res.json({ layouts, fetched_at: new Date().toISOString() })
   })
 )
 
