@@ -98,3 +98,16 @@ create trigger sdui_screens_touch
 
 -- Lock the table: RLS on, no policies → service-role (the server) only.
 alter table public.sdui_screens enable row level security;
+
+-- ─── Take back the stack's blanket grants ───────────────────────────────────
+-- Self-hosted Supabase's ALTER DEFAULT PRIVILEGES hands anon/authenticated a
+-- GRANT ALL on every new table in `public`. RLS already denies them (no
+-- policies), so this is defence in depth rather than the actual protection —
+-- the same treatment crm.sql gives its tables, and for the same reason: a
+-- layout registry is an authoring surface, and a client has no business
+-- reaching it directly. The server reads it as `service_role`, which keeps its
+-- grants and bypasses RLS.
+--
+-- Must stay LAST in this file: a later CREATE TABLE would pick the default
+-- grants straight back up.
+revoke all on public.sdui_screens from anon, authenticated;
