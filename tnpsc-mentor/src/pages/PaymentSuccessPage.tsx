@@ -18,6 +18,10 @@ const PLAN_META: Record<
     /** Which entitlementsStore/premiumStore boolean proves this specific plan
      *  is actually active - see the `confirmed` check below. */
     flag: 'premium' | 'vettri' | 'rankBooster' | 'mockPack'
+    /** Where "Start practising" goes. Defaults to the Test Arena; a plan that
+     *  is one product opens that product, so a buyer who paid from its link
+     *  lands on what they bought rather than hunting for it. */
+    startPath?: string
   }
 > = {
   premium: {
@@ -66,6 +70,7 @@ const PLAN_META: Record<
     ],
     accent: 'gold',
     flag: 'rankBooster',
+    startPath: '/test-series?tab=rankbooster',
   },
   group1_mock_pack: {
     nameKey: 'mockPackBannerTitle',
@@ -207,7 +212,7 @@ export default function PaymentSuccessPage() {
         {/* replace:true keeps Back from bouncing through the success screen. */}
         <div className="mt-6 flex flex-col gap-2.5">
           <button
-            onClick={() => navigate('/test-arena', { replace: true })}
+            onClick={() => navigate(plan.startPath ?? '/test-arena', { replace: true })}
             className="btn-wrap btn-brand w-full px-6 py-3 text-sm"
           >
             {t('paySuccessStart')} <ArrowRight size={16} />

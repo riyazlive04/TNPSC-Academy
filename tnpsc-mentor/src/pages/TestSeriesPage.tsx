@@ -28,8 +28,8 @@ import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { useAuth } from '../hooks/useAuth'
 import { useT } from '../lib/i18n'
+import { shownHubTab, type HubTab } from '../lib/testSeriesFlags'
 
-type HubTab = 'vettri' | 'rankbooster' | 'overall'
 /** Within the Group 1 tab: the scheduled series, or the full mock papers. */
 type G1View = 'series' | 'mock'
 
@@ -78,7 +78,11 @@ export default function TestSeriesPage() {
         ? 'vettri'
         : 'rankbooster')
 
-  const [tab, setTabState] = useState<HubTab>(initialTab)
+  const [chosenTab, setChosenTab] = useState<HubTab>(initialTab)
+  // A product that is switched off hands its tab to the other one. Derived, not
+  // stored: see shownHubTab for why an effect correcting state here once left
+  // Group II/IIA links showing the Group 1 series.
+  const tab = shownHubTab(chosenTab, { marathon: marathonOn, rankBooster: rankBoosterOn })
   const [g1View, setG1ViewState] = useState<G1View>(urlG1View)
 
   /** Write the current position into the URL (replace: no history spam from a
@@ -101,20 +105,11 @@ export default function TestSeriesPage() {
    * just left, which is precisely what a reload would then restore.
    */
   const goTo = (nextTab: HubTab, nextView: G1View) => {
-    setTabState(nextTab)
+    setChosenTab(nextTab)
     setG1ViewState(nextView)
     syncUrl(nextTab, nextView)
   }
   const setG1View = (next: G1View) => goTo(next === 'mock' ? 'vettri' : tab, next)
-  // Both flags default false until the settings fetch resolves. If whichever
-  // tab we're sitting on turns out to be off, land on the other one instead —
-  // only fires on that one resolution, never overrides a manual tab click.
-  useEffect(() => {
-    // setTabState, not setTab: this is a correction for a product being off,
-    // not a place the user chose, so it must not rewrite their URL.
-    if (!rankBoosterOn && marathonOn) setTabState('vettri')
-    else if (!marathonOn && rankBoosterOn) setTabState('rankbooster')
-  }, [marathonOn, rankBoosterOn])
 
   // Click-and-drag-to-scroll for the promo banner stack below: a mouse user can
   // grab anywhere on a banner and drag to scroll the page, not just the edge

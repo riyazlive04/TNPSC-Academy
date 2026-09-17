@@ -406,9 +406,9 @@ export default function RankBoosterLandingPage() {
    *  section instead of a purchase flow. */
   const handleEnrollClick = () => {
     if (!isAuthenticated) return goAuth('/register')
-    if (ownsRankBooster) {
-      return navigate('/test-series', { state: { tab: 'rankbooster' } })
-    }
+    // In the URL rather than router state, so a reload after the hand-off
+    // still lands on the Group II/IIA tab.
+    if (ownsRankBooster) return navigate('/test-series?tab=rankbooster')
     // Taken off sale: the server would refuse the order anyway, so send them
     // into the app rather than into a checkout that cannot complete. The
     // pricing grid further down drops the card on the same flag.
