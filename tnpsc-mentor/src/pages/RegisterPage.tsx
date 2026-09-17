@@ -788,8 +788,10 @@ export default function RegisterPage() {
 
         <div className="mt-6 text-center text-sm">
           <span className="text-ink2">{t('alreadyRegistered')} </span>
+          {/* Same deep-link carry as LoginPage's link to here. */}
           <Link
             to="/login"
+            state={fromPath ? { from: { pathname: fromPath } } : undefined}
             className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
           >
             {t('signIn')}

@@ -559,8 +559,11 @@ export default function LoginPage() {
             ("free") rather than what it does ("create an account"). */}
         <p className="tamil mt-6 text-center font-body text-sm text-ink2">
           {t('newHere')}{' '}
+          {/* Carries the deep link along, or a visitor bounced here on the way
+              to a page who then signs up instead lands on the dashboard. */}
           <Link
             to="/register"
+            state={fromPath ? { from: { pathname: fromPath } } : undefined}
             className="focus-ring rounded font-heading font-bold text-brand transition hover:text-brand-dark"
           >
             {t('registerForFree')}

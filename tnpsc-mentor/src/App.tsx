@@ -14,7 +14,7 @@ import { useThemeStore } from './store/themeStore'
 import { useUpsellStore } from './store/upsellStore'
 import { api, warmApi } from './lib/api'
 import { installCopyGuard } from './lib/copyGuard'
-import { trackPageView } from './lib/tracking'
+import { trackPageView, trackViewContent } from './lib/tracking'
 import { pageVariants } from './lib/motion'
 import { useT } from './lib/i18n'
 import AppLayout from './components/Layout/AppLayout'
@@ -348,10 +348,16 @@ function AnimatedRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Standalone public enrollment page for the Group II/IIA Rank Booster
-          test series (marketing/ad landing target) — purchasable directly
-          once signed in, or via sign-up-then-return for a brand-new visitor. */}
-      <Route path="/rank-booster" element={<RankBoosterLandingPage />} />
+      {/* The Group II/IIA links skip the public landing page and open the
+          app's Test Series page on its Group II/IIA tab, where the ₹1,249
+          banner is the purchase (see Group2SeriesLink). RankBoosterLandingPage
+          is kept in the tree for the mock-pack links below, so restoring it
+          here is one route away. Both shapes of the dedicated link are kept
+          (RANK_BOOSTER_BUY_PATHS in lib/authRouting) because both are already
+          in circulation. */}
+      <Route path="/rank-booster" element={<Group2SeriesLink />} />
+      <Route path="/group-2-test-series" element={<Group2SeriesLink />} />
+      <Route path="/rank-booster/group-2-test-series" element={<Group2SeriesLink />} />
 
       {/* The shareable pay link for the ₹399 Group 1 Mock Test Pack. Renders
           THIS page with the confirm sheet already open over it, rather than a
@@ -363,15 +369,6 @@ function AnimatedRoutes() {
           (MOCK_PACK_BUY_PATHS in lib/authRouting). */}
       <Route path="/mock-test-pack" element={<RankBoosterLandingPage />} />
       <Route path="/rank-booster/mock-test-pack" element={<RankBoosterLandingPage />} />
-
-      {/* The dedicated, self-describing link for the ₹1,249 Group II/IIA test
-          series — the same page as /rank-booster, but named for the exam it
-          sells rather than the internal product name, opened on its ₹1,249
-          price banner with the confirm sheet already up. Two paths for the
-          same reason the mock-pack link has two (RANK_BOOSTER_BUY_PATHS in
-          lib/authRouting). */}
-      <Route path="/group-2-test-series" element={<RankBoosterLandingPage />} />
-      <Route path="/rank-booster/group-2-test-series" element={<RankBoosterLandingPage />} />
 
       {/* Standalone public enrollment page for the two Group 1 products - the
           13-paper Test Series (Test Marathon 2026) and the 6-paper Mock Test
@@ -455,6 +452,28 @@ function RootRedirect() {
   // through a redirect the ProtectedRoute would have to undo.
   if (user) return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
   return <Navigate to="/login" replace />
+}
+
+/** The Group II/IIA links (/rank-booster, /group-2-test-series and its nested
+ * alias): straight into the Test Series page on its Group II/IIA tab.
+ *
+ * A guest goes to signup first, since these links are handed to people who
+ * have not bought yet. The destination rides in ?from= rather than router
+ * state so it survives an in-app browser (Instagram, WhatsApp) handing the
+ * page to the real one. It carries no ?tab because sanitizeFromPath only
+ * accepts a bare path, and Group II/IIA is the hub's default tab anyway.
+ *
+ * ViewContent still fires here so ad reporting keeps counting arrivals on the
+ * link, as it did when the landing page sat at these URLs. */
+function Group2SeriesLink() {
+  const user = useAuthStore((s) => s.user)
+  const loading = useAuthStore((s) => s.loading)
+  useEffect(() => {
+    trackViewContent({ contentName: 'Group2TestSeriesPayLink', contentCategory: 'landing' })
+  }, [])
+  if (loading) return <PageLoader />
+  if (user) return <Navigate to="/test-series?tab=rankbooster" replace />
+  return <Navigate to="/register?from=/test-series" replace />
 }
 
 /** Full-screen fallback — only for screens that own the whole viewport (auth,
