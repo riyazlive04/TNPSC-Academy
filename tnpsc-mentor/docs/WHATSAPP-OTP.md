@@ -1,5 +1,13 @@
 # WhatsApp signup OTP (AiSensy)
 
+> **Superseded 2026-09-17: delivery now goes through Wasi, not AiSensy.** The
+> AiSensy plan lapsed on 2026-09-13, and every send after that failed with
+> `No Plan active on assistant!`. The server now calls Wasi's Hub API
+> (`POST /api/v1/messages`, Authentication template `signup_otp2`) using
+> `WASI_API_KEY` / `WASI_CLIENT_ID` / `WASI_OTP_TEMPLATE`; see
+> `server/.env.example`. The flow, ticket gate and Telegram fallback below
+> are unchanged. The AiSensy setup steps are kept only as history.
+
 Signup verifies that the aspirant **owns** the mobile number they register:
 a 6-digit code is sent to that number **on WhatsApp**, and the account is only
 created after the code checks out. Delivery goes through

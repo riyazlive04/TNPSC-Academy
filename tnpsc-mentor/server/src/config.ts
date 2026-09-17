@@ -80,16 +80,18 @@ export const config = {
   // Country code prefixed to the 10-digit Indian mobile before calling MSG91,
   // which wants the full international number with no leading '+'.
   msg91CountryCode: process.env.MSG91_COUNTRY_CODE ?? '91',
-  // ─── AiSensy — WhatsApp signup OTP (optional) ────────────────────────────────
-  // Official WhatsApp Business API platform (aisensy.com) used to send the
-  // one-time code that verifies phone OWNERSHIP at signup, through a
-  // Meta-approved Authentication template wired to an AiSensy "API campaign".
-  // Unlike MSG91, AiSensy only delivers messages — this server generates,
-  // stores (hashed) and verifies the code itself (see lib/whatsappOtp.ts).
-  // When either of these is blank the /register/otp endpoints return 503 and
-  // /register works exactly as before (no phone verification required).
-  aisensyApiKey: process.env.AISENSY_API_KEY ?? '',
-  aisensyCampaignName: process.env.AISENSY_CAMPAIGN_NAME ?? '',
+  // ─── Wasi — WhatsApp signup OTP (optional) ───────────────────────────────────
+  // Sirah's WhatsApp Business API hub (wasi.sirahagents.com; replaced AiSensy
+  // 2026-09-17) used to send the one-time code that verifies phone OWNERSHIP at
+  // signup, through a Meta-approved Authentication template on the Tnpsc
+  // Mentors WABA. Wasi only delivers messages — this server generates, stores
+  // (hashed) and verifies the code itself (see lib/whatsappOtp.ts).
+  // When the key, client id or template is blank the /register/otp endpoints
+  // return 503 and /register works exactly as before (no phone verification).
+  wasiBaseUrl: process.env.WASI_BASE_URL ?? 'https://wasi.sirahagents.com',
+  wasiApiKey: process.env.WASI_API_KEY ?? '',
+  wasiClientId: process.env.WASI_CLIENT_ID ?? '',
+  wasiOtpTemplate: process.env.WASI_OTP_TEMPLATE ?? '',
   // ─── Telegram bot — signup phone verification fallback (optional) ───────────
   // For numbers with no WhatsApp: the user opens this bot via a one-time deep
   // link and shares their Telegram-verified phone number, which must match the
@@ -162,10 +164,10 @@ export const pushEnabled = Boolean(config.vapidPublicKey && config.vapidPrivateK
 /** True when MSG91 OTP credentials are present — gates phone-OTP login. */
 export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTemplateId)
 
-/** True when AiSensy is fully configured — gates the WhatsApp signup-OTP
+/** True when Wasi is fully configured — gates the WhatsApp signup-OTP
  * endpoints AND makes /register require a verified-phone ticket. */
 export const whatsappOtpEnabled = Boolean(
-  config.aisensyApiKey && config.aisensyCampaignName
+  config.wasiApiKey && config.wasiClientId && config.wasiOtpTemplate
 )
 
 /** True when the Telegram bot is configured — gates the Telegram fallback for

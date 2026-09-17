@@ -1,18 +1,20 @@
-// ─── WhatsApp signup OTP (AiSensy) ───────────────────────────────────────────
+// ─── WhatsApp signup OTP (Wasi) ──────────────────────────────────────────────
 // Sends and verifies the one-time code that proves a user OWNS the mobile
 // number they typed at signup. Unlike MSG91 (which owns the whole OTP
-// lifecycle), AiSensy is a dumb pipe — a WhatsApp Business API platform
-// (aisensy.com) that delivers a Meta-approved Authentication template through
-// its "API campaign" endpoint. So THIS module owns code generation, storage
-// and verification: codes live in public.phone_otps as an HMAC only
-// (service-role access only), expire after 10 minutes, allow 5 wrong guesses,
-// and a fresh code can't be re-requested inside a 45 s cooldown.
+// lifecycle), Wasi is a dumb pipe — Sirah's WhatsApp Business API hub
+// (wasi.sirahagents.com; replaced AiSensy 2026-09-17 after its plan lapsed)
+// that delivers a Meta-approved Authentication template through its Hub API.
+// So THIS module owns code generation, storage and verification: codes live
+// in public.phone_otps as an HMAC only (service-role access only), expire
+// after 10 minutes, allow 5 wrong guesses, and a fresh code can't be
+// re-requested inside a 45 s cooldown.
 //
 // The message text lives in the approved template, not here — Meta only
 // permits OTP content in AUTHENTICATION-category templates, whose body is
 // fixed ("<code> is your verification code…" + copy-code button); custom
-// wording gets auto-rejected. The template behind AISENSY_CAMPAIGN_NAME must
-// take the code as its single body param AND as the copy-code button param.
+// wording gets auto-rejected. The template behind WASI_OTP_TEMPLATE takes the
+// code as body param {{1}}, and Wasi must also fill the copy-code button's
+// url param with it — Meta rejects an Authentication send missing either.
 
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { config } from '../config.js'
@@ -23,8 +25,6 @@ const RESEND_COOLDOWN_S = 45
 const MAX_ATTEMPTS = 5
 // India-only app (every entry point validates a 6-9 leading 10-digit mobile).
 const COUNTRY_CODE = '91'
-
-const AISENSY_ENDPOINT = 'https://backend.aisensy.com/campaign/t1/api/v2'
 
 export type SendResult =
   | { ok: true }
@@ -42,35 +42,33 @@ function hashOtp(tenDigit: string, code: string): string {
     .digest('base64url')
 }
 
-/** Fire the AiSensy API campaign that delivers the code. Never throws —
- * network/DNS failures come back as status 0 so callers surface a clean 502
- * instead of a stack trace. Note "accepted" here means AiSensy queued the
- * message with Meta, not that it reached a handset — a number with no WhatsApp
- * fails silently downstream (there is no pre-send lookup on the official API). */
-async function aisensySend(tenDigit: string, code: string): Promise<{ status: number; data: unknown }> {
+/** Send the Authentication template that delivers the code through Wasi's Hub
+ * API. Never throws — network/DNS failures come back as status 0 so callers
+ * surface a clean 502 instead of a stack trace. Note a 2xx here means Meta
+ * accepted the message, not that it reached a handset — a number with no
+ * WhatsApp fails silently downstream (there is no pre-send lookup on the
+ * official API). */
+async function wasiSend(tenDigit: string, code: string): Promise<{ status: number; data: unknown }> {
   try {
-    const res = await fetch(AISENSY_ENDPOINT, {
+    const res = await fetch(`${config.wasiBaseUrl}/api/v1/messages`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.wasiApiKey}`,
+      },
       body: JSON.stringify({
-        apiKey: config.aisensyApiKey,
-        campaignName: config.aisensyCampaignName,
-        destination: `${COUNTRY_CODE}${tenDigit}`,
-        // Names the contact inside AiSensy's CRM; no real name exists yet at
-        // this point in signup, so the number itself is the honest label.
-        userName: tenDigit,
-        // Authentication templates want the code twice: once for the body
-        // param, once for the copy-code (url-type) button param.
-        templateParams: [code],
-        buttons: [
-          {
-            type: 'button',
-            sub_type: 'url',
-            index: 0,
-            parameters: [{ type: 'text', text: code }],
-          },
-        ],
+        // Must match the key's own client — Wasi rejects a mismatch (403).
+        client_id: config.wasiClientId,
+        to: `${COUNTRY_CODE}${tenDigit}`,
+        type: 'template',
+        template: config.wasiOtpTemplate,
+        // Positional {{1}}; Wasi mirrors it into the copy-code button param
+        // for Authentication templates.
+        params: { '1': code },
       }),
+      // Wasi waits on Meta's Graph API before answering; don't let a hung
+      // upstream hold the signup request open indefinitely.
+      signal: AbortSignal.timeout(15_000),
     })
     return { status: res.status, data: await res.json().catch(() => ({})) }
   } catch (e) {
@@ -108,9 +106,13 @@ export async function sendSignupOtp(tenDigit: string): Promise<SendResult> {
     return { ok: false, code: 'store_failed' }
   }
 
-  const { status, data } = await aisensySend(tenDigit, code)
+  const { status, data } = await wasiSend(tenDigit, code)
   if (status < 200 || status >= 300) {
     console.error('[wa-otp] send failed', tenDigit, status, JSON.stringify(data).slice(0, 300))
+    // Drop the undelivered code so a retry sends a fresh one instead of
+    // tripping the cooldown and landing on a code-entry step for a message
+    // that never went out.
+    await supabaseAdmin.from('phone_otps').delete().eq('phone', tenDigit)
     return { ok: false, code: 'send_failed' }
   }
 

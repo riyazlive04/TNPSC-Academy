@@ -385,7 +385,7 @@ async function emailStatus(email: string): Promise<'none' | 'google' | 'password
   return s === 'google' || s === 'password' ? s : 'none'
 }
 
-// ─── Signup phone verification (WhatsApp OTP via AiSensy) ─────────────────────
+// ─── Signup phone verification (WhatsApp OTP via Wasi) ────────────────────────
 // Proves the user OWNS the number BEFORE the account exists: send a code to the
 // number's WhatsApp, verify it, and hand back a short-lived signed ticket that
 // /register then requires. Reuses the login-OTP rate limiters (phone+IP).
