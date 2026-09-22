@@ -38,7 +38,7 @@ import {
   VETTRI_BONUS_KEYS,
 } from '../components/UI/VettriCard'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
-import FloatingLangSwitch, { useLandingLang } from '../components/Landing/FloatingLangSwitch'
+import LandingLangPrompt, { useLandingLang } from '../components/Landing/LandingLangPrompt'
 import PricingCards, { MOCK_ITEMS, MOCK_PACK_LABELS } from '../components/Landing/PricingCards'
 import Reveal from '../components/Landing/Reveal'
 import PercentileDemoCard from '../components/Landing/PercentileDemoCard'
@@ -513,7 +513,7 @@ export default function Group1LandingPage() {
   // two click handlers below.
   const sales = usePlanSales()
 
-  const [lang, setLang] = useLandingLang()
+  const [lang, setLang, langChosen] = useLandingLang()
   const t = (key: keyof typeof T) => T[key][lang]
   // Global i18n (src/lib/i18n.ts) driven by THIS page's own toggle rather than
   // the app's language store — used to pull the shared Vettri perk/bonus copy
@@ -656,9 +656,7 @@ export default function Group1LandingPage() {
   const mockPerks = MOCK_ITEMS.map((it) => it[lang])
 
   return (
-    // pb-48 on phones clears both the sticky CTA bar and the floating language
-    // button above it, so the footer's last line can scroll out from under them.
-    <div className="min-h-screen overflow-x-clip bg-canvas pb-48 sm:pb-0">
+    <div className="min-h-screen overflow-x-clip bg-canvas pb-24 sm:pb-0">
       {/* ─── Header ───────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3">
@@ -1405,13 +1403,7 @@ export default function Group1LandingPage() {
         )}
       </div>
 
-      {/* Lifted clear of the sticky CTA bar above on phones (a Tamil CTA can
-          wrap that bar to ~84px); the bar is gone from sm up. */}
-      <FloatingLangSwitch
-        lang={lang}
-        onChange={setLang}
-        positionClassName="bottom-[calc(7.75rem+env(safe-area-inset-bottom))] sm:bottom-12"
-      />
+      <LandingLangPrompt open={!langChosen} onChoose={setLang} />
 
       {/* Pre-payment recaps - opened directly by the CTAs above for an eligible
           signed-in visitor; confirming opens Razorpay, no extra scroll or

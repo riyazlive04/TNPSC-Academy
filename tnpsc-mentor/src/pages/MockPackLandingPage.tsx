@@ -22,7 +22,7 @@ import { MOCK_ITEMS } from '../components/Landing/PricingCards'
 import { usePlanSales } from '../hooks/usePlanSales'
 import { trackViewContent, trackInitiateCheckout } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
-import FloatingLangSwitch, { useLandingLang } from '../components/Landing/FloatingLangSwitch'
+import LandingLangPrompt, { useLandingLang } from '../components/Landing/LandingLangPrompt'
 
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 
@@ -115,10 +115,7 @@ export default function MockPackLandingPage() {
   const purchase = useMockPackPurchase()
   const sales = usePlanSales()
 
-  const [lang, setLang] = useLandingLang()
-  // The price card the floating language button must never cover (it lands
-  // in the same corner on a short phone) - see FloatingLangSwitch avoidRef.
-  const priceCard = useRef<HTMLDivElement>(null)
+  const [lang, setLang, langChosen] = useLandingLang()
   const t = (key: keyof typeof T) => T[key][lang]
 
   useEffect(() => {
@@ -287,7 +284,7 @@ export default function MockPackLandingPage() {
 
           {/* Right - price and the one button */}
           <div className="mx-auto w-full max-w-sm lg:mx-0 lg:ml-auto">
-            <div ref={priceCard} className="card overflow-hidden p-4 shadow-card ring-1 ring-sky/25 sm:p-6">
+            <div className="card overflow-hidden p-4 shadow-card ring-1 ring-sky/25 sm:p-6">
               <div className="tamil -mx-4 -mt-4 mb-3 bg-gradient-to-r from-sky to-brand px-2 py-2 text-center font-heading text-2xs font-bold uppercase leading-tight text-white sm:-mx-6 sm:-mt-6 sm:mb-4">
                 {t('priceBadge')}
               </div>
@@ -360,13 +357,8 @@ export default function MockPackLandingPage() {
       </main>
 
       {/* ─── Footer - one line, so it costs almost no vertical space ──────── */}
-      {/* On phones the right-hand 7.5rem is left to the floating language
-          button, which sits in that corner: the policy links wrap to the left
-          of it instead of under it, at any scroll position, without adding
-          height to a page meant to fit one screen. From sm up the button is
-          lifted clear of the one-line footer instead. */}
       <footer className="shrink-0 border-t border-line bg-card">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-4 gap-y-1 py-2.5 pl-4 pr-[7.5rem] font-body text-2xs text-ink2 sm:justify-between sm:px-6">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 py-2.5 font-body text-2xs text-ink2 sm:justify-between sm:px-6">
           <span className="tamil">© 2026 TNPSC Mentors</span>
           <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <a href="/privacy" className="tamil transition hover:text-brand-dark">{t('privacy')}</a>
@@ -377,12 +369,7 @@ export default function MockPackLandingPage() {
         </div>
       </footer>
 
-      <FloatingLangSwitch
-        lang={lang}
-        onChange={setLang}
-        positionClassName="bottom-11 sm:bottom-20"
-        avoidRef={priceCard}
-      />
+      <LandingLangPrompt open={!langChosen} onChoose={setLang} />
     </div>
   )
 }
