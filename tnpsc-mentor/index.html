@@ -109,14 +109,14 @@
         } catch (e) {}
       })()
     </script>
-    <title>TNPSC Mentors – TNPSC Test Series, Group 2 & Previous Year Questions</title>
+    <title>TNPSC Mentors – TNPSC Test Series for Group 1, 2 & 4 with Previous Year Questions</title>
     <meta
       name="description"
-      content="Free TNPSC test series in Tamil &amp; English: Group 2 test series with General English &amp; General Tamil tests, previous year questions with explanations, and a daily current affairs test. Practice online with TNPSC Mentors."
+      content="Free TNPSC test series in Tamil &amp; English for Group 1, Group 2 / 2A and Group 4: mock tests, Group 2 General English &amp; General Tamil tests, previous year questions with explanations, and a daily current affairs test. Practice online with TNPSC Mentors."
     />
     <meta
       name="keywords"
-      content="TNPSC, TNPSC test series, TNPSC Group 2 test series, Group 2 General English test series, Group 2 General Tamil test series, TNPSC previous year questions, previous year questions with explanation, TNPSC daily current affairs test, TNPSC online test, TNPSC mock test"
+      content="TNPSC, TNPSC test series, TNPSC Group 1 test series, TNPSC Group 2 test series, TNPSC Group 4 test series, Group 2 General English test series, Group 2 General Tamil test series, TNPSC previous year questions, previous year questions with explanation, TNPSC daily current affairs test, TNPSC online test, TNPSC mock test"
     />
     <meta name="author" content="TNPSC Mentors" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -128,6 +128,16 @@
     <script>
       (function () {
         try {
+          // Drop a trailing slash before anything reads the path. A shared link
+          // with a preview of its own is served from dist/<path>/index.html (see
+          // src/lib/shareMeta.ts), and an nginx that reaches it through `$uri/`
+          // 301s /path to /path/ on the way. The pay-link pages compare exact
+          // paths (MOCK_PACK_BUY_PATHS etc.), so /rank-booster/mock-test-pack/
+          // would quietly lose its auto-opening checkout sheet.
+          var p = location.pathname
+          if (p.length > 1 && p.charAt(p.length - 1) === '/') {
+            history.replaceState(history.state, '', p.replace(/\/+$/, '') + location.search + location.hash)
+          }
           var d = document
           var canonical = d.createElement('link')
           canonical.rel = 'canonical'
@@ -141,12 +151,18 @@
       })()
     </script>
 
-    <!-- Social sharing (Open Graph + Twitter card) -->
+    <!-- Social sharing (Open Graph + Twitter card). These are the DEFAULT
+         preview, used by any link without one of its own, so they name no single
+         exam group. The shareable group links (Group 1 / 2 / 4 pay links and PYQ
+         pages) get their own copy of this file at build time with these tags
+         swapped — see src/lib/shareMeta.ts. Keep the tags' shape (attribute
+         order, one content="" each): the build finds them by pattern and fails
+         if it cannot. -->
     <meta property="og:site_name" content="TNPSC Mentors" />
-    <meta property="og:title" content="TNPSC Test Series, Group 2 & Previous Year Questions – TNPSC Mentors" />
+    <meta property="og:title" content="TNPSC Test Series – Group 1, 2 & 4 Mock Tests and Previous Year Questions" />
     <meta
       property="og:description"
-      content="Free TNPSC test series in Tamil & English: Group 2 (General English & General Tamil), previous year questions with explanations, and daily current affairs tests."
+      content="Free TNPSC test series in Tamil & English for Group 1, Group 2 / 2A and Group 4: mock tests, previous year questions with explanations, and daily current affairs tests."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://tnpscmentors.in/" />
@@ -154,10 +170,10 @@
     <meta property="og:locale" content="en_IN" />
     <meta property="og:locale:alternate" content="ta_IN" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TNPSC Test Series, Group 2 & Previous Year Questions – TNPSC Mentors" />
+    <meta name="twitter:title" content="TNPSC Test Series – Group 1, 2 & 4 Mock Tests and Previous Year Questions" />
     <meta
       name="twitter:description"
-      content="Free TNPSC test series in Tamil & English: Group 2 (General English & General Tamil), previous year questions with explanations, and daily current affairs tests."
+      content="Free TNPSC test series in Tamil & English for Group 1, Group 2 / 2A and Group 4: mock tests, previous year questions with explanations, and daily current affairs tests."
     />
     <meta name="twitter:image" content="https://tnpscmentors.in/brand-logo.png" />
 

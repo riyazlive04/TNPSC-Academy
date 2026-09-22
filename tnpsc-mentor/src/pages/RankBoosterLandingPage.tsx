@@ -33,6 +33,7 @@ import {
   RANK_BOOSTER_PERK_KEYS,
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
+import { MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import PricingCards from '../components/Landing/PricingCards'
 import Reveal from '../components/Landing/Reveal'
@@ -316,15 +317,22 @@ export default function RankBoosterLandingPage() {
     })
   }, [isG2PayLink])
 
+  // The mock-pack paths are titled by what they sell — the Group 1 pack — not
+  // by the Group II/IIA page behind the sheet (lib/shareMeta names them the
+  // same way in the link preview).
   useEffect(() => {
-    document.title = isG2PayLink
+    document.title = isMockPayLink
       ? lang === 'ta'
-        ? `TNPSC Group 2 / 2A தேர்வுத் தொடர் 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
-        : `TNPSC Group 2 / 2A Test Series 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
-      : lang === 'ta'
-        ? 'TNPSC Group II/IIA Test Series - இப்போதே Enroll ஆகுங்க'
-        : 'TNPSC Group II/IIA Test Series - Enroll now'
-  }, [lang, isG2PayLink])
+        ? `TNPSC குரூப் 1 மாதிரித் தேர்வுகள் - ₹${MOCK_PACK_PRICE_RUPEES}`
+        : `TNPSC Group 1 Mock Test Pack - ₹${MOCK_PACK_PRICE_RUPEES}`
+      : isG2PayLink
+        ? lang === 'ta'
+          ? `TNPSC Group 2 / 2A தேர்வுத் தொடர் 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
+          : `TNPSC Group 2 / 2A Test Series 2026 - ₹${RANK_BOOSTER_PRICE_RUPEES}`
+        : lang === 'ta'
+          ? 'TNPSC Group II/IIA Test Series - இப்போதே Enroll ஆகுங்க'
+          : 'TNPSC Group II/IIA Test Series - Enroll now'
+  }, [lang, isG2PayLink, isMockPayLink])
 
   useEffect(() => {
     if (isAuthenticated && !loaded) refresh()

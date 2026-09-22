@@ -1,10 +1,46 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+// tsconfig.node.json is `composite`, so it wants every file it reaches listed
+// in its own include (TS6307) — but listing this one makes the app's `tsc`,
+// which owns src/ and type-checks this file, fail with TS6305. The import's
+// types still flow through; only that project-layout error is silenced.
+// (@ts-expect-error cannot be used: TS never counts it as used for TS6307.)
+// @ts-ignore TS6307
+import { applyShareMeta, sharePages } from './src/lib/shareMeta'
+
+/**
+ * Writes dist/<path>/index.html for every shareable route in src/lib/shareMeta,
+ * each a copy of the built index.html carrying that route's link-preview title,
+ * so a Group 1 link no longer previews with the default tags. `post` so Vite's
+ * own HTML plugin has already put index.html (with the hashed asset tags) in
+ * the bundle.
+ */
+function sharePreviewPages(): Plugin {
+  return {
+    name: 'share-preview-pages',
+    apply: 'build',
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      const index = bundle['index.html']
+      if (!index || index.type !== 'asset') {
+        this.error('share-preview-pages: index.html is not in the bundle')
+      }
+      const html = String(index.source)
+      for (const page of sharePages()) {
+        this.emitFile({
+          type: 'asset',
+          fileName: `${page.path.slice(1)}/index.html`,
+          source: page.meta ? applyShareMeta(html, page.path, page.meta) : html,
+        })
+      }
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), sharePreviewPages()],
   test: {
     environment: 'node',
     // The API server is a separate package with its own vitest, tsconfig and
