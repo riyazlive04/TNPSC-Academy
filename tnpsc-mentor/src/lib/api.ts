@@ -41,7 +41,7 @@ import { translate } from './i18n'
 import { useLanguageStore } from '../store/languageStore'
 import { useAuthConfigStore } from '../store/authConfigStore'
 
-const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
+export const API_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:4000').replace(/\/$/, '')
 
 // Web keeps its refresh token in an HttpOnly cookie (set by the server) so a XSS
 // can't read it; the native Android WebView can't rely on cross-site cookies, so

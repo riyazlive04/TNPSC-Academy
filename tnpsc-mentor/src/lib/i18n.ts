@@ -1539,6 +1539,12 @@ const STRINGS = {
     en: 'Payment failed. Please try again.',
     ta: 'பணம் செலுத்துதல் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.',
   },
+  // Redirect-flow only (iPhones, in-app browsers): Razorpay took the money but
+  // our server could not confirm it yet, so paying again would double-charge.
+  payErrPending: {
+    en: 'We could not confirm your payment yet. If money was deducted, please do not pay again - write to support@tnpscmentors.in and we will activate your plan.',
+    ta: 'உங்கள் கட்டணத்தை இன்னும் உறுதிப்படுத்த முடியவில்லை. பணம் கழிக்கப்பட்டிருந்தால் மீண்டும் செலுத்த வேண்டாம் - support@tnpscmentors.in-க்கு எழுதுங்கள், உங்கள் திட்டத்தைச் செயல்படுத்துகிறோம்.',
+  },
   // In-app purchase (App Store / Play) specific failures.
   payErrUnavailable: {
     en: 'In-app purchases are unavailable on this device. Please sign in to the store and try again.',

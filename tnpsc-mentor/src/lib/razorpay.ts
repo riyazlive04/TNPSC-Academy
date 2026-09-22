@@ -4,7 +4,7 @@
 // our server to verify the signature. The secret never touches the browser, and
 // "paid" is only ever set server-side after that verification.
 
-import { api } from './api'
+import { api, API_URL } from './api'
 import { trackPurchase } from './tracking'
 import type { Profile } from '../types'
 
@@ -27,6 +27,7 @@ interface RazorpayOptions {
   theme?: { color?: string }
   handler: (resp: RazorpaySuccess) => void
   modal?: { ondismiss?: () => void }
+  callback_url?: string
 }
 interface RazorpaySuccess {
   razorpay_order_id: string
@@ -40,6 +41,31 @@ declare global {
 }
 
 let scriptPromise: Promise<boolean> | null = null
+
+/**
+ * Where Checkout sends the buyer when it cannot use a popup.
+ *
+ * checkout.js keeps its own list of browsers where a popup is unreliable -
+ * every iPhone/iPad browser, Chrome for iOS, Android WebViews, the Instagram
+ * and Facebook in-app browsers, UC Browser, Opera Mini - and in those, card,
+ * netbanking and wallet payments open the bank page in a popup that the
+ * browser simply blocks. Given a callback_url, it switches exactly those
+ * browsers to a full-page redirect instead and leaves every other browser on
+ * the popup + `handler` flow below (it only forces `redirect` when both are
+ * true). The redirect ends with Razorpay's page POSTing the result to our
+ * server, which verifies it the same way /verify does and 303s the buyer back
+ * here: to /payment-success, or to this page with `?payment=<reason>` (see
+ * PaymentReturnNotice). `origin` picks which of our two domains to return to,
+ * since each keeps its own session; the server allowlists both params.
+ */
+function redirectCallbackUrl(): string {
+  const here = new URL(window.location.href)
+  here.searchParams.delete('payment') // a previous attempt's flag
+  const url = new URL(`${API_URL}/api/payments/callback`)
+  url.searchParams.set('origin', window.location.origin)
+  url.searchParams.set('back', here.pathname + here.search)
+  return url.toString()
+}
 
 /** Lazily inject checkout.js once; resolves true when the SDK is ready. */
 function loadCheckoutScript(): Promise<boolean> {
@@ -158,6 +184,7 @@ export async function startCheckout(params: CheckoutParams): Promise<CheckoutRes
         }
       },
       modal: { ondismiss: () => resolve({ status: 'dismissed' }) },
+      callback_url: redirectCallbackUrl(),
     })
     rzp.on('payment.failed', (resp: unknown) => {
       const err = (resp as { error?: { description?: string } })?.error?.description

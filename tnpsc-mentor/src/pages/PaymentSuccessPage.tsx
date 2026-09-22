@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Check, Crown, Trophy, Rocket, ListChecks, Loader2 } from 'lucide-react'
 import { usePremiumStore } from '../store/premiumStore'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useCreditsStore } from '../store/creditsStore'
-import { useT, type StringKey } from '../lib/i18n'
+import { useT, translate, type StringKey } from '../lib/i18n'
+import { trackPurchase } from '../lib/tracking'
 
 /** What the success screen shows per purchased plan (?plan= query param). The
  * perk lists mirror the purchase cards so the recap matches what was pitched. */
@@ -98,7 +99,7 @@ const PLAN_META: Record<
  * this component on its own).
  */
 export default function PaymentSuccessPage() {
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const { t } = useT()
   const plan = PLAN_META[params.get('plan') ?? ''] ?? PLAN_META.premium
@@ -121,6 +122,29 @@ export default function PaymentSuccessPage() {
     void useEntitlementsStore.getState().refresh()
     void useCreditsStore.getState().reload()
   }, [])
+
+  // A buyer on the redirect flow (iPhones, in-app browsers - see
+  // redirectCallbackUrl in lib/razorpay.ts) never ran Checkout's in-page
+  // handler, which is where the purchase conversion normally fires; the
+  // server's callback sent them here with the payment id and amount instead.
+  // Reported only once the store confirms the plan, so a hand-typed URL
+  // reports nothing, and the two params are then dropped from the URL so a
+  // reload cannot count the same sale twice.
+  const pid = params.get('pid')
+  const amt = Number(params.get('amt'))
+  const reported = useRef(false)
+  useEffect(() => {
+    if (!pid || !confirmed || reported.current) return
+    reported.current = true
+    if (amt > 0) {
+      trackPurchase({ transactionId: pid, value: amt, description: translate(plan.nameKey, 'en') })
+    }
+    const next = new URLSearchParams(params)
+    next.delete('pid')
+    next.delete('amt')
+    setParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pid, confirmed])
 
   // Confirmation is normally instant (the calling card already set the flag
   // before navigating here); this timeout is only a safety valve so a slow

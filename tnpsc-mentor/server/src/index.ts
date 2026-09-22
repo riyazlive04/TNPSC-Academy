@@ -23,7 +23,7 @@ import analyticsRoutes from './routes/analytics.js'
 import adminRoutes from './routes/admin.js'
 import superadminRoutes from './routes/superadmin.js'
 import feedbackRoutes from './routes/feedback.js'
-import paymentRoutes from './routes/payments.js'
+import paymentRoutes, { paymentCallbackRouter } from './routes/payments.js'
 import iapRoutes from './routes/iap.js'
 import couponRoutes from './routes/coupons.js'
 import notificationRoutes from './routes/notifications.js'
@@ -90,6 +90,10 @@ app.use('/api/auth', authRoutes)
 // gate below, so that OTP channel isn't blocked while WhatsApp's (inside
 // /api/auth) isn't either.
 app.use('/api/telegram', telegramRoutes)
+// Razorpay's redirect-mode return (iPhones, in-app browsers). Self-authenticating
+// by signature, and ahead of the maintenance gate because the buyer has already
+// been charged by the time it arrives — see paymentCallbackRouter.
+app.use('/api/payments/callback', paymentCallbackRouter)
 
 // Closes the app to everyone except admins/superadmins when maintenance mode
 // is on (superadmin console → toggle). Everything mounted above this line

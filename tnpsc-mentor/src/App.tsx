@@ -30,6 +30,7 @@ import OfflineBanner from './components/OfflineBanner'
 import { getConsent } from './lib/cookieConsent'
 import PushPrimer from './components/Onboarding/PushPrimer'
 import Toaster from './components/UI/Toaster'
+import PaymentReturnNotice from './components/PaymentReturnNotice'
 import LogoLoader from './components/UI/LogoLoader'
 
 // The forced-upsell overlay ships in its own chunk (it drags in the purchase
@@ -247,6 +248,7 @@ export default function App() {
     <BackButtonGuard />
     <PushPrimer />
     <Toaster />
+    <PaymentReturnNotice />
     <UpsellOutlet />
     </>
   )

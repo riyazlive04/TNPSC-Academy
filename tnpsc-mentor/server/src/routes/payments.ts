@@ -1,7 +1,7 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
 import crypto from 'node:crypto'
 import Razorpay from 'razorpay'
-import { config, razorpayEnabled } from '../config.js'
+import { config, isAllowedOrigin, razorpayEnabled } from '../config.js'
 import { asyncH, sendDbError } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { supabaseAdmin } from '../supabase.js'
@@ -10,6 +10,14 @@ import { premiumEntitlement, bundleAccess } from '../lib/premium.js'
 import { isPlanOnSale } from '../lib/settings.js'
 import { evaluateCoupon, couponLimiter } from './coupons.js'
 import { notifyAdmins } from '../notify.js'
+import { settlePayment, type OrderRow, type SettleDeps } from '../lib/paymentSettle.js'
+import {
+  safeReturnOrigin,
+  safeReturnPath,
+  successUrl,
+  failureUrl,
+  type ReturnReason,
+} from '../lib/paymentRedirect.js'
 
 const router = Router()
 
@@ -174,108 +182,145 @@ router.post(
   })
 )
 
+// ─── Ledger + Razorpay access for settlePayment() ────────────────────────────
+// The three verification gates live in lib/paymentSettle.ts, shared by /verify
+// (popup flow) and /callback (redirect flow); these are the calls they make.
+// `fetchAttempts` > 1 retries a Razorpay outage before giving up — worth it
+// only on the callback, whose buyer cannot retry (they are mid-navigation).
+function settleDeps(fetchAttempts = 1): SettleDeps {
+  return {
+    secret: config.razorpayKeySecret,
+    findOrder: async (orderId) => {
+      const { data, error } = await supabaseAdmin
+        .from('payments')
+        .select('id, user_id, status, amount, notes')
+        .eq('razorpay_order_id', orderId)
+        .single()
+      return { row: (data as OrderRow | null) ?? null, error }
+    },
+    fetchPayment: async (paymentId) => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          const pay = await rzp!.payments.fetch(paymentId)
+          return { order_id: String(pay.order_id), amount: pay.amount, status: String(pay.status) }
+        } catch (e) {
+          if (attempt >= fetchAttempts) throw e
+          await new Promise((r) => setTimeout(r, 1000 * attempt))
+        }
+      }
+    },
+    // Guarded on `created`: a bad/late call can never overwrite a resolved row,
+    // and concurrent valid calls transition it to `paid` at most once.
+    resolve: async (rowId, status, paymentId, signature) => {
+      const { error } = await supabaseAdmin
+        .from('payments')
+        .update({ status, razorpay_payment_id: paymentId, razorpay_signature: signature })
+        .eq('id', rowId)
+        .eq('status', 'created')
+      return { error }
+    },
+  }
+}
+
 // ─── POST /api/payments/verify ───────────────────────────────────────────────
-// Verify the Checkout callback and mark the payment `paid`. Three independent
-// gates, each of which alone blocks a forged/replayed/tampered credit:
-//   1. Idempotency — a `paid` order is TERMINAL: re-posting any triple against it
-//      is a no-op success, so the credit can't be replayed and (critically) the
-//      row can never be flipped back to `failed` (state-downgrade attack).
-//   2. Signature — HMAC_SHA256(order_id|payment_id, KEY_SECRET), constant-time:
-//      only a genuine Razorpay success matches, so the client can't forge a pay.
-//   3. Server-side confirmation — we fetch the payment from Razorpay and assert
-//      it's captured, belongs to THIS order, and paid the EXACT recorded amount,
-//      so a valid signature for a mismatched/under-paid payment can't slip through.
-// The final UPDATE is guarded on `status='created'` so concurrent/duplicate valid
-// calls credit at most once.
+// Popup flow: Checkout's in-page handler posts the triple here and the card
+// unlocks on `verified: true`. See settlePayment() for the three gates.
 router.post(
   '/verify',
   requireAuth,
   asyncH(async (req: AuthedRequest, res) => {
-    const orderId = String(req.body?.razorpay_order_id ?? '')
-    const paymentId = String(req.body?.razorpay_payment_id ?? '')
-    const signature = String(req.body?.razorpay_signature ?? '')
-    if (!orderId || !paymentId || !signature) {
-      return res.status(400).json({ error: 'Missing payment verification fields.' })
-    }
-
-    // The order must belong to THIS user — stops one user verifying against
-    // another user's order id.
-    const { data: row, error: lookupErr } = await supabaseAdmin
-      .from('payments')
-      .select('id, user_id, status, amount')
-      .eq('razorpay_order_id', orderId)
-      .single()
-    if (lookupErr) return sendDbError(res, lookupErr)
-    if (!row || row.user_id !== req.userId) {
-      return res.status(404).json({ error: 'Order not found.' })
-    }
-
-    // Gate 1 — idempotent & replay/downgrade-safe: a paid order never changes.
-    if (row.status === 'paid') return res.json({ verified: true })
-
-    // Helper: record a terminal failure ONLY if the row is still pending, so a
-    // bad/late call can never overwrite an already-resolved row.
-    const markFailed = () =>
-      supabaseAdmin
-        .from('payments')
-        .update({ status: 'failed', razorpay_payment_id: paymentId, razorpay_signature: signature })
-        .eq('id', row.id)
-        .eq('status', 'created')
-
-    // Gate 2 — cryptographic signature (primary forgery control).
-    const expected = crypto
-      .createHmac('sha256', config.razorpayKeySecret)
-      .update(`${orderId}|${paymentId}`)
-      .digest('hex')
-    const sigOk =
-      expected.length === signature.length &&
-      crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
-    if (!sigOk) {
-      await markFailed()
-      return res.status(400).json({ error: 'Signature verification failed.', verified: false })
-    }
-
-    // Gate 3 — confirm the real payment with Razorpay: right order, exact amount,
-    // and actually captured/authorised. A definitive MISMATCH is fatal (mark
-    // failed). A FETCH failure (Razorpay outage) is NON-final: we must not credit
-    // on signature alone — the row stays `created` (untouched) and we return a
-    // retryable 503 so the client can re-verify once Razorpay is reachable again.
-    try {
-      const pay = await rzp!.payments.fetch(paymentId)
-      const amountPaid = Number(pay.amount)
-      const settled = pay.status === 'captured' || pay.status === 'authorized'
-      if (pay.order_id !== orderId || amountPaid !== Number(row.amount) || !settled) {
-        console.error('[verify] payment/order mismatch', {
-          orderId,
-          paymentId,
-          expectedAmount: row.amount,
-          got: { order: pay.order_id, amount: pay.amount, status: pay.status },
-        })
-        await markFailed()
+    const outcome = await settlePayment(
+      {
+        orderId: String(req.body?.razorpay_order_id ?? ''),
+        paymentId: String(req.body?.razorpay_payment_id ?? ''),
+        signature: String(req.body?.razorpay_signature ?? ''),
+        ownerId: req.userId!,
+      },
+      settleDeps()
+    )
+    switch (outcome.kind) {
+      case 'paid':
+        return res.json({ verified: true })
+      case 'missing-fields':
+        return res.status(400).json({ error: 'Missing payment verification fields.' })
+      case 'not-found':
+        return res.status(404).json({ error: 'Order not found.' })
+      case 'db-error':
+        return sendDbError(res, outcome.error)
+      case 'bad-signature':
+        return res.status(400).json({ error: 'Signature verification failed.', verified: false })
+      case 'mismatch':
         return res.status(400).json({ error: 'Payment could not be verified.', verified: false })
-      }
-    } catch (e) {
-      // Do NOT fall through to crediting: skipping the amount/capture check on a
-      // fetch error would let a valid signature for an under-paid/uncaptured
-      // payment slip through. Leave the row pending and ask the client to retry.
-      console.error('[verify] Razorpay fetch failed; cannot confirm payment', (e as Error).message)
-      return res.status(503).json({
-        error: 'Could not confirm the payment right now. Please retry in a moment.',
-        verified: false,
-        retryable: true,
-      })
+      case 'unconfirmed':
+        // Never credited on signature alone: the row stays pending and the
+        // client may re-verify once Razorpay is reachable again.
+        return res.status(503).json({
+          error: 'Could not confirm the payment right now. Please retry in a moment.',
+          verified: false,
+          retryable: true,
+        })
+    }
+  })
+)
+
+// ─── POST /api/payments/callback ─────────────────────────────────────────────
+// Redirect flow. Razorpay's checkout.js cannot rely on a popup on iPhones,
+// Chrome for iOS, Android WebViews and the Instagram/Facebook in-app browsers,
+// and in exactly those it switches to a full-page redirect — but only when it
+// was given a callback_url (lib/razorpay.ts passes one). After paying, the
+// buyer's browser arrives here with a form POST from Razorpay's page carrying
+// the same triple /verify gets, or `error[...]` fields instead.
+//
+// No requireAuth: this is a cross-site navigation, so no bearer token and no
+// SameSite cookie comes with it. The signature is the proof (only Razorpay and
+// this server hold the secret) and the ledger row names the buyer, so nothing
+// here needs to know who is asking. Mounted in index.ts AHEAD of the
+// maintenance gate: a payment that already left the buyer's bank must be
+// credited even if the app closed in the meantime.
+//
+// Every outcome is a 303 back to the origin the buyer paid from — see
+// lib/paymentRedirect.ts for why those query params are allowlisted.
+export const paymentCallbackRouter = Router()
+paymentCallbackRouter.post(
+  '/',
+  express.urlencoded({ extended: true, limit: '20kb' }),
+  asyncH(async (req, res) => {
+    const fallbackOrigin = config.corsOrigins.find((o) => o.startsWith('https://')) ?? config.corsOrigins[0]
+    const origin = safeReturnOrigin(req.query.origin, isAllowedOrigin, fallbackOrigin)
+    const back = safeReturnPath(req.query.back)
+    const fail = (reason: ReturnReason) => res.redirect(303, failureUrl(origin, back, reason))
+
+    if (!rzp) return fail('pending')
+
+    const body = (req.body ?? {}) as Record<string, unknown>
+    if (body.error) {
+      // Razorpay posts a failure here only once its own retry screen is done
+      // with it. Nothing to mark: the row stays `created`, as it does when the
+      // popup flow reports payment.failed.
+      console.warn('[callback] Razorpay reported a failed payment', body.error)
+      return fail('failed')
     }
 
-    // Credit — guarded on `created` so concurrent/duplicate valid calls (and any
-    // replay that raced past gate 1) transition the row to `paid` at most once.
-    const { error: updErr } = await supabaseAdmin
-      .from('payments')
-      .update({ status: 'paid', razorpay_payment_id: paymentId, razorpay_signature: signature })
-      .eq('id', row.id)
-      .eq('status', 'created')
-    if (updErr) return sendDbError(res, updErr)
-
-    res.json({ verified: true })
+    const paymentId = String(body.razorpay_payment_id ?? '')
+    const outcome = await settlePayment(
+      {
+        orderId: String(body.razorpay_order_id ?? ''),
+        paymentId,
+        signature: String(body.razorpay_signature ?? ''),
+      },
+      settleDeps(3)
+    )
+    if (outcome.kind === 'paid') {
+      return res.redirect(303, successUrl(origin, outcome.row.notes?.plan, paymentId, Number(outcome.row.amount)))
+    }
+    // 'pending' = the money may well have moved but we could not confirm it
+    // yet (Razorpay unreachable, ledger write failed): the buyer is told to
+    // hold on / contact support rather than to pay again. An unknown order
+    // (PGRST116 from .single()) is not that — it is simply not ours.
+    const unsure =
+      outcome.kind === 'unconfirmed' || (outcome.kind === 'db-error' && outcome.error.code !== 'PGRST116')
+    if (outcome.kind === 'db-error' && unsure) console.error('[callback] ledger error', outcome.error)
+    return fail(unsure ? 'pending' : 'unverified')
   })
 )
 
