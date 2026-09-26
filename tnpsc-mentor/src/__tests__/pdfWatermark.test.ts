@@ -69,7 +69,7 @@ describe('stampWatermark', () => {
   it('composites at the faint alpha instead of full strength', () => {
     const { canvas, calls } = fakeCanvas(1520, 800)
     stampWatermark(canvas, 'MARK', { pxPerPt: 3, ...A4 })
-    expect(calls.find((c) => c.op === 'globalAlpha')?.args[0]).toBe(0.08)
+    expect(calls.find((c) => c.op === 'globalAlpha')?.args[0]).toBe(0.16)
     expect(calls.find((c) => c.op === 'fillStyle')?.args[0]).toBe('#7C5CFF')
   })
 

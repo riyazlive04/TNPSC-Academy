@@ -103,6 +103,8 @@ const CrmPage = lazy(() => import('./pages/CrmPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
 const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
+const AnswerKeyPage = lazy(() => import('./pages/AnswerKeyPage'))
+const PastAnswerKeyPage = lazy(() => import('./pages/PastAnswerKeyPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
 interface RouteDef {
@@ -399,6 +401,29 @@ function AnimatedRoutes() {
       <Route path="/group-1-mock-pack" element={<MockPackLandingPage />} />
       <Route path="/mock-399" element={<MockPackLandingPage />} />
       <Route path="/399" element={<MockPackLandingPage />} />
+
+      {/* Public, indexable answer-key hubs — one per exam group, with a switcher
+          between them (downloads after each exam). The short links are real
+          routes rendering the same page, so each gets its own link preview;
+          the page points the canonical tag at the long URL (lib/answerKeyGroups). */}
+      <Route path="/tnpsc-group-1-answer-key-2026" element={<AnswerKeyPage group="group1" />} />
+      <Route path="/group-1-answer-key" element={<AnswerKeyPage group="group1" />} />
+      <Route path="/answer-key" element={<AnswerKeyPage group="group1" />} />
+      <Route path="/tnpsc-group-2-answer-key-2026" element={<AnswerKeyPage group="group2" />} />
+      <Route path="/group-2-answer-key" element={<AnswerKeyPage group="group2" />} />
+      <Route path="/tnpsc-group-4-answer-key-2026" element={<AnswerKeyPage group="group4" />} />
+      <Route path="/group-4-answer-key" element={<AnswerKeyPage group="group4" />} />
+
+      {/* Past-year answer-key pages: the exam already happened, so there is no
+          PDF pipeline — the CTA sends the visitor into the real PYQ bank for
+          that year (lib/answerKeyGroups PAST_ANSWER_KEY_PAGES). */}
+      <Route path="/tnpsc-group-1-answer-key-2025" element={<PastAnswerKeyPage pastKey="group1-2025" />} />
+      <Route path="/tnpsc-group-1-answer-key-2024" element={<PastAnswerKeyPage pastKey="group1-2024" />} />
+      <Route path="/tnpsc-group-1-answer-key-2022" element={<PastAnswerKeyPage pastKey="group1-2022" />} />
+      <Route path="/tnpsc-group-2-answer-key-2025" element={<PastAnswerKeyPage pastKey="group2-2025" />} />
+      <Route path="/tnpsc-group-2-answer-key-2024" element={<PastAnswerKeyPage pastKey="group2-2024" />} />
+      <Route path="/tnpsc-group-4-answer-key-2025" element={<PastAnswerKeyPage pastKey="group4-2025" />} />
+      <Route path="/tnpsc-group-4-answer-key-2024" element={<PastAnswerKeyPage pastKey="group4-2024" />} />
 
       {/* Public policy pages (linked from the landing footer) */}
       <Route path="/privacy" element={<PolicyPage slug="privacy" />} />

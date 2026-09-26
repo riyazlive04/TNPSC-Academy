@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import indexHtml from '../../index.html?raw'
 import appSource from '../App.tsx?raw'
 import { PYQ_GROUPS, pyqSectionSlug } from '../lib/constants'
+import { ANSWER_KEY_GROUPS, examPhase } from '../lib/answerKeyGroups'
 import {
   SHARE_GROUP_LABEL,
   SHARE_ROUTES,
@@ -126,6 +127,54 @@ describe('applyShareMeta', () => {
   it('fails loudly when index.html loses a tag it swaps', () => {
     const noOgUrl = indexHtml.replace(/<meta property="og:url"[^>]*>/, '')
     expect(() => applyShareMeta(noOgUrl, '/group-1', meta)).toThrow(/og:url/)
+  })
+})
+
+describe('answer-key pages', () => {
+  const group1 = ANSWER_KEY_GROUPS.group1
+  const meta = shareMetaFor(group1.path)!
+  const out = applyShareMeta(indexHtml, group1.path, meta)
+  const ldBlocks = [...out.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1])
+
+  it('leads its <title> with the search phrase, not the Test Series pattern', () => {
+    expect(out).toContain('<title>TNPSC Group 1 Answer Key 2026 &amp; Question Paper with Explanations</title>')
+  })
+
+  it('bakes its own JSON-LD into the static HTML, next to the site-wide block', () => {
+    expect(ldBlocks).toHaveLength(2)
+    const types = (JSON.parse(ldBlocks[1]) as { '@graph': { '@type': string }[] })['@graph'].map((n) => n['@type'])
+    expect(types).toEqual(expect.arrayContaining(['Article', 'BreadcrumbList', 'WebPage', 'Event']))
+  })
+
+  it('gives the short links the same preview', () => {
+    for (const path of group1.shortPaths) expect(shareMetaFor(path)).toEqual(meta)
+  })
+
+  it('gives every group its own page, and skips the Event node until the exam is notified', () => {
+    for (const group of Object.values(ANSWER_KEY_GROUPS)) {
+      const m = shareMetaFor(group.path)
+      expect(m, group.path).not.toBeNull()
+      expect(m!.documentTitle).toBe(group.docTitle)
+      const types = (JSON.parse(JSON.stringify(m!.jsonLd)) as { '@graph': { '@type': string }[] })['@graph'].map(
+        (n) => n['@type'],
+      )
+      expect(types.includes('Event'), group.key).toBe(group.examStart !== null)
+    }
+  })
+})
+
+describe('examPhase', () => {
+  const group1 = ANSWER_KEY_GROUPS.group1
+  it('switches at the exam start and end instants', () => {
+    expect(examPhase(group1, Date.parse(group1.examStart!) - 1)).toBe('before')
+    expect(examPhase(group1, Date.parse(group1.examStart!))).toBe('during')
+    expect(examPhase(group1, Date.parse(group1.examEnd!))).toBe('after')
+  })
+
+  it('stays "before" forever for a group with no notified exam date', () => {
+    const group2 = ANSWER_KEY_GROUPS.group2
+    expect(group2.examStart).toBeNull()
+    expect(examPhase(group2, Date.now())).toBe('before')
   })
 })
 

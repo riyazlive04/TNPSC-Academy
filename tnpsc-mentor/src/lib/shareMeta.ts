@@ -20,6 +20,8 @@
  * instead, so a new public route cannot quietly fall back to the default.
  */
 
+import { ANSWER_KEY_GROUPS, PAST_ANSWER_KEY_PAGES, answerKeyJsonLd, pastAnswerKeyJsonLd } from './answerKeyGroups'
+
 export type ShareGroup = 'group1' | 'group2' | 'group4'
 
 /** How each exam group is named in a preview title. */
@@ -33,10 +35,15 @@ export interface ShareMeta {
   /** Preview title. The group is named first: WhatsApp cuts titles at ~40 characters. */
   title: string
   description: string
+  /** The whole <title>, for a search page that needs its keywords first. Default: `${title} – TNPSC Mentors`. */
+  documentTitle?: string
+  /** Page-specific structured data, written into the static HTML next to index.html's own. */
+  jsonLd?: object
 }
 
 export interface ShareRoute extends ShareMeta {
-  /** The exam group the link sells or opens; null for a page covering several. */
+  /** The exam group the link sells or opens; null for a page covering several,
+   *  or a search page whose title leads with its own phrase, not the Test Series one. */
   group: ShareGroup | null
   paths: string[]
 }
@@ -144,6 +151,45 @@ export const SHARE_ROUTES: ShareRoute[] = [
   },
   ...pyqSectionRoutes('group4'),
 
+  // ─── Answer-key hubs ──────────────────────────────────────────────────────
+  // One post-exam answer-key hub per group (plus its short links), and one
+  // page per past exam year that already happened. `group: null` because
+  // each page's title leads with its own search phrase ("... Answer Key
+  // 2026 ...") rather than the Test Series
+  // pattern `groupTitle()` builds.
+  {
+    group: null,
+    paths: [ANSWER_KEY_GROUPS.group1.path, ...ANSWER_KEY_GROUPS.group1.shortPaths],
+    title: ANSWER_KEY_GROUPS.group1.title,
+    documentTitle: ANSWER_KEY_GROUPS.group1.docTitle,
+    description: ANSWER_KEY_GROUPS.group1.description,
+    jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group1),
+  },
+  {
+    group: null,
+    paths: [ANSWER_KEY_GROUPS.group2.path, ...ANSWER_KEY_GROUPS.group2.shortPaths],
+    title: ANSWER_KEY_GROUPS.group2.title,
+    documentTitle: ANSWER_KEY_GROUPS.group2.docTitle,
+    description: ANSWER_KEY_GROUPS.group2.description,
+    jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group2),
+  },
+  {
+    group: null,
+    paths: [ANSWER_KEY_GROUPS.group4.path, ...ANSWER_KEY_GROUPS.group4.shortPaths],
+    title: ANSWER_KEY_GROUPS.group4.title,
+    documentTitle: ANSWER_KEY_GROUPS.group4.docTitle,
+    description: ANSWER_KEY_GROUPS.group4.description,
+    jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group4),
+  },
+  ...PAST_ANSWER_KEY_PAGES.map((p) => ({
+    group: null,
+    paths: [p.path],
+    title: p.title,
+    documentTitle: p.docTitle,
+    description: p.description,
+    jsonLd: pastAnswerKeyJsonLd(p),
+  })),
+
   // ─── Across groups ────────────────────────────────────────────────────────
   {
     group: null,
@@ -158,7 +204,9 @@ export const SHARE_ROUTES: ShareRoute[] = [
 export function shareMetaFor(path: string): ShareMeta | null {
   const clean = path.length > 1 ? path.replace(/\/+$/, '') : path
   for (const route of SHARE_ROUTES) {
-    if (route.paths.indexOf(clean) !== -1) return { title: route.title, description: route.description }
+    if (route.paths.indexOf(clean) === -1) continue
+    const { group: _group, paths: _paths, ...meta } = route
+    return meta
   }
   return null
 }
@@ -206,7 +254,7 @@ export function applyShareMeta(html: string, path: string, meta: ShareMeta): str
   const title = escapeHtml(meta.title)
   const description = escapeHtml(meta.description)
   const swaps: [RegExp, string][] = [
-    [/(<title>)[^<]*(<\/title>)/, `${title} – TNPSC Mentors`],
+    [/(<title>)[^<]*(<\/title>)/, meta.documentTitle ? escapeHtml(meta.documentTitle) : `${title} – TNPSC Mentors`],
     [/(<meta\s+name="description"\s+content=")[^"]*(")/, description],
     [/(<meta\s+property="og:title"\s+content=")[^"]*(")/, title],
     [/(<meta\s+property="og:description"\s+content=")[^"]*(")/, description],
@@ -218,6 +266,12 @@ export function applyShareMeta(html: string, path: string, meta: ShareMeta): str
   for (const [pattern, value] of swaps) {
     if (!pattern.test(out)) throw new Error(`shareMeta: index.html has no tag matching ${pattern}`)
     out = out.replace(pattern, (_m, open: string, close: string) => open + value + close)
+  }
+  if (meta.jsonLd) {
+    if (!out.includes('</head>')) throw new Error('shareMeta: index.html has no </head> for the JSON-LD')
+    // < keeps a "</script>" inside a string value from closing the tag.
+    const json = JSON.stringify(meta.jsonLd).replace(/</g, '\\u003c')
+    out = out.replace('</head>', () => `  <script type="application/ld+json">${json}</script>\n  </head>`)
   }
   return out
 }

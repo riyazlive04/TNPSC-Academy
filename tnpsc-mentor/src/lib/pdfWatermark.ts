@@ -39,6 +39,13 @@ export interface StampOptions {
   /** Page coords (pt) of this canvas's top-left, so tiles line up across blocks. */
   originXPt?: number
   originYPt?: number
+  /**
+   * Alpha the violet is composited at. Kept low enough to read through, high
+   * enough to actually see: at 0.08 the darkest pixel of the mark landed on
+   * rgb(245,242,255) — about 4% off white, i.e. invisible on a phone. 0.16
+   * puts it near rgb(234,229,255), which reads as a tint without competing
+   * with the text.
+   */
   opacity?: number
   fontSizePt?: number
   stepXPt?: number
@@ -80,7 +87,7 @@ export function stampWatermark(
     pageHPt,
     originXPt = 0,
     originYPt = 0,
-    opacity = 0.08,
+    opacity = 0.16,
     fontSizePt = 26,
     stepXPt = 280,
     stepYPt = 120,

@@ -200,7 +200,9 @@ export async function generateStudyNotePdf(note: StudyNote): Promise<void> {
   // just the blocks; built once and re-added under a fixed alias so jsPDF keeps
   // a single copy. Blocks carry the same lattice on the same page-space grid,
   // so the layers meet seamlessly.
-  const NOTES_MARK = { opacity: 0.06, fontSizePt: 30, stepXPt: 250, stepYPt: 150 }
+  // Slightly softer than the shared default, matching the ratio it always
+  // had — bigger glyphs on a sparser grid cover more of the sheet.
+  const NOTES_MARK = { opacity: 0.12, fontSizePt: 30, stepXPt: 250, stepYPt: 150 }
   const bg = makeWatermarkLayer(NOTES_WATERMARK, {
     pxPerPt: (RENDER_W * 2) / contentW,
     pageWPt: pageW,

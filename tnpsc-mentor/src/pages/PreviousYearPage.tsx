@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Landmark,
   Palette,
@@ -22,6 +22,7 @@ import { iconFor } from '../lib/subjectIcons'
 import { api } from '../lib/api'
 import { deriveGateKey } from '../lib/freeGate'
 import { PYQ_SUBJECTS, subjectName } from '../lib/constants'
+import { YearFilter, parseYearParam } from '../components/UI/YearFilter'
 import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
 
@@ -62,7 +63,16 @@ export default function PreviousYearPage() {
   const { t, lang } = useT()
 
   // Selected exam year (null = all years). Scopes every test + the subject counts.
-  const [year, setYear] = useState<number | null>(null)
+  // Lives in the URL (`?year=`) like the Group 2/4 PYQ pages, so a deep link
+  // (e.g. from an answer-key page) can land straight on one year.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const year = parseYearParam(searchParams.get('year'), PYQ_YEARS)
+  const setYear = (y: number | null) => {
+    const next = new URLSearchParams(searchParams)
+    if (y) next.set('year', String(y))
+    else next.delete('year')
+    setSearchParams(next, { replace: true })
+  }
   // subject → count, or null for a subject whose count request failed (rendered
   // as "—", never as a misleading "0 questions").
   const [counts, setCounts] = useState<Record<string, number | null> | null>(
@@ -168,17 +178,7 @@ export default function PreviousYearPage() {
       </div>
 
       {/* Exam-year filter. "All Years" + each year; scopes every subject below. */}
-      <div className="mb-5">
-        <p className="tamil mb-2 font-heading text-2xs font-bold uppercase tracking-wide text-muted">
-          {t('filterByYear')}
-        </p>
-        <div className="-mx-1 flex flex-wrap gap-2 px-1">
-          <YearChip label={t('allYears')} active={year === null} onClick={() => setYear(null)} />
-          {PYQ_YEARS.map((y) => (
-            <YearChip key={y} label={String(y)} active={year === y} onClick={() => setYear(y)} />
-          ))}
-        </div>
-      </div>
+      <YearFilter years={PYQ_YEARS} value={year} onChange={setYear} />
 
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
@@ -227,19 +227,5 @@ export default function PreviousYearPage() {
         </ChoiceGrid>
       )}
     </PickerPage>
-  )
-}
-
-function YearChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`focus-ring rounded-full px-3.5 py-1.5 font-heading text-sm font-semibold tabular-nums transition-colors ${
-        active ? 'bg-primary text-white' : 'bg-tint-violet text-primary hover:bg-primary/15'
-      }`}
-    >
-      {label}
-    </button>
   )
 }
