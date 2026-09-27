@@ -78,6 +78,24 @@ const T = {
   statusAfter: { ta: 'தயாராகிறது', en: 'Being prepared' },
 
   subjectsTitle: { ta: 'பாட வாரியான விடைக்குறிப்பு', en: 'Subject-Wise Answer Key' },
+
+  // Released layout (mirrors the past-year pages once a key is out).
+  releasedTitle: { ta: '2026 விடைக்குறிப்பு PDF — இலவசப் பதிவிறக்கம்', en: '2026 Answer Key PDF — free download' },
+  releasedSub: {
+    ta: 'ஒவ்வொரு வினாவுக்கும் விளக்கத்துடன் முழு விடைக்குறிப்பு — தமிழ் அல்லது English-ல். சரியான விடைகள் குறிக்கப்பட்ட வினாத்தாளும் உண்டு.',
+    en: 'The full answer key with an explanation for every question, in Tamil or English. Plus the question paper with the correct answers marked.',
+  },
+  releasedKeyButton: { ta: 'PDF விடைக்குறிப்பைப் பதிவிறக்கு', en: 'Download answer key PDF' },
+  releasedPaperButton: { ta: 'விடைகளுடன் வினாத்தாள்', en: 'Question paper with answers' },
+  infoTitle: { ta: 'வினாத்தாள் விவரம்', en: 'Paper Details' },
+  infoFormatVal: { ta: 'இலவச PDF · தமிழ் & English விளக்கங்கள்', en: 'Free PDF · Tamil & English explanations' },
+  answerKeyType: { ta: 'விடைக்குறிப்பு வகை', en: 'Answer Key' },
+  answerKeyTypeVal: { ta: 'TNPSC Mentors தொகுத்தது (அதிகாரப்பூர்வமற்றது)', en: 'Compiled by TNPSC Mentors (unofficial)' },
+  loopTitle: { ta: 'எங்களுடன் இணைந்திருங்க', en: 'Stay in the loop' },
+  loopSub: {
+    ta: 'அடுத்த தேர்வு விடைக்குறிப்பு உள்ளிட்ட புதுப்பிப்புகளுக்கு Telegram அல்லது YouTube-ல் இணையுங்க.',
+    en: "Join our Telegram or YouTube for the next exam's answer key and other updates.",
+  },
   colSubject: { ta: 'பாடம்', en: 'Subject' },
   subjectSoon: { ta: 'விரைவில்', en: 'Soon' },
 
@@ -151,27 +169,35 @@ function introText(lang: LandingLang, def: AnswerKeyGroupDef, released: boolean)
     : `The ${name} Answer Key 2026 will be published on this page. Candidates can download the question paper, the answer key, and subject-wise explanations here as PDFs. This page will be updated as soon as TNPSC announces the exam.`
 }
 
-function buildFaqs(def: AnswerKeyGroupDef): { ta: { q: string; a: string }; en: { q: string; a: string } }[] {
+function buildFaqs(def: AnswerKeyGroupDef, released: boolean): { ta: { q: string; a: string }; en: { q: string; a: string } }[] {
   const label = def.examLabel
   return [
     {
       en: {
         q: `When will the TNPSC ${label} answer key 2026 be released?`,
-        a: 'We publish our answer key on this page right after the exam ends. TNPSC releases its official tentative key later on tnpsc.gov.in.',
+        a: released
+          ? 'It is out now: download it free from the top of this page. TNPSC releases its official tentative key later on tnpsc.gov.in.'
+          : 'We publish our answer key on this page right after the exam ends. TNPSC releases its official tentative key later on tnpsc.gov.in.',
       },
       ta: {
         q: `TNPSC ${label} விடைக்குறிப்பு 2026 எப்போது வெளியாகும்?`,
-        a: 'தேர்வு முடிந்தவுடனே இந்தப் பக்கத்தில் எங்கள் விடைக்குறிப்பை வெளியிடுவோம். TNPSC-ன் அதிகாரப்பூர்வ உத்தேச விடைக்குறிப்பு பின்னர் tnpsc.gov.in-ல் வெளியாகும்.',
+        a: released
+          ? 'இப்போதே வெளியாகிவிட்டது: இந்தப் பக்கத்தின் மேலே இலவசமாகப் பதிவிறக்கலாம். TNPSC-ன் அதிகாரப்பூர்வ உத்தேச விடைக்குறிப்பு பின்னர் tnpsc.gov.in-ல் வெளியாகும்.'
+          : 'தேர்வு முடிந்தவுடனே இந்தப் பக்கத்தில் எங்கள் விடைக்குறிப்பை வெளியிடுவோம். TNPSC-ன் அதிகாரப்பூர்வ உத்தேச விடைக்குறிப்பு பின்னர் tnpsc.gov.in-ல் வெளியாகும்.',
       },
     },
     {
       en: {
         q: `Where can I download the TNPSC ${label} question paper 2026?`,
-        a: 'Right here, in the table above — as a free PDF, once the exam is over.',
+        a: released
+          ? 'Right here: use "Question paper with answers" at the top of this page. It is a free PDF in Tamil and English.'
+          : 'Right here, in the table above — as a free PDF, once the exam is over.',
       },
       ta: {
         q: `TNPSC ${label} வினாத்தாள் 2026-ஐ எங்கே பதிவிறக்கலாம்?`,
-        a: 'இங்கேயே, மேலே உள்ள அட்டவணையில் — தேர்வு முடிந்ததும் இலவச PDF-ஆக.',
+        a: released
+          ? 'இங்கேயே: இந்தப் பக்கத்தின் மேலே உள்ள "விடைகளுடன் வினாத்தாள்" பொத்தான் — தமிழ் & English இலவச PDF.'
+          : 'இங்கேயே, மேலே உள்ள அட்டவணையில் — தேர்வு முடிந்ததும் இலவச PDF-ஆக.',
       },
     },
     {
@@ -260,7 +286,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
     ? (def.resources.find((r) => r.key === 'key' && r.href) ?? def.resources.find((r) => r.kind === 'pdf' && r.href))
     : undefined
   const pastPages = pastPagesForGroup(group)
-  const faqs = buildFaqs(def)
+  const faqs = buildFaqs(def, released)
   const resourceCopy: Record<ResourceKey, { icon: typeof FileText; ta: string; en: string }> = {
     paper: { icon: FileText, ta: `TNPSC ${def.examLabel} வினாத்தாள் 2026`, en: `TNPSC ${def.examLabel} Question Paper 2026` },
     key: { icon: KeyRound, ta: 'விரிவான விடைக்குறிப்பு', en: 'Detailed Answer Key' },
@@ -304,6 +330,50 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
   }
 
   const appLabel = isAuthenticated ? t('ctaAppAuthed') : t('ctaApp')
+  const keyRes = def.resources.find((r) => r.key === 'key')
+  const paperRes = def.resources.find((r) => r.key === 'paper')
+
+  // Until the 2026 key is out, the past papers are what a visitor can
+  // actually download — so they sit high on the page with the PDF as the
+  // loud button, not tucked into the sidebar. Shared by both layouts.
+  const pastYearsList = pastPages.length > 0 && (
+    <>
+      <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">
+        TNPSC {def.examLabel} Previous Year Answer Keys (PDF)
+      </h2>
+      <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
+        {pastPages.map((p) => (
+          <li key={p.key} className="flex flex-wrap items-center gap-3 bg-card px-3 py-3 sm:px-4">
+            <a
+              href={p.path}
+              className="tamil min-w-0 flex-1 font-heading text-sm font-semibold text-ink hover:text-brand-dark"
+            >
+              TNPSC {def.examLabel} Answer Key {p.year}
+            </a>
+            {p.pdfHref && (
+              <a
+                href={p.pdfHref}
+                download
+                onClick={(e) => {
+                  track('answer_key_download_pdf', { group, year: p.year, source: 'hub' })
+                  pdf.onTrigger(e, { en: p.pdfHref!, ta: p.pdfHrefTa })
+                }}
+                className="btn-wrap btn-brand tamil inline-flex min-h-[40px] items-center px-4 text-sm"
+              >
+                <Download size={15} /> {t('downloadPdf')}
+              </a>
+            )}
+            <a
+              href={p.path}
+              className="tamil inline-flex items-center gap-1 font-heading text-sm font-bold text-brand hover:text-brand-dark"
+            >
+              {t('viewPage')} <ArrowRight size={14} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
 
   return (
     <div id="top" className="min-h-screen overflow-x-clip bg-card pb-24 sm:pb-0">
@@ -330,285 +400,366 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
             {def.title}
           </h1>
           <p className="tamil mt-2 font-body text-xs font-medium text-ink2">{T.byline[lang](formatDate(lang, def.updated))}</p>
-          <p className="tamil mt-4 font-body text-[15px] leading-relaxed text-ink2">{introText(lang, def, released)}</p>
-
-          {/* Live status banner — compact, not a full-bleed hero: the banner
-              image in every phase (a plain placeholder before the exam when
-              there is none), with an "in progress" / "over" badge under it. */}
-          <div className="mt-5 rounded-card border border-line bg-card p-4 sm:p-5">
-            {def.bannerImage ? (
-              <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
-            ) : (
-              phase === 'before' && (
-                <div className="flex aspect-[3/1] w-full items-center justify-center rounded-field border border-dashed border-line bg-gray-50 dark:bg-white/5">
-                  <span className="tamil font-body text-xs font-medium text-ink2">{t('beforeLead')}</span>
-                </div>
-              )
-            )}
-            {phase === 'during' && (
-              <span className={`tamil inline-flex items-center gap-2 rounded-full bg-brand px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/80" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                </span>
-                {t('duringBadge')}
-              </span>
-            )}
-            {phase === 'after' && (
-              <span className={`tamil inline-flex items-center gap-2 rounded-full bg-correct px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
-                <Check size={14} /> {t('afterBadge')}
-              </span>
-            )}
-            <p className="tamil mt-2 font-body text-xs font-medium text-ink2">{examWhen(lang, def, t('tba'))}</p>
-          </div>
-
-          {/* ─── Latest Status table ─────────────────────────────────────────── */}
-          <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('statusTitle')}</h2>
-          <div className="mt-3 overflow-hidden rounded-card border border-line">
-            <table className="w-full border-collapse text-left">
-              <tbody>
-                {[
-                  [t('statusExamName'), def.examFullName[lang]],
-                  [t('statusExamDate'), examWhen(lang, def, t('tba'))],
-                  [t('statusQuestions'), def.totalQuestions === null ? t('tba') : String(def.totalQuestions)],
-                  [t('statusMarks'), def.totalMarks === null ? t('tba') : String(def.totalMarks)],
-                  [
-                    t('statusNegative'),
-                    def.negativeMarking === null ? t('tba') : def.negativeMarking ? t('statusNegativeYes') : t('statusNegativeNo'),
-                  ],
-                  [
-                    t('statusPaper'),
-                    phase === 'after' && def.resources.find((r) => r.key === 'paper')?.href
-                      ? t('statusAvailable')
-                      : t('statusNotYet'),
-                  ],
-                  [
-                    t('statusKey'),
-                    phase === 'after' && def.resources.some((r) => r.key !== 'paper' && r.href)
-                      ? t('statusAvailable')
-                      : t('statusNotYet'),
-                  ],
-                  [t('statusFormat'), t('statusFormatVal')],
-                ].map(([label, value], i) => (
-                  <tr key={label} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
-                    <th
-                      scope="row"
-                      className="tamil w-2/5 border-b border-line px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4"
-                    >
-                      {label}
-                    </th>
-                    <td className="tamil border-b border-line px-3 py-2.5 font-body text-sm text-ink2 sm:px-4">{value}</td>
-                  </tr>
-                ))}
-                <tr className="bg-card">
-                  <th scope="row" className="tamil px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4">
-                    {t('statusSource')}
-                  </th>
-                  <td className="px-3 py-2.5 font-body text-sm sm:px-4">
-                    <a
-                      href={TNPSC_OFFICIAL_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 hover:decoration-brand"
-                    >
-                      tnpsc.gov.in
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* ─── Downloads table ──────────────────────────────────────────────── */}
-          <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">
-            TNPSC {def.examLabel} Answer Key 2026 PDF
-          </h2>
-          <div className="mt-3 overflow-x-auto rounded-card border border-line">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-white/10">
-                  <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colSNo')}
-                  </th>
-                  <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colItem')}
-                  </th>
-                  <th className="tamil px-3 py-2.5 text-right font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colStatus')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {def.resources.map((r, i) => {
-                  const copy = resourceCopy[r.key]
-                  const live = phase === 'after' && r.href
-                  return (
-                    <tr key={r.key} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
-                      <td className="border-t border-line px-3 py-3 font-body text-sm text-ink2 sm:px-4">{i + 1}</td>
-                      <td className="border-t border-line px-3 py-3 sm:px-4">
-                        <span className="tamil inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink">
-                          <copy.icon size={15} className="shrink-0 text-brand" />
-                          {r.label?.[lang] ?? copy[lang]}
-                        </span>
-                      </td>
-                      <td className="border-t border-line px-3 py-3 text-right sm:px-4">
-                        {live ? (
-                          <a
-                            href={r.href!}
-                            {...(r.kind === 'pdf' ? { download: '' } : {})}
-                            onClick={(e) => pdf.onTrigger(e, { en: r.href!, ta: r.hrefTa ?? null })}
-                            aria-label={r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}
-                            className="btn-wrap btn-brand tamil inline-flex min-h-[40px] min-w-[40px] items-center justify-center px-2.5 text-sm sm:px-4"
-                          >
-                            {r.kind === 'pdf' ? <Download size={15} /> : <ExternalLink size={15} />}
-                            {/* Icon-only on phones: the Tamil label would push the table sideways. */}
-                            <span className="hidden sm:inline">{r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}</span>
-                          </a>
-                        ) : (
-                          <span className="tamil inline-flex items-center gap-1.5 font-body text-sm font-medium text-ink2">
-                            <Clock size={14} /> {phase === 'after' ? t('statusAfter') : t('statusBefore')}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ─── Previous years ───────────────────────────────────────────────── */}
-          {/* Until the 2026 key is out, the past papers are what a visitor can
-              actually download — so they sit high on the page with the PDF as
-              the loud button, not tucked into the sidebar. */}
-          {pastPages.length > 0 && (
-            <>
-              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">
-                TNPSC {def.examLabel} Previous Year Answer Keys (PDF)
-              </h2>
-              <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
-                {pastPages.map((p) => (
-                  <li key={p.key} className="flex flex-wrap items-center gap-3 bg-card px-3 py-3 sm:px-4">
-                    <a
-                      href={p.path}
-                      className="tamil min-w-0 flex-1 font-heading text-sm font-semibold text-ink hover:text-brand-dark"
-                    >
-                      TNPSC {def.examLabel} Answer Key {p.year}
-                    </a>
-                    {p.pdfHref && (
-                      <a
-                        href={p.pdfHref}
-                        download
-                        onClick={(e) => {
-                          track('answer_key_download_pdf', { group, year: p.year, source: 'hub' })
-                          pdf.onTrigger(e, { en: p.pdfHref!, ta: p.pdfHrefTa })
-                        }}
-                        className="btn-wrap btn-brand tamil inline-flex min-h-[40px] items-center px-4 text-sm"
-                      >
-                        <Download size={15} /> {t('downloadPdf')}
-                      </a>
-                    )}
-                    <a
-                      href={p.path}
-                      className="tamil inline-flex items-center gap-1 font-heading text-sm font-bold text-brand hover:text-brand-dark"
-                    >
-                      {t('viewPage')} <ArrowRight size={14} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </>
+          {!released && (
+            <p className="tamil mt-4 font-body text-[15px] leading-relaxed text-ink2">{introText(lang, def, false)}</p>
           )}
 
-          {/* ─── Subject-wise table ───────────────────────────────────────────── */}
-          <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsTitle')}</h2>
-          <div className="mt-3 overflow-x-auto rounded-card border border-line">
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-white/10">
-                  <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colSNo')}
-                  </th>
-                  <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colSubject')}
-                  </th>
-                  <th className="tamil px-3 py-2.5 text-right font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
-                    {t('colStatus')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {def.subjects.map((s, i) => {
-                  const live = phase === 'after' && s.href
-                  return (
-                    <tr key={s.en} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
-                      <td className="border-t border-line px-3 py-3 font-body text-sm text-ink2 sm:px-4">{i + 1}</td>
-                      <td className="tamil border-t border-line px-3 py-3 font-heading text-sm font-semibold text-ink sm:px-4">
-                        {s[lang]}
-                      </td>
-                      <td className="border-t border-line px-3 py-3 text-right sm:px-4">
-                        {live ? (
-                          <a
-                            href={s.href!}
-                            onClick={() => track('answer_key_download', { resource: `subject:${s.en}`, group })}
-                            className="tamil inline-flex items-center gap-1.5 font-heading text-sm font-bold text-brand hover:text-brand-dark"
-                          >
-                            <Download size={15} /> {t('downloadPdf')}
-                          </a>
-                        ) : (
-                          <span className="tamil inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-ink2 dark:bg-white/10">
-                            {t('subjectSoon')}
-                          </span>
-                        )}
+          {released ? (
+            <>
+              {/* ─── Released: the past-year page layout ───────────────────── */}
+              {def.bannerImage && (
+                <div className="mt-5 overflow-hidden rounded-card border border-line bg-card p-4 sm:p-5">
+                  <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
+                </div>
+              )}
+
+              {/* Download CTA — the detailed key leads (it asks Tamil or
+                  English), the answered question paper is the second button. */}
+              <div className="mt-6 rounded-card border border-brand/40 bg-brand-soft p-5 text-center sm:p-6">
+                <h2 className="tamil font-heading text-lg font-bold text-ink sm:text-xl">{t('releasedTitle')}</h2>
+                <p className="tamil mt-1 font-body text-sm text-ink2">{t('releasedSub')}</p>
+                <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  {keyRes?.href && (
+                    <a
+                      href={keyRes.href}
+                      download
+                      onClick={(e) => pdf.onTrigger(e, { en: keyRes.href!, ta: keyRes.hrefTa ?? null })}
+                      className="btn-wrap btn-brand tamil inline-flex w-full max-w-sm justify-center px-6 py-3.5 text-base shadow-lg shadow-brand/25 sm:w-auto"
+                    >
+                      <Download size={18} /> {t('releasedKeyButton')}
+                    </a>
+                  )}
+                  {paperRes?.href && (
+                    <a
+                      href={paperRes.href}
+                      download
+                      onClick={(e) => pdf.onTrigger(e, { en: paperRes.href!, ta: paperRes.hrefTa ?? null })}
+                      className="btn-wrap btn-ghost tamil inline-flex w-full max-w-sm justify-center bg-card px-6 py-3 text-sm sm:w-auto"
+                    >
+                      <FileText size={16} /> {t('releasedPaperButton')}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* ─── Paper details table ───────────────────────────────────── */}
+              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('infoTitle')}</h2>
+              <div className="mt-3 overflow-hidden rounded-card border border-line">
+                <table className="w-full border-collapse text-left">
+                  <tbody>
+                    {[
+                      [t('statusExamName'), def.examFullName[lang]],
+                      [t('statusExamDate'), examWhen(lang, def, t('tba'))],
+                      [t('statusQuestions'), def.totalQuestions === null ? t('tba') : String(def.totalQuestions)],
+                      [t('statusMarks'), def.totalMarks === null ? t('tba') : String(def.totalMarks)],
+                      [
+                        t('statusNegative'),
+                        def.negativeMarking === null
+                          ? t('tba')
+                          : def.negativeMarking
+                            ? t('statusNegativeYes')
+                            : t('statusNegativeNo'),
+                      ],
+                      [t('statusFormat'), t('infoFormatVal')],
+                      [t('answerKeyType'), t('answerKeyTypeVal')],
+                    ].map(([label, value], i) => (
+                      <tr key={label} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
+                        <th
+                          scope="row"
+                          className="tamil w-2/5 border-b border-line px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4"
+                        >
+                          {label}
+                        </th>
+                        <td className="tamil border-b border-line px-3 py-2.5 font-body text-sm text-ink2 sm:px-4">{value}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-card">
+                      <th scope="row" className="tamil px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4">
+                        {t('statusSource')}
+                      </th>
+                      <td className="px-3 py-2.5 font-body text-sm sm:px-4">
+                        <a
+                          href={TNPSC_OFFICIAL_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 hover:decoration-brand"
+                        >
+                          tnpsc.gov.in
+                        </a>
                       </td>
                     </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ─── Notify ───────────────────────────────────────────────────────── */}
-          {!(phase === 'after' && allReady) && (
-            <div className="mt-8 rounded-card border border-line bg-card p-5">
-              <h3 className="tamil font-heading text-base font-bold text-ink">{t('notifyTitle')}</h3>
-              <p className="tamil mt-1 font-body text-sm leading-relaxed text-ink2">{t('notifySub')}</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <a
-                  href={TELEGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => track('answer_key_notify', { channel: 'telegram', group })}
-                  className="btn-wrap btn tamil min-h-[48px] bg-[#0B72B5] px-4 text-sm text-white hover:brightness-110"
-                >
-                  <Send size={16} /> {t('notifyTelegram')}
-                </a>
-                <a
-                  href={YOUTUBE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => track('answer_key_notify', { channel: 'youtube', group })}
-                  className="btn-wrap btn tamil min-h-[48px] bg-[#CC0000] px-4 text-sm text-white hover:brightness-110"
-                >
-                  <Youtube size={16} /> {t('notifyYoutube')}
-                </a>
-                {!isAuthenticated && (
-                  <a
-                    href="/register"
-                    onClick={(e) => {
-                      track('answer_key_notify', { channel: 'register', group })
-                      if (isAndroidWebView) {
-                        e.preventDefault()
-                        openInBrowser('/register')
-                      }
-                    }}
-                    className="btn-wrap btn-ghost tamil min-h-[48px] px-4 text-sm"
-                  >
-                    <UserPlus size={16} /> {t('notifyRegister')}
-                  </a>
-                )}
+                  </tbody>
+                </table>
               </div>
-            </div>
+
+              {pastYearsList}
+
+              {/* ─── Stay in the loop ──────────────────────────────────────── */}
+              <div className="mt-8 rounded-card border border-line bg-card p-5">
+                <h3 className="tamil font-heading text-base font-bold text-ink">{t('loopTitle')}</h3>
+                <p className="tamil mt-1 font-body text-sm leading-relaxed text-ink2">{t('loopSub')}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <a
+                    href={TELEGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track('answer_key_notify', { channel: 'telegram', group })}
+                    className="btn-wrap btn tamil min-h-[48px] bg-[#0B72B5] px-4 text-sm text-white hover:brightness-110"
+                  >
+                    <Send size={16} /> {t('notifyTelegram')}
+                  </a>
+                  <a
+                    href={YOUTUBE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => track('answer_key_notify', { channel: 'youtube', group })}
+                    className="btn-wrap btn tamil min-h-[48px] bg-[#CC0000] px-4 text-sm text-white hover:brightness-110"
+                  >
+                    <Youtube size={16} /> {t('notifyYoutube')}
+                  </a>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Live status banner — compact, not a full-bleed hero: the banner
+                  image in every phase (a plain placeholder before the exam when
+                  there is none), with an "in progress" / "over" badge under it. */}
+              <div className="mt-5 rounded-card border border-line bg-card p-4 sm:p-5">
+                {def.bannerImage ? (
+                  <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
+                ) : (
+                  phase === 'before' && (
+                    <div className="flex aspect-[3/1] w-full items-center justify-center rounded-field border border-dashed border-line bg-gray-50 dark:bg-white/5">
+                      <span className="tamil font-body text-xs font-medium text-ink2">{t('beforeLead')}</span>
+                    </div>
+                  )
+                )}
+                {phase === 'during' && (
+                  <span className={`tamil inline-flex items-center gap-2 rounded-full bg-brand px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/80" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                    </span>
+                    {t('duringBadge')}
+                  </span>
+                )}
+                {phase === 'after' && (
+                  <span className={`tamil inline-flex items-center gap-2 rounded-full bg-correct px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
+                    <Check size={14} /> {t('afterBadge')}
+                  </span>
+                )}
+                <p className="tamil mt-2 font-body text-xs font-medium text-ink2">{examWhen(lang, def, t('tba'))}</p>
+              </div>
+
+              {/* ─── Latest Status table ─────────────────────────────────────────── */}
+              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('statusTitle')}</h2>
+              <div className="mt-3 overflow-hidden rounded-card border border-line">
+                <table className="w-full border-collapse text-left">
+                  <tbody>
+                    {[
+                      [t('statusExamName'), def.examFullName[lang]],
+                      [t('statusExamDate'), examWhen(lang, def, t('tba'))],
+                      [t('statusQuestions'), def.totalQuestions === null ? t('tba') : String(def.totalQuestions)],
+                      [t('statusMarks'), def.totalMarks === null ? t('tba') : String(def.totalMarks)],
+                      [
+                        t('statusNegative'),
+                        def.negativeMarking === null ? t('tba') : def.negativeMarking ? t('statusNegativeYes') : t('statusNegativeNo'),
+                      ],
+                      [
+                        t('statusPaper'),
+                        phase === 'after' && def.resources.find((r) => r.key === 'paper')?.href
+                          ? t('statusAvailable')
+                          : t('statusNotYet'),
+                      ],
+                      [
+                        t('statusKey'),
+                        phase === 'after' && def.resources.some((r) => r.key !== 'paper' && r.href)
+                          ? t('statusAvailable')
+                          : t('statusNotYet'),
+                      ],
+                      [t('statusFormat'), t('statusFormatVal')],
+                    ].map(([label, value], i) => (
+                      <tr key={label} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
+                        <th
+                          scope="row"
+                          className="tamil w-2/5 border-b border-line px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4"
+                        >
+                          {label}
+                        </th>
+                        <td className="tamil border-b border-line px-3 py-2.5 font-body text-sm text-ink2 sm:px-4">{value}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-card">
+                      <th scope="row" className="tamil px-3 py-2.5 align-top font-heading text-sm font-semibold text-ink sm:px-4">
+                        {t('statusSource')}
+                      </th>
+                      <td className="px-3 py-2.5 font-body text-sm sm:px-4">
+                        <a
+                          href={TNPSC_OFFICIAL_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-brand underline decoration-brand/40 underline-offset-2 hover:decoration-brand"
+                        >
+                          tnpsc.gov.in
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* ─── Downloads table ──────────────────────────────────────────────── */}
+              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">
+                TNPSC {def.examLabel} Answer Key 2026 PDF
+              </h2>
+              <div className="mt-3 overflow-x-auto rounded-card border border-line">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-white/10">
+                      <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colSNo')}
+                      </th>
+                      <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colItem')}
+                      </th>
+                      <th className="tamil px-3 py-2.5 text-right font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colStatus')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {def.resources.map((r, i) => {
+                      const copy = resourceCopy[r.key]
+                      const live = phase === 'after' && r.href
+                      return (
+                        <tr key={r.key} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
+                          <td className="border-t border-line px-3 py-3 font-body text-sm text-ink2 sm:px-4">{i + 1}</td>
+                          <td className="border-t border-line px-3 py-3 sm:px-4">
+                            <span className="tamil inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink">
+                              <copy.icon size={15} className="shrink-0 text-brand" />
+                              {r.label?.[lang] ?? copy[lang]}
+                            </span>
+                          </td>
+                          <td className="border-t border-line px-3 py-3 text-right sm:px-4">
+                            {live ? (
+                              <a
+                                href={r.href!}
+                                {...(r.kind === 'pdf' ? { download: '' } : {})}
+                                onClick={(e) => pdf.onTrigger(e, { en: r.href!, ta: r.hrefTa ?? null })}
+                                aria-label={r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}
+                                className="btn-wrap btn-brand tamil inline-flex min-h-[40px] min-w-[40px] items-center justify-center px-2.5 text-sm sm:px-4"
+                              >
+                                {r.kind === 'pdf' ? <Download size={15} /> : <ExternalLink size={15} />}
+                                {/* Icon-only on phones: the Tamil label would push the table sideways. */}
+                                <span className="hidden sm:inline">{r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}</span>
+                              </a>
+                            ) : (
+                              <span className="tamil inline-flex items-center gap-1.5 font-body text-sm font-medium text-ink2">
+                                <Clock size={14} /> {phase === 'after' ? t('statusAfter') : t('statusBefore')}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {pastYearsList}
+
+              {/* ─── Subject-wise table ───────────────────────────────────────────── */}
+              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsTitle')}</h2>
+              <div className="mt-3 overflow-x-auto rounded-card border border-line">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-white/10">
+                      <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colSNo')}
+                      </th>
+                      <th className="tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colSubject')}
+                      </th>
+                      <th className="tamil px-3 py-2.5 text-right font-heading text-xs font-bold uppercase tracking-wide text-ink2 sm:px-4">
+                        {t('colStatus')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {def.subjects.map((s, i) => {
+                      const live = phase === 'after' && s.href
+                      return (
+                        <tr key={s.en} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
+                          <td className="border-t border-line px-3 py-3 font-body text-sm text-ink2 sm:px-4">{i + 1}</td>
+                          <td className="tamil border-t border-line px-3 py-3 font-heading text-sm font-semibold text-ink sm:px-4">
+                            {s[lang]}
+                          </td>
+                          <td className="border-t border-line px-3 py-3 text-right sm:px-4">
+                            {live ? (
+                              <a
+                                href={s.href!}
+                                onClick={() => track('answer_key_download', { resource: `subject:${s.en}`, group })}
+                                className="tamil inline-flex items-center gap-1.5 font-heading text-sm font-bold text-brand hover:text-brand-dark"
+                              >
+                                <Download size={15} /> {t('downloadPdf')}
+                              </a>
+                            ) : (
+                              <span className="tamil inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-ink2 dark:bg-white/10">
+                                {t('subjectSoon')}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* ─── Notify ───────────────────────────────────────────────────────── */}
+              {!(phase === 'after' && allReady) && (
+                <div className="mt-8 rounded-card border border-line bg-card p-5">
+                  <h3 className="tamil font-heading text-base font-bold text-ink">{t('notifyTitle')}</h3>
+                  <p className="tamil mt-1 font-body text-sm leading-relaxed text-ink2">{t('notifySub')}</p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <a
+                      href={TELEGRAM_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track('answer_key_notify', { channel: 'telegram', group })}
+                      className="btn-wrap btn tamil min-h-[48px] bg-[#0B72B5] px-4 text-sm text-white hover:brightness-110"
+                    >
+                      <Send size={16} /> {t('notifyTelegram')}
+                    </a>
+                    <a
+                      href={YOUTUBE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => track('answer_key_notify', { channel: 'youtube', group })}
+                      className="btn-wrap btn tamil min-h-[48px] bg-[#CC0000] px-4 text-sm text-white hover:brightness-110"
+                    >
+                      <Youtube size={16} /> {t('notifyYoutube')}
+                    </a>
+                    {!isAuthenticated && (
+                      <a
+                        href="/register"
+                        onClick={(e) => {
+                          track('answer_key_notify', { channel: 'register', group })
+                          if (isAndroidWebView) {
+                            e.preventDefault()
+                            openInBrowser('/register')
+                          }
+                        }}
+                        className="btn-wrap btn-ghost tamil min-h-[48px] px-4 text-sm"
+                      >
+                        <UserPlus size={16} /> {t('notifyRegister')}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* ─── Disclaimer ───────────────────────────────────────────────────── */}
