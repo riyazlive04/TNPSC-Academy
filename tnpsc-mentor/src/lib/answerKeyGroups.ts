@@ -37,8 +37,21 @@ export interface AnswerKeyResource {
 export interface AnswerKeySubject {
   en: string
   ta: string
+  /** The English (or only) edition. */
   href: string | null
+  /** The Tamil-explanations edition; set = the page asks which language. */
+  hrefTa?: string | null
+  /** How many of the paper's questions fall under this subject. */
+  questions?: number
 }
+
+const g1Subject = (en: string, ta: string, slug: string, questions: number): AnswerKeySubject => ({
+  en,
+  ta,
+  href: `/downloads/group1-2026/tnpsc-group-1-2026-${slug}-answer-key.pdf`,
+  hrefTa: `/downloads/group1-2026/tnpsc-group-1-2026-${slug}-answer-key-tamil.pdf`,
+  questions,
+})
 
 export interface AnswerKeyGroupDef {
   key: AnswerKeyGroupKey
@@ -124,15 +137,16 @@ export const ANSWER_KEY_GROUPS: Record<AnswerKeyGroupKey, AnswerKeyGroupDef> = {
         },
       },
     ],
+    // Syllabus unit order; question counts add up to the paper's 200.
     subjects: [
-      { en: 'General Science', ta: 'பொது அறிவியல்', href: null },
-      { en: 'Geography of India', ta: 'இந்தியப் புவியியல்', href: null },
-      { en: 'History, Culture & Indian National Movement', ta: 'இந்திய வரலாறு, பண்பாடு & தேசிய இயக்கம்', href: null },
-      { en: 'Indian Polity', ta: 'இந்திய அரசியலமைப்பு', href: null },
-      { en: 'Indian Economy & Development Administration in TN', ta: 'இந்தியப் பொருளாதாரம் & தமிழக வளர்ச்சி நிர்வாகம்', href: null },
-      { en: 'History, Culture & Heritage of Tamil Nadu', ta: 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & மரபு', href: null },
-      { en: 'Aptitude & Mental Ability', ta: 'திறனறிவு & மனக்கூர்மை', href: null },
-      { en: 'Current Affairs', ta: 'நடப்பு நிகழ்வுகள்', href: null },
+      g1Subject('General Science', 'பொது அறிவியல்', 'general-science', 13),
+      g1Subject('Geography of India', 'இந்தியப் புவியியல்', 'geography', 11),
+      g1Subject('Indian History & National Movement', 'இந்திய வரலாறு & தேசிய இயக்கம்', 'indian-history', 26),
+      g1Subject('Indian Polity', 'இந்திய அரசியலமைப்பு', 'indian-polity', 44),
+      g1Subject('Indian Economy & Development Administration in TN', 'இந்தியப் பொருளாதாரம் & தமிழக வளர்ச்சி நிர்வாகம்', 'economy', 36),
+      g1Subject('Tamil Nadu History, Culture & Socio-Political Movements', 'தமிழ்நாட்டின் வரலாறு, பண்பாடு & சமூக-அரசியல் இயக்கங்கள்', 'tamil-nadu-history', 44),
+      g1Subject('Aptitude', 'திறனறிவு', 'aptitude', 19),
+      g1Subject('Reasoning', 'தருக்க அறிவு', 'reasoning', 7),
     ],
     bannerImage: '/group1-answer-key-banner-2026.jpg',
     seriesLink: { href: '/group-1', label: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' } },

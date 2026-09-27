@@ -65,6 +65,23 @@ SOURCES = {
     "group4-2025/tnpsc-group-4-answer-key-2025-tamil.pdf": "group4/TNPSC_Group4_2025_AnswerKey_Tamil.pdf",
     "group4-2024/tnpsc-group-4-answer-key-2024.pdf": "group4/TNPSC_Group4_2024_AnswerKey.pdf",
     "group4-2024/tnpsc-group-4-answer-key-2024-tamil.pdf": "group4/TNPSC_Group4_2024_AnswerKey_Tamil.pdf",
+    # Group 1 2026 subject-wise keys
+    "group1-2026/tnpsc-group-1-2026-general-science-answer-key.pdf": "Group1/subject_2026/Group1_2026_GeneralScience.pdf",
+    "group1-2026/tnpsc-group-1-2026-general-science-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_GeneralScience_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-geography-answer-key.pdf": "Group1/subject_2026/Group1_2026_Geography.pdf",
+    "group1-2026/tnpsc-group-1-2026-geography-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_Geography_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-indian-history-answer-key.pdf": "Group1/subject_2026/Group1_2026_IndianHistory.pdf",
+    "group1-2026/tnpsc-group-1-2026-indian-history-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_IndianHistory_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-indian-polity-answer-key.pdf": "Group1/subject_2026/Group1_2026_IndianPolity.pdf",
+    "group1-2026/tnpsc-group-1-2026-indian-polity-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_IndianPolity_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-economy-answer-key.pdf": "Group1/subject_2026/Group1_2026_Economy_DevAdmin.pdf",
+    "group1-2026/tnpsc-group-1-2026-economy-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_Economy_DevAdmin_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-tamil-nadu-history-answer-key.pdf": "Group1/subject_2026/Group1_2026_TamilNadu_History.pdf",
+    "group1-2026/tnpsc-group-1-2026-tamil-nadu-history-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_TamilNadu_History_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-aptitude-answer-key.pdf": "Group1/subject_2026/Group1_2026_Aptitude.pdf",
+    "group1-2026/tnpsc-group-1-2026-aptitude-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_Aptitude_Tamil.pdf",
+    "group1-2026/tnpsc-group-1-2026-reasoning-answer-key.pdf": "Group1/subject_2026/Group1_2026_Reasoning.pdf",
+    "group1-2026/tnpsc-group-1-2026-reasoning-answer-key-tamil.pdf": "Group1/subject_2026/Group1_2026_Reasoning_Tamil.pdf",
 }
 
 # Social strip: (platform, handle, link, platform colour). Links match the

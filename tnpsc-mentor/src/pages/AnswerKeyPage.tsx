@@ -94,6 +94,12 @@ const T = {
   infoFormatVal: { ta: 'இலவச PDF · தமிழ் & English விளக்கங்கள்', en: 'Free PDF · Tamil & English explanations' },
   answerKeyType: { ta: 'விடைக்குறிப்பு வகை', en: 'Answer Key' },
   answerKeyTypeVal: { ta: 'TNPSC Mentors தொகுத்தது (அதிகாரப்பூர்வமற்றது)', en: 'Compiled by TNPSC Mentors (unofficial)' },
+  subjectsReleasedTitle: { ta: 'பாட வாரியான விடைக்குறிப்பு (PDF)', en: 'Subject-Wise Answer Key (PDF)' },
+  subjectsReleasedSub: {
+    ta: 'ஒவ்வொரு பாடத்துக்கும் தனி PDF — விளக்கம் & ஆதாரத்துடன், தமிழ் அல்லது English-ல்.',
+    en: 'One PDF per subject, with explanation & source, in Tamil or English.',
+  },
+  questionsCount: { ta: 'வினாக்கள்', en: 'questions' },
   loopTitle: { ta: 'எங்களுடன் இணைந்திருங்க', en: 'Stay in the loop' },
   loopSub: {
     ta: 'அடுத்த தேர்வு விடைக்குறிப்பு உள்ளிட்ட புதுப்பிப்புகளுக்கு Telegram அல்லது YouTube-ல் இணையுங்க.',
@@ -494,6 +500,42 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                   </tbody>
                 </table>
               </div>
+
+              {/* ─── Subject-wise PDFs ─────────────────────────────────────── */}
+              {def.subjects.some((sub) => sub.href) && (
+                <>
+                  <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsReleasedTitle')}</h2>
+                  <p className="tamil mt-1 font-body text-sm text-ink2">{t('subjectsReleasedSub')}</p>
+                  <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
+                    {def.subjects
+                      .filter((sub) => sub.href)
+                      .map((sub) => (
+                        <li key={sub.en} className="flex items-center gap-3 bg-card px-3 py-3 sm:px-4">
+                          <span className="min-w-0 flex-1">
+                            <span className="tamil block font-heading text-sm font-semibold text-ink">{sub[lang]}</span>
+                            {sub.questions != null && (
+                              <span className="tamil block font-body text-xs text-ink2">
+                                {sub.questions} {t('questionsCount')}
+                              </span>
+                            )}
+                          </span>
+                          <a
+                            href={sub.href!}
+                            download
+                            onClick={(e) => {
+                              track('answer_key_download', { resource: `subject:${sub.en}`, group })
+                              pdf.onTrigger(e, { en: sub.href!, ta: sub.hrefTa ?? null })
+                            }}
+                            aria-label={`${t('downloadPdf')}: ${sub[lang]}`}
+                            className="btn-wrap btn-brand tamil inline-flex min-h-[40px] shrink-0 items-center px-4 text-sm"
+                          >
+                            <Download size={15} /> {t('downloadPdf')}
+                          </a>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              )}
 
               {pastYearsList}
 
