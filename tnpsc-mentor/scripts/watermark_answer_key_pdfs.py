@@ -195,6 +195,18 @@ def header_strip(page, logo_xref: int) -> int:
     return logo_xref
 
 
+def pdf_title(path: str) -> str:
+    """The searchable document title Google shows for the PDF itself, from the
+    published file name: tnpsc-group-4-answer-key-2024-tamil.pdf ->
+    "TNPSC Group 4 Answer Key 2024 (Tamil explanations) - TNPSC Mentors"."""
+    stem = os.path.basename(path)[:-4]
+    lang = ""
+    if stem.endswith("-tamil"):
+        stem, lang = stem[: -len("-tamil")], " (Tamil explanations)"
+    words = ["TNPSC" if w == "tnpsc" else w if w == "with" else w.capitalize() for w in stem.split("-")]
+    return f"{' '.join(words)}{lang} - TNPSC Mentors"
+
+
 def brand(path: str) -> bool:
     doc = fitz.open(path)
     if doc.metadata.get("creator") == CREATOR:
@@ -213,10 +225,9 @@ def brand(path: str) -> bool:
     for page in doc:
         social_strip(page)
 
-    base = os.path.basename(path)
     doc.set_metadata(
         {
-            "title": doc.metadata.get("title") or base.replace(".pdf", "").replace("-", " ").replace("_", " "),
+            "title": pdf_title(path),
             "author": "TNPSC Mentors",
             "subject": f"Answer key sourced from TNPSC Mentors - https://{SITE}",
             "keywords": "TNPSC Mentors, tnpscmentors.in, TNPSC Answer Key",

@@ -137,7 +137,23 @@ describe('answer-key pages', () => {
   const ldBlocks = [...out.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1])
 
   it('leads its <title> with the search phrase, not the Test Series pattern', () => {
-    expect(out).toContain('<title>TNPSC Group 1 Answer Key 2026 &amp; Question Paper with Explanations</title>')
+    expect(group1.docTitle.startsWith('TNPSC Group 1 Answer Key 2026')).toBe(true)
+    expect(out).toContain(`<title>${group1.docTitle.replace(/&/g, '&amp;')}</title>`)
+  })
+
+  it('ships a static canonical naming the one URL, for the short links too', () => {
+    for (const path of [group1.path, ...group1.shortPaths]) {
+      const html = applyShareMeta(indexHtml, path, shareMetaFor(path)!)
+      const canonicals = [...html.matchAll(/<link rel="canonical" href="([^"]+)"/g)].map((m) => m[1])
+      expect(canonicals, path).toEqual([`https://tnpscmentors.in${group1.path}`])
+    }
+  })
+
+  it('puts the page content in the static HTML for crawlers that do not run JavaScript', () => {
+    const root = out.slice(out.indexOf('<div id="root">'), out.indexOf('</main></div>'))
+    expect(root).toContain(`<h1>${group1.title.replace(/&/g, '&amp;')}</h1>`)
+    for (const r of group1.resources.filter((x) => x.href)) expect(root).toContain(`href="${r.href}"`)
+    for (const s of group1.subjects.filter((x) => x.href)) expect(root).toContain(`href="${s.href}"`)
   })
 
   it('bakes its own JSON-LD into the static HTML, next to the site-wide block', () => {

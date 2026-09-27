@@ -151,9 +151,9 @@ export const ANSWER_KEY_GROUPS: Record<AnswerKeyGroupKey, AnswerKeyGroupDef> = {
     bannerImage: '/group1-answer-key-banner-2026.jpg',
     seriesLink: { href: '/group-1', label: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' } },
     title: 'TNPSC Group 1 Answer Key 2026 & Question Paper with Explanations',
-    docTitle: 'TNPSC Group 1 Answer Key 2026 & Question Paper with Explanations',
+    docTitle: 'TNPSC Group 1 Answer Key 2026 PDF (27 Sep Prelims) Tamil & English',
     description:
-      'TNPSC Group 1 Answer Key 2026: download the prelims question paper PDF, a detailed answer key and subject-wise explanations in Tamil & English. Free.',
+      'TNPSC Group 1 Answer Key 2026 for the 27 September prelims: free PDF of the question paper with answers, a question-wise key with explanation & source in Tamil or English, and subject-wise PDFs.',
   },
 
   group2: {
@@ -601,4 +601,143 @@ export function pastAnswerKeyJsonLd(def: PastAnswerKeyPageDef): object {
       },
     ],
   }
+}
+
+// ─── Static page content for crawlers ────────────────────────────────────────
+// The pages themselves render in the browser, so the HTML the server sends
+// has an empty <div id="root"> — a crawler that does not run JavaScript right
+// away (Google queues rendering, sometimes for days on a young site) finds
+// nothing to index. The build writes this plain-HTML version of the SAME
+// content into each page's root; React replaces it as soon as the app mounts,
+// so visitors see it at most for a moment while the bundle loads.
+
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+const link = (href: string, text: string, attrs = '') => `<a href="${esc(href)}"${attrs}>${esc(text)}</a>`
+
+const STATIC_STYLE =
+  'max-width:960px;margin:0 auto;padding:24px 16px;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1f2a44;line-height:1.6'
+
+function staticShell(inner: string): string {
+  return `<main style="${STATIC_STYLE}">${inner}</main>`
+}
+
+function faqHtml(faqs: { q: string; a: string }[]): string {
+  return `<h2>Frequently asked questions</h2>${faqs.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}`
+}
+
+function otherExamsHtml(current: AnswerKeyGroupKey | null): string {
+  const hubs = ANSWER_KEY_GROUP_ORDER.filter((k) => k !== current).map((k) => ANSWER_KEY_GROUPS[k])
+  const past = PAST_ANSWER_KEY_PAGES
+  return (
+    `<h2>More TNPSC answer keys</h2><ul>` +
+    hubs.map((h) => `<li>${link(h.path, `TNPSC ${h.examLabel} Answer Key 2026`)}</li>`).join('') +
+    past.map((p) => `<li>${link(p.path, `TNPSC ${ANSWER_KEY_GROUPS[p.group].examLabel} Answer Key ${p.year}`)}</li>`).join('') +
+    `</ul>`
+  )
+}
+
+/** The hub page's content as plain HTML, as of `now` (the build time). */
+export function answerKeyStaticHtml(def: AnswerKeyGroupDef, now: number): string {
+  const label = def.examLabel
+  const released = examPhase(def, now) === 'after' && def.resources.some((r) => r.href)
+  const parts: string[] = [`<h1>${esc(def.title)}</h1>`, `<p>TNPSC Mentors · Updated ${esc(def.updated)}</p>`]
+
+  if (released) {
+    parts.push(
+      `<p>The ${esc(def.examFullName.en)} Answer Key 2026 is out. Download the question paper with the correct answers marked, and the full answer key with an explanation and source for every question, in Tamil or English, as free PDFs. TNPSC ${esc(label)} விடைக்குறிப்பு 2026: தமிழ் விளக்கங்களுடன் இலவச PDF.</p>`,
+      `<h2>TNPSC ${esc(label)} Answer Key 2026 PDF: free download</h2><ul>`
+    )
+    for (const r of def.resources) {
+      if (!r.href) continue
+      const name = r.label?.en ?? RESOURCE_SEO_NAME(def)[r.key]
+      parts.push(`<li>${link(r.href, `${name} (PDF)`)}`)
+      if (r.hrefTa) parts.push(` · ${link(r.hrefTa, `${name}, Tamil explanations (PDF)`)}`)
+      parts.push(`</li>`)
+    }
+    parts.push(`</ul>`)
+  } else {
+    parts.push(
+      `<p>The ${esc(def.examFullName.en)} Answer Key 2026 will be published on this page: the question paper, the answer key and subject-wise explanations, as free PDFs in Tamil and English.</p>`
+    )
+  }
+
+  const liveSubjects = def.subjects.filter((s) => s.href)
+  if (liveSubjects.length) {
+    parts.push(`<h2>TNPSC ${esc(label)} 2026 Subject-Wise Answer Key (PDF)</h2><ul>`)
+    for (const s of liveSubjects) {
+      const count = s.questions != null ? ` (${s.questions} questions)` : ''
+      parts.push(`<li>${esc(s.en)}${count}: ${link(s.href!, `${s.en} answer key PDF`)}`)
+      if (s.hrefTa) parts.push(` · ${link(s.hrefTa, `${s.en} answer key PDF, Tamil`)}`)
+      parts.push(`</li>`)
+    }
+    parts.push(`</ul>`)
+  }
+
+  const rows: [string, string][] = [
+    ['Exam name', def.examFullName.en],
+    ['Exam date', def.examStart ? def.examStart.slice(0, 10) : 'To be announced'],
+    ['Total questions', def.totalQuestions === null ? 'To be announced' : String(def.totalQuestions)],
+    ['Total marks', def.totalMarks === null ? 'To be announced' : String(def.totalMarks)],
+    ['Negative marking', def.negativeMarking === null ? 'To be announced' : def.negativeMarking ? 'Yes' : 'No'],
+    ['Answer key', 'Compiled by TNPSC Mentors (unofficial); the official key is on tnpsc.gov.in'],
+  ]
+  parts.push(
+    `<h2>Paper details</h2><table>${rows.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>`
+  )
+
+  const past = pastPagesForGroup(def.key)
+  if (past.length) {
+    parts.push(`<h2>TNPSC ${esc(label)} Previous Year Answer Keys (PDF)</h2><ul>`)
+    for (const p of past) {
+      parts.push(`<li>${link(p.path, `TNPSC ${label} Answer Key ${p.year}`)}`)
+      if (p.pdfHref) parts.push(` · ${link(p.pdfHref, `${p.year} answer key PDF`)}`)
+      parts.push(`</li>`)
+    }
+    parts.push(`</ul>`)
+  }
+
+  parts.push(
+    faqHtml([
+      {
+        q: `When will the TNPSC ${label} answer key 2026 be released?`,
+        a: released
+          ? 'It is out now: download it free from this page. TNPSC releases its official tentative key later on tnpsc.gov.in.'
+          : 'We publish our answer key on this page right after the exam ends. TNPSC releases its official tentative key later on tnpsc.gov.in.',
+      },
+      {
+        q: `Where can I download the TNPSC ${label} question paper 2026?`,
+        a: released
+          ? 'Right here: the question paper with the correct answers marked is a free PDF in Tamil and English.'
+          : 'Right here, as a free PDF, once the exam is over.',
+      },
+      {
+        q: 'Is this the official TNPSC answer key?',
+        a: 'No. It is prepared independently by TNPSC Mentors so you can estimate your score early. The official key from TNPSC is final.',
+      },
+      { q: 'Are the explanations available in Tamil?', a: 'Yes. Every explanation is available in both Tamil and English.' },
+    ]),
+    otherExamsHtml(def.key)
+  )
+  return staticShell(parts.join(''))
+}
+
+/** A past-year page's content as plain HTML. */
+export function pastAnswerKeyStaticHtml(def: PastAnswerKeyPageDef): string {
+  const hub = ANSWER_KEY_GROUPS[def.group]
+  const label = hub.examLabel
+  const parts: string[] = [`<h1>${esc(def.title)}</h1>`, `<p>TNPSC Mentors · Updated ${esc(def.updated)}</p>`, `<p>${esc(def.description)}</p>`]
+  if (def.pdfHref) {
+    parts.push(`<h2>${def.year} Answer Key PDF: free download</h2><ul>`)
+    parts.push(`<li>${link(def.pdfHref, `TNPSC ${label} Answer Key ${def.year} PDF`)}</li>`)
+    if (def.pdfHrefTa) parts.push(`<li>${link(def.pdfHrefTa, `TNPSC ${label} Answer Key ${def.year} PDF, Tamil explanations`)}</li>`)
+    parts.push(`</ul>`)
+  }
+  parts.push(
+    `<p>${link(def.practiceHref, `Practice the ${def.year} paper with the answer key`)} (${def.questionCount} questions with bilingual explanations).</p>`,
+    `<p>${link(hub.path, `TNPSC ${label} Answer Key 2026`)}</p>`,
+    otherExamsHtml(null)
+  )
+  return staticShell(parts.join(''))
 }

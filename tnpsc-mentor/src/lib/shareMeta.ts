@@ -20,7 +20,14 @@
  * instead, so a new public route cannot quietly fall back to the default.
  */
 
-import { ANSWER_KEY_GROUPS, PAST_ANSWER_KEY_PAGES, answerKeyJsonLd, pastAnswerKeyJsonLd } from './answerKeyGroups'
+import {
+  ANSWER_KEY_GROUPS,
+  PAST_ANSWER_KEY_PAGES,
+  answerKeyJsonLd,
+  answerKeyStaticHtml,
+  pastAnswerKeyJsonLd,
+  pastAnswerKeyStaticHtml,
+} from './answerKeyGroups'
 
 export type ShareGroup = 'group1' | 'group2' | 'group4'
 
@@ -39,6 +46,12 @@ export interface ShareMeta {
   documentTitle?: string
   /** Page-specific structured data, written into the static HTML next to index.html's own. */
   jsonLd?: object
+  /** The page's own content as plain HTML, written into <div id="root"> so
+   *  crawlers get the text without running the app (React replaces it on mount). */
+  bodyHtml?: string
+  /** Written as a static <link rel="canonical">; set it when short links share
+   *  the page, so every path names the one URL. */
+  canonicalPath?: string
 }
 
 export interface ShareRoute extends ShareMeta {
@@ -81,6 +94,9 @@ const pyqSectionRoutes = (group: 'group2' | 'group4'): ShareRoute[] =>
     title: groupTitle(group, `${s.name} Previous Year Questions`),
     description: PYQ_DESCRIPTION[group],
   }))
+
+/** The static answer-key pages show the before/after-exam content as of the build. */
+const BUILD_TIME = Date.now()
 
 export const SHARE_ROUTES: ShareRoute[] = [
   // ─── Group 1 ──────────────────────────────────────────────────────────────
@@ -164,6 +180,8 @@ export const SHARE_ROUTES: ShareRoute[] = [
     documentTitle: ANSWER_KEY_GROUPS.group1.docTitle,
     description: ANSWER_KEY_GROUPS.group1.description,
     jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group1),
+    bodyHtml: answerKeyStaticHtml(ANSWER_KEY_GROUPS.group1, BUILD_TIME),
+    canonicalPath: ANSWER_KEY_GROUPS.group1.path,
   },
   {
     group: null,
@@ -172,6 +190,8 @@ export const SHARE_ROUTES: ShareRoute[] = [
     documentTitle: ANSWER_KEY_GROUPS.group2.docTitle,
     description: ANSWER_KEY_GROUPS.group2.description,
     jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group2),
+    bodyHtml: answerKeyStaticHtml(ANSWER_KEY_GROUPS.group2, BUILD_TIME),
+    canonicalPath: ANSWER_KEY_GROUPS.group2.path,
   },
   {
     group: null,
@@ -180,6 +200,8 @@ export const SHARE_ROUTES: ShareRoute[] = [
     documentTitle: ANSWER_KEY_GROUPS.group4.docTitle,
     description: ANSWER_KEY_GROUPS.group4.description,
     jsonLd: answerKeyJsonLd(ANSWER_KEY_GROUPS.group4),
+    bodyHtml: answerKeyStaticHtml(ANSWER_KEY_GROUPS.group4, BUILD_TIME),
+    canonicalPath: ANSWER_KEY_GROUPS.group4.path,
   },
   ...PAST_ANSWER_KEY_PAGES.map((p) => ({
     group: null,
@@ -188,6 +210,8 @@ export const SHARE_ROUTES: ShareRoute[] = [
     documentTitle: p.docTitle,
     description: p.description,
     jsonLd: pastAnswerKeyJsonLd(p),
+    bodyHtml: pastAnswerKeyStaticHtml(p),
+    canonicalPath: p.path,
   })),
 
   // ─── Across groups ────────────────────────────────────────────────────────
@@ -266,6 +290,16 @@ export function applyShareMeta(html: string, path: string, meta: ShareMeta): str
   for (const [pattern, value] of swaps) {
     if (!pattern.test(out)) throw new Error(`shareMeta: index.html has no tag matching ${pattern}`)
     out = out.replace(pattern, (_m, open: string, close: string) => open + value + close)
+  }
+  if (meta.canonicalPath) {
+    if (!out.includes('</head>')) throw new Error('shareMeta: index.html has no </head> for the canonical link')
+    const href = escapeHtml(SHARE_ORIGIN + meta.canonicalPath)
+    out = out.replace('</head>', () => `  <link rel="canonical" href="${href}" />\n  </head>`)
+  }
+  if (meta.bodyHtml) {
+    const root = '<div id="root"></div>'
+    if (!out.includes(root)) throw new Error('shareMeta: index.html has no empty <div id="root"> for the page content')
+    out = out.replace(root, () => `<div id="root">${meta.bodyHtml}</div>`)
   }
   if (meta.jsonLd) {
     if (!out.includes('</head>')) throw new Error('shareMeta: index.html has no </head> for the JSON-LD')

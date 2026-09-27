@@ -139,10 +139,14 @@
             history.replaceState(history.state, '', p.replace(/\/+$/, '') + location.search + location.hash)
           }
           var d = document
-          var canonical = d.createElement('link')
-          canonical.rel = 'canonical'
-          canonical.href = 'https://tnpscmentors.in' + location.pathname
-          d.head.appendChild(canonical)
+          // Pages built with a canonical of their own (src/lib/shareMeta.ts)
+          // keep it; every other path gets one here.
+          if (!d.querySelector('link[rel="canonical"]')) {
+            var canonical = d.createElement('link')
+            canonical.rel = 'canonical'
+            canonical.href = 'https://tnpscmentors.in' + location.pathname
+            d.head.appendChild(canonical)
+          }
           if (location.hostname === 'app.tnpscmentors.in') {
             var robots = d.querySelector('meta[name="robots"]')
             if (robots) robots.setAttribute('content', 'noindex, follow')
