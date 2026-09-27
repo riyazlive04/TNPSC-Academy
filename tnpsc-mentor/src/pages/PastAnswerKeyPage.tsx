@@ -43,6 +43,15 @@ const T = {
   practiceTitle: { ta: 'இந்த ஆண்டு வினாத்தாளைப் பயிற்சி செய்யுங்க', en: 'Practice this year’s paper now' },
   practiceButton: { ta: 'விடைக்குறிப்புடன் பயிற்சி செய்ய', en: 'Practice with answer key' },
   downloadButton: { ta: 'PDF விடைக்குறிப்பைப் பதிவிறக்கு', en: 'Download answer key PDF' },
+  downloadTitle: {
+    ta: (y: number) => `${y} விடைக்குறிப்பு PDF — இலவசப் பதிவிறக்கம்`,
+    en: (y: number) => `${y} Answer Key PDF — free download`,
+  },
+  downloadSub: {
+    ta: 'முழு விடைக்குறிப்பு ஒரே PDF-ல். பிறகு அதே வினாத்தாளை App-ல் விளக்கத்துடன் பயிற்சி செய்யுங்க.',
+    en: 'The full answer key in one PDF. Then practise the same paper in the app, with explanations.',
+  },
+  downloadShort: { ta: 'PDF பதிவிறக்கு', en: 'Download PDF' },
 
   infoTitle: { ta: 'வினாத்தாள் விவரம்', en: 'Paper Details' },
   examName: { ta: 'தேர்வின் பெயர்', en: 'Exam Name' },
@@ -50,6 +59,7 @@ const T = {
   questionsAvailable: { ta: 'பயிற்சிக்குக் கிடைக்கும் வினாக்கள்', en: 'Questions Available to Practice' },
   format: { ta: 'வடிவம்', en: 'Format' },
   formatVal: { ta: 'App-ல் இலவசப் பயிற்சி + விளக்கம்', en: 'Free in-app practice + explanations' },
+  formatValPdf: { ta: 'இலவச PDF + App-ல் பயிற்சி & விளக்கம்', en: 'Free PDF + in-app practice & explanations' },
   answerKeyType: { ta: 'விடைக்குறிப்பு வகை', en: 'Answer Key' },
   answerKeyTypeVal: { ta: 'TNPSC Mentors தொகுத்தது (அதிகாரப்பூர்வமற்றது)', en: 'Compiled by TNPSC Mentors (unofficial)' },
   statusSource: { ta: 'அதிகாரப்பூர்வ தளம்', en: 'Official Source' },
@@ -250,30 +260,40 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
             <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
           </div>
 
-          {/* ─── Practice CTA ───────────────────────────────────────────────── */}
-          <div className="mt-6 rounded-card border border-line bg-card p-5 text-center sm:p-6">
-            <h2 className="tamil font-heading text-lg font-bold text-ink sm:text-xl">{t('practiceTitle')}</h2>
+          {/* ─── Download + practice CTA ────────────────────────────────────── */}
+          {/* The PDF is what most visitors searched for, so when there is one it
+              leads in brand violet; practising in the app is the secondary step. */}
+          <div
+            className={`mt-6 rounded-card border p-5 text-center sm:p-6 ${
+              def.pdfHref ? 'border-brand/40 bg-brand-soft' : 'border-line bg-card'
+            }`}
+          >
+            <h2 className="tamil font-heading text-lg font-bold text-ink sm:text-xl">
+              {def.pdfHref ? T.downloadTitle[lang](def.year) : t('practiceTitle')}
+            </h2>
             <p className="tamil mt-1 font-body text-sm text-ink2">
-              {def.questionCount.toLocaleString()} · {t('questionsAvailable')}
+              {def.pdfHref ? t('downloadSub') : `${def.questionCount.toLocaleString()} · ${t('questionsAvailable')}`}
             </p>
             <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <a
-                href={def.practiceHref}
-                onClick={onPracticeClick}
-                className="btn-wrap btn-brand tamil inline-flex w-full max-w-sm justify-center px-6 py-3 text-sm sm:w-auto"
-              >
-                {t('practiceButton')} <ArrowRight size={16} />
-              </a>
               {def.pdfHref && (
                 <a
                   href={def.pdfHref}
                   download
                   onClick={onDownloadClick}
-                  className="btn-wrap btn tamil inline-flex w-full max-w-sm justify-center border border-line bg-card px-6 py-3 text-sm text-ink hover:bg-gray-50 dark:hover:bg-white/5 sm:w-auto"
+                  className="btn-wrap btn-brand tamil inline-flex w-full max-w-sm justify-center px-6 py-3.5 text-base shadow-lg shadow-brand/25 sm:w-auto"
                 >
-                  <Download size={16} /> {t('downloadButton')}
+                  <Download size={18} /> {t('downloadButton')}
                 </a>
               )}
+              <a
+                href={def.practiceHref}
+                onClick={onPracticeClick}
+                className={`btn-wrap tamil inline-flex w-full max-w-sm justify-center px-6 py-3 text-sm sm:w-auto ${
+                  def.pdfHref ? 'btn-ghost bg-card' : 'btn-brand'
+                }`}
+              >
+                {t('practiceButton')} <ArrowRight size={16} />
+              </a>
             </div>
           </div>
 
@@ -286,7 +306,7 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
                   [t('examName'), hub.examFullName[lang]],
                   [t('examYear'), String(def.year)],
                   [t('questionsAvailable'), def.questionCount.toLocaleString()],
-                  [t('format'), t('formatVal')],
+                  [t('format'), def.pdfHref ? t('formatValPdf') : t('formatVal')],
                   [t('answerKeyType'), t('answerKeyTypeVal')],
                 ].map(([label, value], i) => (
                   <tr key={label} className={i % 2 === 1 ? 'bg-gray-50 dark:bg-white/5' : 'bg-card'}>
@@ -430,6 +450,7 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
         appLabel={t('openApp')}
         appHref={appHref}
         onAppClick={onAppClick}
+        download={def.pdfHref ? { href: def.pdfHref, label: t('downloadShort'), onClick: onDownloadClick } : undefined}
       />
 
       <LandingLangPrompt open={!langChosen} onChoose={setLang} />

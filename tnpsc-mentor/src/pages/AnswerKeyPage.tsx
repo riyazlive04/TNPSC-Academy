@@ -1,5 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
-import { BookOpen, Check, CircleAlert, Clock, Download, ExternalLink, FileText, KeyRound, Send, UserPlus, Youtube } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, CircleAlert, Clock, Download, ExternalLink, FileText, KeyRound, Send, UserPlus, Youtube } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useForceLightTheme } from '../hooks/useForceLightTheme'
 import LandingLangPrompt, { useLandingLang, type LandingLang } from '../components/Landing/LandingLangPrompt'
@@ -21,6 +21,7 @@ import {
   ANSWER_KEY_GROUP_ORDER,
   ANSWER_KEY_ORIGIN,
   examPhase,
+  pastPagesForGroup,
   type AnswerKeyGroupDef,
   type AnswerKeyGroupKey,
   type ResourceKey,
@@ -39,6 +40,9 @@ const T = {
 
   byline: { ta: (d: string) => `TNPSC Mentors · புதுப்பிக்கப்பட்டது: ${d}`, en: (d: string) => `TNPSC Mentors · Updated: ${d}` },
   chooseExamTitle: { ta: 'தேர்வைத் தேர்ந்தெடுங்க', en: 'Choose Your Exam' },
+  chooseYear: { ta: 'மற்ற ஆண்டுகள்', en: 'Other Years' },
+  currentYearChip: { ta: '2026 (தற்போதைய)', en: '2026 (current)' },
+  viewPage: { ta: 'விவரம்', en: 'Details' },
   ctaKey: { ta: 'விடைக்குறிப்புக்குச் செல்', en: 'Go to the answer key' },
   ctaAppAuthed: { ta: 'என் Dashboard-க்கு செல்', en: 'Go to my dashboard' },
   ctaApp: { ta: 'இலவசக் கணக்கு', en: 'Free account' },
@@ -243,6 +247,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
   useEffect(() => setPhase(examPhase(def, now)), [now, def])
 
   const allReady = def.resources.every((r) => r.href)
+  const pastPages = pastPagesForGroup(group)
   const faqs = buildFaqs(def)
   const resourceCopy: Record<ResourceKey, { icon: typeof FileText; ta: string; en: string }> = {
     paper: { icon: FileText, ta: `TNPSC ${def.examLabel} வினாத்தாள் 2026`, en: `TNPSC ${def.examLabel} Question Paper 2026` },
@@ -456,6 +461,46 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
             </table>
           </div>
 
+          {/* ─── Previous years ───────────────────────────────────────────────── */}
+          {/* Until the 2026 key is out, the past papers are what a visitor can
+              actually download — so they sit high on the page with the PDF as
+              the loud button, not tucked into the sidebar. */}
+          {pastPages.length > 0 && (
+            <>
+              <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">
+                TNPSC {def.examLabel} Previous Year Answer Keys (PDF)
+              </h2>
+              <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
+                {pastPages.map((p) => (
+                  <li key={p.key} className="flex flex-wrap items-center gap-3 bg-card px-3 py-3 sm:px-4">
+                    <a
+                      href={p.path}
+                      className="tamil min-w-0 flex-1 font-heading text-sm font-semibold text-ink hover:text-brand-dark"
+                    >
+                      TNPSC {def.examLabel} Answer Key {p.year}
+                    </a>
+                    {p.pdfHref && (
+                      <a
+                        href={p.pdfHref}
+                        download
+                        onClick={() => track('answer_key_download_pdf', { group, year: p.year, source: 'hub' })}
+                        className="btn-wrap btn-brand tamil inline-flex min-h-[40px] items-center px-4 text-sm"
+                      >
+                        <Download size={15} /> {t('downloadPdf')}
+                      </a>
+                    )}
+                    <a
+                      href={p.path}
+                      className="tamil inline-flex items-center gap-1 font-heading text-sm font-bold text-brand hover:text-brand-dark"
+                    >
+                      {t('viewPage')} <ArrowRight size={14} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
           {/* ─── Subject-wise table ───────────────────────────────────────────── */}
           <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsTitle')}</h2>
           <div className="mt-3 overflow-x-auto rounded-card border border-line">
@@ -578,6 +623,18 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
               active: key === group,
             }))}
           />
+
+          {pastPages.length > 0 && (
+            <div className="mt-5">
+              <AnswerKeySidebarBox
+                title={t('chooseYear')}
+                items={[
+                  { href: def.path, label: t('currentYearChip'), active: true },
+                  ...pastPages.map((p) => ({ href: p.path, label: String(p.year) })),
+                ]}
+              />
+            </div>
+          )}
 
           <div className="mt-5">
             <AnswerKeySidebarBox title={t('sidebarLinksTitle')} items={sidebarLinks} />

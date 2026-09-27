@@ -2,6 +2,7 @@ import type { MouseEvent, ReactNode } from 'react'
 import {
   ArrowRight,
   BookOpen,
+  Download,
   Facebook,
   Instagram,
   KeyRound,
@@ -276,21 +277,35 @@ export function AnswerKeyStickyBar({
   appLabel,
   appHref,
   onAppClick,
+  download,
 }: {
   answerKeyLabel: string
   appLabel: string
   appHref: string
   onAppClick: AnswerKeyAppClick
+  /** When the page has a PDF, the bar leads with it (brand) and the app button steps back to ghost. */
+  download?: { href: string; label: string; onClick: () => void }
 }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-line bg-card/95 px-4 py-3 pb-safe backdrop-blur sm:hidden">
-      <a href="#answer-key" className="btn-wrap btn-ghost tamil min-h-[48px] flex-1 px-3 text-sm">
-        <KeyRound size={16} className="shrink-0" /> {answerKeyLabel}
-      </a>
+      {download ? (
+        <a
+          href={download.href}
+          download
+          onClick={download.onClick}
+          className="btn-wrap btn-brand tamil min-h-[48px] flex-1 px-3 text-sm"
+        >
+          <Download size={16} className="shrink-0" /> {download.label}
+        </a>
+      ) : (
+        <a href="#answer-key" className="btn-wrap btn-ghost tamil min-h-[48px] flex-1 px-3 text-sm">
+          <KeyRound size={16} className="shrink-0" /> {answerKeyLabel}
+        </a>
+      )}
       <a
         href={appHref}
         onClick={(e) => onAppClick(e, 'sticky')}
-        className="btn-wrap btn-brand tamil min-h-[48px] flex-1 px-3 text-sm"
+        className={`btn-wrap ${download ? 'btn-ghost' : 'btn-brand'} tamil min-h-[48px] flex-1 px-3 text-sm`}
       >
         {appLabel} <ArrowRight size={16} className="shrink-0" />
       </a>
