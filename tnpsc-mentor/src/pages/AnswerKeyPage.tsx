@@ -332,19 +332,21 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
           <p className="tamil mt-2 font-body text-xs font-medium text-ink2">{T.byline[lang](formatDate(lang, def.updated))}</p>
           <p className="tamil mt-4 font-body text-[15px] leading-relaxed text-ink2">{introText(lang, def, released)}</p>
 
-          {/* Live status banner — compact, not a full-bleed hero: a banner
-              image before, "in progress" during, "over" after. */}
+          {/* Live status banner — compact, not a full-bleed hero: the banner
+              image in every phase (a plain placeholder before the exam when
+              there is none), with an "in progress" / "over" badge under it. */}
           <div className="mt-5 rounded-card border border-line bg-card p-4 sm:p-5">
-            {phase === 'before' &&
-              (def.bannerImage ? (
-                <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
-              ) : (
+            {def.bannerImage ? (
+              <img src={def.bannerImage} alt={def.title} className="w-full rounded-field" />
+            ) : (
+              phase === 'before' && (
                 <div className="flex aspect-[3/1] w-full items-center justify-center rounded-field border border-dashed border-line bg-gray-50 dark:bg-white/5">
                   <span className="tamil font-body text-xs font-medium text-ink2">{t('beforeLead')}</span>
                 </div>
-              ))}
+              )
+            )}
             {phase === 'during' && (
-              <span className="tamil inline-flex items-center gap-2 rounded-full bg-brand px-3 py-1.5 font-heading text-xs font-bold text-white">
+              <span className={`tamil inline-flex items-center gap-2 rounded-full bg-brand px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/80" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
@@ -353,7 +355,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
               </span>
             )}
             {phase === 'after' && (
-              <span className="tamil inline-flex items-center gap-2 rounded-full bg-correct px-3 py-1.5 font-heading text-xs font-bold text-white">
+              <span className={`tamil inline-flex items-center gap-2 rounded-full bg-correct px-3 py-1.5 font-heading text-xs font-bold text-white ${def.bannerImage ? 'mt-4' : ''}`}>
                 <Check size={14} /> {t('afterBadge')}
               </span>
             )}
