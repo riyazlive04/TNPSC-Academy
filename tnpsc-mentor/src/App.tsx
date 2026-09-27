@@ -13,6 +13,7 @@ import { useAuthConfigStore } from './store/authConfigStore'
 import { useThemeStore } from './store/themeStore'
 import { useUpsellStore } from './store/upsellStore'
 import { api, warmApi } from './lib/api'
+import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
 import { trackPageView, trackViewContent } from './lib/tracking'
 import { pageVariants } from './lib/motion'
@@ -100,6 +101,7 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const SduiScreenPage = lazy(() => import('./pages/SduiScreenPage'))
 const CrmPage = lazy(() => import('./pages/CrmPage'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
 const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
@@ -344,8 +346,8 @@ function AnimatedRoutes() {
 
   return (
     <Routes location={location}>
-      {/* Root is auth-aware: logged-in users go straight to the app, everyone
-          else lands on /login. The marketing landing page is bypassed. */}
+      {/* Root is auth-aware: logged-in users go straight to the app, logged-out
+          web visitors see the public marketing/APK-download landing page. */}
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -461,15 +463,16 @@ function AnimatedRoutes() {
   )
 }
 
-/** Root path "/": send authenticated users straight into the app; everyone else
- * goes straight to the login screen. Waits for the initial session bootstrap so
- * a logged-in user isn't bounced through /login on a hard refresh.
+/** Root path "/": send authenticated users straight into the app; show the
+ * public landing page to logged-out web visitors. Waits for the initial session
+ * bootstrap so a logged-in user isn't flashed the landing page on a hard refresh.
  *
- * The public marketing / APK-download landing page used to sit here for
- * logged-out web visitors. It is now bypassed on every platform — the root URL
- * IS the auth portal, with no intermediate screen — so src/pages/LandingPage.tsx
- * is kept in the tree but no longer routed anywhere (and its lazy chunk is never
- * fetched). Restoring it is one route away. */
+ * Restored 2026-09-27 after a stretch (from 007d396) where the web root went
+ * straight to /login: that left Google a login form as the homepage, with no
+ * links into the public answer-key pages. The landing page's footer carries
+ * those links. The native build still skips it — a marketing / APK-download
+ * page makes no sense inside the installed app (LandingPage is lazily
+ * imported, so its chunk is never fetched in the APK). */
 function RootRedirect() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
@@ -478,7 +481,8 @@ function RootRedirect() {
   // Telecallers have no arena — send them straight to the desk rather than
   // through a redirect the ProtectedRoute would have to undo.
   if (user) return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
-  return <Navigate to="/login" replace />
+  if (isNativeApp()) return <Navigate to="/login" replace />
+  return <LandingPage />
 }
 
 /** The Group II/IIA links (/rank-booster, /group-2-test-series and its nested
