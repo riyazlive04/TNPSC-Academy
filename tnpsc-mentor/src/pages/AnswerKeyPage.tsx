@@ -14,6 +14,7 @@ import {
   TNPSC_OFFICIAL_URL,
   YOUTUBE_URL,
 } from '../components/Landing/AnswerKeyChrome'
+import { usePdfLangChooser } from '../components/Landing/PdfLangDialog'
 import { track, trackViewContent } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 import {
@@ -133,8 +134,13 @@ const SIDEBAR_PYQ_LINKS: { href: string; label: PlainKey }[] = [
 
 // ─── Per-group copy ──────────────────────────────────────────────────────────
 
-function introText(lang: LandingLang, def: AnswerKeyGroupDef): string {
+function introText(lang: LandingLang, def: AnswerKeyGroupDef, released: boolean): string {
   const name = def.examFullName[lang]
+  if (released) {
+    return lang === 'ta'
+      ? `${name} விடைக்குறிப்பு 2026 வெளியாகிவிட்டது. சரியான விடைகள் குறிக்கப்பட்ட வினாத்தாளையும், ஒவ்வொரு வினாவுக்கும் விரிவான விளக்கங்களுடன் கூடிய விடைக்குறிப்பையும் (தமிழ் அல்லது English) கீழே இலவச PDF-ஆகப் பதிவிறக்கலாம்.`
+      : `The ${name} Answer Key 2026 is out. Download the question paper with the correct answers marked, and the full answer key with a detailed explanation for every question (in Tamil or English), as free PDFs below.`
+  }
   if (lang === 'ta') {
     return def.examStart
       ? `${name} விடைக்குறிப்பு 2026 இந்தப் பக்கத்தில் வெளியிடப்படும். வினாத்தாள், துணைக்குறிப்பு (Answer Key) மற்றும் பாட வாரியான விளக்கங்களை இங்கே PDF-ஆகப் பதிவிறக்கலாம். இது ஏற்கனவே அறிவிக்கப்பட்ட தேர்வுத் தேதியை அடிப்படையாகக் கொண்டது — அதிகாரப்பூர்வ ஹால் டிக்கெட்டுடன் ஒப்பிட்டுப் பாருங்க.`
@@ -247,6 +253,12 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
   useEffect(() => setPhase(examPhase(def, now)), [now, def])
 
   const allReady = def.resources.every((r) => r.href)
+  const released = phase === 'after' && def.resources.some((r) => r.href)
+  const pdf = usePdfLangChooser(lang, (pdfLang, href) => track('answer_key_download', { group, lang: pdfLang, href }))
+  // Once released, the phone sticky bar leads with the detailed key (or the first live PDF).
+  const stickyPdf = released
+    ? (def.resources.find((r) => r.key === 'key' && r.href) ?? def.resources.find((r) => r.kind === 'pdf' && r.href))
+    : undefined
   const pastPages = pastPagesForGroup(group)
   const faqs = buildFaqs(def)
   const resourceCopy: Record<ResourceKey, { icon: typeof FileText; ta: string; en: string }> = {
@@ -318,7 +330,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
             {def.title}
           </h1>
           <p className="tamil mt-2 font-body text-xs font-medium text-ink2">{T.byline[lang](formatDate(lang, def.updated))}</p>
-          <p className="tamil mt-4 font-body text-[15px] leading-relaxed text-ink2">{introText(lang, def)}</p>
+          <p className="tamil mt-4 font-body text-[15px] leading-relaxed text-ink2">{introText(lang, def, released)}</p>
 
           {/* Live status banner — compact, not a full-bleed hero: a banner
               image before, "in progress" during, "over" after. */}
@@ -370,7 +382,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                   ],
                   [
                     t('statusKey'),
-                    phase === 'after' && def.resources.find((r) => r.key === 'key')?.href
+                    phase === 'after' && def.resources.some((r) => r.key !== 'paper' && r.href)
                       ? t('statusAvailable')
                       : t('statusNotYet'),
                   ],
@@ -434,7 +446,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                       <td className="border-t border-line px-3 py-3 sm:px-4">
                         <span className="tamil inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink">
                           <copy.icon size={15} className="shrink-0 text-brand" />
-                          {copy[lang]}
+                          {r.label?.[lang] ?? copy[lang]}
                         </span>
                       </td>
                       <td className="border-t border-line px-3 py-3 text-right sm:px-4">
@@ -442,11 +454,13 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                           <a
                             href={r.href!}
                             {...(r.kind === 'pdf' ? { download: '' } : {})}
-                            onClick={() => track('answer_key_download', { resource: r.key, group })}
-                            className="tamil inline-flex items-center gap-1.5 font-heading text-sm font-bold text-brand hover:text-brand-dark"
+                            onClick={(e) => pdf.onTrigger(e, { en: r.href!, ta: r.hrefTa ?? null })}
+                            aria-label={r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}
+                            className="btn-wrap btn-brand tamil inline-flex min-h-[40px] min-w-[40px] items-center justify-center px-2.5 text-sm sm:px-4"
                           >
                             {r.kind === 'pdf' ? <Download size={15} /> : <ExternalLink size={15} />}
-                            {r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}
+                            {/* Icon-only on phones: the Tamil label would push the table sideways. */}
+                            <span className="hidden sm:inline">{r.kind === 'pdf' ? t('downloadPdf') : t('openLink')}</span>
                           </a>
                         ) : (
                           <span className="tamil inline-flex items-center gap-1.5 font-body text-sm font-medium text-ink2">
@@ -483,7 +497,10 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                       <a
                         href={p.pdfHref}
                         download
-                        onClick={() => track('answer_key_download_pdf', { group, year: p.year, source: 'hub' })}
+                        onClick={(e) => {
+                          track('answer_key_download_pdf', { group, year: p.year, source: 'hub' })
+                          pdf.onTrigger(e, { en: p.pdfHref!, ta: p.pdfHrefTa })
+                        }}
                         className="btn-wrap btn-brand tamil inline-flex min-h-[40px] items-center px-4 text-sm"
                       >
                         <Download size={15} /> {t('downloadPdf')}
@@ -680,8 +697,18 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
         appLabel={t('openApp')}
         appHref={appHref}
         onAppClick={onAppClick}
+        download={
+          stickyPdf
+            ? {
+                href: stickyPdf.href!,
+                label: t('downloadPdf'),
+                onClick: (e) => pdf.onTrigger(e, { en: stickyPdf.href!, ta: stickyPdf.hrefTa ?? null }),
+              }
+            : undefined
+        }
       />
 
+      {pdf.dialog}
       <LandingLangPrompt open={!langChosen} onChoose={setLang} />
     </div>
   )

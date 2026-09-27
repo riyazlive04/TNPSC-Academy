@@ -14,6 +14,7 @@ import {
   TNPSC_OFFICIAL_URL,
   YOUTUBE_URL,
 } from '../components/Landing/AnswerKeyChrome'
+import { usePdfLangChooser } from '../components/Landing/PdfLangDialog'
 import { track, trackViewContent } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 import {
@@ -227,8 +228,11 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
     track('answer_key_practice', { group: def.group, year: def.year })
     if (isAndroidWebView) openInBrowser(def.practiceHref)
   }
-  const onDownloadClick = () => {
-    track('answer_key_download_pdf', { group: def.group, year: def.year })
+  const pdf = usePdfLangChooser(lang, (pdfLang) =>
+    track('answer_key_download_pdf', { group: def.group, year: def.year, lang: pdfLang })
+  )
+  const onDownloadClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (def.pdfHref) pdf.onTrigger(e, { en: def.pdfHref, ta: def.pdfHrefTa })
   }
 
   const appLabel = isAuthenticated ? t('ctaAppAuthed') : t('ctaApp')
@@ -453,6 +457,7 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
         download={def.pdfHref ? { href: def.pdfHref, label: t('downloadShort'), onClick: onDownloadClick } : undefined}
       />
 
+      {pdf.dialog}
       <LandingLangPrompt open={!langChosen} onChoose={setLang} />
     </div>
   )

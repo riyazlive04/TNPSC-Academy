@@ -11,7 +11,7 @@ SIGNUP_URL = "https://tnpscmentors.in/register"
 SITE = "www.tnpscmentors.in"
 
 FEATURES = [
-    "Test Series - full-length mock exams (Group 1 Test Marathon and more)",
+    "Test Series - full-length mock exams",
     "PYQ Practice - previous year papers with bilingual explanations",
     "Daily Current Affairs - daily quiz plus a monthly magazine",
     "Smart Revision - practice that adapts to your weak topics",
@@ -97,7 +97,5 @@ def add_signup_page(doc: "fitz.Document") -> None:
     page.insert_link({"kind": fitz.LINK_URI, "from": link_rect, "uri": SIGNUP_URL})
 
     center_text(page, cx, link_y + 22, "Free to start - no credit card required.", 9, "helv", INK2)
-
-    # ── Footer ───────────────────────────────────────────────────
-    page.draw_line(fitz.Point(left, h - 34), fitz.Point(right, h - 34), color=(0.85, 0.85, 0.88), width=0.75)
-    center_text(page, cx, h - 18, f"Powered by TNPSC Mentors  ·  {SITE}", 8.5, "helv", INK2)
+    # No footer here: watermark_answer_key_pdfs.py draws the social strip on
+    # every page, this one included.

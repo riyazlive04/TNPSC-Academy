@@ -25,7 +25,13 @@ export interface AnswerKeyResource {
   key: ResourceKey
   /** 'pdf' downloads; 'page' opens (a web page or in-app route). */
   kind: 'pdf' | 'page'
+  /** The English (or bilingual) edition. */
   href: string | null
+  /** The Tamil-explanations edition; when set, the page asks which language
+   *  the visitor wants before downloading. */
+  hrefTa?: string | null
+  /** Overrides the row's default name when the file is more specific than it. */
+  label?: { en: string; ta: string }
 }
 
 export interface AnswerKeySubject {
@@ -95,11 +101,28 @@ export const ANSWER_KEY_GROUPS: Record<AnswerKeyGroupKey, AnswerKeyGroupDef> = {
     totalMarks: 300,
     negativeMarking: false,
     published: '2026-09-23',
-    updated: '2026-09-23',
+    updated: '2026-09-27',
+    // No separate 'explanations' row: the detailed key carries them, per question.
     resources: [
-      { key: 'paper', kind: 'pdf', href: null },
-      { key: 'key', kind: 'pdf', href: null },
-      { key: 'explanations', kind: 'pdf', href: null },
+      {
+        key: 'paper',
+        kind: 'pdf',
+        href: '/downloads/group1-2026/tnpsc-group-1-question-paper-2026-with-answers.pdf',
+        label: {
+          en: 'Question Paper 2026 with Answers Marked (Tamil + English)',
+          ta: 'வினாத்தாள் 2026 — சரியான விடைகள் குறிக்கப்பட்டது (தமிழ் + English)',
+        },
+      },
+      {
+        key: 'key',
+        kind: 'pdf',
+        href: '/downloads/group1-2026/tnpsc-group-1-answer-key-2026.pdf',
+        hrefTa: '/downloads/group1-2026/tnpsc-group-1-answer-key-2026-tamil.pdf',
+        label: {
+          en: 'Answer Key 2026 with Detailed Explanations (Tamil / English)',
+          ta: 'விரிவான விளக்கங்களுடன் விடைக்குறிப்பு 2026 (தமிழ் / English)',
+        },
+      },
     ],
     subjects: [
       { en: 'General Science', ta: 'பொது அறிவியல்', href: null },
@@ -214,6 +237,8 @@ export interface PastAnswerKeyPageDef {
   /** The official answer-key PDF under public/downloads/<group>-<year>/, or
    *  null while it hasn't been prepared for that year yet. */
   pdfHref: string | null
+  /** The same key with Tamil explanations, or null while only English exists. */
+  pdfHrefTa: string | null
   practiceHref: string
   questionCount: number
   title: string
@@ -233,6 +258,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-1-answer-key-2025',
     bannerImage: '/group1-answer-key-banner-2025.jpg',
     pdfHref: '/downloads/group1-2025/tnpsc-group-1-answer-key-2025.pdf',
+    pdfHrefTa: null,
     practiceHref: practiceHref('group1', 2025),
     questionCount: 197,
     title: 'TNPSC Group 1 Answer Key 2025 & Previous Year Question Paper with Explanations',
@@ -249,6 +275,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-1-answer-key-2024',
     bannerImage: '/group1-answer-key-banner-2024.jpg',
     pdfHref: '/downloads/group1-2024/tnpsc-group-1-answer-key-2024.pdf',
+    pdfHrefTa: null,
     practiceHref: practiceHref('group1', 2024),
     questionCount: 195,
     title: 'TNPSC Group 1 Answer Key 2024 & Previous Year Question Paper with Explanations',
@@ -265,6 +292,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-1-answer-key-2022',
     bannerImage: '/group1-answer-key-banner-2022.jpg',
     pdfHref: '/downloads/group1-2022/tnpsc-group-1-answer-key-2022.pdf',
+    pdfHrefTa: null,
     practiceHref: practiceHref('group1', 2022),
     questionCount: 195,
     title: 'TNPSC Group 1 Answer Key 2022 & Previous Year Question Paper with Explanations',
@@ -281,6 +309,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-2-answer-key-2025',
     bannerImage: '/group2-answer-key-banner-2025.jpg',
     pdfHref: '/downloads/group2-2025/tnpsc-group-2-answer-key-2025.pdf',
+    pdfHrefTa: null,
     practiceHref: practiceHref('group2', 2025),
     questionCount: 296,
     title: 'TNPSC Group 2 & 2A Answer Key 2025 & Previous Year Question Paper with Explanations',
@@ -297,6 +326,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-2-answer-key-2024',
     bannerImage: '/group2-answer-key-banner-2024.jpg',
     pdfHref: '/downloads/group2-2024/tnpsc-group-2-answer-key-2024.pdf',
+    pdfHrefTa: null,
     practiceHref: practiceHref('group2', 2024),
     questionCount: 298,
     title: 'TNPSC Group 2 & 2A Answer Key 2024 & Previous Year Question Paper with Explanations',
@@ -313,6 +343,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-4-answer-key-2025',
     bannerImage: '/group4-answer-key-banner-2025.jpg',
     pdfHref: '/downloads/group4-2025/tnpsc-group-4-answer-key-2025.pdf',
+    pdfHrefTa: '/downloads/group4-2025/tnpsc-group-4-answer-key-2025-tamil.pdf',
     practiceHref: practiceHref('group4', 2025),
     questionCount: 200,
     title: 'TNPSC Group 4 Answer Key 2025 & Previous Year Question Paper with Explanations',
@@ -329,6 +360,7 @@ export const PAST_ANSWER_KEY_PAGES: PastAnswerKeyPageDef[] = [
     path: '/tnpsc-group-4-answer-key-2024',
     bannerImage: '/group4-answer-key-banner-2024.jpg',
     pdfHref: '/downloads/group4-2024/tnpsc-group-4-answer-key-2024.pdf',
+    pdfHrefTa: '/downloads/group4-2024/tnpsc-group-4-answer-key-2024-tamil.pdf',
     practiceHref: practiceHref('group4', 2024),
     questionCount: 200,
     title: 'TNPSC Group 4 Answer Key 2024 & Previous Year Question Paper with Explanations',
@@ -429,11 +461,23 @@ export function answerKeyJsonLd(group: AnswerKeyGroupDef): object {
         ],
         ...(published.length
           ? {
-              hasPart: published.map((r) => ({
-                '@type': 'DigitalDocument',
-                name: resourceSeoName[r.key],
-                url: absolute(r.href),
-              })),
+              hasPart: published.flatMap((r) => [
+                {
+                  '@type': 'DigitalDocument',
+                  name: resourceSeoName[r.key],
+                  url: absolute(r.href),
+                },
+                ...(r.hrefTa
+                  ? [
+                      {
+                        '@type': 'DigitalDocument',
+                        name: `${resourceSeoName[r.key]} (Tamil)`,
+                        url: absolute(r.hrefTa),
+                        inLanguage: 'ta-IN',
+                      },
+                    ]
+                  : []),
+              ]),
             }
           : {}),
       },
@@ -527,6 +571,16 @@ export function pastAnswerKeyJsonLd(def: PastAnswerKeyPageDef): object {
                   name: `TNPSC ${hub.examLabel} Answer Key ${def.year} (PDF)`,
                   url: absolute(def.pdfHref),
                 },
+                ...(def.pdfHrefTa
+                  ? [
+                      {
+                        '@type': 'DigitalDocument',
+                        name: `TNPSC ${hub.examLabel} Answer Key ${def.year} with Tamil Explanations (PDF)`,
+                        url: absolute(def.pdfHrefTa),
+                        inLanguage: 'ta-IN',
+                      },
+                    ]
+                  : []),
               ],
             }
           : {}),

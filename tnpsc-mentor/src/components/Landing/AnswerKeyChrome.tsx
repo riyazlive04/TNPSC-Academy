@@ -284,7 +284,7 @@ export function AnswerKeyStickyBar({
   appHref: string
   onAppClick: AnswerKeyAppClick
   /** When the page has a PDF, the bar leads with it (brand) and the app button steps back to ghost. */
-  download?: { href: string; label: string; onClick: () => void }
+  download?: { href: string; label: string; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }
 }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-line bg-card/95 px-4 py-3 pb-safe backdrop-blur sm:hidden">
