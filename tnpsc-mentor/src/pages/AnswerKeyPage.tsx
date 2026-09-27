@@ -82,11 +82,14 @@ const T = {
   // Released layout (mirrors the past-year pages once a key is out).
   releasedTitle: { ta: '2026 விடைக்குறிப்பு PDF — இலவசப் பதிவிறக்கம்', en: '2026 Answer Key PDF — free download' },
   releasedSub: {
-    ta: 'ஒவ்வொரு வினாவுக்கும் விளக்கத்துடன் முழு விடைக்குறிப்பு — தமிழ் அல்லது English-ல். சரியான விடைகள் குறிக்கப்பட்ட வினாத்தாளும் உண்டு.',
-    en: 'The full answer key with an explanation for every question, in Tamil or English. Plus the question paper with the correct answers marked.',
+    ta: 'ஒவ்வொரு வினாவுக்கும் விளக்கம் & ஆதாரத்துடன் முழு விடைக்குறிப்பு — தமிழ் அல்லது English-ல். சரியான விடைகள் குறிக்கப்பட்ட வினாத்தாளும் உண்டு.',
+    en: 'The full answer key with an explanation and source for every question, in Tamil or English. Plus the question paper with the correct answers marked.',
   },
-  releasedKeyButton: { ta: 'PDF விடைக்குறிப்பைப் பதிவிறக்கு', en: 'Download answer key PDF' },
-  releasedPaperButton: { ta: 'விடைகளுடன் வினாத்தாள்', en: 'Question paper with answers' },
+  releasedKeyButton: {
+    ta: 'விளக்கம் & ஆதாரத்துடன் விடைக்குறிப்பு PDF பதிவிறக்கு',
+    en: 'Download answer key PDF with explanation & source',
+  },
+  releasedPaperButton: { ta: 'விடைக்குறிப்பு PDF மட்டும்', en: 'Just answer key PDF' },
   infoTitle: { ta: 'வினாத்தாள் விவரம்', en: 'Paper Details' },
   infoFormatVal: { ta: 'இலவச PDF · தமிழ் & English விளக்கங்கள்', en: 'Free PDF · Tamil & English explanations' },
   answerKeyType: { ta: 'விடைக்குறிப்பு வகை', en: 'Answer Key' },
@@ -190,13 +193,13 @@ function buildFaqs(def: AnswerKeyGroupDef, released: boolean): { ta: { q: string
       en: {
         q: `Where can I download the TNPSC ${label} question paper 2026?`,
         a: released
-          ? 'Right here: use "Question paper with answers" at the top of this page. It is a free PDF in Tamil and English.'
+          ? 'Right here: "Just answer key PDF" at the top of this page is the full question paper with the correct answers marked, a free PDF in Tamil and English.'
           : 'Right here, in the table above — as a free PDF, once the exam is over.',
       },
       ta: {
         q: `TNPSC ${label} வினாத்தாள் 2026-ஐ எங்கே பதிவிறக்கலாம்?`,
         a: released
-          ? 'இங்கேயே: இந்தப் பக்கத்தின் மேலே உள்ள "விடைகளுடன் வினாத்தாள்" பொத்தான் — தமிழ் & English இலவச PDF.'
+          ? 'இங்கேயே: இந்தப் பக்கத்தின் மேலே உள்ள "விடைக்குறிப்பு PDF மட்டும்" — சரியான விடைகள் குறிக்கப்பட்ட முழு வினாத்தாள், தமிழ் & English இலவச PDF.'
           : 'இங்கேயே, மேலே உள்ள அட்டவணையில் — தேர்வு முடிந்ததும் இலவச PDF-ஆக.',
       },
     },
@@ -424,7 +427,7 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                       href={keyRes.href}
                       download
                       onClick={(e) => pdf.onTrigger(e, { en: keyRes.href!, ta: keyRes.hrefTa ?? null })}
-                      className="btn-wrap btn-brand tamil inline-flex w-full max-w-sm justify-center px-6 py-3.5 text-base shadow-lg shadow-brand/25 sm:w-auto"
+                      className="btn-wrap btn-brand tamil inline-flex w-full max-w-sm justify-center sm:max-w-none px-6 py-3.5 text-base shadow-lg shadow-brand/25 sm:w-auto"
                     >
                       <Download size={18} /> {t('releasedKeyButton')}
                     </a>
