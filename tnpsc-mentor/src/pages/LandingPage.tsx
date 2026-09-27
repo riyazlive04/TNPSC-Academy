@@ -42,6 +42,7 @@ import { useAuthStore } from '../store/authStore'
 import { useThemeStore } from '../store/themeStore'
 import { api } from '../lib/api'
 import { trackApkDownload } from '../lib/tracking'
+import { ANSWER_KEY_GROUPS, ANSWER_KEY_GROUP_ORDER, PAST_ANSWER_KEY_PAGES } from '../lib/answerKeyGroups'
 import PricingCards from '../components/Landing/PricingCards'
 
 // ─── Open items (founder to supply before launch) ────────────────────────────
@@ -1056,6 +1057,20 @@ export default function LandingPage() {
               </a>
             </div>
 
+            {/* The answer-key pages' only link from the rest of the site — without
+                it they were orphans Google could reach through the sitemap alone.
+                Anchor text stays English: it is the phrase aspirants search. */}
+            <div className="flex flex-col gap-3 font-body text-sm">
+              <span className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-ink2">
+                Answer Keys
+              </span>
+              {ANSWER_KEY_GROUP_ORDER.map((key) => (
+                <a key={key} href={ANSWER_KEY_GROUPS[key].path} className="text-ink transition hover:text-brand-dark">
+                  TNPSC {ANSWER_KEY_GROUPS[key].examLabel} Answer Key 2026
+                </a>
+              ))}
+            </div>
+
             <div className="flex flex-col gap-3 font-body text-sm">
               <span className="font-heading text-xs font-semibold uppercase tracking-[0.16em] text-ink2">
                 Legal
@@ -1075,7 +1090,19 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col gap-2 border-t border-line pt-6 font-body text-xs text-ink2 sm:flex-row sm:items-center sm:justify-between">
+          <nav aria-label="Previous year answer keys" className="mt-8 border-t border-line pt-6 font-body text-xs text-ink2">
+            <span className="font-heading font-semibold text-ink">Previous year answer keys & question papers: </span>
+            {PAST_ANSWER_KEY_PAGES.map((p, i) => (
+              <span key={p.key}>
+                {i > 0 && ' · '}
+                <a href={p.path} className="transition hover:text-brand-dark">
+                  TNPSC {ANSWER_KEY_GROUPS[p.group].examLabel} Answer Key {p.year}
+                </a>
+              </span>
+            ))}
+          </nav>
+
+          <div className="mt-6 flex flex-col gap-2 border-t border-line pt-6 font-body text-xs text-ink2 sm:flex-row sm:items-center sm:justify-between">
             <p>© {2026} TNPSC Mentors · {t('footerDisclaimer')}</p>
             <p>
               Collaborated with{' '}
