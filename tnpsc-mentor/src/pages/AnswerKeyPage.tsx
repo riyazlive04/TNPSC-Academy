@@ -451,6 +451,42 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                 </div>
               </div>
 
+              {/* ─── Subject-wise PDFs ─────────────────────────────────────── */}
+              {def.subjects.some((sub) => sub.href) && (
+                <>
+                  <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsReleasedTitle')}</h2>
+                  <p className="tamil mt-1 font-body text-sm text-ink2">{t('subjectsReleasedSub')}</p>
+                  <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
+                    {def.subjects
+                      .filter((sub) => sub.href)
+                      .map((sub) => (
+                        <li key={sub.en} className="flex items-center gap-3 bg-card px-3 py-3 sm:px-4">
+                          <span className="min-w-0 flex-1">
+                            <span className="tamil block font-heading text-sm font-semibold text-ink">{sub[lang]}</span>
+                            {sub.questions != null && (
+                              <span className="tamil block font-body text-xs text-ink2">
+                                {sub.questions} {t('questionsCount')}
+                              </span>
+                            )}
+                          </span>
+                          <a
+                            href={sub.href!}
+                            download
+                            onClick={(e) => {
+                              track('answer_key_download', { resource: `subject:${sub.en}`, group })
+                              pdf.onTrigger(e, { en: sub.href!, ta: sub.hrefTa ?? null })
+                            }}
+                            aria-label={`${t('downloadPdf')}: ${sub[lang]}`}
+                            className="btn-wrap btn-brand tamil inline-flex min-h-[40px] shrink-0 items-center px-4 text-sm"
+                          >
+                            <Download size={15} /> {t('downloadPdf')}
+                          </a>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              )}
+
               {/* ─── Paper details table ───────────────────────────────────── */}
               <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('infoTitle')}</h2>
               <div className="mt-3 overflow-hidden rounded-card border border-line">
@@ -500,42 +536,6 @@ export default function AnswerKeyPage({ group }: { group: AnswerKeyGroupKey }) {
                   </tbody>
                 </table>
               </div>
-
-              {/* ─── Subject-wise PDFs ─────────────────────────────────────── */}
-              {def.subjects.some((sub) => sub.href) && (
-                <>
-                  <h2 className="tamil mt-8 font-heading text-lg font-bold text-ink sm:text-xl">{t('subjectsReleasedTitle')}</h2>
-                  <p className="tamil mt-1 font-body text-sm text-ink2">{t('subjectsReleasedSub')}</p>
-                  <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line">
-                    {def.subjects
-                      .filter((sub) => sub.href)
-                      .map((sub) => (
-                        <li key={sub.en} className="flex items-center gap-3 bg-card px-3 py-3 sm:px-4">
-                          <span className="min-w-0 flex-1">
-                            <span className="tamil block font-heading text-sm font-semibold text-ink">{sub[lang]}</span>
-                            {sub.questions != null && (
-                              <span className="tamil block font-body text-xs text-ink2">
-                                {sub.questions} {t('questionsCount')}
-                              </span>
-                            )}
-                          </span>
-                          <a
-                            href={sub.href!}
-                            download
-                            onClick={(e) => {
-                              track('answer_key_download', { resource: `subject:${sub.en}`, group })
-                              pdf.onTrigger(e, { en: sub.href!, ta: sub.hrefTa ?? null })
-                            }}
-                            aria-label={`${t('downloadPdf')}: ${sub[lang]}`}
-                            className="btn-wrap btn-brand tamil inline-flex min-h-[40px] shrink-0 items-center px-4 text-sm"
-                          >
-                            <Download size={15} /> {t('downloadPdf')}
-                          </a>
-                        </li>
-                      ))}
-                  </ul>
-                </>
-              )}
 
               {pastYearsList}
 
