@@ -342,6 +342,27 @@ html.lang-asking{overflow:hidden}
 @media (min-width:1024px){.col-side{margin-top:0}}
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
+/* Visually gone, still read by search engines and screen readers. Only for
+   content something else on screen is already showing. */
+.vh{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+
+.herobanner{display:none}
+@media (min-width:700px){
+  html:not([data-lang="ta"]) .herobanner{
+    display:block;margin:18px 0 6px;border-radius:var(--r-hero);overflow:hidden;
+    aspect-ratio:1774/887;background:var(--brand-soft) center/cover no-repeat;
+    background-image:image-set(url("hero-1200.webp") 1x, url("hero-1774.webp") 2x);
+    box-shadow:var(--shadow-soft)}
+  /* Older Safari/Chromium without image-set() take the JPEG. */
+  @supports not (background-image:image-set(url("x.webp") 1x)){
+    html:not([data-lang="ta"]) .herobanner{background-image:url("hero-1200.jpg")}
+  }
+  /* The banner already says all of this — keep it in the DOM, drop it visually. */
+  html:not([data-lang="ta"]) .hero-text{position:absolute;width:1px;height:1px;
+    margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);
+    white-space:nowrap;border:0}
+}
 .hero{padding:22px 0 6px}
 .hero h1{font-size:clamp(23px,4.2vw,34px);line-height:1.28;margin:12px 0 10px}
 .hero .lede{color:var(--ink2);font-size:16.5px;margin:0 0 18px;max-width:62ch}

@@ -408,7 +408,15 @@ setFooterUnits(liveUnits.map((u) => u.def).filter((d) => d.key !== UNIT_OTHER.ke
 console.log(`\nWriting to ${OUT}`)
 rmSync(OUT, { recursive: true, force: true })
 write('archive.css', CSS)
-for (const f of ['logo-mark.png', 'social.png']) {
+for (const f of [
+  'logo-mark.png',
+  'social.png',
+  // The hub's hero banner: a 1x WebP, a 2x WebP, and a JPEG for browsers
+  // without image-set(). Only ever fetched above 700px — see .herobanner.
+  'hero-1200.webp',
+  'hero-1774.webp',
+  'hero-1200.jpg',
+]) {
   write(f, readFileSync(resolve(ROOT, 'scripts/qbank/assets', f)))
 }
 
@@ -681,7 +689,12 @@ writePage(
       },
       FAQ.jsonLd,
     ],
-    body: `<section class="hero">
+    body: `<div class="herobanner" role="img" aria-label="${esc(
+      `${BRAND} — TNPSC previous year question papers with answers, detailed explanations and insights. ` +
+        `${n(totalQ)} questions, ${n(paperList.length)} papers, ${n(liveUnits.length)} subjects, in Tamil and English.`,
+    )}"></div>
+<section class="hero">
+<div class="hero-text">
 <p class="eyebrow">${both('Free · No sign-up to read', 'இலவசம் · படிக்க கணக்கு தேவையில்லை')}</p>
 <h1>${en('TNPSC previous year question papers, with answers')}${ta(
       'TNPSC முந்தைய ஆண்டு வினாத்தாள்கள், விடைகளுடன்',
@@ -699,6 +712,7 @@ writePage(
 <li><b>${n(liveUnits.length)}</b>${one('subjects', 'பாடங்கள்')}</li>
 <li><b>2</b>${one('languages', 'மொழிகள்')}</li>
 </ul>
+</div>
 <div class="hero-cta">
 <a class="btn btn-brand btn-lg" href="#papers">${one('Browse the papers', 'வினாத்தாள்களைப் பாருங்க')}</a>
 <a class="btn btn-ghost btn-lg" href="${esc(APP_REGISTER)}">${one('Create a free account', 'இலவசக் கணக்கு தொடங்குங்க')}</a>
