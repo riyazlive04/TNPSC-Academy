@@ -44,7 +44,20 @@ function renderTeX(tex: string): string {
  */
 function isLiteralDollarSpan(s: string): boolean {
   if (/[\\^_{}]/.test(s)) return false
+  // Indic script with no TeX around it is a sentence that happens to sit
+  // between two stray dollar signs, not an equation. This sits after the test
+  // above on purpose: the bank really does write fractions with Tamil operands
+  // (\dfrac{மதிப்பெண்களின் கூட்டுத்தொகை}{மாணவர்களின் எண்ணிக்கை} is a perfectly
+  // good "sum of marks over number of students"), and those carry a backslash
+  // or a brace, so they are already settled as math.
+  if (/[ऀ-෿]/.test(s)) return true
   if (/\b(billion|million|trillion|crore|lakh)\b/i.test(s)) return true
+  // A number followed by a word, as in "A sum grows from $400 to $500" — the
+  // span captured between the two dollar signs is "400 to ", which carries only
+  // one short word and so slips past the two-long-words test below. Genuine
+  // single-$ math ("$x$", "$2+3$", "$n = 5$") has no digit-then-word pair, so
+  // this catches none of it.
+  if (/\d[\d,.]*\s+[A-Za-z]/.test(s)) return true
   return (s.match(/[A-Za-z]{3,}/g) ?? []).length >= 2
 }
 

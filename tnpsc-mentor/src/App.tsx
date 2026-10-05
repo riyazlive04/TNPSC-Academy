@@ -457,6 +457,15 @@ function AnimatedRoutes() {
         />
       ))}
 
+      {/* The public question archive (tnpscmentors.in/questions/) is thousands
+          of pre-rendered static pages served by nginx, not routes in this app.
+          A signed-in reader arrives here only via ?from=/questions/..., which
+          the post-auth router hands to navigate() — a client-side move that
+          would land on NotFound because React Router owns the URL once the SPA
+          has booted. Handing it back to the browser makes nginx serve the real
+          page. See lockedExplanation() in scripts/qbank/render.mjs. */}
+      <Route path="/questions/*" element={<LeaveToStaticSite />} />
+
       {/* Fallback */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -572,6 +581,40 @@ function MaintenancePage() {
       </Link>
     </div>
   )
+}
+
+/**
+ * Hand a static-site URL back to the browser.
+ *
+ * replace() rather than assign() so the back button returns to wherever the
+ * reader came from rather than to this invisible hop. The one-shot sessionStorage
+ * guard matters because /questions/<missing> falls through nginx's try_files to
+ * this SPA: without it, that URL would bounce between the browser and the router
+ * forever instead of showing the not-found page once.
+ */
+function LeaveToStaticSite() {
+  const target = window.location.pathname + window.location.search
+  const bounced = (() => {
+    try {
+      return sessionStorage.getItem('static-bounce') === target
+    } catch {
+      return false
+    }
+  })()
+
+  useEffect(() => {
+    if (bounced) return
+    try {
+      sessionStorage.setItem('static-bounce', target)
+    } catch {
+      // Private mode: the guard is unavailable, so skip the hop entirely rather
+      // than risk a loop.
+      return
+    }
+    window.location.replace(target)
+  }, [bounced, target])
+
+  return bounced ? <NotFound /> : null
 }
 
 function NotFound() {

@@ -71,6 +71,10 @@ function deviceKey(accessToken: string | undefined, req: { body?: { device_id?: 
 // receive the refresh token in the JSON body and send it back explicitly; both
 // transports are supported in parallel.
 const RT_COOKIE = 'tnpsc_rt'
+// Readable by JS, on the parent domain, and worth nothing on its own — see the
+// note above setRtCookie. Only the public question archive reads it.
+const HINT_COOKIE = 'tnpsc_has_session'
+const HINT_DOMAIN = '.tnpscmentors.in'
 const RT_MAX_AGE_MS = 60 * 24 * 60 * 60 * 1000 // 60 days
 // Scoped to /api/auth so the cookie is only ever sent to the auth endpoints that
 // need it (login/refresh/logout), never to data routes.
@@ -86,6 +90,17 @@ function setRtCookie(res: Response, refreshToken: string): void {
     path: RT_PATH,
     maxAge: RT_MAX_AGE_MS,
   })
+  // Mirror the session's existence (not the session) onto the parent domain.
+  if (config.isProd) {
+    res.cookie(HINT_COOKIE, '1', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'lax',
+      domain: HINT_DOMAIN,
+      path: '/',
+      maxAge: RT_MAX_AGE_MS,
+    })
+  }
 }
 
 /** Clear the refresh-token cookie on logout. */
@@ -96,6 +111,9 @@ function clearRtCookie(res: Response): void {
     sameSite: config.isProd ? 'none' : 'lax',
     path: RT_PATH,
   })
+  if (config.isProd) {
+    res.clearCookie(HINT_COOKIE, { domain: HINT_DOMAIN, path: '/' })
+  }
 }
 
 // ─── Brute-force / abuse limiters ────────────────────────────────────────────

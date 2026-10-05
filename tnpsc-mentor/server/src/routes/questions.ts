@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, roleOf, type AuthedRequest } from '../middleware/auth.js'
+import { supabaseAdmin } from '../supabase.js'
 import { recordSeen } from '../lib/seen.js'
 import { bundleAccess } from '../lib/premium.js'
 import {
@@ -204,6 +205,62 @@ async function isUnlimited(req: AuthedRequest, category?: string): Promise<boole
     return false // fail closed on entitlement: treat as free (gate may apply)
   }
 }
+
+// ─── GET /api/questions/archive-explanation ──────────────────────────────────
+// The public question archive (tnpscmentors.in/questions/, built by
+// scripts/qbank) ships the question and its answer but withholds the
+// explanation entirely — not blurred, absent — because a CSS blur over real
+// text is defeated by View Source and reads as cloaking to Google. A signed-in
+// reader fetches it from here instead, and the page swaps it in.
+//
+// Scope is the SAME allow-list the archive publishes, not a deny-list: this is
+// a public-origin, low-friction endpoint, so a new paid bank must be invisible
+// to it by default. Anything outside PYQ is a 404 whether or not it exists.
+const ARCHIVE_CATEGORIES = ['pyq', 'pyq2', 'pyq4']
+
+// Generous, because a reader legitimately opens many of these pages in a
+// session, but bounded so an account cannot be used to drain the explanations
+// wholesale. Keyed per user rather than per IP: a college or an office shares
+// one address, and the endpoint already requires a session.
+const archiveLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => (req as AuthedRequest).userId ?? req.ip ?? 'anon',
+  message: { error: 'Too many explanation requests — try again later.' },
+})
+
+router.get(
+  '/archive-explanation',
+  requireAuth,
+  archiveLimiter,
+  asyncH(async (req: AuthedRequest, res) => {
+    const id = typeof req.query.id === 'string' ? req.query.id.trim() : ''
+    // A malformed id must not reach the database as a cast error.
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return res.status(400).json({ error: 'Bad id' })
+
+    const { data, error } = await supabaseAdmin
+      .from('questions')
+      .select('id, category, active, explanation, explanation_ta, why_wrong, explanation_video_url')
+      .eq('id', id)
+      .in('category', ARCHIVE_CATEGORIES)
+      .eq('active', true)
+      .maybeSingle()
+
+    if (error) return sendDbError(res, error)
+    if (!data) return res.status(404).json({ error: 'Not found' })
+
+    res.set('Cache-Control', 'private, max-age=300')
+    res.json({
+      id: data.id,
+      explanation: data.explanation ?? null,
+      explanation_ta: data.explanation_ta ?? null,
+      why_wrong: data.why_wrong ?? null,
+      explanation_video_url: data.explanation_video_url ?? null,
+    })
+  })
+)
 
 // ─── GET /api/questions/topic-access ─────────────────────────────────────────
 // Powers the PYQ + Current Affairs lock UI: the caller's unlimited state plus the
