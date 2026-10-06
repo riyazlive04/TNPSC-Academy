@@ -67,13 +67,13 @@ export const GROUP4_PUBLISHED = '2026-10-06'
 export const GROUP4_UPDATED = '2026-10-06'
 
 /**
- * The banner in the "start your preparation" block, under public/. It sells
- * the PYQ archive, so it sits with the CTA rather than under the H1: a visitor
- * who searched "Group 4 notification" wants the vacancy news first, and a hero
- * reading "Previous Year Question Papers" would answer a question they did not
- * ask. null drops the frame.
+ * The hero banner under the H1, from public/. It is the generic PYQ-archive
+ * graphic rather than a Group 4 one, so it carries the brand and the proof
+ * ("5,273 questions, 24 papers") rather than restating the notification the
+ * copy beside it already gives. One copy only: it is the hero, not also the
+ * CTA image. null drops the frame.
  */
-export const GROUP4_PREP_IMAGE: string | null = '/pyq-archive-banner.jpg'
+export const GROUP4_HERO_IMAGE: string | null = '/pyq-archive-banner.jpg'
 
 const dateOf = (event: string) => GROUP4_DATES.find((d) => d.event === event) ?? null
 
@@ -235,7 +235,7 @@ export function group4NotificationJsonLd(): object {
         '@id': `${url}#article`,
         headline: GROUP4_SHARE_TITLE,
         description: GROUP4_DESCRIPTION,
-        image: [absolute(GROUP4_PREP_IMAGE ?? '/brand-logo.png')],
+        image: [absolute(GROUP4_HERO_IMAGE ?? '/brand-logo.png')],
         inLanguage: 'en-IN',
         datePublished: GROUP4_PUBLISHED,
         dateModified: GROUP4_UPDATED,

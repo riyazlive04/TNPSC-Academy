@@ -31,7 +31,7 @@ import {
   GROUP4_DATES,
   GROUP4_DOC_TITLE,
   GROUP4_FAQS,
-  GROUP4_PREP_IMAGE,
+  GROUP4_HERO_IMAGE,
   GROUP4_NOTIFICATION_PATH,
   GROUP4_ORIGIN,
   GROUP4_POST_GROUPS,
@@ -189,7 +189,7 @@ const T = {
   ctaB4: { ta: 'தினசரி நடப்பு நிகழ்வுகள் — தமிழ் & English-ல், தினமும் காலையில்', en: 'Daily current affairs in Tamil and English, updated every morning' },
   ctaPrimary: { ta: 'இலவசப் பயிற்சியைத் தொடங்கு', en: 'Start free practice now' },
   ctaSecondary: { ta: 'குரூப் 4 PYQ-க்களைப் பார்', en: 'See Group 4 previous year questions' },
-  prepImageAlt: {
+  heroImageAlt: {
     ta: 'TNPSC முந்தைய ஆண்டு வினாத்தாள்கள் — 5,273 வினாக்கள், 24 தாள்கள், 11 பாடங்கள், தமிழ் & English',
     en: 'TNPSC previous year question papers with answers, detailed explanations and insights — 5,273 questions across 24 papers and 11 subjects, in Tamil and English',
   },
@@ -249,6 +249,14 @@ const SIDEBAR_LINKS: { href: string; label: CopyKey }[] = [
   { href: '/materials', label: 'linkMaterials' },
 ]
 
+// The four semantic tiles from design-system.md, rotated one per section.
+const TINTS = [
+  { bg: 'bg-tint-violet', fg: 'text-brand' },
+  { bg: 'bg-tint-coral', fg: 'text-accent' },
+  { bg: 'bg-tint-blue', fg: 'text-sky' },
+  { bg: 'bg-tint-green', fg: 'text-correct' },
+] as const
+
 const num = (n: number) => n.toLocaleString('en-IN')
 
 // ─── Page ────────────────────────────────────────────────────────────────────
@@ -303,7 +311,7 @@ export default function Group4NotificationPage() {
   const appLabel = isAuthenticated ? t('ctaAppAuthed') : t('ctaApp')
 
   return (
-    <div id="top" className="min-h-screen overflow-x-clip bg-card pb-24 sm:pb-0">
+    <div id="top" className="min-h-screen overflow-x-clip bg-surface pb-24 sm:pb-0">
       <AnswerKeyHeader
         onToggleLang={() => setLang(lang === 'ta' ? 'en' : 'ta')}
         copy={{
@@ -321,6 +329,7 @@ export default function Group4NotificationPage() {
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:grid lg:grid-cols-[1fr,300px] lg:items-start lg:gap-10">
         <div className="min-w-0">
           {/* ─── Hero ─────────────────────────────────────────────────────── */}
+          <section className="rounded-card border border-line bg-card p-4 shadow-soft sm:p-6">
           <span className="tamil inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 font-heading text-xs font-bold text-white">
             <CalendarDays size={13} /> {GROUP4.notification.notificationNo} · {GROUP4_DATES[0].displayDate}
           </span>
@@ -331,6 +340,29 @@ export default function Group4NotificationPage() {
           <p className="tamil mt-2 font-body text-xs font-medium text-ink2">
             {t('byline')}: {GROUP4_UPDATED}
           </p>
+
+          {GROUP4_HERO_IMAGE && (
+            <div className="mt-5 overflow-hidden rounded-field border border-line">
+              <img
+                src={GROUP4_HERO_IMAGE}
+                alt={t('heroImageAlt')}
+                width={1400}
+                height={700}
+                className="block w-full"
+                // The hero IS the LCP element: fetch it ahead of the lazy route
+                // chunks rather than letting it arrive after first paint.
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                // A missing file must not leave a broken-image icon under the
+                // H1: drop the frame instead.
+                onError={(e) => {
+                  const frame = e.currentTarget.parentElement
+                  if (frame) frame.style.display = 'none'
+                }}
+              />
+            </div>
+          )}
 
           <p className="tamil mt-5 font-body text-[15px] leading-relaxed text-ink2">{t('heroLead')}</p>
           <p className="tamil mt-3 font-body text-[15px] leading-relaxed text-ink2">{t('heroLead2')}</p>
@@ -358,9 +390,10 @@ export default function Group4NotificationPage() {
               <Timer size={15} /> {num(daysLeft)} {t('countdownDays')}
             </p>
           )}
+          </section>
 
           {/* ─── At a glance ──────────────────────────────────────────────── */}
-          <Section id="glance" icon={ListChecks} title={t('glanceTitle')}>
+          <Section id="glance" icon={ListChecks} title={t('glanceTitle')} tint={TINTS[0]}>
             <dl className="grid gap-px overflow-hidden rounded-card border border-line bg-line sm:grid-cols-2">
               {[
                 { k: t('glanceVacancies'), v: num(GROUP4.summary.totalVacancies) },
@@ -392,7 +425,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Important dates ──────────────────────────────────────────── */}
-          <Section id="dates" icon={CalendarDays} title={t('datesTitle')}>
+          <Section id="dates" icon={CalendarDays} title={t('datesTitle')} tint={TINTS[1]}>
             <Scroller>
               <table className="w-full min-w-[460px] border-collapse text-left">
                 <thead>
@@ -420,7 +453,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Vacancies ────────────────────────────────────────────────── */}
-          <Section id="vacancies" icon={Users} title={t('vacTitle')}>
+          <Section id="vacancies" icon={Users} title={t('vacTitle')} tint={TINTS[2]}>
             <p className="tamil font-body text-[15px] leading-relaxed text-ink2">{t('vacLead')}</p>
 
             <h3 className="tamil mt-6 font-heading text-base font-bold text-ink">{t('groupsTitle')}</h3>
@@ -510,7 +543,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Eligibility ──────────────────────────────────────────────── */}
-          <Section id="eligibility" icon={GraduationCap} title={t('eligTitle')}>
+          <Section id="eligibility" icon={GraduationCap} title={t('eligTitle')} tint={TINTS[3]}>
             {[
               { h: t('eligQualTitle'), b: t('eligQualBody') },
               { h: t('eligAgeTitle'), b: t('eligAgeBody') },
@@ -524,7 +557,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Exam pattern ─────────────────────────────────────────────── */}
-          <Section id="pattern" icon={FileText} title={t('patternTitle')}>
+          <Section id="pattern" icon={FileText} title={t('patternTitle')} tint={TINTS[0]}>
             <p className="tamil font-body text-[15px] leading-relaxed text-ink2">{t('patternLead')}</p>
             <Scroller className="mt-4">
               <table className="w-full min-w-[520px] border-collapse text-left">
@@ -569,7 +602,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Selection process ────────────────────────────────────────── */}
-          <Section id="selection" icon={ListChecks} title={t('selectionTitle')}>
+          <Section id="selection" icon={ListChecks} title={t('selectionTitle')} tint={TINTS[1]}>
             <ol className="space-y-3">
               {GROUP4.selectionProcess.steps.map((step, i) => (
                 <li key={step} className="flex gap-3">
@@ -584,7 +617,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Centres ──────────────────────────────────────────────────── */}
-          <Section id="centres" icon={MapPin} title={t('centresTitle')}>
+          <Section id="centres" icon={MapPin} title={t('centresTitle')} tint={TINTS[2]}>
             <p className="tamil font-body text-[15px] leading-relaxed text-ink2">{t('centresBody')}</p>
             <ul className="mt-4 flex flex-wrap gap-1.5">
               {GROUP4.examCentres.districts.map((d) => (
@@ -596,7 +629,7 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── How to apply + fee ───────────────────────────────────────── */}
-          <Section id="apply" icon={Check} title={t('applyTitle')}>
+          <Section id="apply" icon={Check} title={t('applyTitle')} tint={TINTS[3]}>
             <ol className="space-y-3">
               {GROUP4.applicationProcess.steps.map((step, i) => (
                 <li key={step} className="flex gap-3">
@@ -612,31 +645,10 @@ export default function Group4NotificationPage() {
           </Section>
 
           {/* ─── Conversion block ─────────────────────────────────────────── */}
-          <section id="prepare" className="mt-10 scroll-mt-20 rounded-card border border-brand/40 bg-brand-soft p-5 sm:p-7">
+          <section id="prepare" className="mt-6 scroll-mt-20 rounded-card border border-brand/40 bg-brand-soft p-5 shadow-soft sm:p-7">
             <h2 className="tamil font-heading text-lg font-bold text-ink sm:text-xl">{t('ctaTitle')}</h2>
 
-            {GROUP4_PREP_IMAGE && (
-              <div className="mt-4 overflow-hidden rounded-card border border-line bg-card">
-                <img
-                  src={GROUP4_PREP_IMAGE}
-                  alt={t('prepImageAlt')}
-                  width={1400}
-                  height={700}
-                  className="block w-full"
-                  // Well below the fold on every viewport — never block the LCP.
-                  loading="lazy"
-                  decoding="async"
-                  // A missing file must not leave a broken-image icon mid-page:
-                  // drop the frame instead.
-                  onError={(e) => {
-                    const frame = e.currentTarget.parentElement
-                    if (frame) frame.style.display = 'none'
-                  }}
-                />
-              </div>
-            )}
-
-            <p className="tamil mt-4 font-heading text-base font-extrabold text-brand-dark">{t('ctaHook')}</p>
+            <p className="tamil mt-2 font-heading text-base font-extrabold text-brand-dark">{t('ctaHook')}</p>
             <p className="tamil mt-2 font-body text-sm leading-relaxed text-ink2">{t('ctaBody')}</p>
             <ul className="mt-4 space-y-2">
               {[t('ctaB1'), t('ctaB2'), t('ctaB3'), t('ctaB4')].map((b) => (
@@ -662,7 +674,7 @@ export default function Group4NotificationPage() {
           </section>
 
           {/* ─── Disclaimer ───────────────────────────────────────────────── */}
-          <aside className="mt-8 flex items-start gap-3 rounded-card border border-line bg-gray-50 p-4 dark:bg-white/5">
+          <aside className="mt-6 flex items-start gap-3 rounded-card border border-line bg-card p-4">
             <AlertTriangle size={18} className="mt-0.5 shrink-0 text-ink2" />
             <div>
               <p className="tamil font-heading text-sm font-bold text-ink">{t('disclaimerTitle')}</p>
@@ -734,23 +746,39 @@ export default function Group4NotificationPage() {
 
 // ─── Small presentational helpers ────────────────────────────────────────────
 
+/**
+ * One content block: a card on the canvas with a tinted icon tile in its
+ * header. The page is a long run of tables and prose, and with every section
+ * drawn flat on one white field they ran together — the card edge is what
+ * tells a scanning visitor where "Eligibility" stops and "Exam pattern"
+ * starts. The tint rotates through the four semantic tiles (design-system.md)
+ * so neighbouring sections never share one.
+ */
 function Section({
   id,
   icon: Icon,
   title,
+  tint,
   children,
 }: {
   id: string
   icon: typeof Users
   title: string
+  tint: (typeof TINTS)[number]
   children: React.ReactNode
 }) {
   return (
-    <section id={id} className="mt-10 scroll-mt-20">
-      <h2 className="tamil flex items-center gap-2 font-heading text-lg font-bold tracking-tight text-ink sm:text-xl">
-        <Icon size={19} className="shrink-0 text-brand" /> {title}
+    <section
+      id={id}
+      className="mt-6 scroll-mt-20 overflow-hidden rounded-card border border-line bg-card shadow-soft"
+    >
+      <h2 className="tamil flex items-center gap-3 border-b border-line px-4 py-3.5 font-heading text-lg font-bold tracking-tight text-ink sm:px-6 sm:text-xl">
+        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-field ${tint.bg}`}>
+          <Icon size={18} className={tint.fg} />
+        </span>
+        {title}
       </h2>
-      <div className="mt-4">{children}</div>
+      <div className="px-4 py-5 sm:px-6">{children}</div>
     </section>
   )
 }
