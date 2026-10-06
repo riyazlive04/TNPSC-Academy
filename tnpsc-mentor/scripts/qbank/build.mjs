@@ -33,12 +33,13 @@ import { resolve, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { UNIT_OTHER, ALL_UNITS, resolveUnit, slugify } from './taxonomy.mjs'
 import { findRepeats } from './repeats.mjs'
+import { findSimilar, conceptReport } from './similar.mjs'
 import {
   CSS, ORIGIN, BASE, HUB_PATH, BRAND,
   esc, plain, page, questionJsonLd, promo, pager, mathText, hasMath, n,
   setFooterUnits, faqSection, en, ta, both, one,
   questionCard, answerSection, explanationSection, questionFaq, miniQuestion,
-  insightSection, repeatNotice, toc,
+  repeatNotice, toc,
   APP_REGISTER,
 } from './render.mjs'
 
@@ -389,6 +390,27 @@ console.log(
 const paperList = [...papers.values()].sort((a, b) => b.year - a.year || a.label.localeCompare(b.label))
 console.log(
   `  ${paperList.filter((p) => p.numbered).length} of ${paperList.length} papers keep their own question numbers`,
+)
+
+// What else TNPSC has asked about the same thing. Near-duplicates are excluded:
+// they already have a repeat notice of their own, and offering the same question
+// back as "similar" teaches nobody anything.
+const similar = findSimilar(clean, { perQuestion: 3, exclude: repeats })
+const byId = new Map(clean.map((q) => [q.id, q]))
+let crossPaper = 0
+for (const [id, list] of similar) {
+  const mine = byId.get(id)?._paper?.slug
+  if (list.some((o) => o._paper?.slug !== mine)) crossPaper++
+}
+console.log(
+  `  ${n(similar.size)} of ${n(clean.length)} questions have subject-matter matches ` +
+    `(${n(crossPaper)} reach another paper)`,
+)
+const concepts = conceptReport(clean)
+console.log(
+  `  ${concepts.length} concept families tag the bank: ` +
+    concepts.slice(0, 6).map((c) => `${c.name} ${c.questions}`).join(', ') +
+    `, … smallest ${concepts.at(-1).name} ${concepts.at(-1).questions}`,
 )
 
 // ─── Writing ─────────────────────────────────────────────────────────────────
@@ -907,26 +929,40 @@ for (const u of liveUnits) {
       const correct = String(q.correct_answer ?? '').toUpperCase()
       const answerText = plain(q[`option_${correct.toLowerCase()}`] ?? '')
 
-      // Six siblings, taken from around this question so neighbouring pages link
-      // to overlapping-but-different sets — that is what gets a tree this size
-      // crawled rather than only its first few hundred pages.
+      // The questions TNPSC has asked about the same thing — a disease question
+      // next to the other disease questions, not next to whatever happens to sit
+      // beside it in the topic list. See similar.mjs.
+      //
+      // Where there is no match (a one-off question using words nothing else in
+      // the bank uses) the old neighbours stand in, because this block is also
+      // what gets a tree of 5,273 pages crawled past its first few hundred: every
+      // page has to link onward to several others.
       const RELATED = 3
-      const related = []
+      const matched = similar.get(q.id) ?? []
+      const related = [...matched]
       for (let k = 1; related.length < RELATED && k < list.length; k++) {
         for (const j of [i + k, i - k]) {
-          if (j >= 0 && j < list.length && j !== i && related.length < RELATED) related.push(list[j])
+          if (j < 0 || j >= list.length || j === i || related.length >= RELATED) continue
+          if (!related.some((r) => r.id === list[j].id)) related.push(list[j])
         }
       }
 
       const relHtml = related.length
-        ? `<section class="sec-block" id="more">
+        ? `<section class="sec-block" id="similar">
 <h2>${one(
-            `More ${groupName} questions`,
-            'மேலும் வினாக்கள்',
+            matched.length
+              ? 'Other questions TNPSC has asked on this'
+              : `More ${groupName} questions`,
+            matched.length ? 'இதே பொருளில் கேட்கப்பட்ட மற்ற வினாக்கள்' : 'மேலும் வினாக்கள்',
           )}</h2>
 <p class="sub">${one(
-            'Each one with its options, the correct answer marked, and the exam and year it was asked in.',
-            'ஒவ்வொன்றும் விடைத் தேர்வுகளுடன், சரியான விடை குறிக்கப்பட்டு, எந்தத் தேர்வில் எந்த ஆண்டு கேட்கப்பட்டது என்பதுடன்.',
+            matched.length
+              ? 'Picked for subject matter, not order — mostly from other exams and other years. ' +
+                  'Each one with its options and the correct answer marked.'
+              : 'Each one with its options, the correct answer marked, and the exam and year it was asked in.',
+            matched.length
+              ? 'பொருள் அடிப்படையில் தேர்ந்தெடுக்கப்பட்டவை — பெரும்பாலும் வேறு தேர்வுகள், வேறு ஆண்டுகளிலிருந்து.'
+              : 'ஒவ்வொன்றும் விடைத் தேர்வுகளுடன், சரியான விடை குறிக்கப்பட்டு, எந்தத் தேர்வில் எந்த ஆண்டு கேட்கப்பட்டது என்பதுடன்.',
           )}</p>
 <ul class="minis">${related.map((r) => miniQuestion(r, { source: true })).join('')}</ul>
 <p class="mini-go"><a href="${esc(groupPath)}">${one(
@@ -962,33 +998,17 @@ ${next ? `<a href="${esc(next._path)}"><i>${both('Next question →', 'அடு
       const faq = questionFaq(q, { paper: q._paper, unit: unitForSections })
       const answerHtml = answerSection(q)
       const explanationHtml = explanationSection(q)
-      // How many of the papers here carry this exact question. Counted the
-      // same way repeatNotice lists them, so the number in the grid and the
-      // links under it can never disagree.
-      const siblings = repeats.get(q.id) ?? []
-      const papersIn = new Set(
-        [q, ...siblings.filter((s) => s.id !== q.id)].filter((s) => s._paper).map((s) => s._paper.path),
-      ).size
+      const repeatHtml = repeatNotice(repeats.get(q.id) ?? [], q)
 
-      const insight = insightSection(q, {
-        unit: { name: u.def.en, path: u.path },
-        topic: g.topic ? { name: g.topic.name, path: g.topic.path } : undefined,
-        paper: q._paper,
-        papersIn,
-        papers: paperList.length,
-      })
-      const repeatHtml = repeatNotice(siblings, q)
-
-      // The contents box, back but shorter. The old one listed every section —
-      // Answer / Explanation / Question details / More questions / FAQ — which
-      // is a list of furniture, not of reasons to stay. These three are what
-      // somebody arriving from a search actually came for, and each is a
-      // section that genuinely exists on the page: 'More questions' and the FAQ
-      // are still here to read, they are simply not what the box is for.
+      // The contents box lists what somebody arriving from a search came for.
+      // The third entry was a grid of facts about the question — its paper, its
+      // subject, how it was built. True, and nobody's reason to stay: the facts
+      // are already in the breadcrumb and the sidebar. It points at the other
+      // questions on the same subject matter instead.
       const contents = toc([
         ...(answerHtml ? [{ id: 'answer', label: one('Answer', 'விடை') }] : []),
         ...(explanationHtml ? [{ id: 'explanation', label: one('Explanation', 'விளக்கம்') }] : []),
-        { id: 'insights', label: one('Question insights', 'வினா பற்றி') },
+        ...(relHtml ? [{ id: 'similar', label: one('Similar questions', 'இதே போன்ற வினாக்கள்') }] : []),
       ])
 
       const body = `${questionCard(q)}
@@ -996,7 +1016,6 @@ ${contents}
 ${repeatHtml}
 ${answerHtml}
 ${explanationHtml}
-${insight}
 ${relHtml}
 ${faq.html}
 ${nav}

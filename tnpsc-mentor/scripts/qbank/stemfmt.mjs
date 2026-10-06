@@ -120,22 +120,6 @@ function matchTable(pairs, caps, fmt, lang = 'en') {
  * @param {(s: string) => string} fmt  escape-and-typeset, i.e. mathText
  * @returns {{lead: string, body: string}}
  */
-/**
- * The shape of a question: a match table, an assertion-reason pair, a list of
- * statements to judge, or a question asked straight out.
- *
- * Read off the formatter's own output rather than guessed at again, so this can
- * never disagree with what the page actually renders.
- */
-export function stemKind(text, fmt) {
-  const { body } = stemHtml(text, fmt)
-  if (!body) return 'direct'
-  if (body.includes('<div class="stem-ar"')) return 'assertion-reason'
-  if (body.includes('<table class="match"')) return 'match'
-  if (body.includes('<ul class="stem-list"')) return 'statements'
-  return 'direct'
-}
-
 export function stemHtml(text, fmt, lang = 'en') {
   const src = String(text ?? '')
   if (!src.trim()) return { lead: '', body: '' }
