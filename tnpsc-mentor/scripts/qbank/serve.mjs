@@ -12,15 +12,17 @@
 // worth catching — a link that resolves on a laptop and 404s in production.
 // So: the same four steps, in the same order, and nothing else.
 //
-// It also mounts the tree at /questions/ rather than at the root, because that
-// is the path every internal link, canonical and sitemap entry is written
-// against. Serving it at / would make every one of those links wrong.
+// The tree is mounted at /questions/, because that is the path every inner
+// link, canonical, asset and sitemap entry is written against. The one
+// exception is the hub, which is the site's home page: nginx answers `/` with
+// questions/index.html and 301s /questions/ to it, and this server does the
+// same, so a hub link that only works on one of the two shows up here.
 
 import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { resolve, dirname, join, extname, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { BASE } from './render.mjs'
+import { BASE, HUB_PATH } from './render.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
@@ -59,25 +61,31 @@ let missing = 0
 const server = createServer((req, res) => {
   const url = decodeURIComponent((req.url ?? '/').split('?')[0])
 
+  // The hub's old URL now redirects to its only one, exactly as nginx does.
+  if (url === `${BASE}/` || url === BASE) {
+    res.writeHead(301, { Location: HUB_PATH }).end()
+    return
+  }
+
   // Everything outside /questions/ belongs to the React app in production, so
   // there is nothing here to serve it with. Say so plainly instead of 404ing,
-  // which would look like a broken archive link when it is not one.
-  if (!url.startsWith(`${BASE}/`) && url !== BASE) {
-    res.writeHead(url === '/' ? 302 : 404, url === '/' ? { Location: `${BASE}/` } : { 'Content-Type': 'text/html; charset=utf-8' })
+  // which would look like a broken archive link when it is not one. The root is
+  // the exception: it is the hub, served from questions/index.html.
+  if (url !== HUB_PATH && !url.startsWith(`${BASE}/`)) {
+    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
     res.end(
-      url === '/'
-        ? ''
-        : `<!doctype html><meta charset=utf-8><body style="font:16px system-ui;padding:40px;max-width:40em">
+      `<!doctype html><meta charset=utf-8><body style="font:16px system-ui;padding:40px;max-width:40em">
 <h1>Not part of the archive</h1>
 <p><code>${url}</code> is served by the React app in production, not by this tree.
-Only <code>${BASE}/</code> is built here.</p>
-<p><a href="${BASE}/">Go to the archive</a></p>`,
+Only <code>${BASE}/</code> and the hub at <code>/</code> are built here.</p>
+<p><a href="${HUB_PATH}">Go to the archive</a></p>`,
     )
     return
   }
 
-  // Resolve under OUT, refusing anything that climbs out of it.
-  const rel = normalize(url.slice(BASE.length)).replace(/^[\\/]+/, '')
+  // Resolve under OUT, refusing anything that climbs out of it. `/` is the hub,
+  // which is OUT/index.html — the same file nginx's `location = /` serves.
+  const rel = url === HUB_PATH ? '' : normalize(url.slice(BASE.length)).replace(/^[\\/]+/, '')
   const base = join(OUT, rel)
   if (!base.startsWith(OUT)) {
     res.writeHead(403).end('Forbidden')
@@ -97,7 +105,7 @@ Only <code>${BASE}/</code> is built here.</p>
 <h1>404 — not in the built tree</h1>
 <p><code>${url}</code> resolved to no file. In production nginx would fall through to the
 React app's <code>/index.html</code> here, so this would render the SPA's not-found page.</p>
-<p><a href="${BASE}/">Back to the archive</a></p>`,
+<p><a href="${HUB_PATH}">Back to the archive</a></p>`,
     )
     return
   }
@@ -112,7 +120,7 @@ React app's <code>/index.html</code> here, so this would render the SPA's not-fo
 
 server.listen(PORT, () => {
   console.log(`\n  Serving ${OUT}`)
-  console.log(`  as nginx would, at http://localhost:${PORT}${BASE}/\n`)
+  console.log(`  as nginx would, at http://localhost:${PORT}${HUB_PATH}\n`)
   console.log('  Figures and the sign-up buttons point at the live site, so those work.')
   console.log('  Ctrl-C to stop.\n')
 })

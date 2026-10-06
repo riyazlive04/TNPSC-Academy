@@ -3,10 +3,15 @@
      are listed; the logged-in app (app.tnpscmentors.in) is intentionally omitted
      and marked noindex. Update <lastmod> when the landing content changes. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- The home page is the question archive's hub, served from
+       /var/www/tnpsc/questions/index.html by nginx's `location = /` and built
+       by scripts/qbank. It is listed here rather than in
+       /questions/sitemap.xml because that sitemap may only carry URLs at or
+       below its own path. Daily: the archive grows as papers are added. -->
   <url>
     <loc>https://tnpscmentors.in/</loc>
-    <lastmod>2026-09-27</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>

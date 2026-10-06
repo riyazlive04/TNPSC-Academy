@@ -13,7 +13,6 @@ import { useAuthConfigStore } from './store/authConfigStore'
 import { useThemeStore } from './store/themeStore'
 import { useUpsellStore } from './store/upsellStore'
 import { api, warmApi } from './lib/api'
-import { isNativeApp } from './lib/nativeAuth'
 import { installCopyGuard } from './lib/copyGuard'
 import { trackPageView, trackViewContent } from './lib/tracking'
 import { pageVariants } from './lib/motion'
@@ -101,7 +100,11 @@ const MessagesPage = lazy(() => import('./pages/MessagesPage'))
 const SuperAdminPage = lazy(() => import('./pages/SuperAdminPage'))
 const SduiScreenPage = lazy(() => import('./pages/SduiScreenPage'))
 const CrmPage = lazy(() => import('./pages/CrmPage'))
-const LandingPage = lazy(() => import('./pages/LandingPage'))
+// LandingPage is deliberately NOT imported or routed. Since the 2026-10-06 URL
+// change the main domain's `/` is the static question archive (nginx serves
+// questions/index.html there), and the web app is entered at /app. The page
+// itself is kept in src/pages/LandingPage.tsx: restoring it is this import
+// plus a <Route> back on whatever path it should answer.
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
 const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
@@ -348,9 +351,11 @@ function AnimatedRoutes() {
 
   return (
     <Routes location={location}>
-      {/* Root is auth-aware: logged-in users go straight to the app, logged-out
-          web visitors see the public marketing/APK-download landing page. */}
-      <Route path="/" element={<RootRedirect />} />
+      {/* The app's front door. `/app` is the link we hand out; `/` answers the
+          same way for the two surfaces the apex's static root never reaches —
+          the app subdomain and the installed APK (see AppEntry). */}
+      <Route path="/app" element={<AppEntry />} />
+      <Route path="/" element={<AppEntry />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -494,17 +499,23 @@ function AnimatedRoutes() {
   )
 }
 
-/** Root path "/": send authenticated users straight into the app; show the
- * public landing page to logged-out web visitors. Waits for the initial session
- * bootstrap so a logged-in user isn't flashed the landing page on a hard refresh.
+/** The web app's front door, mounted at BOTH "/app" and "/": signed-in users go
+ * straight to their first screen, everyone else to sign-in. It waits for the
+ * initial session bootstrap so a logged-in user is never bounced to /login on a
+ * hard refresh.
  *
- * Restored 2026-09-27 after a stretch (from 007d396) where the web root went
- * straight to /login: that left Google a login form as the homepage, with no
- * links into the public answer-key pages. The landing page's footer carries
- * those links. The native build still skips it — a marketing / APK-download
- * page makes no sense inside the installed app (LandingPage is lazily
- * imported, so its chunk is never fetched in the APK). */
-function RootRedirect() {
+ * Why two paths. Since 2026-10-06 the public site's root IS the question
+ * archive: nginx answers tnpscmentors.in/ with the pre-rendered
+ * questions/index.html, so this component is simply never reached there, and
+ * /app is the link we hand out to open the app. It still has to answer "/",
+ * because two surfaces load the SPA at the root and have no static archive in
+ * front of them — app.tnpscmentors.in (the logged-in product host) and the
+ * installed APK, whose WebView boots at "/".
+ *
+ * The public landing page it used to render for logged-out web visitors is
+ * unrouted (see the note where its import was); the archive is the marketing
+ * front door now, and its own header links here. */
+function AppEntry() {
   const user = useAuthStore((s) => s.user)
   const loading = useAuthStore((s) => s.loading)
   const isTelecaller = useAuthStore(selectIsTelecaller)
@@ -512,8 +523,7 @@ function RootRedirect() {
   // Telecallers have no arena — send them straight to the desk rather than
   // through a redirect the ProtectedRoute would have to undo.
   if (user) return <Navigate to={isTelecaller ? '/crm' : '/test-arena'} replace />
-  if (isNativeApp()) return <Navigate to="/login" replace />
-  return <LandingPage />
+  return <Navigate to="/login" replace />
 }
 
 /** The Group II/IIA links (/rank-booster, /group-2-test-series and its nested

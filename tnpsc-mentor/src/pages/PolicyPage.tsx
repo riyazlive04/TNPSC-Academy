@@ -49,7 +49,9 @@ export default function PolicyPage({ slug }: { slug: string }) {
       {/* Top bar */}
       <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link to="/" className="group flex items-center gap-2.5">
+          {/* A real navigation, not a <Link>: "/" is the static question
+              archive nginx serves, which the router knows nothing about. */}
+          <a href="/" className="group flex items-center gap-2.5">
             {/* Same mark, size and hover as the landing page and app shell — a
                 policy page is the one place a visitor is checking who they are
                 dealing with, so the branding must not look improvised. */}
@@ -61,13 +63,13 @@ export default function PolicyPage({ slug }: { slug: string }) {
             <span className="font-heading text-base font-semibold tracking-tight text-ink">
               TNPSC <span className="text-brand">Mentors</span>
             </span>
-          </Link>
-          <Link
-            to="/"
+          </a>
+          <a
+            href="/"
             className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand-dark"
           >
             <ArrowLeft size={16} /> Home
-          </Link>
+          </a>
         </div>
       </header>
 

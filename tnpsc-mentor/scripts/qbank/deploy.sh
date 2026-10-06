@@ -42,7 +42,11 @@ rm -rf /tmp/qbank
 echo \"installed: \$(find $WEB -type f | wc -l) files, \$(du -sh $WEB | cut -f1)\""
 
 echo "==> Live checks (through DNS + TLS + nginx, not from the box):"
-for p in /questions/ /questions/past-papers/ /questions/logo-mark.png /questions/social.png /questions/sitemap.xml; do
+# "/" is the hub (nginx serves questions/index.html there) and must be 200;
+# /questions/ is its old URL and must be 301. Both are checked, because a
+# missing `location = /` shows up as the home page quietly turning back into
+# the app shell, which only this check would notice.
+for p in / /questions/ /questions/past-papers/ /questions/logo-mark.png /questions/social.png /questions/sitemap.xml; do
   printf '  %-32s %s\n' "$p" "$(curl -s -o /dev/null -w '%{http_code}' "https://tnpscmentors.in$p")"
 done
 

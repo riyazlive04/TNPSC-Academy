@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url'
 import { UNIT_OTHER, ALL_UNITS, resolveUnit, slugify } from './taxonomy.mjs'
 import { findRepeats } from './repeats.mjs'
 import {
-  CSS, ORIGIN, BASE, BRAND,
+  CSS, ORIGIN, BASE, HUB_PATH, BRAND,
   esc, plain, page, questionJsonLd, promo, pager, mathText, hasMath, n,
   setFooterUnits, faqSection, en, ta, both, one,
   questionCard, answerSection, explanationSection, questionFaq, miniQuestion,
@@ -401,7 +401,8 @@ function write(relPath, body) {
   filesWritten++
 }
 
-/** A page at a path like '/questions/foo/' lands at 'foo/index.html'. */
+/** A page at a path like '/questions/foo/' lands at 'foo/index.html'; the hub
+ * at '/' lands on 'index.html', which is what nginx serves for the root. */
 function writePage(path, html) {
   const rel = path.replace(new RegExp(`^${BASE}/?`), '').replace(/\/$/, '')
   write(rel ? join(rel, 'index.html') : 'index.html', html)
@@ -427,7 +428,7 @@ for (const f of [
   write(f, readFileSync(resolve(ROOT, 'scripts/qbank/assets', f)))
 }
 
-const HUB = { name: 'Previous year questions', path: `${BASE}/` }
+const HUB = { name: 'Previous year questions', path: HUB_PATH }
 const PAPERS = { name: 'Past papers', path: `${BASE}/past-papers/` }
 const sitemapUrls = []
 const track = (path, priority, changefreq) => sitemapUrls.push({ path, priority, changefreq })
@@ -672,14 +673,18 @@ const unitTiles = liveUnits
   )
   .join('\n')
 
+// The hub is the site's home page, so it is written at HUB_PATH ('/') rather
+// than at `${BASE}/`: writePage still lands it on OUT/index.html — the same
+// file nginx serves for `/` — but its canonical, breadcrumb and JSON-LD now
+// name the root URL, which is the only one that answers (see render.mjs).
 writePage(
-  `${BASE}/`,
+  HUB_PATH,
   page({
     title: `TNPSC Previous Year Question Papers with Answers — Group 1, 2, 4 | ${BRAND}`,
     description:
       `${n(totalQ)} questions from the real TNPSC Group 1, Group 2 / 2A and Group 4 papers, each with its ` +
       `correct answer, in Tamil and English. Free to read — ${n(paperList.length)} papers, no sign-up needed.`,
-    path: `${BASE}/`,
+    path: HUB_PATH,
     crumbs: [HUB],
     sidebar: [papersBox(), subjectsBox()],
     sticky: { href: `${BASE}/past-papers/`, label: 'Browse papers', labelTa: 'வினாத்தாள்கள்' },
@@ -689,7 +694,7 @@ writePage(
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: 'TNPSC Previous Year Question Papers with Answers',
-        url: ORIGIN + BASE + '/',
+        url: ORIGIN + HUB_PATH,
         description: `${n(totalQ)} questions from past TNPSC papers, each with its correct answer.`,
         inLanguage: ['en', 'ta'],
         publisher: { '@type': 'Organization', name: BRAND, url: ORIGIN },
@@ -741,7 +746,9 @@ ${paperSections()}
 <div class="reveal">${promo()}</div>`,
   }),
 )
-track(`${BASE}/`, 1.0, 'daily')
+// The hub is NOT tracked here. It now lives at `/`, and a sitemap may only
+// list URLs at or below its own path — this one is served from /questions/,
+// so the root sitemap (public/sitemap.xml) is what carries the home page.
 
 // ─── The past-papers hub ─────────────────────────────────────────────────────
 

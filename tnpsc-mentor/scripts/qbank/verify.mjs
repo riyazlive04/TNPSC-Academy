@@ -9,7 +9,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { resolve, dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ORIGIN, BASE } from './render.mjs'
+import { ORIGIN, BASE, HUB_PATH } from './render.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
@@ -34,13 +34,17 @@ const files = walk(OUT)
 const htmlFiles = files.filter((f) => f.endsWith('.html'))
 console.log(`${htmlFiles.length} HTML pages, ${files.length} files in total`)
 
-/** '/questions/foo/' -> the file that serves it. */
+/** '/questions/foo/' -> the file that serves it. OUT/index.html is reachable
+ * at HUB_PATH ('/') too: nginx answers the root with it (see render.mjs). */
 const served = new Set()
 for (const f of files) {
   const rel = relative(OUT, f).split('\\').join('/')
   served.add(`${BASE}/${rel}`)
   if (rel.endsWith('/index.html')) served.add(`${BASE}/${rel.slice(0, -'index.html'.length)}`)
-  else if (rel === 'index.html') served.add(`${BASE}/`)
+  else if (rel === 'index.html') {
+    served.add(`${BASE}/`)
+    served.add(HUB_PATH)
+  }
 }
 
 const problems = []
@@ -91,7 +95,7 @@ for (const f of htmlFiles) {
   // Internal links must land on something this tree actually serves.
   for (const m of html.matchAll(/href="([^"]+)"/g)) {
     const href = m[1]
-    if (!href.startsWith(`${BASE}/`)) continue
+    if (href !== HUB_PATH && !href.startsWith(`${BASE}/`)) continue
     totalLinks++
     if (!served.has(href)) problems.push(`${rel}: dead link -> ${href}`)
   }

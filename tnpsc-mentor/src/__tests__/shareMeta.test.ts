@@ -18,7 +18,12 @@ import {
 
 /** Public routes that are fine with index.html's default, group-neutral preview. */
 const DEFAULT_PREVIEW_OK = [
+  // "/" and "/app" are the app's front door (AppEntry): a redirect to
+  // /test-arena or /login with no content of its own, so index.html's neutral
+  // preview is the right one. On the apex "/" is not even the SPA any more —
+  // nginx serves the static question archive there, which carries its own tags.
   '/',
+  '/app',
   '/login',
   '/register',
   '/forgot-password',
@@ -28,6 +33,9 @@ const DEFAULT_PREVIEW_OK = [
   '/payment-policy',
   '/refund-policy',
   '/delete-account',
+  // Not an SPA page at all: LeaveToStaticSite hands the URL to the pre-rendered
+  // question archive, whose own HTML carries its own per-question OG tags.
+  '/questions/*',
 ]
 
 const publicRoutes = [...appSource.matchAll(/<Route\s+path="(\/[^"]*)"/g)].map((m) => m[1])

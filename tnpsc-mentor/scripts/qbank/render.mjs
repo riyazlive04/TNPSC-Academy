@@ -21,6 +21,15 @@ import { stemHtml, stemKind } from './stemfmt.mjs'
 
 export const ORIGIN = 'https://tnpscmentors.in'
 export const BASE = '/questions'
+/**
+ * Where the archive's hub page answers. The tree's FILES all live under BASE
+ * (that is the directory nginx serves and deploy.sh rsyncs), but the hub is
+ * the site's home page: nginx answers `/` with questions/index.html and 301s
+ * `/questions/` to it, so the hub has exactly one URL and it is the root one.
+ * Every link, canonical and breadcrumb that means "the hub" uses this; every
+ * asset and inner page keeps BASE.
+ */
+export const HUB_PATH = '/'
 /** The app the pages send people to. */
 export const APP_ORIGIN = 'https://app.tnpscmentors.in'
 export const BRAND = 'TNPSC Mentors'
@@ -818,6 +827,51 @@ const LANG_SWITCH = `<div class="langset" role="group" aria-label="Language / �
  * itself waits for the body. With JavaScript off, the prompt is never unhidden
  * and both languages stay on the page — which is also what a crawler sees.
  */
+// ─── Analytics ───────────────────────────────────────────────────────────────
+// The same tags the SPA loads, because since 2026-10-06 the archive's hub IS
+// the site's home page and the rest of the tree is its highest-traffic surface
+// — without this, the busiest pages on the domain report nothing.
+//
+// Three things are deliberately copied from index.html rather than simplified:
+//
+//  1. The tags live inside window.__loadTrackers() and are only ever CALLED,
+//     never run inline. That is the DPDP/GDPR shape: processing starts on a
+//     decision, not on page load, and a future prompt only has to call this.
+//  2. The stored choice uses the SAME key on the SAME origin as the app
+//     ('tnpsc:cookie-consent'), so a visitor who decided in the app is not
+//     re-decided here, and a decision made here carries into the app. First-time
+//     visitors are auto-accepted, which is the product decision recorded in
+//     src/lib/cookieConsent.ts — mirrored here so the two cannot drift apart.
+//  3. NO <noscript> pixel. It cannot be gated by script, so it would fire ahead
+//     of any consent path — and this tree's whole premise is that it reads
+//     without JavaScript, which makes a JS-less visitor the normal case here
+//     rather than the rounding error index.html could dismiss.
+//
+// localhost is excluded so `node scripts/qbank/serve.mjs` previews stay out of
+// the numbers. Every host this talks to is already allowed by the main domain's
+// CSP in deploy/nginx-tnpsc.conf (script-src 'unsafe-inline' covers the snippet
+// itself), so shipping this needs no nginx change.
+const ANALYTICS = `<script>
+window.__loadTrackers=function(){
+if(location.hostname==='localhost'||window.__trackersLoaded)return;
+window.__trackersLoaded=true;
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P4WXHVR8');
+(function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);
+})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','1006796038910199');fbq('track','PageView');};
+(function(){var K='tnpsc:cookie-consent',v=null;
+try{v=localStorage.getItem(K)}catch(e){}
+if(v==='rejected')return;
+if(v!=='accepted'){try{localStorage.setItem(K,'accepted')}catch(e){}}
+window.__loadTrackers();})();
+</script>`
+
 const LANG_SCRIPT = `<script>(function(){try{
 var K='tnpsc-landing-lang',A='tnpsc-archive-lang-asked',d=document.documentElement;
 var get=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
@@ -985,7 +1039,7 @@ function footer() {
 </div>
 </div>
 <nav class="foot-links" aria-label="Subjects">
-<a href="${BASE}/">${one('All questions', 'அனைத்து வினாக்கள்')}</a>
+<a href="${HUB_PATH}">${one('All questions', 'அனைத்து வினாக்கள்')}</a>
 <a href="${BASE}/past-papers/">${one('Past papers', 'முந்தைய வினாத்தாள்கள்')}</a>
 ${footerUnits.map((u) => `<a href="${BASE}/${u.key}/">${esc(u.en)}</a>`).join('')}
 </nav>
@@ -1071,6 +1125,7 @@ ${o.prev ? `<link rel="prev" href="${esc(ORIGIN + o.prev)}">\n` : ''}${o.next ? 
 <meta name="theme-color" content="#6E4FE8">
 <link rel="icon" type="image/png" href="${BASE}/logo-mark.png">
 <link rel="apple-touch-icon" href="${BASE}/logo-mark.png">
+${ANALYTICS}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONTS}">
@@ -1080,12 +1135,12 @@ ${LANG_SCRIPT}
 </head>
 <body id="top">
 <header class="site-head"><div class="shell row">
-<a class="brand" href="${BASE}/" aria-label="${esc(BRAND)}">
+<a class="brand" href="${HUB_PATH}" aria-label="${esc(BRAND)}">
 <img src="${BASE}/logo-mark.png" alt="" width="36" height="36">
 <span class="nm">TNPSC <b>Mentors</b></span>
 </a>
 <nav class="mainnav" aria-label="Main">
-<a href="${BASE}/">${one('Questions', 'வினாக்கள்')}</a>
+<a href="${HUB_PATH}">${one('Questions', 'வினாக்கள்')}</a>
 <a href="${BASE}/past-papers/">${one('Past papers', 'வினாத்தாள்கள்')}</a>
 <a href="/tnpsc-group-1-answer-key-2026">${one('Answer key', 'விடைக்குறிப்பு')}</a>
 </nav>
