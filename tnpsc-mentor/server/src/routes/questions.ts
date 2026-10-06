@@ -284,6 +284,28 @@ router.get(
 //   * IP rate-limited, because there is no account to key on.
 const FREE_SAMPLE_SIZE = 10
 
+// One question per subject, which is what makes the sheet a sample of the bank
+// rather than a sample of one corner of it. Ordering the whole bank by
+// external_id and taking ten gave ten APTITUDE questions from a single year
+// ('pyq-aptitude-…' sorts first), which reads as "this is a maths app".
+//
+// These are the `questions.subject` values the Group 1 PYQ bank actually uses —
+// the same strings as PYQ_SUBJECTS in src/lib/constants.ts. A subject that has
+// no row with both explanations is simply skipped, so the sheet gets shorter
+// rather than failing.
+const FREE_SAMPLE_SUBJECTS = [
+  'History and INM',
+  'Polity',
+  'Geography',
+  'History Culture Heritage of TN',
+  'Development Administration of TamilNadu',
+  'Indian Economy',
+  'Biology',
+  'Physics',
+  'Chemistry',
+  'Aptitude',
+]
+
 /** The sheet, built once per process. */
 let freeSampleCache: { at: number; rows: unknown[] } | null = null
 const FREE_SAMPLE_TTL = 6 * 60 * 60 * 1000
@@ -307,32 +329,46 @@ router.get(
     }
 
     // Both languages and a real explanation are required: this sheet is the
-    // argument for creating an account, so a row with a blank Tamil side or a
-    // one-line explanation would argue against it. `external_id` is the stable
-    // ordering — it encodes paper and question number (see
-    // supabase/pyq_full_paper.sql), so the ten are a readable run, not ten
-    // unrelated rows, and they do not change between calls.
-    const { data, error } = await supabaseAdmin
-      .from('questions')
-      .select(
-        'id, category, subject, topic, year, question_type, difficulty, external_id,' +
-          ' question_text, option_a, option_b, option_c, option_d, correct_answer,' +
-          ' explanation, why_wrong, question_text_ta, option_a_ta, option_b_ta,' +
-          ' option_c_ta, option_d_ta, explanation_ta'
+    // argument for creating an account, so a row with a blank Tamil side would
+    // argue against it. Within a subject, `external_id` is the stable ordering
+    // (it encodes the paper and question number — see
+    // supabase/pyq_full_paper.sql), so each subject contributes the same
+    // question on every call.
+    const picks = await Promise.all(
+      FREE_SAMPLE_SUBJECTS.map((subject) =>
+        supabaseAdmin
+          .from('questions')
+          .select(
+            'id, category, subject, topic, year, question_type, difficulty, external_id,' +
+              ' question_text, option_a, option_b, option_c, option_d, correct_answer,' +
+              ' explanation, why_wrong, question_text_ta, option_a_ta, option_b_ta,' +
+              ' option_c_ta, option_d_ta, explanation_ta'
+          )
+          .eq('category', 'pyq')
+          .eq('subject', subject)
+          .eq('active', true)
+          .not('explanation', 'is', null)
+          .not('explanation_ta', 'is', null)
+          .not('question_text_ta', 'is', null)
+          .order('external_id', { ascending: true })
+          .limit(1)
+          .maybeSingle()
       )
-      .eq('category', 'pyq')
-      .eq('active', true)
-      .not('explanation', 'is', null)
-      .not('explanation_ta', 'is', null)
-      .not('question_text_ta', 'is', null)
-      .order('external_id', { ascending: true })
-      .limit(FREE_SAMPLE_SIZE)
+    )
 
-    if (error) return sendDbError(res, error)
-    const rows = data ?? []
-    freeSampleCache = { at: Date.now(), rows }
+    // One subject failing must not take the sheet down with it — a nine-question
+    // sample is still a sample. A total failure (nothing came back at all) is
+    // reported, because that is a broken endpoint rather than a thin sheet.
+    const rows = picks.map((p) => p.data).filter((row): row is NonNullable<typeof row> => !!row)
+    if (!rows.length) {
+      const failed = picks.find((p) => p.error)
+      if (failed?.error) return sendDbError(res, failed.error)
+      return res.status(404).json({ error: 'No sample questions available.' })
+    }
+
+    freeSampleCache = { at: Date.now(), rows: rows.slice(0, FREE_SAMPLE_SIZE) }
     res.set('Cache-Control', 'public, max-age=3600')
-    res.json({ questions: rows })
+    res.json({ questions: freeSampleCache.rows })
   })
 )
 
