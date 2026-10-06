@@ -123,15 +123,12 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  <!-- The question archive's hub. The archive itself is tens of thousands of
-       pages with its own sitemap index at /questions/sitemap.xml, listed in
-       robots.txt; this file is a <urlset> and cannot nest one. -->
-  <url>
-    <loc>https://tnpscmentors.in/questions/</loc>
-    <lastmod>2026-10-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  <!-- /questions/ is NOT listed: nginx 301s it to "/", which IS the archive's
+       hub and is the first entry in this file. A sitemap must list the
+       canonical destination, not a redirect, or Search Console reports the
+       whole set as "Page with redirect". The archive's own pages live in the
+       sitemap index at /questions/sitemap.xml, listed in robots.txt; this file
+       is a <urlset> and cannot nest one. -->
   <url>
     <loc>https://tnpscmentors.in/questions/past-papers/</loc>
     <lastmod>2026-10-01</lastmod>
