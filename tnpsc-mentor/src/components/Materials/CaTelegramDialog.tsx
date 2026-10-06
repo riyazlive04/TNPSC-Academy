@@ -34,7 +34,7 @@ function resolveCaption(template: string, issue: CaMagazineIssue, lang: Lang): s
   return template
     .replace(/\{date\}/g, issueDateLabel(issue.ca_type, issue.date, lang))
     .replace(/\{items\}/g, String(issue.items))
-    .replace(/\{name\}/g, magazineName(lang))
+    .replace(/\{name\}/g, magazineName(lang, issue.ca_type))
     .replace(/\{link\}/g, APP_LINK)
 }
 
@@ -168,7 +168,7 @@ export default function CaTelegramDialog({
         setStep(`Building the ${LANG_NAME[lang]} PDF…`)
         const doc = await buildMagazinePdfDoc({
           items,
-          title: magazineName(lang),
+          title: magazineName(lang, issue.ca_type),
           subtitle: issueDateLabel(issue.ca_type, issue.date, lang),
           lang,
           // A published copy carries the brand + site URL, not a student's name.

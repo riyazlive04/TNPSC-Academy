@@ -8,6 +8,7 @@ import {
   KNOW_LEVELS,
   KNOW_LEVEL_TONE,
   issueDateLabel,
+  magazineKindLabel,
   knowLevelShort,
   magazineName,
   type KnowLevel,
@@ -80,8 +81,9 @@ export default function MagazineReader({
     levelFilter && items ? items.filter((i) => i.know_level === levelFilter) : items
   const viewLang = hasTamil ? readLang : 'en'
 
-  const title = magazineName(viewLang)
+  const title = magazineName(viewLang, caType)
   const dateLine = issueDateLabel(caType, date, viewLang)
+  const kindLine = magazineKindLabel(caType, viewLang)
 
   const downloadPdf = async () => {
     if (downloading || !shownItems?.length) return
@@ -98,9 +100,12 @@ export default function MagazineReader({
         title,
         subtitle: levelFilter ? `${dateLine} · ${knowLevelShort(levelFilter, viewLang)}` : dateLine,
         lang: viewLang,
+        // The filename carries the kind too: a downloads folder holding both
+        // 'July 2026' and '9 July 2026' sheets gives no clue which is the
+        // month's consolidation.
         fileLabel: levelFilter
-          ? `${issueDateLabel(caType, date, 'en')} ${knowLevelShort(levelFilter, 'en')}`
-          : issueDateLabel(caType, date, 'en'),
+          ? `${magazineKindLabel(caType, 'en')} ${issueDateLabel(caType, date, 'en')} ${knowLevelShort(levelFilter, 'en')}`
+          : `${magazineKindLabel(caType, 'en')} ${issueDateLabel(caType, date, 'en')}`,
         watermark: pdfWatermark(profile),
       })
     } catch {
@@ -167,7 +172,17 @@ export default function MagazineReader({
           </span>
           <div className="min-w-0 flex-1">
             <h2 className="tamil truncate font-heading text-base font-semibold text-ink">{title}</h2>
-            <p className="tamil mt-0.5 truncate font-body text-xs text-ink2">{dateLine}</p>
+            <p className="tamil mt-0.5 flex items-center gap-1.5 truncate font-body text-xs text-ink2">
+              <span
+                className={[
+                  'tamil flex-shrink-0 rounded-full px-1.5 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide',
+                  caType === 'month_wise' ? 'bg-goldsoft text-gold' : 'bg-brand-soft text-brand',
+                ].join(' ')}
+              >
+                {kindLine}
+              </span>
+              <span className="truncate">{dateLine}</span>
+            </p>
           </div>
           {downloadable && shownItems && shownItems.length > 0 && (
             <button

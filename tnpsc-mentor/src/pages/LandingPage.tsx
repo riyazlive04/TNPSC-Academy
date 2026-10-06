@@ -44,6 +44,7 @@ import { api } from '../lib/api'
 import { trackApkDownload } from '../lib/tracking'
 import { ANSWER_KEY_GROUPS, ANSWER_KEY_GROUP_ORDER, PAST_ANSWER_KEY_PAGES } from '../lib/answerKeyGroups'
 import PricingCards from '../components/Landing/PricingCards'
+import FreeSampleSheet from '../components/Landing/FreeSampleSheet'
 
 // ─── Open items (founder to supply before launch) ────────────────────────────
 // Replace these placeholders with the real hosted values. Everything else on
@@ -854,6 +855,13 @@ export default function LandingPage() {
             </Reveal>
           ))}
         </div>
+      </section>
+
+      {/* ─── Free sample sheet (10 solved questions, no account) ──────────── */}
+      <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 sm:pb-24">
+        <Reveal>
+          <FreeSampleSheet lang={lang} registerHref={isAuthed ? APP_URL : APP_REGISTER_URL} />
+        </Reveal>
       </section>
 
       {/* ─── Section 6 - install (friction killer) ────────────────────────── */}

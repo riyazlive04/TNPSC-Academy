@@ -5632,7 +5632,7 @@ function CaMagazineTab() {
       const { generateMagazinePdf } = await import('../lib/magazinePdf')
       await generateMagazinePdf({
         items,
-        title: magazineName(lang),
+        title: magazineName(lang, issue.ca_type),
         subtitle: issueDateLabel(issue.ca_type, issue.date, lang),
         lang,
         fileLabel: issueDateLabel(issue.ca_type, issue.date, 'en'),

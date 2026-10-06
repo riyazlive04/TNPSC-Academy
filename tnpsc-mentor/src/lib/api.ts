@@ -740,6 +740,19 @@ export const api = {
     })
     return data.questions
   },
+  /**
+   * The signed-out sample sheet: ten previous-year questions WITH their
+   * explanations, served to anyone (`auth: false`). The landing page renders
+   * them as a PDF and asks for an account afterwards. A fixed ten rows, cached
+   * hard on both sides — see the route for why it can't be walked.
+   */
+  async freeSampleQuestions(): Promise<Question[]> {
+    const data = await request<{ questions: Question[] }>('/api/questions/free-sample', {
+      auth: false,
+      swr: 60 * 60_000,
+    })
+    return data.questions
+  },
   /** The new-user Starter Challenge paper (fixed hard mixed set, ≤18 questions). */
   async starterQuestions(count: number): Promise<Question[]> {
     const data = await request<{ questions: Question[] }>('/api/questions/starter-test', {

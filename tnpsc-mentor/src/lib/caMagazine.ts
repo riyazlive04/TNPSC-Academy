@@ -169,16 +169,44 @@ export const KNOW_LEVEL_HEX: Record<KnowLevel, { bg: string; fg: string }> = {
 }
 
 // ─── Issue identity ──────────────────────────────────────────────────────────
-// Every issue — daily or monthly — carries the same name on one line and its
-// date on the next. No source/publication credit is ever shown to students.
+// Every issue carries its name on one line and its date on the next. No
+// source/publication credit is ever shown to students.
+//
+// The name says WHICH magazine it is. Daily and monthly issues used to share
+// one name ('Current Affair') and were told apart only by the date line below
+// it — '9 July 2026' vs 'July 2026' — which nobody reads as a different kind of
+// issue. A month's consolidation is a different publication from a day's paper:
+// 100+ items to revise, not one morning's news. So the kind is part of the
+// name, and `magazineKindLabel` puts it on a badge wherever the two can appear
+// in the same list.
 const MAGAZINE_NAME_EN = 'Current Affair'
 const MAGAZINE_NAME_TA = 'நடப்பு நிகழ்வுகள்'
 
-/** The magazine's name in the chosen language. */
-export function magazineName(lang: 'en' | 'ta' | 'both'): string {
-  if (lang === 'ta') return MAGAZINE_NAME_TA
-  if (lang === 'both') return `${MAGAZINE_NAME_EN} / ${MAGAZINE_NAME_TA}`
-  return MAGAZINE_NAME_EN
+const MAGAZINE_KIND_EN: Record<CaMagazineType, string> = {
+  day_wise: 'Daily',
+  month_wise: 'Monthly',
+}
+const MAGAZINE_KIND_TA: Record<CaMagazineType, string> = {
+  day_wise: 'தினசரி',
+  month_wise: 'மாதாந்திர',
+}
+
+/** 'Monthly' / 'மாதாந்திர' — the issue kind on its own, for a badge or chip. */
+export function magazineKindLabel(caType: CaMagazineType, lang: 'en' | 'ta' | 'both'): string {
+  return lang === 'ta' ? MAGAZINE_KIND_TA[caType] : MAGAZINE_KIND_EN[caType]
+}
+
+/**
+ * The magazine's name in the chosen language. Pass the issue's `caType` to get
+ * the kind-qualified name ('Monthly Current Affair'); omit it for the generic
+ * brand name, which is right only where no single issue is being named.
+ */
+export function magazineName(lang: 'en' | 'ta' | 'both', caType?: CaMagazineType): string {
+  const en = caType ? `${MAGAZINE_KIND_EN[caType]} ${MAGAZINE_NAME_EN}` : MAGAZINE_NAME_EN
+  const ta = caType ? `${MAGAZINE_KIND_TA[caType]} ${MAGAZINE_NAME_TA}` : MAGAZINE_NAME_TA
+  if (lang === 'ta') return ta
+  if (lang === 'both') return `${en} / ${ta}`
+  return en
 }
 
 // ─── Dates ───────────────────────────────────────────────────────────────────

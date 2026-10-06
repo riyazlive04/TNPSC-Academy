@@ -262,6 +262,80 @@ router.get(
   })
 )
 
+// ─── GET /api/questions/free-sample ──────────────────────────────────────────
+// The signed-out lead magnet: ten previous-year questions WITH their full
+// explanations, which the landing page turns into a PDF in the browser and
+// hands over before asking for an account. The ask comes after the download,
+// not before it — somebody who has read ten of our explanations knows what an
+// account is for, which is the whole point of giving these away.
+//
+// This is the one route that serves explanations to nobody in particular, so it
+// is deliberately narrow:
+//
+//   * a FIXED ten rows, not a sample. The set is chosen by a stable ordering,
+//     so every visitor gets the same sheet and the endpoint can never be walked
+//     through the bank by calling it repeatedly. Ten questions is a sample of
+//     the product; a random ten per call would be a slow export of it.
+//   * category='pyq' only — TNPSC's own published Group 1 questions, which are
+//     already on the open web at /questions/ — named as a literal rather than
+//     taken from a list, so no future bank can widen this by being added to one.
+//   * answered from memory after the first call, and cached at the edge, so the
+//     marketing page cannot put load on the database.
+//   * IP rate-limited, because there is no account to key on.
+const FREE_SAMPLE_SIZE = 10
+
+/** The sheet, built once per process. */
+let freeSampleCache: { at: number; rows: unknown[] } | null = null
+const FREE_SAMPLE_TTL = 6 * 60 * 60 * 1000
+
+const freeSampleLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip ?? 'anon',
+  message: { error: 'Too many requests — try again later.' },
+})
+
+router.get(
+  '/free-sample',
+  freeSampleLimiter,
+  asyncH(async (_req, res) => {
+    if (freeSampleCache && Date.now() - freeSampleCache.at < FREE_SAMPLE_TTL) {
+      res.set('Cache-Control', 'public, max-age=3600')
+      return res.json({ questions: freeSampleCache.rows })
+    }
+
+    // Both languages and a real explanation are required: this sheet is the
+    // argument for creating an account, so a row with a blank Tamil side or a
+    // one-line explanation would argue against it. `external_id` is the stable
+    // ordering — it encodes paper and question number (see
+    // supabase/pyq_full_paper.sql), so the ten are a readable run, not ten
+    // unrelated rows, and they do not change between calls.
+    const { data, error } = await supabaseAdmin
+      .from('questions')
+      .select(
+        'id, category, subject, topic, year, question_type, difficulty, external_id,' +
+          ' question_text, option_a, option_b, option_c, option_d, correct_answer,' +
+          ' explanation, why_wrong, question_text_ta, option_a_ta, option_b_ta,' +
+          ' option_c_ta, option_d_ta, explanation_ta'
+      )
+      .eq('category', 'pyq')
+      .eq('active', true)
+      .not('explanation', 'is', null)
+      .not('explanation_ta', 'is', null)
+      .not('question_text_ta', 'is', null)
+      .order('external_id', { ascending: true })
+      .limit(FREE_SAMPLE_SIZE)
+
+    if (error) return sendDbError(res, error)
+    const rows = data ?? []
+    freeSampleCache = { at: Date.now(), rows }
+    res.set('Cache-Control', 'public, max-age=3600')
+    res.json({ questions: rows })
+  })
+)
+
 // ─── GET /api/questions/topic-access ─────────────────────────────────────────
 // Powers the PYQ + Current Affairs lock UI: the caller's unlimited state plus the
 // topic keys whose one free test is already used. Unlimited (premium/vettri/staff)

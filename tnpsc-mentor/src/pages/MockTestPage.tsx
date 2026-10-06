@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, FileText, Layers, ListChecks, Minus, Plus, Trophy } from 'lucide-react'
+import { ArrowLeft, Clock, FileText, Layers, ListChecks, Trophy } from 'lucide-react'
 import PillButton from '../components/UI/PillButton'
 import PillSection from '../components/UI/PillSection'
 import { SkeletonPills } from '../components/UI/Skeleton'
@@ -17,12 +17,21 @@ const ALL_TOPICS = '__all__'
 // Bounds for the subject-exam configuration controls.
 const Q_MIN = 10
 const Q_MAX = 100
-const Q_STEP = 5
-const Q_DEFAULT = 50
 const T_MIN = 10
 const T_MAX = 120
 const T_STEP = 5
 const T_DEFAULT = 50
+
+/**
+ * The paper's LENGTH is derived from the time limit — one question a minute,
+ * the TNPSC prelims pace — instead of being set on a stepper of its own. One
+ * decision ("how long do I want to sit?") instead of two that had to agree
+ * with each other, and the default 50 minutes still opens the 50-question exam
+ * this tab has always offered.
+ */
+function questionsForMinutes(minutes: number): number {
+  return Math.max(Q_MIN, Math.min(Q_MAX, Math.round(minutes)))
+}
 
 const DIFFICULTIES: { key: Difficulty | null; labelKey: 'diffMixed' | 'diffEasy' | 'diffMedium' | 'diffHard' }[] = [
   { key: null, labelKey: 'diffMixed' },
@@ -209,8 +218,8 @@ function SubjectExamTab() {
   const [topic, setTopic] = useState<string | null>(null)
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null)
   const [topics, setTopics] = useState<string[]>([])
-  const [questionCount, setQuestionCount] = useState(Q_DEFAULT)
   const [minutes, setMinutes] = useState(T_DEFAULT)
+  const questionCount = questionsForMinutes(minutes)
 
   const [loadingSubjects, setLoadingSubjects] = useState(true)
   const [loadingTopics, setLoadingTopics] = useState(false)
@@ -331,38 +340,9 @@ function SubjectExamTab() {
       {/* Step 4 - questions & time (side by side) */}
       {subject && topic && (
         <PillSection title={t('examSetup')} className="mb-8 animate-fadeIn" wrap={false}>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Number of questions - stepper */}
-            <div className="rounded-card border border-line bg-card p-4">
-              <div className="mb-3 flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
-                <FileText size={14} /> {t('numQuestions')}
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <button
-                  type="button"
-                  aria-label="−"
-                  onClick={() => setQuestionCount((c) => Math.max(Q_MIN, c - Q_STEP))}
-                  disabled={questionCount <= Q_MIN}
-                  className="icon-btn h-10 w-10 disabled:opacity-40"
-                >
-                  <Minus size={18} />
-                </button>
-                <span className="font-heading text-2xl font-bold tabular-nums text-ink">
-                  {questionCount}
-                </span>
-                <button
-                  type="button"
-                  aria-label="+"
-                  onClick={() => setQuestionCount((c) => Math.min(Q_MAX, c + Q_STEP))}
-                  disabled={questionCount >= Q_MAX}
-                  className="icon-btn h-10 w-10 disabled:opacity-40"
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-            </div>
-
-            {/* Time limit - slider */}
+          <div className="grid grid-cols-1 gap-4">
+            {/* Time limit - the one control. The number of questions follows
+                from it (≈1 min each) and is shown under the slider. */}
             <div className="rounded-card border border-line bg-card p-4">
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 font-heading text-xs font-semibold uppercase tracking-wide text-ink2">
@@ -371,6 +351,14 @@ function SubjectExamTab() {
                 <span className="font-heading text-sm font-bold tabular-nums text-brand">
                   {minutes} {t('minutesUnit')}
                 </span>
+              </div>
+              <div className="tamil mb-3 flex items-center gap-2 font-body text-xs text-ink2">
+                <FileText size={14} className="flex-shrink-0 text-brand" />
+                <span className="font-heading text-base font-bold tabular-nums text-brand">
+                  {questionCount}
+                </span>
+                {t('questionsCount')}
+                <span className="text-ink2/70">· {t('paceHint')}</span>
               </div>
               <input
                 type="range"

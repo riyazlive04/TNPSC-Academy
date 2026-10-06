@@ -15,23 +15,37 @@ import type { QuizConfig } from '../types'
 // many questions actually exist for the chosen topic (fetched on mount).
 const MIN_QUESTIONS = 5
 const MIN_MINUTES = 5
-const MAX_MINUTES = 120
+// 180, the real TNPSC prelims duration — the ceiling has to reach it now that
+// the time limit is what sizes the paper (and that a full previous-year paper,
+// 200 questions, can be sat here).
+const MAX_MINUTES = 180
 const MINUTE_STEP = 5
+// Default sitting: 20 minutes, which at the pace below is the 20-question
+// practice test this screen has always started by offering.
+const DEFAULT_MINUTES = 20
 
-// Suggested pace: roughly one minute per question (a comfortable practice speed,
-// close to the TNPSC prelims rate). Rounded to the slider's 5-min step and kept
-// within the allowed range.
+// The pace that ties the two together: roughly one minute per question (a
+// comfortable practice speed, close to the TNPSC prelims rate).
 const RECOMMENDED_SEC_PER_Q = 60
+
+/** How long a paper of `count` questions should take, on the slider's step. */
 function recommendedMinutes(count: number): number {
   const stepped = Math.round((count * RECOMMENDED_SEC_PER_Q) / 60 / MINUTE_STEP) * MINUTE_STEP
   return Math.max(MIN_MINUTES, Math.min(MAX_MINUTES, stepped))
 }
 
+/** How many questions fit in `minutes` at that pace — the inverse. */
+function questionsForMinutes(minutes: number): number {
+  return Math.max(1, Math.round((minutes * 60) / RECOMMENDED_SEC_PER_Q))
+}
+
 /**
  * Proctored pre-test screen for practice quizzes (Subject Practice, PYQ, Current
- * Affairs, Aptitude, Revision). Lets the aspirant choose how many questions and
- * how long, shows the exam rules with a mandatory confirmation, then requests
- * full-screen and hands off to the quiz engine (/quiz) with `proctored: true`.
+ * Affairs, Aptitude, Revision). Lets the aspirant choose how long they want to
+ * sit — the paper's LENGTH follows from that at ~1 minute a question, rather
+ * than being a second slider to keep in step with it — shows the exam rules
+ * with a mandatory confirmation, then requests full-screen and hands off to the
+ * quiz engine (/quiz).
  * Reached via router state from useStartTest - a direct/refresh hit with no
  * config bounces back to the Test Arena.
  */
@@ -42,40 +56,27 @@ export default function QuizInstructionsPage() {
   const config = location.state as QuizConfig | null
 
   const [agreed, setAgreed] = useState(false)
-  // Seed the question count from the config when the launching flow chose one
-  // (e.g. the Starter Challenge's fixed paper); the pool clamp still applies.
-  const [count, setCount] = useState(config?.questionCount ?? 20)
-  const [minutes, setMinutes] = useState(20)
-  // Until the user drags the time slider, the time limit tracks the recommended
-  // pace (≈1 min/question) so it always matches the chosen question count.
+  const [minutes, setMinutes] = useState(DEFAULT_MINUTES)
+  // Set once the user drags the time slider: a fixed-length paper stops
+  // re-deriving its suggested duration from that point on.
   const [timeTouched, setTimeTouched] = useState(false)
-  // How many questions exist for this config - bounds the question slider.
+  // How many questions exist for this config - the upper bound on the paper.
   // Seeded from the picker page's known count (config.availableCount) so the
   // number shows immediately; otherwise null until the fetch below resolves.
   const [available, setAvailable] = useState<number | null>(config?.availableCount ?? null)
-
-  const recommended = recommendedMinutes(count)
-  useEffect(() => {
-    if (!timeTouched) setMinutes(recommended)
-  }, [recommended, timeTouched])
 
   useEffect(() => {
     if (!config) navigate('/test-arena', { replace: true })
   }, [config, navigate])
 
-  // Resolve the available-question count so the slider spans the full real pool
-  // (no artificial cap - the aspirant can practise every question in the topic).
-  // When the picker page already passed the count (config.availableCount), use
-  // it directly and skip the network round-trip; otherwise fetch it.
+  // Resolve the available-question count: the ceiling on the paper (no
+  // artificial cap - the aspirant can practise every question in the topic, and
+  // a full previous-year paper is exactly the whole pool). When the picker page
+  // already passed the count (config.availableCount), use it directly and skip
+  // the network round-trip; otherwise fetch it.
   useEffect(() => {
     if (!config) return
-    const clamp = (n: number) =>
-      setCount((c) => Math.max(Math.min(c, n), Math.min(MIN_QUESTIONS, n)))
-
-    if (config.availableCount != null) {
-      clamp(config.availableCount)
-      return
-    }
+    if (config.availableCount != null) return
 
     let cancelled = false
     api
@@ -83,7 +84,6 @@ export default function QuizInstructionsPage() {
       .then((n) => {
         if (cancelled) return
         setAvailable(n)
-        clamp(n)
       })
       .catch(() => {
         // On failure, fall back to a sane default so the user isn't blocked.
@@ -94,6 +94,15 @@ export default function QuizInstructionsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // A FIXED-LENGTH paper (a PYQ full paper, the Starter Challenge) suggests its
+  // own duration — ~1 minute a question — until the aspirant moves the slider.
+  // Lives above the `!config` early return because it feeds a hook.
+  const fixedCount = config?.fullPaper ? available : (config?.questionCount ?? null)
+  useEffect(() => {
+    if (fixedCount == null || timeTouched) return
+    setMinutes(recommendedMinutes(fixedCount))
+  }, [fixedCount, timeTouched])
 
   // Free (credit-gated) learners confirm the per-question credit fee in a popup.
   // Category-aware: a plan that includes this bank outright (the ₹399 Mock Pack
@@ -114,6 +123,24 @@ export default function QuizInstructionsPage() {
   const maxCount = available ?? DEFAULT_QUESTIONS
   const minCount = Math.min(MIN_QUESTIONS, maxCount)
   const noQuestions = available === 0
+
+  // How long the paper is.
+  //
+  // There is no question-count control any more: the aspirant sets how long they
+  // want to sit, and the paper is however many questions fit at ~1 minute each.
+  // One decision instead of two that had to be kept consistent with each other,
+  // and the number of credits a free learner spends is still on screen (and in
+  // the confirm popup) before they commit.
+  //
+  // A FIXED-LENGTH paper overrides that (see `fixedCount` above): a PYQ full
+  // paper is the whole printed paper, and the Starter Challenge is its own
+  // 18-question set. Those set the count, and the time limit is what the
+  // aspirant chooses around it.
+  const count = Math.max(
+    Math.min(fixedCount ?? questionsForMinutes(minutes), maxCount),
+    minCount
+  )
+  const recommended = recommendedMinutes(count)
 
   const startQuiz = () => {
     // Regular practice tests are NOT proctored - no fullscreen, no violation
@@ -162,48 +189,9 @@ export default function QuizInstructionsPage() {
           </p>
         )}
 
-        {/* Setup: number of questions (slider, capped at the available pool) */}
-        <div className="card mb-4 p-5">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h3 className="tamil font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
-              {t('numQuestions')}
-            </h3>
-            {loadingCount ? (
-              <span className="inline-flex items-center gap-1.5 font-body text-xs text-ink2">
-                <Loader2 size={13} className="animate-spin" /> {t('countingQuestions')}
-              </span>
-            ) : (
-              <span className="font-body text-xs text-ink2">
-                <span className="font-heading text-base font-bold text-brand">{count}</span>
-                {' / '}
-                {maxCount} {t('questionsAvailable')}
-              </span>
-            )}
-          </div>
-          {noQuestions ? (
-            <p className="tamil font-body text-sm text-ink2">{t('noQuestionsLong')}</p>
-          ) : (
-            <>
-              <input
-                type="range"
-                min={minCount}
-                max={maxCount}
-                step={1}
-                value={count}
-                disabled={loadingCount || maxCount <= minCount}
-                onChange={(e) => setCount(Number(e.target.value))}
-                aria-label={t('numQuestions')}
-                className="w-full accent-brand disabled:opacity-50"
-              />
-              <div className="mt-1 flex justify-between font-body text-2xs text-ink2">
-                <span>{minCount}</span>
-                <span>{maxCount}</span>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Setup: time limit (slider) */}
+        {/* Setup: how long to sit. The paper's LENGTH follows from it (~1 minute
+            a question), so there is one control here, not two. A fixed-length
+            paper shows its length instead and keeps the slider for the clock. */}
         <div className="card mb-6 p-5">
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="tamil font-heading text-sm font-semibold uppercase tracking-wide text-ink2">
@@ -215,17 +203,31 @@ export default function QuizInstructionsPage() {
             </span>
           </div>
 
-          {/* Suggested time, derived from the chosen question count */}
+          {/* What that buys: the number of questions this test will actually
+              serve — which is also what a free learner is about to spend in
+              credits, so it has to be on screen before they agree. */}
           <div className="mb-3 flex items-center justify-between gap-2">
-            <span className="inline-flex flex-wrap items-center gap-1.5 font-body text-xs text-ink2">
-              <Clock size={13} className="text-brand" />
-              {t('recommendedTime')}:{' '}
-              <span className="font-heading font-semibold text-ink">
-                {recommended} {t('minutesShort')}
+            {loadingCount ? (
+              <span className="inline-flex items-center gap-1.5 font-body text-xs text-ink2">
+                <Loader2 size={13} className="animate-spin" /> {t('countingQuestions')}
               </span>
-              <span className="text-ink2/70">· {t('recommendedTimeHint')}</span>
-            </span>
-            {minutes !== recommended && (
+            ) : noQuestions ? (
+              <span className="tamil font-body text-sm text-ink2">{t('noQuestionsLong')}</span>
+            ) : (
+              <span className="tamil inline-flex flex-wrap items-center gap-1.5 font-body text-xs text-ink2">
+                <ListChecks size={13} className="text-brand" />
+                <span className="font-heading text-base font-bold text-brand tabular-nums">
+                  {count}
+                </span>
+                {t('questionsCount')}
+                <span className="text-ink2/70">
+                  {fixedCount != null
+                    ? `· ${t('fullPaperFixedHint')}`
+                    : `· ${t('ofAvailableHint').replace('{n}', String(maxCount))} · ${t('paceHint')}`}
+                </span>
+              </span>
+            )}
+            {fixedCount != null && minutes !== recommended && (
               <button
                 type="button"
                 onClick={() => {

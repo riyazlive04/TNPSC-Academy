@@ -6,7 +6,7 @@ import { SkeletonCards } from '../components/UI/Skeleton'
 import ErrorState from '../components/UI/ErrorState'
 import { api, type Material, type MaterialKind } from '../lib/api'
 import { youtubeThumb, materialTitle, kindLabel, formatFileSize } from '../lib/materials'
-import { issueDateLabel, magazineName } from '../lib/caMagazine'
+import { issueDateLabel, magazineKindLabel, magazineName } from '../lib/caMagazine'
 import { useT, type StringKey } from '../lib/i18n'
 
 const KIND_ICON: Record<MaterialKind, typeof Play> = {
@@ -185,8 +185,11 @@ function MaterialCard({
   // Magazine cards are named and dated from the issue itself (name on one line,
   // date on the next) rather than from whatever title the row was published with.
   const issue = m.kind === 'magazine' && m.magazine_ca_type && m.magazine_date
-  const title = issue ? magazineName(lang) : materialTitle(m, lang)
+  const title = issue ? magazineName(lang, m.magazine_ca_type!) : materialTitle(m, lang)
   const dateLine = issue ? issueDateLabel(m.magazine_ca_type!, m.magazine_date!, lang) : null
+  // Daily and monthly issues sit side by side on this shelf, so the kind goes
+  // on the card's label row rather than being left to the date line.
+  const kindChip = issue ? magazineKindLabel(m.magazine_ca_type!, lang) : null
   return (
     <button
       onClick={onOpen}
@@ -225,7 +228,8 @@ function MaterialCard({
       </div>
       {/* Meta */}
       <div className="flex flex-1 flex-col gap-1 p-3">
-        <span className="font-heading text-2xs font-bold uppercase tracking-wide text-primary">
+        <span className="tamil font-heading text-2xs font-bold uppercase tracking-wide text-primary">
+          {kindChip ? `${kindChip} · ` : ''}
           {kindLabel(m.kind)}
           {m.file_size ? ` · ${formatFileSize(m.file_size)}` : ''}
         </span>

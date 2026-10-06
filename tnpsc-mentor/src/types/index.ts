@@ -370,6 +370,20 @@ export interface QuizConfig {
   tkAdhigaram?: number
   /** Thirukkural quiz: the chosen question format (omitted = mixed). */
   tkFormat?: string
+  /**
+   * PYQ "Full Paper": sit a whole previous-year paper rather than a sample of
+   * one subject or section. Implies the entire pool for the config (no
+   * question-count choice) and `paperOrder`, so the questions arrive in the
+   * order they were printed. Only ever set together with a `year` — a full
+   * paper across years is not a paper.
+   */
+  fullPaper?: boolean
+  /**
+   * Draw in printed-paper order instead of the usual unseen-first/random
+   * sample. Read by get_quiz_questions, which reconstructs the question number
+   * from `external_id` (see supabase/pyq_full_paper.sql).
+   */
+  paperOrder?: boolean
 }
 
 // ─── Mock-test blueprint (group-exam patterns) ──────────────────────────────

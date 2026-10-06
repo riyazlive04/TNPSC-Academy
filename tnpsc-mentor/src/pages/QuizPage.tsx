@@ -704,9 +704,14 @@ export default function QuizPage() {
                 onClick={() => setShowExitModal(true)}
                 aria-label={t('exitTest')}
                 title={t('exitTest')}
-                className="grid h-[42px] w-[42px] flex-shrink-0 place-items-center rounded-pill border border-line bg-card text-ink2 transition-colors hover:bg-coralsoft hover:text-coral"
+                className="press inline-flex min-w-0 flex-shrink-0 items-center gap-1.5 rounded-pill border border-line bg-card px-3 py-2.5 font-heading text-sm font-semibold text-ink2 transition-colors hover:border-coral/40 hover:bg-coralsoft hover:text-coral sm:px-4"
               >
-                <X size={18} />
+                <X size={16} className="flex-shrink-0" />
+                {/* Named, not a bare X: a lone cross in a test reads as "close
+                    this box", and aspirants were not finding the way out. The
+                    SHORT label — Prev and Flag drop theirs under 400px, which
+                    is what buys this one the room to stay on at 320px Tamil. */}
+                <span className="whitespace-nowrap">{t('exitShort')}</span>
               </button>
             )}
             <button

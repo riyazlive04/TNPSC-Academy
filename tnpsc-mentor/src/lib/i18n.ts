@@ -555,6 +555,9 @@ const STRINGS = {
     ta: 'தொடர முடியும்',
   },
   exitTest: { en: 'Exit test', ta: 'தேர்வை விட்டு வெளியேறு' },
+  // Nav-pill label. Deliberately one short word in both languages — it sits in
+  // the quiz bottom bar next to Prev, Flag and Next.
+  exitShort: { en: 'Exit', ta: 'வெளியேறு' },
   flagForReview: { en: 'Flag this question for review', ta: 'மதிப்பாய்வுக்காக இந்த வினாவைக் குறி' },
   unflagQuestion: { en: 'Unflag this question', ta: 'இந்த வினாவின் குறியை அகற்று' },
   attemptedLabel: { en: 'Attempted', ta: 'முயற்சித்தவை' },
@@ -1337,6 +1340,18 @@ const STRINGS = {
   recommendedTime: { en: 'Recommended', ta: 'பரிந்துரைக்கப்பட்டது' },
   recommendedTimeHint: { en: '≈1 minute per question', ta: 'ஒரு வினாவுக்கு ≈1 நிமிடம்' },
   applyRecommended: { en: 'Use', ta: 'பயன்படுத்து' },
+  // The paper's length is now DERIVED from the time limit (≈1 min/question), so
+  // these two explain the number the aspirant no longer sets directly.
+  ofAvailableHint: { en: 'of {n} available', ta: 'உள்ள {n}-ல்' },
+  paceHint: { en: '≈1 min each', ta: 'ஒன்றுக்கு ≈1 நிமி.' },
+  fullPaperFixedHint: { en: 'the whole paper', ta: 'முழுத் தாள்' },
+  // PYQ "Full Paper" — the whole year's paper as one test, in printed order.
+  fullPaper: { en: 'Full Paper', ta: 'முழுத் தேர்வுத் தாள்' },
+  fullPaperSub: { en: 'in the printed order', ta: 'தாளில் உள்ள வரிசையில்' },
+  fullPaperPickYear: {
+    en: 'Pick a year above to sit that whole paper',
+    ta: 'முழுத் தாளையும் எழுத மேலே ஓர் ஆண்டைத் தேர்ந்தெடுக்கவும்',
+  },
   // In-test low-time warning banner (shown visibly in the final minute)
   timeWarn60: { en: 'Less than 1 minute left - wrap up your answers.', ta: '1 நிமிடத்திற்கும் குறைவே - உங்கள் பதில்களை முடிக்கவும்.' },
   timeWarn30: { en: 'Only 30 seconds left!', ta: '30 வினாடிகள் மட்டுமே!' },

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Newspaper } from 'lucide-react'
 import { api, type Material } from '../lib/api'
-import { issueDateLabel, magazineName } from '../lib/caMagazine'
+import { issueDateLabel, magazineKindLabel, magazineName } from '../lib/caMagazine'
 import { caMagazineLink, isIsoDate } from '../lib/shareLinks'
 import MagazineReader from '../components/Materials/MagazineReader'
 import ShareLinkButton from '../components/UI/ShareLinkButton'
@@ -80,13 +80,15 @@ export default function CaMagazineLinkPage() {
       : null
   const notFound = !!date && !!items && !active
 
-  const card = (m: Material) => (
+  const card = (m: Material) => {
+    const caType = m.magazine_ca_type ?? 'day_wise'
+    return (
     <button
       key={m.id}
       onClick={() => navigate(`/ca/magazine/${m.magazine_date}`)}
       className="focus-ring group overflow-hidden rounded-card border border-line bg-card text-left transition-colors hover:border-brand/40"
     >
-      <span className="block aspect-[3/2] w-full overflow-hidden bg-tint-violet">
+      <span className="relative block aspect-[3/2] w-full overflow-hidden bg-tint-violet">
         {covers[m.id] ? (
           <img
             src={covers[m.id]}
@@ -100,17 +102,26 @@ export default function CaMagazineLinkPage() {
             <Newspaper size={26} />
           </span>
         )}
+        <span
+          className={[
+            'tamil absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 font-heading text-2xs font-bold uppercase tracking-wide shadow-sm',
+            caType === 'month_wise' ? 'bg-gold text-white' : 'bg-card/90 text-brand',
+          ].join(' ')}
+        >
+          {magazineKindLabel(caType, lang)}
+        </span>
       </span>
       <span className="block p-3">
         <span className="tamil block truncate font-heading text-sm font-semibold leading-snug text-ink">
-          {magazineName(lang)}
+          {magazineName(lang, caType)}
         </span>
         <span className="tamil mt-0.5 block truncate font-body text-xs text-ink2">
-          {issueDateLabel(m.magazine_ca_type ?? 'day_wise', m.magazine_date ?? '', lang)}
+          {issueDateLabel(caType, m.magazine_date ?? '', lang)}
         </span>
       </span>
     </button>
-  )
+    )
+  }
 
   const grid = (list: Material[]) => (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{list.map(card)}</div>

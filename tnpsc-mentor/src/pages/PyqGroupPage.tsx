@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Calculator, Type, Languages, GraduationCap, type LucideIcon } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import FullPaperHero from '../components/UI/FullPaperHero'
 import { type Tint } from '../components/UI/IconTile'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
@@ -16,6 +17,7 @@ import {
   subjectName,
   type PyqSection,
 } from '../lib/constants'
+import { useStartTest } from '../hooks/useStartTest'
 import { useT } from '../lib/i18n'
 
 // Section → row presentation (icon + tint). The data behind each is fetched as a
@@ -32,6 +34,12 @@ const SECTION_UI: Record<PyqSection, { icon: LucideIcon; tint: Tint }> = {
 // show the other's numbers.
 const countsCache = new Map<string, Record<string, number>>()
 const cacheKey = (groupKey: string, year: number | null) => `${groupKey}|${year ?? 'all'}`
+
+// Whole-paper total per (group, year), for the Full Paper panel. One
+// year-scoped count rather than the sum of the section cards, so a question
+// whose section is not in the registry still counts toward the paper the
+// aspirant sits — and pays for.
+const fullCountCache = new Map<string, number>()
 
 /**
  * A section-wise PYQ group's paper list (Group 2 / 2A or Group 4 / VAO — see
@@ -61,6 +69,10 @@ export default function PyqGroupPage() {
   const [counts, setCounts] = useState<Record<string, number> | null>(
     group ? countsCache.get(cacheKey(group.key, year)) ?? null : {}
   )
+  const [fullCount, setFullCount] = useState<number | null>(
+    group && year != null ? (fullCountCache.get(cacheKey(group.key, year)) ?? null) : null
+  )
+  const startTest = useStartTest()
 
   // Unknown group → back to the chooser.
   useEffect(() => {
@@ -95,7 +107,48 @@ export default function PyqGroupPage() {
     }
   }, [group, year])
 
+  // Full-paper total for the selected year.
+  useEffect(() => {
+    if (!group || year == null) {
+      setFullCount(null)
+      return
+    }
+    const key = cacheKey(group.key, year)
+    const cached = fullCountCache.get(key)
+    if (cached != null) {
+      setFullCount(cached)
+      return
+    }
+    let cancelled = false
+    setFullCount(null)
+    api
+      .countQuestions({ category: group.category, year })
+      .then((n) => {
+        if (cancelled) return
+        fullCountCache.set(key, n)
+        setFullCount(n)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [group, year])
+
   if (!group) return null
+
+  // The whole year's paper for this group — every section, printed order.
+  const beginFullPaper = () => {
+    if (year == null || !fullCount) return
+    startTest({
+      category: group.category,
+      year,
+      fullPaper: true,
+      paperOrder: true,
+      availableCount: fullCount,
+      questionCount: fullCount,
+      labelParts: ['PYQ', group.label, { t: 'fullPaper' }, String(year)],
+    })
+  }
 
   return (
     <PickerPage badge={t(group.i18n.badge)} backTo="/test-arena/pyq">
@@ -109,6 +162,9 @@ export default function PyqGroupPage() {
       {/* Exam-year filter. Scopes the section counts below and is carried into
           whichever section is opened. */}
       <YearFilter years={years} value={year} onChange={setYear} />
+
+      {/* Sit the whole paper, rather than drilling into one section of it. */}
+      <FullPaperHero year={year} count={fullCount ?? undefined} onClick={beginFullPaper} />
 
       {counts === null ? (
         // Same grid the sections land in, so nothing shifts when they arrive.

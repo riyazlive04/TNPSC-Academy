@@ -32,7 +32,7 @@ function resolveCaption(template: string, issue: CaMagazineIssue, lang: Lang): s
   return template
     .replace(/\{date\}/g, issueDateLabel(issue.ca_type, issue.date, lang))
     .replace(/\{items\}/g, String(issue.items))
-    .replace(/\{name\}/g, magazineName(lang))
+    .replace(/\{name\}/g, magazineName(lang, issue.ca_type))
     .replace(/\{link\}/g, APP_LINK)
 }
 
@@ -142,7 +142,7 @@ export default function CaWhatsappDialog({
       const { BRAND_WATERMARK } = await import('../../lib/pdfWatermark')
       await generateMagazinePdf({
         items,
-        title: magazineName(lang),
+        title: magazineName(lang, issue.ca_type),
         subtitle: issueDateLabel(issue.ca_type, issue.date, lang),
         lang,
         fileLabel: `WhatsApp_${issueDateLabel(issue.ca_type, issue.date, 'en')}_${lang.toUpperCase()}`,

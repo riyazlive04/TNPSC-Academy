@@ -129,7 +129,7 @@ export default function CaMagazineCarousel() {
       </span>
       <span className="block p-3">
         <span className="tamil block truncate font-heading text-sm font-semibold leading-snug text-ink">
-          {magazineName(lang)}
+          {magazineName(lang, 'day_wise')}
         </span>
         <span className="tamil mt-0.5 block truncate font-body text-xs text-ink2">
           {issueDateLabel('day_wise', m.date, lang)}

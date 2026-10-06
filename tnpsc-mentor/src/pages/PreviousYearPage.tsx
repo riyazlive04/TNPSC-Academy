@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
+import FullPaperHero from '../components/UI/FullPaperHero'
 import VettriCard from '../components/UI/VettriCard'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import { SkeletonChoiceGrid } from '../components/UI/Skeleton'
@@ -56,6 +57,12 @@ const PYQ_YEARS = [2025, 2024, 2022, 2021, 2019]
 // FULLY successful loads are cached — see the loader below.
 const countsCache = new Map<number | 'all', Record<string, number>>()
 const yearKey = (y: number | null): number | 'all' => y ?? 'all'
+
+// Whole-paper total per year, for the Full Paper panel. Asked for as ONE
+// year-scoped count rather than summed from the subject cards: a question whose
+// subject fell outside PYQ_SUBJECTS would be missing from that sum, and this
+// number is both the length of the paper and what a free learner spends on it.
+const fullCountCache = new Map<number, number>()
 
 export default function PreviousYearPage() {
   const startTest = useStartTest()
@@ -118,6 +125,35 @@ export default function PreviousYearPage() {
     }
   }, [year])
 
+  // Full-paper total for the selected year (null = unknown / not applicable).
+  const [fullCount, setFullCount] = useState<number | null>(
+    year != null ? (fullCountCache.get(year) ?? null) : null
+  )
+  useEffect(() => {
+    if (year == null) {
+      setFullCount(null)
+      return
+    }
+    const cached = fullCountCache.get(year)
+    if (cached != null) {
+      setFullCount(cached)
+      return
+    }
+    let cancelled = false
+    setFullCount(null)
+    api
+      .countQuestions({ category: 'pyq', year })
+      .then((n) => {
+        if (cancelled) return
+        fullCountCache.set(year, n)
+        setFullCount(n)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [year])
+
   // Lock state (which subjects have used their one free test).
   useEffect(() => {
     let cancelled = false
@@ -170,6 +206,20 @@ export default function PreviousYearPage() {
     })
   }
 
+  // The whole year's paper, in the order it was printed.
+  const beginFullPaper = () => {
+    if (year == null || !fullCount) return
+    startTest({
+      category: 'pyq',
+      year,
+      fullPaper: true,
+      paperOrder: true,
+      availableCount: fullCount,
+      questionCount: fullCount,
+      labelParts: ['PYQ', { t: 'fullPaper' }, String(year)],
+    })
+  }
+
   return (
     <PickerPage badge={t('pyq1Badge')} backTo="/test-arena/pyq">
       <div className="mb-5">
@@ -186,6 +236,9 @@ export default function PreviousYearPage() {
           <VettriCard />
         </div>
       )}
+
+      {/* Sit the whole paper, rather than one subject's questions out of it. */}
+      <FullPaperHero year={year} count={fullCount ?? undefined} onClick={beginFullPaper} />
 
       {counts === null ? (
         <SkeletonChoiceGrid count={PYQ_SUBJECTS.length} />
