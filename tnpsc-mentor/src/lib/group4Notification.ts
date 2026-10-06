@@ -164,42 +164,18 @@ const absolute = (href: string) => (/^https?:\/\//.test(href) ? href : GROUP4_OR
  * organisation and website @ids point at the graph index.html already
  * declares, so the whole site still describes one publisher.
  *
- * One JobPosting per post GROUP rather than per post: 46 nodes would bloat the
- * head for no extra coverage, and the six groups are what the page's H3s are.
+ * Deliberately NO JobPosting nodes. They were here and Google's Rich Results
+ * Test rejected all six, which was the right call on three counts: the markup
+ * is only for a page that IS a single job posting, this page lists 46 posts;
+ * each node bundled a whole cadre (3,614 vacancies across 14 post codes) into
+ * one "posting"; and the page describes a notification rather than accepting
+ * applications, so there is nothing to apply to here. Marking it up anyway
+ * risks a manual action for spammy structured data, and it would never have
+ * been eligible for the rich result. The notification is an Event we report
+ * on, which is what Article + Event say.
  */
 export function group4NotificationJsonLd(): object {
   const url = GROUP4_ORIGIN + GROUP4_NOTIFICATION_PATH
-
-  const jobPostings = GROUP4_POST_GROUPS.map((g, i) => ({
-    '@type': 'JobPosting',
-    '@id': `${url}#job-${i + 1}`,
-    title: `TNPSC Group 4 2026 — ${g.group}`,
-    description: `${g.vacancies} vacancies for ${g.group} under the Tamil Nadu Public Service Commission Combined Civil Services Examination - IV (Group IV Services) 2026, Advertisement No. 747.`,
-    identifier: {
-      '@type': 'PropertyValue',
-      name: 'TNPSC Post Codes',
-      value: g.postCodes.join(', '),
-    },
-    datePosted: GROUP4_PUBLISHED,
-    validThrough: GROUP4_APPLY_DEADLINE_ISO,
-    employmentType: 'FULL_TIME',
-    totalJobOpenings: g.vacancies,
-    hiringOrganization: {
-      '@type': 'GovernmentOrganization',
-      name: 'Tamil Nadu Public Service Commission',
-      sameAs: 'https://www.tnpsc.gov.in/',
-    },
-    jobLocation: {
-      '@type': 'Place',
-      address: { '@type': 'PostalAddress', addressRegion: 'Tamil Nadu', addressCountry: 'IN' },
-    },
-    educationRequirements: {
-      '@type': 'EducationalOccupationalCredential',
-      credentialCategory: 'SSLC (10th standard) or higher, depending on the post',
-    },
-    directApply: false,
-    url: raw.notification.applyUrl,
-  }))
 
   return {
     '@context': 'https://schema.org',
@@ -274,7 +250,6 @@ export function group4NotificationJsonLd(): object {
           address: { '@type': 'PostalAddress', addressRegion: 'Tamil Nadu', addressCountry: 'IN' },
         },
       },
-      ...jobPostings,
       {
         '@type': 'FAQPage',
         '@id': `${url}#faq`,
