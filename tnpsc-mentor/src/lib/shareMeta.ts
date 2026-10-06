@@ -28,6 +28,15 @@ import {
   pastAnswerKeyJsonLd,
   pastAnswerKeyStaticHtml,
 } from './answerKeyGroups'
+import {
+  GROUP4_DESCRIPTION,
+  GROUP4_DOC_TITLE,
+  GROUP4_NOTIFICATION_PATH,
+  GROUP4_NOTIFICATION_SHORT_PATHS,
+  GROUP4_SHARE_TITLE,
+  group4NotificationJsonLd,
+  group4NotificationStaticHtml,
+} from './group4Notification'
 
 export type ShareGroup = 'group1' | 'group2' | 'group4'
 
@@ -183,6 +192,19 @@ export const SHARE_ROUTES: ShareRoute[] = [
     description: PYQ_DESCRIPTION.group4,
   },
   ...pyqSectionRoutes('group4'),
+  {
+    // The Group 4 2026 notification page. `group: null` because its title
+    // leads with the search phrase people type ("Group 4 Notification 2026
+    // ... vacancies"), not the Test Series pattern groupTitle() builds.
+    group: null,
+    paths: [GROUP4_NOTIFICATION_PATH, ...GROUP4_NOTIFICATION_SHORT_PATHS],
+    title: GROUP4_SHARE_TITLE,
+    documentTitle: GROUP4_DOC_TITLE,
+    description: GROUP4_DESCRIPTION,
+    jsonLd: group4NotificationJsonLd(),
+    bodyHtml: group4NotificationStaticHtml(),
+    canonicalPath: GROUP4_NOTIFICATION_PATH,
+  },
 
   // ─── Answer-key hubs ──────────────────────────────────────────────────────
   // One post-exam answer-key hub per group (plus its short links), and one

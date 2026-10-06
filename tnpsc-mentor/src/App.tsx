@@ -108,6 +108,7 @@ const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
 const TargetG2LandingPage = lazy(() => import('./pages/TargetG2LandingPage'))
 const AnswerKeyPage = lazy(() => import('./pages/AnswerKeyPage'))
 const PastAnswerKeyPage = lazy(() => import('./pages/PastAnswerKeyPage'))
+const Group4NotificationPage = lazy(() => import('./pages/Group4NotificationPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 
 interface RouteDef {
@@ -416,6 +417,14 @@ function AnimatedRoutes() {
       <Route path="/target-group-2/english" element={<TargetG2LandingPage track="english" />} />
       <Route path="/target-group-2-tamil" element={<TargetG2LandingPage track="tamil" />} />
       <Route path="/target-group-2/tamil" element={<TargetG2LandingPage track="tamil" />} />
+
+      {/* Public, indexable TNPSC Group 4 2026 notification page. The short
+          links are real routes rendering the same page, so each gets its own
+          link preview; the page points the canonical tag at the long URL
+          (lib/group4Notification). */}
+      <Route path="/group-4-notification-2026" element={<Group4NotificationPage />} />
+      <Route path="/group-4-notification" element={<Group4NotificationPage />} />
+      <Route path="/group-4-vacancy-2026" element={<Group4NotificationPage />} />
 
       {/* Public, indexable answer-key hubs — one per exam group, with a switcher
           between them (downloads after each exam). The short links are real

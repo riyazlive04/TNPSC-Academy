@@ -1,0 +1,327 @@
+{
+  "_source": "Extracted from TNPSC Advertisement No. 747, Notification No. 11/2026 (group_english.pdf, 85 pages). The official PDF is the source of truth; the English version is final per para 6.5.",
+  "notification": {
+    "examName": "Combined Civil Services Examination - IV (Group IV Services)",
+    "shortName": "TNPSC Group 4",
+    "conductingBody": "Tamil Nadu Public Service Commission",
+    "conductingBodyShort": "TNPSC",
+    "advertisementNo": "747",
+    "notificationNo": "11/2026",
+    "notificationDate": "2026-10-06",
+    "year": 2026,
+    "applyUrl": "https://www.tnpscexams.in",
+    "officialWebsite": "https://www.tnpsc.gov.in",
+    "applicationMode": "Online only",
+    "helpline": "1800 419 0958",
+    "helplineHours": "10.00 A.M to 5.45 P.M on all working days",
+    "languages": ["English", "Tamil"],
+    "sourceDocument": "group_english.pdf"
+  },
+
+  "summary": {
+    "totalVacancies": 6574,
+    "totalPosts": 46,
+    "numberOfOrganizations": 26,
+    "examStages": 1,
+    "examStageNames": ["Single Stage Written Examination"],
+    "totalQuestions": 200,
+    "totalMarks": 300,
+    "durationHours": 3,
+    "examMode": "OMR (offline, objective)",
+    "applicationFee": 100,
+    "applicationFeeCurrency": "INR",
+    "largestVacancyPost": "Junior Assistant (Non Security), Tamil Nadu Ministerial Service",
+    "largestVacancyCount": 2610,
+    "minimumQualificationFloor": "SSLC (10th pass)",
+    "examDistrictsCount": 38
+  },
+
+  "importantDates": [
+    { "event": "Date of Notification", "date": "2026-10-06", "displayDate": "06.10.2026", "time": null },
+    { "event": "Online application starts", "date": "2026-10-06", "displayDate": "06.10.2026", "time": null },
+    { "event": "Last date to apply online", "date": "2026-11-05", "displayDate": "05.11.2026", "time": "11.59 PM" },
+    { "event": "Application Correction Window opens", "date": "2026-11-09", "displayDate": "09.11.2026", "time": "12.01 AM" },
+    { "event": "Application Correction Window closes", "date": "2026-11-11", "displayDate": "11.11.2026", "time": "11.59 PM" },
+    { "event": "Written Examination", "date": "2027-01-10", "displayDate": "10.01.2027", "time": "09.30 AM to 12.30 PM" }
+  ],
+
+  "examPattern": {
+    "stage": "Single Stage Written Examination",
+    "mode": "OMR (Optical Mark Recognition)",
+    "type": "Objective",
+    "singlePaper": true,
+    "totalQuestions": 200,
+    "totalMarks": 300,
+    "duration": "3 hours",
+    "parts": [
+      {
+        "part": "Part A",
+        "subject": "Tamil Eligibility-cum-Scoring Test",
+        "standard": "SSLC",
+        "questions": 100,
+        "marks": 150,
+        "minimumQualifyingMarks": 90,
+        "gateNote": "Part B and Part C are evaluated only if the candidate secures 60 marks (40%) in Part A. Part A questions are set in Tamil only.",
+        "languageOfQuestions": ["Tamil"]
+      },
+      {
+        "part": "Part B",
+        "subject": "General Studies",
+        "standard": null,
+        "questions": 75,
+        "marks": 150,
+        "marksNote": "Part B and Part C together carry 150 marks",
+        "languageOfQuestions": ["Tamil", "English"]
+      },
+      {
+        "part": "Part C",
+        "subject": "Aptitude and Mental Ability",
+        "standard": null,
+        "questions": 25,
+        "marks": 150,
+        "marksNote": "Part B and Part C together carry 150 marks",
+        "languageOfQuestions": ["Tamil", "English"]
+      }
+    ],
+    "differentlyAbledOption": {
+      "available": true,
+      "note": "Differently abled candidates (any percentage of disability) who studied only English at Board / University may write General English (SSLC standard) instead of the Tamil Eligibility-cum-Scoring Test. No translation part. Minimum qualifying marks 60 (40%). The Certificate of Disability in the Annexure V format must be uploaded with the online application."
+    },
+    "syllabusLocation": "Annexure III of the Notification"
+  },
+
+  "fee": {
+    "examinationFee": 100,
+    "currency": "INR",
+    "paymentModes": ["Net Banking", "Credit Card", "Debit Card", "UPI"],
+    "offlinePaymentAccepted": false,
+    "concessionAvailable": true,
+    "concessionNote": "Special categories may claim fee exemption as per Annexure II. Each concession claim consumes one free chance. The Yes / No choice cannot be edited after submission.",
+    "serviceChargesApply": true
+  },
+
+  "eligibility": {
+    "ageAsOnDate": "2026-07-01",
+    "minimumGeneralEducationalQualification": "A pass in the Secondary School Leaving Certificate (SSLC) Examination of Tamil Nadu",
+    "qualificationCutoffDate": "Must be possessed on the date of notification (06.10.2026)",
+    "degreeOrderOfStudy": "10th + HSC / Diploma or equivalent + UG Degree",
+    "tamilKnowledgeRequired": true,
+    "tamilKnowledgeNote": "Adequate knowledge of Tamil as on the notification date: SSLC / HSC / Degree with Tamil as one of the languages, or the High School course in Tamil medium, or a pass in the TNPSC Second Class Language Test (Full Test) in Tamil. Otherwise the test must be cleared within two years of appointment.",
+    "ageLimits": {
+      "others": {
+        "description": "Candidates not belonging to SCs, SC(A)s, STs, MBCs/DCs, BC(OBCM)s and BCMs",
+        "typicalMinimumAge": 18,
+        "typicalMaximumAge": 30,
+        "vaoMinimumAge": 21,
+        "vaoMaximumAge": 30,
+        "executiveOfficerMinimumAge": 25,
+        "forestPostsMinimumAge": 21,
+        "forestPostsMaximumAge": 30,
+        "concessions": {
+          "personsWithBenchmarkDisability": 40,
+          "exServicemen": 48,
+          "destituteWidow": 40
+        }
+      },
+      "reserved": {
+        "description": "SCs, SC(A)s, STs, MBCs/DCs, BC(OBCM)s and BCMs",
+        "maximumAgeBcObcmBcmMbcDc": 32,
+        "maximumAgeScScaSt": 35,
+        "vaoMaximumAge": 40,
+        "concessions": {
+          "personsWithBenchmarkDisabilityBcObcmBcmMbcDc": 42,
+          "personsWithBenchmarkDisabilityScScaSt": 45,
+          "exServicemen": 53,
+          "destituteWidow": 35
+        }
+      },
+      "noMaximumAgeLimitPostCodes": ["3521", "3788", "3816", "3520", "3321", "3848", "3817", "3672", "3746", "3103", "3806"],
+      "note": "Several corporation and board posts carry no maximum age limit. See paras 4.1.1 and 4.1.2 of the notification for the exact post-wise table."
+    },
+    "restrictions": [
+      "Candidates not belonging to SCs, SC(A)s, STs, MBCs/DCs, BC(OBCM)s and BCMs who have completed five years or more of Government service since first appointment are not eligible, even if within the age limit.",
+      "Only persons professing the Hindu religion are eligible for posts in the Hindu Religious and Charitable Endowments Department.",
+      "Only persons professing the Muslim religion are eligible for Typist (3846) and Steno Typist Grade III (3847) in the Tamil Nadu Waqf Board.",
+      "Candidates with blindness and low vision are not eligible for posts in the Judicial Department / Tamil Nadu State Legal Services Authority."
+    ]
+  },
+
+  "selectionProcess": {
+    "steps": [
+      "Single Stage Written Examination (OMR, 200 questions, 300 marks)",
+      "Onscreen Certificate Verification (1:3 general / 1:2 reserved for VAO, Junior Assistant, Typist and Steno Typist; 1:6 all categories for Forest Guard with Driving Licence and Forest Watcher)",
+      "Physical Standards Test and Endurance Test (Forest Guard with Driving Licence and Forest Watcher only, 1:3 ratio, at Chennai only)",
+      "Physical Certificate Verification",
+      "Counselling and appointment"
+    ],
+    "enduranceTest": {
+      "applicableTo": ["Forest Guard with Driving Licence (3318)", "Forest Watcher (3319)"],
+      "maleDistanceKm": 25,
+      "femaleAndThirdGenderDistanceKm": 16,
+      "timeLimitHours": 4,
+      "venue": "Chennai only",
+      "conductedBy": "Principal Chief Conservator of Forests"
+    },
+    "tieBreakerOrder": [
+      "Higher educational qualification",
+      "Higher technical qualification (Typewriting / Shorthand) where prescribed",
+      "Seniority in age",
+      "Earlier application number"
+    ],
+    "resultsPublishedOn": "https://www.tnpsc.gov.in",
+    "hallTicketOn": "https://www.tnpscexams.in"
+  },
+
+  "posts": [
+    { "sNo": 1, "name": "Village Administrative Officer", "postCode": "2025", "service": "Tamil Nadu Ministerial Service", "vacancies": 291, "payLevel": "Level 8", "qualification": "Minimum General Educational Qualification (SSLC pass)" },
+    { "sNo": 2, "name": "Junior Assistant (Security)", "postCode": "2400", "service": "Tamil Nadu Ministerial Service", "vacancies": 28, "payLevel": "Level 8", "qualification": "Minimum General Educational Qualification (SSLC pass)" },
+    { "sNo": 3, "name": "Bill Collector", "postCode": "2500", "service": "Tamil Nadu Ministerial Service", "vacancies": 59, "payLevel": "Level 8", "qualification": "Minimum General Educational Qualification (SSLC pass)" },
+    { "sNo": 4, "name": "Junior Assistant (Non Security)", "postCode": "2600", "service": "Tamil Nadu Ministerial Service", "vacancies": 2610, "payLevel": "Level 8", "qualification": "Minimum General Educational Qualification (SSLC pass)" },
+    { "sNo": 5, "name": "Junior Assistant (Non Security)", "postCode": "4600", "service": "Tamil Nadu Judicial Ministerial Service", "vacancies": 252, "payLevel": "Level 8", "qualification": "Minimum General Educational Qualification (SSLC pass)" },
+    { "sNo": 6, "name": "Junior Assistant", "postCode": "3842", "service": "Tamil Nadu Municipal Council Service", "vacancies": 119, "payLevel": "Level 8", "qualification": "Must have passed S.S.L.C. Examination" },
+    { "sNo": 7, "name": "Revenue Assistant", "postCode": "3843", "service": "Tamil Nadu Municipal Council Service", "vacancies": 96, "payLevel": "Level 8", "qualification": "Must have passed S.S.L.C. Examination" },
+    { "sNo": 8, "name": "Junior Assistant", "postCode": "3840", "service": "Tamil Nadu Municipal Corporation Service", "vacancies": 70, "payLevel": "Level 8", "qualification": "Must have passed S.S.L.C. Examination" },
+    { "sNo": 9, "name": "Junior Assistant", "postCode": "3512", "service": "Tamil Nadu Adi Dravidar Housing and Development Corporation Ltd.", "vacancies": 43, "payLevel": "Level 8 (EPF)", "qualification": "SSLC pass (10th pass)" },
+    { "sNo": 10, "name": "Junior Assistant", "postCode": "3851", "service": "Tamil Nadu Municipal Corporation Service (Greater Chennai Corporation)", "vacancies": 134, "payLevel": "Level 8", "qualification": "Must have passed S.S.L.C. Examination" },
+    { "sNo": 11, "name": "Tax Collector", "postCode": "3854", "service": "Tamil Nadu Municipal Corporation Service (Greater Chennai Corporation)", "vacancies": 107, "payLevel": "Level 8", "qualification": "Must have passed S.S.L.C. Examination" },
+    { "sNo": 12, "name": "Junior Assistant", "postCode": "3521", "service": "Tamil Nadu Small Industries Development Corporation Ltd", "vacancies": 25, "payLevel": "Level 8 (EPF)", "qualification": "Graduate from a UGC-recognised University" },
+    { "sNo": 13, "name": "Junior Assistant", "postCode": "3788", "service": "Tamil Nadu Handloom Weavers Co-operative Societies Ltd.", "vacancies": 20, "payLevel": "Rs.17000-54060 (EPF)", "qualification": "Any degree with a Diploma in Co-operative Management, or Co-operation as a special subject in the degree", "note": "Selected candidates must be ready to be posted anywhere in India" },
+    { "sNo": 14, "name": "Junior Assistant", "postCode": "3816", "service": "Tamil Nadu Police Housing Corporation Limited", "vacancies": 5, "payLevel": "Level 8 (EPF)", "qualification": "Any degree from a recognised University" },
+    { "sNo": 15, "name": "Junior Assistant", "postCode": "3520", "service": "Tamil Nadu Power Finance and Infrastructure Development Corporation Ltd.", "vacancies": 3, "payLevel": "Level 8 (EPF)", "qualification": "B.Com. degree from a recognised University" },
+    { "sNo": 16, "name": "Junior Assistant", "postCode": "3321", "service": "Tamil Nadu Medicinal Plant Farms & Herbal Medicine Corporation Limited", "vacancies": 6, "payLevel": "Level 8 (EPF)", "qualification": "A degree from a recognised University or Institution, plus a Certificate Course in Computer on Office Automation" },
+    { "sNo": 17, "name": "Junior Assistant (Accounts)", "postCode": "3848", "service": "Tamil Nadu Power Distribution Corporation Limited", "vacancies": 422, "payLevel": "Level 3 (Rs.19500-62000)", "qualification": "B.Com. degree from a recognised University" },
+    { "sNo": 18, "name": "Bill Collector", "postCode": "3214", "service": "Tamil Nadu Urban Habitat Development Board", "vacancies": 38, "payLevel": "Level 3 (Rs.16600-52400)", "qualification": "Minimum General Educational Qualification (a pass in SSLC)" },
+    { "sNo": 19, "name": "Junior Administrative Assistant", "postCode": "3835", "service": "Tamil Nadu State Legal Services Authority", "vacancies": 42, "payLevel": "Level 8", "qualification": "Must have passed the S.S.L.C Public Examination" },
+    { "sNo": 20, "name": "Junior Administrative Assistant (Computer Operator)", "postCode": "3836", "service": "Tamil Nadu State Legal Services Authority", "vacancies": 13, "payLevel": "Level 8", "qualification": "SSLC + Typewriting Higher Grade in English and Tamil + Certificate Course in Computer on Office Automation" },
+    { "sNo": 21, "name": "Junior Assistant cum Typist", "postCode": "3804", "service": "Electronic Corporation of Tamil Nadu", "vacancies": 6, "payLevel": "Level 8 (EPF)", "qualification": "SSLC + Government Technical Examination in Typewriting + Certificate Course in Computer on Office Automation" },
+    { "sNo": 22, "name": "Typist", "postCode": "2200", "service": "Tamil Nadu Ministerial Service / Legislative Assembly Secretariat Service / Secretariat Service", "vacancies": 856, "payLevel": "Level 8", "qualification": "SSLC + Government Technical Examination in Typewriting + Certificate Course in Computer on Office Automation", "includesBacklog": true },
+    { "sNo": 23, "name": "Typist", "postCode": "4200", "service": "Tamil Nadu Judicial Ministerial Service", "vacancies": 377, "payLevel": "Level 8", "qualification": "SSLC + Government Technical Examination in Typewriting + Certificate Course in Computer on Office Automation", "includesBacklog": true },
+    { "sNo": 24, "name": "Typist", "postCode": "3834", "service": "Tamil Nadu Small Industries Development Corporation Ltd", "vacancies": 15, "payLevel": "Level 8 (EPF)", "qualification": "SSLC + Government Technical Examination in Typewriting + Certificate Course in Computer on Office Automation" },
+    { "sNo": 25, "name": "Typist", "postCode": "3846", "service": "Tamil Nadu Waqf Board", "vacancies": 6, "payLevel": "Level 8", "qualification": "SSLC + Typewriting Higher / Senior Grade in Tamil and English + Certificate Course in Computer on Office Automation", "note": "Only persons professing the Muslim religion are eligible" },
+    { "sNo": 26, "name": "Typist", "postCode": "3844", "service": "Tamil Nadu Municipal Council Service", "vacancies": 260, "payLevel": "Level 8", "qualification": "SSLC + Typewriting in English and Tamil both by Senior Grade" },
+    { "sNo": 27, "name": "Typist", "postCode": "3852", "service": "Tamil Nadu Municipal Corporation Service (Greater Chennai Corporation)", "vacancies": 56, "payLevel": "Level 8", "qualification": "SSLC + Typewriting Senior Grade in Tamil and English", "includesBacklog": true },
+    { "sNo": 28, "name": "Typist", "postCode": "3817", "service": "Tamil Nadu Police Housing Corporation Limited", "vacancies": 2, "payLevel": "Level 8 (EPF)", "qualification": "Higher Secondary or equivalent + Government Technical Examination in Typewriting + Certificate Course in Computer on Office Automation" },
+    { "sNo": 29, "name": "Steno Typist (Grade III)", "postCode": "2300", "service": "Tamil Nadu Ministerial Service", "vacancies": 209, "payLevel": "Level 10", "qualification": "SSLC + Government Technical Examination in Typewriting and Shorthand + Certificate Course in Computer on Office Automation", "includesBacklog": true },
+    { "sNo": 30, "name": "Steno Typist (Grade III)", "postCode": "4300", "service": "Tamil Nadu Judicial Ministerial Service", "vacancies": 145, "payLevel": "Level 10", "qualification": "SSLC + Government Technical Examination in Typewriting and Shorthand + Certificate Course in Computer on Office Automation", "includesBacklog": true },
+    { "sNo": 31, "name": "Steno Typist (Grade III)", "postCode": "3837", "service": "Tamil Nadu Adi Dravidar Housing and Development Corporation Ltd.", "vacancies": 1, "payLevel": "Level 10 (EPF)", "qualification": "SSLC + Government Technical Examination in Typewriting and Shorthand + Certificate Course in Computer on Office Automation" },
+    { "sNo": 32, "name": "Steno Typist (Grade III)", "postCode": "3838", "service": "Tamil Nadu Small Industries Development Corporation Ltd", "vacancies": 2, "payLevel": "Level 10 (EPF)", "qualification": "SSLC + Government Technical Examination in Typewriting and Shorthand + Certificate Course in Computer on Office Automation" },
+    { "sNo": 33, "name": "Steno Typist (Grade III)", "postCode": "3847", "service": "Tamil Nadu Waqf Board", "vacancies": 2, "payLevel": "Level 8", "qualification": "SSLC + Typewriting and Shorthand Higher / Senior Grade in Tamil and English + Certificate Course in Computer on Office Automation", "note": "Only persons professing the Muslim religion are eligible" },
+    { "sNo": 34, "name": "Steno Typist (Grade III)", "postCode": "3672", "service": "Chennai Metropolitan Development Authority", "vacancies": 1, "payLevel": "Level 10", "qualification": "Degree (10+2+3 pattern) + Typewriting and Shorthand as prescribed + Computer Office Automation", "backlogOnly": true },
+    { "sNo": 35, "name": "Steno Typist", "postCode": "3845", "service": "Tamil Nadu Municipal Council Service", "vacancies": 16, "payLevel": "Level 10", "qualification": "SSLC + Typewriting and Shorthand in Tamil and English both by Senior Grade" },
+    { "sNo": 36, "name": "Personal Clerk", "postCode": "3841", "service": "Tamil Nadu Municipal Corporation Service", "vacancies": 60, "payLevel": "Level 10", "qualification": "SSLC + Typewriting and Shorthand in Tamil and English both by Senior Grade" },
+    { "sNo": 37, "name": "Shorthand Typist (Grade III)", "postCode": "3853", "service": "Tamil Nadu Municipal Corporation Service (Greater Chennai Corporation)", "vacancies": 28, "payLevel": "Level 10", "qualification": "SSLC + Typewriting Senior Grade in Tamil and English + Shorthand as prescribed + Computer Office Automation", "includesBacklog": true },
+    { "sNo": 38, "name": "Telephone Operator", "postCode": "3822", "service": "Tamil Nadu Forensic Science Subordinate Service", "vacancies": 1, "payLevel": "Level 8", "qualification": "SSLC + a certificate in Telephone Board operation from the Telephone Department or a recognised Telephone Institute" },
+    { "sNo": 39, "name": "Executive Officer (Grade IV)", "postCode": "1655", "service": "Tamil Nadu Hindu Religious and Charitable Endowments Subordinate Service", "vacancies": 46, "payLevel": "Level 8", "qualification": "SSLC, or the title of Tamil Pulavar recognised by the UGC for its grant", "note": "Only persons professing the Hindu religion are eligible" },
+    { "sNo": 40, "name": "Junior Inspector of Co-operative Societies", "postCode": "1095", "service": "Tamil Nadu Co-operative Subordinate Service", "vacancies": 8, "payLevel": "Level 10", "qualification": "SSLC for reserved categories; a pass in the Intermediate / Pre-University Examination for other categories" },
+    { "sNo": 41, "name": "Record Clerk (Grade III)", "postCode": "3839", "service": "Tamil Nadu Industrial Investment Corporation Limited", "vacancies": 19, "payLevel": "Level 3 (EPF)", "qualification": "S.S.L.C pass" },
+    { "sNo": 42, "name": "Senior Laboratory Assistant", "postCode": "3746", "service": "Arasu Rubber Corporation Limited", "vacancies": 1, "payLevel": "Level 10 (EPF)", "qualification": "Higher Secondary (plus two) with Physics, Chemistry, Biology, Zoology or Botany as one of the subjects" },
+    { "sNo": 43, "name": "Laboratory Assistant", "postCode": "3103", "service": "Tamil Nadu Forensic Science Subordinate Service", "vacancies": 23, "payLevel": "Level 8", "qualification": "Higher Secondary with Science as a subject" },
+    { "sNo": 44, "name": "Sales Assistant", "postCode": "3806", "service": "Tamil Nadu Handicrafts Development Corporation Limited", "vacancies": 10, "payLevel": "Level 8 (EPF)", "qualification": "Any degree; preference to Business Administration / Commerce / Corporate / Marketing / Economics", "note": "Selected candidates must be ready to be posted in New Delhi, Kolkata and anywhere in Tamil Nadu" },
+    { "sNo": 45, "name": "Forest Watcher", "postCode": "3319", "service": "Tamil Nadu Forest Subordinate Service", "vacancies": 40, "payLevel": "Level 3", "qualification": "Minimum General Educational Qualification (SSLC); preference to persons discharged from Army Service (Land Force)", "includesSportspersonsQuota": true, "requiresEnduranceTest": true },
+    { "sNo": 46, "name": "Forest Guard with Driving Licence", "postCode": "3318", "service": "Tamil Nadu Forest Subordinate Service", "vacancies": 1, "payLevel": "Level 5", "qualification": "Higher Secondary with Physics, Chemistry, Biology, Zoology or Botany + a valid driving licence + 3 years LMV/HMV driving experience + basic automobile knowledge + a first aid certificate", "requiresEnduranceTest": true }
+  ],
+
+  "postGroups": [
+    { "group": "Junior Assistant (all cadres)", "vacancies": 3614, "postCodes": ["2400", "2600", "4600", "3842", "3840", "3512", "3851", "3521", "3788", "3816", "3520", "3321", "3848", "3804"] },
+    { "group": "Typist", "vacancies": 1572, "postCodes": ["2200", "4200", "3834", "3846", "3844", "3852", "3817"] },
+    { "group": "Steno Typist / Shorthand Typist / Personal Clerk", "vacancies": 464, "postCodes": ["2300", "4300", "3837", "3838", "3847", "3672", "3845", "3841", "3853"] },
+    { "group": "Village Administrative Officer", "vacancies": 291, "postCodes": ["2025"] },
+    { "group": "Bill Collector / Tax Collector / Revenue Assistant", "vacancies": 300, "postCodes": ["2500", "3214", "3854", "3843"] },
+    { "group": "Other posts", "vacancies": 333, "postCodes": ["1655", "1095", "3839", "3746", "3103", "3806", "3319", "3318", "3822", "3835", "3836"] }
+  ],
+
+  "organizations": [
+    "Tamil Nadu Ministerial Service",
+    "Tamil Nadu Judicial Ministerial Service",
+    "Tamil Nadu Municipal Council Service",
+    "Tamil Nadu Municipal Corporation Service",
+    "Tamil Nadu Municipal Corporation Service (Greater Chennai Corporation)",
+    "Tamil Nadu Legislative Assembly Secretariat Service",
+    "Tamil Nadu Secretariat Service",
+    "Tamil Nadu Adi Dravidar Housing and Development Corporation Ltd.",
+    "Tamil Nadu Small Industries Development Corporation Ltd",
+    "Tamil Nadu Handloom Weavers Co-operative Societies Ltd.",
+    "Tamil Nadu Police Housing Corporation Limited",
+    "Tamil Nadu Power Finance and Infrastructure Development Corporation Ltd.",
+    "Tamil Nadu Medicinal Plant Farms & Herbal Medicine Corporation Limited",
+    "Tamil Nadu Power Distribution Corporation Limited",
+    "Tamil Nadu Urban Habitat Development Board",
+    "Tamil Nadu State Legal Services Authority",
+    "Electronic Corporation of Tamil Nadu",
+    "Tamil Nadu Waqf Board",
+    "Chennai Metropolitan Development Authority",
+    "Tamil Nadu Forensic Science Subordinate Service",
+    "Tamil Nadu Hindu Religious and Charitable Endowments Subordinate Service",
+    "Tamil Nadu Co-operative Subordinate Service",
+    "Tamil Nadu Industrial Investment Corporation Limited",
+    "Arasu Rubber Corporation Limited",
+    "Tamil Nadu Handicrafts Development Corporation Limited",
+    "Tamil Nadu Forest Subordinate Service"
+  ],
+
+  "examCentres": {
+    "selectionRule": "Candidates may choose two preferred examination centres and will be allotted a venue in one of them. Candidates with benchmark disability choose only one centre.",
+    "changeAllowed": false,
+    "districtCount": 38,
+    "districts": [
+      "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri",
+      "Dindigul", "Erode", "Kallakurichi", "Kancheepuram", "Kanniyakumari", "Karur",
+      "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal",
+      "Perambalur", "Pudukottai", "Ramanathapuram", "Ranipet", "Salem", "Sivagangai",
+      "Tenkasi", "Thanjavur", "The Nilgiris", "Theni", "Thiruvallur", "Thiruvannamalai",
+      "Thiruvarur", "Thoothukudi", "Tiruchirapalli", "Tirunelveli", "Tirupathur",
+      "Tiruppur", "Vellore", "Villupuram", "Virudhunagar"
+    ],
+    "fullCentreListLocation": "Para 3.7.4 / Annexure I of the Notification"
+  },
+
+  "applicationProcess": {
+    "steps": [
+      "Complete One Time Registration (OTR) at www.tnpscexams.in",
+      "Link the Aadhaar number with the OTR (mandatory)",
+      "Fill the online application for Combined Civil Services Examination - IV",
+      "Choose the post option: All the Posts, or Posts other than Forest Guard with Driving Licence / Forest Watcher",
+      "Upload a photograph taken on or after the notification date, and a signature drawn in a 6.0 x 2.0 cm box",
+      "Pay Rs.100 online, or claim the fee concession if eligible",
+      "Submit before 05.11.2026 11.59 PM"
+    ],
+    "otrNote": "One Time Registration is not an application for any post. A valid e-mail ID and mobile number are mandatory.",
+    "correctionWindow": "09.11.2026 to 11.11.2026 is the last chance to edit the application"
+  },
+
+  "bannedItems": [
+    "Mobile phones, pagers, any electronic or programmable device",
+    "Pen drives and storage media",
+    "Smart / digital watches and watches with in-built memory",
+    "Rings with in-built memory, smart glasses / meta glasses",
+    "Cameras, bluetooth devices, communication chips",
+    "Design data books, mathematical and drawing instruments, log tables, stencils of maps, slide rules",
+    "Books, notes, loose sheets, guides, rough sheets",
+    "Money purse / wallet, handbags"
+  ],
+
+  "seo": {
+    "primaryKeywords": [
+      "TNPSC Group 4 notification 2026",
+      "TNPSC Group 4 vacancy 2026",
+      "Group 4 notification",
+      "Group 4 vacancies",
+      "TNPSC Group 4 2026 apply online",
+      "TNPSC Group 4 exam date 2027"
+    ],
+    "secondaryKeywords": [
+      "TNPSC Group 4 syllabus",
+      "TNPSC Group 4 exam pattern",
+      "TNPSC Group 4 age limit",
+      "TNPSC Group 4 eligibility",
+      "TNPSC Group 4 VAO vacancy",
+      "TNPSC Junior Assistant vacancy 2026",
+      "TNPSC Typist vacancy 2026",
+      "TNPSC Group 4 previous year question papers",
+      "TNPSC Group 4 mock test",
+      "TNPSC Group 4 notification 2026 in Tamil"
+    ],
+    "suggestedSlug": "/group-4-notification-2026",
+    "suggestedInternalLinks": ["/group-4", "/pyq", "/mock", "/questions/", "/current-affairs", "/register"]
+  }
+}
