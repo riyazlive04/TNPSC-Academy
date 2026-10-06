@@ -14,7 +14,7 @@ type Tab = 'papers' | 'analytics'
 /**
  * One product's tab content inside the Test Marathon hub (`TestSeriesPage`):
  * its own Papers/Analytics sub-tabs, its own paywall sheet, its own attempt
- * launcher. Parameterized by `series` so the exact same component renders both
+ * launcher. Parameterized by `series` so the exact same component renders every
  * the Vettri Nichayam (Group 1) tab and the Rank Booster (Group II/IIA) tab —
  * the hub just swaps `series` + the paywall cards + a couple of copy keys.
  */
@@ -27,7 +27,7 @@ export default function TestSeriesProductPanel({
   onLockedTap,
   previewLocked = false,
 }: {
-  series: 'g1_marathon' | 'g2a_rankbooster'
+  series: 'g1_marathon' | 'g2a_rankbooster' | 'g2_target_en' | 'g2_target_ta'
   offerTitleKey: StringKey
   paywallCards: ReactNode
   /** Whether any of `paywallCards` is still on sale (superadmin Payments tab).

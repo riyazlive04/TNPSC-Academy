@@ -23,6 +23,14 @@ export type PlanId =
   | 'vettri_month'
   | 'rank_booster_g2'
   | 'group1_mock_pack'
+  // Target Group 2 2026, one plan per language track. Deliberately absent from
+  // IAP_CATALOG below: no store product has been created for them yet, so they
+  // are web-only. catalogForPlan() returns undefined, which makes useStorePrice
+  // fall back to the web price and purchasePlan() fail cleanly as 'unsupported'
+  // on native. Add the entries here once the product ids exist in Play Console
+  // AND App Store Connect — never one without the other.
+  | 'target_g2_en'
+  | 'target_g2_ta'
 
 export interface CatalogEntry {
   plan: PlanId

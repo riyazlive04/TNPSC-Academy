@@ -152,6 +152,30 @@ router.post(
   })
 )
 
+// ─── POST /api/superadmin/users/revoke-target-g2 ─────────────────────────────
+// Withdraw a user's Target Group 2 2026 access. `plan` names ONE track
+// ('target_g2_en' / 'target_g2_ta') so a buyer who holds both is not stripped of
+// the one that was not in question; omit it to revoke both. Every other plan is
+// untouched.
+router.post(
+  '/users/revoke-target-g2',
+  asyncH(async (req: AuthedRequest, res) => {
+    const { userId, plan } = req.body ?? {}
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' })
+    }
+    if (plan != null && plan !== 'target_g2_en' && plan !== 'target_g2_ta') {
+      return res.status(400).json({ error: `Invalid plan: ${plan}` })
+    }
+    const { data, error } = await req.db!.rpc('superadmin_revoke_target_g2', {
+      p_user: userId,
+      p_plan: plan ?? null,
+    })
+    if (error) return sendDbError(res, error)
+    res.json({ revoked: Number(data ?? 0) })
+  })
+)
+
 // ─── POST /api/superadmin/users/grant-plan ───────────────────────────────────
 // Comp a plan: inserts a ₹0 'paid' ledger row (same shape as a 100%-off coupon
 // order), so the normal computed entitlement grants access for the plan's own
@@ -778,7 +802,7 @@ router.get(
     const { data: tests, error } = await req.db!
       .from('test_series')
       .select(
-        'id, test_set, title, title_ta, unit_label, subjects_label, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
+        'id, test_set, question_sets, title, title_ta, unit_label, subjects_label, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
       )
       .eq('series', series)
       .order('sort_order')
@@ -794,10 +818,19 @@ router.get(
       loaded[r.test_set] = (loaded[r.test_set] ?? 0) + 1
     }
 
-    const result = ((tests ?? []) as { test_set: number }[]).map((tst) => ({
-      ...tst,
-      loaded_questions: loaded[tst.test_set] ?? 0,
-    }))
+    // A paper is usually the one bank its test_set names, but it may be built
+    // from several (a Target Group 2 Grand Mock = a shared General Studies half
+    // + its track's language half), so sum across whatever it names. Counting
+    // by test_set alone would report those mocks as empty.
+    const result = ((tests ?? []) as { test_set: number; question_sets: number[] | null }[]).map(
+      (tst) => ({
+        ...tst,
+        loaded_questions: (tst.question_sets?.length ? tst.question_sets : [tst.test_set]).reduce(
+          (n, set) => n + (loaded[set] ?? 0),
+          0
+        ),
+      })
+    )
     res.json({ tests: result })
   })
 )

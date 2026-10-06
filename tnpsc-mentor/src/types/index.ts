@@ -344,13 +344,14 @@ export interface QuizConfig {
   mockGroup?: GroupType
   /** A fixed full mock exam id ('exam1'..'exam6') when mockKind === 'exam'. */
   mockExamId?: string
-  /** A scheduled test-series id ('test1'..'test13', or 'g2rb1'..'g2rb10' for
-   *  Rank Booster) when mockKind === 'series'. */
+  /** A scheduled test-series id ('test1'..'test13' for the Marathon,
+   *  'g2rb1'..'g2rb23' for Rank Booster, 'g2te1'..'g2te13' / 'g2tt1'..'g2tt13'
+   *  for the two Target Group 2 tracks) when mockKind === 'series'. */
   seriesTestId?: string
   /** Which test-series product `seriesTestId` belongs to. Defaults server-side
    *  to 'g1_marathon' when omitted, so this can stay unset for the original
    *  Test Marathon flow. */
-  seriesKey?: 'g1_marathon' | 'g2a_rankbooster'
+  seriesKey?: 'g1_marathon' | 'g2a_rankbooster' | 'g2_target_en' | 'g2_target_ta'
   /** A Vettri Nichayam exam id ('vettri1'..'vettri13') when mockKind === 'vettri'. */
   vettriExamId?: string
   /** Set when this quiz is a revision re-test (gates similar-question fetch). */

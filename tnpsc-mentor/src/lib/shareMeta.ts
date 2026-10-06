@@ -151,6 +151,23 @@ export const SHARE_ROUTES: ShareRoute[] = [
       '23 complete tests in the real TNPSC Group II / IIA prelims pattern — GS + Aptitude, Language and 3 Grand Mocks — on a systematic schedule, with bilingual explanations.',
   },
   {
+    // The two Target Group 2 2026 pay links get a preview EACH, naming the
+    // language track: these links are forwarded on WhatsApp, and a shared card
+    // that did not say which language would hand buyers the wrong track.
+    group: 'group2',
+    paths: ['/target-group-2-english', '/target-group-2/english'],
+    title: groupTitle('group2', 'General English Test Series 2026'),
+    description:
+      '13 General English papers for the TNPSC Group II / IIA prelims — 10 unit-wise tests to the Code 495 syllabus weighting plus 3 full 200-question Grand Mocks, every question explained. ₹849, 90-day access.',
+  },
+  {
+    group: 'group2',
+    paths: ['/target-group-2-tamil', '/target-group-2/tamil'],
+    title: groupTitle('group2', 'General Tamil Test Series 2026'),
+    description:
+      '13 பொது தமிழ் papers for the TNPSC Group II / IIA prelims — 10 unit-wise tests to the Code 495 syllabus weighting plus 3 full 200-question Grand Mocks, every question explained. ₹849, 90-day access.',
+  },
+  {
     group: 'group2',
     paths: ['/test-arena/pyq/group2'],
     title: groupTitle('group2', 'Previous Year Question Papers'),

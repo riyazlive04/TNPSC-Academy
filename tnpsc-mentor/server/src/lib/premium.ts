@@ -5,6 +5,7 @@ import {
   VETTRI_MONTH_VALIDITY_MS,
   RANK_BOOSTER_VALIDITY_MS,
   MOCK_PACK_VALIDITY_MS,
+  TARGET_G2_VALIDITY_MS,
 } from '../pricing.js'
 
 export interface PremiumEntitlement {
@@ -58,6 +59,25 @@ export interface BundleEntitlement {
    *  credits, so it stays its own field. */
   mockPack: boolean
   mockPackUntil: string | null
+  /** The ₹849/90-day "Target Group 2 2026" GENERAL ENGLISH track. */
+  targetG2English: boolean
+  targetG2EnglishUntil: string | null
+  /** The ₹849/90-day "Target Group 2 2026" GENERAL TAMIL track. */
+  targetG2Tamil: boolean
+  targetG2TamilUntil: string | null
+  /** Either track — "this person is in the Target Group 2 2026 programme".
+   *  Used for the hub tab and the landing pitch, never to unlock a paper: each
+   *  track's papers are gated on that track's own field, because the tracks are
+   *  two separate ₹849 purchases.
+   *
+   *  Deliberately NOT implied by premium / vettri / rankBooster, and it implies
+   *  none of them: this plan was specified as standalone in both directions, so
+   *  unlike every other union on this interface it is a union of one plan pair
+   *  and nothing else. It is also absent from `creditsUnlimited` — the series
+   *  never spends credits (the test-series engine does not charge them), so
+   *  folding it in would hand out unlimited practice across the whole app for
+   *  the cheapest plan we sell. */
+  targetG2: boolean
 }
 
 /**
@@ -97,7 +117,8 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
     PREMIUM_VALIDITY_MS,
     VETTRI_VALIDITY_MS,
     RANK_BOOSTER_VALIDITY_MS,
-    MOCK_PACK_VALIDITY_MS
+    MOCK_PACK_VALIDITY_MS,
+    TARGET_G2_VALIDITY_MS
   )
   const since = new Date(Date.now() - window).toISOString()
   const { data, error } = await db
@@ -144,6 +165,16 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
   const mockPackActive =
     !!mockPackRow && now - new Date(mockPackRow.created_at).getTime() < MOCK_PACK_VALIDITY_MS
 
+  // Target Group 2 2026: two ₹849/90-day plans, one per language track, each
+  // bounded against the same window independently — the English track does not
+  // unlock the Tamil papers or the other way round.
+  const targetG2EnRow = latestFor('target_g2_en')
+  const targetG2EnActive =
+    !!targetG2EnRow && now - new Date(targetG2EnRow.created_at).getTime() < TARGET_G2_VALIDITY_MS
+  const targetG2TaRow = latestFor('target_g2_ta')
+  const targetG2TaActive =
+    !!targetG2TaRow && now - new Date(targetG2TaRow.created_at).getTime() < TARGET_G2_VALIDITY_MS
+
   return {
     premium: premiumActive,
     premiumUntil: premiumActive ? untilFor(premiumRow, PREMIUM_VALIDITY_MS) : null,
@@ -157,5 +188,12 @@ export async function bundleAccess(db: SupabaseClient): Promise<BundleEntitlemen
     mockUnlocked: premiumActive || mockPackActive || vettriActive,
     mockPack: mockPackActive,
     mockPackUntil: mockPackActive ? untilFor(mockPackRow, MOCK_PACK_VALIDITY_MS) : null,
+    targetG2English: targetG2EnActive,
+    targetG2EnglishUntil: targetG2EnActive
+      ? untilFor(targetG2EnRow, TARGET_G2_VALIDITY_MS)
+      : null,
+    targetG2Tamil: targetG2TaActive,
+    targetG2TamilUntil: targetG2TaActive ? untilFor(targetG2TaRow, TARGET_G2_VALIDITY_MS) : null,
+    targetG2: targetG2EnActive || targetG2TaActive,
   }
 }

@@ -41,6 +41,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
+import { useTargetG2Enabled } from '../hooks/useTargetG2Enabled'
 import { useFlashcardsEnabled } from '../hooks/useFlashcardsEnabled'
 import { useVettriEnabled } from '../hooks/useVettriEnabled'
 import {
@@ -148,6 +149,7 @@ export default function TestArenaPage() {
   const { user, profile, isAdmin, isSuperAdmin } = useAuth()
   const testSeriesOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
+  const targetG2On = useTargetG2Enabled()
   // Which plans are on sale - gates the two priced discovery banners below.
   const sales = usePlanSales()
   const vettriOn = useVettriEnabled()
@@ -612,10 +614,10 @@ export default function TestArenaPage() {
                 subtitle={t('vettriArenaSub')}
               />
             )}
-            {/* Test Marathon - the scheduled test-series hub (Vettri Nichayam +
-                Rank Booster tabs inside). Shows once EITHER product is
-                enabled, so the card is never a dead end. */}
-            {(testSeriesOn || rankBoosterOn) && (
+            {/* Test Marathon - the scheduled test-series hub (Vettri Nichayam,
+                Rank Booster and Target Group 2 tabs inside). Shows once ANY of
+                those products is enabled, so the card is never a dead end. */}
+            {(testSeriesOn || rankBoosterOn || targetG2On) && (
               <GridCard
                 onClick={() => navigate('/test-series')}
                 style={{ '--i': 2 } as React.CSSProperties}

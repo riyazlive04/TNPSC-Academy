@@ -550,6 +550,15 @@ const PAYMENT_SWITCHES: PaymentSwitch[] = [
     icon: ListChecks,
     tone: 'bg-skysoft text-sky',
   },
+  // One switch for both ₹849 language tracks: "stop selling this series" means
+  // closing the English and the Tamil pay link together.
+  {
+    key: 'target_g2_sale_enabled',
+    titleKey: 'paymentsPlanTargetG2',
+    whereKey: 'paymentsPlanTargetG2Where',
+    icon: BookOpen,
+    tone: 'bg-brand-soft text-brand',
+  },
 ]
 
 /** Defaults mirrored from server/src/lib/settings.ts, applied when a settings
@@ -560,6 +569,7 @@ const PAYMENT_DEFAULTS: Record<string, boolean> = {
   vettri_sale_enabled: true,
   rank_booster_sale_enabled: true,
   mock_pack_sale_enabled: true,
+  target_g2_sale_enabled: true,
 }
 
 function PaymentsTab() {
@@ -1559,6 +1569,10 @@ type PlanAction =
   | 'revoke-vettri'
   | 'grant-rank-booster'
   | 'revoke-rank-booster'
+  | 'grant-target-g2-en'
+  | 'revoke-target-g2-en'
+  | 'grant-target-g2-ta'
+  | 'revoke-target-g2-ta'
 
 function DetailItem({ label, value }: { label: string; value: string }) {
   return (
@@ -1707,13 +1721,27 @@ function UserDetailModal({
         await api.superadmin.revokeRankBooster(user.id)
         onChange({ rank_booster: false, rank_booster_until: null })
         toast.success('Group II/IIA Test Series revoked.')
-      } else {
+      } else if (action === 'grant-rank-booster') {
         await api.superadmin.grantPlan(user.id, 'rank_booster_g2')
         onChange({
           rank_booster: true,
           rank_booster_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
         toast.success('Group II/IIA Test Series granted for 30 days.')
+      } else {
+        // Target Group 2 2026. No onChange: the user list does not carry these
+        // two entitlements (superadmin_list_users has no column for them), so
+        // there is no row state to correct — see the note rendered on the rows.
+        const track = action.endsWith('-en') ? 'english' : 'tamil'
+        const plan = track === 'english' ? 'target_g2_en' : 'target_g2_ta'
+        const label = `Target Group 2 2026 (${track === 'english' ? 'General English' : 'General Tamil'})`
+        if (action.startsWith('revoke-')) {
+          const revoked = await api.superadmin.revokeTargetG2(user.id, plan)
+          toast.success(revoked ? `${label} revoked.` : `${label}: nothing to revoke.`)
+        } else {
+          await api.superadmin.grantPlan(user.id, plan)
+          toast.success(`${label} granted for 90 days.`)
+        }
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Action failed.')
@@ -1732,6 +1760,9 @@ function UserDetailModal({
     grant: PlanAction
     revoke: PlanAction
     grantLabel: string
+    /** This plan's state is not in the user list, so neither button can be
+     *  hidden behind an "active" flag we do not have: show both, and say so. */
+    stateUnknown?: boolean
   }) => {
     const action = opts.active ? opts.revoke : opts.grant
     const isBusy = busy === action
@@ -1744,12 +1775,45 @@ function UserDetailModal({
         <div className="min-w-0 flex-1">
           <p className="font-heading text-sm font-semibold text-ink">{opts.name}</p>
           <p className="font-body text-xs text-ink2">
-            {opts.active
-              ? `Active${opts.until ? ` · until ${new Date(opts.until).toLocaleDateString()}` : ''}`
-              : 'Not active'}
+            {opts.stateUnknown
+              ? 'State not shown here'
+              : opts.active
+                ? `Active${opts.until ? ` · until ${new Date(opts.until).toLocaleDateString()}` : ''}`
+                : 'Not active'}
           </p>
         </div>
-        {confirming ? (
+        {opts.stateUnknown ? (
+          <div className="flex flex-shrink-0 items-center gap-1.5">
+            {([opts.grant, opts.revoke] as const).map((act) => {
+              const isRevoke = act === opts.revoke
+              return confirm === act ? (
+                <button
+                  key={act}
+                  onClick={() => run(act)}
+                  disabled={!!busy}
+                  className={`focus-ring inline-flex items-center gap-1.5 rounded-lg px-3 py-2 font-heading text-xs font-semibold text-white transition disabled:opacity-60 ${
+                    isRevoke ? 'bg-coral hover:bg-coral/90' : 'bg-brand hover:bg-brand-dark'
+                  }`}
+                >
+                  {busy === act && <Spinner size={13} />} Confirm
+                </button>
+              ) : (
+                <button
+                  key={act}
+                  onClick={() => setConfirm(act)}
+                  disabled={!!busy || confirm !== null}
+                  className={`focus-ring flex-shrink-0 rounded-lg border px-3 py-2 font-heading text-xs font-semibold transition disabled:opacity-50 ${
+                    isRevoke
+                      ? 'border-line text-coral hover:border-coral/40 hover:bg-coral/5'
+                      : 'border-line text-brand hover:border-brand/40 hover:bg-brand-soft/50'
+                  }`}
+                >
+                  {isRevoke ? 'Revoke' : opts.grantLabel}
+                </button>
+              )
+            })}
+          </div>
+        ) : confirming ? (
           <div className="flex flex-shrink-0 items-center gap-1.5">
             <button
               onClick={() => run(action)}
@@ -1888,6 +1952,28 @@ function UserDetailModal({
             grant: 'grant-rank-booster',
             revoke: 'revoke-rank-booster',
             grantLabel: 'Grant 30 days',
+          })}
+          {planRow({
+            icon: <BookOpen size={18} />,
+            iconClass: 'bg-brand-soft text-brand',
+            name: 'Target Group 2 2026 · English',
+            active: false,
+            until: null,
+            grant: 'grant-target-g2-en',
+            revoke: 'revoke-target-g2-en',
+            grantLabel: 'Grant 90 days',
+            stateUnknown: true,
+          })}
+          {planRow({
+            icon: <BookOpen size={18} />,
+            iconClass: 'bg-brand-soft text-brand',
+            name: 'Target Group 2 2026 · Tamil',
+            active: false,
+            until: null,
+            grant: 'grant-target-g2-ta',
+            revoke: 'revoke-target-g2-ta',
+            grantLabel: 'Grant 90 days',
+            stateUnknown: true,
           })}
         </div>
 
@@ -2406,13 +2492,23 @@ function MockExamsTab() {
 }
 
 // ─── Test Series ────────────────────────────────────────────────────────────────
-type AdminSeries = 'g1_marathon' | 'g2a_rankbooster'
+type AdminSeries = 'g1_marathon' | 'g2a_rankbooster' | 'g2_target_en' | 'g2_target_ta'
 
 // Labeled to match the student-facing hub tabs exactly ("Group 1 Test Series" /
 // "Rank Booster" inside the Test Marathon hub — see TestSeriesPage.tsx).
-const SERIES_TABS: { key: AdminSeries; labelKey: 'vettriTitle' | 'rankBoosterTab'; settingKey: 'test_series_enabled' | 'rank_booster_enabled' }[] = [
+//
+// The two Target Group 2 tracks share ONE settingKey on purpose: they are one
+// product sold through two pay links, and there is no state in which only one
+// of them should exist, so the switch on either tab turns both on or off.
+const SERIES_TABS: {
+  key: AdminSeries
+  labelKey: 'vettriTitle' | 'rankBoosterTab' | 'targetG2EnglishTitle' | 'targetG2TamilTitle'
+  settingKey: 'test_series_enabled' | 'rank_booster_enabled' | 'target_g2_enabled'
+}[] = [
   { key: 'g1_marathon', labelKey: 'vettriTitle', settingKey: 'test_series_enabled' },
   { key: 'g2a_rankbooster', labelKey: 'rankBoosterTab', settingKey: 'rank_booster_enabled' },
+  { key: 'g2_target_en', labelKey: 'targetG2EnglishTitle', settingKey: 'target_g2_enabled' },
+  { key: 'g2_target_ta', labelKey: 'targetG2TamilTitle', settingKey: 'target_g2_enabled' },
 ]
 
 function TestSeriesTab() {

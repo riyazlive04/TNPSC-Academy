@@ -31,6 +31,13 @@ export const RANK_BOOSTER_PRICE_PAISE = 124900 // ₹1,249
  *  Mirrors Rank Booster's shape: single tier, no MRP/discount. ₹399 flat. */
 export const MOCK_PACK_PRICE_PAISE = 39900 // ₹399
 
+/** Target Group 2 2026 — the Group II/IIA LANGUAGE series, sold as two separate
+ *  plans at the same price: `target_g2_en` (General English track) and
+ *  `target_g2_ta` (General Tamil track). A buyer picks their track by which pay
+ *  link they were sent, so the plan they bought IS their track and there is no
+ *  track to store anywhere else. ₹849 flat, no MRP/discount. */
+export const TARGET_G2_PRICE_PAISE = 84900 // ₹849
+
 /** Razorpay needs a positive order; never charge below ₹1. */
 export const MIN_CHARGE_PAISE = 100
 
@@ -62,6 +69,12 @@ export const RANK_BOOSTER_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 90 days
 /** Mock Pack entitlement window — one paid order grants 80 days; paying again
  *  grants another 80 days from that payment. */
 export const MOCK_PACK_VALIDITY_MS = 80 * 24 * 60 * 60 * 1000 // 80 days
+
+/** Target Group 2 2026 entitlement window — one paid order grants 90 days on
+ *  that track; paying again grants another 90 days from that payment. Matches
+ *  Rank Booster, the neighbouring standalone Group II/IIA plan. The two tracks
+ *  are bounded independently, so owning both is two separate windows. */
+export const TARGET_G2_VALIDITY_MS = 90 * 24 * 60 * 60 * 1000 // 90 days
 
 /**
  * Free users may download this many explanation PDFs in total (mirrors the
@@ -95,6 +108,7 @@ export function baseAmountForPlan(plan: string | undefined, clientAmount: number
   if (plan === 'vettri_month') return VETTRI_MONTH_PRICE_PAISE
   if (plan === 'rank_booster_g2') return RANK_BOOSTER_PRICE_PAISE
   if (plan === 'group1_mock_pack') return MOCK_PACK_PRICE_PAISE
+  if (plan === 'target_g2_en' || plan === 'target_g2_ta') return TARGET_G2_PRICE_PAISE
   const n = Math.trunc(Number(clientAmount))
   return Math.min(Math.max(Number.isFinite(n) ? n : 0, MIN_CHARGE_PAISE), 10_000_000)
 }
@@ -106,6 +120,8 @@ export const KNOWN_PLANS = new Set([
   'vettri_month',
   'rank_booster_g2',
   'group1_mock_pack',
+  'target_g2_en',
+  'target_g2_ta',
 ])
 
 /** The paid plans, as a type. Shared with the IAP catalog so a store product
@@ -116,3 +132,5 @@ export type PlanId =
   | 'vettri_month'
   | 'rank_booster_g2'
   | 'group1_mock_pack'
+  | 'target_g2_en'
+  | 'target_g2_ta'

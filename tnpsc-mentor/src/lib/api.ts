@@ -1295,6 +1295,14 @@ export const api = {
     async grantPlan(userId: string, plan: GrantablePlan): Promise<void> {
       await request('/api/superadmin/users/grant-plan', { method: 'POST', body: { userId, plan } })
     },
+    /** Revoke one Target Group 2 2026 track, or both when `plan` is omitted. */
+    async revokeTargetG2(userId: string, plan?: 'target_g2_en' | 'target_g2_ta'): Promise<number> {
+      const data = await request<{ revoked: number }>('/api/superadmin/users/revoke-target-g2', {
+        method: 'POST',
+        body: { userId, plan },
+      })
+      return data.revoked
+    },
     /** Hard-delete a user account and all their data. Irreversible. */
     async deleteUser(userId: string): Promise<void> {
       await request('/api/superadmin/users/delete', { method: 'POST', body: { userId } })
@@ -2702,6 +2710,17 @@ export interface BundleEntitlement {
    *  credit allowance (50 instead of 10), not unlimited credits. */
   mockPack: boolean
   mockPackUntil: string | null
+  /** The ₹849/90-day Target Group 2 2026 GENERAL ENGLISH track. */
+  targetG2English: boolean
+  targetG2EnglishUntil: string | null
+  /** The ₹849/90-day Target Group 2 2026 GENERAL TAMIL track. */
+  targetG2Tamil: boolean
+  targetG2TamilUntil: string | null
+  /** Either track. Shows the hub tab; never unlocks a paper — each track's
+   *  papers are gated on that track's own field, since they are two purchases.
+   *  Standalone in both directions: no other plan implies it, and it implies no
+   *  other plan (not even the credit-gate bypass). */
+  targetG2: boolean
 }
 
 /** Public, superadmin-controlled feature flags (defaults applied server-side). */
@@ -2716,6 +2735,9 @@ export interface AppSettings {
   vettri_enabled: boolean
   /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
   rank_booster_enabled: boolean
+  /** Show the Target Group 2 2026 language series (hub tab + Test Arena tile).
+   *  One flag for both tracks — one product sold two ways. */
+  target_g2_enabled: boolean
   /** Show the flashcard ("Instants") peek on the dashboard. Off = admins only. */
   flashcards_enabled: boolean
   /** App-wide: non-admins get MaintenancePage + every gated API 503s. */
@@ -2738,6 +2760,8 @@ export interface AppSettings {
   rank_booster_sale_enabled: boolean
   /** Sell the ₹399 / 80-day Group 1 Mock Test Pack. */
   mock_pack_sale_enabled: boolean
+  /** Sell the ₹849 / 90-day Target Group 2 2026 series — BOTH language tracks. */
+  target_g2_sale_enabled: boolean
 }
 
 /** Explanation-PDF download allowance. Premium users are unlimited (remaining
@@ -2896,6 +2920,9 @@ export type GrantablePlan =
   | 'vettri_nichayam'
   | 'vettri_month'
   | 'rank_booster_g2'
+  | 'group1_mock_pack'
+  | 'target_g2_en'
+  | 'target_g2_ta'
 
 /** Per-user activity + credit snapshot (superadmin user-detail popup).
  *  Mirrors the superadmin_user_insights RPC. Accuracy is null until the user

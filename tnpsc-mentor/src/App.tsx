@@ -105,6 +105,7 @@ const LandingPage = lazy(() => import('./pages/LandingPage'))
 const RankBoosterLandingPage = lazy(() => import('./pages/RankBoosterLandingPage'))
 const Group1LandingPage = lazy(() => import('./pages/Group1LandingPage'))
 const MockPackLandingPage = lazy(() => import('./pages/MockPackLandingPage'))
+const TargetG2LandingPage = lazy(() => import('./pages/TargetG2LandingPage'))
 const AnswerKeyPage = lazy(() => import('./pages/AnswerKeyPage'))
 const PastAnswerKeyPage = lazy(() => import('./pages/PastAnswerKeyPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
@@ -403,6 +404,18 @@ function AnimatedRoutes() {
       <Route path="/group-1-mock-pack" element={<MockPackLandingPage />} />
       <Route path="/mock-399" element={<MockPackLandingPage />} />
       <Route path="/399" element={<MockPackLandingPage />} />
+
+      {/* The two Target Group 2 2026 pay links, ₹849 each. NOT two shapes of
+          one link: the English and the Tamil track are separate purchases, and
+          the link a buyer is handed is how they pick their language paper — so
+          these must never redirect to each other or collapse into a chooser
+          (TARGET_G2_*_BUY_PATHS in lib/authRouting). Each has a second path
+          shape because both get shared, and both are real routes so a buyer who
+          signs up mid-checkout returns to the exact URL they were sent. */}
+      <Route path="/target-group-2-english" element={<TargetG2LandingPage track="english" />} />
+      <Route path="/target-group-2/english" element={<TargetG2LandingPage track="english" />} />
+      <Route path="/target-group-2-tamil" element={<TargetG2LandingPage track="tamil" />} />
+      <Route path="/target-group-2/tamil" element={<TargetG2LandingPage track="tamil" />} />
 
       {/* Public, indexable answer-key hubs — one per exam group, with a switcher
           between them (downloads after each exam). The short links are real

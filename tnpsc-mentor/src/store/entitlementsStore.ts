@@ -21,6 +21,14 @@ interface EntitlementsState {
   /** The standalone ₹399/80-day Group 1 Mock Test Pack. */
   mockPack: boolean
   mockPackUntil: string | null
+  /** Target Group 2 2026 — one flag per ₹849 language track. Standalone: no
+   *  other plan grants either, and neither grants the other. */
+  targetG2English: boolean
+  targetG2EnglishUntil: string | null
+  targetG2Tamil: boolean
+  targetG2TamilUntil: string | null
+  /** Either track — shows the hub tab. Never use it to unlock a paper. */
+  targetG2: boolean
   loaded: boolean // true once we've checked at least once
   refresh: () => Promise<void>
   /** Optimistically mark vettri (called right after a verified Vettri payment). */
@@ -32,6 +40,9 @@ interface EntitlementsState {
   markRankBooster: () => void
   /** Optimistically mark the Mock Pack (called right after a verified payment). */
   markMockPack: () => void
+  /** Optimistically mark ONE Target Group 2 2026 track (after a verified
+   *  payment). The other track stays locked — it is a separate purchase. */
+  markTargetG2: (track: 'english' | 'tamil') => void
 }
 
 export const useEntitlementsStore = create<EntitlementsState>((set) => ({
@@ -45,6 +56,11 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
   rankBoosterUnlocked: false,
   mockPack: false,
   mockPackUntil: null,
+  targetG2English: false,
+  targetG2EnglishUntil: null,
+  targetG2Tamil: false,
+  targetG2TamilUntil: null,
+  targetG2: false,
   loaded: false,
   refresh: async () => {
     if (!isApiConfigured) {
@@ -64,6 +80,11 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
         rankBoosterUnlocked: e.rankBoosterUnlocked,
         mockPack: e.mockPack,
         mockPackUntil: e.mockPackUntil,
+        targetG2English: e.targetG2English,
+        targetG2EnglishUntil: e.targetG2EnglishUntil,
+        targetG2Tamil: e.targetG2Tamil,
+        targetG2TamilUntil: e.targetG2TamilUntil,
+        targetG2: e.targetG2,
         loaded: true,
       })
     } catch {
@@ -75,4 +96,6 @@ export const useEntitlementsStore = create<EntitlementsState>((set) => ({
   markPremium: () => set({ premium: true, unlimited: true, rankBoosterUnlocked: true }),
   markRankBooster: () => set({ rankBooster: true, rankBoosterUnlocked: true }),
   markMockPack: () => set({ mockPack: true }),
+  markTargetG2: (track) =>
+    set(track === 'english' ? { targetG2English: true, targetG2: true } : { targetG2Tamil: true, targetG2: true }),
 }))

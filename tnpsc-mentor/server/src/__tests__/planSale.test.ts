@@ -30,6 +30,7 @@ describe('planOnSale', () => {
       vettri_sale_enabled: true,
       rank_booster_sale_enabled: true,
       mock_pack_sale_enabled: true,
+      target_g2_sale_enabled: true,
       payments_enabled: false,
     })
     for (const plan of KNOWN_PLANS) expect(planOnSale(allOn, plan)).toBe(false)
@@ -49,12 +50,23 @@ describe('planOnSale', () => {
     expect(planOnSale(settings(), 'vettri_month')).toBe(true)
     expect(planOnSale(settings(), 'rank_booster_g2')).toBe(true)
     expect(planOnSale(settings(), 'group1_mock_pack')).toBe(true)
+    expect(planOnSale(settings(), 'target_g2_en')).toBe(true)
+    expect(planOnSale(settings(), 'target_g2_ta')).toBe(true)
   })
 
   it('maps both Vettri tiers onto the one Vettri switch', () => {
     const off = settings({ vettri_sale_enabled: false })
     expect(planOnSale(off, 'vettri_nichayam')).toBe(false)
     expect(planOnSale(off, 'vettri_month')).toBe(false)
+  })
+
+  it('maps both Target Group 2 tracks onto the one series switch', () => {
+    // They are two purchases but one product: withdrawing the series has to
+    // close both pay links, not leave one of them still taking money.
+    const off = settings({ target_g2_sale_enabled: false })
+    expect(off.target_g2_sale_enabled).toBe(false)
+    expect(planOnSale(off, 'target_g2_en')).toBe(false)
+    expect(planOnSale(off, 'target_g2_ta')).toBe(false)
   })
 
   it('covers every known plan, so none can slip through ungated', () => {

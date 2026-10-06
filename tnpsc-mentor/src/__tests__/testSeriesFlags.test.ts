@@ -5,10 +5,12 @@ import { shownHubTab, type TestSeriesFlags } from '../lib/testSeriesFlags'
 // learner sent to the Group II/IIA tab (the /group-2-test-series link) quietly
 // shown the Group 1 series because the flags had not finished loading.
 
-const bothOn: TestSeriesFlags = { marathon: true, rankBooster: true }
-const notLoaded: TestSeriesFlags = { marathon: false, rankBooster: false }
-const onlyG1: TestSeriesFlags = { marathon: true, rankBooster: false }
-const onlyG2: TestSeriesFlags = { marathon: false, rankBooster: true }
+const bothOn: TestSeriesFlags = { marathon: true, rankBooster: true, targetG2: false }
+const notLoaded: TestSeriesFlags = { marathon: false, rankBooster: false, targetG2: false }
+const onlyG1: TestSeriesFlags = { marathon: true, rankBooster: false, targetG2: false }
+const onlyG2: TestSeriesFlags = { marathon: false, rankBooster: true, targetG2: false }
+const onlyTargetG2: TestSeriesFlags = { marathon: false, rankBooster: false, targetG2: true }
+const allOn: TestSeriesFlags = { marathon: true, rankBooster: true, targetG2: true }
 
 describe('shownHubTab', () => {
   it('shows the Group II/IIA tab that was asked for', () => {
@@ -35,5 +37,25 @@ describe('shownHubTab', () => {
   it('never moves the combined analytics tab', () => {
     expect(shownHubTab('overall', onlyG1)).toBe('overall')
     expect(shownHubTab('overall', onlyG2)).toBe('overall')
+    expect(shownHubTab('overall', onlyTargetG2)).toBe('overall')
+  })
+
+  it('shows the Target Group 2 tab that was asked for', () => {
+    expect(shownHubTab('targetg2', allOn)).toBe('targetg2')
+    expect(shownHubTab('targetg2', onlyTargetG2)).toBe('targetg2')
+  })
+
+  it('keeps the Target Group 2 tab while the flags are still loading', () => {
+    expect(shownHubTab('targetg2', notLoaded)).toBe('targetg2')
+  })
+
+  it('falls back off a switched-off Target Group 2 in the hub tab order', () => {
+    expect(shownHubTab('targetg2', bothOn)).toBe('vettri')
+    expect(shownHubTab('targetg2', onlyG2)).toBe('rankbooster')
+  })
+
+  it('falls back TO Target Group 2 when it is the only product on', () => {
+    expect(shownHubTab('vettri', onlyTargetG2)).toBe('targetg2')
+    expect(shownHubTab('rankbooster', onlyTargetG2)).toBe('targetg2')
   })
 })

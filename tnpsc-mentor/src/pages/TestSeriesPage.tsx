@@ -15,6 +15,8 @@ import {
 } from '../hooks/useRankBoosterPurchase'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import { seriesTap, mockTap, mockEntryVisible, showsPrice } from '../lib/g1Access'
+import TargetG2Card from '../components/UI/TargetG2Card'
+import { TARGET_G2_SERIES, type TargetG2Track } from '../hooks/useTargetG2Purchase'
 import TestSeriesProductPanel from '../components/TestSeries/TestSeriesProductPanel'
 import FullMockExamList from '../components/TestSeries/FullMockExamList'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
@@ -24,6 +26,7 @@ import { useEntitlementsStore } from '../store/entitlementsStore'
 import { upsell } from '../store/upsellStore'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
+import { useTargetG2Enabled } from '../hooks/useTargetG2Enabled'
 import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { useAuth } from '../hooks/useAuth'
@@ -51,6 +54,7 @@ export default function TestSeriesPage() {
   const { previewAsStudent } = useAuth()
   const marathonOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
+  const targetG2On = useTargetG2Enabled()
   // Which plans are on sale - decides whether each product's paywall popup
   // has anything in it. The cards themselves hide on the same flags.
   const sales = usePlanSales()
@@ -70,7 +74,7 @@ export default function TestSeriesPage() {
   const urlTab = searchParams.get('tab')
   const initialTab: HubTab =
     requestedTab ??
-    (urlTab === 'vettri' || urlTab === 'rankbooster' || urlTab === 'overall'
+    (urlTab === 'vettri' || urlTab === 'rankbooster' || urlTab === 'targetg2' || urlTab === 'overall'
       ? urlTab
       : // A ?g1=mock link implies the Group 1 tab even without ?tab, so the
         // mock papers are not restored behind a tab that is not showing them.
@@ -82,7 +86,11 @@ export default function TestSeriesPage() {
   // A product that is switched off hands its tab to the other one. Derived, not
   // stored: see shownHubTab for why an effect correcting state here once left
   // Group II/IIA links showing the Group 1 series.
-  const tab = shownHubTab(chosenTab, { marathon: marathonOn, rankBooster: rankBoosterOn })
+  const tab = shownHubTab(chosenTab, {
+    marathon: marathonOn,
+    rankBooster: rankBoosterOn,
+    targetG2: targetG2On,
+  })
   const [g1View, setG1ViewState] = useState<G1View>(urlG1View)
 
   /** Write the current position into the URL (replace: no history spam from a
@@ -143,6 +151,8 @@ export default function TestSeriesPage() {
   const unlimited = useEntitlementsStore((s) => s.unlimited)
   const rankBoosterUnlocked = useEntitlementsStore((s) => s.rankBoosterUnlocked)
   const mockPack = useEntitlementsStore((s) => s.mockPack)
+  const targetG2English = useEntitlementsStore((s) => s.targetG2English)
+  const targetG2Tamil = useEntitlementsStore((s) => s.targetG2Tamil)
   const rbPurchase = useRankBoosterPurchase()
   const mockPurchase = useMockPackPurchase()
 
@@ -166,8 +176,30 @@ export default function TestSeriesPage() {
   const tabs: { key: HubTab; label: string }[] = [
     ...(rankBoosterOn ? [{ key: 'rankbooster' as const, label: t('testSeriesTabG2') }] : []),
     ...(marathonOn ? [{ key: 'vettri' as const, label: t('testSeriesTabG1') }] : []),
+    ...(targetG2On ? [{ key: 'targetg2' as const, label: t('targetG2Tab') }] : []),
     { key: 'overall' as const, label: t('tsOverallTab') },
   ]
+
+  // ─── Which Target Group 2 track is on screen ───────────────────────────────
+  // The two tracks are separate ₹849 purchases, so the panel shows exactly one
+  // at a time. It opens on whichever the learner owns, and the switcher stays
+  // available to everyone: an English buyer can look at the Tamil papers (they
+  // read as locked, which is correct) and a visitor who owns neither can see
+  // what each track contains before choosing. `chosenTrack` is null until
+  // someone actually switches, so the owned track keeps winning as entitlements
+  // load in rather than being overwritten by a default.
+  const ownedTrack: TargetG2Track | null = targetG2English
+    ? 'english'
+    : targetG2Tamil
+      ? 'tamil'
+      : null
+  const [chosenTrack, setChosenTrack] = useState<TargetG2Track | null>(null)
+  const activeTrack: TargetG2Track = chosenTrack ?? ownedTrack ?? 'english'
+  const otherTrack: TargetG2Track = activeTrack === 'english' ? 'tamil' : 'english'
+  const TARGET_G2_BUY_PATH: Record<TargetG2Track, string> = {
+    english: '/target-group-2-english',
+    tamil: '/target-group-2-tamil',
+  }
 
   // The schedule download sits IN THE SAME ROW as the tab capsule (not
   // stacked inside whichever panel is open), so it stays put across tab
@@ -433,6 +465,44 @@ export default function TestSeriesPage() {
             </>
           }
         />
+      )}
+
+      {tab === 'targetg2' && targetG2On && (
+        <>
+          {/* Track switcher. Always on screen, never auto-hidden for an owner:
+              the other track is a real second product they may want to buy, and
+              hiding it would make it unreachable from inside the app. */}
+          <div className="seg-wrap mb-5 w-full" role="group" aria-label={t('targetG2Tab')}>
+            {(['english', 'tamil'] as const).map((tr) => (
+              <button
+                key={tr}
+                onClick={() => setChosenTrack(tr)}
+                aria-pressed={activeTrack === tr}
+                className={`seg tamil flex-1 ${activeTrack === tr ? 'seg-active' : ''}`}
+              >
+                {tr === 'english' ? t('targetG2English') : t('targetG2Tamil')}
+              </button>
+            ))}
+          </div>
+
+          <TestSeriesProductPanel
+            series={TARGET_G2_SERIES[activeTrack]}
+            offerTitleKey="targetG2Title"
+            entitlementUnlocked={activeTrack === 'english' ? targetG2English : targetG2Tamil}
+            // This product's purchase surface is its own pay link, not the
+            // app-wide upsell modal: the modal sells the other plans and has no
+            // slot for a two-track choice.
+            onLockedTap={() => navigate(TARGET_G2_BUY_PATH[activeTrack])}
+            previewLocked={previewAsStudent}
+            offerEnabled={sales.targetG2}
+            paywallCards={
+              <>
+                <TargetG2Card track={activeTrack} />
+                <TargetG2Card track={otherTrack} />
+              </>
+            }
+          />
+        </>
       )}
 
       {tab === 'overall' &&

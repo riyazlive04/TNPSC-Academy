@@ -1328,6 +1328,18 @@ interface TestSeriesRow {
   sort_order: number
   /** 'free' = open to every signed-in user (the trial paper); 'paid' = bundle. */
   tier: 'free' | 'paid'
+  /** Which question banks (`questions.test_set` inside this series' category)
+   *  make up the paper. NULL means the single set named by `test_set`, which is
+   *  how every series but Target Group 2 2026 is built — see questionSetsFor. */
+  question_sets: number[] | null
+}
+
+/** The banks this paper draws from. A paper is normally the one set its
+ *  `test_set` names; a Target Group 2 Grand Mock is two (a shared General
+ *  Studies half plus its track's language half), so the catalog row may name
+ *  them explicitly instead. */
+function questionSetsFor(row: Pick<TestSeriesRow, 'test_set' | 'question_sets'>): number[] {
+  return row.question_sets?.length ? row.question_sets : [row.test_set]
 }
 
 /** Today's date in IST (Asia/Kolkata, UTC+5:30, no DST) as 'YYYY-MM-DD'. Lexical
@@ -1376,7 +1388,7 @@ router.get(
       req.db!
         .from('test_series')
         .select(
-          'id, test_set, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
+          'id, test_set, question_sets, title, title_ta, unit_label, unit_label_ta, subjects_label, subjects_label_ta, total_questions, duration_seconds, negative_mark, scheduled_date, enabled, open_override, sort_order, tier'
         )
         .eq('series', series)
         .eq('enabled', true)
@@ -1442,7 +1454,7 @@ router.post(
 
     const { data: test, error: tErr } = await req.db!
       .from('test_series')
-      .select('id, test_set, enabled, scheduled_date, open_override, tier')
+      .select('id, test_set, question_sets, enabled, scheduled_date, open_override, tier')
       .eq('id', testId)
       .eq('series', series)
       .maybeSingle()
@@ -1480,7 +1492,7 @@ router.post(
       .from('questions')
       .select(QUIZ_COLS)
       .eq('category', config.category)
-      .eq('test_set', (test as TestSeriesRow).test_set)
+      .in('test_set', questionSetsFor(test as TestSeriesRow))
     if (error) return sendDbError(res, error)
     res.json({ questions: shuffle((data ?? []) as unknown as Record<string, unknown>[]) })
   })

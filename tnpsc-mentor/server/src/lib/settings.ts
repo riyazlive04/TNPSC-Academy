@@ -18,6 +18,9 @@ export interface PublicSettings {
   vettri_enabled: boolean
   /** Show the Group II/IIA Rank Booster nav tab + Test Arena tile. */
   rank_booster_enabled: boolean
+  /** Show the Target Group 2 2026 language series (hub tab + Test Arena tile).
+   *  One flag for both language tracks — they are one product sold two ways. */
+  target_g2_enabled: boolean
   /** Show the flashcard ("Instants") peek on the dashboard. While this is off
    *  the decks are still served to admins, so the feature can be tested on
    *  production before students ever see it. */
@@ -49,6 +52,10 @@ export interface PublicSettings {
   rank_booster_sale_enabled: boolean
   /** Sell the ₹399 / 80-day Group 1 Mock Test Pack. */
   mock_pack_sale_enabled: boolean
+  /** Sell the ₹849 / 90-day Target Group 2 2026 language series. Governs BOTH
+   *  pay links — withdrawing it closes the English and the Tamil track
+   *  together, which is what "stop selling this series" means. */
+  target_g2_sale_enabled: boolean
 }
 
 export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
@@ -57,6 +64,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   test_series_enabled: false,
   vettri_enabled: false,
   rank_booster_enabled: false,
+  target_g2_enabled: false,
   flashcards_enabled: false,
   maintenance_mode: false,
   // Selling is the normal state, so these default ON and a superadmin turns
@@ -68,6 +76,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   vettri_sale_enabled: true,
   rank_booster_sale_enabled: true,
   mock_pack_sale_enabled: true,
+  target_g2_sale_enabled: true,
 }
 
 // ─── Admin-only settings ─────────────────────────────────────────────────────
@@ -169,6 +178,7 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     rank_booster_enabled: Boolean(
       raw.rank_booster_enabled ?? PUBLIC_SETTING_DEFAULTS.rank_booster_enabled
     ),
+    target_g2_enabled: Boolean(raw.target_g2_enabled ?? PUBLIC_SETTING_DEFAULTS.target_g2_enabled),
     flashcards_enabled: Boolean(
       raw.flashcards_enabled ?? PUBLIC_SETTING_DEFAULTS.flashcards_enabled
     ),
@@ -188,6 +198,9 @@ export async function readPublicSettings(): Promise<PublicSettings> {
     mock_pack_sale_enabled: Boolean(
       raw.mock_pack_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.mock_pack_sale_enabled
     ),
+    target_g2_sale_enabled: Boolean(
+      raw.target_g2_sale_enabled ?? PUBLIC_SETTING_DEFAULTS.target_g2_sale_enabled
+    ),
   }
 }
 
@@ -202,6 +215,8 @@ export const PLAN_SALE_FLAG: Record<string, keyof PublicSettings> = {
   vettri_month: 'vettri_sale_enabled',
   rank_booster_g2: 'rank_booster_sale_enabled',
   group1_mock_pack: 'mock_pack_sale_enabled',
+  target_g2_en: 'target_g2_sale_enabled',
+  target_g2_ta: 'target_g2_sale_enabled',
 }
 
 /**

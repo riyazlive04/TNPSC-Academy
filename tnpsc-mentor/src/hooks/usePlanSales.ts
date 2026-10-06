@@ -29,6 +29,8 @@ export interface PlanSales {
   vettri: boolean
   rankBooster: boolean
   mockPack: boolean
+  /** The ₹849 Target Group 2 2026 series — both language tracks at once. */
+  targetG2: boolean
 }
 
 /** The closed state, used until the fetch resolves and if it fails. */
@@ -39,6 +41,7 @@ const NONE: PlanSales = {
   vettri: false,
   rankBooster: false,
   mockPack: false,
+  targetG2: false,
 }
 
 let cache: PlanSales | null = null
@@ -68,6 +71,7 @@ export function usePlanSales(): PlanSales {
             vettri: master && Boolean(s.vettri_sale_enabled),
             rankBooster: master && Boolean(s.rank_booster_sale_enabled),
             mockPack: master && Boolean(s.mock_pack_sale_enabled),
+            targetG2: master && Boolean(s.target_g2_sale_enabled),
           }
           return cache
         })

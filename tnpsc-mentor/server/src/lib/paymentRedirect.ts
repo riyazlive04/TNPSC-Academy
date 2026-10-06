@@ -14,6 +14,8 @@ export const SUCCESS_PLAN_KEY: Record<string, string> = {
   vettri_month: 'vettri_month',
   rank_booster_g2: 'rank_booster_g2',
   group1_mock_pack: 'group1_mock_pack',
+  target_g2_en: 'target_g2_en',
+  target_g2_ta: 'target_g2_ta',
 }
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1'])

@@ -1042,6 +1042,68 @@ const STRINGS = {
   },
   rankBoosterDashCta: { en: 'Explore', ta: 'பார்க்க' },
 
+  // ─── Target Group 2 2026 (₹849 language series, two tracks) ───────────────
+  // One product, two purchases: the General English track and the General Tamil
+  // track. The track a buyer gets is decided by which pay link they were sent,
+  // so nothing here asks them to choose after paying.
+  targetG2Title: { en: 'Target Group 2 2026', ta: 'டார்கெட் குரூப் 2 2026' },
+  targetG2Tab: { en: 'Target Group 2', ta: 'டார்கெட் குரூப் 2' },
+  targetG2Badge: { en: 'Target Group 2 2026', ta: 'டார்கெட் குரூப் 2 2026' },
+  targetG2Validity: { en: '90-day access', ta: '90 நாள் அணுகல்' },
+  targetG2English: { en: 'General English', ta: 'பொது ஆங்கிலம்' },
+  targetG2Tamil: { en: 'General Tamil', ta: 'பொது தமிழ்' },
+  targetG2EnglishTitle: {
+    en: 'Target Group 2 2026 — General English',
+    ta: 'டார்கெட் குரூப் 2 2026 — பொது ஆங்கிலம்',
+  },
+  targetG2TamilTitle: {
+    en: 'Target Group 2 2026 — General Tamil',
+    ta: 'டார்கெட் குரூப் 2 2026 — பொது தமிழ்',
+  },
+  targetG2PageSub: {
+    en: '13 papers for the Group II/IIA language paper: 10 unit-wise tests plus 3 full 200-question Grand Mocks. Attempt each up to twice.',
+    ta: 'குரூப் II/IIA மொழித் தாளுக்கான 13 தேர்வுகள்: 10 அலகு வாரியான தேர்வுகள் மற்றும் 3 முழு 200 வினா மாதிரித் தேர்வுகள். ஒவ்வொன்றையும் இருமுறை வரை எழுதலாம்.',
+  },
+  targetG2ArenaTitle: { en: 'Target Group 2 2026', ta: 'டார்கெட் குரூப் 2 2026' },
+  targetG2ArenaSub: {
+    en: 'Group II/IIA language test series',
+    ta: 'குரூப் II/IIA மொழித் தேர்வுத் தொடர்',
+  },
+  targetG2Perk1: {
+    en: '10 unit-wise language papers (100 questions each), written to the Code 495 syllabus weighting',
+    ta: '10 அலகு வாரியான மொழித் தாள்கள் (தலா 100 வினாக்கள்), குறியீடு 495 பாடத்திட்ட விகிதப்படி',
+  },
+  targetG2Perk2: {
+    en: '3 Grand Mock Tests in the real prelim pattern — General Studies (100) + your language paper (100)',
+    ta: '3 முழு மாதிரித் தேர்வுகள் உண்மையான முதல்நிலைத் தேர்வு முறையில் — பொது அறிவு (100) + உங்கள் மொழித் தாள் (100)',
+  },
+  targetG2Perk3: {
+    en: 'Every question with a full explanation · each paper attemptable twice',
+    ta: 'ஒவ்வொரு வினாவுக்கும் முழு விளக்கம் · ஒவ்வொரு தேர்வையும் இருமுறை எழுதலாம்',
+  },
+  targetG2Perk4: {
+    en: 'Paper 1 is free for everyone — try before you enroll',
+    ta: 'தேர்வு 1 அனைவருக்கும் இலவசம் — சேருமுன் முயற்சிக்கவும்',
+  },
+  targetG2Get: { en: 'Enroll for ₹849', ta: '₹849-க்கு சேருங்கள்' },
+  targetG2BannerTitle: { en: 'Target Group 2 2026', ta: 'டார்கெட் குரூப் 2 2026' },
+  targetG2BannerSub: {
+    en: '13 language papers for Group II/IIA — English or Tamil',
+    ta: 'குரூப் II/IIA-க்கான 13 மொழித் தாள்கள் — ஆங்கிலம் அல்லது தமிழ்',
+  },
+  // Shown on the locked hub tab. It names the two links rather than offering a
+  // picker, because the track is chosen by the link a buyer is sent — see
+  // TargetG2LandingPage.
+  targetG2Locked: {
+    en: 'Target Group 2 2026 is a separate enrollment. Pick the language paper you are writing — each track is ₹849 and unlocks its own 13 papers.',
+    ta: 'டார்கெட் குரூப் 2 2026 என்பது தனி சேர்க்கை. நீங்கள் எழுதும் மொழித் தாளைத் தேர்ந்தெடுங்கள் — ஒவ்வொரு பிரிவும் ₹849, அதன் சொந்த 13 தேர்வுகளைத் திறக்கும்.',
+  },
+  targetG2Preview: { en: 'Preview', ta: 'முன்னோட்டம்' },
+  targetG2OtherTrack: {
+    en: 'You are enrolled in this track only. The other language is a separate ₹849 enrollment.',
+    ta: 'நீங்கள் இந்தப் பிரிவில் மட்டுமே சேர்ந்துள்ளீர்கள். மற்ற மொழி தனி ₹849 சேர்க்கை.',
+  },
+
   // Test Marathon — Analytics tab
   tsTabPapers: { en: 'Papers', ta: 'தேர்வுகள்' },
   tsTabAnalytics: { en: 'Analytics', ta: 'பகுப்பாய்வு' },
@@ -2313,6 +2375,11 @@ const STRINGS = {
   paymentsPlanMockPackWhere: {
     en: '₹399 · 80 days — Test Marathon banner, website pricing',
     ta: '₹399 · 80 நாள் — டெஸ்ட் மாரத்தான் பேனர், இணையதள விலை',
+  },
+  paymentsPlanTargetG2: { en: 'Target Group 2 2026', ta: 'டார்கெட் குரூப் 2 2026' },
+  paymentsPlanTargetG2Where: {
+    en: '₹849 · 90 days — both language pay links (/target-group-2-english, /target-group-2-tamil)',
+    ta: '₹849 · 90 நாள் — இரு மொழி கட்டண இணைப்புகள் (/target-group-2-english, /target-group-2-tamil)',
   },
   paymentsOnSale: { en: 'On sale', ta: 'விற்பனையில்' },
   paymentsOffSale: { en: 'Off sale', ta: 'விற்பனையில் இல்லை' },

@@ -105,6 +105,24 @@ export const GROUP1_MOCK_BUY_PATHS = ['/group-1-mock-test', '/group-1/mock-test'
  */
 export const MOCK_PACK_399_PATHS = ['/group-1-mock-pack', '/mock-399', '/399'] as const
 
+/**
+ * The two Target Group 2 2026 pay links — one per language track.
+ *
+ * These are not two shapes of one link like the pairs above: they are two
+ * different purchases at the same price (`target_g2_en` / `target_g2_ta`), and
+ * which one a buyer is sent IS how they choose their language paper. Sending
+ * someone the wrong one sells them the wrong track, so they must never be
+ * collapsed or made to redirect to each other.
+ */
+export const TARGET_G2_ENGLISH_BUY_PATHS = [
+  '/target-group-2-english',
+  '/target-group-2/english',
+] as const
+export const TARGET_G2_TAMIL_BUY_PATHS = [
+  '/target-group-2-tamil',
+  '/target-group-2/tamil',
+] as const
+
 /** Landing pages where a successful auth should resume checkout immediately
  *  rather than dropping the user back on the page cold. */
 const AUTO_ENROLL_PATHS = new Set<string>([
@@ -115,6 +133,8 @@ const AUTO_ENROLL_PATHS = new Set<string>([
   ...GROUP1_SERIES_BUY_PATHS,
   ...GROUP1_MOCK_BUY_PATHS,
   ...MOCK_PACK_399_PATHS,
+  ...TARGET_G2_ENGLISH_BUY_PATHS,
+  ...TARGET_G2_TAMIL_BUY_PATHS,
 ])
 
 export function isAutoEnrollPath(fromPath?: string): boolean {

@@ -9,22 +9,21 @@ import { trackPurchase } from '../lib/tracking'
 
 /** What the success screen shows per purchased plan (?plan= query param). The
  * perk lists mirror the purchase cards so the recap matches what was pitched. */
-const PLAN_META: Record<
-  string,
-  {
-    nameKey: StringKey
-    validityKey: StringKey
-    perkKeys: readonly StringKey[]
-    accent: 'mint' | 'brand' | 'gold' | 'sky'
-    /** Which entitlementsStore/premiumStore boolean proves this specific plan
-     *  is actually active - see the `confirmed` check below. */
-    flag: 'premium' | 'vettri' | 'rankBooster' | 'mockPack'
-    /** Where "Start practising" goes. Defaults to the Test Arena; a plan that
-     *  is one product opens that product, so a buyer who paid from its link
-     *  lands on what they bought rather than hunting for it. */
-    startPath?: string
-  }
-> = {
+interface PlanMeta {
+  nameKey: StringKey
+  validityKey: StringKey
+  perkKeys: readonly StringKey[]
+  accent: 'mint' | 'brand' | 'gold' | 'sky'
+  /** Which entitlementsStore/premiumStore boolean proves this specific plan
+   *  is actually active - see the `confirmed` check below. */
+  flag: 'premium' | 'vettri' | 'rankBooster' | 'mockPack' | 'targetG2English' | 'targetG2Tamil'
+  /** Where "Start practising" goes. Defaults to the Test Arena; a plan that
+   *  is one product opens that product, so a buyer who paid from its link
+   *  lands on what they bought rather than hunting for it. */
+  startPath?: string
+}
+
+const PLAN_META: Record<string, PlanMeta> = {
   premium: {
     nameKey: 'premiumTitle',
     validityKey: 'premiumValidity',
@@ -80,6 +79,24 @@ const PLAN_META: Record<
     accent: 'sky',
     flag: 'mockPack',
   },
+  // Target Group 2 2026 — one entry per language track, since they are two
+  // purchases and a buyer must be told which one just went through.
+  target_g2_en: {
+    nameKey: 'targetG2EnglishTitle',
+    validityKey: 'targetG2Validity',
+    perkKeys: ['targetG2Perk1', 'targetG2Perk2', 'targetG2Perk3', 'targetG2Perk4'],
+    accent: 'brand',
+    flag: 'targetG2English',
+    startPath: '/test-series?tab=targetg2',
+  },
+  target_g2_ta: {
+    nameKey: 'targetG2TamilTitle',
+    validityKey: 'targetG2Validity',
+    perkKeys: ['targetG2Perk1', 'targetG2Perk2', 'targetG2Perk3', 'targetG2Perk4'],
+    accent: 'brand',
+    flag: 'targetG2Tamil',
+    startPath: '/test-series?tab=targetg2',
+  },
 }
 
 /**
@@ -108,14 +125,21 @@ export default function PaymentSuccessPage() {
   const vettri = useEntitlementsStore((s) => s.vettri)
   const rankBooster = useEntitlementsStore((s) => s.rankBooster)
   const mockPack = useEntitlementsStore((s) => s.mockPack)
-  const confirmed =
-    plan.flag === 'premium'
-      ? premium
-      : plan.flag === 'vettri'
-        ? vettri
-        : plan.flag === 'rankBooster'
-          ? rankBooster
-          : mockPack
+  const targetG2English = useEntitlementsStore((s) => s.targetG2English)
+  const targetG2Tamil = useEntitlementsStore((s) => s.targetG2Tamil)
+  // A lookup keyed by the flag name rather than an if/else chain: the chain
+  // ended in a bare `: mockPack`, so every plan added after it silently
+  // reported the Mock Pack's entitlement as its own confirmation. Typed to the
+  // flag union, so a new plan whose flag is not wired here fails to compile.
+  const FLAG_VALUE: Record<PlanMeta['flag'], boolean> = {
+    premium,
+    vettri,
+    rankBooster,
+    mockPack,
+    targetG2English,
+    targetG2Tamil,
+  }
+  const confirmed = FLAG_VALUE[plan.flag]
 
   useEffect(() => {
     void usePremiumStore.getState().refresh()
