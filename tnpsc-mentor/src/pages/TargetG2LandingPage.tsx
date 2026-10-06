@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Trophy,
@@ -24,7 +24,10 @@ import {
 import { usePlanSales } from '../hooks/usePlanSales'
 import { trackViewContent, trackInitiateCheckout } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
-import LandingLangPrompt, { useLandingLang } from '../components/Landing/LandingLangPrompt'
+import LandingLangPrompt, {
+  useLandingLang,
+  type LandingLang,
+} from '../components/Landing/LandingLangPrompt'
 
 const SUPPORT_EMAIL = 'support@tnpscmentors.in'
 
@@ -168,7 +171,28 @@ export default function TargetG2LandingPage({ track }: { track: TargetG2Track })
   const sales = usePlanSales()
   const copy = TRACK_COPY[track]
 
-  const [lang, setLang, langChosen] = useLandingLang()
+  // ─── What language this page opens in ──────────────────────────────────────
+  // useLandingLang remembers a choice made on ANY public page of this site, so
+  // a visitor who once picked English elsewhere would be handed the Tamil-paper
+  // link in English — and a first-time visitor would get the blocking "Select
+  // your language" popup before they could even see the offer.
+  //
+  // The Tamil link is sent to someone writing the Tamil paper, so it opens in
+  // Tamil whatever this device last chose, and skips the prompt: the link has
+  // already answered it. The header toggle still works and still sticks.
+  //
+  // The English link deliberately does NOT get the mirror-image treatment.
+  // Choosing the English *paper* says nothing about which language someone
+  // reads a sales page in — plenty of Tamil-medium aspirants sit General
+  // English — so that page keeps following the visitor's own choice.
+  const [storedLang, setStoredLang, langChosen] = useLandingLang()
+  const [switched, setSwitched] = useState(false)
+  const trackLang: LandingLang | null = track === 'tamil' ? 'ta' : null
+  const lang = trackLang && !switched ? trackLang : storedLang
+  const setLang = (next: LandingLang) => {
+    setSwitched(true)
+    setStoredLang(next)
+  }
   const t = (key: keyof typeof T) => T[key][lang]
   const c = (key: keyof typeof copy) => (copy[key] as { ta: string; en: string })[lang]
 
@@ -419,7 +443,7 @@ export default function TargetG2LandingPage({ track }: { track: TargetG2Track })
         </div>
       </footer>
 
-      <LandingLangPrompt open={!langChosen} onChoose={setLang} />
+      <LandingLangPrompt open={!langChosen && !trackLang} onChoose={setLang} />
     </div>
   )
 }
