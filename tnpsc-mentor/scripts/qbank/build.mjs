@@ -315,9 +315,9 @@ console.log(
 // make, so each past paper gets its own listing.
 
 const GROUP_LABELS = {
-  pyq: { label: 'Group 1', slug: 'group-1' },
-  pyq2: { label: 'Group 2 / 2A', slug: 'group-2' },
-  pyq4: { label: 'Group 4 / VAO', slug: 'group-4' },
+  pyq: { label: 'Group 1', labelTa: 'குரூப் 1', slug: 'group-1' },
+  pyq2: { label: 'Group 2 / 2A', labelTa: 'குரூப் 2 / 2A', slug: 'group-2' },
+  pyq4: { label: 'Group 4 / VAO', labelTa: 'குரூப் 4 / VAO', slug: 'group-4' },
 }
 
 /**
@@ -359,7 +359,14 @@ for (const q of clean) {
   const slug = `${g.slug}-${q.year}`
   let p = papers.get(slug)
   if (!p) {
-    p = { slug, label: g.label, year: Number(q.year), questions: [], path: `${BASE}/past-papers/${slug}/` }
+    p = {
+      slug,
+      label: g.label,
+      labelTa: g.labelTa,
+      year: Number(q.year),
+      questions: [],
+      path: `${BASE}/past-papers/${slug}/`,
+    }
     papers.set(slug, p)
   }
   p.questions.push(q)
@@ -539,6 +546,9 @@ function writeListing({
   path, questions, crumbs, title, description,
   h1, h1Ta, lede, ledeTa, eyebrow, eyebrowTa,
   extraBody = '', stats = [], sidebar = [], sticky, numbered = false,
+  // A paper page is one paper, so stamping each of its 200 questions with the
+  // same name would be noise. Every other listing mixes papers.
+  showSource = true,
 }) {
   const pages = Math.max(1, Math.ceil(questions.length / PER_PAGE))
   const hrefFor = (p) => (p === 1 ? path : `${path}page-${p}/`)
@@ -549,7 +559,7 @@ function writeListing({
     const suffix = pages > 1 ? ` — page ${p} of ${pages}` : ''
 
     const rowsHtml = `<ul class="minis">${slice
-      .map((q) => miniQuestion(q, { num: numbered ? paperQno(q) : undefined }))
+      .map((q) => miniQuestion(q, { num: numbered ? paperQno(q) : undefined, source: showSource }))
       .join('')}</ul>`
 
     const statsHtml = stats.length
@@ -598,11 +608,9 @@ ${promo()}`
 // are sitting.
 
 const GROUP_ORDER = ['Group 1', 'Group 2 / 2A', 'Group 4 / VAO']
-const GROUP_TA = {
-  'Group 1': 'குரூப் 1',
-  'Group 2 / 2A': 'குரூப் 2 / 2A',
-  'Group 4 / VAO': 'குரூப் 4 / VAO',
-}
+const GROUP_TA = Object.fromEntries(
+  Object.values(GROUP_LABELS).map((g) => [g.label, g.labelTa]),
+)
 
 function papersByGroup() {
   const byGroup = new Map()
@@ -790,12 +798,13 @@ for (const u of liveUnits) {
     h1Ta: `${u.def.ta} — ${n(u.questions.length)} முந்தைய ஆண்டு வினாக்கள்`,
     lede:
       `${u.def.en} questions taken from the real TNPSC papers, each with its correct answer in Tamil and ` +
-      `English.` +
+      `English and the exam and year it was asked in.` +
       (u.def.weight
         ? ` This subject carries ${u.def.weight} of the 200 questions in the Group 1 2026 preliminary paper.`
         : ''),
     ledeTa:
-      `உண்மையான TNPSC வினாத்தாள்களிலிருந்து எடுக்கப்பட்ட வினாக்கள், ஒவ்வொன்றிலும் சரியான விடையுடன்.` +
+      `உண்மையான TNPSC வினாத்தாள்களிலிருந்து எடுக்கப்பட்ட வினாக்கள், ஒவ்வொன்றிலும் சரியான விடையுடன், ` +
+      `எந்தத் தேர்வில் எந்த ஆண்டு கேட்கப்பட்டது என்பதுடன்.` +
       (u.def.weight ? ` குரூப் 1 2026 முதல்நிலைத் தேர்வின் 200 வினாக்களில் ${u.def.weight} இந்தப் பாடத்திலிருந்து.` : ''),
     eyebrow: u.def.weight ? `${u.def.weight} marks · Group 1 2026 Prelims` : 'Previous year questions',
     eyebrowTa: u.def.weight ? `${u.def.weight} மதிப்பெண் · குரூப் 1 2026` : 'முந்தைய ஆண்டு வினாக்கள்',
@@ -817,7 +826,8 @@ for (const u of liveUnits) {
       h1: `${t.name} — ${n(t.questions.length)} previous-year questions`,
       lede:
         `Every ${t.name} question TNPSC has asked in the papers we hold, under ${u.def.en}, with the ` +
-        `correct answer marked in Tamil and English. Explanations are free with an account.`,
+        `correct answer marked in Tamil and English and the exam and year each one comes from. ` +
+        `Explanations are free with an account.`,
       ledeTa:
         `${u.def.ta} பாடத்தின் கீழ், எங்களிடம் உள்ள வினாத்தாள்களில் TNPSC கேட்ட அனைத்து வினாக்களும், ` +
         `சரியான விடை குறிக்கப்பட்டு. விளக்கங்கள் இலவசக் கணக்கில் கிடைக்கும்.`,
@@ -837,6 +847,7 @@ for (const p of paperList) {
     path: p.path,
     questions: p.questions,
     numbered: p.numbered,
+    showSource: false,
     crumbs: [HUB, PAPERS, { name: `${p.label} ${p.year}`, path: p.path }],
     title: `TNPSC ${p.label} ${p.year} Question Paper with Answers`,
     h1: `TNPSC ${p.label} ${p.year} — question paper with answers`,
@@ -903,14 +914,14 @@ for (const u of liveUnits) {
       const relHtml = related.length
         ? `<section class="sec-block" id="more">
 <h2>${one(
-            q._paper ? `More questions from TNPSC ${q._paper.label} ${q._paper.year}` : `More ${groupName} questions`,
-            'இதே வினாத்தாளில் மேலும் வினாக்கள்',
+            `More ${groupName} questions`,
+            'மேலும் வினாக்கள்',
           )}</h2>
 <p class="sub">${one(
-            'Each one with its options and the correct answer marked, the same as above.',
-            'ஒவ்வொன்றும் விடைத் தேர்வுகளுடன், சரியான விடை குறிக்கப்பட்டு.',
+            'Each one with its options, the correct answer marked, and the exam and year it was asked in.',
+            'ஒவ்வொன்றும் விடைத் தேர்வுகளுடன், சரியான விடை குறிக்கப்பட்டு, எந்தத் தேர்வில் எந்த ஆண்டு கேட்கப்பட்டது என்பதுடன்.',
           )}</p>
-<ul class="minis">${related.map((r) => miniQuestion(r)).join('')}</ul>
+<ul class="minis">${related.map((r) => miniQuestion(r, { source: true })).join('')}</ul>
 <p class="mini-go"><a href="${esc(groupPath)}">${one(
             `All ${n(list.length)} ${groupName} questions`,
             'இந்தப் பிரிவின் அனைத்து வினாக்களும்',

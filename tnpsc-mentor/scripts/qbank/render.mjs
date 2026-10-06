@@ -690,6 +690,16 @@ ul.minis{list-style:none;margin:0;padding:0;display:grid;gap:16px}
 /* min-width:0 or a long unbroken stem pushes the number off the row. */
 .mini-q .qt{flex:1 1 auto;min-width:0}
 .mini-q .l-ta{font-weight:600;font-size:.95em;margin-top:6px;color:var(--ink2)}
+/* The paper chip, above the stem — it is context for the question, so it has
+   to be read before it, not found afterwards. */
+.mini-src{margin:0 0 11px}
+.mini-src a{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 9px;
+  border-radius:999px;background:var(--brand-soft);color:var(--brand-dark);
+  font-family:'Plus Jakarta Sans','Anek Tamil',sans-serif;font-size:12.5px;
+  line-height:1.6;border:1px solid transparent}
+.mini-src a:hover{border-color:rgb(110 79 232 / .4);text-decoration:none}
+.mini-src .k{font-weight:600;opacity:.8}
+.mini-src .v{font-weight:800;font-variant-numeric:tabular-nums}
 .mini .stem-body{margin:12px 0 0}
 .mini-opts{margin:12px 0 0}
 .mini-opts li{padding:9px 12px;margin:0 0 6px;font-size:14.5px;background:var(--card);border-width:1px}
@@ -1448,7 +1458,7 @@ ${rows.map(([k, v]) => `<tr><th>${one(k[0], k[1])}</th><td>${v}</td></tr>`).join
  * leaving the primary question unmistakable — it alone holds the <h1>, the
  * title, the meta description and the Quiz markup.
  */
-export function miniQuestion(q, { num } = {}) {
+export function miniQuestion(q, { num, source } = {}) {
   const letters = optionsOf(q)
   const correct = String(q.correct_answer ?? '').trim().toUpperCase()
   const f = stemHtml(q.question_text, mathText)
@@ -1470,8 +1480,25 @@ export function miniQuestion(q, { num } = {}) {
       ? `<div class="stem-body">${f.body ? enBlock(f.body) : ''}${fTa?.body ? taBlock(fTa.body) : ''}</div>`
       : ''
 
+  // Which exam, which year. A paper page does not need this — the page IS
+  // the answer — but a subject page, a topic page and the siblings under a
+  // question all mix papers freely, and there "where is this from" is the first
+  // thing a reader wants about a question they did not choose: a 2013 Group 4
+  // question and a 2026 Group 1 one are worth very different amounts of their
+  // afternoon. The chip is the link to the paper, so the claim is checkable in
+  // one tap rather than asserted.
+  const src =
+    source && q._paper
+      ? `<p class="mini-src"><a href="${esc(q._paper.path)}">` +
+        `<span class="k">${one('Asked in', 'கேட்கப்பட்டது')}</span>` +
+        `<span class="v">${one(
+          `TNPSC ${q._paper.label} · ${q._paper.year}`,
+          `TNPSC ${q._paper.labelTa ?? q._paper.label} · ${q._paper.year}`,
+        )}</span></a></p>`
+      : ''
+
   return `<li class="mini">
-<div class="mini-q">${num ? `<span class="qn">${esc(String(num))}.</span>` : ''}<span class="qt">${en(
+${src}<div class="mini-q">${num ? `<span class="qn">${esc(String(num))}.</span>` : ''}<span class="qt">${en(
     f.lead,
   )}${fTa ? ta(fTa.lead) : ''}</span></div>
 ${structure}
