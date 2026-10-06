@@ -176,7 +176,11 @@ const client = new Client({
   user: process.env.SUPABASE_DB_USER,
   password: process.env.SUPABASE_DB_PASSWORD,
   database: process.env.SUPABASE_DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  // The self-hosted Postgres this now loads into runs with `ssl = off` and is
+  // bound to 127.0.0.1 on the VPS, so a connection asking for TLS is refused
+  // outright. Set SUPABASE_DB_SSL=off there; the default keeps TLS for any
+  // managed/remote host, where it must never be dropped silently.
+  ssl: process.env.SUPABASE_DB_SSL === 'off' ? false : { rejectUnauthorized: false },
   statement_timeout: 120000,
 })
 
