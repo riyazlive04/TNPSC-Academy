@@ -37,8 +37,8 @@ import {
   CSS, ORIGIN, BASE, BRAND,
   esc, plain, page, questionJsonLd, promo, pager, mathText, hasMath, n,
   setFooterUnits, faqSection, en, ta, both, one,
-  questionCard, answerSection, explanationSection, detailsSection, questionFaq, miniQuestion,
-  insightStrip, repeatNotice,
+  questionCard, answerSection, explanationSection, questionFaq, miniQuestion,
+  insightSection, repeatNotice, toc,
   APP_REGISTER,
 } from './render.mjs'
 
@@ -955,44 +955,41 @@ ${next ? `<a href="${esc(next._path)}"><i>${both('Next question →', 'அடு
       const faq = questionFaq(q, { paper: q._paper, unit: unitForSections })
       const answerHtml = answerSection(q)
       const explanationHtml = explanationSection(q)
-      const detailsHtml = detailsSection(q, {
-        paper: q._paper,
-        unit: unitForSections,
-        topic: g.topic?.name,
-      })
+      // How many of the papers here carry this exact question. Counted the
+      // same way repeatNotice lists them, so the number in the grid and the
+      // links under it can never disagree.
+      const siblings = repeats.get(q.id) ?? []
+      const papersIn = new Set(
+        [q, ...siblings.filter((s) => s.id !== q.id)].filter((s) => s._paper).map((s) => s._paper.path),
+      ).size
 
-      // What used to sit here was a table of contents — Answer / Explanation /
-      // Question details / More questions / FAQ. On a page this short it was
-      // noise, and its "Explanation" link pointed at a section the reader
-      // cannot read until they sign in. The slot now carries what the question
-      // IS: its subject, its topic, and how often that topic is actually
-      // examined, each one a link to the page that backs the number up.
-      //
-      // The headline count is the TOPIC's, not this question's. Only ~1.6% of
-      // the archive is a genuine cross-paper repeat, so a per-question counter
-      // would read "1" on almost every page; topic frequency is the real and
-      // useful answer to "how much does this matter". See insightStrip().
-      const insight = insightStrip({
-        unit: {
-          name: u.def.en,
-          path: u.path,
-          count: u.questions.length,
-          marks: u.def.weight,
-        },
-        topic: g.topic
-          ? { name: g.topic.name, path: g.topic.path, count: g.topic.questions.length }
-          : undefined,
+      const insight = insightSection(q, {
+        unit: { name: u.def.en, path: u.path },
+        topic: g.topic ? { name: g.topic.name, path: g.topic.path } : undefined,
         paper: q._paper,
+        papersIn,
         papers: paperList.length,
       })
-      const repeatHtml = repeatNotice(repeats.get(q.id) ?? [], q)
+      const repeatHtml = repeatNotice(siblings, q)
+
+      // The contents box, back but shorter. The old one listed every section —
+      // Answer / Explanation / Question details / More questions / FAQ — which
+      // is a list of furniture, not of reasons to stay. These three are what
+      // somebody arriving from a search actually came for, and each is a
+      // section that genuinely exists on the page: 'More questions' and the FAQ
+      // are still here to read, they are simply not what the box is for.
+      const contents = toc([
+        ...(answerHtml ? [{ id: 'answer', label: one('Answer', 'விடை') }] : []),
+        ...(explanationHtml ? [{ id: 'explanation', label: one('Explanation', 'விளக்கம்') }] : []),
+        { id: 'insights', label: one('Question insights', 'வினா பற்றி') },
+      ])
 
       const body = `${questionCard(q)}
-${insight}
+${contents}
 ${repeatHtml}
 ${answerHtml}
 ${explanationHtml}
-${detailsHtml}
+${insight}
 ${relHtml}
 ${faq.html}
 ${nav}

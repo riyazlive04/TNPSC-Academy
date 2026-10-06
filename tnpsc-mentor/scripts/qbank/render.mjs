@@ -17,7 +17,7 @@
 
 import katex from 'katex'
 import { ALL_UNITS } from './taxonomy.mjs'
-import { stemHtml } from './stemfmt.mjs'
+import { stemHtml, stemKind } from './stemfmt.mjs'
 
 export const ORIGIN = 'https://tnpscmentors.in'
 export const BASE = '/questions'
@@ -561,20 +561,10 @@ section.exp p{margin:0 0 10px;font-size:15.5px;line-height:1.68}
 .why li{font-size:14.5px;color:var(--ink2);padding:7px 0 7px 12px;border-left:2px solid var(--line)}
 .exp-ta{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
 
-/* ── Contents box ────────────────────────────────────────────────────────── */
-.insight{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);
-  padding:0;margin:16px 0;overflow:hidden;box-shadow:var(--shadow-soft)}
-.ins-hero{display:flex;gap:14px;align-items:center;padding:18px 20px;background:var(--brand-soft);
-  border-bottom:1px solid var(--line)}
-.ins-hero:hover{text-decoration:none;filter:brightness(.985)}
-.ins-hero .num{flex:0 0 auto;font-family:'Plus Jakarta Sans',sans-serif;font-size:34px;font-weight:800;
-  color:var(--brand);line-height:1;font-variant-numeric:tabular-nums}
-.ins-hero .num .x{font-size:19px;margin-left:2px;opacity:.55}
-.ins-hero .txt{display:block;font-size:14.5px;color:var(--ink2);line-height:1.5;min-width:0}
-.ins-hero .txt>b{display:block;font-family:'Plus Jakarta Sans','Anek Tamil',sans-serif;font-size:16px;
-  font-weight:800;color:var(--ink);margin-bottom:2px}
-.ins-hero .txt b{color:var(--ink)}
-.ins-hero .go{display:block;margin-top:6px;font-weight:700;color:var(--brand);font-size:13.5px}
+/* ── Question-page blocks: insights, explanation, repeat, contents ───────── */
+.ins>h2{margin-bottom:4px}
+.ins .sub{margin:0 0 14px}
+.ins .ins-cells{border:1px solid var(--line);border-radius:var(--r-field);overflow:hidden}
 .ins-cells{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line)}
 @media (min-width:560px){.ins-cells{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
 .ins-cell{display:block;padding:13px 20px;background:var(--card)}
@@ -1267,78 +1257,143 @@ export function toc(items) {
 </nav>`
 }
 
-/**
- * What this question is, and how much it matters.
- *
- * Each fact is a link to the page that proves it, so "asked 28 times" is not a
- * number a student has to take on faith — it opens the 28 questions.
- *
- * The counts are of THIS archive (24 previous-year papers), never of "TNPSC
- * exams" in general, because that is all we can count. The wording says so.
- *
- * @param {object} o
- * @param {{name:string, nameTa?:string, path:string, count:number, marks?:number|null}} o.unit
- * @param {{name:string, path:string, count:number}} [o.topic] only when the
- *   label is a real syllabus topic — most 'topic' values in the GS banks are
- *   the subject name repeated, and are passed as undefined.
- * @param {{label:string, year:number, path:string}} [o.paper]
- * @param {number} o.papers how many papers the archive covers
- */
-export function insightStrip({ unit, topic, paper, papers }) {
-  // The headline number is the topic's where we have one, because that is the
-  // specific, actionable fact; the subject's otherwise.
-  const hero = topic ?? unit
-  const heroIsTopic = !!topic
+/** One fact in the insight grid. A link when something can prove it. */
+function insCell({ k, kTa, v, s, sTa, href }) {
+  const inner =
+    `<span class="k">${one(k, kTa)}</span><span class="v">${v}</span>` +
+    (s ? `<span class="s">${one(s, sTa)}</span>` : '')
+  return href
+    ? `<a class="ins-cell" href="${esc(href)}">${inner}</a>`
+    : `<div class="ins-cell">${inner}</div>`
+}
 
+/** What each question shape is called, and what it asks of the reader. */
+const KIND_LABELS = {
+  match: {
+    v: ['Match the following', 'பொருத்துக'],
+    s: ['pair List I with List II', 'இரு பட்டியல்களைப் பொருத்த வேண்டும்'],
+  },
+  'assertion-reason': {
+    v: ['Assertion & Reason', 'கூற்று – காரணம்'],
+    s: ['judge both, then the link between them', 'இரண்டையும், பின் அவற்றின் தொடர்பையும் சரிபார்க்க வேண்டும்'],
+  },
+  statements: {
+    v: ['Statement-based', 'கூற்று சார்ந்தது'],
+    s: ['decide which statements hold', 'எந்தக் கூற்றுகள் சரி என முடிவு செய்ய வேண்டும்'],
+  },
+  direct: {
+    v: ['Direct question', 'நேரடி வினா'],
+    s: ['one fact, four options', 'ஒரே தகவல், நான்கு விடைகள்'],
+  },
+}
+
+/**
+ * What this ONE question is.
+ *
+ * Deliberately about the question and nothing else. The version this replaces
+ * led with the subject's frequency — a 34px "407×" above the words "Indian
+ * Polity, asked 407 times" — at the top of a page about a single question. The
+ * number was true of the subject and the sentence said so, but the only reading
+ * available to somebody skimming is that THIS question had been asked 407
+ * times. A number that invites a false reading is worse than no number.
+ *
+ * So every cell is a fact about this row: the paper TNPSC asked it in, where it
+ * sits in the syllabus, how it is built, whether it has ever come round again,
+ * and whether we hold it in Tamil. Each fact that can be proven is a link to
+ * the page that proves it.
+ *
+ * @param {object} q the question row
+ * @param {object} o
+ * @param {{name:string, path:string}} o.unit
+ * @param {{name:string, path:string}} [o.topic] only when the label is a real
+ *   syllabus topic — most 'topic' values in the GS banks repeat the subject
+ *   name, and are passed as undefined.
+ * @param {{label:string, year:number, path:string}} [o.paper]
+ * @param {number} [o.papersIn] how many distinct papers this exact question
+ *   appears in. 1 for the ~98% asked once; see repeats.mjs.
+ * @param {number} o.papers how many papers the archive covers, for context on
+ *   the "once" case — a count means nothing without its denominator.
+ */
+export function insightSection(q, { unit, topic, paper, papersIn = 1, papers } = {}) {
   const cells = []
+
+  if (paper) {
+    cells.push(
+      insCell({
+        k: 'Asked in', kTa: 'கேட்கப்பட்டது',
+        v: `TNPSC ${esc(paper.label)} ${esc(String(paper.year))}`,
+        s: 'see the whole paper', sTa: 'முழு வினாத்தாளும்',
+        href: paper.path,
+      }),
+    )
+  }
+
+  // Of this question, not of its subject: how many of the papers here carry it.
   cells.push(
-    `<a class="ins-cell" href="${esc(unit.path)}">
-<span class="k">${one('Subject', 'பாடம்')}</span>
-<span class="v">${esc(unit.name)}</span>
-<span class="s">${
-      unit.marks
-        ? one(`${unit.marks} of 200 marks in Group 1 prelims`, `குரூப் 1 முதல்நிலையில் ${unit.marks} மதிப்பெண்`)
-        : one(`${n(unit.count)} questions here`, `${n(unit.count)} வினாக்கள்`)
-    }</span>
-</a>`,
+    papersIn > 1
+      ? insCell({
+          k: 'How often', kTa: 'எத்தனை முறை',
+          v: `${n(papersIn)} ${one('times', 'முறை')}`,
+          s: 'repeated — see where', sTa: 'திரும்பக் கேட்கப்பட்டது — எங்கே',
+          href: '#repeat',
+        })
+      : insCell({
+          k: 'How often', kTa: 'எத்தனை முறை',
+          v: one('Once', 'ஒரு முறை'),
+          s: `in the ${n(papers)} papers here`, sTa: `இங்குள்ள ${n(papers)} வினாத்தாள்களில்`,
+        }),
+  )
+
+  cells.push(
+    insCell({
+      k: 'Subject', kTa: 'பாடம்',
+      v: esc(unit.name),
+      s: 'where it sits in the syllabus', sTa: 'பாடத்திட்டத்தில் இதன் இடம்',
+      href: unit.path,
+    }),
   )
 
   if (topic) {
     cells.push(
-      `<a class="ins-cell" href="${esc(topic.path)}">
-<span class="k">${one('Topic', 'தலைப்பு')}</span>
-<span class="v">${esc(topic.name)}</span>
-<span class="s">${one('in the syllabus', 'பாடத்திட்டத்தில்')}</span>
-</a>`,
+      insCell({
+        k: 'Topic', kTa: 'பிரிவு',
+        v: esc(topic.name),
+        s: `within ${unit.name}`, sTa: `${unit.name} பாடத்தின் கீழ்`,
+        href: topic.path,
+      }),
     )
   }
 
-  if (paper) {
-    cells.push(
-      `<a class="ins-cell" href="${esc(paper.path)}">
-<span class="k">${one('Asked in', 'கேட்கப்பட்டது')}</span>
-<span class="v">${esc(paper.label)} ${esc(String(paper.year))}</span>
-<span class="s">${one('see the whole paper', 'முழு வினாத்தாளும்')}</span>
-</a>`,
-    )
-  }
+  const kind = KIND_LABELS[stemKind(q.question_text, mathText)] ?? KIND_LABELS.direct
+  cells.push(
+    insCell({
+      k: 'Question type', kTa: 'வினா வகை',
+      v: one(kind.v[0], kind.v[1]),
+      s: kind.s[0], sTa: kind.s[1],
+    }),
+  )
 
-  return `<section class="insight" aria-label="${esc(one('About this question', 'இந்த வினா பற்றி'))}">
-<a class="ins-hero" href="${esc(hero.path)}">
-<span class="num">${n(hero.count)}<span class="x">×</span></span>
-<span class="txt">
-<b>${esc(hero.name)}</b>
-${en(
-    `asked <b>${n(hero.count)} times</b> across the ${n(papers)} Group 1, 2 and 4 papers on this site`,
-  )}${ta(
-    `இந்தத் தளத்தின் ${n(papers)} வினாத்தாள்களில் <b>${n(hero.count)} முறை</b> கேட்கப்பட்டுள்ளது`,
-  )}
-<span class="go">${one(
-    heroIsTopic ? 'See all of them' : 'See all of them',
-    'அனைத்தையும் பார்க்க',
-  )} →</span>
-</span>
-</a>
+  cells.push(
+    q.question_text_ta
+      ? insCell({
+          k: 'Languages', kTa: 'மொழிகள்',
+          v: one('Tamil & English', 'தமிழ், ஆங்கிலம்'),
+          s: 'both are on this page', sTa: 'இரண்டும் இந்தப் பக்கத்தில்',
+        })
+      : insCell({
+          k: 'Languages', kTa: 'மொழிகள்',
+          v: one('English only', 'ஆங்கிலம் மட்டும்'),
+          // Not "TNPSC did not publish it in Tamil" — we only know what we hold.
+          s: 'we hold only the English wording', sTa: 'ஆங்கில வடிவம் மட்டுமே எங்களிடம் உள்ளது',
+        }),
+  )
+
+  return `<section class="sec-block ins" id="insights">
+<h2>${one('Question insights', 'இந்த வினா பற்றி')}</h2>
+<p class="sub">${both(
+    'Where TNPSC asked this one, where it sits in the syllabus, and how it is built.',
+    'TNPSC இதை எங்கு கேட்டது, பாடத்திட்டத்தில் இதன் இடம் என்ன, இது எப்படி அமைக்கப்பட்டுள்ளது.',
+  )}</p>
 <div class="ins-cells">${cells.join('')}</div>
 </section>`
 }
@@ -1364,7 +1419,7 @@ export function repeatNotice(siblings, self) {
     })
     .map((q) => `<a href="${esc(q._path)}">${esc(q._paper.label)} ${esc(String(q._paper.year))}</a>`)
   if (!links.length) return ''
-  return `<section class="repeat">
+  return `<section class="repeat" id="repeat">
 <p class="r-lab"><span aria-hidden="true">⟳</span> ${one('Asked more than once', 'ஒன்றுக்கு மேற்பட்ட முறை')}</p>
 <p>${en(
     `This question has also been asked in ${links.length === 1 ? 'another paper' : `${n(links.length)} other papers`}. That makes it one to know.`,
@@ -1407,38 +1462,6 @@ export function explanationSection(q, { gate = true } = {}) {
   return `<section class="sec-block" id="explanation">
 <h2>${one(`Why is (${correct}) the correct answer?`, `(${correct}) ஏன் சரியான விடை?`)}</h2>
 ${inner}
-</section>`
-}
-
-/**
- * The facts about this question as a table — exam, year, subject, difficulty.
- * A visitor wants to know whether this is their paper before they read on, and
- * a table says it faster than a sentence.
- */
-export function detailsSection(q, { paper, unit, topic } = {}) {
-  const rows = []
-  if (paper) rows.push([['Exam', 'தேர்வு'], `TNPSC ${esc(paper.label)}`])
-  if (q.year) rows.push([['Year asked', 'கேட்கப்பட்ட ஆண்டு'], String(q.year)])
-  if (unit) rows.push([['Subject', 'பாடம்'], esc(unit.en)])
-  if (topic) rows.push([['Topic', 'பிரிவு'], esc(topic)])
-  if (q.question_type) rows.push([['Question type', 'வினா வகை'], esc(plain(q.question_type))])
-  if (q.difficulty) rows.push([['Difficulty', 'கடினத்தன்மை'], esc(plain(q.difficulty))])
-  rows.push([
-    ['Languages', 'மொழிகள்'],
-    q.question_text_ta ? 'Tamil &amp; English' : 'English',
-  ])
-  if (unit?.weight) {
-    rows.push([
-      ['Weight in Group 1 2026 prelims', 'குரூப் 1 2026 மதிப்பெண்'],
-      `${unit.weight} of 200 questions`,
-    ])
-  }
-  if (!rows.length) return ''
-  return `<section class="sec-block" id="details">
-<h2>${one('About this question', 'இந்த வினா பற்றி')}</h2>
-<table class="facts"><tbody>
-${rows.map(([k, v]) => `<tr><th>${one(k[0], k[1])}</th><td>${v}</td></tr>`).join('')}
-</tbody></table>
 </section>`
 }
 
