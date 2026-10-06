@@ -249,6 +249,29 @@ export function group4NotificationJsonLd(): object {
           name: 'Examination centres across all 38 districts of Tamil Nadu',
           address: { '@type': 'PostalAddress', addressRegion: 'Tamil Nadu', addressCountry: 'IN' },
         },
+        image: [absolute(GROUP4_HERO_IMAGE ?? '/brand-logo.png')],
+        // The fee is what admission to this exam actually costs, so it is a
+        // real Offer — but TNPSC sells it, not us, and the window closes on
+        // 05.11.2026. availabilityStarts/Ends state that as fact instead of an
+        // `availability` that would quietly go stale the day applications shut.
+        offers: {
+          '@type': 'Offer',
+          name: 'Examination application fee',
+          price: String(raw.fee.examinationFee),
+          priceCurrency: raw.fee.currency,
+          url: raw.notification.applyUrl,
+          availabilityStarts: '2026-10-06T00:00:00+05:30',
+          availabilityEnds: GROUP4_APPLY_DEADLINE_ISO,
+          validFrom: '2026-10-06T00:00:00+05:30',
+          seller: {
+            '@type': 'GovernmentOrganization',
+            name: 'Tamil Nadu Public Service Commission',
+            url: 'https://www.tnpsc.gov.in/',
+          },
+        },
+        // No `performer`: a written examination has no one performing at it.
+        // Google lists it as optional for exactly this reason, and inventing
+        // one to clear a warning is how the JobPosting nodes went wrong.
       },
       {
         '@type': 'FAQPage',
