@@ -67,13 +67,13 @@ export const GROUP4_PUBLISHED = '2026-10-06'
 export const GROUP4_UPDATED = '2026-10-06'
 
 /**
- * The hero banner under the H1, from public/. It is the generic PYQ-archive
- * graphic rather than a Group 4 one, so it carries the brand and the proof
- * ("5,273 questions, 24 papers") rather than restating the notification the
- * copy beside it already gives. One copy only: it is the hero, not also the
- * CTA image. null drops the frame.
+ * The hero banner under the H1, from public/. Every figure on it is checked
+ * against this module's data (6,574 vacancies, 46 posts, the five largest
+ * post counts, and all five dates) — if the notification is corrected, the
+ * artwork has to be regenerated with it, not just the JSON. null drops the
+ * frame. 1400px wide, which covers the main column at 2x.
  */
-export const GROUP4_HERO_IMAGE: string | null = '/pyq-archive-banner.jpg'
+export const GROUP4_HERO_IMAGE: string | null = '/group-4-notification-2026-hero.jpg'
 
 const dateOf = (event: string) => GROUP4_DATES.find((d) => d.event === event) ?? null
 
@@ -131,7 +131,7 @@ export const GROUP4_FAQS: Group4Faq[] = [
   {
     q: 'What is the last date to apply for TNPSC Group 4 2026, and when is the exam?',
     a:
-      'Online applications close on 5 November 2026 at 11.59 PM at tnpscexams.in. A three-day correction window follows from 9 to 11 November 2026, after which no edits are allowed. The written examination is on 10 January 2027, from 9.30 A.M. to 12.30 P.M.',
+      'Online applications close on 5 November 2026 at 11.59 PM at apply.tnpscexams.in. A three-day correction window follows from 9 to 11 November 2026, after which no edits are allowed. The written examination is on 10 January 2027, from 9.30 A.M. to 12.30 P.M.',
   },
   {
     q: 'What is the minimum qualification and age limit for TNPSC Group 4 2026?',

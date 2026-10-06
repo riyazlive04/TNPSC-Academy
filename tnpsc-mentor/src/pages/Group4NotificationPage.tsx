@@ -190,8 +190,8 @@ const T = {
   ctaPrimary: { ta: 'இலவசப் பயிற்சியைத் தொடங்கு', en: 'Start free practice now' },
   ctaSecondary: { ta: 'குரூப் 4 PYQ-க்களைப் பார்', en: 'See Group 4 previous year questions' },
   heroImageAlt: {
-    ta: 'TNPSC முந்தைய ஆண்டு வினாத்தாள்கள் — 5,273 வினாக்கள், 24 தாள்கள், 11 பாடங்கள், தமிழ் & English',
-    en: 'TNPSC previous year question papers with answers, detailed explanations and insights — 5,273 questions across 24 papers and 11 subjects, in Tamil and English',
+    ta: 'TNPSC குரூப் 4 (Group IV) 2026 அறிவிப்பு — 6,574 காலியிடங்கள், 46 பணியிடங்கள்; விண்ணப்பம் 06.10.2026 முதல் 05.11.2026 வரை; தேர்வு 10.01.2027, காலை 9.30 முதல் மதியம் 12.30 வரை',
+    en: 'TNPSC Group IV 2026 notification, important dates and vacancies — 6,574 vacancies across 46 posts; applications 06.10.2026 to 05.11.2026; correction window 09.11.2026 to 11.11.2026; exam 10.01.2027, 9.30 AM to 12.30 PM',
   },
   ctaFinePrint: {
     ta: 'தொடங்க இலவசம். பயிற்சி தொடங்க எந்தக் கட்டணமும் இல்லை. Web மற்றும் Android-ல் கிடைக்கிறது.',
@@ -347,7 +347,7 @@ export default function Group4NotificationPage() {
                 src={GROUP4_HERO_IMAGE}
                 alt={t('heroImageAlt')}
                 width={1400}
-                height={700}
+                height={788}
                 className="block w-full"
                 // The hero IS the LCP element: fetch it ahead of the lazy route
                 // chunks rather than letting it arrive after first paint.
@@ -415,9 +415,9 @@ export default function Group4NotificationPage() {
                     href={GROUP4.notification.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="inline-flex items-center gap-1.5 text-brand-dark hover:underline"
+                    className="inline-flex min-h-[40px] items-center gap-1.5 text-brand-dark hover:underline"
                   >
-                    tnpscexams.in <ExternalLink size={13} />
+                    apply.tnpscexams.in <ExternalLink size={13} />
                   </a>
                 </dd>
               </div>
@@ -427,7 +427,7 @@ export default function Group4NotificationPage() {
           {/* ─── Important dates ──────────────────────────────────────────── */}
           <Section id="dates" icon={CalendarDays} title={t('datesTitle')} tint={TINTS[1]}>
             <Scroller>
-              <table className="w-full min-w-[460px] border-collapse text-left">
+              <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-line">
                     <Th>{t('colEvent')}</Th>
@@ -476,8 +476,8 @@ export default function Group4NotificationPage() {
                   aria-pressed={band === b.key}
                   className={
                     band === b.key
-                      ? 'tamil rounded-full bg-brand px-3 py-1.5 font-heading text-xs font-bold text-white'
-                      : 'tamil rounded-full border border-line bg-card px-3 py-1.5 font-heading text-xs font-bold text-ink transition hover:border-brand/40 hover:text-brand-dark'
+                      ? 'tamil inline-flex min-h-[40px] items-center rounded-full bg-brand px-4 font-heading text-xs font-bold text-white'
+                      : 'tamil inline-flex min-h-[40px] items-center rounded-full border border-line bg-card px-4 font-heading text-xs font-bold text-ink transition hover:border-brand/40 hover:text-brand-dark'
                   }
                 >
                   {t(b.label)}
@@ -489,7 +489,43 @@ export default function Group4NotificationPage() {
               {t('vacShown')}: {posts.length} / {GROUP4.summary.totalPosts} · {num(shown)} {t('colVac').toLowerCase()}
             </p>
 
-            <Scroller className="mt-3">
+            {/* Phones get a card per post. A 46-row, 6-column table in a
+                horizontal scroller technically "works" at 320px, but the first
+                screenful is S.No and half a post name — the vacancy count, the
+                thing people came for, is two swipes off-screen. */}
+            <ul className="mt-3 space-y-2 sm:hidden">
+              {posts.map((p) => (
+                <li key={p.postCode} className="rounded-field border border-line bg-card p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-heading text-sm font-bold text-ink">{p.name}</p>
+                    <span className="shrink-0 rounded-full bg-tint-violet px-2.5 py-1 font-heading text-sm font-bold text-brand">
+                      {num(p.vacancies)}
+                    </span>
+                  </div>
+                  <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-body text-xs text-ink2">
+                    <div className="flex gap-1.5">
+                      <dt className="tamil font-medium">{t('colCode')}:</dt>
+                      <dd>{p.postCode}</dd>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <dt className="tamil font-medium">{t('colPay')}:</dt>
+                      <dd>{p.payLevel}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-1.5 font-body text-xs leading-relaxed text-ink2">{p.service}</p>
+                  <p className="mt-1.5 font-body text-xs leading-relaxed text-ink2">{p.qualification}</p>
+                  {p.note && <p className="mt-1 font-body text-xs italic leading-relaxed text-ink2">{p.note}</p>}
+                </li>
+              ))}
+            </ul>
+            {band === 'all' && (
+              <p className="mt-3 flex items-center justify-between rounded-field bg-tint-violet px-3 py-2.5 font-heading text-sm font-bold text-ink sm:hidden">
+                <span className="tamil">{t('vacTotal')}</span>
+                <span>{num(GROUP4.summary.totalVacancies)}</span>
+              </p>
+            )}
+
+            <Scroller className="mt-3 hidden sm:block">
               <table className="w-full min-w-[720px] border-collapse text-left">
                 <thead>
                   <tr className="border-b border-line">
@@ -560,7 +596,7 @@ export default function Group4NotificationPage() {
           <Section id="pattern" icon={FileText} title={t('patternTitle')} tint={TINTS[0]}>
             <p className="tamil font-body text-[15px] leading-relaxed text-ink2">{t('patternLead')}</p>
             <Scroller className="mt-4">
-              <table className="w-full min-w-[520px] border-collapse text-left">
+              <table className="w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b border-line">
                     <Th>{t('colPart')}</Th>
@@ -577,7 +613,7 @@ export default function Group4NotificationPage() {
                         {p.subject}
                         {p.standard && <span className="block font-body text-xs text-ink2">{p.standard} standard</span>}
                       </Td>
-                      <Td className="text-right">{p.questions}</Td>
+                      <Td className="whitespace-nowrap text-right">{p.questions}</Td>
                       <Td className="text-right">{i === 0 ? p.marks : i === 1 ? t('partBcMarks') : ''}</Td>
                     </tr>
                   ))}
@@ -787,14 +823,17 @@ function Section({
 function Scroller({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`overflow-x-auto rounded-card border border-line ${className}`}>
-      <div className="min-w-full p-1">{children}</div>
+      <div className="min-w-full">{children}</div>
     </div>
   )
 }
 
 function Th({ children, className = '' }: { children?: React.ReactNode; className?: string }) {
   return (
-    <th scope="col" className={`tamil px-3 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-ink2 ${className}`}>
+    <th
+      scope="col"
+      className={`tamil px-2 py-2.5 font-heading text-xs font-bold text-ink2 sm:px-3 sm:uppercase sm:tracking-wide ${className}`}
+    >
       {children}
     </th>
   )
@@ -810,7 +849,7 @@ function Td({
   colSpan?: number
 }) {
   return (
-    <td colSpan={colSpan} className={`px-3 py-2.5 font-body text-sm text-ink2 ${className}`}>
+    <td colSpan={colSpan} className={`px-2 py-2.5 font-body text-sm text-ink2 sm:px-3 ${className}`}>
       {children}
     </td>
   )

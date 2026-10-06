@@ -9,7 +9,7 @@
     "notificationNo": "11/2026",
     "notificationDate": "2026-10-06",
     "year": 2026,
-    "applyUrl": "https://www.tnpscexams.in",
+    "applyUrl": "https://apply.tnpscexams.in/",
     "officialWebsite": "https://www.tnpsc.gov.in",
     "applicationMode": "Online only",
     "helpline": "1800 419 0958",
@@ -277,7 +277,7 @@
 
   "applicationProcess": {
     "steps": [
-      "Complete One Time Registration (OTR) at www.tnpscexams.in",
+      "Complete One Time Registration (OTR) at apply.tnpscexams.in",
       "Link the Aadhaar number with the OTR (mandatory)",
       "Fill the online application for Combined Civil Services Examination - IV",
       "Choose the post option: All the Posts, or Posts other than Forest Guard with Driving Licence / Forest Watcher",

@@ -92,7 +92,7 @@ Most Group 4 posts need only a **pass in SSLC (10th standard)**, which makes thi
 | Exam mode | OMR, objective, single paper |
 | Total marks | 300 (200 questions, 3 hours) |
 | Application fee | Rs.100 (concession available) |
-| Apply at | tnpscexams.in |
+| Apply at | apply.tnpscexams.in |
 
 ---
 
@@ -195,7 +195,7 @@ Candidates may choose **two preferred centres** and will be allotted a venue in 
 
 ### H2 — How to Apply for TNPSC Group 4 2026
 
-1. Register on the **One Time Registration (OTR)** platform at `tnpscexams.in`. Aadhaar linking is mandatory.
+1. Register on the **One Time Registration (OTR)** platform at `apply.tnpscexams.in`. Aadhaar linking is mandatory.
 2. Log in and open the application for Combined Civil Services Examination - IV.
 3. Choose your post option — **All the Posts**, or **Posts other than Forest Guard with Driving Licence / Forest Watcher**. This choice decides whether you are considered for the Forest posts.
 4. Upload a photograph taken **on or after 6 October 2026** and a signature drawn inside a 6.0 × 2.0 cm box.
@@ -249,7 +249,7 @@ TNPSC Mentor is built for exactly this exam:
 The TNPSC Group 4 2026 notification announces **6,574 vacancies across 46 posts** in 26 services, corporations and boards. The largest single allotment is 2,610 Junior Assistant (Non Security) posts in the Tamil Nadu Ministerial Service, followed by 856 Typist posts and 422 Junior Assistant (Accounts) posts in the Tamil Nadu Power Distribution Corporation.
 
 **Q2. What is the last date to apply for TNPSC Group 4 2026, and when is the exam?**
-Online applications close on **5 November 2026 at 11.59 PM** at tnpscexams.in. A three-day correction window follows from 9 to 11 November 2026, after which no edits are allowed. The written examination is on **10 January 2027, from 9.30 A.M. to 12.30 P.M.**
+Online applications close on **5 November 2026 at 11.59 PM** at apply.tnpscexams.in. A three-day correction window follows from 9 to 11 November 2026, after which no edits are allowed. The written examination is on **10 January 2027, from 9.30 A.M. to 12.30 P.M.**
 
 **Q3. What is the minimum qualification and age limit for TNPSC Group 4 2026?**
 Most posts require only a **pass in SSLC (10th standard)**, held as on 6 October 2026. The usual age range is 18 to 30 years as on 1 July 2026 for candidates not belonging to the reserved communities, and up to 32 or 35 years for BC(OBCM)s, BCMs, MBCs/DCs, SCs, SC(A)s and STs. VAO and the Forest posts have a minimum age of 21, Executive Officer 25, and eleven corporation and board posts carry no maximum age limit.
