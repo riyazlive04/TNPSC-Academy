@@ -136,7 +136,7 @@ describe('planOnSale with Group 1 archived', () => {
     // were renamed in pricing.ts and not here, this suite would still pass every
     // test above while the archive silently stopped withdrawing anything.
     for (const plan of GROUP1_PLANS) {
-      expect(KNOWN_PLANS as readonly string[]).toContain(plan)
+      expect(KNOWN_PLANS.has(plan)).toBe(true)
     }
   })
 })
