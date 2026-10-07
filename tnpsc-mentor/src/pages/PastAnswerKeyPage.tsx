@@ -89,6 +89,7 @@ const T = {
   linkPyq1: { ta: 'குரூப் 1 PYQ', en: 'Group 1 Previous Year Questions' },
   linkPyq2: { ta: 'குரூப் 2 PYQ', en: 'Group 2 Previous Year Questions' },
   linkPyq4: { ta: 'குரூப் 4 PYQ', en: 'Group 4 Previous Year Questions' },
+  linkG4Notification: { ta: 'குரூப் 4 அறிவிப்பு 2026', en: 'Group 4 Notification 2026' },
   linkMaterials: { ta: 'படிப்புப் பொருட்கள்', en: 'Study Materials' },
 
   featuresTitle: { ta: 'TNPSC தயாரிப்புக்குத் தேவையான எல்லாமே ஒரே App-ல்', en: 'Everything you need for TNPSC, in one app' },
@@ -195,6 +196,7 @@ export default function PastAnswerKeyPage({ pastKey }: { pastKey: string }) {
   const sidebarLinks: { href: string; label: string }[] = [
     ...(hub.seriesLink ? [{ href: hub.seriesLink.href, label: hub.seriesLink.label[lang] }] : []),
     ...SIDEBAR_PYQ_LINKS.map((l) => ({ href: l.href, label: t(l.label) })),
+    { href: '/group-4-notification-2026', label: t('linkG4Notification') },
     { href: '/materials', label: t('linkMaterials') },
   ]
 

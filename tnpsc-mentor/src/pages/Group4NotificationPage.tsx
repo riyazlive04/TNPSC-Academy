@@ -208,7 +208,10 @@ const T = {
   },
 
   sidebarLinksTitle: { ta: 'தொடர்புடைய இணைப்புகள்', en: 'Related Links' },
-  linkPyq4: { ta: 'குரூப் 4 PYQ', en: 'Group 4 Previous Year Questions' },
+  linkArchive4_2025: { ta: 'குரூப் 4 2025 வினாத்தாள்', en: 'Group 4 2025 Question Paper' },
+  linkArchive4_2024: { ta: 'குரூப் 4 2024 வினாத்தாள்', en: 'Group 4 2024 Question Paper' },
+  linkArchiveAll: { ta: 'அனைத்து முந்தைய ஆண்டு வினாத்தாள்கள்', en: 'All Past Question Papers' },
+  linkPyq4: { ta: 'குரூப் 4 PYQ (App)', en: 'Group 4 Previous Year Questions (App)' },
   linkKey4: { ta: 'குரூப் 4 விடைக்குறிப்பு 2026', en: 'Group 4 Answer Key 2026' },
   linkPyq2: { ta: 'குரூப் 2 PYQ', en: 'Group 2 Previous Year Questions' },
   linkPyq1: { ta: 'குரூப் 1 PYQ', en: 'Group 1 Previous Year Questions' },
@@ -241,11 +244,15 @@ const BANDS: { key: QualBand; label: CopyKey }[] = [
   { key: 'degree', label: 'bandDegree' },
 ]
 
+// robots.txt disallows /test-arena, so every link that pointed there was a
+// dead end for a crawler: good for a signed-in reader, worth nothing to the
+// page. The archive pages below are public, indexable and about Group 4.
 const SIDEBAR_LINKS: { href: string; label: CopyKey }[] = [
-  { href: '/test-arena/pyq/group4', label: 'linkPyq4' },
+  { href: '/questions/past-papers/group-4-2025/', label: 'linkArchive4_2025' },
+  { href: '/questions/past-papers/group-4-2024/', label: 'linkArchive4_2024' },
   { href: '/tnpsc-group-4-answer-key-2026', label: 'linkKey4' },
-  { href: '/test-arena/pyq/group2', label: 'linkPyq2' },
-  { href: '/test-arena/pyq/group1', label: 'linkPyq1' },
+  { href: '/questions/past-papers/', label: 'linkArchiveAll' },
+  { href: '/test-arena/pyq/group4', label: 'linkPyq4' },
   { href: '/materials', label: 'linkMaterials' },
 ]
 
@@ -702,7 +709,10 @@ export default function Group4NotificationPage() {
               >
                 {t('ctaPrimary')} <ArrowRight size={16} className="shrink-0" />
               </a>
-              <a href="/test-arena/pyq/group4" className="btn-wrap btn-ghost tamil min-h-[48px] justify-center px-6 text-sm sm:w-auto">
+              <a
+                href="/questions/past-papers/group-4-2025/"
+                className="btn-wrap btn-ghost tamil min-h-[48px] justify-center px-6 text-sm sm:w-auto"
+              >
                 {t('ctaSecondary')}
               </a>
             </div>

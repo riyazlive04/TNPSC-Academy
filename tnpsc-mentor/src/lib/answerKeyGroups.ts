@@ -634,6 +634,10 @@ function otherExamsHtml(current: AnswerKeyGroupKey | null): string {
     `<h2>More TNPSC answer keys</h2><ul>` +
     hubs.map((h) => `<li>${link(h.path, `TNPSC ${h.examLabel} Answer Key 2026`)}</li>`).join('') +
     past.map((p) => `<li>${link(p.path, `TNPSC ${ANSWER_KEY_GROUPS[p.group].examLabel} Answer Key ${p.year}`)}</li>`).join('') +
+    // The Group 4 notification page was an orphan - in the sitemap and
+    // nowhere else - so nothing on the site passed it any authority. These
+    // ten answer-key pages are the closest indexable neighbours it has.
+    `<li>${link('/group-4-notification-2026', 'TNPSC Group 4 Notification 2026: 6,574 vacancies')}</li>` +
     `</ul>`
   )
 }

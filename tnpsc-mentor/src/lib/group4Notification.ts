@@ -359,9 +359,12 @@ export function group4NotificationStaticHtml(): string {
   p.push(
     `<h2>Start your Group 4 preparation today</h2>`,
     `<p>Practise TNPSC Group 4 previous year questions, take full-length mock tests in the real 200-question OMR pattern, and revise daily current affairs in Tamil and English on TNPSC Mentors.</p><ul>`,
-    `<li>${link('/test-arena/pyq/group4', 'TNPSC Group 4 previous year question papers')}</li>`,
+    // These must be paths robots.txt allows; /test-arena is disallowed, so a
+    // link there is invisible to a crawler however useful it is to a reader.
+    `<li>${link('/questions/past-papers/group-4-2025/', 'TNPSC Group 4 2025 question paper with answers')}</li>`,
+    `<li>${link('/questions/past-papers/group-4-2024/', 'TNPSC Group 4 2024 question paper with answers')}</li>`,
+    `<li>${link('/questions/past-papers/', 'All TNPSC past question papers')}</li>`,
     `<li>${link('/tnpsc-group-4-answer-key-2026', 'TNPSC Group 4 answer key 2026')}</li>`,
-    `<li>${link('/register', 'Create a free account and start practising')}</li>`,
     `</ul>`,
   )
 
