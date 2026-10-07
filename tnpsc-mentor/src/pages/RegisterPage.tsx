@@ -71,11 +71,21 @@ const STRENGTH_META: { key: StringKey; color: string }[] = [
 export default function RegisterPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { signUp, sendSignupOtp, verifySignupOtp, startTelegramVerify, checkTelegramVerify } =
+  const {
+    signUp,
+    sendSignupOtp,
+    verifySignupOtp,
+    checkWhatsappNumber,
+    startTelegramVerify,
+    checkTelegramVerify,
+  } =
     useAuth()
   const { t } = useT()
   const setLang = useLanguageStore((s) => s.setLang)
   const isSignupWaOtpConfigured = useAuthConfigStore((s) => s.whatsappOtp)
+  // The no-code gate. Server-side exclusive with whatsappOtp (it only
+  // advertises this one when the OTP isn't armed), so the two never both apply.
+  const isWaCheckConfigured = useAuthConfigStore((s) => s.whatsappCheck)
   const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
   const isGoogleConfigured = useIsGoogleConfigured()
 
@@ -266,6 +276,35 @@ export default function RegisterPage() {
     return true
   }
 
+  /** No-code gate: confirm the number has a WhatsApp account, then create the
+   * account in the SAME submit. The user types nothing extra — the only visible
+   * outcomes are the dashboard or a "this number has no WhatsApp" block. */
+  const runWhatsappCheck = async () => {
+    const res = await checkWhatsappNumber(form.phone.trim())
+    if (res.phoneTaken) {
+      setError(t('errPhoneRegistered'))
+      return
+    }
+    if (res.noWhatsApp) {
+      setError(t('waOtpNoWhatsApp'))
+      // The hard block. Telegram is the only way past it without changing the
+      // number, and it proves the phone a different way for the same ticket.
+      if (isTelegramVerifyConfigured) setOfferTelegram(true)
+      track('signup_wa_check_failed', { reason: 'no_whatsapp' })
+      return
+    }
+    if (res.error || !res.ticket) {
+      const f = friendlyAuthError(res.error ?? '')
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+      return
+    }
+    // Remember it so fixing an unrelated error (duplicate email, weak password)
+    // and resubmitting the SAME number doesn't spend another gateway call.
+    setVerified({ phone: tenDigits(form.phone), ticket: res.ticket })
+    track('signup_wa_check_passed')
+    await doSignUp(res.ticket)
+  }
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setTouched(true)
@@ -293,16 +332,18 @@ export default function RegisterPage() {
 
     track('signup_form_submit')
     setLoading(true)
-    if (!isSignupWaOtpConfigured) {
-      // Feature off: single-step signup, exactly as before.
+    if (!isSignupWaOtpConfigured && !isWaCheckConfigured) {
+      // Both gates off: single-step signup, exactly as before.
       await doSignUp()
     } else if (verified && verified.phone === tenDigits(form.phone)) {
-      // This exact number already passed the OTP — no second prompt.
+      // This exact number already cleared the gate — don't make them do it twice.
       await doSignUp(verified.ticket)
-    } else {
+    } else if (isSignupWaOtpConfigured) {
       setOtp('')
       setOtpInfo('')
       await sendCode()
+    } else {
+      await runWhatsappCheck()
     }
     setLoading(false)
   }
@@ -640,10 +681,12 @@ export default function RegisterPage() {
               inputMode="numeric"
               invalid={touched && !!form.phone && !isValidIndianMobile(form.phone)}
             />
-            {isSignupWaOtpConfigured && (
+            {(isSignupWaOtpConfigured || isWaCheckConfigured) && (
               <p className="tamil mt-1.5 flex items-start gap-1.5 font-body text-xs leading-relaxed text-ink2">
                 <ShieldCheck size={13} className="mt-0.5 flex-shrink-0 text-mint" />
-                {t('whatsappNumberHint')}
+                {isSignupWaOtpConfigured
+                  ? t('whatsappNumberHint')
+                  : t('whatsappNumberCheckHint')}
               </p>
             )}
           </div>
@@ -755,7 +798,12 @@ export default function RegisterPage() {
             {loading
               ? isSignupWaOtpConfigured
                 ? t('sendingOtp')
-                : t('registeringFree')
+                : // The check runs and the account is created in one submit, so
+                  // "Checking…" covers the only part the user is waiting on
+                  // that isn't already the account being made.
+                  isWaCheckConfigured
+                  ? t('verifyingOtp')
+                  : t('registeringFree')
               : t('registerForFree')}
           </button>
         </form>

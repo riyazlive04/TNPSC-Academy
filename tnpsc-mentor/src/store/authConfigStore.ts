@@ -20,6 +20,7 @@ export interface AuthConfigState extends AuthConfig {
 export const useAuthConfigStore = create<AuthConfigState>((set, get) => ({
   google: false,
   whatsappOtp: false,
+  whatsappCheck: false,
   telegramVerify: false,
   phoneOtp: false,
   loaded: false,

@@ -44,6 +44,7 @@ export function useAuth() {
   const signUp = useAuthStore((s) => s.signUp)
   const sendSignupOtp = useAuthStore((s) => s.sendSignupOtp)
   const verifySignupOtp = useAuthStore((s) => s.verifySignupOtp)
+  const checkWhatsappNumber = useAuthStore((s) => s.checkWhatsappNumber)
   const startTelegramVerify = useAuthStore((s) => s.startTelegramVerify)
   const checkTelegramVerify = useAuthStore((s) => s.checkTelegramVerify)
   const signOut = useAuthStore((s) => s.signOut)
@@ -79,6 +80,7 @@ export function useAuth() {
     signUp,
     sendSignupOtp,
     verifySignupOtp,
+    checkWhatsappNumber,
     startTelegramVerify,
     checkTelegramVerify,
     signOut,

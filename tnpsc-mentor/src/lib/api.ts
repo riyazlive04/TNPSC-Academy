@@ -68,6 +68,12 @@ export const isApiConfigured = Boolean(import.meta.env.VITE_API_URL)
 export interface AuthConfig {
   google: boolean
   whatsappOtp: boolean
+  /** The no-code WhatsApp gate: the server can ask its Evolution gateway
+   * whether a number is on WhatsApp, so signup verifies REACHABILITY with one
+   * silent call and nothing for the user to type. Mutually exclusive with
+   * whatsappOtp — the server only advertises this when the OTP (which proves
+   * ownership, and so outranks it) is not armed. */
+  whatsappCheck: boolean
   telegramVerify: boolean
   phoneOtp: boolean
 }
@@ -564,9 +570,10 @@ export const api = {
     // ─── Signup phone verification (WhatsApp OTP) ─────────────────────────────
     /** Send a WhatsApp code to a number being registered. Throws ApiError with
      * 'phone_already_registered' (409) or 'otp_cooldown' (429).
-     * ('phone_no_whatsapp' (404) is legacy: the official WhatsApp API behind
-     * AiSensy has no exists-on-WhatsApp lookup, so the server no longer emits
-     * it — the store/pages keep their handling as a harmless dead path.) */
+     * (This OTP path never emits 'phone_no_whatsapp' (404): the official
+     * WhatsApp API has no exists-on-WhatsApp lookup. Only
+     * registerWhatsappCheck can, so the pages' no-WhatsApp handling is live
+     * under that gate and dead under this one.) */
     async registerOtpSend(phone: string): Promise<{ ok: true }> {
       return request('/api/auth/register/otp/send', {
         method: 'POST',
@@ -582,6 +589,19 @@ export const api = {
         method: 'POST',
         auth: false,
         body: { phone, otp },
+      })
+    },
+    /** Ask whether a number being registered is on WhatsApp. On success the
+     * returned ticket is the one register() needs — there is no code to type.
+     * `checked` is false when the gateway could not be reached and the server
+     * passed the number through unverified (it fails open on purpose).
+     * Throws ApiError with 'phone_already_registered' (409) or
+     * 'phone_no_whatsapp' (404 — the number has no WhatsApp account). */
+    async registerWhatsappCheck(phone: string): Promise<{ ticket: string; checked: boolean }> {
+      return request('/api/auth/register/whatsapp/check', {
+        method: 'POST',
+        auth: false,
+        body: { phone },
       })
     },
     /** Telegram fallback (numbers with no WhatsApp): start a verification and

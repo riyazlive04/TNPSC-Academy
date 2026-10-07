@@ -128,6 +128,15 @@ export interface AuthState {
     noWhatsApp?: boolean
     cooldown?: boolean
   }>
+  /** Signup no-code WhatsApp gate: ask whether the number is on WhatsApp. On
+   * success `ticket` is the proof signUp must carry — there is no code step.
+   * `noWhatsApp` is the hard block the Telegram fallback exists for. */
+  checkWhatsappNumber: (phone: string) => Promise<{
+    error: string | null
+    ticket?: string
+    phoneTaken?: boolean
+    noWhatsApp?: boolean
+  }>
   /** Signup WhatsApp-OTP: verify the code. Success carries the ticket signUp
    * must include; `dead` means the code can't be retried (expired/attempts spent)
    * so the UI should send the user back to "resend". */
@@ -418,6 +427,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (code === 'phone_no_whatsapp') return { error: null, noWhatsApp: true }
       if (code === 'otp_cooldown') return { error: null, cooldown: true }
       return { error: code || 'Could not send the code' }
+    }
+  },
+
+  checkWhatsappNumber: async (phone) => {
+    try {
+      const { ticket } = await api.auth.registerWhatsappCheck(phone)
+      return { error: null, ticket }
+    } catch (e) {
+      const code = e instanceof Error ? e.message : ''
+      if (code === 'phone_already_registered') return { error: null, phoneTaken: true }
+      if (code === 'phone_no_whatsapp') return { error: null, noWhatsApp: true }
+      return { error: code || 'Could not check the number' }
     }
   },
 

@@ -8,6 +8,13 @@
 > `server/.env.example`. The flow, ticket gate and Telegram fallback below
 > are unchanged. The AiSensy setup steps are kept only as history.
 
+> **There is now a second, no-code gate: see
+> [WHATSAPP-CHECK.md](WHATSAPP-CHECK.md).** It asks an Evolution gateway whether
+> a number is *on* WhatsApp instead of sending a code — reachability only, no
+> ownership proof, nothing for the user to type. The two are mutually exclusive:
+> whenever the `WASI_*` vars below are set, the OTP described here wins and the
+> check is ignored.
+
 Signup verifies that the aspirant **owns** the mobile number they register:
 a 6-digit code is sent to that number **on WhatsApp**, and the account is only
 created after the code checks out. Delivery goes through
@@ -53,11 +60,12 @@ claims ownership.
   guess budget in `phone_otps` itself.
 - Code storage: HMAC-SHA256 keyed with the service-role key, phone bound in.
   Plaintext codes never touch the DB or logs.
-- **No pre-send WhatsApp lookup.** The official API (unlike the old Evolution
-  gateway) cannot ask "is this number on WhatsApp?". A WhatsApp-less number is
-  accepted by `/register/otp/send` and simply never receives the message —
-  the old `phone_no_whatsapp` (404) error is no longer emitted (the client
-  still handles it as a harmless dead path).
+- **No pre-send WhatsApp lookup on THIS path.** The official API cannot ask "is
+  this number on WhatsApp?", so a WhatsApp-less number is accepted by
+  `/register/otp/send` and simply never receives the message; `/register/otp/send`
+  never emits `phone_no_whatsapp` (404). The Evolution gateway *can* answer that
+  question, which is the whole of [WHATSAPP-CHECK.md](WHATSAPP-CHECK.md) — under
+  that gate the client's no-WhatsApp handling is live rather than a dead path.
 
 ## One-time setup in AiSensy
 

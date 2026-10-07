@@ -41,10 +41,11 @@ const RESEND_COOLDOWN_S = 45
  * gate in ProtectedRoute never sends them here. A default target group is still
  * submitted to keep group-derived logic working, but it isn't shown to the user.
  *
- * Phone ownership is proven the same way signup proves it: when the WhatsApp
- * OTP feature is live, PATCH /api/profile demands the same phone-verified
- * ticket /register does, so the form flips to a code-entry step (with the
- * Telegram fallback for numbers that have no WhatsApp) before saving.
+ * The phone clears the same gate signup uses: whenever one is armed, PATCH
+ * /api/profile demands the same phone-verified ticket /register does. Under the
+ * WhatsApp OTP that means flipping to a code-entry step; under the no-code
+ * Evolution check it means one silent lookup inside the save (with the Telegram
+ * fallback for numbers that have no WhatsApp in either case).
  */
 export default function CompleteProfilePage() {
   const navigate = useNavigate()
@@ -57,6 +58,7 @@ export default function CompleteProfilePage() {
     profile,
     sendSignupOtp,
     verifySignupOtp,
+    checkWhatsappNumber,
     startTelegramVerify,
     checkTelegramVerify,
     signOut,
@@ -65,6 +67,8 @@ export default function CompleteProfilePage() {
   const needsOnboarding = useAuthStore(selectProfileNeedsOnboarding)
   const { t } = useT()
   const isSignupWaOtpConfigured = useAuthConfigStore((s) => s.whatsappOtp)
+  // The no-code gate; server-side exclusive with whatsappOtp (see RegisterPage).
+  const isWaCheckConfigured = useAuthConfigStore((s) => s.whatsappCheck)
   const isTelegramVerifyConfigured = useAuthConfigStore((s) => s.telegramVerify)
 
   const [phone, setPhone] = useState(profile?.phone ?? '')
@@ -159,6 +163,28 @@ export default function CompleteProfilePage() {
     return true
   }
 
+  /** No-code gate: confirm the number has a WhatsApp account, then save in the
+   * SAME submit — nothing for the user to type. Mirrors RegisterPage. */
+  const runWhatsappCheck = async () => {
+    const res = await checkWhatsappNumber(phone.trim())
+    if (res.phoneTaken) {
+      setError(t('phoneAlreadyRegistered'))
+      return
+    }
+    if (res.noWhatsApp) {
+      setError(t('waOtpNoWhatsApp'))
+      if (isTelegramVerifyConfigured) setOfferTelegram(true)
+      return
+    }
+    if (res.error || !res.ticket) {
+      const f = friendlyAuthError(res.error ?? '')
+      setError(f.key ? t(f.key) : f.text ?? t('errServerUnreachable'))
+      return
+    }
+    setVerified({ phone: tenDigits(phone), ticket: res.ticket })
+    await saveProfile(res.ticket)
+  }
+
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     setTouched(true)
@@ -168,16 +194,18 @@ export default function CompleteProfilePage() {
     if (!isValidIndianMobile(phone)) return setError(t('errMobileInvalid'))
 
     setSaving(true)
-    if (!isSignupWaOtpConfigured) {
-      // Feature off: single-step save, exactly as before.
+    if (!isSignupWaOtpConfigured && !isWaCheckConfigured) {
+      // Both gates off: single-step save, exactly as before.
       await saveProfile()
     } else if (verified && verified.phone === tenDigits(phone)) {
-      // This exact number already passed the OTP — no second prompt.
+      // This exact number already cleared the gate — no second prompt.
       await saveProfile(verified.ticket)
-    } else {
+    } else if (isSignupWaOtpConfigured) {
       setOtp('')
       setOtpInfo('')
       await sendCode()
+    } else {
+      await runWhatsappCheck()
     }
     setSaving(false)
   }
@@ -493,10 +521,12 @@ export default function CompleteProfilePage() {
                 aria-invalid={(touched && !isValidIndianMobile(phone)) || undefined}
                 onChange={(e) => updatePhone(e.target.value)}
               />
-              {isSignupWaOtpConfigured && (
+              {(isSignupWaOtpConfigured || isWaCheckConfigured) && (
                 <p className="tamil mt-1.5 flex items-start gap-1.5 font-body text-xs leading-relaxed text-ink2">
                   <ShieldCheck size={13} className="mt-0.5 flex-shrink-0 text-mint" />
-                  {t('whatsappNumberHint')}
+                  {isSignupWaOtpConfigured
+                    ? t('whatsappNumberHint')
+                    : t('whatsappNumberCheckHint')}
                 </p>
               )}
             </div>
@@ -546,7 +576,9 @@ export default function CompleteProfilePage() {
               {saving
                 ? isSignupWaOtpConfigured
                   ? t('sendingOtp')
-                  : t('sending')
+                  : isWaCheckConfigured
+                    ? t('verifyingOtp')
+                    : t('sending')
                 : t('saveContinue')}
             </button>
           </form>

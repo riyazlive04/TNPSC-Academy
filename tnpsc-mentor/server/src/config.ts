@@ -92,6 +92,23 @@ export const config = {
   wasiApiKey: process.env.WASI_API_KEY ?? '',
   wasiClientId: process.env.WASI_CLIENT_ID ?? '',
   wasiOtpTemplate: process.env.WASI_OTP_TEMPLATE ?? '',
+  // ─── Evolution GO — "is this number on WhatsApp?" check (optional) ──────────
+  // An unofficial WhatsApp Web (Baileys) gateway with a QR-paired number, used
+  // for ONE call: the exists-on-WhatsApp lookup that Meta’s official API does
+  // not offer, which lets signup refuse a number we could never message (see
+  // lib/whatsappCheck.ts). This is a reachability gate, NOT ownership proof —
+  // it sends no code and verifies no identity.
+  // KEY is the INSTANCE's own token (Evolution GO routes the call by token, so
+  // the instance is never named in the request). It is NOT the host’s global
+  // admin apikey — that one is rejected by /user/check anyway, and it can read
+  // and control every instance on the host, so it must never live here.
+  // INSTANCE is optional and purely a log label, so `grep wa-check` says which
+  // pairing is failing; it is not sent anywhere.
+  // With the key blank the check endpoint returns 503 and signup behaves
+  // exactly as before.
+  evolutionBaseUrl: process.env.EVOLUTION_BASE_URL ?? 'https://chat.sirahagents.com',
+  evolutionApiKey: process.env.EVOLUTION_API_KEY ?? '',
+  evolutionInstance: process.env.EVOLUTION_INSTANCE ?? '',
   // ─── Telegram bot — signup phone verification fallback (optional) ───────────
   // For numbers with no WhatsApp: the user opens this bot via a one-time deep
   // link and shares their Telegram-verified phone number, which must match the
@@ -169,6 +186,18 @@ export const msg91Enabled = Boolean(config.msg91AuthKey && config.msg91OtpTempla
 export const whatsappOtpEnabled = Boolean(
   config.wasiApiKey && config.wasiClientId && config.wasiOtpTemplate
 )
+
+/** True when the Evolution gateway is configured — gates the signup
+ * exists-on-WhatsApp check AND makes /register require a verified-phone ticket.
+ * Ignored when whatsappOtpEnabled is also on: real ownership proof (the OTP)
+ * outranks a mere reachability check, so that path wins. */
+export const whatsappCheckEnabled = Boolean(config.evolutionApiKey)
+
+/** True when a phone must clear SOME verification before /register and
+ * PATCH /api/profile will accept it — either the WhatsApp OTP (ownership) or
+ * the Evolution reachability check. Both hand back the same `pv` ticket, so
+ * every gate downstream stays identical whichever one is armed. */
+export const phoneVerifyRequired = whatsappOtpEnabled || whatsappCheckEnabled
 
 /** True when the Telegram bot is configured — gates the Telegram fallback for
  * signup phone verification (/api/telegram). */

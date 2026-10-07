@@ -1885,6 +1885,12 @@ const STRINGS = {
     en: 'A 6-digit code will be sent to this number on WhatsApp.',
     ta: 'இந்த எண்ணுக்கு WhatsApp-இல் 6-இலக்க குறியீடு அனுப்பப்படும்.',
   },
+  // Shown instead of whatsappNumberHint under the no-code gate: nothing is sent
+  // and there is nothing to type, so promising a code would be a lie.
+  whatsappNumberCheckHint: {
+    en: "We'll check this number is on WhatsApp. No code to type.",
+    ta: 'இந்த எண் WhatsApp-இல் உள்ளதா எனச் சரிபார்ப்போம். குறியீடு தேவையில்லை.',
+  },
   errWhatsappRequired: {
     en: 'Please enter the 10-digit mobile number that has WhatsApp.',
     ta: 'WhatsApp உள்ள 10-இலக்க கைபேசி எண்ணை உள்ளிடவும்.',

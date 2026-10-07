@@ -9,6 +9,8 @@ import {
   googleEnabled,
   msg91Enabled,
   whatsappOtpEnabled,
+  whatsappCheckEnabled,
+  phoneVerifyRequired,
   telegramVerifyEnabled,
 } from '../config.js'
 import { requireAuth, requireAdmin, type AuthedRequest } from '../middleware/auth.js'
@@ -36,6 +38,7 @@ import {
   verifyTotpStepUpTicket,
 } from '../lib/otpTicket.js'
 import { sendSignupOtp, verifySignupOtp } from '../lib/whatsappOtp.js'
+import { isOnWhatsApp } from '../lib/whatsappCheck.js'
 import {
   generateSecret,
   verifyToken as verifyTotpToken,
@@ -278,6 +281,10 @@ router.get(
     res.json({
       google: googleEnabled,
       whatsappOtp: whatsappOtpEnabled,
+      // The reachability check is only advertised when it is the gate actually
+      // in force — with the OTP armed, ownership proof supersedes it and the
+      // client must render the code-entry step, not the silent check.
+      whatsappCheck: whatsappCheckEnabled && !whatsappOtpEnabled,
       telegramVerify: telegramVerifyEnabled,
       phoneOtp: msg91Enabled,
     })
@@ -408,12 +415,78 @@ async function emailStatus(email: string): Promise<'none' | 'google' | 'password
 // number's WhatsApp, verify it, and hand back a short-lived signed ticket that
 // /register then requires. Reuses the login-OTP rate limiters (phone+IP).
 
+/** Exists-on-WhatsApp lookups per IP. Keyed on the IP ALONE, not phone+IP like
+ * the OTP limiters: the thing being bounded here is someone sweeping a range of
+ * numbers to learn which are on WhatsApp (and burning gateway calls, which is
+ * what gets a Baileys-paired number flagged). A phone+IP key would let one
+ * client check unlimited DISTINCT numbers, which is precisely the abuse. */
+const waCheckLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: false,
+  message: { error: 'Too many checks. Please wait a while and try again.' },
+})
+
+// POST /api/auth/register/whatsapp/check — "can we message this number?"
+// The no-OTP gate: instead of sending a code and asking the user to type it
+// back, ask the Evolution gateway whether a WhatsApp account exists for the
+// number and issue the SAME `pv` ticket /register demands when it does. One
+// round trip, nothing for the user to type.
+//
+// What this does NOT do is prove ownership — any number that happens to be on
+// WhatsApp passes, whoever types it. It guarantees reachability (no typos, no
+// landlines, no numbers that would silently swallow every notification), which
+// is the stated reason the number is collected. Arming the Wasi OTP vars
+// restores real ownership proof and takes precedence over this route.
+router.post(
+  '/register/whatsapp/check',
+  waCheckLimiter,
+  asyncH(async (req, res) => {
+    // Mirrors the OTP endpoints' 503: not configured means the whole phone gate
+    // is off and /register is not asking for a ticket either.
+    if (!whatsappCheckEnabled) {
+      return res.status(503).json({ error: 'Phone verification is not configured' })
+    }
+    const phone = normalizeMobile(typeof req.body?.phone === 'string' ? req.body.phone : '')
+    if (!phone) return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
+    // Same pre-reject as /register/otp/send: a number already on an account
+    // can't be registered anyway, so say so before spending a gateway call.
+    if (await phoneTakenByOther(phone)) {
+      return res.status(409).json({ error: 'phone_already_registered' })
+    }
+
+    const verdict = await isOnWhatsApp(phone)
+    if (verdict === 'no') {
+      // The one hard block: the client shows "this number has no WhatsApp" and
+      // offers the Telegram fallback, which issues the same ticket by proving
+      // ownership a different way.
+      return res.status(404).json({ error: 'phone_no_whatsapp' })
+    }
+    if (verdict === 'unknown') {
+      // FAIL OPEN, deliberately. 'unknown' means the gateway did not answer —
+      // bad key, wrong instance name, or (most often) the paired number logged
+      // out and the QR needs re-scanning. Failing CLOSED there would stop every
+      // signup in the product the moment a WhatsApp Web session drops, which is
+      // a far worse outcome than letting through the rare unreachable number;
+      // this codebase has already lost a day of signups to a verification
+      // dependency that failed closed (the HIBP block, Aug 2026).
+      // The cost is that a silently-dead gateway means a silently-OFF gate, so
+      // this logs loudly: `pm2 logs tnpsc-api --nostream | grep wa-check`.
+      console.error('[wa-check] UNVERIFIED PASS — gateway gave no answer for', phone)
+    }
+    res.json({ ticket: issuePhoneVerifyTicket(phone), checked: verdict === 'yes' })
+  })
+)
+
 // POST /api/auth/register/otp/send — deliver a code to a number being signed up.
 // Only for numbers NOT yet on an account (mirror of /otp/send, which is only for
 // numbers that ARE) — rejecting here saves a message and matches what /register
 // would say anyway. Note: the official WhatsApp API has no "is this number on
 // WhatsApp" lookup, so a WhatsApp-less number is accepted here and simply never
-// receives the message (the old Evolution gateway could pre-reject those).
+// receives the message. /register/whatsapp/check above CAN pre-reject those,
+// via the Evolution gateway — but only one of the two gates is ever in force.
 router.post(
   '/register/otp/send',
   otpSendLimiter,
@@ -486,10 +559,11 @@ router.post(
     if (normalizedPhone && (await phoneTakenByOther(normalizedPhone))) {
       return res.status(409).json({ error: 'phone_already_registered' })
     }
-    // WhatsApp-OTP gate: when configured, an account can only be created with a
-    // phone whose ownership was JUST proven (the /register/otp/verify ticket).
+    // Phone-verification gate: when either gate is configured, an account can
+    // only be created with a phone that JUST cleared it — the `pv` ticket from
+    // /register/otp/verify (ownership) or /register/whatsapp/check (reachable).
     // Enforced server-side — the client flow alone would be trivial to curl past.
-    if (whatsappOtpEnabled) {
+    if (phoneVerifyRequired) {
       if (!normalizedPhone) {
         console.log('[register-400]', 'invalid_phone', { rawPhone: phone })
         return res.status(400).json({ error: 'Enter a valid 10-digit mobile number' })
