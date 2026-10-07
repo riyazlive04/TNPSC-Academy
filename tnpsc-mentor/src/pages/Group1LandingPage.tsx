@@ -854,13 +854,17 @@ export default function Group1LandingPage() {
 
               <Reveal delay={0.15}>
                 <div className="mt-5 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                  <button
-                    onClick={() => handleSeriesClick('full')}
-                    className="btn-wrap btn-brand group px-6 py-3 text-sm sm:px-7 sm:py-3.5 sm:text-base"
-                  >
-                    <Rocket size={17} /> {t('ctaEnroll')}
-                    <ArrowRight size={17} className="transition-transform duration-200 group-hover:translate-x-1" />
-                  </button>
+                  {/* The schedule PDF beside this stays either way: it is a
+                      reference document about the papers, not an offer. */}
+                  {!g1Archived && (
+                    <button
+                      onClick={() => handleSeriesClick('full')}
+                      className="btn-wrap btn-brand group px-6 py-3 text-sm sm:px-7 sm:py-3.5 sm:text-base"
+                    >
+                      <Rocket size={17} /> {t('ctaEnroll')}
+                      <ArrowRight size={17} className="transition-transform duration-200 group-hover:translate-x-1" />
+                    </button>
+                  )}
                   <a
                     href={SCHEDULE_PDF_URL}
                     download={SCHEDULE_PDF_NAME}
@@ -1339,6 +1343,12 @@ export default function Group1LandingPage() {
       </section>
 
       {/* ─── FAQ ──────────────────────────────────────────────────────────── */}
+      {/* Every question here is about buying — what it costs, whether you can
+          pay in installments, how to pay, how long access lasts, refunds — so
+          the section goes as a whole once the exam is over rather than being
+          thinned out question by question. It also holds the last two prices
+          left on this page, quoted inside prose where they are easy to miss. */}
+      {!g1Archived && (
       <section className="border-t border-line bg-card">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
           <Reveal>
@@ -1363,6 +1373,7 @@ export default function Group1LandingPage() {
           </div>
         </div>
       </section>
+      )}
 
       {/* ─── Footer ───────────────────────────────────────────────────────── */}
       <footer className="border-t border-line bg-card">
