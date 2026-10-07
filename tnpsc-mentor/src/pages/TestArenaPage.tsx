@@ -24,6 +24,8 @@ import Couplet from '../components/Thirukural/Couplet'
 import OnboardingTour from '../components/Onboarding/OnboardingTour'
 import StarterTestPrompt from '../components/Onboarding/StarterTestPrompt'
 import MarathonFreeAlert from '../components/Onboarding/MarathonFreeAlert'
+import Group1RetiredAppBanner from '../components/TestSeries/Group1RetiredAppBanner'
+import { useGroup1Archived } from '../hooks/useGroup1Archived'
 import { loadKuralOfDay, splitCoupletEn, type Kural } from '../lib/thirukural'
 import CreditWall from '../components/UI/CreditWall'
 import IconTile, { type Tint } from '../components/UI/IconTile'
@@ -150,6 +152,7 @@ export default function TestArenaPage() {
   const testSeriesOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
   const targetG2On = useTargetG2Enabled()
+  const g1Archived = useGroup1Archived()
   // Which plans are on sale - gates the two priced discovery banners below.
   const sales = usePlanSales()
   const vettriOn = useVettriEnabled()
@@ -446,6 +449,28 @@ export default function TestArenaPage() {
             empty slot on a screen that otherwise cannot gain one without a
             release. */}
         <SduiSlot name="home.top" signals={sduiSignals} className="space-y-3" />
+
+        {/* Group 1 2026 is finished. This screen goes SILENT about that on its
+            own: the ₹399 strip below and the "test 1 is free" nudge are both
+            gated on their sale flags, so they just disappear, and a student who
+            had been working through those papers is left to guess where the
+            product went. The hub's paper grid explains itself, but only once you
+            have navigated to it — this says it where everyone lands.
+
+            The Buy-now tap opens the live Group II/IIA sheet directly, the same
+            as the priced strips below, so the next exam is one tap from
+            checkout. It is withheld from someone who already owns that series
+            (the notice then stands alone, which is still the news they need) —
+            pitching a plan to the person holding it reads as a double charge. */}
+        {g1Archived && (
+          <Group1RetiredAppBanner
+            onBuy={
+              rankBoosterOn && sales.rankBooster && !rbPurchase.rankBoosterUnlocked
+                ? () => rbPurchase.startEnroll()
+                : undefined
+            }
+          />
+        )}
 
         {/* Group 1 Mock Test Pack + Rank Booster discovery banners. Sit above
             the CA carousel: pricing/enrollment is the highest-intent content on

@@ -179,11 +179,17 @@ export default function TestSeriesPage() {
       .catch(() => undefined)
   }, [tab, overall])
 
-  // Where to send someone who has landed on the retired Group 1 papers: the
-  // first product tab that is still a live exam, in the hub's own left-to-right
-  // order. Null when nothing else is switched on, which drops the signpost
-  // rather than offering a link to a tab that is not there.
-  const nextLiveTab: HubTab | null = rankBoosterOn ? 'rankbooster' : targetG2On ? 'targetg2' : null
+  // The retired-Group-1 notice's button says "Buy now", so in here it has to
+  // actually open a checkout rather than just move to another tab — a button
+  // that names a purchase and delivers a tab switch is a bait. So it opens the
+  // live Group II/IIA sheet when that is genuinely buyable, and is withheld
+  // entirely otherwise (an owner needs no pitch, and with nothing on sale there
+  // is nothing to promise). The notice reads fine with no button: it is the
+  // "exam is over" sentence that matters.
+  const buyLiveSeries: (() => void) | undefined =
+    rankBoosterOn && sales.rankBooster && !rbPurchase.rankBoosterUnlocked
+      ? () => rbPurchase.startEnroll()
+      : undefined
 
   // `chip` marks a tab whose exam is behind us, so the capsule itself says which
   // product is live and which is history — otherwise the retired series reads as
@@ -473,10 +479,7 @@ export default function TestSeriesPage() {
                   of its own — it is shared with the live Group 2 mocks — so the
                   notice does the explaining here. */}
               {g1Archived && (
-                <Group1ArchivedNotice
-                  className="mb-4"
-                  onNext={nextLiveTab ? () => goTo(nextLiveTab, 'series') : undefined}
-                />
+                <Group1ArchivedNotice className="mb-4" onNext={buyLiveSeries} />
               )}
               <FullMockExamList />
             </>
@@ -488,7 +491,7 @@ export default function TestSeriesPage() {
               onLockedTap={() => upsell.bundle()}
               previewLocked={previewAsStudent}
               archived={g1Archived}
-              onArchivedNext={nextLiveTab ? () => goTo(nextLiveTab, 'series') : undefined}
+              onArchivedNext={buyLiveSeries}
               offerEnabled={sales.vettri || sales.premium}
               paywallCards={
                 <>

@@ -49,7 +49,6 @@ export default function Group1RetiredBanner({
 
         {nextHref && (
           <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
-            <p className="tamil font-body text-xs text-muted">{t('g1ArchivedNext')}</p>
             <a
               href={nextHref}
               className="btn-wrap press inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 sm:w-auto"

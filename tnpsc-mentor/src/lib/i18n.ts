@@ -908,12 +908,10 @@ const STRINGS = {
     ta: 'இந்தத் தாள்கள் பயிற்சிக்கு தொடர்ந்து திறந்திருக்கும். குரூப் 1 2026 தொடர் இனி விற்பனையில் இல்லை.',
   },
   // Points someone who landed on retired Group 1 content at an exam that is
-  // still ahead of them, so the dead end becomes a next step.
-  g1ArchivedNext: {
-    en: 'Preparing for Group 2 / 2A? See the live test series.',
-    ta: 'குரூப் 2 / 2A-க்கு தயாராகிறீர்களா? நடப்புத் தேர்வுத் தொடரைப் பாருங்கள்.',
-  },
-  g1ArchivedNextCta: { en: 'View live series', ta: 'நடப்புத் தொடரைப் பார்' },
+  // still ahead of them, so the dead end becomes a next step. Deliberately bare:
+  // the notice beside it already says Group 1 is over, so the button only has to
+  // say what happens when you press it.
+  g1ArchivedNextCta: { en: 'Buy now', ta: 'இப்போதே வாங்கு' },
   // Superadmin console only (never shown to a student), hence English-leaning
   // copy in both slots — the console is operated by staff, and a mistranslated
   // switch here is a worse outcome than an untranslated one.
