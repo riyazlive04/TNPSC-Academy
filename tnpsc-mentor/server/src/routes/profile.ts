@@ -3,8 +3,9 @@ import { asyncH, sendDbError, isMissingFunction } from '../util.js'
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js'
 import { normalizeMobile } from '../lib/msg91.js'
 import { phoneTakenByOther } from '../lib/phone.js'
-import { phoneVerifyRequired } from '../config.js'
+import { phoneVerifyRequired, whatsappOtpEnabled } from '../config.js'
 import { verifyPhoneVerifyTicket } from '../lib/otpTicket.js'
+import { isOnWhatsApp } from '../lib/whatsappCheck.js'
 import { supabaseAdmin } from '../supabase.js'
 import { notifyAdmins } from '../notify.js'
 
@@ -93,7 +94,27 @@ router.patch(
       if (ten && phoneVerifyRequired) {
         const ticketPhone = verifyPhoneVerifyTicket(String(req.body?.phoneTicket ?? ''))
         if (ticketPhone !== ten) {
-          return res.status(403).json({ error: 'phone_not_verified' })
+          // Mirrors /register exactly: the OTP gate has no fallback (only the
+          // user can supply the code), but the no-code check gate can ask the
+          // gateway itself, which is what keeps older app bundles — that know
+          // nothing about the check endpoint — able to finish a Google signup.
+          if (whatsappOtpEnabled) {
+            return res.status(403).json({ error: 'phone_not_verified' })
+          }
+          const verdict = await isOnWhatsApp(ten)
+          if (verdict === 'no') {
+            return res.status(403).json({
+              error:
+                "This number doesn't seem to be on WhatsApp. " +
+                'Please use a mobile number that has WhatsApp.',
+            })
+          }
+          if (verdict === 'unknown') {
+            console.error(
+              '[wa-check] UNVERIFIED PASS — PATCH /api/profile had no ticket and the gateway gave no answer for',
+              ten
+            )
+          }
         }
       }
       fields.phone = ten || null

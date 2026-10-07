@@ -36,9 +36,21 @@ collected on `/complete-profile` and saved via `PATCH /api/profile`, which
 demands the identical ticket whenever a non-empty phone is being set. Clearing a
 phone needs no ticket — only attaching one makes a claim.
 
-Everything is server-enforced: with `EVOLUTION_*` configured, `/register`
-returns `403 phone_not_verified` without a valid ticket, so the check cannot be
-skipped with curl. With the vars blank, signup behaves exactly as before.
+Everything is server-enforced, and the ticket is a convenience rather than the
+only route to the fact. A request that arrives at `/register` (or
+`PATCH /api/profile`) with **no** ticket does not fail — the server runs the
+same lookup itself, inline, and blocks only if the number really has no
+WhatsApp. That is what keeps clients which know nothing about the check
+endpoint working: **older Android bundles ship a static `dist/` and cannot be
+updated over the air**, so a hard ticket requirement would have 403'd every one
+of them the moment the gate was armed. The lookup is cached per number, so for
+a current client (which just called the check endpoint) the inline call is
+free.
+
+Under the **OTP** gate there is no such fallback — only the user can supply the
+code — so a missing ticket there is still `403 phone_not_verified`.
+
+With the vars blank, signup behaves exactly as before.
 
 ## When the number has no WhatsApp
 

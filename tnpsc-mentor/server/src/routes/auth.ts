@@ -570,7 +570,38 @@ router.post(
       }
       const ticketPhone = verifyPhoneVerifyTicket(String(req.body?.phoneTicket ?? ''))
       if (!ticketPhone || ticketPhone !== normalizedPhone) {
-        return res.status(403).json({ error: 'phone_not_verified' })
+        // No usable ticket. Under the OTP gate that is fatal — ownership can
+        // only be proven by the code the user typed back, and this server
+        // cannot conjure it.
+        if (whatsappOtpEnabled) {
+          return res.status(403).json({ error: 'phone_not_verified' })
+        }
+        // Under the no-code check gate, though, the ticket is a convenience,
+        // not the only way to learn the fact: the server can ask the gateway
+        // the very same question right here. So it does — and that is what
+        // keeps clients which know nothing about /register/whatsapp/check able
+        // to register at all. Older Android bundles ship a static dist and
+        // cannot be updated over the air, so without this, arming the gate
+        // would 403 every one of them: the signup collapse this project has
+        // already lived through twice. The lookup is cached per number, so for
+        // a current client (which just called the check endpoint) it is free.
+        const verdict = await isOnWhatsApp(normalizedPhone)
+        if (verdict === 'no') {
+          // A human sentence rather than a machine code: an older client
+          // surfaces an unrecognised error string to the user verbatim.
+          return res.status(403).json({
+            error:
+              "This number doesn't seem to be on WhatsApp. " +
+              'Please register with a mobile number that has WhatsApp.',
+          })
+        }
+        if (verdict === 'unknown') {
+          // Same deliberate fail-open as the check endpoint, same loud log.
+          console.error(
+            '[wa-check] UNVERIFIED PASS — /register had no ticket and the gateway gave no answer for',
+            normalizedPhone
+          )
+        }
       }
     }
     // One email = one account, and an email already registered THROUGH GOOGLE must
