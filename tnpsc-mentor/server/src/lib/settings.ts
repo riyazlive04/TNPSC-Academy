@@ -21,6 +21,20 @@ export interface PublicSettings {
   /** Show the Target Group 2 2026 language series (hub tab + Test Arena tile).
    *  One flag for both language tracks — they are one product sold two ways. */
   target_g2_enabled: boolean
+  /** Group 1 2026 is OVER (prelims sat 27 Sep 2026), so the whole Group 1
+   *  offering is retired: its papers are greyed out and labelled as a finished
+   *  exam wherever they still appear, and the three Group 1 plan ids
+   *  (`vettri_nichayam`, `vettri_month`, `group1_mock_pack`) stop being sellable
+   *  — see `planOnSale`, which vetoes them here rather than trusting that three
+   *  separate sale flags were all turned off by hand. ACCESS is untouched:
+   *  everyone who bought the series or the mock pack keeps it for the rest of
+   *  their window, because the papers are still perfectly good practice.
+   *
+   *  Deliberately NOT the same thing as `test_series_enabled: false`, which
+   *  would make the hub tab and the Test Arena tile vanish and take a paying
+   *  customer's papers with them. Reversible: a Group 1 2027 series turns this
+   *  back off.  */
+  group1_archived: boolean
   /** Show the flashcard ("Instants") peek on the dashboard. While this is off
    *  the decks are still served to admins, so the feature can be tested on
    *  production before students ever see it. */
@@ -65,6 +79,7 @@ export const PUBLIC_SETTING_DEFAULTS: PublicSettings = {
   vettri_enabled: false,
   rank_booster_enabled: false,
   target_g2_enabled: false,
+  group1_archived: false,
   flashcards_enabled: false,
   maintenance_mode: false,
   // Selling is the normal state, so these default ON and a superadmin turns
@@ -179,6 +194,7 @@ export async function readPublicSettings(): Promise<PublicSettings> {
       raw.rank_booster_enabled ?? PUBLIC_SETTING_DEFAULTS.rank_booster_enabled
     ),
     target_g2_enabled: Boolean(raw.target_g2_enabled ?? PUBLIC_SETTING_DEFAULTS.target_g2_enabled),
+    group1_archived: Boolean(raw.group1_archived ?? PUBLIC_SETTING_DEFAULTS.group1_archived),
     flashcards_enabled: Boolean(
       raw.flashcards_enabled ?? PUBLIC_SETTING_DEFAULTS.flashcards_enabled
     ),
@@ -220,6 +236,18 @@ export const PLAN_SALE_FLAG: Record<string, keyof PublicSettings> = {
 }
 
 /**
+ * Every ledger plan id that sells Group 1 content, and nothing else. `group1_archived`
+ * retires all three together: there is no state in which Group 1 2026 is over for
+ * the scheduled series but still worth selling as a mock pack, and listing them
+ * here means archiving cannot half-apply because someone forgot a flag.
+ *
+ * Premium (`premium_annual`) is NOT here even though it unlocks the Group 1
+ * series: it is a whole-syllabus kit that outlives one exam, so retiring Group 1
+ * must not withdraw it.
+ */
+export const GROUP1_PLANS = ['vettri_nichayam', 'vettri_month', 'group1_mock_pack'] as const
+
+/**
  * Whether `plan` may be bought under these settings. The master switch vetoes
  * everything; a plan with no flag of its own — including `null`, the generic
  * contribution path — is governed by the master switch alone. Pure, so the rule
@@ -228,6 +256,10 @@ export const PLAN_SALE_FLAG: Record<string, keyof PublicSettings> = {
 export function planOnSale(settings: PublicSettings, plan: string | null | undefined): boolean {
   if (!settings.payments_enabled) return false
   if (!plan) return true
+  // Group 1 2026 is finished, so its plans are unsellable regardless of their
+  // own sale flags. Checked BEFORE the per-plan flag so turning `vettri_sale_enabled`
+  // back on by itself cannot quietly reopen a retired exam for sale.
+  if (settings.group1_archived && (GROUP1_PLANS as readonly string[]).includes(plan)) return false
   const flag = PLAN_SALE_FLAG[plan]
   return flag ? Boolean(settings[flag]) : true
 }

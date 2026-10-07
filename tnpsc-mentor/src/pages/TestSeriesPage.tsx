@@ -19,6 +19,7 @@ import TargetG2Card from '../components/UI/TargetG2Card'
 import { TARGET_G2_SERIES, type TargetG2Track } from '../hooks/useTargetG2Purchase'
 import TestSeriesProductPanel from '../components/TestSeries/TestSeriesProductPanel'
 import FullMockExamList from '../components/TestSeries/FullMockExamList'
+import Group1ArchivedNotice from '../components/TestSeries/Group1ArchivedNotice'
 import TestSeriesAnalyticsView from '../components/TestSeries/TestSeriesAnalyticsView'
 import { SkeletonAnalytics } from '../components/UI/Skeleton'
 import { fetchTestSeriesAnalyticsOverall, type TestSeriesAnalytics } from '../lib/testSeriesAnalytics'
@@ -27,6 +28,7 @@ import { upsell } from '../store/upsellStore'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
 import { useRankBoosterEnabled } from '../hooks/useRankBoosterEnabled'
 import { useTargetG2Enabled } from '../hooks/useTargetG2Enabled'
+import { useGroup1Archived } from '../hooks/useGroup1Archived'
 import { usePlanSales } from '../hooks/usePlanSales'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import { useAuth } from '../hooks/useAuth'
@@ -55,6 +57,10 @@ export default function TestSeriesPage() {
   const marathonOn = useTestSeriesEnabled()
   const rankBoosterOn = useRankBoosterEnabled()
   const targetG2On = useTargetG2Enabled()
+  // Group 1 2026 has been sat. The tab and the papers stay — they were paid for
+  // — but everything that pitches them goes, and what is left is marked as a
+  // finished exam. See useGroup1Archived.
+  const g1Archived = useGroup1Archived()
   // Which plans are on sale - decides whether each product's paywall popup
   // has anything in it. The cards themselves hide on the same flags.
   const sales = usePlanSales()
@@ -173,9 +179,26 @@ export default function TestSeriesPage() {
       .catch(() => undefined)
   }, [tab, overall])
 
-  const tabs: { key: HubTab; label: string }[] = [
+  // Where to send someone who has landed on the retired Group 1 papers: the
+  // first product tab that is still a live exam, in the hub's own left-to-right
+  // order. Null when nothing else is switched on, which drops the signpost
+  // rather than offering a link to a tab that is not there.
+  const nextLiveTab: HubTab | null = rankBoosterOn ? 'rankbooster' : targetG2On ? 'targetg2' : null
+
+  // `chip` marks a tab whose exam is behind us, so the capsule itself says which
+  // product is live and which is history — otherwise the retired series reads as
+  // just another current offering right up until you open it.
+  const tabs: { key: HubTab; label: string; chip?: string }[] = [
     ...(rankBoosterOn ? [{ key: 'rankbooster' as const, label: t('testSeriesTabG2') }] : []),
-    ...(marathonOn ? [{ key: 'vettri' as const, label: t('testSeriesTabG1') }] : []),
+    ...(marathonOn
+      ? [
+          {
+            key: 'vettri' as const,
+            label: t('testSeriesTabG1'),
+            chip: g1Archived ? t('g1ArchivedChip') : undefined,
+          },
+        ]
+      : []),
     ...(targetG2On ? [{ key: 'targetg2' as const, label: t('targetG2Tab') }] : []),
     { key: 'overall' as const, label: t('tsOverallTab') },
   ]
@@ -304,7 +327,13 @@ export default function TestSeriesPage() {
           Each button is an owner's shortcut OR a pitch, never both: it shows a
           price only while the account can still buy that plan, and otherwise
           just opens the thing. Stacks on mobile. */}
-      {(marathonOn || showMockEntry) && (
+      {/* Both of these are Group 1 adverts — a big coloured band with a price on
+          it — and they sit above the tab capsule, so they show on every tab.
+          Once the exam is over there is nothing left to advertise, and leaving a
+          Group 1 billboard over the Group 2 tabs would be selling backwards. An
+          owner has not lost their shortcut: the Group 1 tab and the mock/series
+          pill inside it both still go straight to the papers. */}
+      {!g1Archived && (marathonOn || showMockEntry) && (
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           {marathonOn && (
             <G1Entry
@@ -352,7 +381,7 @@ export default function TestSeriesPage() {
           of overlapping or squeezing the tab labels. */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="flex w-full rounded-field bg-tint p-0.5 sm:w-auto sm:flex-1">
-          {tabs.map(({ key, label }) => (
+          {tabs.map(({ key, label, chip }) => (
             <button
               key={key}
               type="button"
@@ -362,7 +391,15 @@ export default function TestSeriesPage() {
                 tab === key ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
               }`}
             >
-              {label}
+              <span className="tamil">{label}</span>
+              {/* Tamil roughly doubles the width of both the label and the chip,
+                  and these tabs share one row — so the chip goes on its own line
+                  rather than squeezing the label it describes. */}
+              {chip && (
+                <span className="tamil mt-0.5 block font-heading text-2xs font-bold uppercase tracking-wide text-muted">
+                  {chip}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -430,7 +467,19 @@ export default function TestSeriesPage() {
           </div>
 
           {g1View === 'mock' ? (
-            <FullMockExamList />
+            <>
+              {/* The mock papers are the other half of this retired product, so
+                  they carry the same notice. The list has no `archived` styling
+                  of its own — it is shared with the live Group 2 mocks — so the
+                  notice does the explaining here. */}
+              {g1Archived && (
+                <Group1ArchivedNotice
+                  className="mb-4"
+                  onNext={nextLiveTab ? () => goTo(nextLiveTab, 'series') : undefined}
+                />
+              )}
+              <FullMockExamList />
+            </>
           ) : (
             <TestSeriesProductPanel
               series="g1_marathon"
@@ -438,6 +487,8 @@ export default function TestSeriesPage() {
               entitlementUnlocked={unlimited}
               onLockedTap={() => upsell.bundle()}
               previewLocked={previewAsStudent}
+              archived={g1Archived}
+              onArchivedNext={nextLiveTab ? () => goTo(nextLiveTab, 'series') : undefined}
               offerEnabled={sales.vettri || sales.premium}
               paywallCards={
                 <>

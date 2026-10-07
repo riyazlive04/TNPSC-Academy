@@ -26,11 +26,18 @@ export default function TestSeriesGrid({
   tests,
   onLaunch,
   onLockedTap,
+  archived = false,
 }: {
   tests: TestSeriesItem[]
   onLaunch: (tst: TestSeriesItem) => void
   /** Called instead of `onLaunch` when the card is bundle-locked (not date-locked). */
   onLockedTap: () => void
+  /** This series' exam has been sat, so the papers are history rather than a
+   *  live offering (see useGroup1Archived). Greys the cards down while leaving
+   *  every one of them fully playable: the people looking at these have paid for
+   *  them and they are still good practice. Purely visual — nothing here gates
+   *  access, so a styling change can never lock a buyer out. */
+  archived?: boolean
 }) {
   const { t, lang } = useT()
 
@@ -52,6 +59,11 @@ export default function TestSeriesGrid({
             className={[
               'flex h-full flex-col rounded-card border border-line bg-card p-2.5 shadow-soft transition-shadow sm:p-4',
               disabled ? 'opacity-80' : 'hover:shadow-card',
+              // Desaturated rather than faded further: a retired paper should
+              // read as "last season's", not as "disabled". Saturation carries
+              // that without touching contrast, so the text stays as legible as
+              // any other card — these are still playable and still get sat.
+              archived ? 'saturate-[0.45]' : '',
             ].join(' ')}
           >
             <div className="min-w-0">

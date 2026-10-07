@@ -26,8 +26,10 @@ export interface PlanSales {
   /** Master switch — false forces every plan below to false. */
   payments: boolean
   premium: boolean
+  /** The ₹1,899 / ₹499 Group 1 bundle. Forced false once Group 1 is archived. */
   vettri: boolean
   rankBooster: boolean
+  /** The ₹399 Group 1 mock pack. Forced false once Group 1 is archived. */
   mockPack: boolean
   /** The ₹849 Target Group 2 2026 series — both language tracks at once. */
   targetG2: boolean
@@ -64,13 +66,21 @@ export function usePlanSales(): PlanSales {
           // The master switch vetoes each plan here, once, so no caller has to
           // remember to check both.
           const master = Boolean(s.payments_enabled)
+          // Group 1 2026 is over, so both Group 1 plans are off the table here
+          // regardless of their own sale flags — the same veto the server applies
+          // in planOnSale(). Doing it once in this hook is what makes archiving a
+          // single switch: every purchase card, promo banner, landing pricing
+          // slot and paywall pitch reads these flags, so none of them has to
+          // know about the archive on its own and none of them can be missed.
+          // Premium is untouched: it is a whole-syllabus kit, not a Group 1 plan.
+          const g1 = !s.group1_archived
           cache = {
             ready: true,
             payments: master,
             premium: master && Boolean(s.premium_sale_enabled),
-            vettri: master && Boolean(s.vettri_sale_enabled),
+            vettri: master && g1 && Boolean(s.vettri_sale_enabled),
             rankBooster: master && Boolean(s.rank_booster_sale_enabled),
-            mockPack: master && Boolean(s.mock_pack_sale_enabled),
+            mockPack: master && g1 && Boolean(s.mock_pack_sale_enabled),
             targetG2: master && Boolean(s.target_g2_sale_enabled),
           }
           return cache

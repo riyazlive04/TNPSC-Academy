@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { shownHubTab, type TestSeriesFlags } from '../lib/testSeriesFlags'
+import { shownHubTab, type ProductAreaFlags } from '../lib/testSeriesFlags'
 
 // Which /test-series tab is on screen. The failure this pins is silent: a
 // learner sent to the Group II/IIA tab (the /group-2-test-series link) quietly
 // shown the Group 1 series because the flags had not finished loading.
 
-const bothOn: TestSeriesFlags = { marathon: true, rankBooster: true, targetG2: false }
-const notLoaded: TestSeriesFlags = { marathon: false, rankBooster: false, targetG2: false }
-const onlyG1: TestSeriesFlags = { marathon: true, rankBooster: false, targetG2: false }
-const onlyG2: TestSeriesFlags = { marathon: false, rankBooster: true, targetG2: false }
-const onlyTargetG2: TestSeriesFlags = { marathon: false, rankBooster: false, targetG2: true }
-const allOn: TestSeriesFlags = { marathon: true, rankBooster: true, targetG2: true }
+const bothOn: ProductAreaFlags = { marathon: true, rankBooster: true, targetG2: false }
+const notLoaded: ProductAreaFlags = { marathon: false, rankBooster: false, targetG2: false }
+const onlyG1: ProductAreaFlags = { marathon: true, rankBooster: false, targetG2: false }
+const onlyG2: ProductAreaFlags = { marathon: false, rankBooster: true, targetG2: false }
+const onlyTargetG2: ProductAreaFlags = { marathon: false, rankBooster: false, targetG2: true }
+const allOn: ProductAreaFlags = { marathon: true, rankBooster: true, targetG2: true }
 
 describe('shownHubTab', () => {
   it('shows the Group II/IIA tab that was asked for', () => {

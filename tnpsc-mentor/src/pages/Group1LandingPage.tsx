@@ -46,6 +46,8 @@ import { usePlanSales } from '../hooks/usePlanSales'
 import { translate, type StringKey } from '../lib/i18n'
 import { trackViewContent } from '../lib/tracking'
 import { GROUP1_SERIES_BUY_PATHS, GROUP1_MOCK_BUY_PATHS } from '../lib/authRouting'
+import { useGroup1Archived } from '../hooks/useGroup1Archived'
+import Group1RetiredBanner from '../components/Landing/Group1RetiredBanner'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 
 const SCHEDULE_PDF_URL = '/test-marathon-2026-schedule.pdf'
@@ -506,6 +508,12 @@ export default function Group1LandingPage() {
   const resolved = useThemeStore((s) => s.resolved)
   const toggleTheme = useThemeStore((s) => s.toggle)
   const { unlimited, mockPack, loaded, refresh } = useEntitlementsStore()
+  // Group 1 2026 prelims has been sat, so this whole page is selling a finished
+  // exam. Every price and Pay button below comes off and the retired band goes
+  // up in their place: the links this page answers on are still in circulation
+  // (ads, WhatsApp forwards), so a visitor WILL arrive here and must be told the
+  // exam is over rather than shown a price whose button no longer charges.
+  const g1Archived = useGroup1Archived()
   const series = useVettriPurchase()
   const mock = useMockPackPurchase()
   // Whether each plan is still being sold (superadmin Payments tab). Off, the
@@ -652,6 +660,18 @@ export default function Group1LandingPage() {
   // its own if a future edition of this schedule is dated forward.
   const allPapersReleased = SCHEDULE.every((row) => new Date(row.date).getTime() <= Date.now())
 
+  // What replaces a Pay button once the exam is over. An OWNER still gets their
+  // real CTA (their papers are still there); for everyone else the only honest
+  // offer left is the exam that is still ahead of them.
+  const liveSeriesLink = (
+    <a
+      href="/group-2-test-series"
+      className="btn-wrap btn-soft w-full justify-center px-6 py-2.5 text-sm"
+    >
+      {tGlobal('g1ArchivedNextCta')} <ArrowRight size={16} />
+    </a>
+  )
+
   const seriesPerkKeys = [...VETTRI_PERK_KEYS, ...VETTRI_BONUS_KEYS]
   const mockPerks = MOCK_ITEMS.map((it) => it[lang])
 
@@ -722,7 +742,9 @@ export default function Group1LandingPage() {
           arrived from an ad sees the price before anything else and can pay
           from it without scrolling. On /group-1 the hero's own buy-box already
           does this job, so the band would only be a second copy of it. */}
-      {isSeriesPayLink && (
+      {g1Archived && <Group1RetiredBanner lang={lang} />}
+
+      {!g1Archived && isSeriesPayLink && (
         <section className="border-b border-brand/25 bg-gradient-to-r from-brand to-brand-dark">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
             <div className="min-w-0">
@@ -762,7 +784,7 @@ export default function Group1LandingPage() {
         </section>
       )}
 
-      {isMockPayLink && (
+      {!g1Archived && isMockPayLink && (
         <section className="border-b border-sky/25 bg-gradient-to-r from-sky to-brand">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6">
             <div className="min-w-0">
@@ -879,10 +901,18 @@ export default function Group1LandingPage() {
                     <Trophy size={13} /> {t('boxBadge')}
                   </div>
 
-                  <div className="flex items-baseline justify-center gap-2.5">
-                    <span className="font-display text-3xl font-bold tracking-tight text-ink">₹{VETTRI_PRICE_RUPEES}</span>
-                  </div>
-                  <p className="tamil mt-1 text-center font-body text-xs text-ink2">{t('boxOneTime')}</p>
+                  {g1Archived ? (
+                    <p className="tamil text-center font-heading text-sm font-bold text-ink">
+                      {tGlobal('g1ArchivedTitle')}
+                    </p>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline justify-center gap-2.5">
+                        <span className="font-display text-3xl font-bold tracking-tight text-ink">₹{VETTRI_PRICE_RUPEES}</span>
+                      </div>
+                      <p className="tamil mt-1 text-center font-body text-xs text-ink2">{t('boxOneTime')}</p>
+                    </>
+                  )}
 
                   <div className="mt-4 rounded-field border border-brand/20 bg-brand-soft/60 p-3">
                     <p className="tamil flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
@@ -898,18 +928,23 @@ export default function Group1LandingPage() {
                     </ul>
                   </div>
 
-                  <button
-                    onClick={() => handleSeriesClick('full')}
-                    className="btn-wrap btn-brand group mt-4 w-full justify-center px-6 py-3 text-sm"
-                  >
-                    <Rocket size={16} /> {t('ctaEnroll')}
-                    <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
-                  </button>
+                  {g1Archived ? (
+                    <div className="mt-4">{liveSeriesLink}</div>
+                  ) : (
+                    <button
+                      onClick={() => handleSeriesClick('full')}
+                      className="btn-wrap btn-brand group mt-4 w-full justify-center px-6 py-3 text-sm"
+                    >
+                      <Rocket size={16} /> {t('ctaEnroll')}
+                      <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+                    </button>
+                  )}
 
                   {/* The installment tier is a real second checkout (plan
                       `vettri_month`), not a footnote — so it gets its own
                       button rather than a line of small print a buyer who
                       cannot pay ₹1,899 today would have to ask about. */}
+                  {!g1Archived && (
                   <div className="mt-4 border-t border-line pt-3">
                     <p className="tamil text-center font-heading text-2xs font-semibold uppercase tracking-wide text-ink2">
                       {t('boxOr')}
@@ -924,6 +959,7 @@ export default function Group1LandingPage() {
                       {t('boxInstallmentCta')}
                     </button>
                   </div>
+                  )}
                 </div>
               </div>
             </Reveal>
@@ -960,16 +996,21 @@ export default function Group1LandingPage() {
                   <h3 className="tamil mt-2 font-heading text-lg font-semibold text-ink">{t('planSeriesTitle')}</h3>
                   <p className="tamil mt-1.5 font-body text-xs leading-relaxed text-ink2">{t('planSeriesFor')}</p>
 
-                  <div className="mt-3 border-t border-line pt-3">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display text-3xl font-bold leading-none text-ink">₹{VETTRI_PRICE_RUPEES}</span>
-                      <span className="tamil font-body text-xs text-ink2">{tGlobal('vettriFullSuffix')}</span>
+                  {/* The perk list below stays either way — it describes what the
+                      papers contain, which is still true for everyone who owns
+                      them. It is only the PRICE that stops being true. */}
+                  {!g1Archived && (
+                    <div className="mt-3 border-t border-line pt-3">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-display text-3xl font-bold leading-none text-ink">₹{VETTRI_PRICE_RUPEES}</span>
+                        <span className="tamil font-body text-xs text-ink2">{tGlobal('vettriFullSuffix')}</span>
+                      </div>
+                      <p className="tamil mt-1 font-body text-xs text-ink2">{t('boxOneTime')}</p>
+                      <p className="tamil mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-0.5 font-heading text-2xs font-bold text-correct">
+                        <Gift size={11} /> {t('popularNote')}
+                      </p>
                     </div>
-                    <p className="tamil mt-1 font-body text-xs text-ink2">{t('boxOneTime')}</p>
-                    <p className="tamil mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-tint-green px-2.5 py-0.5 font-heading text-2xs font-bold text-correct">
-                      <Gift size={11} /> {t('popularNote')}
-                    </p>
-                  </div>
+                  )}
 
                   <ul className="mt-4 space-y-2">
                     {seriesPerkKeys.map((k, i) => {
@@ -1004,13 +1045,17 @@ export default function Group1LandingPage() {
                   </ul>
 
                   <div className="mt-auto space-y-2 pt-5">
-                    <button
-                      onClick={() => handleSeriesClick('full')}
-                      className="btn-wrap btn-brand w-full justify-center px-6 py-2.5 text-sm"
-                    >
-                      {ownsSeries ? t('boxOwnedCta') : t('ctaEnroll')} <ArrowRight size={16} />
-                    </button>
-                    {!ownsSeries && (
+                    {/* An owner keeps their real CTA even once the exam is over —
+                        it opens the papers they paid for, which still work. */}
+                    {(!g1Archived || ownsSeries) && (
+                      <button
+                        onClick={() => handleSeriesClick('full')}
+                        className="btn-wrap btn-brand w-full justify-center px-6 py-2.5 text-sm"
+                      >
+                        {ownsSeries ? t('boxOwnedCta') : t('ctaEnroll')} <ArrowRight size={16} />
+                      </button>
+                    )}
+                    {!ownsSeries && !g1Archived && (
                       <button
                         onClick={() => handleSeriesClick('month')}
                         className="btn-wrap btn-ghost w-full justify-center px-6 py-2.5 text-xs"
@@ -1018,6 +1063,7 @@ export default function Group1LandingPage() {
                         {t('boxInstallmentCta')}
                       </button>
                     )}
+                    {g1Archived && !ownsSeries && liveSeriesLink}
                   </div>
                 </div>
               </div>
@@ -1037,14 +1083,16 @@ export default function Group1LandingPage() {
                   </h3>
                   <p className="tamil mt-1.5 font-body text-xs leading-relaxed text-ink2">{t('planMockFor')}</p>
 
-                  <div className="mt-3 border-t border-line pt-3">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display text-3xl font-bold leading-none text-ink">₹{MOCK_PACK_PRICE_RUPEES}</span>
+                  {!g1Archived && (
+                    <div className="mt-3 border-t border-line pt-3">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-display text-3xl font-bold leading-none text-ink">₹{MOCK_PACK_PRICE_RUPEES}</span>
+                      </div>
+                      <p className="tamil mt-1 font-body text-xs text-ink2">
+                        {MOCK_PACK_LABELS.duration[lang]} · {MOCK_PACK_LABELS.oneTimePayment[lang]}
+                      </p>
                     </div>
-                    <p className="tamil mt-1 font-body text-xs text-ink2">
-                      {MOCK_PACK_LABELS.duration[lang]} · {MOCK_PACK_LABELS.oneTimePayment[lang]}
-                    </p>
-                  </div>
+                  )}
 
                   <ul className="mt-4 space-y-2">
                     {MOCK_ITEMS.map((it, i) => {
@@ -1062,13 +1110,17 @@ export default function Group1LandingPage() {
                   </ul>
 
                   <div className="mt-auto pt-5">
-                    <button
-                      onClick={handleMockClick}
-                      disabled={mock.paying}
-                      className="btn-wrap inline-flex w-full items-center justify-center gap-2 rounded-pill bg-sky px-5 py-2.5 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
-                    >
-                      {ownsMockPack ? t('boxOwnedCta') : MOCK_PACK_LABELS.cta[lang]} <ArrowRight size={16} />
-                    </button>
+                    {!g1Archived || ownsMockPack ? (
+                      <button
+                        onClick={handleMockClick}
+                        disabled={mock.paying}
+                        className="btn-wrap inline-flex w-full items-center justify-center gap-2 rounded-pill bg-sky px-5 py-2.5 font-heading text-sm font-bold text-white shadow-sm transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
+                      >
+                        {ownsMockPack ? t('boxOwnedCta') : MOCK_PACK_LABELS.cta[lang]} <ArrowRight size={16} />
+                      </button>
+                    ) : (
+                      liveSeriesLink
+                    )}
                   </div>
                 </div>
               </div>
@@ -1364,6 +1416,10 @@ export default function Group1LandingPage() {
           price instead broke "₹1899" across two lines at 320px. The button is
           the elastic half (btn-wrap lets it use two lines), which is the right
           way round - a wrapped button still reads, a wrapped price does not. */}
+      {/* A persistent Pay bar following you down a page that is selling a
+          finished exam is the most aggressive surface here, so it is the first
+          one to go. */}
+      {!g1Archived && (
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-line bg-card/95 px-4 py-3 pb-safe backdrop-blur sm:hidden">
         {isMockPayLink ? (
           <>
@@ -1402,6 +1458,7 @@ export default function Group1LandingPage() {
           </>
         )}
       </div>
+      )}
 
       <LandingLangPrompt open={!langChosen} onChoose={setLang} />
 

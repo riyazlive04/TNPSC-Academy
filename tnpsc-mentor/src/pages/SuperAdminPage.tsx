@@ -2526,6 +2526,13 @@ function TestSeriesTab() {
   const [seriesOn, setSeriesOn] = useState(false)
   const [savingFlag, setSavingFlag] = useState(false)
 
+  // Group 1 only: its exam has been sat, so the papers are history. Separate
+  // from `seriesOn` because the two answer different questions — this one greys
+  // the papers and stops the selling while LEAVING them open to the people who
+  // bought them, where turning `seriesOn` off would take their papers away too.
+  const [g1Archived, setG1Archived] = useState(false)
+  const [savingArchived, setSavingArchived] = useState(false)
+
   const load = () => {
     setLoading(true)
     setError(false)
@@ -2533,6 +2540,7 @@ function TestSeriesTab() {
       .then(([ts, settings]) => {
         setTests(ts)
         setSeriesOn(Boolean(settings[active.settingKey]))
+        setG1Archived(Boolean(settings.group1_archived))
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -2549,6 +2557,23 @@ function TestSeriesTab() {
       setSeriesOn(!next)
     } finally {
       setSavingFlag(false)
+    }
+  }
+
+  const toggleArchived = async (next: boolean) => {
+    setSavingArchived(true)
+    setG1Archived(next) // optimistic
+    try {
+      await api.superadmin.setSetting('group1_archived', next)
+      // The student-facing flags are cached per session, and this one changes
+      // what is on sale as well as how it looks — so drop the sale cache too or
+      // the console operator keeps seeing prices they just withdrew.
+      invalidatePlanSales()
+    } catch {
+      toast.error(t('couldNotLoad'))
+      setG1Archived(!next)
+    } finally {
+      setSavingArchived(false)
     }
   }
 
@@ -2609,6 +2634,9 @@ function TestSeriesTab() {
           savingId={savingId}
           onToggleSeries={toggleSeries}
           onPatch={patch}
+          archived={g1Archived}
+          savingArchived={savingArchived}
+          onToggleArchived={series === 'g1_marathon' ? toggleArchived : undefined}
         />
       )}
     </div>
@@ -2623,12 +2651,21 @@ function TestSeriesTabBody({
   savingId,
   onToggleSeries,
   onPatch,
+  archived,
+  savingArchived,
+  onToggleArchived,
 }: {
   active: (typeof SERIES_TABS)[number]
   tests: TestSeriesAdmin[]
   seriesOn: boolean
   savingFlag: boolean
   savingId: string | null
+  archived: boolean
+  savingArchived: boolean
+  /** Present only on the Group 1 tab — the other series' exams have not been
+   *  sat yet, and offering an "exam is over" switch on them would invite
+   *  retiring a live product by one mis-click. */
+  onToggleArchived?: (next: boolean) => void
   onToggleSeries: (next: boolean) => void
   onPatch: (
     id: string,
@@ -2659,6 +2696,36 @@ function TestSeriesTabBody({
           </div>
         </div>
       </div>
+
+      {/* Group 1 only: retire the exam. Sits ABOVE the visibility switch because
+          it is the one an operator actually wants when an exam finishes, and the
+          visibility switch is the tempting wrong answer — it looks like it does
+          the same job while also confiscating the papers of everyone who paid. */}
+      {onToggleArchived && (
+        <div className="card mb-4 p-4">
+          <p className="mb-1 font-heading text-sm font-semibold text-ink">
+            {t('g1ArchiveSwitchTitle')}
+          </p>
+          <p className="mb-3 font-body text-xs text-ink2">{t('g1ArchiveSwitchSub')}</p>
+          <div className="flex items-center justify-between gap-3">
+            <span className="tamil font-body text-sm text-ink">{t(active.labelKey)}</span>
+            <button
+              disabled={savingArchived}
+              onClick={() => onToggleArchived(!archived)}
+              aria-pressed={archived}
+              className={`relative h-7 w-12 flex-shrink-0 rounded-full transition-colors ${
+                archived ? 'bg-accentwarm' : 'bg-ink2/30'
+              } disabled:opacity-50`}
+            >
+              <span
+                className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                  archived ? 'left-6' : 'left-1'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Master visibility — show/hide this series' tab + tile for students */}
       <div className="card mb-4 p-4">

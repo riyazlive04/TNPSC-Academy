@@ -22,14 +22,36 @@ export interface TestSeriesFlags {
   rankBooster: boolean
   /** Target Group 2 2026 language series, both tracks (settings.target_g2_enabled). */
   targetG2: boolean
+  /**
+   * Group 1 2026 is over (settings.group1_archived). The Group 1 tab, its papers
+   * and the Test Arena tile all STAY — people paid for them and they are still
+   * good practice — but they render greyed out and labelled as a finished exam,
+   * and nothing Group 1 is offered for sale any more.
+   *
+   * Orthogonal to `marathon` above: `marathon` answers "does this product area
+   * exist", this answers "is it still a live exam". Archived-but-on is the whole
+   * point — turning `marathon` off instead would take a paying customer's papers
+   * away along with the pitch.
+   */
+  group1Archived: boolean
 }
+
+/**
+ * Just the switches that say whether a product AREA exists. The tab fallback
+ * below is only ever asking "is there a tab here", so it takes this and not the
+ * whole flag set: `group1Archived` says an exam is finished, not that its tab is
+ * gone, and a retired product keeps its tab so the people who paid for it can
+ * still reach their papers. Narrowing the parameter makes that structural — the
+ * fallback cannot start reacting to the archive by accident.
+ */
+export type ProductAreaFlags = Pick<TestSeriesFlags, 'marathon' | 'rankBooster' | 'targetG2'>
 
 /** The product tabs, in the order the hub shows them. `overall` is not a
  *  product and never participates in the fallback below. */
 const PRODUCT_TABS = ['vettri', 'rankbooster', 'targetg2'] as const
 
 /** Whether the product behind a tab is switched on. */
-function tabEnabled(tab: HubTab, flags: TestSeriesFlags): boolean {
+function tabEnabled(tab: HubTab, flags: ProductAreaFlags): boolean {
   if (tab === 'vettri') return flags.marathon
   if (tab === 'rankbooster') return flags.rankBooster
   if (tab === 'targetg2') return flags.targetG2
@@ -62,6 +84,7 @@ export function loadTestSeriesFlags(): Promise<TestSeriesFlags | null> {
           marathon: Boolean(s.test_series_enabled),
           rankBooster: Boolean(s.rank_booster_enabled),
           targetG2: Boolean(s.target_g2_enabled),
+          group1Archived: Boolean(s.group1_archived),
         }
         return cache
       })
@@ -81,7 +104,7 @@ export function loadTestSeriesFlags(): Promise<TestSeriesFlags | null> {
  * flags read false until they load, and a correction saved from a half-loaded
  * answer outlives the answer that made it wrong.
  */
-export function shownHubTab(requested: HubTab, flags: TestSeriesFlags): HubTab {
+export function shownHubTab(requested: HubTab, flags: ProductAreaFlags): HubTab {
   if (tabEnabled(requested, flags)) return requested
   // The asked-for product is off. Fall back to another product that is on,
   // keeping the hub's own left-to-right order so the choice is predictable.

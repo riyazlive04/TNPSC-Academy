@@ -2758,6 +2758,10 @@ export interface AppSettings {
   /** Show the Target Group 2 2026 language series (hub tab + Test Arena tile).
    *  One flag for both tracks — one product sold two ways. */
   target_g2_enabled: boolean
+  /** Group 1 2026 is over (prelims sat 27 Sep 2026): grey its papers out, label
+   *  them as a finished exam, and stop selling every Group 1 plan. Does NOT
+   *  revoke access — people who paid keep their papers. */
+  group1_archived: boolean
   /** Show the flashcard ("Instants") peek on the dashboard. Off = admins only. */
   flashcards_enabled: boolean
   /** App-wide: non-admins get MaintenancePage + every gated API 503s. */

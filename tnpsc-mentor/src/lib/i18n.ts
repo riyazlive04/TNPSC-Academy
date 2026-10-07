@@ -894,6 +894,34 @@ const STRINGS = {
   // pill wants a shorter, product-agnostic "Group N Test Series" label
   // without touching those other surfaces.
   testSeriesTabG1: { en: 'Group 1 Test Series', ta: 'குரூப் 1 தேர்வுத் தொடர்' },
+  // ─── Group 1 retired (group1_archived) ─────────────────────────────────────
+  // Group 1 2026 prelims was sat on 27 Sep 2026. These say "this exam is behind
+  // us, the papers are still yours to practise on" — never "this is gone", since
+  // the papers stay open to everyone who bought them.
+  g1ArchivedChip: { en: 'Completed', ta: 'நிறைவு' },
+  g1ArchivedTitle: {
+    en: 'Group 1 2026 prelims is over',
+    ta: 'குரூப் 1 2026 முன்னிலைத் தேர்வு நிறைவடைந்தது',
+  },
+  g1ArchivedBody: {
+    en: 'These papers stay open for practice. The Group 1 2026 series is no longer on sale.',
+    ta: 'இந்தத் தாள்கள் பயிற்சிக்கு தொடர்ந்து திறந்திருக்கும். குரூப் 1 2026 தொடர் இனி விற்பனையில் இல்லை.',
+  },
+  // Points someone who landed on retired Group 1 content at an exam that is
+  // still ahead of them, so the dead end becomes a next step.
+  g1ArchivedNext: {
+    en: 'Preparing for Group 2 / 2A? See the live test series.',
+    ta: 'குரூப் 2 / 2A-க்கு தயாராகிறீர்களா? நடப்புத் தேர்வுத் தொடரைப் பாருங்கள்.',
+  },
+  g1ArchivedNextCta: { en: 'View live series', ta: 'நடப்புத் தொடரைப் பார்' },
+  // Superadmin console only (never shown to a student), hence English-leaning
+  // copy in both slots — the console is operated by staff, and a mistranslated
+  // switch here is a worse outcome than an untranslated one.
+  g1ArchiveSwitchTitle: { en: 'Exam is over (retire Group 1)', ta: 'Exam is over (retire Group 1)' },
+  g1ArchiveSwitchSub: {
+    en: 'Greys the Group 1 papers out, labels them completed and stops selling every Group 1 plan. Does NOT remove access — buyers keep their papers. Use this instead of the visibility switch below when an exam finishes.',
+    ta: 'Greys the Group 1 papers out, labels them completed and stops selling every Group 1 plan. Does NOT remove access — buyers keep their papers. Use this instead of the visibility switch below when an exam finishes.',
+  },
   // The Group 1 hub's second entry point, beside the scheduled series: the
   // standalone mock papers sold by the ₹399 pack. Deliberately shorter than
   // mockPackBannerTitle ("Group 1 Mock Test Pack") — this labels a destination

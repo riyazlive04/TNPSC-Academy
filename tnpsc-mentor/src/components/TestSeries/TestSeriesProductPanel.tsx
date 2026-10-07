@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OfferSheet from '../UI/OfferSheet'
 import TestSeriesGrid from './TestSeriesGrid'
+import Group1ArchivedNotice from './Group1ArchivedNotice'
 import TestSeriesAnalyticsView from './TestSeriesAnalyticsView'
 import { SkeletonAnalytics, SkeletonCards } from '../UI/Skeleton'
 import { api } from '../../lib/api'
@@ -26,6 +27,8 @@ export default function TestSeriesProductPanel({
   entitlementUnlocked,
   onLockedTap,
   previewLocked = false,
+  archived = false,
+  onArchivedNext,
 }: {
   series: 'g1_marathon' | 'g2a_rankbooster' | 'g2_target_en' | 'g2_target_ta'
   offerTitleKey: StringKey
@@ -44,6 +47,13 @@ export default function TestSeriesProductPanel({
    *  ever show an admin what the paywall itself looks like. Client-side only,
    *  matching how the rest of student-preview works (src/store/adminViewStore.ts). */
   previewLocked?: boolean
+  /** This series' exam has been sat (see useGroup1Archived): greys the paper
+   *  cards and heads them with the "exam is over" notice. Visual only — the
+   *  papers stay playable for whoever owns them. */
+  archived?: boolean
+  /** Where the archive notice's signpost goes — the live product to try instead.
+   *  Omitted when there is nothing live to point at, which hides the link. */
+  onArchivedNext?: () => void
 }) {
   const navigate = useNavigate()
   const { t, lang } = useT()
@@ -175,7 +185,17 @@ export default function TestSeriesProductPanel({
       )}
 
       {!loading && !error && tab === 'papers' && tests.length > 0 && (
-        <TestSeriesGrid tests={tests} onLaunch={launch} onLockedTap={onLockedTap} />
+        <>
+          {/* Above the papers, not below: the reason they look greyed has to be
+              read before the greying is noticed, or it just looks broken. */}
+          {archived && <Group1ArchivedNotice className="mb-4" onNext={onArchivedNext} />}
+          <TestSeriesGrid
+            tests={tests}
+            onLaunch={launch}
+            onLockedTap={onLockedTap}
+            archived={archived}
+          />
+        </>
       )}
 
       <OfferSheet open={offerOpen && offerEnabled} onClose={closeOffer} title={t(offerTitleKey)}>

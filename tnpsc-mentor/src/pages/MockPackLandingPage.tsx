@@ -19,7 +19,10 @@ import { useThemeStore } from '../store/themeStore'
 import { useEntitlementsStore } from '../store/entitlementsStore'
 import { useMockPackPurchase, MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
 import { MOCK_ITEMS } from '../components/Landing/PricingCards'
+import { translate } from '../lib/i18n'
 import { usePlanSales } from '../hooks/usePlanSales'
+import { useGroup1Archived } from '../hooks/useGroup1Archived'
+import Group1RetiredBanner from '../components/Landing/Group1RetiredBanner'
 import { trackViewContent, trackInitiateCheckout } from '../lib/tracking'
 import { isAndroidWebView, openInBrowser } from '../lib/webview'
 import LandingLangPrompt, { useLandingLang } from '../components/Landing/LandingLangPrompt'
@@ -135,6 +138,12 @@ export default function MockPackLandingPage() {
 
   const owned = isAdmin || isSuperAdmin || (loaded && mockPack)
   const offSale = sales.ready && !sales.mockPack
+  // Group 1 2026 has been sat, which is a different thing from "withdrawn for
+  // now" and deserves a different sentence: nobody is waiting for this to come
+  // back on sale. `offSale` is already true in this case (the archive vetoes
+  // mockPack in usePlanSales), so this only chooses the WORDING and where the
+  // fallback link goes — the Pay button is gone either way.
+  const g1Archived = useGroup1Archived()
 
   /**
    * Straight to Razorpay - no pre-payment recap in between.
@@ -241,6 +250,10 @@ export default function MockPackLandingPage() {
       </header>
 
       {/* ─── The offer, on one screen ─────────────────────────────────────── */}
+      {/* These ₹399 links are short, memorable and in circulation ("the 399
+          plan"), so arrivals keep coming after the exam. Say so at the top. */}
+      {g1Archived && <Group1RetiredBanner lang={lang} />}
+
       <main className="relative flex flex-1 items-center justify-center px-4 py-3 sm:px-6 sm:py-8">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-sky/20 blur-[110px]" />
@@ -297,10 +310,18 @@ export default function MockPackLandingPage() {
               {offSale ? (
                 <>
                   <p className="tamil mt-4 flex items-center justify-center gap-1.5 rounded-field bg-tint px-3 py-2.5 text-center font-body text-xs font-semibold text-ink2">
-                    <Lock size={13} className="shrink-0" /> {t('offSaleTitle')}
+                    <Lock size={13} className="shrink-0" />
+                    {g1Archived ? translate('g1ArchivedTitle', lang) : t('offSaleTitle')}
                   </p>
-                  <a href="/group-1" className="btn-wrap btn-soft mt-3 w-full justify-center px-6 py-3 text-sm">
-                    {t('offSaleCta')} <ArrowRight size={16} />
+                  {/* Sending an archived visitor to /group-1 would be two dead
+                      ends in a row — that page is retired as well — so skip
+                      straight to the exam that is still ahead of them. */}
+                  <a
+                    href={g1Archived ? '/group-2-test-series' : '/group-1'}
+                    className="btn-wrap btn-soft mt-3 w-full justify-center px-6 py-3 text-sm"
+                  >
+                    {g1Archived ? translate('g1ArchivedNextCta', lang) : t('offSaleCta')}{' '}
+                    <ArrowRight size={16} />
                   </a>
                 </>
               ) : (
