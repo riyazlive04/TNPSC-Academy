@@ -24,8 +24,9 @@ export default function Group1RetiredBanner({
 }: {
   lang: Lang
   /** The live exam to send them to instead. Group II/IIA by default — it is the
-   *  nearest thing to what a Group 1 visitor came for. */
-  nextHref?: string
+   *  nearest thing to what a Group 1 visitor came for. Pass null on a page that
+   *  already IS that destination, where the button would point at itself. */
+  nextHref?: string | null
 }) {
   const t = (key: Parameters<typeof translate>[0]) => translate(key, lang)
 
@@ -46,15 +47,17 @@ export default function Group1RetiredBanner({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
-          <p className="tamil font-body text-xs text-muted">{t('g1ArchivedNext')}</p>
-          <a
-            href={nextHref}
-            className="btn-wrap press inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 sm:w-auto"
-          >
-            {t('g1ArchivedNextCta')} <ArrowRight size={15} className="flex-shrink-0" />
-          </a>
-        </div>
+        {nextHref && (
+          <div className="flex shrink-0 flex-col gap-1.5 sm:items-end">
+            <p className="tamil font-body text-xs text-muted">{t('g1ArchivedNext')}</p>
+            <a
+              href={nextHref}
+              className="btn-wrap press inline-flex w-full min-w-0 items-center justify-center gap-1.5 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-bold text-white shadow-brand transition hover:brightness-105 sm:w-auto"
+            >
+              {t('g1ArchivedNextCta')} <ArrowRight size={15} className="flex-shrink-0" />
+            </a>
+          </div>
+        )}
       </div>
     </section>
   )

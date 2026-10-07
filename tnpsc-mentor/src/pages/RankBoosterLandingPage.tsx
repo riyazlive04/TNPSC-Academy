@@ -34,6 +34,8 @@ import {
   RANK_BOOSTER_BONUS_KEYS,
 } from '../hooks/useRankBoosterPurchase'
 import { MOCK_PACK_PRICE_RUPEES } from '../hooks/useMockPackPurchase'
+import { useGroup1Archived } from '../hooks/useGroup1Archived'
+import Group1RetiredBanner from '../components/Landing/Group1RetiredBanner'
 import PurchaseConfirmModal from '../components/UI/PurchaseConfirmModal'
 import PricingCards from '../components/Landing/PricingCards'
 import Reveal from '../components/Landing/Reveal'
@@ -309,6 +311,13 @@ export default function RankBoosterLandingPage() {
   const isMockPayLink = (MOCK_PACK_BUY_PATHS as readonly string[]).includes(location.pathname)
   const isG2PayLink = (RANK_BOOSTER_BUY_PATHS as readonly string[]).includes(location.pathname)
   const isPayLink = isMockPayLink || isG2PayLink
+  // MOCK_PACK_BUY_PATHS sold the ₹399 GROUP 1 mock pack over this Group II/IIA
+  // page. Those links are still in circulation, and now that Group 1 is retired
+  // they quietly land on a different exam's offer with nothing to explain the
+  // switch — so on those paths only, say what happened. No CTA: this page already
+  // IS the live series the notice would point at.
+  const g1Archived = useGroup1Archived()
+  const showG1Retired = isMockPayLink && g1Archived
 
   useEffect(() => {
     trackViewContent({
@@ -485,6 +494,8 @@ export default function RankBoosterLandingPage() {
           </div>
         </div>
       </header>
+
+      {showG1Retired && <Group1RetiredBanner lang={lang} nextHref={null} />}
 
       {/* ─── ₹1,249 price banner (dedicated Group 2 / 2A pay link only) ────
           The whole offer in one band directly under the header, so a buyer who

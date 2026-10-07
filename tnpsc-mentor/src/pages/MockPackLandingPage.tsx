@@ -302,10 +302,19 @@ export default function MockPackLandingPage() {
                 {t('priceBadge')}
               </div>
 
-              <p className="text-center font-display text-4xl font-bold leading-none tracking-tight text-ink sm:text-5xl">
-                ₹{MOCK_PACK_PRICE_RUPEES}
-              </p>
-              <p className="tamil mt-1.5 text-center font-body text-xs text-ink2 sm:mt-2">{t('priceValidity')}</p>
+              {/* The price is the biggest thing on this card, so leaving it up
+                  while the button below says the exam is over reads as an offer
+                  with a broken button rather than a retired one. */}
+              {!g1Archived && (
+                <>
+                  <p className="text-center font-display text-4xl font-bold leading-none tracking-tight text-ink sm:text-5xl">
+                    ₹{MOCK_PACK_PRICE_RUPEES}
+                  </p>
+                  <p className="tamil mt-1.5 text-center font-body text-xs text-ink2 sm:mt-2">
+                    {t('priceValidity')}
+                  </p>
+                </>
+              )}
 
               {offSale ? (
                 <>
