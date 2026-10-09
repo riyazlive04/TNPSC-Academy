@@ -19,6 +19,7 @@ import CircularProgress from '../components/UI/CircularProgress'
 import SectionHeader from '../components/UI/SectionHeader'
 import { formatTime } from '../components/UI/Timer'
 import { describeConfig } from '../lib/fetchQuestions'
+import { canDownloadExplanationPdf, pdfBlockedBy } from '../lib/pdfAccess'
 import { addBookmark, fetchBookmarkIds, removeBookmark } from '../lib/bookmarks'
 import { scoreByTopic, weakAreas, fetchUserAnalytics } from '../lib/analytics'
 import { fetchHabit } from '../lib/habit'
@@ -95,9 +96,11 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all')
   const [bookmarkIds, setBookmarkIds] = useState<Set<string>>(new Set())
   const [downloadingPdf, setDownloadingPdf] = useState(false)
-  // PDF download is open to everyone (once a test is ≥80% attempted); premium is
-  // unlimited and free users are capped. The quota tells us how many downloads a
-  // free user has left. premiumStore is still refreshed for the rest of the app.
+  // PDF download is open to everyone (once a test is ≥80% attempted — except a
+  // scheduled test-series paper, which has no attendance requirement at all);
+  // premium is unlimited and free users are capped. The quota tells us how many
+  // downloads a free user has left. premiumStore is still refreshed for the rest
+  // of the app.
   const { premium, loaded: premiumLoaded, refresh: refreshPremium } = usePremiumStore()
   const [quota, setQuota] = useState<PdfQuota | null>(null)
   useEffect(() => {
@@ -287,9 +290,16 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
   const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
   const attendancePct = totalQuestions > 0 ? Math.round((attempted / totalQuestions) * 100) : 0
 
-  // The explanation PDF unlocks once the test is at least 80% attempted;
-  // otherwise we just nudge them to finish more of it.
-  const canUnlockPdf = totalQuestions > 0 && attempted / totalQuestions >= 0.8
+  // Scheduled test-series papers have no attendance requirement for the sheet;
+  // every other test keeps the 80% rule. Both branches live in lib/pdfAccess so
+  // they can be pinned by tests — see there for why each one is what it is.
+  const pdfAccess = {
+    mockKind: config.mockKind,
+    attempted,
+    totalQuestions,
+    pdfUnlocked,
+  }
+  const canUnlockPdf = canDownloadExplanationPdf(pdfAccess)
   // Download is open to everyone now. Premium is unlimited; free users get a
   // capped number (quota.remaining). `null` remaining = unlimited (premium) or
   // quota not yet known (preview / not loaded → treated as allowed).
@@ -554,14 +564,23 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
           <div className="mt-8 lg:mt-0">
             <SectionHeader title={t('questionBreakdown')} />
 
-            {/* Explanation PDF - open to everyone once the test is ≥80% attempted.
-                Premium is unlimited; free users get a capped number of downloads
-                and are nudged to upgrade once they run out. */}
+            {/* Explanation PDF - open to everyone once the test is ≥80% attempted,
+                or at any attendance on a scheduled test-series paper (see
+                lib/pdfAccess). Premium is unlimited; free users get a capped
+                number of downloads and are nudged to upgrade once they run out. */}
             <div className="mt-3">
               {!canUnlockPdf ? (
                 <div className="flex items-center gap-2 rounded-field border border-line bg-card px-4 py-2.5 font-body text-xs text-muted">
                   <FileDown size={14} className="flex-shrink-0 text-muted" />
-                  <span className="tamil">{t('pdfWhenComplete')}</span>
+                  {/* A series paper is never held back by the 80% rule, so quoting
+                      it here would state a requirement that does not exist. What
+                      is actually missing in that case is the 25% explanations
+                      unlock, which is what this says instead. */}
+                  <span className="tamil">
+                    {pdfBlockedBy(pdfAccess) === 'explanations25'
+                      ? t('unlockExplanationsMsg')
+                      : t('pdfWhenComplete')}
+                  </span>
                 </div>
               ) : !quotaReady ? (
                 <div className="flex items-center justify-center rounded-field border border-line bg-card px-4 py-2.5">
