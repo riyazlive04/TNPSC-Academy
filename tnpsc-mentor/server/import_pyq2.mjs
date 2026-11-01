@@ -37,7 +37,9 @@ import { join } from 'node:path'
  *   YEARS=2013,2015 APPLY=1 node import_pyq2.mjs  # insert just those years
  */
 
-const ROOT = 'c:/Users/mas20/Desktop/work/TNPSC/Content_materials/Group_2'
+// Defaults to the authoring machine; set CONTENT_ROOT to run this on the VPS,
+// where the live DB is reachable but the Windows content tree is not.
+const ROOT = process.env.CONTENT_ROOT || 'c:/Users/mas20/Desktop/work/TNPSC/Content_materials/Group_2'
 const IMG_ROOT = `${ROOT}/_img`
 const APPLY = process.env.APPLY === '1'
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '')

@@ -195,10 +195,15 @@ describe('examPhase', () => {
     expect(examPhase(group1, Date.parse(group1.examEnd!))).toBe('after')
   })
 
-  it('stays "before" forever for a group with no notified exam date', () => {
+  it('switches to "after" once a released exam is over', () => {
     const group2 = ANSWER_KEY_GROUPS.group2
-    expect(group2.examStart).toBeNull()
-    expect(examPhase(group2, Date.now())).toBe('before')
+    expect(examPhase(group2, Date.parse(group2.examEnd!))).toBe('after')
+  })
+
+  it('stays "before" forever for a group with no notified exam date', () => {
+    const group4 = ANSWER_KEY_GROUPS.group4
+    expect(group4.examStart).toBeNull()
+    expect(examPhase(group4, Date.now())).toBe('before')
   })
 })
 

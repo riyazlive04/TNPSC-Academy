@@ -165,30 +165,50 @@ export const ANSWER_KEY_GROUPS: Record<AnswerKeyGroupKey, AnswerKeyGroupDef> = {
       en: 'TNPSC Group 2 / 2A — Combined Civil Services Examination II / IIA (Prelims)',
       ta: 'TNPSC குரூப் 2 / 2A — Combined Civil Services Examination II / IIA (முதல்நிலை)',
     },
-    examStart: null,
-    examEnd: null,
-    totalQuestions: null,
-    totalMarks: null,
-    negativeMarking: null,
+    examStart: '2026-11-01T09:30:00+05:30',
+    examEnd: '2026-11-01T12:30:00+05:30',
+    totalQuestions: 200,
+    totalMarks: 300,
+    negativeMarking: false,
     published: '2026-09-24',
-    updated: '2026-09-24',
+    updated: '2026-11-01',
+    // One row only: the key carries the question, all four options and the
+    // explanation per question, so a separate question-paper row would repeat it.
     resources: [
-      { key: 'paper', kind: 'pdf', href: null },
-      { key: 'key', kind: 'pdf', href: null },
-      { key: 'explanations', kind: 'pdf', href: null },
+      {
+        key: 'key',
+        kind: 'pdf',
+        href: '/downloads/group2-2026/tnpsc-group-2-answer-key-2026.pdf',
+      },
     ],
+    // Part C is a different paper for each medium, so the three section keys are
+    // what a candidate actually wants rather than a single bundled download.
     subjects: [
-      { en: 'Aptitude', ta: 'திறனாய்வு மற்றும் மனக்கணக்கு', href: null },
-      { en: 'General English', ta: 'பொது ஆங்கிலம்', href: null },
-      { en: 'General Tamil', ta: 'பொதுத் தமிழ்', href: null },
-      { en: 'General Studies', ta: 'பொது அறிவு', href: null },
+      {
+        en: 'General Studies & Aptitude',
+        ta: 'பொது அறிவு மற்றும் திறனாய்வு',
+        href: '/downloads/group2-2026/tnpsc-group-2-2026-general-studies-answer-key.pdf',
+        questions: 100,
+      },
+      {
+        en: 'General English',
+        ta: 'பொது ஆங்கிலம்',
+        href: '/downloads/group2-2026/tnpsc-group-2-2026-general-english-answer-key.pdf',
+        questions: 100,
+      },
+      {
+        en: 'General Tamil',
+        ta: 'பொதுத் தமிழ்',
+        href: '/downloads/group2-2026/tnpsc-group-2-2026-general-tamil-answer-key.pdf',
+        questions: 100,
+      },
     ],
     bannerImage: null,
     seriesLink: { href: '/group-2-test-series', label: { en: 'Group 2 Test Series', ta: 'குரூப் 2 தேர்வுத் தொடர்' } },
     title: 'TNPSC Group 2 & 2A Answer Key 2026 & Question Paper with Explanations',
     docTitle: 'TNPSC Group 2 Answer Key 2026 & Question Paper with Explanations',
     description:
-      'TNPSC Group 2 / 2A Answer Key 2026: download the prelims question paper PDF, a detailed answer key and subject-wise explanations in Tamil & English. Free.',
+      'TNPSC Group 2 / 2A Answer Key 2026 for the prelims held on 1 November 2026: all 200 questions with the correct answer and a worked explanation, plus separate General Studies, General English and General Tamil keys. Free PDF download.',
   },
 
   group4: {
