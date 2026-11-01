@@ -330,7 +330,9 @@ const c = new Client({
   user: process.env.SUPABASE_DB_USER,
   password: process.env.SUPABASE_DB_PASSWORD,
   database: process.env.SUPABASE_DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  // The self-hosted Postgres on the VPS listens on loopback without TLS, so a
+  // run from the box itself sets SUPABASE_DB_SSL=0; remote runs keep SSL on.
+  ssl: process.env.SUPABASE_DB_SSL === '0' ? false : { rejectUnauthorized: false },
   statement_timeout: 300000,
 })
 await c.connect()
