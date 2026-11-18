@@ -1,6 +1,6 @@
 # Public current-affairs archive
 
-Status: BUILT 2026-11-18 — code + tests done; deploy pending
+Status: LIVE 2026-11-18 — 3,887 pages; sitemap https://tnpscmentors.in/current-affairs/sitemap.xml (submit in Search Console)
 
 ## Purpose
 - Same job as the PYQ archive (`scripts/qbank/`): win searches like "TNPSC current affairs 17 November 2026", "current affairs November 2026 Tamil", or a pasted CA question — and offer the app.
