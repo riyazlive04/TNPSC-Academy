@@ -22,7 +22,7 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { resolve, dirname, join, extname, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { BASE, HUB_PATH } from './render.mjs'
+import { BASE, HUB_PATH, CA_PATH } from './render.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
@@ -32,6 +32,10 @@ const argOf = (flag, dflt) => {
 }
 const OUT = resolve(ROOT, argOf('--out', 'qbank-dist'))
 const PORT = Number(argOf('--port', 4178))
+// The current-affairs tree (scripts/ca-archive) mounts beside it when built.
+const CA_OUT = resolve(ROOT, argOf('--ca', 'ca-dist'))
+const CA_BASE = CA_PATH.replace(/\/$/, '')
+const hasCa = existsSync(CA_OUT)
 
 if (!existsSync(OUT)) {
   console.error(`Nothing built at ${OUT} — run: node scripts/qbank/build.mjs`)
@@ -71,7 +75,8 @@ const server = createServer((req, res) => {
   // there is nothing here to serve it with. Say so plainly instead of 404ing,
   // which would look like a broken archive link when it is not one. The root is
   // the exception: it is the hub, served from questions/index.html.
-  if (url !== HUB_PATH && !url.startsWith(`${BASE}/`)) {
+  const inCa = hasCa && url.startsWith(`${CA_BASE}/`)
+  if (url !== HUB_PATH && !url.startsWith(`${BASE}/`) && !inCa) {
     res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' })
     res.end(
       `<!doctype html><meta charset=utf-8><body style="font:16px system-ui;padding:40px;max-width:40em">
@@ -85,9 +90,10 @@ Only <code>${BASE}/</code> and the hub at <code>/</code> are built here.</p>
 
   // Resolve under OUT, refusing anything that climbs out of it. `/` is the hub,
   // which is OUT/index.html — the same file nginx's `location = /` serves.
-  const rel = url === HUB_PATH ? '' : normalize(url.slice(BASE.length)).replace(/^[\\/]+/, '')
-  const base = join(OUT, rel)
-  if (!base.startsWith(OUT)) {
+  const root = inCa ? CA_OUT : OUT
+  const rel = url === HUB_PATH ? '' : normalize(url.slice((inCa ? CA_BASE : BASE).length)).replace(/^[\\/]+/, '')
+  const base = join(root, rel)
+  if (!base.startsWith(root)) {
     res.writeHead(403).end('Forbidden')
     return
   }

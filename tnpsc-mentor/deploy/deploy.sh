@@ -31,13 +31,13 @@ npm run build                       # outputs to dist/
 
 echo "==> Publishing SPA to $WEB_ROOT…"
 sudo mkdir -p "$WEB_ROOT"
-# --exclude /questions/: the public question archive lives under $WEB_ROOT but is
+# --exclude /questions/ and /current-affairs/: the public archives live under $WEB_ROOT but is
 # NOT part of the Vite build — it is tens of thousands of pre-rendered pages
 # generated separately by scripts/qbank (see scripts/qbank/README.md). Without
 # this exclude, --delete removes the whole archive on every deploy. It is kept
 # out of dist/ on purpose: `cap sync` bundles dist/ into the Android app, and
 # the archive would add hundreds of megabytes to the APK.
-sudo rsync -a --delete --exclude '/questions/' "$APP_DIR/dist/" "$WEB_ROOT/"
+sudo rsync -a --delete --exclude '/questions/' --exclude '/current-affairs/' "$APP_DIR/dist/" "$WEB_ROOT/"
 
 echo "==> Building API server…"
 cd "$APP_DIR/server"

@@ -36,6 +36,8 @@ const DEFAULT_PREVIEW_OK = [
   // Not an SPA page at all: LeaveToStaticSite hands the URL to the pre-rendered
   // question archive, whose own HTML carries its own per-question OG tags.
   '/questions/*',
+  // Same for the public current-affairs archive (scripts/ca-archive).
+  '/current-affairs/*',
 ]
 
 const publicRoutes = [...appSource.matchAll(/<Route\s+path="(\/[^"]*)"/g)].map((m) => m[1])

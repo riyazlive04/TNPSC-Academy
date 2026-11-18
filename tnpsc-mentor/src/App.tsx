@@ -492,6 +492,8 @@ function AnimatedRoutes() {
           has booted. Handing it back to the browser makes nginx serve the real
           page. See lockedExplanation() in scripts/qbank/render.mjs. */}
       <Route path="/questions/*" element={<LeaveToStaticSite />} />
+      {/* Same for the public current-affairs archive (scripts/ca-archive). */}
+      <Route path="/current-affairs/*" element={<LeaveToStaticSite />} />
 
       {/* Fallback */}
       <Route path="*" element={<NotFound />} />

@@ -1138,7 +1138,15 @@ ${FEATURES.map(
 </section>`
 }
 
-function footer() {
+/** The public current-affairs tree (scripts/ca-archive). Linked from both trees' chrome. */
+export const CA_PATH = '/current-affairs/'
+
+const PYQ_NOTE = [
+  'Questions and answers are reproduced from TNPSC’s published previous-year papers for study purposes. The explanations are ours.',
+  'வினாக்களும் விடைகளும் TNPSC வெளியிட்ட முந்தைய ஆண்டு வினாத்தாள்களிலிருந்து படிப்பு நோக்கத்திற்காக எடுக்கப்பட்டவை. விளக்கங்கள் எங்களுடையவை.',
+]
+
+function footer(note = PYQ_NOTE) {
   return `<footer class="site">
 <div class="shell">
 <div class="foot-top">
@@ -1163,12 +1171,10 @@ function footer() {
 <nav class="foot-links" aria-label="Subjects">
 <a href="${HUB_PATH}">${one('All questions', 'அனைத்து வினாக்கள்')}</a>
 <a href="${BASE}/past-papers/">${one('Past papers', 'முந்தைய வினாத்தாள்கள்')}</a>
+<a href="${CA_PATH}">${one('Current affairs', 'நடப்பு நிகழ்வுகள்')}</a>
 ${footerUnits.map((u) => `<a href="${BASE}/${u.key}/">${esc(u.en)}</a>`).join('')}
 </nav>
-<p class="foot-note">© 2026 ${esc(BRAND)} · ${both(
-    'Questions and answers are reproduced from TNPSC’s published previous-year papers for study purposes. The explanations are ours.',
-    'வினாக்களும் விடைகளும் TNPSC வெளியிட்ட முந்தைய ஆண்டு வினாத்தாள்களிலிருந்து படிப்பு நோக்கத்திற்காக எடுக்கப்பட்டவை. விளக்கங்கள் எங்களுடையவை.',
-  )}</p>
+<p class="foot-note">© 2026 ${esc(BRAND)} · ${both(note[0], note[1])}</p>
 </div>
 </footer>`
 }
@@ -1187,6 +1193,9 @@ ${footerUnits.map((u) => `<a href="${BASE}/${u.key}/">${esc(u.en)}</a>`).join(''
  * @param {object} [o.sticky]    {href,label,labelTa} for the mobile bar's left button
  * @param {boolean}[o.noindex]
  * @param {string} [o.prev] @param {string} [o.next]
+ * @param {string} [o.css]       stylesheet href (the CA tree ships its own)
+ * @param {string[]}[o.footNote] [en, ta] footer source note
+ * @param {string} [o.ogAlt]     og:image:alt
  */
 export function page(o) {
   const url = ORIGIN + o.path
@@ -1242,7 +1251,7 @@ ${o.prev ? `<link rel="prev" href="${esc(ORIGIN + o.prev)}">\n` : ''}${o.next ? 
 <meta property="og:image" content="${ORIGIN}${BASE}/social.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${esc(BRAND)} — TNPSC previous year questions with answers">
+<meta property="og:image:alt" content="${esc(o.ogAlt ?? `${BRAND} — TNPSC previous year questions with answers`)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#6E4FE8">
 <link rel="icon" type="image/png" href="${BASE}/logo-mark.png">
@@ -1251,7 +1260,7 @@ ${ANALYTICS}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONTS}">
-<link rel="stylesheet" href="${BASE}/archive.css">
+<link rel="stylesheet" href="${o.css ?? `${BASE}/archive.css`}">
 ${o.math ? `<link rel="stylesheet" href="${KATEX_CSS}" crossorigin="anonymous">\n` : ''}<script type="application/ld+json">${JSON.stringify(ld.length === 1 ? ld[0] : ld).replace(/</g, '\\u003c')}</script>
 ${LANG_SCRIPT}
 </head>
@@ -1265,6 +1274,7 @@ ${INSTALL_BAR}
 <nav class="mainnav" aria-label="Main">
 <a href="${HUB_PATH}">${one('Questions', 'வினாக்கள்')}</a>
 <a href="${BASE}/past-papers/">${one('Past papers', 'வினாத்தாள்கள்')}</a>
+<a href="${CA_PATH}">${one('Current affairs', 'நடப்பு நிகழ்வுகள்')}</a>
 <a href="/tnpsc-group-1-answer-key-2026">${one('Answer key', 'விடைக்குறிப்பு')}</a>
 </nav>
 <div class="head-actions">
@@ -1289,7 +1299,7 @@ ${sidebar ? `<aside class="col-side">${sidebar}</aside>` : ''}
 </main>
 ${featuresSection()}
 ${o.faq ?? ''}
-${footer()}
+${footer(o.footNote)}
 ${LANG_PROMPT}
 <div class="stickybar">
 <a class="btn btn-ghost" href="${esc(o.sticky?.href ?? `${BASE}/past-papers/`)}">${one(
@@ -1634,6 +1644,11 @@ export function questionFaq(q, { paper, unit } = {}) {
       `வினாக்களுக்கும் தமிழிலும் ஆங்கிலத்திலும் முழு விளக்கம் தெரியும்.`,
   })
 
+  return inlineFaq(items)
+}
+
+/** A question page's FAQ block + FAQPage markup from [{q, qTa, a, aTa}] (a/aTa are HTML). */
+export function inlineFaq(items) {
   return {
     html: `<section class="sec-block faq-inline" id="faq">
 <h2>${one('Frequently asked questions', 'அடிக்கடி கேட்கப்படும் கேள்விகள்')}</h2>
@@ -1781,9 +1796,9 @@ ${perks.map((p) => `<li>${en(p[0])}${ta(p[1])}</li>`).join('')}
     'இலவசக் கணக்கு தொடங்குங்க',
   )}</a>
 <p class="alt">${en(
-    `Already have an account? <a href="${esc(authUrl(APP_LOGIN, q._path))}">Log in</a> — explanations are free on every previous-year question.`,
+    `Already have an account? <a href="${esc(authUrl(APP_LOGIN, q._path))}">Log in</a> — explanations are free on every question here.`,
   )}${ta(
-    `ஏற்கனவே கணக்கு உள்ளதா? <a href="${esc(authUrl(APP_LOGIN, q._path))}">உள்நுழையுங்க</a> — எல்லா முந்தைய ஆண்டு வினாக்களுக்கும் விளக்கம் இலவசம்.`,
+    `ஏற்கனவே கணக்கு உள்ளதா? <a href="${esc(authUrl(APP_LOGIN, q._path))}">உள்நுழையுங்க</a> — இங்குள்ள எல்லா வினாக்களுக்கும் விளக்கம் இலவசம்.`,
   )}</p>
 </div>
 </section>`
@@ -1805,7 +1820,7 @@ function tagList(q) {
  * distractors as `suggestedAnswer` is the shape Google documents for quiz
  * content, and it is what makes a result show the answer under the title.
  */
-export function questionJsonLd(q, url) {
+export function questionJsonLd(q, url, { level = 'TNPSC Group 1 Preliminary 2026', about } = {}) {
   const letters = optionsOf(q)
   const correct = String(q.correct_answer ?? '').trim().toUpperCase()
   const body = plain(q.question_text)
@@ -1873,8 +1888,8 @@ export function questionJsonLd(q, url) {
     '@id': url + '#quiz',
     url,
     name: plain(body, 110),
-    educationalLevel: 'TNPSC Group 1 Preliminary 2026',
-    about: { '@type': 'Thing', name: plain(q.subject ?? 'TNPSC General Studies') },
+    educationalLevel: level,
+    about: { '@type': 'Thing', name: plain(about ?? q.subject ?? 'TNPSC General Studies') },
     publisher: { '@type': 'Organization', name: BRAND, url: ORIGIN },
     hasPart: question,
   }

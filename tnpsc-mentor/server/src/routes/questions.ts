@@ -215,8 +215,12 @@ async function isUnlimited(req: AuthedRequest, category?: string): Promise<boole
 //
 // Scope is the SAME allow-list the archive publishes, not a deny-list: this is
 // a public-origin, low-friction endpoint, so a new paid bank must be invisible
-// to it by default. Anything outside PYQ is a 404 whether or not it exists.
-const ARCHIVE_CATEGORIES = ['pyq', 'pyq2', 'pyq4']
+// to it by default. Anything outside the list is a 404 whether or not it exists.
+// 'current_affairs' is the monthly CA bank, published by scripts/ca-archive.
+// Daily CA questions live in ca_daily_questions (integer ids, never a UUID), so
+// the id's shape picks the table; a daily row is served only while its day's
+// question set is published, exactly as the archive build decides.
+const ARCHIVE_CATEGORIES = ['pyq', 'pyq2', 'pyq4', 'current_affairs']
 
 // Generous, because a reader legitimately opens many of these pages in a
 // session, but bounded so an account cannot be used to drain the explanations
@@ -237,6 +241,36 @@ router.get(
   archiveLimiter,
   asyncH(async (req: AuthedRequest, res) => {
     const id = typeof req.query.id === 'string' ? req.query.id.trim() : ''
+
+    if (/^[1-9][0-9]{0,15}$/.test(id)) {
+      const { data: dq, error: dqErr } = await supabaseAdmin
+        .from('ca_daily_questions')
+        .select('id, date, explanation, explanation_ta, why_wrong')
+        .eq('id', Number(id))
+        .eq('active', true)
+        .maybeSingle()
+      if (dqErr) return sendDbError(res, dqErr)
+      if (!dq) return res.status(404).json({ error: 'Not found' })
+      const { data: pub, error: pubErr } = await supabaseAdmin
+        .from('materials')
+        .select('id')
+        .eq('kind', 'questions')
+        .eq('questions_source', 'daily')
+        .eq('questions_key', dq.date)
+        .eq('active', true)
+        .limit(1)
+      if (pubErr) return sendDbError(res, pubErr)
+      if (!pub?.length) return res.status(404).json({ error: 'Not found' })
+      res.set('Cache-Control', 'private, max-age=300')
+      return res.json({
+        id: dq.id,
+        explanation: dq.explanation ?? null,
+        explanation_ta: dq.explanation_ta ?? null,
+        why_wrong: dq.why_wrong ?? null,
+        explanation_video_url: null,
+      })
+    }
+
     // A malformed id must not reach the database as a cast error.
     if (!/^[0-9a-f-]{36}$/i.test(id)) return res.status(400).json({ error: 'Bad id' })
 

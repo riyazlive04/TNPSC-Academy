@@ -27,3 +27,5 @@ Sitemap: https://tnpscmentors.in/sitemap.xml
 # is this site's home page and is listed in the sitemap above, not in the index
 # below — a sitemap may only list URLs at or below its own path.
 Sitemap: https://tnpscmentors.in/questions/sitemap.xml
+# The public current-affairs archive (scripts/ca-archive), same arrangement.
+Sitemap: https://tnpscmentors.in/current-affairs/sitemap.xml

@@ -115,3 +115,7 @@ server/_db_backup_20260904/
 server/_qbank/
 /qbank-dist/
 /qbank-sample/
+
+# Public current-affairs archive (scripts/ca-archive): DB dump + build output.
+server/_ca/
+/ca-dist/
