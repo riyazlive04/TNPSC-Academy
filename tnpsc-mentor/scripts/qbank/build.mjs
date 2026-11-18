@@ -36,7 +36,7 @@ import { findRepeats } from './repeats.mjs'
 import { findSimilar, conceptReport } from './similar.mjs'
 import {
   CSS, ORIGIN, BASE, HUB_PATH, BRAND,
-  esc, plain, page, questionJsonLd, promo, pager, mathText, hasMath, n,
+  esc, plain, excerpt, page, questionJsonLd, promo, pager, mathText, hasMath, n,
   setFooterUnits, faqSection, en, ta, both, one,
   questionCard, answerSection, explanationSection, questionFaq, miniQuestion,
   repeatNotice, toc,
@@ -130,6 +130,50 @@ if (outOfScope.length) {
   for (const [c, k] of [...byCat].sort((a, b) => b[1] - a[1])) console.log(`    ${c.padEnd(18)} ${n(k)}`)
   rows = rows.filter((q) => ALLOWED_CATEGORIES.has(q.category))
 }
+
+// ─── Bring the figures into the archive ──────────────────────────────────────
+// Question figures were linked straight at db.tnpscmentors.in, the self-hosted
+// Supabase host. That host exists to be locked down: conf.d/tnpsc-bot-block.conf
+// 403s every indexing bot so Studio can never be crawled, and the 403 catches
+// /robots.txt with everything else. Google's rule for a robots.txt that answers
+// 403 is that the whole host is off-limits — so every figure on an archive page
+// meant to rank was, from Googlebot's side, an image it was forbidden to fetch.
+//
+// Rather than punch a crawler-shaped hole in the database host's front door,
+// the figures move here. There are only a few dozen, they are already public,
+// and an archive that serves its own images is the same archive the rest of
+// this build already produces — self-contained, same-origin, one less host in
+// the critical path for a page that has to render for a crawler.
+//
+// Rewrites happen before anything renders, so the rest of the build never sees
+// a remote URL. The files themselves are fetched further down, once the set of
+// questions that actually ship is known.
+
+const REMOTE_IMG = /^https?:\/\/db\.tnpscmentors\.in\/storage\/v1\/object\/public\/(.+)$/
+const IMG_DIR = 'img'
+/** remote URL → path inside the archive, for every figure that survives. */
+const imageJobs = new Map()
+
+function localiseImage(src) {
+  if (typeof src !== 'string') return src
+  const m = src.match(REMOTE_IMG)
+  if (!m) return src
+  // Keep the bucket's own path: it is already unique, already tidy, and makes
+  // a stray 404 traceable back to the object it came from.
+  const rel = `${IMG_DIR}/${m[1].replace(/[^A-Za-z0-9._/-]/g, '_')}`
+  imageJobs.set(src, rel)
+  return `${BASE}/${rel}`
+}
+
+for (const q of rows) {
+  if (Array.isArray(q.images)) q.images = q.images.map(localiseImage)
+  if (q.option_images && typeof q.option_images === 'object') {
+    for (const k of Object.keys(q.option_images)) {
+      q.option_images[k] = localiseImage(q.option_images[k])
+    }
+  }
+}
+if (imageJobs.size) console.log(`  ${n(imageJobs.size)} figure(s) will be served from the archive`)
 
 // ─── Reject what should not be published ─────────────────────────────────────
 // A question with no answer, a missing option or two identical options is a
@@ -448,6 +492,50 @@ for (const f of [
   'hero-1200.jpg',
 ]) {
   write(f, readFileSync(resolve(ROOT, 'scripts/qbank/assets', f)))
+}
+
+// The figures, fetched from the object store and written into the tree. See the
+// note by `localiseImage`. A cache under scripts/qbank/assets/figures keeps a
+// rebuild offline-capable and stops a few dozen requests going out every time.
+//
+// A figure that cannot be fetched is a HARD failure, not a warning: the markup
+// has already been rewritten to point at a local path, so letting the build
+// finish would ship a page with a broken image and no way back to the original.
+const FIG_CACHE = resolve(ROOT, 'scripts/qbank/assets/figures')
+if (imageJobs.size) {
+  console.log(`Fetching ${n(imageJobs.size)} figure(s)…`)
+  let fetched = 0
+  let cached = 0
+  const missing = []
+  for (const [url, rel] of imageJobs) {
+    const cachePath = join(FIG_CACHE, rel.slice(IMG_DIR.length + 1))
+    let body = null
+    if (existsSync(cachePath)) {
+      body = readFileSync(cachePath)
+      cached++
+    } else {
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        body = Buffer.from(await res.arrayBuffer())
+        mkdirSync(dirname(cachePath), { recursive: true })
+        writeFileSync(cachePath, body)
+        fetched++
+      } catch (err) {
+        missing.push(`${url} — ${err.message}`)
+        continue
+      }
+    }
+    write(rel, body)
+  }
+  if (missing.length) {
+    console.error(`\n${missing.length} figure(s) could not be fetched:`)
+    for (const m of missing) console.error(`  ${m}`)
+    console.error('\nThe pages that use them would ship with a broken image. Fix the')
+    console.error('source objects (or prime scripts/qbank/assets/figures/) and rebuild.')
+    process.exit(1)
+  }
+  console.log(`  ${n(fetched)} downloaded, ${n(cached)} from cache`)
 }
 
 const HUB = { name: 'Previous year questions', path: HUB_PATH }
@@ -1048,11 +1136,19 @@ ${promo({
           // in Tamil has something in its own script to match and to show —
           // the <title> can only be one language without growing too long to
           // display, and that one is English.
+          // The tail used to be "Full explanation free with a <brand> account."
+          // on all 5,273 of these — the one part of the description that was
+          // identical everywhere, on a set of pages whose problem was already
+          // that they looked alike. It is now the opening of the explanation,
+          // which is unique per question, is the thing a searcher actually came
+          // for, and is text the page genuinely shows (see `excerpt`), so a
+          // snippet built from it is not a promise the page then breaks.
           description:
             `${plain(stem, 130)} Ans: (${correct})${answerText ? ` ${plain(answerText, 60)}` : ''}. ` +
             `${q._paper ? `TNPSC ${q._paper.label} ${q._paper.year}. ` : ''}` +
             `${stemTa ? `${plain(stemTa, 110)} ` : ''}` +
-            `Full explanation free with a ${BRAND} account.`,
+            (excerpt(q.explanation, { max: 120, whole: 0 }).text ||
+              `Full explanation free with a ${BRAND} account.`),
           path: q._path,
           crumbs: [
             HUB,

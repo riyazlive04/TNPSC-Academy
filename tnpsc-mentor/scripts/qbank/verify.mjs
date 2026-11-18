@@ -9,7 +9,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { resolve, dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ORIGIN, BASE, HUB_PATH } from './render.mjs'
+import { ORIGIN, BASE, HUB_PATH, excerpt } from './render.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const argv = process.argv.slice(2)
@@ -121,14 +121,24 @@ else {
   }
 }
 
-// ─── The explanations must not be in the HTML at all ─────────────────────────
-// render.mjs withholds the explanation text rather than blurring it (see
-// lockedExplanation there). That is the business model, so it gets a test and
-// not a promise: take a distinctive run of letters out of each explanation in
-// the source export and confirm it appears nowhere in the built tree.
+// ─── Only the OPENING of an explanation may be in the HTML ───────────────────
+// This check used to assert that no explanation text reached the page at all.
+// That stopped being the policy: `excerpt` in render.mjs publishes the opening
+// of each explanation on purpose, because 5,273 pages carrying nothing but a
+// stem, four options and a letter were too alike for Google to index. What is
+// still withheld is everything past that opening, plus the whole why-each-
+// option-is-wrong breakdown.
+//
+// So the probe has to start where the giveaway ends. For each row this computes
+// the same excerpt the renderer would, then takes its distinctive run of
+// letters from the text AFTER it — a leak now means the gate published more
+// than it was supposed to, which is the failure actually worth catching.
 //
 // Comparison strips everything but lowercase letters and digits, so HTML
-// entities, line wrapping and markup between words cannot hide a match.
+// entities, line wrapping and markup between words cannot hide a match. One
+// consequence worth naming: Tamil survives none of that stripping, so a Tamil
+// explanation reduces to almost nothing and is skipped. The Tamil gate rides on
+// the same branch as the English one, which this check does cover.
 //
 // A sample rather than all of them: the gate is one branch in one function, so
 // a leak is systemic and a few hundred probes find it. Checking every row would
@@ -150,8 +160,15 @@ if (!SRC) {
   for (const line of readFileSync(SRC, 'utf8').split('\n')) {
     if (!line.trim()) continue
     const q = JSON.parse(line)
-    const texts = [q.explanation, q.explanation_ta]
-    if (q.why_wrong && typeof q.why_wrong === 'object') texts.push(...Object.values(q.why_wrong))
+    // `gated: true` means the renderer gives this field's opening away, so the
+    // probe must start past it; why_wrong is withheld whole.
+    const texts = [
+      { text: q.explanation, gated: true },
+      { text: q.explanation_ta, gated: true },
+    ]
+    if (q.why_wrong && typeof q.why_wrong === 'object') {
+      for (const v of Object.values(q.why_wrong)) texts.push({ text: v, gated: false })
+    }
     // The question and its options are published on purpose, and explanations
     // in the aptitude banks routinely open by restating the question word for
     // word ("Given: Position 1: top 2, left 3, right 5 …"). A probe taken from
@@ -166,10 +183,17 @@ if (!SRC) {
         ...['a', 'b', 'c', 'd', 'e'].flatMap((L) => [q[`option_${L}`], q[`option_${L}_ta`]]),
       ].join(' '),
     )
-    for (const t of texts) {
+    for (const { text: t, gated } of texts) {
       const flat = strip(t)
       if (flat.length < 120) continue
-      for (let at = 40; at + 60 <= flat.length; at += 20) {
+      // Where the renderer's giveaway ends, in stripped coordinates. `gated`
+      // is false for why_wrong, none of which is ever published, so those probe
+      // from the start as before.
+      const given = gated ? strip(excerpt(t).text).length : 0
+      // Nothing left behind the gate: an explanation short enough to go out
+      // whole has no secret, and probing it would report its own excerpt.
+      if (flat.length - given < 60) continue
+      for (let at = given; at + 60 <= flat.length; at += 20) {
         const probe = flat.slice(at, at + 60)
         if (published.includes(probe)) continue
         secrets.push({ id: q.id, probe })
@@ -182,10 +206,12 @@ if (!SRC) {
   for (let k = 0; k < secrets.length; k += STEP) {
     probed++
     if (blob.includes(secrets[k].probe)) {
-      problems.push(`explanation text for row ${secrets[k].id} is in the published HTML`)
+      problems.push(
+        `row ${secrets[k].id}: explanation text from PAST the published excerpt is in the HTML`,
+      )
     }
   }
-  console.log(`explanation-leak check: ${probed} of ${secrets.length} explanations probed`)
+  console.log(`explanation-gate check: ${probed} of ${secrets.length} explanations probed`)
 }
 
 const mb = (bytes / 1024 / 1024).toFixed(1)

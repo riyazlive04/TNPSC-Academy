@@ -42,6 +42,10 @@ export const APP_LOGIN = `${ORIGIN}/login`
 export const authUrl = (base, backTo) =>
   backTo ? `${base}?from=${encodeURIComponent(backTo)}` : base
 
+/** The Play listing. Kept byte-for-byte in step with src/lib/playStore.ts. */
+export const PLAY_STORE_URL =
+  'https://play.google.com/store/apps/details?id=com.tnpscmentor.app&pcampaignid=web_share'
+
 /** The same accounts the answer-key pages link to. */
 export const YOUTUBE_URL = 'https://www.youtube.com/@TNPSCMentors4you'
 export const INSTAGRAM_URL = 'https://www.instagram.com/mentorstnpsc/?hl=en'
@@ -196,6 +200,69 @@ export function prose(s) {
     .join('')
 }
 
+/**
+ * The opening of an explanation — the part that is given away.
+ *
+ * Every question page used to carry the stem, four options and a letter, and
+ * nothing else that was its own: the explanation, the one piece of writing that
+ * differs from question to question, was held back entirely. Google read 5,273
+ * pages built from the same handful of sentences and filed most of them under
+ * "Crawled – currently not indexed", which is what it says when a page is real
+ * but not worth a slot. A page has to say something before it can rank for it.
+ *
+ * So the first paragraph goes out. Not blurred, not hidden behind CSS, not
+ * served to crawlers and withheld from people — the same words for everyone,
+ * which is the only version of this that is not cloaking. What stays behind the
+ * sign-in is the rest of the reasoning, the option-by-option breakdown, the
+ * Tamil, and the video: still the larger half, and still the reason to sign up.
+ *
+ * Cut on a sentence boundary, never mid-word, and never so close to the end of
+ * the text that the gate would be promising three more words.
+ *
+ * The cut is a SHARE of the text, not a fixed character count. The bank's
+ * median explanation is 362 characters, so a flat 320 would hand over nearly
+ * all of almost every one of them; `share` keeps a real remainder behind the
+ * gate on a short explanation and still lets a long one lead with a full
+ * paragraph. `whole` is the length below which splitting is just mean — those
+ * go out complete and lean on the option breakdown and the Tamil to earn the
+ * sign-up.
+ */
+export function excerpt(s, { max = 320, min = 80, share = 0.6, whole = 180 } = {}) {
+  const text = plain(s)
+  if (!text) return { text: '', truncated: false }
+  if (text.length <= whole) return { text, truncated: false }
+
+  const limit = Math.min(max, Math.max(min, Math.round(text.length * share)))
+  if (text.length <= limit) return { text, truncated: false }
+
+  const window = text.slice(0, limit + 1)
+  // Prefer the last sentence end inside the window; fall back to a word break.
+  const stop = Math.max(
+    window.lastIndexOf('. '),
+    window.lastIndexOf('? '),
+    window.lastIndexOf('! '),
+  )
+  let cut = stop >= min ? stop + 1 : window.slice(0, limit).replace(/\s+\S*$/, '').length
+  if (cut < min) cut = Math.min(text.length, limit)
+  return { text: text.slice(0, cut).trim(), truncated: cut < text.length }
+}
+
+/**
+ * Is this string mostly Tamil script?
+ *
+ * 802 of the 5,274 rows have Tamil prose sitting in the ENGLISH explanation
+ * column — a loading fault in the bank, not something this renderer can repair.
+ * It matters here because the excerpt is the one piece of explanation text that
+ * gets indexed: dropped into the English slot it would be hidden from a reader
+ * in Tamil mode, shown to a reader in English mode who cannot read it, and
+ * handed to Google tagged `en`. Route it by what the characters actually are.
+ */
+export function isTamil(s) {
+  const text = String(s ?? '')
+  if (!text) return false
+  return (text.match(/[஀-௿]/g) || []).length / text.length > 0.3
+}
+
 // ─── Stylesheet ──────────────────────────────────────────────────────────────
 // Hand-written to match the Tailwind classes AnswerKeyChrome.tsx uses. Values
 // come from src/index.css (:root) and tailwind.config.js (radii, shadows).
@@ -308,6 +375,25 @@ html.lang-asking{overflow:hidden}
 .btn-ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
 .btn-ghost:hover{border-color:rgb(110 79 232 / .4);color:var(--brand-dark);background:#FBFAFE}
 .btn-lg{padding:14px 26px;font-size:15px}
+
+/* ── Install-the-app bar ────────────────────────────────────── */
+/* Above the sticky header in the flow, so it scrolls away and the header still
+   pins to the top of the viewport. Hidden until the script says this visitor is
+   an Android/desktop one who has not dismissed it. */
+.installbar{background:var(--brand-soft);border-bottom:1px solid rgb(110 79 232 / .2)}
+.installbar .row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.installbar img{height:28px;width:28px;object-fit:contain;flex-shrink:0}
+.installbar .txt{min-width:0;flex:1}
+.installbar .txt b{display:block;font-family:'Plus Jakarta Sans','Anek Tamil',sans-serif;
+  font-size:13px;font-weight:800;color:var(--brand-dark);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.installbar .txt span{display:none;font-size:12px;color:var(--ink2)}
+@media (min-width:560px){.installbar .txt span{display:block}}
+.installbar .btn{flex-shrink:0;padding:7px 14px;font-size:13px}
+.installbar .x{flex-shrink:0;display:grid;place-items:center;height:28px;width:28px;
+  border:0;border-radius:9px;background:none;color:var(--brand-dark);opacity:.55;
+  font-size:19px;line-height:1;cursor:pointer}
+.installbar .x:hover{opacity:1;background:rgb(110 79 232 / .14)}
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .site-head{position:sticky;top:0;z-index:30;background:rgb(255 255 255 / .95);
@@ -550,6 +636,12 @@ section.exp{margin:20px 0 0;padding:18px 0 0;border-top:1px solid var(--line)}
 section.exp>h2{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink2);
   margin:0 0 10px;font-weight:700}
 section.exp p{margin:0 0 10px;font-size:15.5px;line-height:1.68}
+/* The given-away opening of the explanation. Full contrast, selectable, no
+   filter: it is ordinary body copy and must not read as a teaser. The blurred
+   bars below continue straight on from it, so no margin between the two. */
+.exp-lede{margin:0 0 2px}
+.exp-lede p{margin:0 0 10px;font-size:15.5px;line-height:1.68;color:var(--ink)}
+.exp-lede p:last-child{margin-bottom:0}
 .blurred{padding:2px 0 12px;filter:blur(5px);opacity:.45;user-select:none;pointer-events:none}
 .blurred span{display:block;height:11px;border-radius:999px;background:var(--ink2);margin:10px 0}
 .blurred span:nth-child(1){width:97%}
@@ -557,6 +649,9 @@ section.exp p{margin:0 0 10px;font-size:15.5px;line-height:1.68}
 .blurred span:nth-child(3){width:93%}
 .blurred span:nth-child(4){width:61%}
 .unlock{background:var(--brand-soft);border-radius:var(--r-card);padding:20px;margin-top:-8px}
+/* The -8px above tucks the card under the fading blur. With nothing left to
+   blur the card follows the opening paragraph directly, and needs real space. */
+.exp-lede + .unlock{margin-top:16px}
 .unlock .ask{margin:0 0 13px;font-size:16.5px;font-weight:700;color:var(--ink);
   font-family:'Plus Jakarta Sans','Anek Tamil',sans-serif;line-height:1.4}
 .unlock ul{margin:0 0 17px;padding:0;list-style:none;font-size:14.5px;color:#4A3F7A}
@@ -770,7 +865,7 @@ footer.site .shell{padding-top:40px;padding-bottom:40px}
 @media (max-width:639px){body{padding-bottom:80px}}
 
 .katex{font-size:1.03em}
-@media print{.site-head,.stickybar,.promo,.features,.col-side,.faq{display:none}}
+@media print{.site-head,.stickybar,.installbar,.promo,.features,.col-side,.faq{display:none}}
 `
 
 // ─── Page shell ──────────────────────────────────────────────────────────────
@@ -859,6 +954,45 @@ if(v==='rejected')return;
 if(v!=='accepted'){try{localStorage.setItem(K,'accepted')}catch(e){}}
 window.__loadTrackers();})();
 </script>`
+
+// ─── Install-the-app bar ───────────────────────────────────────────
+// The archive's copy of src/components/InstallAppBanner.tsx. The two are
+// separate because this tree is built outside Vite and renders no React; keep
+// their copy, their dismissal key and their 14-day window in step.
+//
+// Ships `hidden` and is unhidden by the script, so an iOS visitor (the app is
+// Android-only) and anyone who has already dismissed it never see it flash. With
+// JavaScript off it simply stays hidden, which is also what a crawler gets.
+const INSTALL_BAR = `<div class="installbar" id="installbar" hidden>
+<div class="shell row">
+<img src="${BASE}/logo-mark.png" alt="" width="28" height="28">
+<div class="txt">
+<b>${one('Get the TNPSC Mentors app', 'TNPSC Mentors செயலியைப் பெறுங்கள்')}</b>
+<span>${one(
+  'Practise these questions as timed tests — free on Google Play.',
+  'இந்த வினாக்களைத் தேர்வாகப் பரிட்சை செய்யுங்கள் — Google Play-இல் இலவசம்.',
+)}</span>
+</div>
+<a class="btn btn-brand" href="${PLAY_STORE_URL}" target="_blank" rel="noopener"
+ data-install-cta>${one('Install', 'நிறுவு')}</a>
+<button type="button" class="x" data-install-close aria-label="Dismiss / மூடு">&times;</button>
+</div>
+</div>`
+
+const INSTALL_SCRIPT = `<script>(function(){
+var K='tnpsc:installBannerDismissed',W=14*24*60*60*1000;
+var bar=document.getElementById('installbar');if(!bar)return;
+var ua=navigator.userAgent||'';
+if(/iPad|iPhone|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))return;
+try{var at=Number(localStorage.getItem(K));
+if(at>0&&Date.now()-at<W)return}catch(e){}
+bar.hidden=false;
+bar.querySelector('[data-install-close]').addEventListener('click',function(){
+bar.hidden=true;try{localStorage.setItem(K,String(Date.now()))}catch(e){}});
+bar.querySelector('[data-install-cta]').addEventListener('click',function(){
+try{(window.dataLayer=window.dataLayer||[]).push(
+{event:'install_app_click',source:'archive_banner',store:'google_play'})}catch(e){}});
+})();</script>`
 
 const LANG_SCRIPT = `<script>(function(){try{
 var K='tnpsc-landing-lang',A='tnpsc-archive-lang-asked',d=document.documentElement;
@@ -1122,6 +1256,7 @@ ${o.math ? `<link rel="stylesheet" href="${KATEX_CSS}" crossorigin="anonymous">\
 ${LANG_SCRIPT}
 </head>
 <body id="top">
+${INSTALL_BAR}
 <header class="site-head"><div class="shell row">
 <a class="brand" href="${HUB_PATH}" aria-label="${esc(BRAND)}">
 <img src="${BASE}/logo-mark.png" alt="" width="36" height="36">
@@ -1167,6 +1302,7 @@ ${LANG_PROMPT}
     'Unlock all explanations — free',
     'எல்லா விளக்கங்களும் — இலவசம்',
   )}</a>
+${INSTALL_SCRIPT}
 ${o.body.includes('id="exp-locked"') ? UNLOCK_SCRIPT : ''}
 </body>
 </html>
@@ -1546,16 +1682,21 @@ function openExplanation(q, correct, letters) {
  * out in full. The explanation is ours, and it is what a subscription buys, so
  * this is the trade: the answer for free, the reasoning for a sign-up.
  *
- * Note what this does NOT do. It does not write the explanation into the page
- * and hide it with CSS. A blur over real text is undone by View Source, by
+ * Note what this does NOT do. It does not write the full explanation into the
+ * page and hide it with CSS. A blur over real text is undone by View Source, by
  * Reader mode, or by any of the dozen extensions that strip filters — the paid
  * asset would be a right-click away, and serving a crawler text that a visitor
  * cannot read is exactly the cloaking Google penalises. The bars below are
  * decorative; the sentences they stand in for are not in the HTML at all.
  *
- * What IS said is true and comes from metadata rather than content: how many
- * wrong options we can account for, and whether a Tamil version exists. That is
- * an honest advertisement for what is behind the door.
+ * The OPENING of the explanation is different, and it is printed in full above
+ * the gate: real text, in the markup, shown to every visitor and every crawler
+ * alike. See `excerpt` for why that line had to move. It is given away, not
+ * leaked — there is no version of the page where those words are hidden.
+ *
+ * The rest of what is said is true and comes from metadata rather than content:
+ * how many wrong options we can account for, and whether a Tamil version
+ * exists. That is an honest advertisement for what is behind the door.
  */
 function lockedExplanation(q, correct, letters) {
   const ww = q.why_wrong && typeof q.why_wrong === 'object' ? q.why_wrong : null
@@ -1566,8 +1707,30 @@ function lockedExplanation(q, correct, letters) {
   // cannot deliver once they have signed up.
   if (!hasEn && !hasTa && !wrongCount) return ''
 
+  // The given-away opening. Tamil gets a shorter one: it is there so the Tamil
+  // wording of the reasoning is indexable too, not to reproduce the English.
+  const lede = excerpt(q.explanation)
+  const ledeTa = hasTa ? excerpt(q.explanation_ta, { max: 240 }) : { text: '', truncated: false }
+  // A Tamil "English" explanation belongs in the Tamil slot — unless Tamil is
+  // already filled from its own column, in which case showing it twice helps
+  // nobody and the misfiled copy is simply dropped.
+  const ledeMisfiled = !!lede.text && isTamil(lede.text)
+  const ledeEnHtml = ledeMisfiled ? '' : lede.text ? en(`<p>${mathText(lede.text)}</p>`) : ''
+  const ledeTaText = ledeTa.text || (ledeMisfiled ? lede.text : '')
+  const ledeTaHtml = ledeTaText ? ta(`<p>${mathText(ledeTaText)}</p>`) : ''
+  const ledeHtml =
+    ledeEnHtml || ledeTaHtml ? `<div class="exp-lede">${ledeEnHtml}${ledeTaHtml}</div>` : ''
+
   const perks = []
-  if (hasEn) {
+  // With the opening now printed above, "the explanation" is no longer what is
+  // being offered — the REST of it is. Promise that instead, or the gate is
+  // selling something the visitor has just finished reading.
+  if (hasEn && lede.truncated) {
+    perks.push([
+      `The rest of why <b>${esc(correct)}</b> is right, step by step`,
+      `<b>${esc(correct)}</b> ஏன் சரி என்பதற்கான முழு விளக்கம்`,
+    ])
+  } else if (hasEn && !lede.text) {
     perks.push([
       `Why <b>${esc(correct)}</b> is right, explained step by step`,
       `<b>${esc(correct)}</b> ஏன் சரி என்பதற்கான முழு விளக்கம்`,
@@ -1579,21 +1742,37 @@ function lockedExplanation(q, correct, letters) {
       `மற்ற ${wrongCount} விடைகள் ஏன் தவறு என்பதும்`,
     ])
   }
-  if (hasTa) perks.push(['The same explanation in Tamil', 'அதே விளக்கம் தமிழிலும்'])
+  if (hasTa) {
+    perks.push(
+      ledeTa.truncated
+        ? ['The same explanation in Tamil, in full', 'அதே விளக்கம் முழுமையாகத் தமிழிலும்']
+        : ['The same explanation in Tamil', 'அதே விளக்கம் தமிழிலும்'],
+    )
+  }
   perks.push([
     'This question as part of a timed mock test',
     'இந்த வினா உள்ளிட்ட நேரக் கட்டுப்பாட்டுத் தேர்வு',
   ])
 
+  // Is there actually prose still behind the gate? If the whole explanation
+  // fitted in the opening and there is no option breakdown, the decorative bars
+  // would be standing in for nothing. Drop them and let the perks speak.
+  const holdsProse = lede.truncated || ledeTa.truncated || wrongCount > 0
+
+  const ask = holdsProse
+    ? en(`That is the start of it. Read the rest free — it takes one account.`) +
+      ta(`இது தொடக்கம் மட்டுமே. மீதியை இலவசமாகப் படிக்க ஒரு கணக்கு போதும்.`)
+    : en(`Keep going — the same account turns these papers into timed mock tests.`) +
+      ta(`இதே கணக்கில் இந்தத் தாள்களை நேரக் கட்டுப்பாட்டுத் தேர்வாக எழுதலாம்.`)
+
   return `<section class="exp" id="exp-locked" data-qid="${esc(String(q.id))}"
  data-h="Explanation" data-h-ta="விளக்கம்"
  data-wh="Why the other options are wrong" data-wh-ta="மற்ற விடைகள் ஏன் தவறு"
  data-vid="Watch the video explanation" data-vid-ta="வீடியோ விளக்கம்">
-<div class="blurred" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+${ledeHtml}
+${holdsProse ? '<div class="blurred" aria-hidden="true"><span></span><span></span><span></span><span></span></div>' : ''}
 <div class="unlock">
-<p class="ask">${en(
-    `Why is <b>${esc(correct)}</b> the answer? Sign in free to read the full explanation.`,
-  )}${ta(`<b>${esc(correct)}</b> ஏன் சரியான விடை? முழு விளக்கத்தைப் படிக்க இலவசமாக உள்நுழையுங்க.`)}</p>
+<p class="ask">${ask}</p>
 <ul>
 ${perks.map((p) => `<li>${en(p[0])}${ta(p[1])}</li>`).join('')}
 </ul>
@@ -1660,15 +1839,30 @@ export function questionJsonLd(q, url) {
     ...(bodyTa ? { alternateName: bodyTa } : {}),
     inLanguage: bodyTa ? ['en', 'ta'] : 'en',
     answerCount: 1,
-    // No `comment` here on purpose. The explanation is behind a sign-in, and
-    // structured data must describe what the page actually shows — claiming
-    // text a visitor cannot see is what gets markup ignored or penalised.
     acceptedAnswer: {
       '@type': 'Answer',
       text: langValues(
         answerText ? `${correct}. ${answerText}` : correct,
         answerTextTa ? `${correct}. ${answerTextTa}` : null,
       ),
+      // `comment` carries the OPENING of the explanation and nothing more —
+      // exactly the words printed above the gate (see `excerpt`). Structured
+      // data must describe what the page actually shows, so the rest of the
+      // explanation, which a logged-out visitor cannot read, stays out of it.
+      // Tagged by the script it is actually written in, for the reason in
+      // `isTamil`: 802 rows carry Tamil prose in the English column.
+      ...(() => {
+        const lede = excerpt(q.explanation)
+        if (!lede.text) return {}
+        return {
+          comment: {
+            '@type': 'Comment',
+            text: isTamil(lede.text)
+              ? { '@value': lede.text, '@language': 'ta' }
+              : lede.text,
+          },
+        }
+      })(),
     },
     ...(suggested.length ? { suggestedAnswer: suggested } : {}),
   }
@@ -1735,10 +1929,30 @@ export function promo({
 </section>`
 }
 
-/** A numbered pager that stays short on a 400-page topic. */
+/**
+ * A numbered pager that stays short on a 400-page topic.
+ *
+ * The neighbours-and-ends set this used to use — 1, 2, n-1, n, and the three
+ * around the current page — is the conventional shape and it buries the middle.
+ * On the Tamil listing, 56 pages long, page 28 was reachable only by clicking
+ * "next" 27 times. Google records a URL it has found but not yet fetched as
+ * "Discovered – currently not indexed", and thousands of this archive's
+ * question pages sat there: they are linked only from a listing page that is
+ * itself twenty-odd hops from anything.
+ *
+ * So the step set grows by powers of two as it goes out — ±1, ±2, ±4, ±8 … —
+ * which puts every page within about log2(n) clicks of every other. 56 pages
+ * becomes six hops rather than twenty-seven, no page in the archive is more
+ * than a few links from the hub, and a reader skimming a long listing gets a
+ * way to jump that the old pager did not give them either.
+ */
 export function pager(pageNo, pages, hrefFor) {
   if (pages <= 1) return ''
   const want = new Set([1, 2, pages - 1, pages, pageNo - 1, pageNo, pageNo + 1])
+  for (let step = 2; step < pages; step *= 2) {
+    want.add(pageNo - step)
+    want.add(pageNo + step)
+  }
   const shown = [...want].filter((x) => x >= 1 && x <= pages).sort((a, b) => a - b)
   const out = []
   let last = 0
