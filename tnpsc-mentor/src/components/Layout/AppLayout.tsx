@@ -208,14 +208,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   return (
     <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial web:flex web:flex-col">
       {!bare && (
-        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card web:bg-card/95 web:backdrop-blur">
+        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 web:sm:px-6">
             <button
               onClick={() => navigate('/test-arena')}
               className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80"
             >
               <img src="/logo-mark.png" alt="" className="h-9 w-9 flex-shrink-0 object-contain" />
-              <span className="font-heading text-base font-semibold tracking-tight text-ink web:font-extrabold">
+              <span className="font-heading text-base font-semibold tracking-tight text-ink">
                 TNPSC <span className="text-brand">Mentors</span>
               </span>
             </button>
@@ -234,10 +234,12 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                     className={[
                       'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
                       // Web: the archive's text-only nav (bold ink links, no icons).
-                      'web:shrink-0 web:whitespace-nowrap web:rounded-[10px] web:px-2.5 web:text-sm web:font-bold',
+                      // Web: text links on one line - with icons the Tamil labels need ~860px
+                      // and the nav has ~710px inside the 6xl header.
+                      'web:shrink-0 web:whitespace-nowrap web:px-2.5',
                       active
                         ? 'bg-brand-soft text-brand-dark'
-                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark web:text-ink web:hover:bg-brand-soft',
+                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark',
                     ].join(' ')}
                   >
                     <Icon size={17} className="web:hidden" />

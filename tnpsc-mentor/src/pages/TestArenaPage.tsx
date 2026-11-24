@@ -423,12 +423,11 @@ export default function TestArenaPage() {
     <>
       <PageGrid className="py-6 lg:py-8" aside={keepGoing}>
       <div className="space-y-8">
-        {/* Greeting - bare on the surface. Hierarchy from type + space, no box.
-            Web: the archive hero's eyebrow pill + large title. */}
-        <header className="px-1 web:px-0">
-          <p className="tamil font-body text-sm text-muted web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:text-brand-dark">{t(greetingKey())}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 web:mt-3">
-            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink web:text-[clamp(23px,4.2vw,34px)]">
+        {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
+        <header className="px-1">
+          <p className="tamil font-body text-sm text-muted">{t(greetingKey())}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink">
               {firstName || 'Aspirant'}
             </h1>
             {showStreak && (

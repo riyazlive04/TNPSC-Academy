@@ -82,3 +82,10 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | /test-series offer sheet | card stacks, perks/bonus full width, price + coupon + full-width buy button |
 | /profile Rank Booster card (736px) | still side by side (row) — unchanged |
 | tsc / vitest | clean / only pre-existing roles failure |
+
+## v2 web-look-revert (2026-11-24)
+| Check | Result |
+|---|---|
+| Signed-in local (TA dark 1536) dashboard | app look back: plain greeting, unboxed lists, app GridCards; structure kept (header/footer/sidebar). |
+| Header nav with icons (app look) | did NOT fit Tamil: 864px needed / 710px available → icons hidden on web only, app colours/weights kept → 710/710 |
+| webPageKit.test (SectionBlock case removed with the component) | pass |

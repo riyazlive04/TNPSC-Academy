@@ -16,14 +16,7 @@ export function List({
   children: ReactNode
   className?: string
 }) {
-  // web: the archive's boxed `.rows` list; native stays hairline rows on the surface.
-  return (
-    <div
-      className={`divide-y divide-line web:overflow-hidden web:rounded-card web:border web:border-line web:bg-card web:shadow-soft ${className}`}
-    >
-      {children}
-    </div>
-  )
+  return <div className={`divide-y divide-line ${className}`}>{children}</div>
 }
 
 export function ListRow({
@@ -54,7 +47,7 @@ export function ListRow({
       disabled={disabled}
       whileTap={reduce || disabled ? undefined : tapScale}
       style={style}
-      className={`focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45 web:px-4 web:py-3.5 web:transition-colors web:hover:bg-brand-soft/40 ${className}`}
+      className={`focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45 ${className}`}
     >
       {leading}
       <span className="min-w-0 flex-1">

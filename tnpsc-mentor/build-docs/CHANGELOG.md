@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-24
+- feat(web-look-revert): web keeps the app's visual design (v1 archive styling removed from primitives, greeting, badges, header); structure kept. SectionBlock + WEB_EYEBROW deleted.
 - feat(web-shell): browser-only website chrome — `html.is-web` + Tailwind `web:` variant, archive-style text nav, site footer with archive links; Android unchanged.
 - feat(web-page-kit): PageGrid / Crumbs / SectionBlock + web variants on List, ListRow, SectionHeader, ChoiceGrid/Card, StatStrip.
 - feat(web-home): dashboard on web — PageGrid, archive hero greeting, 3-col practice cards, Keep going in the sidebar.

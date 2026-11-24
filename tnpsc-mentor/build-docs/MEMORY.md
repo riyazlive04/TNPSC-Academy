@@ -2,6 +2,9 @@
 
 Long-form history lives in Claude memory + `docs/`. This file records decisions for work tracked in `build-docs/`.
 
+## Web app as web pages v2 (2026-11-24, plan awaiting approval)
+- User: revert the v1 archive LOOK on web (keep the app's visual design); convert STRUCTURE to web pages — phone menu instead of bottom tabs, sheets → pages, buttons → real links, back buttons → breadcrumbs. Reverses v1 "Both" reference + "phone web keeps tabs".
+
 ## Website look for web pages (2026-11-24, deployed 3d183ba)
 - User: reference = archive AND landing pages; web only (Android keeps native chrome); all 54 pages incl. admin.
 - Switch = runtime `Capacitor.isNativePlatform()` → `html.is-web` + Tailwind `web:` variant (one bundle/OTA for both).

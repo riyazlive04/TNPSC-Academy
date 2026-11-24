@@ -74,7 +74,7 @@ export function CardRow({
 // never overlaps the row underneath.
 
 export function CardGrid({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`grid grid-cols-2 gap-3 web:gap-3.5 web:sm:grid-cols-3 ${className}`}>{children}</div>
+  return <div className={`grid grid-cols-2 gap-3 web:sm:grid-cols-3 ${className}`}>{children}</div>
 }
 
 export function GridCard({
@@ -107,7 +107,7 @@ export function GridCard({
       disabled={disabled}
       style={style}
       whileTap={reduce || disabled ? undefined : tapScaleSubtle}
-      className={`stagger-item focus-ring group relative flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card disabled:opacity-45 disabled:hover:translate-y-0 web:p-[18px] web:hover:border-brand/40 ${className}`}
+      className={`stagger-item focus-ring group relative flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card disabled:opacity-45 disabled:hover:translate-y-0 ${className}`}
     >
       {badge && <span className="absolute right-3 top-3">{badge}</span>}
       <IconTile tint={tint} size={44}>

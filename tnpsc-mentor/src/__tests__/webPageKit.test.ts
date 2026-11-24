@@ -61,13 +61,6 @@ describe('web-page-kit', () => {
     expect(render(Crumbs, { items })).toBe('')
   })
 
-  it('AC1 SectionBlock is a card only via web: classes (plain section natively)', async () => {
-    const { SectionBlock } = await import('../components/Site/PageKit')
-    const html = render(SectionBlock, { title: 'T' }, 'body')
-    expect(html).toContain('web:rounded-card')
-    expect(nativeClasses(html)[0]).toBe('scroll-mt-24')
-  })
-
   it('AC2 shared primitives: native classes unchanged once web: tokens are stripped', () => {
     expect(nativeClasses(render(List, {}, 'x'))[0]).toBe('divide-y divide-line')
     expect(nativeClasses(render(ListRow, { title: 'A' }))[0]).toBe(

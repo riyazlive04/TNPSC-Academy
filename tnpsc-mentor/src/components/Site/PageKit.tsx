@@ -5,9 +5,9 @@ import { useLanguageStore } from '../../store/languageStore'
 import { AnswerKeyFooter } from '../Landing/AnswerKeyChrome'
 
 // ─── Website page kit ───────────────────────────────────────────────────────
-// The public archive's page parts (scripts/qbank/render.mjs: .crumbs, .layout,
-// .sec-block) as React. Every web look is behind the `web:` variant or IS_WEB,
-// so the installed app renders exactly what it did before.
+// Website STRUCTURE for the browser (crumbs, main + sidebar grid, footer) —
+// the app's own visual design is kept (user, 2026-11-24 v2). Everything here is
+// behind the `web:` variant or IS_WEB, so the installed app is unchanged.
 
 /**
  * Page container. Native keeps the page's own column width; the browser gets
@@ -36,10 +36,6 @@ export function PageGrid({
     </div>
   )
 }
-
-/** Archive hero eyebrow pill, for a page's section badge (browser only). */
-export const WEB_EYEBROW =
-  'web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:normal-case web:tracking-normal web:text-brand-dark'
 
 export interface Crumb {
   label: ReactNode
@@ -75,36 +71,6 @@ export function Crumbs({ items, className = '' }: { items: Crumb[]; className?: 
         ))}
       </ol>
     </nav>
-  )
-}
-
-/**
- * A named section (archive `.sec-block`): a card in the browser, plain grouping
- * by space on Android (the app's list-led look).
- */
-export function SectionBlock({
-  title,
-  children,
-  id,
-  className = '',
-}: {
-  title?: ReactNode
-  children: ReactNode
-  id?: string
-  className?: string
-}) {
-  return (
-    <section
-      id={id}
-      className={`scroll-mt-24 web:my-4 web:rounded-card web:border web:border-line web:bg-card web:p-5 web:shadow-soft web:sm:px-[26px] web:sm:py-6 ${className}`}
-    >
-      {title && (
-        <h2 className="tamil mb-3 font-display text-base font-semibold tracking-tight text-ink web:text-[19px] web:font-bold web:leading-snug">
-          {title}
-        </h2>
-      )}
-      {children}
-    </section>
   )
 }
 
