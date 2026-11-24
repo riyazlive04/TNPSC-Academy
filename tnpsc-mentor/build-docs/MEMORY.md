@@ -2,6 +2,15 @@
 
 Long-form history lives in Claude memory + `docs/`. This file records decisions for work tracked in `build-docs/`.
 
+## Website look for web pages (2026-11-24, approved — building)
+- User: reference = archive AND landing pages; web only (Android keeps native chrome); all 54 pages incl. admin.
+- Switch = runtime `Capacitor.isNativePlatform()` → `html.is-web` + Tailwind `web:` variant (one bundle/OTA for both).
+- Tokens already shared with `render.mjs`; work is layout. Footer = `AnswerKeyFooter` from `AnswerKeyChrome.tsx`.
+- Web reverses the "de-cardify" premium-redesign rule; native keeps it.
+- User approved my recommendations: phone-width web KEEPS the bottom tab bar; dark mode toggle kept on web; admin consoles get shell + tokens only (tables stay tables).
+- No separate SiteHeader/siteNav.ts: AppLayout's header is web-styled with `web:` classes; `AnswerKeyFooter` reused with a `links` row. Avoids duplicating credits/bell/preview logic.
+- Folder is `components/Landing/` (capital L) in git — Windows hides wrong-case imports; tsc catches them.
+
 ## Public current-affairs archive (2026-11-18)
 - Tree at apex `/current-affairs/` — `/questions/current-affairs/` is the PYQ subject page, SPA CA hub is `/test-arena/current-affairs`.
 - Public only if the `materials` publish row is active (30 of 135 pushed days are unapproved).

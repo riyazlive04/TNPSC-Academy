@@ -19,6 +19,8 @@ import FeedbackModal from '../Feedback/FeedbackModal'
 import NotificationBell from './NotificationBell'
 import BackToTopButton from './BackToTopButton'
 import AlertPopup from './AlertPopup'
+import { AnswerKeyFooter } from '../Landing/AnswerKeyChrome'
+import { IS_WEB } from '../../lib/platform'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -42,6 +44,34 @@ function withinFeedbackWindow(key: string | null): boolean {
   const last = Number(localStorage.getItem(key))
   return Number.isFinite(last) && last > 0 && Date.now() - last < FEEDBACK_WINDOW_MS
 }
+
+// Website footer (browser only) - same destinations as the static archive's
+// footer in scripts/qbank/render.mjs. The archive trees exist only on the apex
+// host, never on app.tnpscmentors.in, hence the absolute URLs.
+const SITE = 'https://tnpscmentors.in'
+const FOOTER = {
+  en: {
+    tagline: 'TNPSC Group 1, Group 2 / 2A and Group 4 preparation, in Tamil and English.',
+    follow: 'Follow us',
+    disclaimer: 'Not affiliated with the Tamil Nadu Public Service Commission.',
+    links: ['All questions', 'Past papers', 'Current affairs', 'Answer key', 'Privacy', 'Refund policy', 'Guidelines'],
+  },
+  ta: {
+    tagline: 'TNPSC குரூப் 1, குரூப் 2 / 2A, குரூப் 4 தேர்வுப் பயிற்சி — தமிழிலும் ஆங்கிலத்திலும்.',
+    follow: 'எங்களைப் பின்தொடருங்க',
+    disclaimer: 'Tamil Nadu Public Service Commission-உடன் தொடர்பில்லை.',
+    links: ['அனைத்து வினாக்கள்', 'வினாத்தாள்கள்', 'நடப்பு நிகழ்வுகள்', 'விடைக்குறிப்பு', 'தனியுரிமை', 'பணத்திருப்பக் கொள்கை', 'வழிகாட்டுதல்கள்'],
+  },
+}
+const FOOTER_HREFS = [
+  `${SITE}/`,
+  `${SITE}/questions/past-papers/`,
+  `${SITE}/current-affairs/`,
+  `${SITE}/tnpsc-group-2-answer-key-2026`,
+  '/privacy',
+  '/refund-policy',
+  '/guidelines',
+]
 
 // Learner navigation - the personal study tabs (spaced revision, progress
 // insights, profile) shown to regular users. Desktop has room for the full
@@ -113,6 +143,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   )
   const lang = useLanguageStore((s) => s.lang) ?? 'en'
   const setLang = useLanguageStore((s) => s.setLang)
+  const foot = FOOTER[lang === 'ta' ? 'ta' : 'en']
   const resolvedTheme = useThemeStore((s) => s.resolved)
   const toggleTheme = useThemeStore((s) => s.toggle)
 
@@ -206,14 +237,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   return (
     <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial">
       {!bare && (
-        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card web:bg-card/95 web:backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 web:sm:px-6">
             <button
               onClick={() => navigate('/test-arena')}
               className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80"
             >
               <img src="/logo-mark.png" alt="" className="h-9 w-9 flex-shrink-0 object-contain" />
-              <span className="font-heading text-base font-semibold tracking-tight text-ink">
+              <span className="font-heading text-base font-semibold tracking-tight text-ink web:font-extrabold">
                 TNPSC <span className="text-brand">Mentors</span>
               </span>
             </button>
@@ -230,12 +261,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                     aria-current={active}
                     className={[
                       'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
+                      // Web: the archive's text-only nav (bold ink links, no icons).
+                      'web:rounded-[10px] web:px-3 web:text-[14.5px] web:font-bold',
                       active
                         ? 'bg-brand-soft text-brand-dark'
-                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark',
+                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark web:text-ink web:hover:bg-brand-soft',
                     ].join(' ')}
                   >
-                    <Icon size={17} />
+                    <Icon size={17} className="web:hidden" />
                     <span className="tamil">{t(key)}</span>
                     {to === '/admin/reports' && openReports > 0 && (
                       <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white">
@@ -346,7 +379,20 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
         </div>
       )}
 
-      <main className={bare ? '' : 'pb-24 lg:pb-10'}>{children}</main>
+      <main className={bare ? '' : IS_WEB ? 'pb-10' : 'pb-24 lg:pb-10'}>{children}</main>
+
+      {/* Website footer (browser only). The padded wrapper keeps it clear of
+          the fixed bottom tab bar on phone widths. */}
+      {!bare && IS_WEB && (
+        <div className="bg-card pb-20 lg:pb-0">
+          <AnswerKeyFooter
+            tagline={foot.tagline}
+            followLabel={foot.follow}
+            disclaimer={foot.disclaimer}
+            links={foot.links.map((label, i) => ({ label, href: FOOTER_HREFS[i] }))}
+          />
+        </div>
+      )}
 
       {/* Admin/superadmin consoles are long, scroll-heavy pages - give content
           managers a quick jump back to the header/tabs. */}

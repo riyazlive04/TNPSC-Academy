@@ -253,5 +253,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  // `web:` = browser only (html.is-web, see src/lib/platform.ts); the installed
+  // app ignores these classes and keeps its native look.
+  plugins: [({ addVariant }) => addVariant('web', 'html.is-web &')],
 }

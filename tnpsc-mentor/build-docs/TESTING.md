@@ -17,3 +17,12 @@ Failures found and fixed:
 - shareMeta test: new `/current-affairs/*` route added to the default-preview allow-list (static pages carry their own OG tags).
 
 Not covered by automated tests: the unlock endpoint's DB path (route handlers have no test harness here) — checked by typecheck + live curl after deploy.
+
+## web-shell (2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| `src/__tests__/webShell.test.ts` (4) | AC1/AC2 `IS_WEB` web vs native + dev override; AC1 footer link row; AC6 answer-key footer unchanged | 4/4 pass |
+| Playwright screenshots via temp `_preview.html` harness: web 1280, web 320 EN, web 320 TA, native 1280 | AC1, AC2, AC5 | web shows text nav + footer; native identical to before (icons, no footer); scrollWidth = viewport at 320 EN/TA |
+| `tsc --noEmit` | — | clean (caught a `landing/` vs `Landing/` import case bug that would break the Linux build) |
+| Regression: `npx vitest run` | answer-key pages, all | 228/229; `roles.test.ts > passwordStrength` fails — pre-existing (fails with these changes stashed) |
+- Not checked: a real signed-in session (shell routes are auth-gated; local DB env is dead) — harness renders AppLayout with an empty body instead.

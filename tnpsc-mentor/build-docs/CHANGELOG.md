@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-24
+- feat(web-shell): browser-only website chrome — `html.is-web` + Tailwind `web:` variant, archive-style text nav, site footer with archive links; Android unchanged.
+
 ## 2026-11-18
 - feat(qbank): committed reviewed WIP — self-hosted figures, explanation opening published, install bar, log-step pager (dcbe5b4).
 - feat(ca-archive): public current-affairs archive at /current-affairs/ — day, month, topic and question pages; unlock endpoint covers CA questions; nav/footer link from the PYQ archive; nginx block; deploy.sh exclude; robots sitemap entry.

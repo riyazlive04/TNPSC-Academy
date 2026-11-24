@@ -246,10 +246,13 @@ export function AnswerKeyFooter({
   tagline,
   followLabel,
   disclaimer,
+  links,
 }: {
   tagline: string
   followLabel: string
   disclaimer: string
+  /** Optional link row above the copyright line (the archive footer's `.foot-links`). */
+  links?: { href: string; label: string }[]
 }) {
   return (
     <footer className="border-t border-line bg-card">
@@ -289,7 +292,16 @@ export function AnswerKeyFooter({
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t border-line pt-6 font-body text-xs text-ink2">
+        {links && (
+          <nav aria-label="Site" className="mt-8 flex flex-wrap gap-x-5 gap-y-2 border-t border-line pt-6 font-body text-sm">
+            {links.map((l) => (
+              <a key={l.href} href={l.href} className="tamil text-ink2 transition hover:text-brand-dark">
+                {l.label}
+              </a>
+            ))}
+          </nav>
+        )}
+        <div className={`${links ? 'mt-5' : 'mt-8 border-t border-line pt-6'} font-body text-xs text-ink2`}>
           <p className="tamil">© 2026 TNPSC Mentors · {disclaimer}</p>
         </div>
       </div>
