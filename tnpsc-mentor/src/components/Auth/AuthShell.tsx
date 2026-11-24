@@ -3,6 +3,8 @@ import { Languages, Sun, Moon } from 'lucide-react'
 import { useLanguageStore, type Lang } from '../../store/languageStore'
 import { useThemeStore } from '../../store/themeStore'
 import { useT, type StringKey } from '../../lib/i18n'
+import { IS_WEB } from '../../lib/platform'
+import { SiteFooter } from '../Site/PageKit'
 
 interface AuthShellProps {
   /** The form card rendered on the right / center. */
@@ -28,10 +30,8 @@ export default function AuthShell({ children }: AuthShellProps) {
 
   const cycleLang = () => setLang(LANG_CYCLE[(LANG_CYCLE.indexOf(lang) + 1) % LANG_CYCLE.length])
 
-  return (
-    <div className="relative grid min-h-dvh lg:grid-cols-2">
-      {/* Language + theme controls (top-right, above both columns) */}
-      <div className="pt-safe absolute right-4 top-4 z-20 flex items-center gap-2">
+  const controls = (
+    <>
         <button
           onClick={cycleLang}
           aria-label={`${t('language')} (${LANG_LABEL[lang]})`}
@@ -46,7 +46,13 @@ export default function AuthShell({ children }: AuthShellProps) {
         >
           {resolvedTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-      </div>
+    </>
+  )
+
+  const shell = (
+    <div className="relative grid min-h-dvh lg:grid-cols-2 web:min-h-0 web:flex-1">
+      {/* Language + theme controls (top-right, above both columns). Web: in the site header instead. */}
+      {!IS_WEB && <div className="pt-safe absolute right-4 top-4 z-20 flex items-center gap-2">{controls}</div>}
 
       {/* ─── Left: violet marketing hero (desktop only) ───────────────────── */}
       <aside className="relative hidden overflow-hidden bg-brand-gradient p-12 text-white lg:flex lg:flex-col lg:justify-between">
@@ -82,7 +88,7 @@ export default function AuthShell({ children }: AuthShellProps) {
       </aside>
 
       {/* ─── Right: form panel ────────────────────────────────────────────── */}
-      <div className="flex min-h-dvh min-w-0 items-center justify-center bg-canvas bg-brand-radial px-4 py-10">
+      <div className="flex min-h-dvh min-w-0 items-center justify-center bg-canvas bg-brand-radial px-4 py-10 web:min-h-0 web:py-14">
         <div className="w-full min-w-0 max-w-md animate-fadeIn">
           <div className="mb-7 flex flex-col items-center text-center lg:hidden">
             {/* Clean logo mark - no surrounding tile/box; reads on light & dark. */}
@@ -105,6 +111,26 @@ export default function AuthShell({ children }: AuthShellProps) {
           {children}
         </div>
       </div>
+    </div>
+  )
+
+  if (!IS_WEB) return shell
+  // Web: the website header (brand → site home) and footer around the same panels.
+  return (
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <header className="sticky top-0 z-30 border-b border-line bg-card/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <a href="/" className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80">
+            <img src="/logo-mark.png" alt="" className="h-9 w-9 object-contain" />
+            <span className="font-heading text-base font-extrabold tracking-tight text-ink">
+              TNPSC <span className="text-brand">Mentors</span>
+            </span>
+          </a>
+          <div className="flex items-center gap-2">{controls}</div>
+        </div>
+      </header>
+      {shell}
+      <SiteFooter />
     </div>
   )
 }

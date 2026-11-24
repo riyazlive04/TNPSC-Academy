@@ -53,3 +53,10 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 |---|---|---|
 | Playwright via `_preview.html`: TestSeries web 1280 + native 390, Insights web 1280 | shared AC | web container aligns with header/footer at 6xl; native unchanged; no h-scroll |
 - Not checked: these pages WITH data (paper lists, analytics charts, materials grid at 6xl) — need backend + session.
+
+## web-pages-auth (2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| Playwright `/login`: web 1280, native 1280, web 320 | shared AC | web: site header + footer around the split hero/form; native identical (corner controls, full-height split); no h-scroll |
+| Regression: AppLayout footer after the SiteFooter move | web-shell AC1 | same footer rendered (PYQ + home shots unchanged) |
+- Not checked: Google sign-in button, device-limit modal, WhatsApp check on Register (need backend).

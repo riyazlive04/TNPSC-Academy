@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { IS_WEB } from '../../lib/platform'
+import { useLanguageStore } from '../../store/languageStore'
+import { AnswerKeyFooter } from '../Landing/AnswerKeyChrome'
 
 // ─── Website page kit ───────────────────────────────────────────────────────
 // The public archive's page parts (scripts/qbank/render.mjs: .crumbs, .layout,
@@ -103,5 +105,47 @@ export function SectionBlock({
       )}
       {children}
     </section>
+  )
+}
+
+// Website footer (browser only) - same destinations as the static archive's
+// footer in scripts/qbank/render.mjs. The archive trees exist only on the apex
+// host, never on app.tnpscmentors.in, hence the absolute URLs.
+const SITE = 'https://tnpscmentors.in'
+const FOOTER = {
+  en: {
+    tagline: 'TNPSC Group 1, Group 2 / 2A and Group 4 preparation, in Tamil and English.',
+    follow: 'Follow us',
+    disclaimer: 'Not affiliated with the Tamil Nadu Public Service Commission.',
+    links: ['All questions', 'Past papers', 'Current affairs', 'Answer key', 'Privacy', 'Refund policy', 'Guidelines'],
+  },
+  ta: {
+    tagline: 'TNPSC குரூப் 1, குரூப் 2 / 2A, குரூப் 4 தேர்வுப் பயிற்சி — தமிழிலும் ஆங்கிலத்திலும்.',
+    follow: 'எங்களைப் பின்தொடருங்க',
+    disclaimer: 'Tamil Nadu Public Service Commission-உடன் தொடர்பில்லை.',
+    links: ['அனைத்து வினாக்கள்', 'வினாத்தாள்கள்', 'நடப்பு நிகழ்வுகள்', 'விடைக்குறிப்பு', 'தனியுரிமை', 'பணத்திருப்பக் கொள்கை', 'வழிகாட்டுதல்கள்'],
+  },
+}
+const FOOTER_HREFS = [
+  `${SITE}/`,
+  `${SITE}/questions/past-papers/`,
+  `${SITE}/current-affairs/`,
+  `${SITE}/tnpsc-group-2-answer-key-2026`,
+  '/privacy',
+  '/refund-policy',
+  '/guidelines',
+]
+
+/** The website footer (archive `footer.site`), used by AppLayout and AuthShell on web. */
+export function SiteFooter() {
+  const lang = useLanguageStore((s) => s.lang)
+  const foot = FOOTER[lang === 'ta' ? 'ta' : 'en']
+  return (
+    <AnswerKeyFooter
+      tagline={foot.tagline}
+      followLabel={foot.follow}
+      disclaimer={foot.disclaimer}
+      links={foot.links.map((label, i) => ({ label, href: FOOTER_HREFS[i] }))}
+    />
   )
 }
