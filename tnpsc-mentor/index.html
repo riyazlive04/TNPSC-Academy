@@ -93,16 +93,18 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#7C6FE8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#181527" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#7C6FE8" />
     <!-- Apply the saved/system theme before paint so there's no light flash. -->
     <script>
       (function () {
         try {
           var m = localStorage.getItem('tnpsc:theme') || 'system'
+          // Only the Android app has a dark mode; the website is always white.
+          var cap = window.Capacitor
           var dark =
-            m === 'dark' ||
-            (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            !!(cap && cap.isNativePlatform && cap.isNativePlatform()) &&
+            (m === 'dark' ||
+            (m === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches))
           var el = document.documentElement
           if (dark) el.classList.add('dark')
           el.style.colorScheme = dark ? 'dark' : 'light'

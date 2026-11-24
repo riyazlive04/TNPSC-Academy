@@ -18,6 +18,9 @@ Failures found and fixed:
 
 Not covered by automated tests: the unlock endpoint's DB path (route handlers have no test harness here) — checked by typecheck + live curl after deploy.
 
+## web-light-only (2026-11-24)
+- Full vitest on a clean HEAD worktree + this change: 230/231, only pre-existing `roles.test.ts > passwordStrength` fails; tsc clean. (Main working tree fails to load all suites because of uncommitted WIP that isn't part of this change.)
+
 ## web-shell (2026-11-24)
 | Test | Maps to | Result |
 |---|---|---|

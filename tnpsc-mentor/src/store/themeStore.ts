@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { IS_WEB } from '../lib/platform'
 
 // Light/dark theming. The user picks 'light', 'dark', or 'system' (the default,
 // which follows the OS). The resolved value drives the `.dark` class on <html>,
@@ -22,6 +23,8 @@ function systemPrefersDark(): boolean {
 }
 
 function resolve(mode: ThemeMode): Resolved {
+  // The website is always white; dark mode is an Android-app-only choice.
+  if (IS_WEB) return 'light'
   return mode === 'system' ? (systemPrefersDark() ? 'dark' : 'light') : mode
 }
 

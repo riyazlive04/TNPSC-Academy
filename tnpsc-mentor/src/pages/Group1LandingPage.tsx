@@ -713,7 +713,7 @@ export default function Group1LandingPage() {
 
             <button
               onClick={toggleTheme}
-              className="icon-btn hidden h-9 w-9 transition-transform duration-300 hover:rotate-45 sm:grid"
+              className="icon-btn hidden h-9 w-9 transition-transform duration-300 hover:rotate-45 sm:grid web:hidden"
               aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {resolved === 'dark' ? <Sun size={18} /> : <Moon size={18} />}

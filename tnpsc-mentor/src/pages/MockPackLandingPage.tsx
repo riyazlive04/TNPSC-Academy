@@ -233,7 +233,7 @@ export default function MockPackLandingPage() {
 
             <button
               onClick={toggleTheme}
-              className="icon-btn hidden h-8 w-8 sm:grid"
+              className="icon-btn hidden h-8 w-8 sm:grid web:hidden"
               aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {resolved === 'dark' ? <Sun size={16} /> : <Moon size={16} />}

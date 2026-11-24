@@ -2,7 +2,10 @@
 
 Long-form history lives in Claude memory + `docs/`. This file records decisions for work tracked in `build-docs/`.
 
-## Web = Answer Key page look (2026-11-24, v3, uncommitted on user hold)
+## Web light-only (2026-11-24)
+- User: "remove dark screen keep on white". Web is always light: `themeStore.resolve()` returns light when IS_WEB; index.html pre-paint script applies dark only inside the Capacitor app; theme toggles hidden on web (header, menu, auth, landing pages). Android keeps its light/dark/system choice. Supersedes the v1 "dark mode kept on web" decision.
+
+## Web = Answer Key page look (2026-11-24, v3)
 - Reference for the web look is `/tnpsc-group-1-answer-key-2026` (user chose it over the /group-1 landing). Android keeps the app look. v2 look revert undone.
 - Sidebar boxes use `SidebarBox` (Site/PageKit.tsx) — same classes as AnswerKeySidebarBox but router `Link`s.
 

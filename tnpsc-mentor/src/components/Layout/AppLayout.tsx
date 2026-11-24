@@ -272,7 +272,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 onClick={toggleTheme}
                 title={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
                 aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
-                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90 web:hidden web:lg:grid"
+                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90 web:hidden"
               >
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
@@ -415,13 +415,6 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               className="tamil press rounded-lg bg-brand-soft px-3 py-2 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
             >
               {LANG_LABEL[lang]}
-            </button>
-            <button
-              onClick={toggleTheme}
-              aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
-              className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring"
-            >
-              {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
         </WebMenu>

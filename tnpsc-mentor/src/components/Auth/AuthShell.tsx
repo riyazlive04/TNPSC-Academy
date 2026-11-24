@@ -42,7 +42,7 @@ export default function AuthShell({ children }: AuthShellProps) {
         <button
           onClick={toggleTheme}
           aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
-          className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-card text-muted transition-colors hover:border-primary/40 hover:text-primary"
+          className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-card text-muted transition-colors hover:border-primary/40 hover:text-primary web:hidden"
         >
           {resolvedTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </button>
