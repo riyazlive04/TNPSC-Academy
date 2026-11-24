@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-24
+- feat(web-crumbs): picker steps in the URL on both platforms (`useUrlParam`; Subject practice, Thirukkural, Aptitude, PYQ aptitude, Samacheer, Current affairs months) with validated deep links; link breadcrumbs replace back buttons on web (9 pages + PickerPage `trail`).
 - feat(web-links): navigation renders real links (ListRow/ChoiceCard/GridCard `to` via shared `Tap`, header, dashboard, PYQ pickers, Profile rows, result/revision/insights CTAs); no route fade or press-scale on web. Uncommitted.
 - feat(web-sidebar): answer-key sidebar boxes — dashboard Keep going + Practice sidebar on picker/practice pages (uncommitted, on hold).
 - revert(web-look-revert): user 2026-11-24 — web follows the Group 1 Answer Key 2026 page (v1 website look restored); Android keeps the app look. Uncommitted, on hold.

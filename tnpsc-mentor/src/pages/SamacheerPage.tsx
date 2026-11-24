@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { BookOpen, GraduationCap } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
 import PillButton from '../components/UI/PillButton'
@@ -18,8 +19,13 @@ export default function SamacheerPage() {
   const startTest = useStartTest()
   const { t, lang } = useT()
 
-  const [subject, setSubject] = useState<string | null>(null)
-  const [standard, setStandard] = useState<number | null>(null)
+  // Subject + standard in the URL (?subject=&std=) so back/links reach them.
+  const [params, setParams] = useSearchParams()
+  const subjectParam = params.get('subject')
+  const subject = subjectParam && (SUBJECTS as readonly string[]).includes(subjectParam) ? subjectParam : null
+  const stdParam = Number(params.get('std'))
+  const standard = subject && (STANDARDS as readonly number[]).includes(stdParam) ? stdParam : null
+  const setStandard = (n: number) => setParams({ subject: subject!, std: String(n) })
 
   const [topics, setTopics] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -75,8 +81,7 @@ export default function SamacheerPage() {
               index={i}
               active={subject === s}
               onClick={() => {
-                setSubject(s)
-                setStandard(null)
+                setParams({ subject: s })
                 setTopics([])
               }}
               icon={iconFor(s) ?? <BookOpen />}

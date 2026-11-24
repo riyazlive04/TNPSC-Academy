@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { PageGrid, PracticeSidebar, WEB_EYEBROW } from '../components/Site/PageKit'
+import { useSearchParams } from 'react-router-dom'
+import { Crumbs, PageGrid, PracticeSidebar, WEB_EYEBROW, type Crumb } from '../components/Site/PageKit'
 import {
   ArrowLeft,
   ChevronRight,
@@ -108,19 +109,44 @@ const topicCountsCache = new Map<string, Record<string, number>>()
 const qtypeCache = new Map<string, Record<string, number>>()
 const qKey = (subject: string, topic?: string) => `${subject}|${topic ?? ALL_TOPICS}`
 
+/** The URL query for a picker step; unset levels are dropped. */
+function stepQuery(subject?: string | null, period?: string | null, topic?: string | null): URLSearchParams {
+  const q = new URLSearchParams()
+  if (subject) q.set('subject', subject)
+  if (period) q.set('period', period)
+  if (topic) q.set('topic', topic)
+  return q
+}
+
 export default function SubjectPracticePage() {
   const startTest = useStartTest()
   const exitToPrevious = useSmartBack('/test-arena')
   const { t, lang } = useT()
 
-  const [step, setStep] = useState<Step>('subject')
 
   const [subjects, setSubjects] = useState<{ subject: string; total: number }[]>(
     subjectsCache ?? []
   )
-  const [subject, setSubject] = useState<string | null>(null)
-  const [period, setPeriod] = useState<HistoryPeriod | null>(null) // History only
-  const [topic, setTopic] = useState<string | null>(null) // null = none; ALL_TOPICS = all
+  // The steps live in the URL (?subject=&period=&topic=), so browser back,
+  // Android's back button, breadcrumbs and shared links all land on the same
+  // step. A period is only honoured for History and only if it is a real unit.
+  const [params, setParams] = useSearchParams()
+  const subject = params.get('subject')
+  const periodParam = params.get('period')
+  const period: HistoryPeriod | null =
+    subject === HISTORY_SUBJECT && HISTORY_PERIODS.some((p) => p.unit === periodParam)
+      ? (periodParam as HistoryPeriod)
+      : null
+  const topic = params.get('topic') // null = none; ALL_TOPICS = all
+  const step: Step = topic
+    ? 'type'
+    : subject === HISTORY_SUBJECT && !period
+      ? 'period'
+      : subject
+        ? 'topic'
+        : 'subject'
+  const goStep = (s?: string | null, p?: string | null, tp?: string | null) =>
+    setParams(stepQuery(s, p, tp))
 
   const [topics, setTopics] = useState<string[]>([])
   const [topicCounts, setTopicCounts] = useState<Record<string, number>>({})
@@ -279,6 +305,20 @@ export default function SubjectPracticePage() {
     return acc
   }, [topicCounts])
 
+  useEffect(() => {
+    if (!subject) return
+    // A subject that doesn't exist (stale or edited link) → back to the first step.
+    if (subjects.length > 0 && !subjects.some((x) => x.subject === subject)) {
+      setParams({}, { replace: true })
+      return
+    }
+    if (isLocked(subject)) {
+      setShowUpsell(true)
+      setParams({}, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject, subjects, premium, usedSubjects])
+
   // ─── Step transitions ──────────────────────────────────────────────────────
   const chooseSubject = (s: string) => {
     // Free user out of their one free test for this subject → show the upsell
@@ -290,38 +330,17 @@ export default function SubjectPracticePage() {
       return
     }
     setShowUpsell(false)
-    setSubject(s)
-    setPeriod(null)
-    setTopic(null)
     setCounts({})
-    // History funnels through the period selector first; every other subject
-    // goes straight to its topic list.
-    setStep(s === HISTORY_SUBJECT ? 'period' : 'topic')
+    // History funnels through the period selector first (step derives from the
+    // URL); every other subject goes straight to its topic list.
+    goStep(s)
   }
-  const choosePeriod = (p: HistoryPeriod) => {
-    setPeriod(p)
-    setTopic(null)
-    setStep('topic')
-  }
-  const chooseTopic = (tp: string) => {
-    setTopic(tp)
-    setStep('type')
-  }
+  const choosePeriod = (p: HistoryPeriod) => goStep(subject, p)
+  const chooseTopic = (tp: string) => goStep(subject, period, tp)
   const back = () => {
-    if (step === 'type') return setStep('topic')
-    if (step === 'topic') {
-      if (period) {
-        setTopic(null)
-        return setStep('period')
-      }
-      setSubject(null)
-      return setStep('subject')
-    }
-    if (step === 'period') {
-      setSubject(null)
-      setPeriod(null)
-      return setStep('subject')
-    }
+    if (step === 'type') return goStep(subject, period)
+    if (step === 'topic') return goStep(period ? subject : null)
+    if (step === 'period') return goStep()
     // At the first step there are no in-page steps left to rewind, so step out to
     // the immediately previous screen in the navigation stack.
     exitToPrevious()
@@ -346,6 +365,24 @@ export default function SubjectPracticePage() {
     return Object.values(counts).reduce((s, n) => s + n, 0) // Mixed = sum of all
   }
 
+  const base = '/test-arena/subjects'
+  const levels: { label: string; to: string }[] = [
+    { label: t('home'), to: '/test-arena' },
+    { label: t('subjectPracticeTitle'), to: base },
+  ]
+  if (subject) levels.push({ label: subjectName(subject, lang), to: base + '?' + stepQuery(subject) })
+  if (period)
+    levels.push({
+      label: t(HISTORY_PERIODS.find((p) => p.unit === period)!.titleKey),
+      to: base + '?' + stepQuery(subject, period),
+    })
+  if (topic)
+    levels.push({
+      label: topic === ALL_TOPICS ? t('allTopics') : topicName(topic, lang),
+      to: base + '?' + stepQuery(subject, period, topic),
+    })
+  const crumbs: Crumb[] = levels.map((l, i) => (i === levels.length - 1 ? { label: l.label } : l))
+
   const heading =
     step === 'subject'
       ? t('pickSubject')
@@ -366,8 +403,9 @@ export default function SubjectPracticePage() {
   return (
     <>
       <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={<PracticeSidebar />}>
-        {/* Back + breadcrumb */}
-        <div className="mb-5 flex items-center justify-between gap-3">
+        <Crumbs className="mb-5" items={crumbs} />
+        {/* Back + breadcrumb (app); the web uses the link crumbs above. */}
+        <div className="mb-5 flex items-center justify-between gap-3 web:hidden">
           <button
             onClick={back}
             className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
@@ -383,9 +421,9 @@ export default function SubjectPracticePage() {
             topic={topic}
             topicLabel={topic && topic !== ALL_TOPICS ? topicName(topic, lang) : ''}
             allTopicsLabel={t('allTopics')}
-            onSubject={() => subject && (setStep('subject'), setSubject(null), setPeriod(null))}
-            onPeriod={() => setStep('period')}
-            onTopic={() => setStep('topic')}
+            onSubject={() => subject && goStep()}
+            onPeriod={() => goStep(subject)}
+            onTopic={() => goStep(subject, period)}
           />
         </div>
 

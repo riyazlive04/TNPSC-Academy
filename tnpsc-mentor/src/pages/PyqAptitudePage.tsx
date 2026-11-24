@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useUrlParam } from '../hooks/useUrlParam'
 import {
   Calculator,
   Brain,
@@ -62,7 +63,9 @@ export default function PyqAptitudePage() {
   const { t, lang } = useT()
 
   const [counts, setCounts] = useState<Record<string, number> | null>(countsCache)
-  const [type, setType] = useState<AptType | null>(null)
+  // Category in the URL (?type=numerics|reasoning) so back/links reach it.
+  const [typeParam, setType] = useUrlParam('type')
+  const type: AptType | null = TYPES.some((x) => x.type === typeParam) ? (typeParam as AptType) : null
   const [avOpen, setAvOpen] = useState(false)
   const [avSection, setAvSection] = useState<AvSection | null>(null)
   const [shapeCounts, setShapeCounts] = useState<Record<string, number>>({})
@@ -177,7 +180,11 @@ export default function PyqAptitudePage() {
         : t('pyqAptitudePickType')
 
   return (
-    <PickerPage badge={t('pyqAptitudeBadge')} backTo="/test-arena/pyq/group1">
+    <PickerPage
+      badge={t('pyqAptitudeBadge')}
+      backTo="/test-arena/pyq/group1"
+      trail={type ? [{ label: t(TYPES.find((x) => x.type === type)!.titleKey) }] : undefined}
+    >
       <div className="mb-5 flex items-center gap-2">
         {(type || avOpen) && (
           <button

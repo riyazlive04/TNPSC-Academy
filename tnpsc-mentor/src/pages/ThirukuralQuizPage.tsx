@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import { PageGrid, PracticeSidebar, WEB_EYEBROW } from '../components/Site/PageKit'
+import { useMemo } from 'react'
+import { useUrlParam } from '../hooks/useUrlParam'
+import { PageGrid, PracticeSidebar, WEB_EYEBROW, Crumbs } from '../components/Site/PageKit'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -46,10 +47,13 @@ export default function ThirukuralQuizPage() {
   const navigate = useNavigate()
   const { t, lang } = useT()
 
-  const [step, setStep] = useState<Step>('adhigaram')
-  const [adhigaram, setAdhigaram] = useState<number | 'all'>('all')
-
   const adhigarams = useMemo(() => adhigaramList(), [])
+  // The chosen chapter lives in the URL (?chapter=<no>|all); absent = chapter step.
+  const [chapter, setChapter] = useUrlParam('chapter')
+  const known = chapter !== null && adhigarams.some((a) => String(a.no) === chapter)
+  // 'all' is a real choice; anything else unknown (a stale/edited link) → chapter step.
+  const step: Step = known || chapter === 'all' ? 'type' : 'adhigaram'
+  const adhigaram: number | 'all' = known ? Number(chapter) : 'all'
   const formats = useMemo(() => formatsFor(adhigaram), [adhigaram])
   const adhigaramPool = useMemo(() => filterQuestions('all', adhigaram).length, [adhigaram])
 
@@ -61,16 +65,10 @@ export default function ThirukuralQuizPage() {
       : chosenAdhigaram.en
     : t('tkAllChapters')
 
-  const chooseAdhigaram = (no: number | 'all') => {
-    setAdhigaram(no)
-    setStep('type')
-  }
+  const chooseAdhigaram = (no: number | 'all') => setChapter(String(no))
 
   const back = () => {
-    if (step === 'type') {
-      setAdhigaram('all')
-      return setStep('adhigaram')
-    }
+    if (step === 'type') return setChapter(null)
     navigate('/test-arena')
   }
 
@@ -94,8 +92,20 @@ export default function ThirukuralQuizPage() {
   return (
     <>
       <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={<PracticeSidebar />}>
-        {/* Back + breadcrumb */}
-        <div className="mb-5 flex items-center justify-between gap-3">
+        <Crumbs
+          className="mb-5"
+          items={
+            step === 'type'
+              ? [
+                  { label: t('home'), to: '/test-arena' },
+                  { label: t('tkQuizTitle'), to: '/test-arena/thirukural' },
+                  { label: adhigaramLabel },
+                ]
+              : [{ label: t('home'), to: '/test-arena' }, { label: t('tkQuizTitle') }]
+          }
+        />
+        {/* Back + breadcrumb (app); the web uses the link crumbs above. */}
+        <div className="mb-5 flex items-center justify-between gap-3 web:hidden">
           <button
             onClick={back}
             className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
@@ -105,10 +115,7 @@ export default function ThirukuralQuizPage() {
           {step === 'type' && (
             <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold">
               <button
-                onClick={() => {
-                  setAdhigaram('all')
-                  setStep('adhigaram')
-                }}
+                onClick={() => setChapter(null)}
                 className="max-w-[12rem] truncate rounded-full bg-tint-violet px-2.5 py-1 font-heading text-primary transition-opacity hover:opacity-80"
               >
                 <span className="tamil">{adhigaramLabel}</span>

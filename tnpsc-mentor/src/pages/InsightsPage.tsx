@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Crumbs } from '../components/Site/PageKit'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -117,9 +118,10 @@ export default function InsightsPage() {
   return (
     <>
       <div className="mx-auto max-w-4xl px-4 py-8 web:max-w-6xl web:sm:px-6">
+        <Crumbs className="mb-5" items={[{ label: t('home'), to: '/test-arena' }, { label: t('insights') }]} />
         <button
           onClick={() => navigate('/test-arena')}
-          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>

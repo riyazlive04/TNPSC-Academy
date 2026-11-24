@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { Crumbs } from '../components/Site/PageKit'
 import { Tap } from '../components/UI/ListRow'
 import { useNavigate, Link } from 'react-router-dom'
 import {
@@ -244,9 +245,10 @@ export default function ProfilePage() {
   return (
     <>
       <div className="mx-auto max-w-3xl px-4 py-6">
+        <Crumbs className="mb-5" items={[{ label: t('home'), to: '/test-arena' }, { label: t('profile') }]} />
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand web:hidden"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>

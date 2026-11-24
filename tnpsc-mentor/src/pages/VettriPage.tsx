@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Crumbs } from '../components/Site/PageKit'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Infinity as InfinityIcon, Lock } from 'lucide-react'
 import VettriCard from '../components/UI/VettriCard'
@@ -78,9 +79,10 @@ export default function VettriPage() {
   return (
     <>
       <div className="mx-auto max-w-3xl px-4 py-8">
+        <Crumbs className="mb-5" items={[{ label: t('home'), to: '/test-arena' }, { label: t('vettriTitle') }]} />
         <button
           onClick={() => navigate('/test-arena')}
-          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
+          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>

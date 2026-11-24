@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useUrlParam } from '../hooks/useUrlParam'
 import { useNavigate } from 'react-router-dom'
 import { RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle, Lock } from 'lucide-react'
 import PickerPage from '../components/Layout/PickerPage'
@@ -175,7 +176,9 @@ export default function CurrentAffairsPage() {
 
   // Month drill-in: selecting a month opens a sub-step where the user picks
   // "All topics" or one specific topic within that month.
-  const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
+  // The open month lives in the URL (?month=<label>); unknown labels are ignored.
+  const [monthParam, setSelectedMonth] = useUrlParam('month')
+  const selectedMonth = monthParam && months.some((m) => m.label === monthParam) ? monthParam : null
   const [monthTopicCounts, setMonthTopicCounts] = useState<Record<string, number> | null>(null)
   const [loadingMonthTopics, setLoadingMonthTopics] = useState(false)
 
@@ -244,7 +247,7 @@ export default function CurrentAffairsPage() {
   }
 
   return (
-    <PickerPage badge={t('currentAffairsBadge')}>
+    <PickerPage badge={t('currentAffairsBadge')} trail={selectedMonth ? [{ label: selectedMonth }] : undefined}>
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
           <p className="tamil mb-3 font-body text-base text-muted">{t('topicFreeUsed')}</p>

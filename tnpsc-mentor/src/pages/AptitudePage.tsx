@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useUrlParam } from '../hooks/useUrlParam'
 import {
   Calculator,
   Brain,
@@ -53,7 +54,9 @@ export default function AptitudePage() {
   const startTest = useStartTest()
   const { t, lang } = useT()
 
-  const [type, setType] = useState<AptType | null>(null)
+  // Category in the URL (?type=numerics|reasoning) so back/links reach it.
+  const [typeParam, setType] = useUrlParam('type')
+  const type: AptType | null = CATEGORIES.some((c) => c.id === typeParam) ? (typeParam as AptType) : null
   const [topics, setTopics] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -198,7 +201,10 @@ export default function AptitudePage() {
   )
 
   return (
-    <PickerPage badge={t('aptitudeBadge')}>
+    <PickerPage
+      badge={t('aptitudeBadge')}
+      trail={type ? [{ label: t(CATEGORIES.find((c) => c.id === type)!.labelKey) }] : undefined}
+    >
       {/* Step 1 - sub-category */}
       <h3 className="tamil mb-3 font-heading text-sm font-bold uppercase tracking-widest text-muted">
         {t('step1Category')}

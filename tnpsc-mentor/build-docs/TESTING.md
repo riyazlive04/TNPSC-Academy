@@ -116,3 +116,15 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | `?native` dashboard | visually unchanged (links render the same classes) |
 - Web: route cross-fade and press-scale off (lib/motion.ts), no App.tsx edit.
 - Not converted yet: step pickers (Subject practice, aptitude, Thirukkural) — they become links with feature 4's URL steps; back buttons → crumbs (feature 4).
+
+## v2 web-crumbs + URL steps (2026-11-24) — signed-in local, Tamil
+| Check | Result |
+|---|---|
+| Subject practice: pick subject → topic → URL `?subject=&topic=`; crumbs Home › Subject practice › Physics › topic, every earlier level a link | pass |
+| Browser back steps topic → subject → first step; back button hidden on web | pass |
+| Deep link `?subject=Physics&topic=__all__` opens the type step with full crumbs | pass |
+| Bad deep links: unknown subject → first step (params cleared, replace); unknown Thirukkural chapter → chapter step | found broken, fixed (validation added), re-checked pass |
+| Thirukkural `?chapter=`, Current affairs `?month=` (crumbs + section crumb links back) | pass |
+| Aptitude / PYQ aptitude `?type=`, Samacheer `?subject=&std=` | tsc only; not clicked through |
+| Crumbs on Daily, Insights, MockTest, Profile, Revision, TestSeries, Vettri, Messages (back button web:hidden) | tsc only |
+- Android: steps now live in the URL there too (user decision A) — the hardware back button steps back one level.

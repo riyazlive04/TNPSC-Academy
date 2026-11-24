@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Crumbs } from '../components/Site/PageKit'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Newspaper, Flame, Gift, Check, Target } from 'lucide-react'
 import YellowBadge from '../components/UI/YellowBadge'
@@ -64,9 +65,10 @@ export default function DailyPage() {
   return (
     <>
       <div className="mx-auto max-w-md px-4 py-8 web:max-w-2xl">
+        <Crumbs className="mb-5" items={[{ label: t('home'), to: '/test-arena' }, { label: t('daily') }]} />
         <button
           onClick={() => navigate('/test-arena')}
-          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"
+          className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand web:hidden"
         >
           <ArrowLeft size={16} /> {t('testArena')}
         </button>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Crumbs } from '../components/Site/PageKit'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Loader2, Send } from 'lucide-react'
 import { api, type MessageItem } from '../lib/api'
@@ -67,9 +68,10 @@ export default function MessagesPage() {
 
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-2xl flex-col px-4 py-4 lg:py-6">
+      <Crumbs className="mb-5" items={[{ label: t('home'), to: '/test-arena' }, { label: t('messagesNav') }]} />
       <button
         onClick={() => navigate(-1)}
-        className="mb-3 inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
+        className="mb-3 inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"
       >
         <ArrowLeft size={16} /> {t('back')}
       </button>

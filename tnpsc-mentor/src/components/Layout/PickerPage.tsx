@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useSmartBack } from '../../hooks/useSmartBack'
 import { useT } from '../../lib/i18n'
-import { Crumbs, PageGrid, PracticeSidebar } from '../Site/PageKit'
+import { Crumbs, PageGrid, PracticeSidebar, type Crumb } from '../Site/PageKit'
 
 interface PickerPageProps {
   /** The yellow section badge shown at the top (already translated). */
@@ -17,6 +18,8 @@ interface PickerPageProps {
   backTo?: string
   /** Back-button label. Defaults to the generic "Back". */
   backLabel?: ReactNode
+  /** Web breadcrumb levels after the section (an open sub-step, e.g. a month). */
+  trail?: Crumb[]
 }
 
 /**
@@ -29,7 +32,8 @@ interface PickerPageProps {
  * stack (see useSmartBack) so a deep flow — PYQ chooser → group → section —
  * reverses one step at a time instead of jumping straight to the Test Arena.
  */
-export default function PickerPage({ badge, children, backTo = '/test-arena', backLabel }: PickerPageProps) {
+export default function PickerPage({ badge, children, backTo = '/test-arena', backLabel, trail }: PickerPageProps) {
+  const { pathname } = useLocation()
   const goBack = useSmartBack(backTo)
   const { t } = useT()
 
@@ -43,7 +47,15 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
       >
         <ArrowLeft size={16} /> {backLabel ?? t('back')}
       </button>
-      <Crumbs className="mb-6" items={[{ label: t('home'), to: '/test-arena' }, { label: badge }]} />
+      <Crumbs
+        className="mb-6"
+        items={[
+          { label: t('home'), to: '/test-arena' },
+          // With a sub-step open, the section crumb links back to its first step.
+          { label: badge, to: trail?.length ? pathname : undefined },
+          ...(trail ?? []),
+        ]}
+      />
 
       <div className="mb-7 mt-4 text-center web:hidden">
         <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
