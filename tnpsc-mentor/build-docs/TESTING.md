@@ -40,3 +40,10 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | Playwright via `_preview.html` (TestArenaPage in AppLayout, no backend): web 1280, web 390, native 390, web 320 TA | shared AC: web layout, native unchanged, no h-scroll | web: eyebrow greeting, 3-col cards, Keep going in sidebar; native identical (cards at foot); scrollWidth = viewport |
 | `webPageKit.test.ts` AC2 updated for SectionHeader `web:px-0` | native classes unchanged | pass |
 - Not checked: SDUI slots, CA carousel, tour spotlight on `data-tour="progress"` in the sidebar, credit wall — need a signed-in session + backend.
+
+## web-pages-practice (2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| Playwright via `_preview.html`: PYQ chooser web 1280 + native 390/1280, SubjectPractice web 1280, Aptitude web 320 TA, Daily web 1280 | shared AC | web: crumbs (Home › section) replace back link + badge, 3-col tiles, footer pinned to bottom on short pages; native: back link + centered badge unchanged, canvas below content unchanged; no h-scroll |
+| `tsc --noEmit` | — | clean |
+- Not checked: data-filled states, free-gate lock chips, CreditConfirmPopup (need backend + session). In-page step back buttons (Aptitude, PyqAptitude, SubjectPractice, Thirukural) kept on web — they step internal state, not history.

@@ -235,7 +235,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   })
 
   return (
-    <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial">
+    <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial web:flex web:flex-col">
       {!bare && (
         <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card web:bg-card/95 web:backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 web:sm:px-6">
@@ -379,7 +379,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
         </div>
       )}
 
-      <main className={bare ? '' : IS_WEB ? 'pb-10' : 'pb-24 lg:pb-10'}>{children}</main>
+      <main className={bare ? '' : IS_WEB ? 'flex-1 pb-10' : 'pb-24 lg:pb-10'}>{children}</main>
 
       {/* Website footer (browser only). The padded wrapper keeps it clear of
           the fixed bottom tab bar on phone widths. */}

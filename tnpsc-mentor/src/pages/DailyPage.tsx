@@ -63,7 +63,7 @@ export default function DailyPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-md px-4 py-8">
+      <div className="mx-auto max-w-md px-4 py-8 web:max-w-2xl">
         <button
           onClick={() => navigate('/test-arena')}
           className="mb-6 inline-flex items-center gap-2 font-heading text-sm font-semibold text-ink2 transition hover:text-brand"

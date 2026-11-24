@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useSmartBack } from '../../hooks/useSmartBack'
 import { useT } from '../../lib/i18n'
+import { Crumbs, PageGrid } from '../Site/PageKit'
 
 interface PickerPageProps {
   /** The yellow section badge shown at the top (already translated). */
@@ -32,24 +33,25 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
   const goBack = useSmartBack(backTo)
   const { t } = useT()
 
+  // Web: website breadcrumbs replace both the back link (the browser has its
+  // own back) and the badge (the last crumb already names the section).
   return (
-    <>
-      <div className="mx-auto max-w-3xl px-4 py-6 lg:py-8">
-        <button
-          onClick={goBack}
-          className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
-        >
-          <ArrowLeft size={16} /> {backLabel ?? t('back')}
-        </button>
+    <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8">
+      <button
+        onClick={goBack}
+        className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"
+      >
+        <ArrowLeft size={16} /> {backLabel ?? t('back')}
+      </button>
+      <Crumbs className="mb-6" items={[{ label: t('home'), to: '/test-arena' }, { label: badge }]} />
 
-        <div className="mb-7 mt-4 text-center">
-          <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
-            {badge}
-          </span>
-        </div>
-
-        {children}
+      <div className="mb-7 mt-4 text-center web:hidden">
+        <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
+          {badge}
+        </span>
       </div>
-    </>
+
+      {children}
+    </PageGrid>
   )
 }

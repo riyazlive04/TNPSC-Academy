@@ -35,6 +35,10 @@ export function PageGrid({
   )
 }
 
+/** Archive hero eyebrow pill, for a page's section badge (browser only). */
+export const WEB_EYEBROW =
+  'web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:normal-case web:tracking-normal web:text-brand-dark'
+
 export interface Crumb {
   label: ReactNode
   /** In-app path; omit on the current page (the last crumb). */
