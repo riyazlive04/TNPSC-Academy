@@ -661,7 +661,9 @@ export default function TestArenaPage() {
                 picker sheet keeps all three actions, just no longer competing
                 for a slot each on the dashboard. */}
             <GridCard
-              onClick={() => setCaHubOpen(true)}
+              // Web: the CA page itself (daily tests + practice); the app keeps its picker sheet.
+              to={IS_WEB ? '/test-arena/current-affairs' : undefined}
+              onClick={IS_WEB ? undefined : () => setCaHubOpen(true)}
               style={{ '--i': 0 } as React.CSSProperties}
               icon={<Newspaper size={20} />}
               tint="green"

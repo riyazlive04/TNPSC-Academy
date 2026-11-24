@@ -29,7 +29,16 @@ let cache: CaDailySet[] | null = null
 /** How many days the picker offers (today + the days before it). */
 const DAYS = 10
 
-export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function DailyCaSheet({
+  open,
+  onClose,
+  inline = false,
+}: {
+  open: boolean
+  onClose: () => void
+  /** Render the day list in the page instead of a bottom sheet (the web CA page). */
+  inline?: boolean
+}) {
   const { t, lang } = useT()
   const startTest = useStartTest()
   const [sets, setSets] = useState<CaDailySet[] | null>(cache)
@@ -61,8 +70,8 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
   const latest = sets?.[0]
   const earlier = sets?.slice(1) ?? []
 
-  return (
-    <BottomSheet open={open} onClose={onClose} title={t('caDailyTitle')}>
+  const body = (
+    <>
       {sets === null && (
         <div className="space-y-3">
           <Skeleton className="h-[84px] w-full rounded-card" />
@@ -158,6 +167,12 @@ export default function DailyCaSheet({ open, onClose }: { open: boolean; onClose
           )}
         </div>
       )}
+    </>
+  )
+  if (inline) return body
+  return (
+    <BottomSheet open={open} onClose={onClose} title={t('caDailyTitle')}>
+      {body}
     </BottomSheet>
   )
 }

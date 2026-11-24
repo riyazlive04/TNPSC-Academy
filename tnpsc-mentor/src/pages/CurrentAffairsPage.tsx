@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react'
+import SectionHeader from '../components/UI/SectionHeader'
+import DailyCaSheet from '../components/Home/DailyCaSheet'
+import { SidebarBox } from '../components/Site/PageKit'
+import { IS_WEB } from '../lib/platform'
 import { useUrlParam } from '../hooks/useUrlParam'
 import { useNavigate } from 'react-router-dom'
 import { RefreshCw, ChevronRight, Newspaper, CalendarDays, ArrowLeft, Shuffle, Lock } from 'lucide-react'
@@ -247,7 +251,27 @@ export default function CurrentAffairsPage() {
   }
 
   return (
-    <PickerPage badge={t('currentAffairsBadge')} trail={selectedMonth ? [{ label: selectedMonth }] : undefined}>
+    <PickerPage
+      badge={t('currentAffairsBadge')}
+      trail={selectedMonth ? [{ label: selectedMonth }] : undefined}
+      asideTop={
+        <SidebarBox
+          title={t('currentAffairsTitle')}
+          items={[
+            { to: '/test-arena/current-affairs', label: t('caTopicPracticeTitle'), active: true },
+            { to: '/test-arena/ca-questions', label: t('caQuestionsTitle') },
+          ]}
+        />
+      }
+    >
+      {/* Web: the daily CA papers live on this page (the app opens them from a
+          dashboard sheet instead). */}
+      {IS_WEB && !selectedMonth && (
+        <section className="mb-8">
+          <SectionHeader title={t('caDailyTitle')} className="mb-3" />
+          <DailyCaSheet open inline onClose={() => undefined} />
+        </section>
+      )}
       {showUpsell && (
         <div className="mb-5 animate-fadeInFast">
           <p className="tamil mb-3 font-body text-base text-muted">{t('topicFreeUsed')}</p>

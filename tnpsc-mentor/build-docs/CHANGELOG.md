@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-11-24
+- feat(web-sheets-to-pages): web — dashboard CA card links to the CA page, which hosts the daily CA papers inline + a CA sidebar; Group II/IIA offer shows as inline cards (no pop-up). Android keeps its sheets.
 - feat(web-crumbs): picker steps in the URL on both platforms (`useUrlParam`; Subject practice, Thirukkural, Aptitude, PYQ aptitude, Samacheer, Current affairs months) with validated deep links; link breadcrumbs replace back buttons on web (9 pages + PickerPage `trail`).
 - feat(web-links): navigation renders real links (ListRow/ChoiceCard/GridCard `to` via shared `Tap`, header, dashboard, PYQ pickers, Profile rows, result/revision/insights CTAs); no route fade or press-scale on web. Uncommitted.
 - feat(web-sidebar): answer-key sidebar boxes — dashboard Keep going + Practice sidebar on picker/practice pages (uncommitted, on hold).

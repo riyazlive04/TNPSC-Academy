@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import OfferSheet from '../UI/OfferSheet'
+import { IS_WEB } from '../../lib/platform'
 import TestSeriesGrid from './TestSeriesGrid'
 import Group1ArchivedNotice from './Group1ArchivedNotice'
 import TestSeriesAnalyticsView from './TestSeriesAnalyticsView'
@@ -113,6 +114,8 @@ export default function TestSeriesProductPanel({
   const seriesLocked = previewLocked || !premium
 
   useEffect(() => {
+    // Web: no pop-up offer; the cards sit inline above the papers instead.
+    if (IS_WEB) return
     if (loading || error || !seriesLocked || tests.length === 0) return
     if (!offerEnabled) return
     if (sessionStorage.getItem(offerDismissedKey)) return
@@ -189,6 +192,7 @@ export default function TestSeriesProductPanel({
           {/* Above the papers, not below: the reason they look greyed has to be
               read before the greying is noticed, or it just looks broken. */}
           {archived && <Group1ArchivedNotice className="mb-4" onNext={onArchivedNext} />}
+          {IS_WEB && seriesLocked && offerEnabled && <div className="mb-6 space-y-4">{paywallCards}</div>}
           <TestSeriesGrid
             tests={tests}
             onLaunch={launch}

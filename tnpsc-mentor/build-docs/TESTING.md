@@ -128,3 +128,13 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | Aptitude / PYQ aptitude `?type=`, Samacheer `?subject=&std=` | tsc only; not clicked through |
 | Crumbs on Daily, Insights, MockTest, Profile, Revision, TestSeries, Vettri, Messages (back button web:hidden) | tsc only |
 - Android: steps now live in the URL there too (user decision A) — the hardware back button steps back one level.
+
+## v2 web-sheets-to-pages (2026-11-24) — signed-in local
+| Check | Result |
+|---|---|
+| Dashboard CA card is a link → /test-arena/current-affairs, no sheet | pass |
+| CA page (web): Daily CA test section inline (DailyCaSheet `inline`), sidebar boxes Current affairs (topic practice / CA questions) + Practice | pass |
+| /test-series web: no offer pop-up, Group II/IIA card inline above the papers | pass |
+| /test-series `?native`: offer sheet still auto-opens | pass |
+| No render loop on the CA page (0 DOM mutations in 3s) | pass |
+- Kept as dialogs by decision: upsell popup (user), Thirukkural reference modal (a /thirukural page would need an App.tsx route; App.tsx carries someone else's WIP).

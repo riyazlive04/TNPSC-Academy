@@ -20,6 +20,8 @@ interface PickerPageProps {
   backLabel?: ReactNode
   /** Web breadcrumb levels after the section (an open sub-step, e.g. a month). */
   trail?: Crumb[]
+  /** Extra web sidebar box(es) above the Practice box. */
+  asideTop?: ReactNode
 }
 
 /**
@@ -32,7 +34,7 @@ interface PickerPageProps {
  * stack (see useSmartBack) so a deep flow — PYQ chooser → group → section —
  * reverses one step at a time instead of jumping straight to the Test Arena.
  */
-export default function PickerPage({ badge, children, backTo = '/test-arena', backLabel, trail }: PickerPageProps) {
+export default function PickerPage({ badge, children, backTo = '/test-arena', backLabel, trail, asideTop }: PickerPageProps) {
   const { pathname } = useLocation()
   const goBack = useSmartBack(backTo)
   const { t } = useT()
@@ -40,7 +42,13 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
   // Web: website breadcrumbs replace both the back link (the browser has its
   // own back) and the badge (the last crumb already names the section).
   return (
-    <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={<PracticeSidebar />}>
+    <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={
+        <div className="space-y-4">
+          {asideTop}
+          <PracticeSidebar />
+        </div>
+      }
+    >
       <button
         onClick={goBack}
         className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"

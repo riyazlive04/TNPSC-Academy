@@ -1,7 +1,7 @@
 # Plan — Web app follows the Group 1 Answer Key 2026 page (2026-11-24, v3)
 - User: Android keeps the app look; the WEB looks like `/tnpsc-group-1-answer-key-2026` (text-link header, main column + right sidebar of boxed link lists, boxed rows). Supersedes v2's "keep the app look on web" (8056bc9 undone).
 - Done: v1 look restored; phone-width web menu; `SidebarBox` + `PracticeSidebar`; real links (v2 feature 3).
-- Next: v2 feature 4 (breadcrumbs + steps in the URL, both platforms) and feature 5 (CA hub / day picker / Thirukkural → pages on web; offer sheet → inline cards on web; upsell stays a popup). v2 feature 1 (look revert) dropped.
+- Done too: feature 4 (URL steps + crumbs, 58f5d58) and feature 5 (CA page as the web CA hub with daily papers inline; offer cards inline). Not done: Thirukkural reference page (needs an App.tsx route; kept as a popup). Upsell stays a popup (user). Not yet deployed.
 
 # (superseded) Plan — Web app as web pages, app look kept (2026-11-24, v2)
 
