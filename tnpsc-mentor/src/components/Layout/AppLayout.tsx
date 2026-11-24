@@ -221,8 +221,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
             </button>
 
             {/* Desktop primary nav - replaces the bottom tab bar on large screens. */}
-            <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-              {nav.map(({ to, icon: Icon, key }) => {
+            {/* Web: one-line short labels; a narrow desktop in Tamil scrolls the nav sideways instead of wrapping it. */}
+            <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex web:min-w-0 web:gap-0.5 web:overflow-x-auto web:[justify-content:safe_center] web:[scrollbar-width:none]">
+              {nav.map(({ to, icon: Icon, key, short }) => {
                 const active = isActive(to)
                 return (
                   <button
@@ -233,14 +234,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                     className={[
                       'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
                       // Web: the archive's text-only nav (bold ink links, no icons).
-                      'web:rounded-[10px] web:px-3 web:text-[14.5px] web:font-bold',
+                      'web:shrink-0 web:whitespace-nowrap web:rounded-[10px] web:px-2.5 web:text-sm web:font-bold',
                       active
                         ? 'bg-brand-soft text-brand-dark'
                         : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark web:text-ink web:hover:bg-brand-soft',
                     ].join(' ')}
                   >
                     <Icon size={17} className="web:hidden" />
-                    <span className="tamil">{t(key)}</span>
+                    <span className="tamil">{t(IS_WEB ? short : key)}</span>
                     {to === '/admin/reports' && openReports > 0 && (
                       <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white">
                         {openReports}
@@ -319,7 +320,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               {profile?.full_name && (
                 <span
                   title={profile.full_name}
-                  className="hidden max-w-[140px] truncate font-body text-sm text-ink2 sm:inline"
+                  className="hidden max-w-[140px] truncate font-body text-sm text-ink2 sm:inline web:lg:hidden"
                 >
                   {profile.full_name}
                 </span>

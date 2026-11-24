@@ -63,3 +63,13 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 
 ## web-pages-admin (2026-11-24)
 - Token swap only (AdminQuestions correct-option colours); `tsc` clean, vitest regression clean. Not visually checked (admin-only, needs an admin session).
+
+## Signed-in local check (2026-11-24) — local build proxied to the LIVE API, real student account
+| Page | Result |
+|---|---|
+| Dashboard (TA, dark, 1536) | real data: kural, G1-retired notice, G2 offer strip, practice cards, Keep going sidebar. Tour anchors mock/practice/progress/credits/lang all present + sized. No console errors. No h-scroll. |
+| **Found + fixed:** Tamil desktop nav wrapped to 2 lines and then (nowrap) clipped Profile | web nav now uses short labels, one line, name label hidden ≥lg on web (Profile tab covers it), tighter padding; fits exactly at 1536 (708/708). <1200px Tamil: nav scrolls sideways (safe-center) instead of wrapping. |
+| Subject practice, Test Series (2-col papers, premium locks), Insights, Materials (4-col) | correct at 6xl |
+| `?native` dashboard + test series | unchanged vs before |
+| Pre-existing, not ours: Group II/IIA offer sheet squeezes its Tamil card text into a narrow column — identical in `?native`. |
+- Not checked here: phone width with real data (window resize unavailable in this browser; 320/390 covered by the earlier Playwright shots).
