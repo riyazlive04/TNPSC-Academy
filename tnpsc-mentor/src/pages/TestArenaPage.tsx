@@ -39,6 +39,8 @@ import { List, ListRow } from '../components/UI/ListRow'
 import SduiSlot from '../components/Sdui/SduiSlot'
 import { useSduiSheetStore } from '../lib/sdui/actions'
 import { CardGrid, GridCard } from '../components/UI/CardRow'
+import { PageGrid } from '../components/Site/PageKit'
+import { IS_WEB } from '../lib/platform'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
 import { useTestSeriesEnabled } from '../hooks/useTestSeriesEnabled'
@@ -379,14 +381,54 @@ export default function TestArenaPage() {
     streak: habit?.currentStreak ?? 0,
   }
 
+  // Keep going - study-loop quick links. Native: a card pair at the foot of the
+  // page. Browser: the website sidebar (a boxed list beside the main column).
+  const keepGoing = (
+    <section className="space-y-2" data-tour="progress">
+      <SectionHeader title={t('keepGoingShort')} className="px-1" />
+      {IS_WEB ? (
+        <List>
+          <ListRow
+            onClick={() => navigate('/revision')}
+            leading={<IconTile tint="violet"><RefreshCw size={18} /></IconTile>}
+            title={t('revision')}
+          />
+          <ListRow
+            onClick={() => navigate('/insights')}
+            leading={<IconTile tint="blue"><BarChart3 size={18} /></IconTile>}
+            title={t('insights')}
+          />
+        </List>
+      ) : (
+        <CardGrid>
+          <GridCard
+            onClick={() => navigate('/revision')}
+            icon={<RefreshCw size={20} />}
+            tint="violet"
+            title={t('revision')}
+          />
+          <GridCard
+            onClick={() => navigate('/insights')}
+            style={{ '--i': 1 } as React.CSSProperties}
+            icon={<BarChart3 size={20} />}
+            tint="blue"
+            title={t('insights')}
+          />
+        </CardGrid>
+      )}
+    </section>
+  )
+
   return (
     <>
-      <div className="mx-auto max-w-2xl space-y-8 px-4 py-6 lg:py-8">
-        {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
-        <header className="px-1">
-          <p className="tamil font-body text-sm text-muted">{t(greetingKey())}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink">
+      <PageGrid className="py-6 lg:py-8" aside={keepGoing}>
+      <div className="space-y-8">
+        {/* Greeting - bare on the surface. Hierarchy from type + space, no box.
+            Web: the archive hero's eyebrow pill + large title. */}
+        <header className="px-1 web:px-0">
+          <p className="tamil font-body text-sm text-muted web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:text-brand-dark">{t(greetingKey())}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 web:mt-3">
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink web:text-[clamp(23px,4.2vw,34px)]">
               {firstName || 'Aspirant'}
             </h1>
             {showStreak && (
@@ -691,31 +733,15 @@ export default function TestArenaPage() {
             Profile screen. */}
         <CreditWall />
 
-        {/* Keep going - study-loop quick links, matching the practice cards. */}
-        <section className="space-y-2" data-tour="progress">
-          <SectionHeader title={t('keepGoingShort')} className="px-1" />
-          <CardGrid>
-            <GridCard
-              onClick={() => navigate('/revision')}
-              icon={<RefreshCw size={20} />}
-              tint="violet"
-              title={t('revision')}
-            />
-            <GridCard
-              onClick={() => navigate('/insights')}
-              style={{ '--i': 1 } as React.CSSProperties}
-              icon={<BarChart3 size={20} />}
-              tint="blue"
-              title={t('insights')}
-            />
-          </CardGrid>
-        </section>
+        {/* Keep going - in the sidebar on web (PageGrid aside). */}
+        {!IS_WEB && keepGoing}
 
         {/* The tail of the dashboard: the natural home for a survey prompt, a
             seasonal notice or a link into a /s/<key> screen that exists only as
             a published layout. Empty until used. */}
         <SduiSlot name="home.footer" signals={sduiSignals} className="space-y-3" />
       </div>
+      </PageGrid>
 
       {/* Flashcard decks, as a card peeking in from the right edge. Portals to
           document.body and positions itself — nothing to lay out here.

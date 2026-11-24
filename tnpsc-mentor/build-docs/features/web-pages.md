@@ -11,7 +11,7 @@ Each group = one commit, after `web-shell` + `web-page-kit`. Every page gets: Cr
 ## Groups
 | # | Group | Pages | Sidebar (desktop) | Group-specific risk |
 |---|---|---|---|---|
-| 3 | public | Group1Landing, RankBooster, MockPack, TargetG2, AnswerKey, PastAnswerKey, Group4Notification | existing side boxes | pay links + GA4 events + OG share pages (`shareMeta.ts`) |
+| 3 | public — SKIPPED 2026-11-24: already website-style (own header, full footer w/ support + legal); swapping in the archive footer would drop those | Group1Landing, RankBooster, MockPack, TargetG2, AnswerKey, PastAnswerKey, Group4Notification | existing side boxes | pay links + GA4 events + OG share pages (`shareMeta.ts`) |
 | 4 | home | TestArena | credits, streak, Thirukkural, CA carousel | SDUI regions, tour spotlight anchors, PushNudge, Starter Challenge CTA |
 | 5 | practice | SubjectPractice, PreviousYear, PyqGroupChooser, PyqGroup, PyqSection, PyqAptitude, Aptitude, Samacheer, HistoryPeriods, Daily, ThirukuralQuiz | topic list / year filter | subject free gate, CreditConfirmPopup, year chips |
 | 6 | ca | CurrentAffairs, CaQuestions, CaMagazineLink, CaTestLink, Materials, FlashcardDeck | day picker / months | signed URLs, share links, flashcards flag |

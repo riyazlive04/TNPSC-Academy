@@ -73,6 +73,7 @@ describe('web-page-kit', () => {
     expect(nativeClasses(render(ListRow, { title: 'A' }))[0]).toBe(
       'focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45'
     )
+    expect(nativeClasses(render(SectionHeader, { title: 'S' }))[0]).toBe('flex items-baseline justify-between gap-3')
     expect(nativeClasses(render(SectionHeader, { title: 'S' }))[1]).toBe(
       'tamil font-display text-base font-semibold tracking-tight text-ink'
     )

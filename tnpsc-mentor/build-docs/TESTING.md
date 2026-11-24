@@ -33,3 +33,10 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | `src/__tests__/webPageKit.test.ts` (5) | AC1 PageGrid web/native + no empty aside, AC3 Crumbs a11y + native null, SectionBlock native plain, AC2 primitives' native classes unchanged | 5/5 pass |
 | Playwright on kit demo harness: web 1280, web 390, native 390, web 320 TA | AC4 2-col ≥1024 / stacked below; native list-led look intact | pass; no horizontal scroll |
 | Regression: `npx vitest run` | all | first run: AC2 kit test flaked (timed out re-importing `motion` after `vi.resetModules()` under the parallel suite) — d72aaef was pushed with it red by mistake. Fixed: primitives imported once at file top. Two full runs after: only the pre-existing `roles.test.ts > passwordStrength` failure |
+
+## web-pages-home (2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| Playwright via `_preview.html` (TestArenaPage in AppLayout, no backend): web 1280, web 390, native 390, web 320 TA | shared AC: web layout, native unchanged, no h-scroll | web: eyebrow greeting, 3-col cards, Keep going in sidebar; native identical (cards at foot); scrollWidth = viewport |
+| `webPageKit.test.ts` AC2 updated for SectionHeader `web:px-0` | native classes unchanged | pass |
+- Not checked: SDUI slots, CA carousel, tour spotlight on `data-tour="progress"` in the sidebar, credit wall — need a signed-in session + backend.
