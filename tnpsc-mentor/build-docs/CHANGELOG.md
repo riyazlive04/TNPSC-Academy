@@ -2,6 +2,7 @@
 
 ## 2026-11-24
 - feat(web-shell): browser-only website chrome — `html.is-web` + Tailwind `web:` variant, archive-style text nav, site footer with archive links; Android unchanged.
+- feat(web-page-kit): PageGrid / Crumbs / SectionBlock + web variants on List, ListRow, SectionHeader, ChoiceGrid/Card, StatStrip.
 
 ## 2026-11-18
 - feat(qbank): committed reviewed WIP — self-hosted figures, explanation opening published, install bar, log-step pager (dcbe5b4).

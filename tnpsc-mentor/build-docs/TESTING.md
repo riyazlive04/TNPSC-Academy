@@ -26,3 +26,10 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | `tsc --noEmit` | — | clean (caught a `landing/` vs `Landing/` import case bug that would break the Linux build) |
 | Regression: `npx vitest run` | answer-key pages, all | 228/229; `roles.test.ts > passwordStrength` fails — pre-existing (fails with these changes stashed) |
 - Not checked: a real signed-in session (shell routes are auth-gated; local DB env is dead) — harness renders AppLayout with an empty body instead.
+
+## web-page-kit (2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| `src/__tests__/webPageKit.test.ts` (5) | AC1 PageGrid web/native + no empty aside, AC3 Crumbs a11y + native null, SectionBlock native plain, AC2 primitives' native classes unchanged | 5/5 pass |
+| Playwright on kit demo harness: web 1280, web 390, native 390, web 320 TA | AC4 2-col ≥1024 / stacked below; native list-led look intact | pass; no horizontal scroll |
+| Regression: `npx vitest run` | all | only the pre-existing `roles.test.ts > passwordStrength` failure |

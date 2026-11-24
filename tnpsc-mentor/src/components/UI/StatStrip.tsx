@@ -20,7 +20,8 @@ export default function StatStrip({
   className?: string
 }) {
   return (
-    <div className={`flex items-stretch ${className}`}>
+    // web: the archive's `.stats` pills; native keeps hairline-separated metrics.
+    <div className={`flex items-stretch web:flex-wrap web:gap-2.5 ${className}`}>
       {items.map((s, i) => (
         <div
           key={i}
@@ -28,11 +29,12 @@ export default function StatStrip({
             'flex-1',
             i > 0 ? 'border-l border-line pl-4' : '',
             i < items.length - 1 ? 'pr-4' : '',
+            'web:flex-none web:rounded-field web:border web:border-line web:bg-card web:px-4 web:py-2.5 web:shadow-pill',
           ].join(' ')}
         >
           <div
-            className={`font-display text-2xl font-bold leading-none ${
-              s.accent ? 'text-accent' : 'text-ink'
+            className={`font-display text-2xl font-bold leading-none web:text-xl web:font-extrabold ${
+              s.accent ? 'text-accent' : 'text-ink web:text-brand'
             }`}
           >
             {s.value}

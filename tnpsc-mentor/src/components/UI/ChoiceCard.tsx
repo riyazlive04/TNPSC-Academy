@@ -37,7 +37,8 @@ export function ChoiceGrid({
   children: ReactNode
   className?: string
 }) {
-  return <div className={`grid grid-cols-2 gap-3 ${className}`}>{children}</div>
+  // web: the archive's wider tile grid once there is room for a third column.
+  return <div className={`grid grid-cols-2 gap-3 web:gap-3.5 web:sm:grid-cols-3 ${className}`}>{children}</div>
 }
 
 export function ChoiceCard({
@@ -84,7 +85,8 @@ export function ChoiceCard({
       style={{ '--i': index } as React.CSSProperties}
       className={[
         'stagger-item group focus-ring relative flex h-full flex-col items-start gap-2.5 rounded-card border p-3.5 text-left shadow-soft transition-transform duration-200',
-        disabled ? 'opacity-45' : 'hover:-translate-y-0.5',
+        disabled ? 'opacity-45' : 'hover:-translate-y-0.5 web:hover:border-brand/40',
+        'web:p-[18px]',
         active ? 'border-primary ring-2 ring-primary/30' : 'border-line',
         'bg-card',
         className,
