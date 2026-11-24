@@ -217,7 +217,7 @@ export default function VettriCard({
   const basePrice = storePriceString ?? `₹${sel.rupees}`
 
   return (
-    <div className={`card relative overflow-hidden p-6 pl-7 ${className}`}>
+    <div className={`card relative overflow-hidden p-6 pl-7 [container-type:inline-size] ${className}`}>
       <span className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-brand" />
 
       {dismissible && (
@@ -258,7 +258,7 @@ export default function VettriCard({
         </div>
       )}
 
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative flex flex-col gap-5 wide:flex-row wide:items-center wide:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
@@ -308,16 +308,16 @@ export default function VettriCard({
         </div>
 
         {/* Right: plan toggle + price + coupon + CTA */}
-        <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
+        <div className="flex flex-shrink-0 flex-col items-start gap-3 wide:items-end">
           {/* Full ₹1,899 / Monthly ₹499 selector */}
-          <div className="flex w-full rounded-field bg-tint p-0.5 sm:w-auto">
+          <div className="flex w-full rounded-field bg-tint p-0.5 wide:w-auto">
             {(['full', 'month'] as VettriPlan[]).map((p) => (
               <button
                 key={p}
                 type="button"
                 onClick={() => choosePlan(p)}
                 aria-pressed={plan === p}
-                className={`flex-1 whitespace-nowrap rounded-[10px] px-3 py-1.5 font-heading text-xs font-semibold transition-colors sm:flex-none ${
+                className={`flex-1 whitespace-nowrap rounded-[10px] px-3 py-1.5 font-heading text-xs font-semibold transition-colors wide:flex-none ${
                   plan === p ? 'bg-card text-brand shadow-sm' : 'text-ink2 hover:text-ink'
                 }`}
               >
@@ -362,7 +362,7 @@ export default function VettriCard({
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-stretch gap-1 sm:items-end">
+            <div className="flex flex-col items-stretch gap-1 wide:items-end">
               <div className="flex items-center gap-1.5">
                 <input
                   value={code}
@@ -403,7 +403,7 @@ export default function VettriCard({
               setConfirmOpen(true)
             }}
             disabled={paying}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:gap-2.5 hover:brightness-105 active:brightness-95 disabled:opacity-60 wide:w-auto"
           >
             {paying ? (
               <Loader2 size={16} className="animate-spin" />

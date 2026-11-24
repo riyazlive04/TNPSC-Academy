@@ -76,10 +76,10 @@ export default function TargetG2Card({
   if (!loaded || unlocked || dismissed) return null
 
   return (
-    <div className={`card relative overflow-hidden p-6 pl-7 ${className}`}>
+    <div className={`card relative overflow-hidden p-6 pl-7 [container-type:inline-size] ${className}`}>
       <span className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-brand" />
 
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative flex flex-col gap-5 wide:flex-row wide:items-center wide:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-tint-violet px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-brand">
@@ -105,7 +105,7 @@ export default function TargetG2Card({
         </div>
 
         {/* Right: price + coupon + CTA */}
-        <div className="flex flex-shrink-0 flex-col items-start gap-3 sm:items-end">
+        <div className="flex flex-shrink-0 flex-col items-start gap-3 wide:items-end">
           <span className="font-display text-3xl font-bold tracking-tight text-ink">
             {isFree ? t('premiumFree') : applied ? displayPrice : basePrice}
           </span>
@@ -127,7 +127,7 @@ export default function TargetG2Card({
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-stretch gap-1 sm:items-end">
+              <div className="flex flex-col items-stretch gap-1 wide:items-end">
                 <div className="flex items-center gap-1.5">
                   <input
                     value={code}
@@ -154,7 +154,7 @@ export default function TargetG2Card({
           <button
             onClick={startEnroll}
             disabled={paying}
-            className="btn-wrap inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:brightness-105 active:brightness-95 disabled:opacity-60 sm:w-auto"
+            className="btn-wrap inline-flex w-full items-center justify-center gap-2 rounded-pill bg-brand px-5 py-2.5 font-heading text-sm font-semibold text-white shadow-brand transition-all hover:brightness-105 active:brightness-95 disabled:opacity-60 wide:w-auto"
           >
             {paying ? (
               <Loader2 size={16} className="animate-spin" />

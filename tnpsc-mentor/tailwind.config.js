@@ -255,5 +255,14 @@ export default {
   },
   // `web:` = browser only (html.is-web, see src/lib/platform.ts); the installed
   // app ignores these classes and keeps its native look.
-  plugins: [({ addVariant }) => addVariant('web', 'html.is-web &')],
+  // `wide:` = the nearest [container-type:inline-size] ancestor is >= 40rem.
+  // The purchase cards use it so they lay out by their OWN width: side by side
+  // on a page, stacked inside the narrow offer sheet / upsell popup even on a
+  // desktop (a viewport `sm:` squeezed them there).
+  plugins: [
+    ({ addVariant }) => {
+      addVariant('web', 'html.is-web &')
+      addVariant('wide', '@container (min-width: 40rem)')
+    },
+  ],
 }

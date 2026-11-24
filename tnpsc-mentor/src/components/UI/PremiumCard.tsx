@@ -238,7 +238,7 @@ export default function PremiumCard({
 
   return (
     <div
-      className={`card relative overflow-hidden p-6 pl-7 ${className}`}
+      className={`card relative overflow-hidden p-6 pl-7 [container-type:inline-size] ${className}`}
     >
       {/* Mint accent stripe - premium gets its own identity, distinct from the
           violet app chrome, without another heavy gradient panel. */}
@@ -283,7 +283,7 @@ export default function PremiumCard({
         </div>
       )}
 
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="relative flex flex-col gap-5 wide:flex-row wide:items-center wide:justify-between">
         {/* Left: title + perks */}
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-mintsoft px-2.5 py-1 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
@@ -329,7 +329,7 @@ export default function PremiumCard({
             <p className="tamil flex items-center gap-1.5 font-heading text-2xs font-bold uppercase tracking-wide text-mint">
               <Gift size={13} /> {t('premiumBonusTitle')}
             </p>
-            <ul className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2">
+            <ul className="mt-2 grid gap-x-3 gap-y-1 wide:grid-cols-2">
               {BONUS_KEYS.map((b) => (
                 <li key={b} className="flex items-start gap-1.5 font-body text-xs text-ink">
                   <Check size={12} className="mt-0.5 flex-shrink-0 text-mint" />
@@ -342,7 +342,7 @@ export default function PremiumCard({
 
         {/* Right: checkout panel - price, value framing, coupon and CTA as one
             contained unit instead of loose right-aligned rows. */}
-        <div className="w-full flex-shrink-0 rounded-tile border border-line bg-tint/40 p-4 sm:w-64">
+        <div className="w-full flex-shrink-0 rounded-tile border border-line bg-tint/40 p-4 wide:w-64">
           {/* Price */}
           <div className="text-center">
             <div className="flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5">

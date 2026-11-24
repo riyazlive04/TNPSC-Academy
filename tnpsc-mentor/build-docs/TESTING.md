@@ -73,3 +73,12 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | `?native` dashboard + test series | unchanged vs before |
 | Pre-existing, not ours: Group II/IIA offer sheet squeezes its Tamil card text into a narrow column — identical in `?native`. |
 - Not checked here: phone width with real data (window resize unavailable in this browser; 320/390 covered by the earlier Playwright shots).
+
+## fix(offer-cards) — Group II/IIA offer sheet squeeze (2026-11-24)
+- Root cause: purchase cards switched to side-by-side on the VIEWPORT `sm:` breakpoint; inside the 576px offer sheet / upsell popup on a desktop the price+coupon column kept its width and crushed the text column (Tamil worst).
+- Fix: `wide:` variant = `@container (min-width: 40rem)`; card root `[container-type:inline-size]`; every `sm:` in RankBooster/TargetG2/Vettri/Premium cards → `wide:`.
+| Check (signed-in, local build → live API, Tamil dark 1536) | Result |
+|---|---|
+| /test-series offer sheet | card stacks, perks/bonus full width, price + coupon + full-width buy button |
+| /profile Rank Booster card (736px) | still side by side (row) — unchanged |
+| tsc / vitest | clean / only pre-existing roles failure |
