@@ -52,7 +52,7 @@ export default function BookmarksPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 lg:py-8 web:max-w-6xl web:sm:px-6">
         <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"

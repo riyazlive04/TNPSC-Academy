@@ -21,3 +21,8 @@ Each group = one commit, after `web-shell` + `web-page-kit`. Every page gets: Cr
 | 10 | admin | AdminQuestions, AdminReports, SuperAdmin, Crm, SduiScreen | none | dense tables stay tables; shell + tokens only (pending decision) |
 
 Not converted: `LandingPage.tsx` (unrouted).
+
+## As built (2026-11-24)
+- Groups 6–8: shell + kit primitives + `.card` (already the archive card) cover the look. Only grid-heavy pages widen to the website width (`web:max-w-6xl`): Materials, Insights, TestSeries, Bookmarks. Reading pages (instructions, policy, result, profile, revision, CA magazine) keep their narrow measure on purpose.
+- CurrentAffairs + CaQuestions came in with PickerPage (group 5 commit).
+- Quiz/MockQuiz: render outside AppLayout's chrome as before; no change.

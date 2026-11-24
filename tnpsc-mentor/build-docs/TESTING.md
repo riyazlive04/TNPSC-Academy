@@ -47,3 +47,9 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | Playwright via `_preview.html`: PYQ chooser web 1280 + native 390/1280, SubjectPractice web 1280, Aptitude web 320 TA, Daily web 1280 | shared AC | web: crumbs (Home › section) replace back link + badge, 3-col tiles, footer pinned to bottom on short pages; native: back link + centered badge unchanged, canvas below content unchanged; no h-scroll |
 | `tsc --noEmit` | — | clean |
 - Not checked: data-filled states, free-gate lock chips, CreditConfirmPopup (need backend + session). In-page step back buttons (Aptitude, PyqAptitude, SubjectPractice, Thirukural) kept on web — they step internal state, not history.
+
+## web-pages-wide (groups 6–8, 2026-11-24)
+| Test | Maps to | Result |
+|---|---|---|
+| Playwright via `_preview.html`: TestSeries web 1280 + native 390, Insights web 1280 | shared AC | web container aligns with header/footer at 6xl; native unchanged; no h-scroll |
+- Not checked: these pages WITH data (paper lists, analytics charts, materials grid at 6xl) — need backend + session.

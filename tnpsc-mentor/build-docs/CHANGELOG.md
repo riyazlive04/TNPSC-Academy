@@ -5,6 +5,7 @@
 - feat(web-page-kit): PageGrid / Crumbs / SectionBlock + web variants on List, ListRow, SectionHeader, ChoiceGrid/Card, StatStrip.
 - feat(web-home): dashboard on web — PageGrid, archive hero greeting, 3-col practice cards, Keep going in the sidebar.
 - feat(web-practice): PickerPage on the kit (crumbs replace back link + badge on web) → PYQ/aptitude/samacheer/history/CA pickers; SubjectPractice + Thirukural on PageGrid; Daily widened; footer pinned to bottom on web.
+- feat(web-pages-wide): Materials, Insights, TestSeries, Bookmarks widen to the website width on web.
 - skipped web-pages-public: landing/answer-key pages already website-style.
 
 ## 2026-11-18

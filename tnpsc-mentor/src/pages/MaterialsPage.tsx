@@ -69,7 +69,7 @@ export default function MaterialsPage() {
 
   return (
     <>
-      <div className="mx-auto max-w-4xl px-4 py-6">
+      <div className="mx-auto max-w-4xl px-4 py-6 web:max-w-6xl web:sm:px-6">
         {/* Header */}
         <div className="mb-5 flex items-center gap-3">
           <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-brand-gradient text-white shadow-brand">

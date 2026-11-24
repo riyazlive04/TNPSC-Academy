@@ -252,7 +252,7 @@ export default function TestSeriesPage() {
         : null
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-3xl px-4 py-8 web:max-w-6xl web:sm:px-6">
       <button
         onClick={() => navigate('/test-arena')}
         className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary"
