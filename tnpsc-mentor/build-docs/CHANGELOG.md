@@ -11,6 +11,7 @@
 - fix(web-shell): Tamil desktop nav kept on one line (found in the signed-in check) (3d183ba).
 - deploy: 3d183ba live via deploy.sh (box was clean at 13de6b7); live check — admin home, student preview dashboard (sidebar, footer, nav fits), /, /questions/, /current-affairs/ all 200. Rollback = redeploy 13de6b7.
 - fix(offer-cards): purchase cards lay out by their own width (container query), so the Group II/IIA offer sheet no longer squeezes its text on desktop.
+- deploy: 429373f live (offer-card fix); live check — student-preview /test-series sheet stacks correctly, @container CSS served.
 - skipped web-pages-public: landing/answer-key pages already website-style.
 
 ## 2026-11-18
