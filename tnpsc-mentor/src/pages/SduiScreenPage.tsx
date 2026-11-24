@@ -10,7 +10,7 @@
 // case here, not an error.
 
 import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Compass } from 'lucide-react'
 import SduiRenderer from '../components/Sdui/SduiRenderer'
 import { useSduiLayout, useSduiStore } from '../lib/sdui/client'
@@ -51,9 +51,9 @@ export default function SduiScreenPage() {
           <Compass size={30} className="text-primary" />
         </span>
         <p className="tamil font-body text-sm leading-relaxed text-muted">{t('couldNotLoad')}</p>
-        <button onClick={() => navigate('/test-arena')} className="btn-brand px-6 py-3 text-sm">
+        <Link to="/test-arena" className="btn-brand px-6 py-3 text-sm">
           {t('testArena')}
-        </button>
+        </Link>
       </div>
     )
   }

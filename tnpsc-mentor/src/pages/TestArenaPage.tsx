@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, type NavigateFunction } from 'react-router-dom'
-import { motion, useReducedMotion } from 'motion/react'
+import { useNavigate } from 'react-router-dom'
+import { useReducedMotion } from 'motion/react'
 import {
   BookOpen,
   Newspaper,
@@ -35,11 +35,11 @@ import CaMagazineCarousel from '../components/Home/CaMagazineCarousel'
 import FlashcardPeek from '../components/Home/FlashcardPeek'
 import DailyCaSheet from '../components/Home/DailyCaSheet'
 import CurrentAffairsHubSheet from '../components/Home/CurrentAffairsHubSheet'
-import { List, ListRow } from '../components/UI/ListRow'
+import { List, ListRow, Tap } from '../components/UI/ListRow'
 import SduiSlot from '../components/Sdui/SduiSlot'
 import { useSduiSheetStore } from '../lib/sdui/actions'
 import { CardGrid, GridCard } from '../components/UI/CardRow'
-import { PageGrid } from '../components/Site/PageKit'
+import { PageGrid, SidebarBox } from '../components/Site/PageKit'
 import { IS_WEB } from '../lib/platform'
 import { useAuth } from '../hooks/useAuth'
 import { useStartTest } from '../hooks/useStartTest'
@@ -358,7 +358,6 @@ export default function TestArenaPage() {
       <AdminDashboard
         name={firstName}
         isSuperAdmin={isSuperAdmin}
-        onNavigate={navigate}
         t={t}
       />
     )
@@ -383,32 +382,31 @@ export default function TestArenaPage() {
 
   // Keep going - study-loop quick links. Native: a card pair at the foot of the
   // page. Browser: the website sidebar (a boxed list beside the main column).
-  const keepGoing = (
+  const keepGoing = IS_WEB ? (
+    // Web: the Answer Key pages' sidebar boxes.
+    <div className="space-y-4" data-tour="progress">
+      <SidebarBox
+        title={t('keepGoingShort')}
+        items={[
+          { to: '/revision', label: t('revision') },
+          { to: '/insights', label: t('insights') },
+          { to: '/bookmarks', label: t('questionBank') },
+        ]}
+      />
+    </div>
+  ) : (
     <section className="space-y-2" data-tour="progress">
       <SectionHeader title={t('keepGoingShort')} className="px-1" />
-      {IS_WEB ? (
-        <List>
-          <ListRow
-            onClick={() => navigate('/revision')}
-            leading={<IconTile tint="violet"><RefreshCw size={18} /></IconTile>}
-            title={t('revision')}
-          />
-          <ListRow
-            onClick={() => navigate('/insights')}
-            leading={<IconTile tint="blue"><BarChart3 size={18} /></IconTile>}
-            title={t('insights')}
-          />
-        </List>
-      ) : (
+      {(
         <CardGrid>
           <GridCard
-            onClick={() => navigate('/revision')}
+            to="/revision"
             icon={<RefreshCw size={20} />}
             tint="violet"
             title={t('revision')}
           />
           <GridCard
-            onClick={() => navigate('/insights')}
+            to="/insights"
             style={{ '--i': 1 } as React.CSSProperties}
             icon={<BarChart3 size={20} />}
             tint="blue"
@@ -423,11 +421,12 @@ export default function TestArenaPage() {
     <>
       <PageGrid className="py-6 lg:py-8" aside={keepGoing}>
       <div className="space-y-8">
-        {/* Greeting - bare on the surface. Hierarchy from type + space, no box. */}
-        <header className="px-1">
-          <p className="tamil font-body text-sm text-muted">{t(greetingKey())}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink">
+        {/* Greeting - bare on the surface. Hierarchy from type + space, no box.
+            Web: the archive hero's eyebrow pill + large title. */}
+        <header className="px-1 web:px-0">
+          <p className="tamil font-body text-sm text-muted web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:text-brand-dark">{t(greetingKey())}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 web:mt-3">
+            <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-ink web:text-[clamp(23px,4.2vw,34px)]">
               {firstName || 'Aspirant'}
             </h1>
             {showStreak && (
@@ -643,7 +642,7 @@ export default function TestArenaPage() {
             title={t('mockHeroTitle')}
             subtitle={featured.subtitle}
             cta={t('start')}
-            onClick={() => navigate(featured.to)}
+            to={featured.to}
           />
         </div>
 
@@ -672,7 +671,7 @@ export default function TestArenaPage() {
             {/* Vettri Nichayam bundle. */}
             {vettriOn && (
               <GridCard
-                onClick={() => navigate('/vettri')}
+                to="/vettri"
                 style={{ '--i': 1 } as React.CSSProperties}
                 icon={<Trophy size={20} />}
                 tint="coral"
@@ -685,7 +684,7 @@ export default function TestArenaPage() {
                 those products is enabled, so the card is never a dead end. */}
             {(testSeriesOn || rankBoosterOn || targetG2On) && (
               <GridCard
-                onClick={() => navigate('/test-series')}
+                to="/test-series"
                 style={{ '--i': 2 } as React.CSSProperties}
                 icon={<CalendarDays size={20} />}
                 tint="coral"
@@ -698,7 +697,7 @@ export default function TestArenaPage() {
               .map((card, i) => (
                 <GridCard
                   key={card.to}
-                  onClick={() => navigate(card.to)}
+                  to={card.to}
                   style={{ '--i': i + 3 } as React.CSSProperties}
                   icon={card.icon}
                   tint={card.tint}
@@ -715,7 +714,7 @@ export default function TestArenaPage() {
               ))}
             {/* Thirukkural quiz - a self-contained bilingual practice bank. */}
             <GridCard
-              onClick={() => navigate('/test-arena/thirukural')}
+              to="/test-arena/thirukural"
               style={{ '--i': restCards.length + 2 } as React.CSSProperties}
               icon={<ScrollText size={20} />}
               tint="green"
@@ -867,18 +866,18 @@ function Hero({
   title,
   subtitle,
   cta,
-  onClick,
+  to,
 }: {
   icon: React.ReactNode
   title: string
   subtitle: string
   cta: string
-  onClick: () => void
+  to: string
 }) {
   const reduce = useReducedMotion()
   return (
-    <motion.button
-      onClick={onClick}
+    <Tap
+      to={to}
       whileTap={reduce ? undefined : tapScaleSubtle}
       className="hero-panel focus-ring group relative flex w-full items-center gap-4 p-6 text-left"
     >
@@ -899,7 +898,7 @@ function Hero({
         {cta} <ChevronRight size={16} />
       </span>
       <ChevronRight size={20} className="relative flex-shrink-0 text-white/70 sm:hidden" />
-    </motion.button>
+    </Tap>
   )
 }
 
@@ -920,12 +919,10 @@ function greetingKey(): StringKey {
 function AdminDashboard({
   name,
   isSuperAdmin,
-  onNavigate,
   t,
 }: {
   name?: string
   isSuperAdmin: boolean
-  onNavigate: NavigateFunction
   t: (key: StringKey) => string
 }) {
   return (
@@ -949,7 +946,7 @@ function AdminDashboard({
             title={t('superadminConsole')}
             subtitle={t('platformMetricsSub')}
             cta={t('start')}
-            onClick={() => onNavigate('/superadmin')}
+            to="/superadmin"
           />
         )}
 
@@ -961,7 +958,7 @@ function AdminDashboard({
             {BANK_CARDS.map((card, i) => (
               <ListRow
                 key={card.to}
-                onClick={() => onNavigate(card.to)}
+                to={card.to}
                 style={{ '--i': i } as React.CSSProperties}
                 leading={<IconTile tint={card.tint}>{card.icon}</IconTile>}
                 title={t(card.titleKey)}
@@ -969,11 +966,8 @@ function AdminDashboard({
               />
             ))}
             <ListRow
-              onClick={() =>
-                onNavigate('/admin/questions', {
-                  state: { category: 'outer', label: 'Outer Questions' },
-                })
-              }
+              to="/admin/questions"
+              state={{ category: 'outer', label: 'Outer Questions' }}
               leading={
                 <IconTile tint="coral">
                   <Layers size={20} />

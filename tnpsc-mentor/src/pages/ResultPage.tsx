@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useReducedMotion } from 'motion/react'
 import {
   BookOpen,
@@ -458,9 +458,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                   : ''}{' '}
                 - {t('revSavedSleep')}
               </p>
-              <button onClick={() => navigate('/revision')} className="btn-ghost mt-2.5 px-4 py-2 text-sm">
+              <Link to="/revision" className="btn-ghost mt-2.5 px-4 py-2 text-sm">
                 {t('revGoToRevision')}
-              </button>
+              </Link>
             </div>
           </div>
         )}
@@ -470,9 +470,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
             <div className="min-w-0">
               <p className="tamil font-heading text-sm font-bold text-ink">{t('revClearedNoticeTitle')}</p>
               <p className="tamil mt-1 font-body text-sm text-ink2">{t('revClearedNoticeBody')}</p>
-              <button onClick={() => navigate('/revision')} className="btn-ghost mt-2.5 px-4 py-2 text-sm">
+              <Link to="/revision" className="btn-ghost mt-2.5 px-4 py-2 text-sm">
                 {t('revGoToRevision')}
-              </button>
+              </Link>
             </div>
           </div>
         )}
@@ -553,9 +553,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
                     )
                   })}
                 </div>
-                <button onClick={() => navigate('/revision')} className="btn-wrap btn-soft mt-4 w-full px-5 py-3 text-sm">
+                <Link to="/revision" className="btn-wrap btn-soft mt-4 w-full px-5 py-3 text-sm">
                   {t('practiceMistakes')} →
-                </button>
+                </Link>
               </section>
             )}
           </div>
@@ -670,9 +670,9 @@ export default function ResultPage({ previewPayload }: { previewPayload?: Result
           <button onClick={handleRetry} className="btn-wrap btn-ghost flex-1 px-6 py-3.5">
             <RefreshCw size={18} /> {t('retryTest')}
           </button>
-          <button onClick={() => navigate('/test-arena')} className="btn-wrap btn-brand flex-1 px-6 py-3.5">
+          <Link to="/test-arena" className="btn-wrap btn-brand flex-1 px-6 py-3.5">
             <Home size={18} /> {t('testArena')}
-          </button>
+          </Link>
         </div>
       </div>
 

@@ -6,6 +6,8 @@
 //
 // Durations are in SECONDS (the unit `motion/react` expects).
 
+import { IS_WEB } from './platform'
+
 export const DURATION = {
   /** Micro feedback: press, hover, toggle. */
   micro: 0.15,
@@ -33,11 +35,14 @@ export const EASE_OUT = [0, 0, 0.2, 1] as const
 // The exit is deliberately faster than the entrance and drops the drift: with
 // mode="wait" the outgoing screen must finish before the new one starts, so
 // every millisecond spent there is felt as lag on a tab tap. Total ≈ 250 ms.
-export const pageVariants = {
-  initial: { opacity: 0, y: 6 },
-  animate: { opacity: 1, y: 0, transition: { duration: DURATION.page, ease: EASE_OUT } },
-  exit: { opacity: 0, transition: { duration: DURATION.pageOut, ease: EASE_STANDARD } },
-}
+// Web pages load like web pages: no route cross-fade in the browser.
+export const pageVariants = IS_WEB
+  ? { initial: {}, animate: {}, exit: {} }
+  : {
+      initial: { opacity: 0, y: 6 },
+      animate: { opacity: 1, y: 0, transition: { duration: DURATION.page, ease: EASE_OUT } },
+      exit: { opacity: 0, transition: { duration: DURATION.pageOut, ease: EASE_STANDARD } },
+    }
 export const pageTransition = { duration: DURATION.page, ease: EASE_STANDARD }
 
 // ─── List entrance ──────────────────────────────────────────────────────────
@@ -55,5 +60,6 @@ export const listItem = {
 // ─── Press feedback ─────────────────────────────────────────────────────────
 // The canonical tap depress for interactive rows/tiles/buttons. Pair with
 // `whileTap={tapScale}` on a `motion.*` element.
-export const tapScale = { scale: 0.97 }
-export const tapScaleSubtle = { scale: 0.985 }
+// Press-scale is an app gesture; links and buttons on the web don't shrink.
+export const tapScale = IS_WEB ? undefined : { scale: 0.97 }
+export const tapScaleSubtle = IS_WEB ? undefined : { scale: 0.985 }

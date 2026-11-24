@@ -89,3 +89,30 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | Signed-in local (TA dark 1536) dashboard | app look back: plain greeting, unboxed lists, app GridCards; structure kept (header/footer/sidebar). |
 | Header nav with icons (app look) | did NOT fit Tamil: 864px needed / 710px available → icons hidden on web only, app colours/weights kept → 710/710 |
 | webPageKit.test (SectionBlock case removed with the component) | pass |
+
+## v2 web-menu (2026-11-24) — signed-in local, 400px same-origin iframes (web vs `?native`)
+| AC | Result |
+|---|---|
+| web <lg: no bottom tab bar, menu button present; native keeps tab bar, no menu button | pass |
+| drawer: focus on close button, body scroll locked, links = real hrefs (/test-arena /test-series /revision /materials /insights /profile) | pass |
+| following a link navigates + closes + restores scroll; Esc closes; focus returns to the menu button | pass |
+| no horizontal scroll at 400px (scrollWidth 390) | pass |
+| Tour: hidden target (lang button on phone web) now falls back to the centred card (0x0 rect treated as missing) | code change; not run through the tour |
+- Note: a frozen tab after several HMR edits to AppLayout was a stale hot reload — a fresh tab loaded fine.
+
+## v3 answer-key look (2026-11-24) — signed-in local, Tamil dark
+| Check | Result |
+|---|---|
+| Dashboard 1536 | v1 look back; Keep going as answer-key SidebarBox (Revision, Insights, Question bank); nav 708/708 |
+| /test-arena/pyq 1536 | crumbs + main + Practice sidebar (current section highlighted) |
+| /test-arena/pyq at 400px (iframe) web vs `?native` | web: menu + crumbs, Practice sidebar stacked below the content, no h-scroll (390); native: back button, badge, bottom tabs, no aside |
+
+## v2 web-links (2026-11-24) — signed-in local
+| Check | Result |
+|---|---|
+| `webPageKit.test` "web-links": ListRow with `to` → `<a href>`; disabled / action-only → `<button>` | pass (6/6) |
+| Dashboard: 20 real links (header nav, mock hero, practice cards, sidebar, footer) | pass |
+| Clicking a link is SPA navigation (no reload); PYQ group cards + group-2 section cards are links; empty section stays a disabled button | pass |
+| `?native` dashboard | visually unchanged (links render the same classes) |
+- Web: route cross-fade and press-scale off (lib/motion.ts), no App.tsx edit.
+- Not converted yet: step pickers (Subject practice, aptitude, Thirukkural) — they become links with feature 4's URL steps; back buttons → crumbs (feature 4).

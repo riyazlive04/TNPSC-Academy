@@ -179,9 +179,7 @@ export default function PyqGroupPage() {
                 key={s}
                 index={i}
                 disabled={n === 0}
-                onClick={() =>
-                  navigate(withYear(`/test-arena/pyq/${group.key}/${pyqSectionSlug(s)}`, year))
-                }
+                to={withYear(`/test-arena/pyq/${group.key}/${pyqSectionSlug(s)}`, year)}
                 icon={iconFor(s) ?? <Icon strokeWidth={2} />}
                 tint={tint}
                 title={subjectName(s, lang)}

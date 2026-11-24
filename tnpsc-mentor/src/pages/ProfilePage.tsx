@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
+import { Tap } from '../components/UI/ListRow'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -519,12 +520,12 @@ export default function ProfilePage() {
                     {t('quickLinks')}
                   </h2>
                   <div className="card divide-y divide-line overflow-hidden">
-                    <NavRow onClick={() => navigate('/bookmarks')} icon={<Bookmark size={16} />} label={t('questionBank')} />
+                    <NavRow to="/bookmarks" icon={<Bookmark size={16} />} label={t('questionBank')} />
                     {/* Materials - moved off the mobile bottom bar (see AppLayout's
                         MOBILE_LEARNER_NAV) to keep that at 5 tabs; same hasMaterials
                         gate so this never shows an empty hub. */}
                     {hasMaterials && (
-                      <NavRow onClick={() => navigate('/materials')} icon={<Library size={16} />} label={t('materials')} />
+                      <NavRow to="/materials" icon={<Library size={16} />} label={t('materials')} />
                     )}
                     {/* How it works - replay the first-run welcome tour.
                         Aspirant-only (admins don't use the onboarding/gamification
@@ -1192,14 +1193,18 @@ function NavRow({
   label,
   sub,
   onClick,
+  to,
 }: {
   icon: React.ReactNode
   label: string
   sub?: string
-  onClick: () => void
+  onClick?: () => void
+  /** A destination: renders a real link. */
+  to?: string
 }) {
   return (
-    <button
+    <Tap
+      to={to}
       onClick={onClick}
       className="group flex w-full items-center gap-3 bg-card px-4 py-3.5 text-left transition-colors hover:bg-tint/40 active:bg-tint/60"
     >
@@ -1211,7 +1216,7 @@ function NavRow({
         {sub && <span className="tamil block font-body text-xs text-ink2">{sub}</span>}
       </span>
       <ChevronRight size={18} className="flex-shrink-0 text-muted/40" />
-    </button>
+    </Tap>
   )
 }
 

@@ -1,6 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Home, ShieldCheck, RefreshCw, User, BarChart3, Sun, Moon, Flag, Library, CalendarDays, Trophy, Eye, EyeOff, Coins, Menu as MenuIcon, X } from 'lucide-react'
 import { useAuth } from '../../hooks/useAuth'
 import WorkspaceSwitch from './WorkspaceSwitch'
 import { useCreditsStore } from '../../store/creditsStore'
@@ -21,6 +21,7 @@ import BackToTopButton from './BackToTopButton'
 import AlertPopup from './AlertPopup'
 import { SiteFooter } from '../Site/PageKit'
 import { IS_WEB } from '../../lib/platform'
+import { useFocusTrap } from '../UI/useFocusTrap'
 
 interface AppLayoutProps {
   children: ReactNode
@@ -106,6 +107,10 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   }
   const { t } = useT()
   const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+  // Following a menu link closes the menu.
+  useEffect(() => setMenuOpen(false), [location.pathname])
   // Feedback is accepted once per 3 months (enforced server-side). After a user
   // rates the app we hide the entry point for that window, then surface it again.
   // Persisted per-user in localStorage as the last-submission epoch (no request).
@@ -208,17 +213,18 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
   return (
     <div className="min-h-dvh overflow-x-clip bg-canvas bg-brand-radial web:flex web:flex-col">
       {!bare && (
-        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card">
+        <header className="pt-safe sticky top-0 z-30 border-b border-line bg-card web:bg-card/95 web:backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 web:sm:px-6">
-            <button
-              onClick={() => navigate('/test-arena')}
+            <Link
+              to="/test-arena"
+              aria-label="TNPSC Mentors"
               className="flex flex-shrink-0 items-center gap-2.5 transition hover:opacity-80"
             >
               <img src="/logo-mark.png" alt="" className="h-9 w-9 flex-shrink-0 object-contain" />
-              <span className="font-heading text-base font-semibold tracking-tight text-ink">
+              <span className="font-heading text-base font-semibold tracking-tight text-ink web:font-extrabold">
                 TNPSC <span className="text-brand">Mentors</span>
               </span>
-            </button>
+            </Link>
 
             {/* Desktop primary nav - replaces the bottom tab bar on large screens. */}
             {/* Web: one-line short labels; a narrow desktop in Tamil scrolls the nav sideways instead of wrapping it. */}
@@ -226,20 +232,18 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
               {nav.map(({ to, icon: Icon, key, short }) => {
                 const active = isActive(to)
                 return (
-                  <button
+                  <Link
                     key={to}
-                    onClick={() => navigate(to)}
+                    to={to}
                     {...warm(to)}
-                    aria-current={active}
+                    aria-current={active ? 'page' : undefined}
                     className={[
                       'press focus-ring flex items-center gap-2 rounded-xl px-3.5 py-2 font-heading text-sm font-medium transition-colors',
-                      // Web: the archive's text-only nav (bold ink links, no icons).
-                      // Web: text links on one line - with icons the Tamil labels need ~860px
-                      // and the nav has ~710px inside the 6xl header.
-                      'web:shrink-0 web:whitespace-nowrap web:px-2.5',
+                      // Web: the Answer Key pages' text nav (bold ink links, no icons, one line).
+                      'web:shrink-0 web:whitespace-nowrap web:rounded-[10px] web:px-2.5 web:text-sm web:font-bold',
                       active
                         ? 'bg-brand-soft text-brand-dark'
-                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark',
+                        : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark web:text-ink web:hover:bg-brand-soft',
                     ].join(' ')}
                   >
                     <Icon size={17} className="web:hidden" />
@@ -249,7 +253,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                         {openReports}
                       </span>
                     )}
-                  </button>
+                  </Link>
                 )
               })}
             </nav>
@@ -260,7 +264,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 data-tour="lang"
                 title={t('chooseLanguage')}
                 aria-label={`${t('chooseLanguage')} (${LANG_LABEL[lang]})`}
-                className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
+                className="tamil press rounded-lg bg-brand-soft px-2.5 py-1.5 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring web:hidden web:lg:inline-block"
               >
                 {LANG_LABEL[lang]}
               </button>
@@ -268,7 +272,7 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 onClick={toggleTheme}
                 title={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
                 aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
-                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90"
+                className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90 web:hidden web:lg:grid"
               >
                 {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
               </button>
@@ -304,14 +308,14 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                   both and which one they're in. Students never see it. */}
               {isCrmStaff && <WorkspaceSwitch active="student" />}
               {isSuperAdmin ? (
-                <button
-                  onClick={() => navigate('/superadmin')}
+                <Link
+                  to="/superadmin"
                   title={t('superadminConsole')}
                   aria-label={t('superadminConsole')}
                   className="press hidden items-center gap-1 rounded-lg bg-brand-gradient px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-white shadow-brand focus-ring sm:inline-flex"
                 >
                   <ShieldCheck size={13} /> {t('superadmin')}
-                </button>
+                </Link>
               ) : (
                 isAdmin && (
                   <span className="hidden items-center gap-1 rounded-lg bg-goldsoft px-2.5 py-1.5 font-heading text-xs font-semibold uppercase tracking-wide text-gold sm:inline-flex">
@@ -326,6 +330,19 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
                 >
                   {profile.full_name}
                 </span>
+              )}
+              {/* Web below lg: the site menu replaces the app's bottom tab bar
+                  (and holds language + theme, which do not fit beside it at 320px). */}
+              {IS_WEB && (
+                <button
+                  onClick={() => setMenuOpen(true)}
+                  aria-label={lang === 'ta' ? 'மெனு' : 'Menu'}
+                  aria-expanded={menuOpen}
+                  aria-controls="web-menu"
+                  className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring lg:hidden"
+                >
+                  <MenuIcon size={20} />
+                </button>
               )}
               {/* No profile avatar here: the bottom nav already carries a Profile
                   tab, and two entry points to the same screen in one viewport read
@@ -355,10 +372,9 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
 
       <main className={bare ? '' : IS_WEB ? 'flex-1 pb-10' : 'pb-24 lg:pb-10'}>{children}</main>
 
-      {/* Website footer (browser only). The padded wrapper keeps it clear of
-          the fixed bottom tab bar on phone widths. */}
+      {/* Website footer (browser only). */}
       {!bare && IS_WEB && (
-        <div className="bg-card pb-20 lg:pb-0">
+        <div className="bg-card">
           <SiteFooter />
         </div>
       )}
@@ -367,7 +383,52 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
           managers a quick jump back to the header/tabs. */}
       {!bare && isAdmin && <BackToTopButton />}
 
-      {!bare && (
+      {!bare && IS_WEB && (
+        <WebMenu open={menuOpen} onClose={closeMenu} closeLabel={t('close')}>
+          {nav.map(({ to, icon: Icon, key }) => {
+            const active = isActive(to)
+            return (
+              <Link
+                key={to}
+                to={to}
+                {...warm(to)}
+                aria-current={active ? 'page' : undefined}
+                className={[
+                  'focus-ring flex items-center gap-3 rounded-xl px-3 py-2.5 font-heading text-sm font-medium transition-colors',
+                  active ? 'bg-brand-soft text-brand-dark' : 'text-ink2 hover:bg-brand-soft/60 hover:text-brand-dark',
+                ].join(' ')}
+              >
+                <Icon size={18} className="flex-shrink-0" />
+                <span className="tamil min-w-0 flex-1">{t(key)}</span>
+                {to === '/admin/reports' && openReports > 0 && (
+                  <span className="grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-coral px-1 font-heading text-2xs font-bold text-white">
+                    {openReports}
+                  </span>
+                )}
+              </Link>
+            )
+          })}
+          <div className="mt-3 flex items-center gap-2 border-t border-line pt-4">
+            <button
+              onClick={cycleLang}
+              aria-label={`${t('chooseLanguage')} (${LANG_LABEL[lang]})`}
+              className="tamil press rounded-lg bg-brand-soft px-3 py-2 font-heading text-xs font-semibold text-brand-dark transition hover:bg-tint focus-ring"
+            >
+              {LANG_LABEL[lang]}
+            </button>
+            <button
+              onClick={toggleTheme}
+              aria-label={resolvedTheme === 'dark' ? t('lightMode') : t('darkMode')}
+              className="grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring"
+            >
+              {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
+        </WebMenu>
+      )}
+
+      {/* App bottom tab bar - the installed app only; the browser uses the menu above. */}
+      {!bare && !IS_WEB && (
         <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-card lg:hidden">
           <div
             className="mx-auto flex max-w-md items-stretch justify-between gap-0.5 px-2 py-1.5"
@@ -440,7 +501,6 @@ export default function AppLayout({ children, bare = false }: AppLayoutProps) {
  * through to the profile, where the meter + upgrade options live.
  */
 function CreditPill() {
-  const navigate = useNavigate()
   const { t } = useT()
   const loaded = useCreditsStore((s) => s.loaded)
   const unlimited = useCreditsStore((s) => s.unlimited)
@@ -448,8 +508,8 @@ function CreditPill() {
   if (!loaded || unlimited) return null
   const low = balance < 10
   return (
-    <button
-      onClick={() => navigate('/profile')}
+    <Link
+      to="/profile"
       data-tour="credits"
       title={t('creditsTitle')}
       aria-label={`${balance} ${t('creditsWord')}`}
@@ -459,6 +519,63 @@ function CreditPill() {
       ].join(' ')}
     >
       <Coins size={14} /> {balance}
-    </button>
+    </Link>
+  )
+}
+
+/**
+ * The browser's site menu below `lg` (replaces the app's bottom tab bar on
+ * web): a right-hand drawer, focus-trapped, closed by Esc, the backdrop, the X
+ * or following a link. Body scroll is locked while it is open.
+ */
+function WebMenu({
+  open,
+  onClose,
+  closeLabel,
+  children,
+}: {
+  open: boolean
+  onClose: () => void
+  closeLabel: string
+  children: ReactNode
+}) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(open, panelRef)
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open, onClose])
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-40 lg:hidden">
+      <div aria-hidden="true" onClick={onClose} className="absolute inset-0 bg-black/40" />
+      <div
+        ref={panelRef}
+        id="web-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        tabIndex={-1}
+        className="pt-safe absolute inset-y-0 right-0 flex w-72 max-w-[85vw] flex-col gap-1 overflow-y-auto border-l border-line bg-card p-4 shadow-card outline-none"
+      >
+        <button
+          onClick={onClose}
+          aria-label={closeLabel}
+          className="mb-2 grid h-9 w-9 place-items-center self-end rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring"
+        >
+          <X size={20} />
+        </button>
+        {children}
+      </div>
+    </div>
   )
 }

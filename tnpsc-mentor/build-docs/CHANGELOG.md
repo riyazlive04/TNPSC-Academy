@@ -1,6 +1,10 @@
 # Changelog
 
 ## 2026-11-24
+- feat(web-links): navigation renders real links (ListRow/ChoiceCard/GridCard `to` via shared `Tap`, header, dashboard, PYQ pickers, Profile rows, result/revision/insights CTAs); no route fade or press-scale on web. Uncommitted.
+- feat(web-sidebar): answer-key sidebar boxes — dashboard Keep going + Practice sidebar on picker/practice pages (uncommitted, on hold).
+- revert(web-look-revert): user 2026-11-24 — web follows the Group 1 Answer Key 2026 page (v1 website look restored); Android keeps the app look. Uncommitted, on hold.
+- feat(web-menu): phone/tablet-width web gets a site menu drawer (links, language, theme) instead of the app bottom tab bar; tour skips the spotlight for hidden targets.
 - feat(web-look-revert): web keeps the app's visual design (v1 archive styling removed from primitives, greeting, badges, header); structure kept. SectionBlock + WEB_EYEBROW deleted.
 - feat(web-shell): browser-only website chrome — `html.is-web` + Tailwind `web:` variant, archive-style text nav, site footer with archive links; Android unchanged.
 - feat(web-page-kit): PageGrid / Crumbs / SectionBlock + web variants on List, ListRow, SectionHeader, ChoiceGrid/Card, StatStrip.

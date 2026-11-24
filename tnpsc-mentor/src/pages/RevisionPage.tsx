@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, RefreshCw, Check } from 'lucide-react'
 import ProgressBar from '../components/UI/ProgressBar'
 import QuestionCard from '../components/Quiz/QuestionCard'
@@ -168,9 +168,9 @@ export default function RevisionPage() {
               >
                 <RefreshCw size={16} /> {t('revision')}
               </button>
-              <button onClick={() => navigate('/insights')} className="btn-brand px-5 py-2.5">
+              <Link to="/insights" className="btn-brand px-5 py-2.5">
                 {t('insights')}
-              </button>
+              </Link>
             </div>
           </div>
         )}

@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import PickerPage from '../components/Layout/PickerPage'
 import { ChoiceGrid, ChoiceCard } from '../components/UI/ChoiceCard'
 import { iconUrl } from '../lib/subjectIcons'
@@ -11,7 +10,6 @@ import { useT } from '../lib/i18n'
  * share theirs (see PYQ_GROUPS in lib/constants).
  */
 export default function PyqGroupChooserPage() {
-  const navigate = useNavigate()
   const { t } = useT()
 
   return (
@@ -26,7 +24,7 @@ export default function PyqGroupChooserPage() {
       <ChoiceGrid>
         <ChoiceCard
           index={0}
-          onClick={() => navigate('/test-arena/pyq/group1')}
+          to="/test-arena/pyq/group1"
           icon={iconUrl('pyq-group-1')}
           tint="violet"
           title={t('group1Pyq')}
@@ -34,7 +32,7 @@ export default function PyqGroupChooserPage() {
         />
         <ChoiceCard
           index={1}
-          onClick={() => navigate('/test-arena/pyq/group2')}
+          to="/test-arena/pyq/group2"
           icon={iconUrl('pyq-group-2')}
           tint="blue"
           title={t('group2Pyq')}
@@ -42,7 +40,7 @@ export default function PyqGroupChooserPage() {
         />
         <ChoiceCard
           index={2}
-          onClick={() => navigate('/test-arena/pyq/group4')}
+          to="/test-arena/pyq/group4"
           icon={iconUrl('pyq-group-4')}
           tint="green"
           title={t('group4Pyq')}

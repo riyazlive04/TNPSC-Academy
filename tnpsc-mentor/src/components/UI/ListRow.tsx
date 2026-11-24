@@ -1,7 +1,35 @@
-import type { ReactNode } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import type { CSSProperties, ReactNode } from 'react'
+import { motion, useReducedMotion, type MotionProps } from 'motion/react'
+import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { tapScale } from '../../lib/motion'
+
+/** A router Link that takes motion props (press feedback in the app). */
+export const MotionLink = motion.create(Link)
+
+/**
+ * The tappable surface of a row/card: a real link when it has a destination
+ * (`to`) and isn't disabled, otherwise a button. Links give the web app proper
+ * web behaviour (open in new tab, copy link, middle-click).
+ */
+export function Tap({
+  to,
+  state,
+  disabled,
+  ...rest
+}: {
+  to?: string
+  state?: unknown
+  disabled?: boolean
+  onClick?: () => void
+  whileTap?: MotionProps['whileTap']
+  style?: CSSProperties
+  className?: string
+  children: ReactNode
+}) {
+  if (to && !disabled) return <MotionLink to={to} state={state} {...rest} />
+  return <motion.button type="button" disabled={disabled} {...rest} />
+}
 
 // ─── List + ListRow ─────────────────────────────────────────────────────────
 // The backbone of the calm, list-led skeleton (≈80% of the app). Rows sit
@@ -16,7 +44,14 @@ export function List({
   children: ReactNode
   className?: string
 }) {
-  return <div className={`divide-y divide-line ${className}`}>{children}</div>
+  // web: the archive's boxed `.rows` list; native stays hairline rows on the surface.
+  return (
+    <div
+      className={`divide-y divide-line web:overflow-hidden web:rounded-card web:border web:border-line web:bg-card web:shadow-soft ${className}`}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function ListRow({
@@ -25,6 +60,8 @@ export function ListRow({
   subtitle,
   trailing,
   onClick,
+  to,
+  state,
   disabled = false,
   className = '',
   style,
@@ -35,20 +72,17 @@ export function ListRow({
   /** Defaults to a chevron. Pass a value/badge for stat-style rows. */
   trailing?: ReactNode
   onClick?: () => void
+  /** A destination: renders a real link (open in new tab, copy link). Disabled rows stay buttons. */
+  to?: string
+  state?: unknown
   disabled?: boolean
   className?: string
   style?: React.CSSProperties
 }) {
   const reduce = useReducedMotion()
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      whileTap={reduce || disabled ? undefined : tapScale}
-      style={style}
-      className={`focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45 ${className}`}
-    >
+  const cls = `focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45 web:px-4 web:py-3.5 web:transition-colors web:hover:bg-brand-soft/40 ${className}`
+  const body = (
+    <>
       {leading}
       <span className="min-w-0 flex-1">
         <span className="tamil block truncate font-display text-base font-semibold leading-snug text-ink">
@@ -66,6 +100,19 @@ export function ListRow({
           className="flex-shrink-0 text-muted/40 transition-colors group-hover:text-muted"
         />
       )}
-    </motion.button>
+    </>
+  )
+  return (
+    <Tap
+      to={to}
+      state={state}
+      onClick={onClick}
+      disabled={disabled}
+      whileTap={reduce || disabled ? undefined : tapScale}
+      style={style}
+      className={cls}
+    >
+      {body}
+    </Tap>
   )
 }

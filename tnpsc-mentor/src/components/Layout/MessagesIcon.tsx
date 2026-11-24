@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { MessageCircle } from 'lucide-react'
 import { useMessageStore, startMessagePolling } from '../../store/messageStore'
 import { useT } from '../../lib/i18n'
@@ -10,7 +10,6 @@ import { useT } from '../../lib/i18n'
  * item, wants room to read/reply), so it's just an icon + badge, no dropdown.
  */
 export default function MessagesIcon() {
-  const navigate = useNavigate()
   const { t } = useT()
   const unread = useMessageStore((s) => s.unread)
 
@@ -19,8 +18,8 @@ export default function MessagesIcon() {
   }, [])
 
   return (
-    <button
-      onClick={() => navigate('/messages')}
+    <Link
+      to="/messages"
       title={t('messagesNav')}
       aria-label={unread > 0 ? `${t('messagesNav')} (${unread} unread)` : t('messagesNav')}
       className="relative grid h-9 w-9 place-items-center rounded-lg text-ink2 transition hover:bg-brand-soft hover:text-brand-dark focus-ring active:scale-90"
@@ -34,6 +33,6 @@ export default function MessagesIcon() {
           {unread > 9 ? '9+' : unread}
         </span>
       )}
-    </button>
+    </Link>
   )
 }

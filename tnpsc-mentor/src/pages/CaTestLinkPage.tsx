@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { ListChecks } from 'lucide-react'
 import { api, type CaDailySet } from '../lib/api'
 import { dailyCaConfig } from '../lib/caDaily'
@@ -80,9 +80,9 @@ export default function CaTestLinkPage() {
         <p className="tamil max-w-sm font-body text-sm leading-relaxed text-ink2">
           {t('caLinkTestMissing')}
         </p>
-        <button onClick={() => navigate('/test-arena')} className="btn-wrap btn-brand px-5 py-2.5 text-sm">
+        <Link to="/test-arena" className="btn-wrap btn-brand px-5 py-2.5 text-sm">
           {t('caLinkBackToDashboard')}
-        </button>
+        </Link>
       </div>
     )
   }

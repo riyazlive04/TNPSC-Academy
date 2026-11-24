@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
+import { Tap } from './ListRow'
 import { ChevronRight } from 'lucide-react'
 import { tapScaleSubtle } from '../../lib/motion'
 import IconTile, { type Tint } from './IconTile'
@@ -20,6 +21,8 @@ export function CardRow({
   subtitle,
   trailing,
   onClick,
+  to,
+  state,
   disabled = false,
   className = '',
   style,
@@ -30,14 +33,18 @@ export function CardRow({
   /** Defaults to a chevron. Pass a value/badge for stat-style rows. */
   trailing?: ReactNode
   onClick?: () => void
+  /** A destination: renders a real link. */
+  to?: string
+  state?: unknown
   disabled?: boolean
   className?: string
   style?: React.CSSProperties
 }) {
   const reduce = useReducedMotion()
   return (
-    <motion.button
-      type="button"
+    <Tap
+      to={to}
+      state={state}
       onClick={onClick}
       disabled={disabled}
       whileTap={reduce || disabled ? undefined : tapScaleSubtle}
@@ -61,7 +68,7 @@ export function CardRow({
           className="flex-shrink-0 text-muted/40 transition-all group-hover:translate-x-0.5 group-hover:text-muted"
         />
       )}
-    </motion.button>
+    </Tap>
   )
 }
 
@@ -74,7 +81,7 @@ export function CardRow({
 // never overlaps the row underneath.
 
 export function CardGrid({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`grid grid-cols-2 gap-3 web:sm:grid-cols-3 ${className}`}>{children}</div>
+  return <div className={`grid grid-cols-2 gap-3 web:gap-3.5 web:sm:grid-cols-3 ${className}`}>{children}</div>
 }
 
 export function GridCard({
@@ -84,6 +91,8 @@ export function GridCard({
   subtitle,
   badge,
   onClick,
+  to,
+  state,
   disabled = false,
   className = '',
   style,
@@ -95,19 +104,23 @@ export function GridCard({
   /** Small corner badge - e.g. a "3/12 subjects" progress count. */
   badge?: ReactNode
   onClick?: () => void
+  /** A destination: renders a real link. */
+  to?: string
+  state?: unknown
   disabled?: boolean
   className?: string
   style?: React.CSSProperties
 }) {
   const reduce = useReducedMotion()
   return (
-    <motion.button
-      type="button"
+    <Tap
+      to={to}
+      state={state}
       onClick={onClick}
       disabled={disabled}
       style={style}
       whileTap={reduce || disabled ? undefined : tapScaleSubtle}
-      className={`stagger-item focus-ring group relative flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card disabled:opacity-45 disabled:hover:translate-y-0 ${className}`}
+      className={`stagger-item focus-ring group relative flex h-full flex-col items-start gap-2.5 rounded-card border border-line bg-card p-3.5 text-left shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card disabled:opacity-45 disabled:hover:translate-y-0 web:p-[18px] web:hover:border-brand/40 ${className}`}
     >
       {badge && <span className="absolute right-3 top-3">{badge}</span>}
       <IconTile tint={tint} size={44}>
@@ -121,6 +134,6 @@ export function GridCard({
           </span>
         )}
       </span>
-    </motion.button>
+    </Tap>
   )
 }

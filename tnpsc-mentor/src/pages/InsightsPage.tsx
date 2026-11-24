@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft,
   Award,
@@ -142,9 +142,9 @@ export default function InsightsPage() {
               <Sparkles size={28} />
             </span>
             <p className="tamil max-w-xs font-body text-ink2">{t('noData')}</p>
-            <button onClick={() => navigate('/mock')} className="btn-brand btn-lg">
+            <Link to="/mock" className="btn-brand btn-lg">
               {t('takeATest')}
-            </button>
+            </Link>
           </div>
         )}
 
