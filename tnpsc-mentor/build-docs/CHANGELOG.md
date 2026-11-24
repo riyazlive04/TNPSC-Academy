@@ -8,6 +8,8 @@
 - feat(web-pages-wide): Materials, Insights, TestSeries, Bookmarks widen to the website width on web.
 - feat(web-auth): sign-in pages get the website header + footer on web; footer moved to shared SiteFooter.
 - feat(web-admin): AdminQuestions correct-option colours on the theme token (dark-mode fix); admin consoles otherwise get the shell only.
+- fix(web-shell): Tamil desktop nav kept on one line (found in the signed-in check) (3d183ba).
+- deploy: 3d183ba live via deploy.sh (box was clean at 13de6b7); live check — admin home, student preview dashboard (sidebar, footer, nav fits), /, /questions/, /current-affairs/ all 200. Rollback = redeploy 13de6b7.
 - skipped web-pages-public: landing/answer-key pages already website-style.
 
 ## 2026-11-18
