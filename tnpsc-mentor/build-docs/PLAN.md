@@ -1,4 +1,9 @@
-# Plan — Web app as web pages, app look kept (2026-11-24, v2) — AWAITING APPROVAL
+# Plan — Web app follows the Group 1 Answer Key 2026 page (2026-11-24, v3)
+- User: Android keeps the app look; the WEB looks like `/tnpsc-group-1-answer-key-2026` (text-link header, main column + right sidebar of boxed link lists, boxed rows). Supersedes v2's "keep the app look on web" (8056bc9 undone).
+- Done: v1 look restored; phone-width web menu; `SidebarBox` + `PracticeSidebar`; real links (v2 feature 3).
+- Next: v2 feature 4 (breadcrumbs + steps in the URL, both platforms) and feature 5 (CA hub / day picker / Thirukkural → pages on web; offer sheet → inline cards on web; upsell stays a popup). v2 feature 1 (look revert) dropped.
+
+# (superseded) Plan — Web app as web pages, app look kept (2026-11-24, v2)
 
 ## Goal and scope
 - Browser only: every SPA page behaves like a website page — links, URLs, breadcrumbs, a header menu, pages instead of sheets — while keeping the app's own visual look (colours, list rows, cards as the app draws them).

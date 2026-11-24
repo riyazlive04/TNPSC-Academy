@@ -70,7 +70,10 @@ export default function OnboardingTour({
   const measure = useCallback(() => {
     const el = targetRef.current
     if (!el) return setRect(null)
-    setRect(el.getBoundingClientRect())
+    const r = el.getBoundingClientRect()
+    // A hidden target (e.g. the language button, which moves into the site
+    // menu on phone-width web) measures 0x0: show the centred card instead.
+    setRect(r.width || r.height ? r : null)
   }, [])
 
   useLayoutEffect(() => {

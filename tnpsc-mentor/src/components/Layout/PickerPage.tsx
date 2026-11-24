@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useSmartBack } from '../../hooks/useSmartBack'
 import { useT } from '../../lib/i18n'
-import { Crumbs, PageGrid } from '../Site/PageKit'
+import { Crumbs, PageGrid, PracticeSidebar } from '../Site/PageKit'
 
 interface PickerPageProps {
   /** The yellow section badge shown at the top (already translated). */
@@ -36,7 +36,7 @@ export default function PickerPage({ badge, children, backTo = '/test-arena', ba
   // Web: website breadcrumbs replace both the back link (the browser has its
   // own back) and the badge (the last crumb already names the section).
   return (
-    <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8">
+    <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={<PracticeSidebar />}>
       <button
         onClick={goBack}
         className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-muted transition-colors hover:text-primary web:hidden"

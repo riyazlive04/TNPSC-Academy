@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+import { useT, type StringKey } from '../../lib/i18n'
 import { IS_WEB } from '../../lib/platform'
 import { useLanguageStore } from '../../store/languageStore'
 import { AnswerKeyFooter } from '../Landing/AnswerKeyChrome'
 
 // ─── Website page kit ───────────────────────────────────────────────────────
-// Website STRUCTURE for the browser (crumbs, main + sidebar grid, footer) —
-// the app's own visual design is kept (user, 2026-11-24 v2). Everything here is
-// behind the `web:` variant or IS_WEB, so the installed app is unchanged.
+// The public archive's page parts (scripts/qbank/render.mjs: .crumbs, .layout,
+// .sec-block) as React. Every web look is behind the `web:` variant or IS_WEB,
+// so the installed app renders exactly what it did before.
 
 /**
  * Page container. Native keeps the page's own column width; the browser gets
@@ -34,6 +36,70 @@ export function PageGrid({
         {side && <aside className="mt-8 min-w-0 lg:sticky lg:top-24 lg:mt-0">{aside}</aside>}
       </div>
     </div>
+  )
+}
+
+/** Archive hero eyebrow pill, for a page's section badge (browser only). */
+export const WEB_EYEBROW =
+  'web:inline-flex web:rounded-full web:bg-brand-soft web:px-3 web:py-1.5 web:font-heading web:text-[12.5px] web:font-bold web:normal-case web:tracking-normal web:text-brand-dark'
+
+/**
+ * Boxed sidebar link list — the Answer Key pages' AnswerKeySidebarBox (violet
+ * title strip + divided rows), with in-app router links instead of reloads.
+ */
+export function SidebarBox({
+  title,
+  items,
+  className = '',
+}: {
+  title: ReactNode
+  items: { to: string; label: ReactNode; active?: boolean }[]
+  className?: string
+}) {
+  return (
+    <div className={`overflow-hidden rounded-card border border-line ${className}`}>
+      <p className="tamil border-b border-line bg-card px-4 py-2.5 font-heading text-xs font-bold uppercase tracking-wide text-brand-dark">
+        {title}
+      </p>
+      <ul className="divide-y divide-line bg-card">
+        {items.map((l) => (
+          <li key={l.to}>
+            <Link
+              to={l.to}
+              aria-current={l.active ? 'page' : undefined}
+              className={
+                l.active
+                  ? 'tamil flex items-center justify-between gap-2 bg-gray-50 px-4 py-3 font-heading text-sm font-bold text-brand-dark dark:bg-white/5'
+                  : 'tamil focus-ring flex items-center justify-between gap-2 px-4 py-3 font-body text-sm font-medium text-ink transition hover:bg-gray-50 hover:text-brand-dark dark:hover:bg-white/5'
+              }
+            >
+              {l.label}
+              {!l.active && <ArrowRight size={14} className="shrink-0 text-ink2" />}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+const PRACTICE_LINKS: { to: string; key: StringKey }[] = [
+  { to: '/test-arena/subjects', key: 'subjectPracticeTitle' },
+  { to: '/test-arena/pyq', key: 'pyqTitle' },
+  { to: '/test-arena/current-affairs', key: 'currentAffairsTitle' },
+  { to: '/test-arena/aptitude', key: 'aptitudeTitle' },
+  { to: '/mock', key: 'mockTests' },
+]
+
+/** The practice sections as a sidebar box, current section highlighted (web pickers). */
+export function PracticeSidebar() {
+  const { t } = useT()
+  const { pathname } = useLocation()
+  return (
+    <SidebarBox
+      title={t('practice')}
+      items={PRACTICE_LINKS.map(({ to, key }) => ({ to, label: t(key), active: pathname.startsWith(to) }))}
+    />
   )
 }
 
@@ -71,6 +137,36 @@ export function Crumbs({ items, className = '' }: { items: Crumb[]; className?: 
         ))}
       </ol>
     </nav>
+  )
+}
+
+/**
+ * A named section (archive `.sec-block`): a card in the browser, plain grouping
+ * by space on Android (the app's list-led look).
+ */
+export function SectionBlock({
+  title,
+  children,
+  id,
+  className = '',
+}: {
+  title?: ReactNode
+  children: ReactNode
+  id?: string
+  className?: string
+}) {
+  return (
+    <section
+      id={id}
+      className={`scroll-mt-24 web:my-4 web:rounded-card web:border web:border-line web:bg-card web:p-5 web:shadow-soft web:sm:px-[26px] web:sm:py-6 ${className}`}
+    >
+      {title && (
+        <h2 className="tamil mb-3 font-display text-base font-semibold tracking-tight text-ink web:text-[19px] web:font-bold web:leading-snug">
+          {title}
+        </h2>
+      )}
+      {children}
+    </section>
   )
 }
 

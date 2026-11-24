@@ -15,8 +15,8 @@ export default function SectionHeader({
   className?: string
 }) {
   return (
-    <div className={`flex items-baseline justify-between gap-3 ${className}`}>
-      <h2 className="tamil font-display text-base font-semibold tracking-tight text-ink">
+    <div className={`flex items-baseline justify-between gap-3 web:px-0 ${className}`}>
+      <h2 className="tamil font-display text-base font-semibold tracking-tight text-ink web:text-[21px] web:font-bold">
         {title}
       </h2>
       {action && (

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { PageGrid } from '../components/Site/PageKit'
+import { PageGrid, PracticeSidebar, WEB_EYEBROW } from '../components/Site/PageKit'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -93,7 +93,7 @@ export default function ThirukuralQuizPage() {
 
   return (
     <>
-      <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8">
+      <PageGrid nativeWidth="max-w-3xl" className="py-6 lg:py-8" aside={<PracticeSidebar />}>
         {/* Back + breadcrumb */}
         <div className="mb-5 flex items-center justify-between gap-3">
           <button
@@ -119,7 +119,7 @@ export default function ThirukuralQuizPage() {
 
         {/* Title block */}
         <div className="mb-5">
-          <span className="tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent">
+          <span className={`tamil font-display text-sm font-bold uppercase tracking-[0.14em] text-accent ${WEB_EYEBROW}`}>
             {t('thirukuralBadge')}
           </span>
           <h1 className="tamil mt-1.5 font-display text-2xl font-bold tracking-tight text-ink lg:text-2xl">

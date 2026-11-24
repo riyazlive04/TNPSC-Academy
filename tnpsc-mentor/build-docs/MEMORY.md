@@ -2,7 +2,11 @@
 
 Long-form history lives in Claude memory + `docs/`. This file records decisions for work tracked in `build-docs/`.
 
-## Web app as web pages v2 (2026-11-24, plan awaiting approval)
+## Web = Answer Key page look (2026-11-24, v3, uncommitted on user hold)
+- Reference for the web look is `/tnpsc-group-1-answer-key-2026` (user chose it over the /group-1 landing). Android keeps the app look. v2 look revert undone.
+- Sidebar boxes use `SidebarBox` (Site/PageKit.tsx) — same classes as AnswerKeySidebarBox but router `Link`s.
+
+## Web app as web pages v2 (2026-11-24) — look part superseded by v3
 - User: revert the v1 archive LOOK on web (keep the app's visual design); convert STRUCTURE to web pages — phone menu instead of bottom tabs, sheets → pages, buttons → real links, back buttons → breadcrumbs. Reverses v1 "Both" reference + "phone web keeps tabs".
 
 ## Website look for web pages (2026-11-24, deployed 3d183ba)
