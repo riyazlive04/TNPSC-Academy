@@ -581,14 +581,14 @@ const AdminQuestionRow = memo(function AdminQuestionRow({
               className={[
                 'tamil flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm',
                 isCorrect
-                  ? 'bg-green-50 font-semibold text-green-700'
+                  ? 'bg-correct/10 font-semibold text-correct'
                   : 'text-navytext/75',
               ].join(' ')}
             >
               <span
                 className={[
                   'flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                  isCorrect ? 'bg-green-500 text-white' : 'bg-primary/10 text-primary',
+                  isCorrect ? 'bg-correct text-white' : 'bg-primary/10 text-primary',
                 ].join(' ')}
               >
                 {letter}

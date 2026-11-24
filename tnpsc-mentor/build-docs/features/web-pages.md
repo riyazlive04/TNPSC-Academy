@@ -28,3 +28,4 @@ Not converted: `LandingPage.tsx` (unrouted).
 - Quiz/MockQuiz: render outside AppLayout's chrome as before; no change.
 - Group 9: `AuthShell` gets the website header (brand → `/`, language + theme) and `SiteFooter` on web → Login/Register/Forgot/Reset/CompleteProfile. LanguageScreen, WelcomeIntro, Setup left as full-screen first-run steps.
 - Footer copy/links moved from AppLayout into `SiteFooter` (Site/PageKit.tsx) — one source for AppLayout + AuthShell.
+- Group 10 (admin): shell already applies (all are AppLayout routes). Token pass: AdminQuestions correct-option green-50/700/500 → `correct` token (was wrong in dark mode). Kept on purpose: white toggle knobs, WhatsApp brand green, amber warning chips in SuperAdmin.

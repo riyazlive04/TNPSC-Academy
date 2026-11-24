@@ -1,4 +1,4 @@
-# Plan — Website look for every web page (2026-11-24) — APPROVED 2026-11-24 (recommendations accepted)
+# Plan — Website look for every web page (2026-11-24) — BUILT 2026-11-24 (not yet deployed); see features/web-pages.md "As built"
 
 ## Goal and scope
 - In a **browser**, every SPA page (all 54, admin consoles included) should read like the public website: the `/questions/` + `/current-affairs/` archive and the landing/answer-key pages. Same brand header with text nav, pill breadcrumbs, card tiles + section blocks, content + 300px sidebar on desktop, site footer.

@@ -7,6 +7,7 @@
 - feat(web-practice): PickerPage on the kit (crumbs replace back link + badge on web) → PYQ/aptitude/samacheer/history/CA pickers; SubjectPractice + Thirukural on PageGrid; Daily widened; footer pinned to bottom on web.
 - feat(web-pages-wide): Materials, Insights, TestSeries, Bookmarks widen to the website width on web.
 - feat(web-auth): sign-in pages get the website header + footer on web; footer moved to shared SiteFooter.
+- feat(web-admin): AdminQuestions correct-option colours on the theme token (dark-mode fix); admin consoles otherwise get the shell only.
 - skipped web-pages-public: landing/answer-key pages already website-style.
 
 ## 2026-11-18

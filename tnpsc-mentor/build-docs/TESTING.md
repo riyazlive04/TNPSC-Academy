@@ -60,3 +60,6 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 | Playwright `/login`: web 1280, native 1280, web 320 | shared AC | web: site header + footer around the split hero/form; native identical (corner controls, full-height split); no h-scroll |
 | Regression: AppLayout footer after the SiteFooter move | web-shell AC1 | same footer rendered (PYQ + home shots unchanged) |
 - Not checked: Google sign-in button, device-limit modal, WhatsApp check on Register (need backend).
+
+## web-pages-admin (2026-11-24)
+- Token swap only (AdminQuestions correct-option colours); `tsc` clean, vitest regression clean. Not visually checked (admin-only, needs an admin session).
