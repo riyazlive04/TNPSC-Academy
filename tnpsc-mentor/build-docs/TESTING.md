@@ -32,4 +32,4 @@ Not covered by automated tests: the unlock endpoint's DB path (route handlers ha
 |---|---|---|
 | `src/__tests__/webPageKit.test.ts` (5) | AC1 PageGrid web/native + no empty aside, AC3 Crumbs a11y + native null, SectionBlock native plain, AC2 primitives' native classes unchanged | 5/5 pass |
 | Playwright on kit demo harness: web 1280, web 390, native 390, web 320 TA | AC4 2-col ≥1024 / stacked below; native list-led look intact | pass; no horizontal scroll |
-| Regression: `npx vitest run` | all | only the pre-existing `roles.test.ts > passwordStrength` failure |
+| Regression: `npx vitest run` | all | first run: AC2 kit test flaked (timed out re-importing `motion` after `vi.resetModules()` under the parallel suite) — d72aaef was pushed with it red by mistake. Fixed: primitives imported once at file top. Two full runs after: only the pre-existing `roles.test.ts > passwordStrength` failure |

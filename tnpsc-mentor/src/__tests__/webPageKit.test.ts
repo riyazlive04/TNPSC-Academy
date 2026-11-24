@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement as h } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router-dom'
+// Platform-independent primitives: imported once (re-importing motion per test
+// after vi.resetModules() is slow enough to time out under the full suite).
+import { List, ListRow } from '../components/UI/ListRow'
+import SectionHeader from '../components/UI/SectionHeader'
+import { ChoiceGrid } from '../components/UI/ChoiceCard'
 
 const platform = vi.hoisted(() => ({ IS_WEB: true }))
 vi.mock('../lib/platform', () => platform)
@@ -63,10 +68,7 @@ describe('web-page-kit', () => {
     expect(nativeClasses(html)[0]).toBe('scroll-mt-24')
   })
 
-  it('AC2 shared primitives: native classes unchanged once web: tokens are stripped', async () => {
-    const { List, ListRow } = await import('../components/UI/ListRow')
-    const SectionHeader = (await import('../components/UI/SectionHeader')).default
-    const { ChoiceGrid } = await import('../components/UI/ChoiceCard')
+  it('AC2 shared primitives: native classes unchanged once web: tokens are stripped', () => {
     expect(nativeClasses(render(List, {}, 'x'))[0]).toBe('divide-y divide-line')
     expect(nativeClasses(render(ListRow, { title: 'A' }))[0]).toBe(
       'focus-ring group flex w-full items-center gap-3 py-3 text-left disabled:opacity-45'
