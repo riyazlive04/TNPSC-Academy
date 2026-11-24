@@ -60,11 +60,14 @@ describe('friendlyAuthError', () => {
 })
 
 describe('passwordStrength', () => {
+  // Length points at 8 (the signup floor, server/src/lib/passwordPolicy.ts) and 12.
   it('scores from weak to strong', () => {
     expect(passwordStrength('')).toBe(0)
     expect(passwordStrength('abc')).toBe(0)
-    expect(passwordStrength('abcdef')).toBe(1)
+    expect(passwordStrength('abcdefg')).toBe(0) // below the 8-char floor
+    expect(passwordStrength('abcdefgh')).toBe(1)
     expect(passwordStrength('Abcdef1')).toBeGreaterThanOrEqual(2)
-    expect(passwordStrength('Abcdefgh12!')).toBe(4)
+    expect(passwordStrength('Abcdefgh12!')).toBe(3) // 11 chars: no 12+ point
+    expect(passwordStrength('Abcdefgh123!')).toBe(4)
   })
 })

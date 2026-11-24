@@ -18,8 +18,11 @@ Failures found and fixed:
 
 Not covered by automated tests: the unlock endpoint's DB path (route handlers have no test harness here) — checked by typecheck + live curl after deploy.
 
+## roles / passwordStrength (2026-11-24)
+- Long-failing `roles.test.ts > passwordStrength`: the TEST was stale. f3a0f01 raised the floor to 8 chars (server passwordPolicy MIN_LENGTH=8, Register form) and moved meter thresholds 6/10 → 8/12; the test kept the old ones. Updated with boundary cases (7 → 0, 8 → 1, 11 → 3, 12 → 4). Full suite 231/231 (PowerShell).
+
 ## web-light-only (2026-11-24)
-- Full vitest on a clean HEAD worktree + this change: 230/231, only pre-existing `roles.test.ts > passwordStrength` fails; tsc clean. (Main working tree fails to load all suites because of uncommitted WIP that isn't part of this change.)
+- Full vitest on a clean HEAD worktree + this change: 230/231, only pre-existing `roles.test.ts > passwordStrength` fails; tsc clean. (Correction: the "all suites fail to load" errors — `reading 'on'` / `No test suite found` — come from running vitest under Git Bash in the agent shell, not from WIP; run tests from PowerShell.)
 
 ## web-shell (2026-11-24)
 | Test | Maps to | Result |
